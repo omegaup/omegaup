@@ -37,8 +37,16 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
+    export function AuthorRankTablePayload(
+      elementId: string = 'payload',
+    ): types.AuthorRankTablePayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function BadgeDetailsPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.BadgeDetailsPayload {
       return (x => {
         x.badge = (x => {
@@ -59,21 +67,23 @@ export namespace types {
     }
 
     export function CoderOfTheMonthPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
-    export function CommonPayload(elementId: string): types.CommonPayload {
+    export function CommonPayload(
+      elementId: string = 'payload',
+    ): types.CommonPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
     export function ContestListPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ContestListPayload {
       return (x => {
         x.contests = (x => {
@@ -214,7 +224,9 @@ export namespace types {
       );
     }
 
-    export function IndexPayload(elementId: string): types.IndexPayload {
+    export function IndexPayload(
+      elementId: string = 'payload',
+    ): types.IndexPayload {
       return (x => {
         x.coderOfTheMonthData = (x => {
           if (x.all)
@@ -249,16 +261,34 @@ export namespace types {
       );
     }
 
-    export function ProblemEditPayload(
-      elementId: string,
-    ): types.ProblemEditPayload {
+    export function ProblemAdminsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemAdminsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
+    export function ProblemEditPayload(
+      elementId: string = 'payload',
+    ): types.ProblemEditPayload {
+      return (x => {
+        if (x.problemsetter)
+          x.problemsetter = (x => {
+            if (x.creation_date)
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ProblemFormPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ProblemFormPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -266,7 +296,7 @@ export namespace types {
     }
 
     export function ProblemListPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ProblemListPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -274,22 +304,40 @@ export namespace types {
     }
 
     export function ProblemTagsPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.ProblemTagsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
+    export function SchoolOfTheMonthPayload(
+      elementId: string = 'payload',
+    ): types.SchoolOfTheMonthPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function SchoolProfileDetailsPayload(
+      elementId: string = 'payload',
+    ): types.SchoolProfileDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function SchoolRankPayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.SchoolRankPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
-    export function StatsPayload(elementId: string): types.StatsPayload {
+    export function StatsPayload(
+      elementId: string = 'payload',
+    ): types.StatsPayload {
       return (x => {
         if (x.max_wait_time)
           x.max_wait_time = ((x: number) => new Date(x * 1000))(
@@ -302,7 +350,7 @@ export namespace types {
     }
 
     export function UserRankTablePayload(
-      elementId: string,
+      elementId: string = 'payload',
     ): types.UserRankTablePayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
@@ -312,6 +360,24 @@ export namespace types {
 
   export interface AssignmentProgress {
     [key: string]: types.Progress;
+  }
+
+  export interface AuthorRankTablePayload {
+    length: number;
+    page: number;
+    ranking: types.AuthorsRank;
+  }
+
+  export interface AuthorsRank {
+    ranking: {
+      author_ranking?: number;
+      author_score: number;
+      classname: string;
+      country_id?: string;
+      name?: string;
+      username: string;
+    }[];
+    total: number;
   }
 
   export interface Badge {
@@ -510,6 +576,7 @@ export namespace types {
     badge?: string;
     message?: string;
     status?: string;
+    url?: string;
   }
 
   export interface PageItem {
@@ -525,6 +592,17 @@ export namespace types {
     submissions: number;
     accepted: number;
     difficulty: number;
+  }
+
+  export interface ProblemAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface ProblemAdminsPayload {
+    admins: types.ProblemAdmin[];
+    alias: string;
+    group_admins: types.ProblemGroupAdmin[];
   }
 
   export interface ProblemDetails {
@@ -612,7 +690,13 @@ export namespace types {
     memoryLimit: number | number;
     outputLimit: number;
     overallWallTimeLimit: number;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
     source: string;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };
@@ -646,6 +730,12 @@ export namespace types {
     validatorTypes: { [key: string]: null | string };
     visibility: number;
     visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface ProblemListItem {
@@ -750,12 +840,65 @@ export namespace types {
     score: number;
   }
 
+  export interface SchoolCoderOfTheMonth {
+    time: string;
+    username: string;
+    classname: string;
+  }
+
+  export interface SchoolOfTheMonthPayload {
+    candidatesToSchoolOfTheMonth: {
+      country_id: string;
+      name: string;
+      ranking: number;
+      school_id: number;
+      school_of_the_month_id: number;
+      score: number;
+    }[];
+    isMentor: boolean;
+    options?: { canChooseSchool: boolean; schoolIsSelected: boolean };
+    schoolsOfPreviousMonth: {
+      country_id: string;
+      name: string;
+      ranking: number;
+      school_id: number;
+    }[];
+    schoolsOfPreviousMonths: {
+      country_id: string;
+      name: string;
+      school_id: number;
+      time: string;
+    }[];
+  }
+
+  export interface SchoolProblemsSolved {
+    month: number;
+    problems_solved: number;
+    year: number;
+  }
+
+  export interface SchoolProfileDetailsPayload {
+    school_id: number;
+    school_name: string;
+    ranking: number;
+    country?: { id: string; name: string };
+    state_name?: string;
+  }
+
   export interface SchoolRankPayload {
     page: number;
     length: number;
     rank: types.School[];
     totalRows: number;
     showHeader: boolean;
+  }
+
+  export interface SchoolUser {
+    username: string;
+    classname: string;
+    created_problems: number;
+    solved_problems: number;
+    organized_contests: number;
   }
 
   export interface Scoreboard {
@@ -855,7 +998,7 @@ export namespace types {
       country_id?: string;
       name?: string;
       problems_solved: number;
-      ranking: number;
+      ranking?: number;
       score: number;
       user_id: number;
       username: string;
@@ -1002,6 +1145,7 @@ export namespace messages {
     scoreboard: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
+    show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
     submissions_gap: number;
@@ -1090,6 +1234,7 @@ export namespace messages {
     problemset_id: number;
     requests_user_information: string;
     scoreboard: number;
+    show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
     submissions_gap: number;
@@ -1220,6 +1365,7 @@ export namespace messages {
     problemset_id: number;
     rerun_id: number;
     scoreboard: number;
+    show_penalty: boolean;
     show_scoreboard_after: boolean;
     start_time: Date;
     submissions_gap: number;
@@ -1380,6 +1526,8 @@ export namespace messages {
       total: { points: number; penalty: number };
     }[];
   };
+  export type ContestSearchUsersRequest = { [key: string]: any };
+  export type ContestSearchUsersResponse = { label: string; value: string }[];
   export type ContestSetRecommendedRequest = { [key: string]: any };
   export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
@@ -1923,8 +2071,8 @@ export namespace messages {
   };
   export type ProblemAdminsRequest = { [key: string]: any };
   export type ProblemAdminsResponse = {
-    admins: { role: string; username: string }[];
-    group_admins: { alias: string; name: string; role: string }[];
+    admins: types.ProblemAdmin[];
+    group_admins: types.ProblemGroupAdmin[];
   };
   export type ProblemBestScoreRequest = { [key: string]: any };
   export type ProblemBestScoreResponse = { score: number };
@@ -2492,28 +2640,16 @@ export namespace messages {
   }[];
   export type SchoolMonthlySolvedProblemsCountRequest = { [key: string]: any };
   export type SchoolMonthlySolvedProblemsCountResponse = {
-    distinct_problems_solved: {
-      month: number;
-      problems_solved: number;
-      year: number;
-    }[];
+    distinct_problems_solved: types.SchoolProblemsSolved[];
   };
   export type SchoolSchoolCodersOfTheMonthRequest = { [key: string]: any };
   export type SchoolSchoolCodersOfTheMonthResponse = {
-    coders: { time: string; username: string; classname: string }[];
+    coders: types.SchoolCoderOfTheMonth[];
   };
   export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
   export type SchoolSelectSchoolOfTheMonthResponse = {};
   export type SchoolUsersRequest = { [key: string]: any };
-  export type SchoolUsersResponse = {
-    users: {
-      username: string;
-      classname: string;
-      created_problems: number;
-      solved_problems: number;
-      organized_contests: number;
-    }[];
-  };
+  export type SchoolUsersResponse = { users: types.SchoolUser[] };
 
   // Scoreboard
   export type ScoreboardRefreshRequest = { [key: string]: any };
@@ -2853,6 +2989,9 @@ export namespace controllers {
     scoreboardMerge: (
       params?: messages.ContestScoreboardMergeRequest,
     ) => Promise<messages.ContestScoreboardMergeResponse>;
+    searchUsers: (
+      params?: messages.ContestSearchUsersRequest,
+    ) => Promise<messages.ContestSearchUsersResponse>;
     setRecommended: (
       params?: messages.ContestSetRecommendedRequest,
     ) => Promise<messages.ContestSetRecommendedResponse>;

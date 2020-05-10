@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
-import * as api from '../api_transitional';
+import * as api from '../api';
+import T from '../lang';
 import arena_Runs from '../components/arena/Runs.vue';
 import * as ui from '../ui';
 import * as time from '../time';
@@ -20,6 +21,7 @@ export default class ArenaAdmin {
       render: function(createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
+            contestAlias: arena.options.contestAlias,
             runs: runsStore.state.runs,
             showContest: self.arena.options.contestAlias == 'admin',
             showProblem: !arena.options.isOnlyProblem,
@@ -28,12 +30,16 @@ export default class ArenaAdmin {
             showPager: true,
             showRejudge: true,
             showUser: true,
+            problemsetProblems: Object.values(self.arena.problems),
           },
           on: {
             details: run => {
               window.location.hash += `/show-run:${run.guid}`;
             },
             disqualify: run => {
+              if (!window.confirm(T.runDisqualifyConfirm)) {
+                return;
+              }
               api.Run.disqualify({ run_alias: run.guid })
                 .then(data => {
                   run.type = 'disqualified';

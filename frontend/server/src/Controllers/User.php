@@ -5,9 +5,11 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
+ * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
+ * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank}
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int}
- * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: int, score: float, user_id: int, username: string}>, total: int}
+ * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
@@ -1402,11 +1404,10 @@ class User extends \OmegaUp\Controllers\Controller {
                 'Identity'
             );
         }
-        $r->ensureBool('omit_rank', false);
         return self::getUserProfile(
             $r->identity,
             $identity,
-            boolval($r['omit_rank']),
+            $r->ensureOptionalBool('omit_rank') ?? false,
             $category
         );
     }
@@ -2301,8 +2302,8 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->identity->language_id = $language->language_id;
         }
 
-        $r->ensureBool('is_private', false);
-        $r->ensureBool('hide_problem_tags', false);
+        $r->ensureOptionalBool('is_private');
+        $r->ensureOptionalBool('hide_problem_tags');
 
         if (!is_null($r['gender'])) {
             \OmegaUp\Validators::validateInEnum(
@@ -2511,6 +2512,62 @@ class User extends \OmegaUp\Controllers\Controller {
             },
             APC_USER_CACHE_USER_RANK_TIMEOUT
         );
+    }
+
+    /**
+     * Get authors rank.
+     *
+     * @return AuthorsRank
+     */
+    public static function getAuthorsRank(
+        int $offset,
+        int $rowCount
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::AUTHORS_RANK,
+            "{$offset}-{$rowCount}",
+            /**
+             * @return AuthorsRank
+             */
+            function () use (
+                $offset,
+                $rowCount
+            ): array {
+                return \OmegaUp\DAO\UserRank::getAuthorsRank(
+                    $offset,
+                    $rowCount
+                );
+            },
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
+    }
+
+    /**
+     * Prepare all the properties to be sent to the
+     * author rank table view via smarty.
+     *
+     * @return array{smartyProperties: array{payload: AuthorRankTablePayload}, entrypoint: string}
+     *
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
+     */
+    public static function getAuthorRankForSmarty(\OmegaUp\Request $r) {
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'ranking' => self::getAuthorsRank(
+                        $page,
+                        $length
+                    ),
+                ],
+            ],
+            'entrypoint' => 'authors_rank',
+        ];
     }
 
     /**
@@ -3304,15 +3361,15 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      *
-     * @return array{smartyProperties: array{payload: UserRankTablePayload}, template: string}
+     * @return array{smartyProperties: array{payload: UserRankTablePayload}, entrypoint: string}
      *
      * @omegaup-request-param mixed $filter
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
     public static function getRankForSmarty(\OmegaUp\Request $r) {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['filter'],
             'filter',
@@ -3342,7 +3399,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     ),
                 ],
             ],
-            'template' => 'rank.users.tpl',
+            'entrypoint' => 'users_rank',
         ];
 
         try {
@@ -3395,7 +3452,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $category
      * @omegaup-request-param mixed $date
      *
-     * @return array{smartyProperties: array{payload: IndexPayload}, template: string}
+     * @return array{smartyProperties: array{payload: IndexPayload}, entrypoint: string}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3440,7 +3497,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     ] : [],
                 ],
             ],
-            'template' => 'index.tpl',
+            'entrypoint' => 'common_index',
         ];
     }
 
@@ -3449,7 +3506,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $category
      *
-     * @return array{smartyProperties: array{payload: CoderOfTheMonthPayload}, template: string}
+     * @return array{smartyProperties: array{payload: CoderOfTheMonthPayload}, entrypoint: string}
      */
     public static function getCoderOfTheMonthDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3512,7 +3569,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'smartyProperties' => [
                     'payload' => $response,
                 ],
-                'template' => 'codersofthemonth.tpl',
+                'entrypoint' => 'coder_of_the_month',
             ];
         }
 
@@ -3523,8 +3580,9 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             'coderIsSelected' =>
                 !empty(
-                    \OmegaUp\DAO\CoderOfTheMonth::getByTime(
+                    \OmegaUp\DAO\CoderOfTheMonth::getByTimeAndSelected(
                         $dateToSelect,
+                        false,
                         $category
                     )
                 ),
@@ -3532,8 +3590,13 @@ class User extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => $response,
+                'title' => (
+                    (strval($category) === 'female') ?
+                    'omegaupTitleCodersofthemonthFemale' :
+                    'omegaupTitleCodersofthemonth'
+                ),
             ],
-            'template' => 'codersofthemonth.tpl',
+            'entrypoint' => 'coder_of_the_month',
         ];
     }
 

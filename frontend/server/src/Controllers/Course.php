@@ -78,7 +78,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'description'
         );
 
-        $r->ensureBool('unlimited_duration', false);
+        $r->ensureOptionalBool('unlimited_duration');
         $startTime = $r->ensureTimestamp(
             'start_time',
             $courseStartTime->time,
@@ -124,7 +124,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     private static function validateClone(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
-        $r->ensureInt('start_time', null, null, true);
+        $r->ensureInt('start_time');
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
     }
 
@@ -251,15 +251,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             $isRequired
         );
 
-        $r->ensureBool('unlimited_duration', false);
-        $r->ensureInt('start_time', null, null, !$isUpdate);
+        $r->ensureOptionalInt('start_time', null, null, !$isUpdate);
         $r->ensureOptionalInt(
             'finish_time',
             null,
             null,
             /* required */ (
                 !$isUpdate &&
-                !$r['unlimited_duration']
+                !($r->ensureOptionalBool('unlimited_duration') ?? false)
             )
         );
 
@@ -270,15 +269,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         // Show scoreboard, needs basic information and request user information are always optional
-        $r->ensureBool('needs_basic_information', false /*isRequired*/);
-        $r->ensureBool('show_scoreboard', false /*isRequired*/);
+        $r->ensureOptionalBool('needs_basic_information');
+        $r->ensureOptionalBool('show_scoreboard');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['requests_user_information'],
             'requests_user_information',
             ['no', 'optional', 'required']
         );
 
-        $r->ensureInt('school_id', null, null, false /*isRequired*/);
+        $r->ensureOptionalInt('school_id');
 
         if (is_null($r['school_id'])) {
             $school = null;
@@ -770,9 +769,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             is_null($course->finish_time) ? null : $course->finish_time->time
         );
 
-        $r->ensureBool('unlimited_duration', false);
+        $unlimitedDuration = $r->ensureOptionalBool(
+            'unlimited_duration'
+        ) ?? false;
 
-        if ($r['unlimited_duration'] && !is_null($course->finish_time)) {
+        if ($unlimitedDuration && !is_null($course->finish_time)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseDoesNotHaveUnlimitedDuration'
             );
@@ -806,10 +807,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
         self::updateValueProperties($r, $assignment, $valueProperties);
 
-        if (
-            is_null($course->finish_time) &&
-            $r['unlimited_duration']
-        ) {
+        if (is_null($course->finish_time) && $unlimitedDuration) {
             $assignment->finish_time = null;
         }
         \OmegaUp\DAO\DAO::transBegin();
@@ -1338,8 +1336,8 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $r->ensureIdentity();
 
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('page_size', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -1543,9 +1541,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureBool('resolution');
-
-        $request->accepted = boolval($r['resolution']);
+        $request->accepted = $r->ensureBool('resolution');
         $request->last_update = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
         \OmegaUp\DAO\CourseIdentityRequest::update($request);
@@ -3033,8 +3029,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('offset');
+        $r->ensureOptionalInt('rowcount');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',

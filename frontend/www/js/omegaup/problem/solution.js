@@ -1,6 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as markdown from '../markdown';
 import * as ui from '../ui';
 import problem_Solution from '../components/problem/Solution.vue';
@@ -21,7 +21,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'unlock-solution': function() {
-            API.Problem.solution({
+            api.Problem.solution({
               problem_alias: payload['alias'],
               forfeit_problem: true,
             })
@@ -45,7 +45,7 @@ OmegaUp.on('ready', function() {
               .catch(ui.apiError);
           },
           'get-tokens': function() {
-            API.ProblemForfeited.getCounts({})
+            api.ProblemForfeited.getCounts()
               .then(function(data) {
                 problemSolution.allTokens = data.allowed;
                 problemSolution.availableTokens = data.allowed - data.seen;
@@ -57,7 +57,7 @@ OmegaUp.on('ready', function() {
           },
           'get-solution': function() {
             if (payload['solution_status'] === 'unlocked') {
-              API.Problem.solution({ problem_alias: payload['alias'] })
+              api.Problem.solution({ problem_alias: payload['alias'] })
                 .then(function(data) {
                   if (!data.exists || !data.solution) {
                     return;

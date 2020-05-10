@@ -1,13 +1,13 @@
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import coderofthemonth_List from '../components/coderofthemonth/List.vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.CoderOfTheMonthPayload('payload');
+  const payload = types.payloadParsers.CoderOfTheMonthPayload();
   let coderOfTheMonthList = new Vue({
     el: '#main-container',
     render: function(createElement) {
@@ -25,9 +25,10 @@ OmegaUp.on('ready', () => {
           category: payload.category,
         },
         on: {
-          'select-coder': function(coderUsername: string) {
+          'select-coder': function(coderUsername: string, category: string) {
             api.User.selectCoderOfTheMonth({
               username: coderUsername,
+              category: category,
             })
               .then(function() {
                 ui.success(

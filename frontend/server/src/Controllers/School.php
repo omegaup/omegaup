@@ -8,7 +8,12 @@
  * @author joemmanuel
  *
  * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
+ * @psalm-type SchoolCoderOfTheMonth=array{time: string, username: string, classname: string}
+ * @psalm-type SchoolProfileDetailsPayload=array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null}
+ * @psalm-type SchoolProblemsSolved=array{month: int, problems_solved: int, year: int}
  * @psalm-type SchoolRankPayload=array{page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool}
+ * @psalm-type SchoolOfTheMonthPayload=array{candidatesToSchoolOfTheMonth: list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}, schoolsOfPreviousMonth: list<array{country_id: string, name: string, ranking: int, school_id: int}>, schoolsOfPreviousMonths: list<array{country_id: string, name: string, school_id: int, time: string}>}
+ * @psalm-type SchoolUser=array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}
  */
 class School extends \OmegaUp\Controllers\Controller {
     /**
@@ -51,7 +56,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{template: string, smartyProperties: array{details: array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null}}}
+     * @return array{template: string, smartyProperties: array{payload: SchoolProfileDetailsPayload}}
      *
      * @omegaup-request-param int $school_id
      */
@@ -63,7 +68,7 @@ class School extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        $details = [
+        $payload = [
             'school_id' => intval($school->school_id),
             'school_name' => strval($school->name),
             'ranking' => intval($school->ranking),
@@ -78,7 +83,7 @@ class School extends \OmegaUp\Controllers\Controller {
                 )
             );
             if (!is_null($country)) {
-                $details['country'] = [
+                $payload['country'] = [
                     'id' => strval($country->country_id),
                     'name' => strval($country->name),
                 ];
@@ -90,16 +95,16 @@ class School extends \OmegaUp\Controllers\Controller {
                     strval($school->state_id)
                 );
                 if (!is_null($state)) {
-                    $details['state_name'] = $state->name;
+                    $payload['state_name'] = $state->name;
                 }
             }
         }
 
         return [
             'smartyProperties' => [
-                'details' => $details
+                'payload' => $payload,
             ],
-            'template' => 'school.profile.tpl'  ,
+            'template' => 'school.profile.tpl',
         ];
     }
 
@@ -174,7 +179,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{coders: list<array{time: string, username: string, classname: string}>}
+     * @return array{coders: list<SchoolCoderOfTheMonth>}
      *
      * @omegaup-request-param int $school_id
      */
@@ -198,7 +203,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{distinct_problems_solved: list<array{month: int, problems_solved: int, year: int}>}
+     * @return array{distinct_problems_solved: list<SchoolProblemsSolved>}
      *
      * @omegaup-request-param int $school_id
      */
@@ -223,7 +228,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{users: list<array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}>}
+     * @return array{users: list<SchoolUser>}
      *
      * @omegaup-request-param int $school_id
      */
@@ -270,14 +275,14 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for historical rank of schools with pagination
      *
-     * @return array{smartyProperties: array{payload: SchoolRankPayload}, template: string}
+     * @return array{smartyProperties: array{payload: SchoolRankPayload}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
     public static function getRankForSmarty(\OmegaUp\Request $r): array {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
@@ -305,14 +310,14 @@ class School extends \OmegaUp\Controllers\Controller {
                     'totalRows' => $schoolRank['totalRows'],
                 ],
             ],
-            'template' => 'rank.schools.tpl',
+            'entrypoint' => 'schools_rank',
         ];
     }
 
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{template: string, smartyProperties: array{schoolOfTheMonthPayload: array{candidatesToSchoolOfTheMonth: list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, schoolsOfPreviousMonths: list<array{school_id: int, name: string, country_id: string, time: string}>, schoolsOfCurrentMonth: list<array{school_id: int, ranking: int, name: string, country_id: string}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}}}}
+     * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload}, entrypoint: string}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {
@@ -333,16 +338,16 @@ class School extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'smartyProperties' => [
-                'schoolOfTheMonthPayload' => [
+                'payload' => [
                     'schoolsOfPreviousMonths' => \OmegaUp\DAO\SchoolOfTheMonth::getSchoolsOfTheMonth(),
-                    'schoolsOfCurrentMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
+                    'schoolsOfPreviousMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getMonthlyList(
                         $currentDate
                     ),
                     'candidatesToSchoolOfTheMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(),
                     'isMentor' => $isMentor,
                 ],
             ],
-            'template' => 'schoolofthemonth.tpl',
+            'entrypoint' => 'school_of_the_month',
         ];
 
         if (!$isMentor) {
@@ -353,7 +358,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $firstDayOfNextMonth->modify('first day of next month');
         $dateToSelect = $firstDayOfNextMonth->format('Y-m-d');
 
-        $response['smartyProperties']['schoolOfTheMonthPayload']['options'] = [
+        $response['smartyProperties']['payload']['options'] = [
             'canChooseSchool' =>
                 \OmegaUp\Authorization::canChooseCoderOrSchool(
                     $currentTimestamp

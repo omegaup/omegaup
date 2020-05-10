@@ -4,11 +4,11 @@ import { OmegaUp } from '../omegaup.js';
 import { types } from '../api_types';
 import { omegaup } from '../omegaup.ts';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.ProblemListPayload('payload');
+  const payload = types.payloadParsers.ProblemListPayload();
   const problemsList = new Vue({
     el: '#problem-list',
     render: function(createElement) {

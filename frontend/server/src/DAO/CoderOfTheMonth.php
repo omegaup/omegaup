@@ -97,7 +97,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
                       FROM
                           Coder_Of_The_Month
                       WHERE
-                          time = cm.time AND selected_by IS NOT NULL
+                          time = cm.time AND
+                          selected_by IS NOT NULL AND
+                          category = ?
                   )
               ))
               AND cm.category = ?
@@ -109,7 +111,7 @@ class CoderOfTheMonth extends \OmegaUp\DAO\Base\CoderOfTheMonth {
       /** @var list<array{country_id: string, email: null|string, time: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$category, $date]
+            [$category, $category, $date]
         );
     }
 

@@ -2,7 +2,7 @@ import common_Stats from '../components/common/Stats.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import { types } from '../api_types';
 import * as ui from '../ui';
 import * as Highcharts from 'highcharts';

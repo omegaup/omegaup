@@ -1,8 +1,21 @@
 <template>
   <div class="card h-100">
-    <h5 class="card-header" v-bind:class="`card-header-${category}`">
-      {{ category === 'female' ? T.coderOfTheMonthFemale : T.coderOfTheMonth }}
-    </h5>
+    <div
+      class="d-flex justify-content-between card-header"
+      v-bind:class="`card-header-${category}`"
+    >
+      <h5 class="m-0">
+        {{
+          category === 'female' ? T.coderOfTheMonthFemale : T.coderOfTheMonth
+        }}
+      </h5>
+      <a
+        class="card-header-help"
+        href="https://blog.omegaup.com/reglas-del-coder-del-mes/"
+      >
+        <font-awesome-icon v-bind:icon="['fas', 'info-circle']" />
+      </a>
+    </div>
     <div
       class="card-body d-flex flex-column justify-content-center text-center"
     >
@@ -38,13 +51,22 @@
       </template>
     </div>
     <div class="card-footer">
-      <a href="/coderofthemonth/">{{ T.coderOfTheMonthFullList }}</a>
+      <a
+        v-bind:href="
+          category == 'female'
+            ? '/coderofthemonth/female/'
+            : '/coderofthemonth/'
+        "
+        >{{ T.coderOfTheMonthFullList }}</a
+      >
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-h5.card-header {
+@import '../../../../sass/main.scss';
+
+.card-header {
   color: white;
   background-color: #5588dd;
 
@@ -61,8 +83,14 @@ import T from '../../lang';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
+library.add(faInfoCircle);
+
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-user-username': user_Username,
   },
 })

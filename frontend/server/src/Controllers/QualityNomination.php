@@ -507,6 +507,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $qualitynomination_id
      * @omegaup-request-param mixed $rationale
      * @omegaup-request-param mixed $status
+     * @omegaup-request-param bool|null $all
      *
      * @return array{status: string}
      */
@@ -524,7 +525,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['rationale'],
             'rationale'
         );
-
         // Validate request
         $r->ensureMainUserIdentity();
         self::validateMemberOfReviewerGroup($r);
@@ -554,7 +554,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $r['problem_alias'],
             'problem_alias'
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($qualitynomination->problem_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemIdNotFound'
+            );
+        }
+        $problem = \OmegaUp\DAO\Problems::getByPK(
+            $qualitynomination->problem_id
+        );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -594,14 +601,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
 
-        $qualitynominationlog = new \OmegaUp\DAO\VO\QualityNominationLog([
-            'user_id' => $r->user->user_id,
-            'qualitynomination_id' => $qualitynomination->qualitynomination_id,
-            'from_status' => $qualitynomination->status,
-            'to_status' => $r['status'],
-            'rationale' => $r['rationale']
-        ]);
-        $qualitynomination->status = $qualitynominationlog->to_status;
+        if ($r->ensureOptionalBool('all') ?? false) {
+            $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionsForProblem(
+                $qualitynomination->problem_id
+            );
+        } else {
+            $nominations = [$qualitynomination];
+        }
 
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
@@ -618,14 +624,25 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $problemParams->updatePublished,
                 /*$redirect=*/ false
             );
-            \OmegaUp\DAO\QualityNominations::update($qualitynomination);
-            \OmegaUp\DAO\QualityNominationLog::create($qualitynominationlog);
+            foreach ($nominations as $nomination) {
+                $nomination->status = strval($r['status']);
+                \OmegaUp\DAO\QualityNominations::update($nomination);
+                \OmegaUp\DAO\QualityNominationLog::create(
+                    new \OmegaUp\DAO\VO\QualityNominationLog([
+                        'user_id' => $nomination->user_id,
+                        'qualitynomination_id' => $nomination->qualitynomination_id,
+                        'from_status' => $nomination->status,
+                        'to_status' => $r['status'],
+                        'rationale' => $r['rationale']
+                    ])
+                );
+            }
             \OmegaUp\DAO\DAO::transEnd();
             if ($r['status'] == 'banned' || $r['status'] == 'warning') {
                 self::sendNotificationEmail(
                     $problem,
                     $qualitynomination,
-                    $qualitynominationlog->rationale ?? '',
+                    $r['rationale'] ?? '',
                     strval($r['status'])
                 );
             }
@@ -754,8 +771,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         ?int $nominator,
         ?int $assignee
     ): array {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('page_size', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $pageSize = is_null(
@@ -819,8 +836,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureMainUserIdentity();
 
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('offset');
+        $r->ensureOptionalInt('rowcount');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',
@@ -903,8 +920,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $r->ensureMainUserIdentity();
 
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('offset');
+        $r->ensureOptionalInt('rowcount');
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
         $rowCount = is_null(
@@ -1051,7 +1068,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}}, template: string}
+     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}}, entrypoint: string}
      *
      * @omegaup-request-param int $qualitynomination_id
      */
@@ -1063,7 +1080,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureMainUserIdentity();
-        $r->ensureInt('qualitynomination_id', null, null, true);
+        $r->ensureInt('qualitynomination_id');
 
         $qualityNominationId = intval($r['qualitynomination_id']);
 
@@ -1074,7 +1091,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     $qualityNominationId
                 ),
             ],
-            'template' => 'quality.nomination.details.tpl',
+            'entrypoint' => 'qualitynomination_details',
         ];
     }
 
@@ -1093,8 +1110,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureMainUserIdentity();
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
         self::validateMemberOfReviewerGroup($r);
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
@@ -1131,8 +1148,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureMainUserIdentity();
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null(

@@ -1,7 +1,7 @@
 import user_ManageIdentities from '../components/user/ManageIdentities.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 
@@ -15,7 +15,7 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'add-identity': function(username, password) {
-            API.User.associateIdentity({
+            api.User.associateIdentity({
               username: username,
               password: password,
             })
@@ -37,7 +37,7 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshIdentityList() {
-    API.User.listAssociatedIdentities({})
+    api.User.listAssociatedIdentities({})
       .then(function(data) {
         manageIdentities.identities = data.identities;
       })

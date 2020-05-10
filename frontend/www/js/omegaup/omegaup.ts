@@ -1,5 +1,5 @@
 import * as ui from './ui';
-import * as api from './api_transitional';
+import * as api from './api';
 import * as errors from './errors';
 import * as time from './time';
 
@@ -510,12 +510,6 @@ export namespace omegaup {
     source_link?: boolean;
     source_name?: string;
     source_url?: string;
-  }
-
-  export interface SchoolCoderOfTheMonth {
-    classname: string;
-    time: string;
-    username: string;
   }
 
   export interface SchoolOfTheMonth extends SchoolsRank {
