@@ -2422,7 +2422,7 @@ class User extends \OmegaUp\Controllers\Controller {
             'rank' => 0,
             'name' => strval($identity->name),
             'problems_solved' => 0,
-            'author_ranking' => 0,
+            'author_ranking' => null,
         ];
 
         if (is_null($identity->user_id)) {

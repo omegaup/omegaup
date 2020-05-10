@@ -795,7 +795,7 @@ const translations: { [key: string]: string; } = {
   problemsetNotFound: "Conjunto de problemas no encontrado.",
   profile: "Nombre",
   profileAddIdentitiesTooltip: "Agrega identidades utilizando el nombre de usuario de omegaUp",
-  profileAuthorRank: "Rank de autor",
+  profileAuthorRank: "Rango de autor",
   profileContests: "Concursos participados",
   profileContestsTableContest: "Concurso",
   profileContestsTablePlace: "Lugar",
