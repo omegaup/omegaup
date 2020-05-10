@@ -50,11 +50,8 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('open', $response['events'][0]['event']['name']);
     }
 
-    /**
-     * Users are added as admins and they have access to edit the course
-     */
-    public function testUserAdminCourse() {
-        // Create a course with 5 assignments
+    public function testNormalUserCannotAccessToDetailsCourse() {
+        // Create a course
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
 
         // Create normal user
@@ -76,15 +73,23 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
+    }
 
-        // Admin login
-        $adminLogin = self::login($courseData['admin']);
+    public function testUserCanAccessToCourseIntroWhenIsInvitedAsStudent() {
+        // Create a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+
+        // Create normal user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // First, admin adds user to course as a student
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $identity
         );
+
+        // User login
+        $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
             new \OmegaUp\Request([
@@ -94,6 +99,14 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($response['template'], 'arena.course.intro.tpl');
+    }
+
+    public function testUserCanAccessToCourseDetailsWhenIsInvitedAsAdmin() {
+        // Create a course
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+
+        // Create normal user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         // Admin login
         $adminLogin = self::login($courseData['admin']);
@@ -106,6 +119,9 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
             ])
         );
+
+        // User login
+        $login = self::login($identity);
 
         $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
             new \OmegaUp\Request([
