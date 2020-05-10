@@ -77,17 +77,17 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function contestUserFeedbackProvider(): array {
         return [
             // feedback, solved, before contest end, can see details
-            ['none', false, false, false],
-            ['none', false, true, false],
-            ['none', true, true, false],
-            ['summary', false, false, true],
-            ['summary', false, true, true],
-            ['summary', true, false, true],
-            ['summary', true, true, true],
-            ['detailed', false, false, true],
-            ['detailed', false, true, true],
-            ['detailed', true, false, true],
-            ['detailed', true, true, true],
+            ['none', false, false],
+            ['none', false, false],
+            ['none', true, false],
+            ['summary', false, true],
+            ['summary', false, true],
+            ['summary', true, true],
+            ['summary', true, true],
+            ['detailed', false, true],
+            ['detailed', false, true],
+            ['detailed', true, true],
+            ['detailed', true, true],
         ];
     }
 
@@ -225,7 +225,6 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testUserInContest(
         string $feedback,
         bool $solved,
-        bool $beforeContestEnd,
         bool $canSeeDetails
     ) {
         $adminLogin = self::login($this->admin);
@@ -279,12 +278,11 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        if (!$beforeContestEnd) {
-            \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 7200);
-            $this->assertCanSeeRunDetails(
-                $acRunData['response']['guid'],
-                $this->identity
-            );
-        }
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 7200);
+        // The result is always visible because contestant got AC verdict at least once
+        $this->assertCanSeeRunDetails(
+            $acRunData['response']['guid'],
+            $this->identity
+        );
     }
 }

@@ -940,7 +940,8 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         return self::getOptionalRunDetails(
             $submission,
-            $run
+            $run,
+            /*$showDetails=*/ false
         );
     }
 
@@ -955,10 +956,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
         if (
             !is_null($contest)
-            && (
-                !$isProblemSolved
-                || $contest->finish_time > \OmegaUp\Time::get()
-            )
+            && $contest->finish_time->time > \OmegaUp\Time::get()
         ) {
             return $contest->feedback;
         }
@@ -971,7 +969,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Runs $run,
-        bool $showDetails = false
+        bool $showDetails
     ): array {
         $response = [];
         if (OMEGAUP_LOCKDOWN) {
