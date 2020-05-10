@@ -53,6 +53,13 @@
                   <template v-if="courses.accessMode === 'admin'">
                     <td>
                       <a
+                        class="glyphicon glyphicon-edit"
+                        v-bind:href="`/course/${course.alias}/edit/`"
+                        v-bind:title="T.omegaupTitleCourseEdit"
+                      ></a>
+                    </td>
+                    <td>
+                      <a
                         class="glyphicon glyphicon-list-alt"
                         v-bind:href="`/course/${course.alias}/list/`"
                         v-bind:title="T.courseListSubmissionsByGroup"

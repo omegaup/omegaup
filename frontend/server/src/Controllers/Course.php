@@ -2340,7 +2340,27 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $requestUserInformation = $courseDetails['requests_user_information'];
         $inContest = false;
-        if (
+        $isCourseAdmin = \OmegaUp\Authorization::isCourseAdmin(
+            $r->identity,
+            $course
+        );
+        if ($isCourseAdmin) {
+            $smartyProperties = [
+                'showRanking' => true,
+                'payload' => [
+                    'details' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity,
+                        /*$onlyIntroDetails=*/ false
+                    ),
+                    'progress' => \OmegaUp\DAO\Courses::getAssignmentsProgress(
+                        $course->course_id,
+                        $r->identity->identity_id
+                    ),
+                ],
+            ];
+            $template = 'course.details.tpl';
+        } elseif (
             $shouldShowIntro
             || !$hasAcceptedTeacher
             || (!$hasSharedUserInformation
@@ -2418,7 +2438,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 ),
             ];
             $template = 'arena.course.intro.tpl';
-        } elseif ($showAssignment) {
+        } else {
             $smartyProperties = [
                 'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
                     $r->identity,
@@ -2438,25 +2458,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             ];
             $template = 'arena.contest.course.tpl';
             $inContest = true;
-        } else {
-            $smartyProperties = [
-                'showRanking' => \OmegaUp\Authorization::isCourseAdmin(
-                    $r->identity,
-                    $course
-                ),
-                'payload' => [
-                    'details' => self::getCommonCourseDetails(
-                        $course,
-                        $r->identity,
-                        /*$onlyIntroDetails=*/ false
-                    ),
-                    'progress' => \OmegaUp\DAO\Courses::getAssignmentsProgress(
-                        $course->course_id,
-                        $r->identity->identity_id
-                    ),
-                ],
-            ];
-            $template = 'course.details.tpl';
         }
 
         return [
