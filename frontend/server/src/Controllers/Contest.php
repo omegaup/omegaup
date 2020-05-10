@@ -40,8 +40,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         /** @var list<array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}> */
         $contests = [];
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('page_size', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
         \OmegaUp\Validators::validateOptionalNumber($r['active'], 'active');
         \OmegaUp\Validators::validateOptionalNumber(
             $r['recommended'],
@@ -236,8 +236,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
     public static function apiAdminList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('page_size', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -281,8 +281,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $callbackUserFunction
     ): array {
         $r->ensureIdentity();
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('page_size', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -618,8 +618,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Do nothing.
             $r->identity = null;
         }
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('page_size', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
@@ -1528,7 +1528,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $originalContest->start_time->time
         );
 
-        $r->ensureInt('start_time', null, null, false);
+        $r->ensureOptionalInt('start_time');
         $startTime = (
             !is_null($r['start_time']) ?
             intval($r['start_time']) :
@@ -1826,11 +1826,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         // Window_length is optional
         if (!empty($r['window_length'])) {
-            $r->ensureInt(
+            $r->ensureOptionalInt(
                 'window_length',
                 0,
-                is_null($contestLength) ? null : intval($contestLength / 60),
-                false
+                is_null($contestLength) ? null : intval($contestLength / 60)
             );
         }
 
@@ -1851,7 +1850,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureOptionalBool('partial_score');
-        $r->ensureInt('submissions_gap', 0, null, $isRequired);
+        $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
         \OmegaUp\Validators::validateNumberInRange(
@@ -1869,7 +1868,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['feedback'],
             'feedback',
-            ['no', 'yes', 'partial'],
+            ['none', 'summary', 'detailed'],
             $isRequired
         );
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -2171,7 +2170,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /*$required=*/ false
         );
         $r->ensureFloat('points', 0, INF);
-        $r->ensureInt('order_in_contest', 0, null, false);
+        $r->ensureOptionalInt('order_in_contest', 0, null);
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateAddToContestRequest(
@@ -2899,8 +2898,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        $r->ensureInt('offset', null, null, false /* optional */);
-        $r->ensureInt('rowcount', null, null, false /* optional */);
+        $r->ensureOptionalInt('offset' /* optional */);
+        $r->ensureOptionalInt('rowcount' /* optional */);
 
         return $contest;
     }
@@ -2916,8 +2915,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        $r->ensureInt('offset', null, null, false /* optional */);
-        $r->ensureInt('rowcount', null, null, false /* optional */);
+        $r->ensureOptionalInt('offset' /* optional */);
+        $r->ensureOptionalInt('rowcount' /* optional */);
         $contest = self::validateClarifications($r);
 
         $isContestDirector = \OmegaUp\Authorization::isContestAdmin(
@@ -3825,8 +3824,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('offset');
+        $r->ensureOptionalInt('rowcount');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['status'],
             'status',

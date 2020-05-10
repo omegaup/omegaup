@@ -5,6 +5,8 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
+ * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
+ * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank}
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
@@ -2516,6 +2518,62 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get authors rank.
+     *
+     * @return AuthorsRank
+     */
+    public static function getAuthorsRank(
+        int $offset,
+        int $rowCount
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::AUTHORS_RANK,
+            "{$offset}-{$rowCount}",
+            /**
+             * @return AuthorsRank
+             */
+            function () use (
+                $offset,
+                $rowCount
+            ): array {
+                return \OmegaUp\DAO\UserRank::getAuthorsRank(
+                    $offset,
+                    $rowCount
+                );
+            },
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
+    }
+
+    /**
+     * Prepare all the properties to be sent to the
+     * author rank table view via smarty.
+     *
+     * @return array{smartyProperties: array{payload: AuthorRankTablePayload}, entrypoint: string}
+     *
+     * @omegaup-request-param int|null $length
+     * @omegaup-request-param int|null $page
+     */
+    public static function getAuthorRankForSmarty(\OmegaUp\Request $r) {
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $length = $r->ensureOptionalInt('length') ?? 100;
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'page' => $page,
+                    'length' => $length,
+                    'ranking' => self::getAuthorsRank(
+                        $page,
+                        $length
+                    ),
+                ],
+            ],
+            'entrypoint' => 'authors_rank',
+        ];
+    }
+
+    /**
      * Expires the known ranks
      *
      * @TODO: This should be called only in the grader->frontend callback and only IFF
@@ -3313,8 +3371,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      */
     public static function getRankForSmarty(\OmegaUp\Request $r) {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['filter'],
             'filter',
