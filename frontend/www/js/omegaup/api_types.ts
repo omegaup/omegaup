@@ -2534,6 +2534,7 @@ export namespace messages {
         group: string;
         max_score: number;
         score: number;
+        verdict?: string;
       }[];
       judged_by: string;
       max_score?: number;
