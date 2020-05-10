@@ -956,8 +956,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             $identityId
         );
         if (
-            !is_null($contest)
-            && $contest->finish_time->time > \OmegaUp\Time::get()
+            !is_null($contest) &&
+            $contest->finish_time->time > \OmegaUp\Time::get()
         ) {
             return $contest->feedback;
         }
