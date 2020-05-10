@@ -29,6 +29,7 @@ let config = [
       admin_roles: './frontend/www/js/omegaup/admin/roles.js',
       arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',
+      authors_rank: './frontend/www/js/omegaup/user/authors_rank.ts',
       badge_details: './frontend/www/js/omegaup/badge/details.ts',
       badge_list: './frontend/www/js/omegaup/badge/list.js',
       coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
