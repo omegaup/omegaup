@@ -478,8 +478,7 @@
 			{
 				"api": "/course/introDetails/",
 				"params": {
-					"course_alias": "curso-prueba",
-					"assignment_alias": "tarea-prueba"
+					"course_alias": "curso-prueba"
 				}
 			},
 			{
