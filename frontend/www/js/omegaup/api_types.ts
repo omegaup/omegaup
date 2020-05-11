@@ -37,6 +37,14 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
+    export function AuthorRankTablePayload(
+      elementId: string = 'payload',
+    ): types.AuthorRankTablePayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function BadgeDetailsPayload(
       elementId: string = 'payload',
     ): types.BadgeDetailsPayload {
@@ -253,6 +261,14 @@ export namespace types {
       );
     }
 
+    export function ProblemAdminsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemAdminsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemEditPayload(
       elementId: string = 'payload',
     ): types.ProblemEditPayload {
@@ -344,6 +360,24 @@ export namespace types {
 
   export interface AssignmentProgress {
     [key: string]: types.Progress;
+  }
+
+  export interface AuthorRankTablePayload {
+    length: number;
+    page: number;
+    ranking: types.AuthorsRank;
+  }
+
+  export interface AuthorsRank {
+    ranking: {
+      author_ranking?: number;
+      author_score: number;
+      classname: string;
+      country_id?: string;
+      name?: string;
+      username: string;
+    }[];
+    total: number;
   }
 
   export interface Badge {
@@ -542,6 +576,7 @@ export namespace types {
     badge?: string;
     message?: string;
     status?: string;
+    url?: string;
   }
 
   export interface PageItem {
@@ -557,6 +592,17 @@ export namespace types {
     submissions: number;
     accepted: number;
     difficulty: number;
+  }
+
+  export interface ProblemAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface ProblemAdminsPayload {
+    admins: types.ProblemAdmin[];
+    alias: string;
+    group_admins: types.ProblemGroupAdmin[];
   }
 
   export interface ProblemDetails {
@@ -684,6 +730,12 @@ export namespace types {
     validatorTypes: { [key: string]: null | string };
     visibility: number;
     visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface ProblemListItem {
@@ -946,7 +998,7 @@ export namespace types {
       country_id?: string;
       name?: string;
       problems_solved: number;
-      ranking: number;
+      ranking?: number;
       score: number;
       user_id: number;
       username: string;
@@ -958,6 +1010,7 @@ export namespace types {
     name: string;
     problems_solved: number;
     rank: number;
+    author_ranking?: number;
   }
 
   export interface UserRankTablePayload {
@@ -1474,6 +1527,8 @@ export namespace messages {
       total: { points: number; penalty: number };
     }[];
   };
+  export type ContestSearchUsersRequest = { [key: string]: any };
+  export type ContestSearchUsersResponse = { label: string; value: string }[];
   export type ContestSetRecommendedRequest = { [key: string]: any };
   export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
@@ -2017,8 +2072,8 @@ export namespace messages {
   };
   export type ProblemAdminsRequest = { [key: string]: any };
   export type ProblemAdminsResponse = {
-    admins: { role: string; username: string }[];
-    group_admins: { alias: string; name: string; role: string }[];
+    admins: types.ProblemAdmin[];
+    group_admins: types.ProblemGroupAdmin[];
   };
   export type ProblemBestScoreRequest = { [key: string]: any };
   export type ProblemBestScoreResponse = { score: number };
@@ -2027,7 +2082,7 @@ export namespace messages {
   export type ProblemClarificationsResponse = {
     clarifications: {
       clarification_id: number;
-      contest_alias: string;
+      contest_alias?: string;
       author?: string;
       message: string;
       time: Date;
@@ -2480,6 +2535,7 @@ export namespace messages {
         group: string;
         max_score: number;
         score: number;
+        verdict?: string;
       }[];
       judged_by: string;
       max_score?: number;
@@ -2934,6 +2990,9 @@ export namespace controllers {
     scoreboardMerge: (
       params?: messages.ContestScoreboardMergeRequest,
     ) => Promise<messages.ContestScoreboardMergeResponse>;
+    searchUsers: (
+      params?: messages.ContestSearchUsersRequest,
+    ) => Promise<messages.ContestSearchUsersResponse>;
     setRecommended: (
       params?: messages.ContestSetRecommendedRequest,
     ) => Promise<messages.ContestSetRecommendedResponse>;

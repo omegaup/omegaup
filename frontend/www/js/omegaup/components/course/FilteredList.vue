@@ -28,7 +28,7 @@
                   <th>{{ T.wordsEndTime }}</th>
                   <th>{{ T.wordsNumHomeworks }}</th>
                   <th>{{ T.wordsNumTests }}</th>
-                  <th colspan="2" v-if="courses.accessMode === 'admin'">
+                  <th colspan="3" v-if="courses.accessMode === 'admin'">
                     {{ T.wordsActions }}
                   </th>
                 </tr>
@@ -51,6 +51,13 @@
                   <td>{{ course.counts.homework }}</td>
                   <td>{{ course.counts.test }}</td>
                   <template v-if="courses.accessMode === 'admin'">
+                    <td>
+                      <a
+                        class="glyphicon glyphicon-edit"
+                        v-bind:href="`/course/${course.alias}/edit/`"
+                        v-bind:title="T.omegaupTitleCourseEdit"
+                      ></a>
+                    </td>
                     <td>
                       <a
                         class="glyphicon glyphicon-list-alt"

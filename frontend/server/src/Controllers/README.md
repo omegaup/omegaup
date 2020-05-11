@@ -49,6 +49,7 @@
   - [`/api/contest/scoreboard/`](#apicontestscoreboard)
   - [`/api/contest/scoreboardEvents/`](#apicontestscoreboardevents)
   - [`/api/contest/scoreboardMerge/`](#apicontestscoreboardmerge)
+  - [`/api/contest/searchUsers/`](#apicontestsearchusers)
   - [`/api/contest/setRecommended/`](#apicontestsetrecommended)
   - [`/api/contest/stats/`](#apiconteststats)
   - [`/api/contest/update/`](#apicontestupdate)
@@ -1214,6 +1215,29 @@ Gets the accomulative scoreboard for an array of contests
 | Name      | Type                                                                                                                                                     |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ranking` | `{ name: string; username: string; contests: { [key: string]: { points: number; penalty: number; }; }; total: { points: number; penalty: number; }; }[]` |
+
+## `/api/contest/searchUsers/`
+
+### Description
+
+Search users in contest
+
+### Parameters
+
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| `query`         | `mixed` |             |
+| `contest_alias` | `mixed` |             |
+
+### Returns
+
+```typescript
+{
+  label: string;
+  value: string;
+}
+[];
+```
 
 ## `/api/contest/setRecommended/`
 
@@ -2564,10 +2588,10 @@ Returns all problem administrators
 
 ### Returns
 
-| Name           | Type                                               |
-| -------------- | -------------------------------------------------- |
-| `admins`       | `{ role: string; username: string; }[]`            |
-| `group_admins` | `{ alias: string; name: string; role: string; }[]` |
+| Name           | Type                        |
+| -------------- | --------------------------- |
+| `admins`       | `types.ProblemAdmin[]`      |
+| `group_admins` | `types.ProblemGroupAdmin[]` |
 
 ## `/api/problem/bestScore/`
 
@@ -3512,17 +3536,17 @@ Gets the details of a run. Includes admin details if admin.
 
 ### Returns
 
-| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `admin`         | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `alias`         | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `details`       | `{ compile_meta?: { [key: string]: { memory: number; sys_time: number; time: number; verdict: string; wall_time: number; }; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: { verdict: string; }; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
-| `guid`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `judged_by`     | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `language`      | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `logs`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `admin`         | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `alias`         | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `details`       | `{ compile_meta?: { [key: string]: { memory: number; sys_time: number; time: number; verdict: string; wall_time: number; }; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: { verdict: string; }; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; verdict?: string; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
+| `guid`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `judged_by`     | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `language`      | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `logs`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ## `/api/run/disqualify/`
 

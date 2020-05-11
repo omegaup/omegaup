@@ -128,6 +128,51 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     }
 
     /**
+     * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, username: string, name: null|string}>
+     */
+    public static function searchUsers(
+        string $usernameOrName,
+        int $problemsetId
+    ): array {
+        $sql = 'SELECT DISTINCT
+                    i.username,
+                    i.name,
+                    i.country_id,
+                    pi.access_time,
+                    pi.end_time
+                FROM
+                    Problemset_Identities pi
+                INNER JOIN
+                    Identities i
+                ON
+                    i.identity_id = pi.identity_id
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = pi.problemset_id
+                WHERE
+                    p.problemset_id = ? AND
+                    (
+                        i.username = ? OR
+                        i.name = ? OR
+                        i.username LIKE CONCAT("%", ?, "%") OR
+                        i.name LIKE CONCAT("%", ?, "%")
+                    );';
+
+        /** @var list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, name: null|string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
+                $problemsetId,
+                $usernameOrName,
+                $usernameOrName,
+                $usernameOrName,
+                $usernameOrName
+            ]
+        );
+    }
+
+    /**
      * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string}>
      */
     final public static function getIdentitiesByProblemset(int $problemsetId): array {
