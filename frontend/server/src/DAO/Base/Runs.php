@@ -34,7 +34,6 @@ abstract class Runs {
             SET
                 `submission_id` = ?,
                 `version` = ?,
-                `commit` = ?,
                 `status` = ?,
                 `verdict` = ?,
                 `runtime` = ?,
@@ -55,7 +54,6 @@ abstract class Runs {
                 intval($Runs->submission_id)
             ),
             $Runs->version,
-            $Runs->commit,
             $Runs->status,
             $Runs->verdict,
             intval($Runs->runtime),
@@ -95,7 +93,6 @@ abstract class Runs {
                 `Runs`.`run_id`,
                 `Runs`.`submission_id`,
                 `Runs`.`version`,
-                `Runs`.`commit`,
                 `Runs`.`status`,
                 `Runs`.`verdict`,
                 `Runs`.`runtime`,
@@ -189,7 +186,6 @@ abstract class Runs {
                 `Runs`.`run_id`,
                 `Runs`.`submission_id`,
                 `Runs`.`version`,
-                `Runs`.`commit`,
                 `Runs`.`status`,
                 `Runs`.`verdict`,
                 `Runs`.`runtime`,
@@ -251,7 +247,6 @@ abstract class Runs {
                 `Runs` (
                     `submission_id`,
                     `version`,
-                    `commit`,
                     `status`,
                     `verdict`,
                     `runtime`,
@@ -272,7 +267,6 @@ abstract class Runs {
                     ?,
                     ?,
                     ?,
-                    ?,
                     ?
                 );';
         $params = [
@@ -282,7 +276,6 @@ abstract class Runs {
                 intval($Runs->submission_id)
             ),
             $Runs->version,
-            $Runs->commit,
             $Runs->status,
             $Runs->verdict,
             intval($Runs->runtime),

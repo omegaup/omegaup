@@ -2126,9 +2126,10 @@ export class Arena {
       guid: data.guid,
       groups: groups,
       language: data.language,
-      feedback: self.options.contestAlias
-        ? self.currentProblemset.feedback
-        : 'detailed',
+      feedback:
+        self.options.contestAlias && self.currentProblemset
+          ? self.currentProblemset.feedback
+          : 'detailed',
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

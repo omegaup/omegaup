@@ -414,6 +414,7 @@ export namespace omegaup {
     rank: number;
     name?: string;
     problems_solved: number;
+    author_ranking: number | null;
   }
 
   export interface Scoreboard {

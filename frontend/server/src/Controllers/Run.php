@@ -466,7 +466,6 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $run = new \OmegaUp\DAO\VO\Runs([
             'version' => $problem->current_version,
-            'commit' => $problem->commit,
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
