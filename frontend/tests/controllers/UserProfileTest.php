@@ -137,7 +137,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
                 $this->assertNotNull($v);
             }
         }
-        $this->assertEquals(0, $response['rankinfo']['author_ranking']);
+        $this->assertNull($response['rankinfo']['author_ranking']);
         unset($response['rankinfo']['author_ranking']);
         foreach ($response['rankinfo'] as $k => $v) {
             $this->assertNotNull($v);
