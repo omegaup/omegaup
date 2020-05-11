@@ -5,6 +5,13 @@
         <div class="form-group">
           <label
             >{{ T.wordsGroupAdmin }}
+            <span
+              aria-hidden="true"
+              class="glyphicon glyphicon-info-sign"
+              data-placement="top"
+              data-toggle="tooltip"
+              v-bind:title="T.courseEditAddGroupAdminsTooltip"
+            ></span>
             <omegaup-autocomplete
               class="form-control"
               v-bind:init="el => typeahead.groupTypeahead(el)"
