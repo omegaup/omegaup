@@ -522,7 +522,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Request can proceed unauthenticated.
         }
 
-        $isPractice = isset($r['is_practice']) && boolval($r['is_practice']);
+        $isPractice = $r->ensureOptionalBool('is_practice') ?? false;
 
         $shouldShowIntro = !$isPractice && \OmegaUp\Controllers\Contest::shouldShowIntro(
             $r->identity,
