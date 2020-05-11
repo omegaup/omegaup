@@ -77,10 +77,12 @@ import T from '../../lang';
 import * as UI from '../../ui';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
+import CountryFlag from '../CountryFlag.vue';
 
 @Component({
   components: {
     'omegaup-user-username': user_Username,
+    'omegaup-countryflag': CountryFlag,
   },
 })
 export default class AuthorsRank extends Vue {

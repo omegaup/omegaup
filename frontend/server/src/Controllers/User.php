@@ -2546,7 +2546,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Prepare all the properties to be sent to the
      * author rank table view via smarty.
      *
-     * @return array{smartyProperties: array{payload: AuthorRankTablePayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: AuthorRankTablePayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
@@ -2565,6 +2565,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         $length
                     ),
                 ],
+                'title' => 'omegaupTitleAuthorsRank',
             ],
             'entrypoint' => 'authors_rank',
         ];

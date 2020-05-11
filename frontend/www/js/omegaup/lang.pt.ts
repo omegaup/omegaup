@@ -552,6 +552,7 @@ const translations: { [key: string]: string; } = {
   oldPassword: "Senha antiga",
   omegaupTitleAdminUsers: "Gerenciamento de usu\u00e1rios",
   omegaupTitleApi: "Api",
+  omegaupTitleAuthorsRank: "Ranking de autores",
   omegaupTitleBadges: "Crach\u00e1s",
   omegaupTitleCodersofthemonth: "Programador do m\u00eas",
   omegaupTitleCodersofthemonthFemale: "Programador do m\u00eas feminino",
