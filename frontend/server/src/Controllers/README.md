@@ -2695,6 +2695,7 @@ Entry point for Problem Details API
 | Name                      | Type        | Description |
 | ------------------------- | ----------- | ----------- |
 | `contest_alias`           | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
 | `prevent_problemset_open` | `bool|null` |             |
 | `problem_alias`           | `mixed`     |             |
 | `problemset_id`           | `mixed`     |             |
@@ -2929,6 +2930,7 @@ Returns the solution for a problem if conditions are satisfied.
 | ----------------- | ----------- | ----------- |
 | `contest_alias`   | `mixed`     |             |
 | `forfeit_problem` | `bool|null` |             |
+| `lang`            | `mixed`     |             |
 | `problem_alias`   | `mixed`     |             |
 | `problemset_id`   | `mixed`     |             |
 | `statement_type`  | `mixed`     |             |
