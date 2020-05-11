@@ -43,6 +43,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitUpload: "O sube un archivo",
   arenaRunSubmitWaitBetweenUploads: "Debes esperar %(submissionGap) segundos entre cada env\u00edo del mismo problema",
   assignmentNotFound: "Tarea/examen no encontrado",
+  authorRankRangeHeader: "Top %(lowCount) a %(highCount) autores con m\u00e1s puntaje",
   badgeAssignationTimeMessage: "Fecha en que conseguiste esta insignia",
   badgeFirstAssignationMessage: "La primera vez que esta insignia fue asignada",
   badgeNotAssignedMessage: "A\u00fan no has conseguido esta insignia",

@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
         props: {
           page: payload.page,
           length: payload.length,
-          ranking: payload.ranking,
+          rankingData: payload.ranking,
         },
       });
     },
