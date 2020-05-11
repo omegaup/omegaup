@@ -40,7 +40,7 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public static function getSortedResults(string $query) {
-        /** @var list<array{user_id: int}> */
+        /** @var list<array{user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($query);
         $results = [];
         foreach ($rs as $user) {
