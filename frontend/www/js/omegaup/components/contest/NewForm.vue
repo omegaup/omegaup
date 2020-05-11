@@ -151,14 +151,14 @@
           <div class="form-group col-md-6">
             <label>{{ T.wordsFeedback }}</label>
             <select class="form-control" v-model="feedback">
-              <option value="yes">
-                {{ T.wordsYes }}
+              <option value="none">
+                {{ T.wordsNone }}
               </option>
-              <option value="no">
-                {{ T.wordsNo }}
+              <option value="summary">
+                {{ T.wordsSummary }}
               </option>
-              <option value="partial">
-                {{ T.wordsPartial }}
+              <option value="detailed">
+                {{ T.wordsDetailed }}
               </option>
             </select>
             <p class="help-block">
@@ -322,7 +322,7 @@ export default class NewForm extends Vue {
     this.scoreboard = 0;
     this.pointsDecayFactor = 0;
     this.submissionsGap = 1;
-    this.feedback = 'yes';
+    this.feedback = 'detailed';
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
@@ -336,7 +336,7 @@ export default class NewForm extends Vue {
     this.scoreboard = 0;
     this.pointsDecayFactor = 0;
     this.submissionsGap = 0;
-    this.feedback = 'yes';
+    this.feedback = 'detailed';
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
@@ -350,7 +350,7 @@ export default class NewForm extends Vue {
     this.scoreboard = 75;
     this.pointsDecayFactor = 0;
     this.submissionsGap = 1;
-    this.feedback = 'yes';
+    this.feedback = 'detailed';
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;

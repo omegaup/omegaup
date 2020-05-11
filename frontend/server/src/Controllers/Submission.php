@@ -20,8 +20,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      */
     public static function apiLatestSubmissions(\OmegaUp\Request $r) {
-        $r->ensureInt('offset', null, null, false);
-        $r->ensureInt('rowcount', null, null, false);
+        $r->ensureOptionalInt('offset');
+        $r->ensureOptionalInt('rowcount');
 
         $offset = is_null($r['offset']) ? 1 : intval($r['offset']);
         $rowCount = is_null($r['rowcount']) ? 100 : intval($r['rowcount']);
@@ -71,8 +71,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      */
     public static function getLatestSubmissionsForSmarty(\OmegaUp\Request $r): array {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
@@ -100,8 +100,8 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      */
     public static function getLatestUserSubmissionsForSmarty(\OmegaUp\Request $r): array {
-        $r->ensureInt('page', null, null, false);
-        $r->ensureInt('length', null, null, false);
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('length');
 
         $identity = self::resolveTargetIdentity($r);
         if (is_null($identity)) {
