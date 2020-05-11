@@ -15,7 +15,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
     private function setupContest(
         bool $isGraderExpectedToBeCalled
     ) {
-         // Get a problem
+        // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         // Get a contest
@@ -94,6 +94,165 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $clarification->problemset_id
         );
         $this->assertEquals($problem->problem_id, $clarification->problem_id);
+    }
+
+    /**
+     * Creates a valid clarification, to a problem.
+     */
+    public function testProblemClarificationsAsAuthor() {
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemData,
+            $contestData,
+            $contestant
+        );
+
+        // Assert status of new contest
+        $this->assertArrayHasKey(
+            'clarification_id',
+            $clarificationData['response']
+        );
+
+        // Get clarification as problem author.
+        $login = self::login($problemData['author']);
+        $response = \OmegaUp\Controllers\Problem::apiClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+        $this->assertCount(1, $response['clarifications']);
+        $this->assertEquals(
+            $clarificationData['request']['message'],
+            $response['clarifications'][0]['message']
+        );
+    }
+
+    /**
+     * Creates a valid clarification, to a problem.
+     */
+    public function testProblemClarificationsAsUser() {
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemData,
+            $contestData,
+            $contestant
+        );
+
+        // Assert status of new contest
+        $this->assertArrayHasKey(
+            'clarification_id',
+            $clarificationData['response']
+        );
+
+        // Get clarification as another user.
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+        $this->assertCount(0, $response['clarifications']);
+    }
+
+    /**
+     * Creates a valid clarification, to a problem.
+     */
+    public function testProblemClarificationsWithPublicAnswerAsUser() {
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemData,
+            $contestData,
+            $contestant
+        );
+
+        // Assert status of new contest
+        $this->assertArrayHasKey(
+            'clarification_id',
+            $clarificationData['response']
+        );
+
+        // Answer the clarification publicly.
+        \OmegaUp\Test\Factories\Clarification::answer(
+            $clarificationData,
+            $contestData,
+            'answer to everyone',
+            $contestData['director']->username,
+            1
+        );
+
+        // Get clarification as another user.
+        [
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+        $this->assertCount(1, $response['clarifications']);
+        $this->assertEquals(
+            $clarificationData['request']['message'],
+            $response['clarifications'][0]['message']
+        );
+    }
+
+    /**
+     * Creates a valid clarification, to a problem.
+     */
+    public function testProblemClarificationsAsClarificationAuthor() {
+        [
+            'problemData' => $problemData,
+            'contestData' => $contestData,
+            'contestant' => $contestant,
+        ] = $this->setupContest(/*$isGraderExpectedToBeCalled=*/false);
+
+        $clarificationData = \OmegaUp\Test\Factories\Clarification::createClarification(
+            $problemData,
+            $contestData,
+            $contestant
+        );
+
+        // Assert status of new contest
+        $this->assertArrayHasKey(
+            'clarification_id',
+            $clarificationData['response']
+        );
+
+        // Get clarification as the author of the clarification.
+        $login = self::login($contestant);
+        $response = \OmegaUp\Controllers\Problem::apiClarifications(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+        $this->assertCount(1, $response['clarifications']);
+        $this->assertEquals(
+            $clarificationData['request']['message'],
+            $response['clarifications'][0]['message']
+        );
     }
 
     /**
