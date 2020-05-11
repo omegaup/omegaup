@@ -284,7 +284,7 @@ export default class NewForm extends Vue {
   availableLanguages = this.data?.available_languages ?? this.allLanguages;
   contest = this.data ?? null;
   description = this.data?.description ?? '';
-  feedback = this.data?.feedback ?? 'yes';
+  feedback = this.data?.feedback ?? 'none';
   finishTime = this.data?.finish_time ?? this.initialFinishTime;
   scoreboard = this.data?.scoreboard ?? 100;
   languages = this.data?.languages ?? [];
