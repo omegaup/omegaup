@@ -2339,7 +2339,56 @@ class Course extends \OmegaUp\Controllers\Controller {
             true  /*onlyIntroDetails*/
         );
         $requestUserInformation = $courseDetails['requests_user_information'];
-        $inContest = false;
+
+        $isCourseAdmin = \OmegaUp\Authorization::isCourseAdmin(
+            $r->identity,
+            $course
+        );
+        if ($isCourseAdmin && !$showAssignment) {
+            return [
+                'smartyProperties' => [
+                    'showRanking' => true,
+                    'payload' => [
+                        'details' => self::getCommonCourseDetails(
+                            $course,
+                            $r->identity,
+                            /*$onlyIntroDetails=*/ false
+                        ),
+                        'progress' => \OmegaUp\DAO\Courses::getAssignmentsProgress(
+                            $course->course_id,
+                            $r->identity->identity_id
+                        ),
+                    ],
+                ],
+                'template' => 'course.details.tpl',
+                'inContest' => false,
+            ];
+        }
+
+        if ($showAssignment) {
+            return [
+                'smartyProperties' => [
+                    'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
+                        $r->identity,
+                        $course,
+                        $group
+                    ),
+                    'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
+                        !is_null($r->user) &&
+                        !\OmegaUp\Controllers\User::isMainIdentity(
+                            $r->user,
+                            $r->identity
+                        ) &&
+                        \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                            $r->user
+                        ),
+                    ],
+                ],
+                'template' => 'arena.contest.course.tpl',
+                'inContest' => true,
+            ];
+        }
+
         if (
             $shouldShowIntro
             || !$hasAcceptedTeacher
@@ -2395,54 +2444,39 @@ class Course extends \OmegaUp\Controllers\Controller {
             if (!is_null($teacherStatement)) {
                 $acceptTeacherStatement['gitObjectId'] = $teacherStatement['git_object_id'];
             }
-
-            $smartyProperties = [
-                'coursePayload' => array_merge(
-                    $registrationResponse,
-                    [
-                        'name' => $courseDetails['name'],
-                        'description' => $courseDetails['description'],
-                        'alias' => $courseDetails['alias'],
-                        'currentUsername' => $r->identity->username,
-                        'needsBasicInformation' => $needsBasicInformation,
-                        'requestsUserInformation' =>
-                            $courseDetails['requests_user_information'],
-                        'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
-                        'statements' => [
-                            'privacy' => $privacyStatement,
-                            'acceptTeacher' => $acceptTeacherStatement,
-                        ],
-                        'isFirstTimeAccess' => !$hasSharedUserInformation,
-                        'shouldShowResults' => $shouldShowIntro,
-                    ]
-                ),
+            return [
+                'smartyProperties' => [
+                    'coursePayload' => array_merge(
+                        $registrationResponse,
+                        [
+                            'name' => $courseDetails['name'],
+                            'description' => $courseDetails['description'],
+                            'alias' => $courseDetails['alias'],
+                            'currentUsername' => $r->identity->username,
+                            'needsBasicInformation' => $needsBasicInformation,
+                            'requestsUserInformation' =>
+                                $courseDetails['requests_user_information'],
+                            'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
+                            'statements' => [
+                                'privacy' => $privacyStatement,
+                                'acceptTeacher' => $acceptTeacherStatement,
+                            ],
+                            'isFirstTimeAccess' => !$hasSharedUserInformation,
+                            'shouldShowResults' => $shouldShowIntro,
+                        ]
+                    ),
+                ],
+                'template' => 'arena.course.intro.tpl',
+                'inContest' => false,
             ];
-            $template = 'arena.course.intro.tpl';
-        } elseif ($showAssignment) {
-            $smartyProperties = [
+        }
+
+        return [
+            'smartyProperties' => [
                 'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
                     $r->identity,
                     $course,
                     $group
-                ),
-                'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
-                    !is_null($r->user) &&
-                    !\OmegaUp\Controllers\User::isMainIdentity(
-                        $r->user,
-                        $r->identity
-                    ) &&
-                    \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
-                        $r->user
-                    ),
-                ],
-            ];
-            $template = 'arena.contest.course.tpl';
-            $inContest = true;
-        } else {
-            $smartyProperties = [
-                'showRanking' => \OmegaUp\Authorization::isCourseAdmin(
-                    $r->identity,
-                    $course
                 ),
                 'payload' => [
                     'details' => self::getCommonCourseDetails(
@@ -2455,14 +2489,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity->identity_id
                     ),
                 ],
-            ];
-            $template = 'course.details.tpl';
-        }
-
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => $template,
-            'inContest' => $inContest,
+            ],
+            'template' => 'course.details.tpl',
+            'inContest' => false,
         ];
     }
 
