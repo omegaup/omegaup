@@ -56,6 +56,8 @@ const translations: { [key: string]: string; } = {
   badge_coderOfTheMonth_name: "Programador do M\u00eas",
   badge_contestManager_description: "O usu\u00e1rio tem administrado pelo menos um concurso.",
   badge_contestManager_name: "Administrador de Concurso",
+  badge_cppCourseGraduate_description: "O usu\u00e1rio tem resolvido mais de 60% do curso de C ++..",
+  badge_cppCourseGraduate_name: "P\u00f3s-gradua\u00e7\u00e3o C++",
   badge_cppExpert_description: "O usu\u00e1rio tem resolvido mais de 10 problemas em C++.",
   badge_cppExpert_name: "Usu\u00e1rio Especialista em C++",
   badge_feedbackProvider_description: "O usu\u00e1rio tem enviado a qualifica\u00e7\u00e3o de pelo menos um problema.",
