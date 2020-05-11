@@ -2082,7 +2082,7 @@ export namespace messages {
   export type ProblemClarificationsResponse = {
     clarifications: {
       clarification_id: number;
-      contest_alias: string;
+      contest_alias?: string;
       author?: string;
       message: string;
       time: Date;
