@@ -656,7 +656,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Get identity profile from cache
      *
-     * @return array{birth_date?: \OmegaUp\Timestamp|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: \OmegaUp\Timestamp|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool}
+     * @return array{birth_date?: \OmegaUp\Timestamp|null, country: null|string, country_id: null|string, email?: null|string, gender?: null|string, graduation_date?: \OmegaUp\Timestamp|null, gravatar_92?: string, hide_problem_tags?: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{name?: string, problems_solved?: int, rank?: int, author_ranking?: int|null}, scholar_degree?: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified?: bool}
      */
     public static function getProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,

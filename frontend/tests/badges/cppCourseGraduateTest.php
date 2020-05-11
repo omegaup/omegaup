@@ -6,9 +6,8 @@
  * @author RuizYugen
  */
 class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
-
-    public function testCourse() {
-        $courseAlias='introduccion_a_cpp';
+    public function testCourseCpp() {
+        $courseAlias = 'introduccion_a_cpp';
 
         //create course
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(

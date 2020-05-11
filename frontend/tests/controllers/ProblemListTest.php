@@ -965,6 +965,27 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                         } else {
                             $this->assertTrue($comp >= 0);
                         }
+                    } elseif ($col === 'difficulty' || $col === 'quality') {
+                        if ($mode === 'asc') {
+                            $this->assertGreaterThanOrEqual(
+                                $last[$j][$col],
+                                $first[$i][$col]
+                            );
+                        } else {
+                            // Problems with null difficulty / quality are
+                            // sorted later.
+                            if (!is_null($last[$j][$col])) {
+                                $this->assertLessThanOrEqual(
+                                    $last[$j][$col],
+                                    $first[$i][$col]
+                                );
+                            } else {
+                                $this->assertGreaterThanOrEqual(
+                                    $last[$j][$col],
+                                    $first[$i][$col]
+                                );
+                            }
+                        }
                     } else {
                         if ($mode === 'asc') {
                             $this->assertTrue(

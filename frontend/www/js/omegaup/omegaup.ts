@@ -80,6 +80,12 @@ export namespace omegaup {
     Required = 'required',
   }
 
+  export enum SubmissionFeedback {
+    None = 'none',
+    Summary = 'summary',
+    Detailed = 'detailed',
+  }
+
   export interface ArenaContests {
     [timeType: string]: omegaup.Contest[];
   }
@@ -408,6 +414,7 @@ export namespace omegaup {
     rank: number;
     name?: string;
     problems_solved: number;
+    author_ranking: number | null;
   }
 
   export interface Scoreboard {
@@ -493,6 +500,7 @@ export namespace omegaup {
     admin?: boolean;
     compile_error?: string;
     details?: Details;
+    feedback?: SubmissionFeedback;
     groups?: DetailsGroup[];
     guid: string;
     judged_by: string;

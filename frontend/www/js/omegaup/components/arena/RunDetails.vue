@@ -9,16 +9,21 @@
           <thead>
             <tr>
               <th>{{ T.wordsGroup }}</th>
-              <th>{{ T.wordsCase }}</th>
+              <th v-if="data.feedback !== 'summary'">{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
-              <th colspan="3">{{ T.rankScore }}</th>
+              <th colspan="3">
+                {{ T.rankScore }}
+              </th>
               <th width="1"></th>
             </tr>
           </thead>
           <tbody v-for="element in data.groups">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
-              <th colspan="2">
+              <th class="text-center" v-if="element.verdict">
+                {{ element.verdict }}
+              </th>
+              <th colspan="2" v-else="">
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
                   <span
                     v-bind:class="{
@@ -97,7 +102,7 @@
           <li>
             <a
               class="output"
-              v-bind:href="'/api/run/download/run_alias/' + data.guid + '/'"
+              v-bind:href="`/api/run/download/run_alias/${data.guid}/`"
               v-if="data.problem_admin"
               >{{ T.wordsDownloadOutput }}</a
             >
@@ -106,7 +111,7 @@
             <a
               class="details"
               v-bind:href="
-                '/api/run/download/run_alias/' + data.guid + '/complete/true/'
+                `/api/run/download/run_alias/${data.guid}/complete/true/`
               "
               v-if="data.problem_admin"
               >{{ T.wordsDownloadDetails }}</a
