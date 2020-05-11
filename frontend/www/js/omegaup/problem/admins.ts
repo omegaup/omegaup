@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
     'problem-admins-payload',
   );
   const problemAdmins = new Vue({
-    el: '#problem-admins .admins',
+    el: '#admins .admins',
     render: function(createElement) {
       return createElement('omegaup-problem-admins', {
         props: { initialAdmins: this.initialAdmins },
@@ -58,7 +58,7 @@ OmegaUp.on('ready', () => {
   });
 
   const problemGroupAdmins = new Vue({
-    el: '#problem-admins .groups',
+    el: '#admins .groups',
     render: function(createElement) {
       return createElement('omegaup-problem-group-admins', {
         props: { initialGroups: this.initialGroups },
