@@ -3029,7 +3029,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{clarifications: list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>}
+     * @return array{clarifications: list<array{clarification_id: int, contest_alias: null|string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>}
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         // Get user
@@ -3056,10 +3056,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             !empty($r['offset']) ? intval($r['offset']) : null,
             intval($r['rowcount'])
         );
-
-        foreach ($clarifications as &$clar) {
-            $clar['time'] = intval($clar['time']);
-        }
 
         // Add response to array
         return [
