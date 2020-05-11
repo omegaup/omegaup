@@ -146,7 +146,7 @@ CREATE TABLE `Contests` (
   `points_decay_factor` double NOT NULL DEFAULT '0' COMMENT 'El factor de decaimiento de los puntos de este concurso. El default es 0 (no decae). TopCoder es 0.7',
   `partial_score` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'Verdadero si el usuario recibirá puntaje parcial para problemas no resueltos en todos los casos',
   `submissions_gap` int NOT NULL DEFAULT '60' COMMENT 'Tiempo mínimo en segundos que debe de esperar un usuario despues de realizar un envío para hacer otro',
-  `feedback` enum('no','yes','partial') NOT NULL,
+  `feedback` enum('none','summary','detailed') NOT NULL DEFAULT 'none' COMMENT 'Indica la cantidad de información que se mostrará en los detalles de un envío. "detailed" muestra el veredicto de la solución caso por caso. "summary" muestra porcentaje de casos que tuvo bien, así como el veredicto del caso con peor calificación. "none" oculta toda la información de los veredictos.',
   `penalty` int NOT NULL DEFAULT '1' COMMENT 'Entero indicando el número de minutos con que se penaliza por recibir un no-accepted',
   `penalty_type` enum('contest_start','problem_open','runtime','none') NOT NULL COMMENT 'Indica la política de cálculo de penalty: minutos desde que inició el concurso, minutos desde que se abrió el problema, o tiempo de ejecución (en milisegundos).',
   `penalty_calc_policy` enum('sum','max') NOT NULL COMMENT 'Indica como afecta el penalty al score.',
@@ -933,7 +933,7 @@ CREATE TABLE `Tags` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `User_Rank` (
   `user_id` int NOT NULL,
-  `ranking` int NOT NULL,
+  `ranking` int DEFAULT NULL,
   `problems_solved_count` int NOT NULL DEFAULT '0',
   `score` double NOT NULL DEFAULT '0',
   `username` varchar(50) NOT NULL,

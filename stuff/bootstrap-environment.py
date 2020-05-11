@@ -255,7 +255,7 @@ def main():
 
         db_migrate_args = [
             os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py'),
-            '--kill-other-connections'
+            '--kill-other-connections',
         ]
         for name, value in [('--username', args.username),
                             ('--password', args.password),
