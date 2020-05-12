@@ -2159,7 +2159,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $preventProblemsetOptin = $r->ensureOptionalBool(
             'prevent_problemset_open'
         ) ?? false;
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['contest_alias'],
             'contest_alias'
@@ -2173,7 +2172,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Do nothing. Not logged user can access here
         }
-        $lang = $r['lang'] ?? \OmegaUp\Controllers\Identity::getPreferredLanguage(
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
             $r->identity
         );
         $result = self::getValidProblemAndProblemset(
@@ -2482,7 +2481,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateOptionalStringNonEmpty($r['lang'], 'lang');
         \OmegaUp\Validators::validateValidAlias(
             $r['problem_alias'],
             'problem_alias'
@@ -2503,7 +2501,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         $problemset = $response['problemset'];
         $problem = $response['problem'];
-        $lang = $r['lang'] ?? \OmegaUp\Controllers\Identity::getPreferredLanguage(
+        $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
             $r->identity
         );
 
@@ -4345,7 +4343,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'selectedTags' => $selectedTags,
                 ],
                 'problemMarkdownPayload' =>  [
-                   'statement' => $details['statement'],
+                    'statement' => $details['statement'],
                     'alias' => $problem->alias,
                     'title' => $problem->title,
                     'source' => $problem->source,
