@@ -99,7 +99,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
     }
 
     /**
-     * @return array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
+     * @return array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string,name: null|string, username: string}>, total: int}
      */
     public static function getAuthorsRank(
         int $page,
