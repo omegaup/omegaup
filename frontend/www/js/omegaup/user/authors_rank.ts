@@ -13,6 +13,7 @@ OmegaUp.on('ready', () => {
           page: payload.page,
           length: payload.length,
           rankingData: payload.ranking,
+          pagerItems: payload.pagerItems,
         },
       });
     },

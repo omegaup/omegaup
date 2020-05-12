@@ -9,19 +9,6 @@
           })
         }}
       </h5>
-      <div class="card-body" v-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="`/rank/authors/?page=${page - 1}`">
-            {{ T.wordsPrevPage }}</a
-          >
-          <span v-show="showNextPage">|</span>
-        </template>
-        <a
-          v-show="showNextPage"
-          v-bind:href="`/rank/authors/?page=${page + 1}`"
-          >{{ T.wordsNextPage }}</a
-        >
-      </div>
       <table class="table mb-0">
         <thead>
           <tr>
@@ -67,6 +54,11 @@
         >
       </div>
     </div>
+    <!-- TODO: Usar aquí el Paginador migrado a BS4 y borrar la navegación anterior.
+    <omegaup-common-paginator
+      v-bind:pagerItems="pagerItems"
+    ></omegaup-common-paginator>
+    -->
   </div>
 </template>
 
@@ -78,17 +70,20 @@ import * as UI from '../../ui';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
 import CountryFlag from '../CountryFlag.vue';
+import common_Paginator from '../common/Paginator.vue';
 
 @Component({
   components: {
     'omegaup-user-username': user_Username,
     'omegaup-countryflag': CountryFlag,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class AuthorsRank extends Vue {
   @Prop() page!: number;
   @Prop() length!: number;
   @Prop() rankingData!: types.AuthorsRank;
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   UI = UI;
