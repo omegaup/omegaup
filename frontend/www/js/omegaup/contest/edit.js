@@ -271,7 +271,7 @@ OmegaUp.on('ready', function() {
               'add-admin': function(ev) {
                 api.Contest.addAdmin({
                   contest_alias: contestAlias,
-                  usernameOrEmail: ev.user,
+                  usernameOrEmail: ev.username,
                 })
                   .then(function(response) {
                     ui.success(T.adminAdded);

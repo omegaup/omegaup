@@ -129,7 +129,8 @@
       </div>
       <div class="tab-pane active" v-if="showTab === 'admins'">
         <omegaup-contest-admins
-          v-bind:data="admins"
+          v-bind:initial-admins="admins"
+          v-bind:has-parent-component="true"
           v-on:emit-add-admin="
             addAdminComponent => $emit('add-admin', addAdminComponent)
           "
@@ -138,7 +139,8 @@
           "
         ></omegaup-contest-admins>
         <omegaup-contest-group-admins
-          v-bind:data="groupAdmins"
+          v-bind:initial-groups="groupAdmins"
+          v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
             groupAdminsComponent =>
               $emit('add-group-admin', groupAdminsComponent)
@@ -169,12 +171,12 @@ import { omegaup, OmegaUp } from '../../omegaup';
 import T from '../../lang';
 import * as UI from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
-import contest_Admins from './Admins.vue';
+import contest_Admins from '../common/Admins.vue';
 import contest_Clone from './Clone.vue';
 import contest_Contestant from './Contestant.vue';
 import common_Requests from '../common/Requests.vue';
 import contest_Groups from './Groups.vue';
-import contest_GroupAdmins from './GroupAdmins.vue';
+import contest_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
 import common_Publish from '../common/Publish.vue';
