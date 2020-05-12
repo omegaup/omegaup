@@ -1614,6 +1614,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
+     * @omegaup-request-param mixed $lang
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param mixed $memory_limit
      * @omegaup-request-param mixed $message
@@ -2173,7 +2174,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             // Do nothing. Not logged user can access here
         }
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            $r->identity
+            $r->identity,
+            $r
         );
         $result = self::getValidProblemAndProblemset(
             $r->identity,
@@ -2502,7 +2504,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problemset = $response['problemset'];
         $problem = $response['problem'];
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            $r->identity
+            $r->identity,
+            $r
         );
 
         // Get the expected commit version.
@@ -3883,6 +3886,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime?: int|string, MemoryLimit: int|string, OutputLimit?: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance?: float}}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}, template: string}
      *
      * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $lang
      * @omegaup-request-param bool|null $prevent_problemset_open
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $problemset_id

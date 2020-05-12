@@ -1521,6 +1521,7 @@ Returns details of a given assignment
 | ------------ | ------- | ----------- |
 | `assignment` | `mixed` |             |
 | `course`     | `mixed` |             |
+| `lang`       | `mixed` |             |
 | `token`      | `mixed` |             |
 | `username`   | `mixed` |             |
 
@@ -3033,6 +3034,7 @@ Updates problem solution only
 | `email_clarifications`    | `bool|null` |             |
 | `extra_wall_time`         | `mixed`     |             |
 | `input_limit`             | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
 | `languages`               | `mixed`     |             |
 | `memory_limit`            | `mixed`     |             |
 | `message`                 | `mixed`     |             |
@@ -3142,6 +3144,7 @@ and the number of solutions already seen
 | `contest_alias`   | `mixed` |             |
 | `course`          | `mixed` |             |
 | `interview_alias` | `mixed` |             |
+| `lang`            | `mixed` |             |
 | `problemset_id`   | `int`   |             |
 | `token`           | `mixed` |             |
 | `tokens`          | `mixed` |             |
