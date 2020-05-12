@@ -921,31 +921,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name                          | Type      |
-| ----------------------------- | --------- |
-| `admission_mode`              | `string`  |
-| `alias`                       | `string`  |
-| `description`                 | `string`  |
-| `feedback`                    | `string`  |
-| `finish_time`                 | `Date`    |
-| `languages`                   | `string`  |
-| `partial_score`               | `boolean` |
-| `penalty`                     | `number`  |
-| `penalty_calc_policy`         | `string`  |
-| `penalty_type`                | `string`  |
-| `points_decay_factor`         | `number`  |
-| `problemset_id`               | `number`  |
-| `rerun_id`                    | `number`  |
-| `scoreboard`                  | `number`  |
-| `show_penalty`                | `boolean` |
-| `show_scoreboard_after`       | `boolean` |
-| `start_time`                  | `Date`    |
-| `submissions_gap`             | `number`  |
-| `title`                       | `string`  |
-| `window_length`               | `number`  |
-| `user_registration_requested` | `boolean` |
-| `user_registration_answered`  | `boolean` |
-| `user_registration_accepted`  | `boolean` |
+```typescript
+types.ContestPublicDetails;
+```
 
 ## `/api/contest/registerForContest/`
 
