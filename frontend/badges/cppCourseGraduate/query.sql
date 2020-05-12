@@ -1,5 +1,5 @@
 SELECT
-	p.user_id
+	DISTINCT p.user_id
 FROM
     (
         SELECT
