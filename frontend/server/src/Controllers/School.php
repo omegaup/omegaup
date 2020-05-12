@@ -56,7 +56,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{template: string, smartyProperties: array{payload: SchoolProfileDetailsPayload}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: SchoolProfileDetailsPayload}}
      *
      * @omegaup-request-param int $school_id
      */
@@ -104,7 +104,7 @@ class School extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => $payload,
             ],
-            'template' => 'school.profile.tpl',
+            'entrypoint' => 'school_profile',
         ];
     }
 

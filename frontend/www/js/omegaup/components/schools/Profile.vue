@@ -1,14 +1,12 @@
 <template>
-  <div class="row">
-    <div class="page-header">
-      <h1 class="text-center">
-        <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
-        {{ name }}
-      </h1>
-    </div>
+  <div class="container-lg p-5">
+    <h3 class="text-center mb-4">
+      <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
+      {{ name }}
+    </h3>
     <div class="row">
       <div class="col-md-4">
-        <div class="panel panel-default" v-if="country">
+        <div class="card" v-if="country">
           <ul class="list-group">
             <li class="list-group-item">
               <strong>{{ T.wordsCountry }}:</strong>
@@ -39,8 +37,8 @@
         </omegaup-grid-paginator>
       </div>
       <div class="col-md-8">
-        <div class="panel panel-default">
-          <div class="panel-body">
+        <div class="card">
+          <div class="card-body">
             <omegaup-school-chart
               v-bind:data="monthlySolvedProblemsCount"
               v-bind:school="name"
@@ -97,12 +95,15 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import * as UI from '../../ui';
+
 import CountryFlag from '../CountryFlag.vue';
 import SchoolChart from './Chart.vue';
 import GridPaginator from '../GridPaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
-import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
+import { SchoolCoderOfTheMonth, SchoolUser } from '../../types';
+import { Chart } from 'highcharts-vue';
 
 @Component({
   components: {
@@ -110,6 +111,7 @@ import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
     'omegaup-school-chart': SchoolChart,
     'omegaup-grid-paginator': GridPaginator,
     'omegaup-username': UserName,
+    highcharts: Chart,
   },
 })
 export default class SchoolProfile extends Vue {
@@ -120,8 +122,10 @@ export default class SchoolProfile extends Vue {
   @Prop() monthlySolvedProblemsCount!: types.SchoolProblemsSolved[];
   @Prop() users!: SchoolUser[];
   @Prop() codersOfTheMonth!: SchoolCoderOfTheMonth;
+  @Prop() chartOptions!: Chart;
 
   T = T;
+  UI = UI;
   sortBy = 'solved_problems';
   sortOptions = [
     {

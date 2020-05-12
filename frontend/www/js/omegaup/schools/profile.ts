@@ -10,7 +10,7 @@ import * as ui from '../ui';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolProfileDetailsPayload();
   const schoolProfile = new Vue({
-    el: '#school-profile',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-school-profile', {
         props: {
