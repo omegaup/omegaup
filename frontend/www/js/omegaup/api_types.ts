@@ -1063,6 +1063,7 @@ export namespace types {
     name: string;
     problems_solved: number;
     rank: number;
+    author_ranking?: number;
   }
 
   export interface UserRankTablePayload {
@@ -2110,7 +2111,7 @@ export namespace messages {
   export type ProblemClarificationsResponse = {
     clarifications: {
       clarification_id: number;
-      contest_alias: string;
+      contest_alias?: string;
       author?: string;
       message: string;
       time: Date;
@@ -2563,6 +2564,7 @@ export namespace messages {
         group: string;
         max_score: number;
         score: number;
+        verdict?: string;
       }[];
       judged_by: string;
       max_score?: number;

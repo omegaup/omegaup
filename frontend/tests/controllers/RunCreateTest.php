@@ -210,9 +210,6 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Check problem submissions (1)
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $this->assertEquals(1, $problem->submissions);
-
-        $run = \OmegaUp\DAO\Runs::getByGUID($response['guid']);
-        $this->assertEquals($problem->commit, $run->commit);
     }
 
     /**

@@ -875,7 +875,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 $exception->addCustomMessageToArray(
                     'start_time',
-                    $contest->start_time
+                    date('r', $contest->start_time->time)
                 );
 
                 throw $exception;
@@ -1876,7 +1876,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateOptionalInEnum(
             $r['feedback'],
             'feedback',
-            ['no', 'yes', 'partial'],
+            ['none', 'summary', 'detailed'],
             $isRequired
         );
         \OmegaUp\Validators::validateOptionalInEnum(
