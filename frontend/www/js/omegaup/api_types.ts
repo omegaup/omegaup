@@ -1277,7 +1277,7 @@ export namespace messages {
       languages?: string;
       last_updated: Date;
       original_finish_time?: Date;
-      partial_score?: number;
+      partial_score: boolean;
       penalty?: number;
       penalty_calc_policy?: string;
       penalty_type?: string;
@@ -1310,7 +1310,7 @@ export namespace messages {
       languages?: string;
       last_updated: Date;
       original_finish_time?: Date;
-      partial_score?: number;
+      partial_score: boolean;
       penalty?: number;
       penalty_calc_policy?: string;
       penalty_type?: string;

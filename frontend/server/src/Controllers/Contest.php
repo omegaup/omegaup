@@ -268,9 +268,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Callback to get contests list, depending on a given method
      *
      * @param \OmegaUp\Request $r
-     * @param Closure(int, int, int, null|string):list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}> $callbackUserFunction
+     * @param Closure(int, int, int, null|string):list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}> $callbackUserFunction
      *
-     * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
+     * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -308,7 +308,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests where current user is the director
      *
-     * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
+     * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -337,7 +337,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests where current user is participating in
      *
-     * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score?: int, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
+     * @return array{contests: list<array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}>}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -705,7 +705,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{contests: list<array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: \OmegaUp\Timestamp, start_time: \OmegaUp\Timestamp|null, finish_time: \OmegaUp\Timestamp|null, last_updated: \OmegaUp\Timestamp|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score?: int, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: bool, scoreboard_url: string, scoreboard_url_admin: string}>}, privateContestsAlert: bool}, template: string}
+     * @return array{smartyProperties: array{payload: array{contests: list<array{contest_id: int, problemset_id: int, acl_id?: int, title: string, description: string, original_finish_time?: \OmegaUp\Timestamp, start_time: \OmegaUp\Timestamp|null, finish_time: \OmegaUp\Timestamp|null, last_updated: \OmegaUp\Timestamp|null, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard?: int, points_decay_factor?: float, partial_score: bool, submissions_gap?: int, feedback?: string, penalty?: int, penalty_type?: string, penalty_calc_policy?: string, show_scoreboard_after?: int, urgent?: int, languages?: null|string, recommended: bool, scoreboard_url: string, scoreboard_url_admin: string}>}, privateContestsAlert: bool}, template: string}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -1664,7 +1664,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $feedback
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $languages
-     * @omegaup-request-param mixed $partial_score
+     * @omegaup-request-param bool|null $partial_score
      * @omegaup-request-param mixed $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
@@ -1700,6 +1700,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureOptionalBool('basic_information');
+        $r->ensureOptionalBool('partial_score');
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
             'needs_basic_information' => boolval($r['basic_information']),
