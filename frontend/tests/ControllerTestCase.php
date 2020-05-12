@@ -192,7 +192,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
             $contest->points_decay_factor
         );
         $this->assertEquals(
-            $r['partial_score'] == '1',
+            boolval($r['partial_score']),
             $contest->partial_score
         );
         $this->assertEquals($r['submissions_gap'], $contest->submissions_gap);

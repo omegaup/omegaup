@@ -81,7 +81,13 @@ class ContestParams {
     public $feedback;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string} $params
+     * @readonly
+     * @var bool
+     */
+    public $partialScore;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -118,6 +124,7 @@ class ContestParams {
         );
         $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
         $this->feedback = $params['feedback'] ?? 'detailed';
+        $this->partialScore = $params['partialScore'] ?? true;
     }
 }
 
@@ -147,7 +154,7 @@ class Contest {
             'admission_mode' => $params->admissionMode,
             'alias' => substr($params->title, 0, 20),
             'points_decay_factor' => '0.02',
-            'partial_score' => '0',
+            'partial_score' => $params->partialScore,
             'submissions_gap' => '60',
             'feedback' => $params->feedback,
             'penalty' => 100,
