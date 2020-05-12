@@ -1,5 +1,6 @@
 import course_AddStudents from '../components/course/AddStudents.vue';
-import course_Administrators from '../components/course/Administrators.vue';
+import course_Admins from '../components/common/Admins.vue';
+import course_GroupAdmins from '../components/common/GroupAdmins.vue';
 import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_AssignmentList from '../components/course/AssignmentList.vue';
 import course_Form from '../components/course/Form.vue';
@@ -74,68 +75,77 @@ OmegaUp.on('ready', function() {
     });
   }
 
-  var administrators = new Vue({
-    el: '#admins div',
+  const courseAdmins = new Vue({
+    el: '#admins .admins',
     render: function(createElement) {
-      return createElement('omegaup-course-administrators', {
-        props: {
-          admins: this.admins,
-          groupadmins: this.groupadmins,
-        },
+      return createElement('omegaup-course-admins', {
+        props: { initialAdmins: this.initialAdmins },
         on: {
-          removeAdmin: function(admin) {
-            api.Course.removeAdmin({
-              course_alias: courseAlias,
-              usernameOrEmail: admin.username,
-            })
-              .then(function(data) {
-                refreshCourseAdmins();
-                UI.success(T.adminRemoved);
-              })
-              .catch(UI.apiError);
-          },
-          removeGroupAdmin: function(group) {
-            api.Course.removeGroupAdmin({
-              course_alias: courseAlias,
-              group: group.alias,
-            })
-              .then(function(data) {
-                refreshCourseAdmins();
-                UI.success(T.groupAdminRemoved);
-              })
-              .catch(UI.apiError);
-          },
-          'add-admin': function(useradmin) {
+          'add-admin': useradmin => {
             api.Course.addAdmin({
               course_alias: courseAlias,
               usernameOrEmail: useradmin,
             })
-              .then(function(data) {
+              .then(data => {
                 UI.success(T.adminAdded);
                 refreshCourseAdmins();
               })
               .catch(UI.apiError);
           },
-          'add-group-admin': function(groupadmin) {
-            api.Course.addGroupAdmin({
+          'remove-admin': username => {
+            api.Course.removeAdmin({
               course_alias: courseAlias,
-              group: groupadmin,
+              usernameOrEmail: username,
             })
-              .then(function(data) {
-                UI.success(T.groupAdminAdded);
+              .then(data => {
                 refreshCourseAdmins();
+                UI.success(T.adminRemoved);
               })
               .catch(UI.apiError);
           },
         },
       });
     },
-    data: {
-      admins: [],
-      groupadmins: [],
-    },
+    data: { initialAdmins: [] },
     components: {
-      'omegaup-course-administrators': course_Administrators,
+      'omegaup-course-admins': course_Admins,
+    },
+  });
+
+  const courseGroupAdmins = new Vue({
+    el: '#admins .groups',
+    render: function(createElement) {
+      return createElement('omegaup-course-group-admins', {
+        props: { initialGroups: this.initialGroups },
+        on: {
+          'add-group-admin': groupAlias => {
+            api.Course.addGroupAdmin({
+              course_alias: courseAlias,
+              group: groupAlias,
+            })
+              .then(data => {
+                UI.success(T.groupAdminAdded);
+                refreshCourseAdmins();
+              })
+              .catch(UI.apiError);
+          },
+          'remove-group-admin': groupAlias => {
+            api.Course.removeGroupAdmin({
+              course_alias: courseAlias,
+              group: groupAlias,
+            })
+              .then(data => {
+                refreshCourseAdmins();
+                UI.success(T.groupAdminRemoved);
+              })
+              .catch(UI.apiError);
+          },
+        },
+      });
+    },
+    data: { initialGroups: [] },
+    components: {
+      'omegaup-course-group-admins': course_GroupAdmins,
     },
   });
 
@@ -675,8 +685,8 @@ OmegaUp.on('ready', function() {
   function refreshCourseAdmins() {
     api.Course.admins({ course_alias: courseAlias })
       .then(function(data) {
-        administrators.admins = data.admins;
-        administrators.groupadmins = data.group_admins;
+        courseAdmins.initialAdmins = data.admins;
+        courseGroupAdmins.initialGroups = data.group_admins;
       })
       .catch(UI.apiError);
   }
