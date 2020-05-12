@@ -38,7 +38,10 @@ declare global {
 }
 
 function typeaheadWrapper<T>(
-  searchFn: (options: { query: string }) => Promise<T[]>,
+  searchFn: (options: {
+    query: string;
+    contest_alias?: string;
+  }) => Promise<T[]>,
 ) {
   let lastRequest = <
     [string, (results: T[]) => void, (results: T[]) => void] | null
@@ -233,6 +236,47 @@ export function tagTypeahead(
     )
     .on('typeahead:select', cb)
     .on('typeahead:autocomplete', cb);
+}
+
+export function userContestTypeahead(
+  elem: JQuery<HTMLElement>,
+  contestAlias: string,
+): void {
+  const cb = (event: Event, val: { label: string; value: string }) =>
+    $(<EventTarget>event.target).val(val.label);
+  elem
+    .typeahead<{ label: string; value: string }>(
+      {
+        minLength: 3,
+        highlight: false,
+      },
+      {
+        source: typeaheadWrapper(
+          (options: { query: string; contest_alias?: string }) =>
+            new Promise<{ label: string; value: string }[]>((resolve, reject) =>
+              api.Contest.searchUsers({
+                query: options.query,
+                contest_alias: contestAlias,
+              })
+                .then(data => resolve(data))
+                .catch(reject),
+            ),
+        ),
+        async: true,
+        limit: 10,
+        display: 'label',
+        templates: {
+          suggestion: val =>
+            ui.formatString(
+              '<div data-value="%(value)"><strong>%(label)</strong> (%(value))</div>',
+              val,
+            ),
+        },
+      },
+    )
+    .on('typeahead:select', cb)
+    .on('typeahead:autocomplete', cb)
+    .trigger('change');
 }
 
 export function userTypeahead(

@@ -63,7 +63,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     }
 
     /**
-     * @return list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>
+     * @return list<array{clarification_id: int, contest_alias: null|string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>
      */
     final public static function GetProblemClarifications(
         int $problemId,
@@ -93,10 +93,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                 SELECT
                     c.clarification_id,
                     con.alias AS contest_alias,
-                    NULL AS author,
+                    "" AS author,
                     c.message,
-                    c.`time`,
                     c.answer,
+                    c.`time`,
                     c.public
                 FROM Clarifications c
             ';
@@ -121,7 +121,20 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+        $result = [];
+        /** @var array{answer: null|string, author: string, clarification_id: int, contest_alias: null|string, message: string, public: bool, time: \OmegaUp\Timestamp} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $val
+            ) as $row
+        ) {
+            if (!$admin) {
+                $row['author'] = null;
+            }
+            $result[] = $row;
+        }
+
+        return $result;
     }
 }
