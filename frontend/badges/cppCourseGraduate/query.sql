@@ -21,7 +21,8 @@ FROM (
     INNER JOIN
         Courses c ON c.course_id = a.course_id
     WHERE
-        c.alias = 'introduccion_a_cpp'
+        c.alias = 'introduccion_a_cpp' AND
+        i.user_id IS NOT NULL
     GROUP BY
         i.user_id, psp.problem_id
     ) p
