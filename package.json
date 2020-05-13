@@ -34,7 +34,7 @@
     "sortablejs": "^1.7.0",
     "style-loader": "^1.0.0",
     "ts-loader": "^6.0.2",
-    "typescript": "^3.5.1",
+    "typescript": "^3.8.3",
     "unfetch": "^4.1.0",
     "vue-codemirror-lite": "^1.0.4",
     "vue-form-wizard": "^0.8.4",

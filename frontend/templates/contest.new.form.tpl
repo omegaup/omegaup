@@ -97,9 +97,9 @@
 					<div class="form-group col-md-6">
 						<label for="feedback">{#wordsFeedback#}</label>
 						<select name="feedback" id="feedback" class="form-control">
-							<option value="yes">{#wordsYes#}</option>
-							<option value="no">{#wordsNo#}</option>
-							<option value="partial">{#wordsPartial#}</option>
+							<option value="none">{#wordsNone#}</option>
+							<option value="summary">{#wordsSummary#}</option>
+							<option value="detailed">{#wordsDetailed#}</option>
 						</select>
 						<p class="help-block">{#contestNewFormImmediateFeedbackDesc#}</p>
 					</div>

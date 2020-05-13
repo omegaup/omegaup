@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Vue from 'vue';
 
 import * as api from '../api';
@@ -19,7 +21,7 @@ import * as time from '../time';
 import * as typeahead from '../typeahead';
 import * as ui from '../ui';
 
-import ArenaAdmin from './admin_arena.js';
+import ArenaAdmin from './admin_arena';
 import {
   EphemeralGrader,
   EventsSocket,
@@ -2105,6 +2107,9 @@ export class Arena {
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
       for (let i = 0; i < detailsGroups.length; i++) {
+        if (!detailsGroups[i].cases) {
+          continue;
+        }
         detailsGroups[i].cases.sort(numericSort('name'));
       }
       groups = detailsGroups;
@@ -2123,6 +2128,10 @@ export class Arena {
       guid: data.guid,
       groups: groups,
       language: data.language,
+      feedback:
+        self.options.contestAlias && self.currentProblemset
+          ? self.currentProblemset.feedback
+          : 'detailed',
     };
     document.querySelector('.run-details-view').style.display = 'block';
   }

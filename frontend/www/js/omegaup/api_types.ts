@@ -37,6 +37,14 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
+    export function AuthorRankTablePayload(
+      elementId: string = 'payload',
+    ): types.AuthorRankTablePayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function BadgeDetailsPayload(
       elementId: string = 'payload',
     ): types.BadgeDetailsPayload {
@@ -71,6 +79,21 @@ export namespace types {
     ): types.CommonPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function ContestIntroPayload(
+      elementId: string = 'payload',
+    ): types.ContestIntroPayload {
+      return (x => {
+        x.contest = (x => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
       );
     }
 
@@ -372,6 +395,25 @@ export namespace types {
     [key: string]: types.Progress;
   }
 
+  export interface AuthorRankTablePayload {
+    length: number;
+    page: number;
+    ranking: types.AuthorsRank;
+    pagerItems: types.PageItem[];
+  }
+
+  export interface AuthorsRank {
+    ranking: {
+      author_ranking?: number;
+      author_score: number;
+      classname: string;
+      country_id?: string;
+      name?: string;
+      username: string;
+    }[];
+    total: number;
+  }
+
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;
@@ -460,6 +502,18 @@ export namespace types {
     navbarSection: string;
   }
 
+  export interface ContestIntroPayload {
+    contest: types.ContestPublicDetails;
+    needsBasicInformation?: boolean;
+    privacyStatement?: {
+      markdown: string;
+      statementType: string;
+      gitObjectId?: string;
+    };
+    requestsUserInformation?: string;
+    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+  }
+
   export interface ContestListItem {
     admission_mode: string;
     alias: string;
@@ -488,6 +542,32 @@ export namespace types {
     };
     isLogged: boolean;
     query: string;
+  }
+
+  export interface ContestPublicDetails {
+    admission_mode: string;
+    alias: string;
+    description: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string;
+    partial_score: boolean;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problemset_id: number;
+    rerun_id: number;
+    scoreboard: number;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+    user_registration_requested?: boolean;
+    user_registration_answered?: boolean;
+    user_registration_accepted?: boolean;
   }
 
   export interface CourseAssignment {
@@ -1002,7 +1082,7 @@ export namespace types {
       country_id?: string;
       name?: string;
       problems_solved: number;
-      ranking: number;
+      ranking?: number;
       score: number;
       user_id: number;
       username: string;
@@ -1014,6 +1094,7 @@ export namespace types {
     name: string;
     problems_solved: number;
     rank: number;
+    author_ranking?: number;
   }
 
   export interface UserRankTablePayload {
@@ -1280,7 +1361,7 @@ export namespace messages {
       languages?: string;
       last_updated: Date;
       original_finish_time?: Date;
-      partial_score?: number;
+      partial_score: boolean;
       penalty?: number;
       penalty_calc_policy?: string;
       penalty_type?: string;
@@ -1313,7 +1394,7 @@ export namespace messages {
       languages?: string;
       last_updated: Date;
       original_finish_time?: Date;
-      partial_score?: number;
+      partial_score: boolean;
       penalty?: number;
       penalty_calc_policy?: string;
       penalty_type?: string;
@@ -1354,31 +1435,7 @@ export namespace messages {
   };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
-  export type ContestPublicDetailsResponse = {
-    admission_mode: string;
-    alias: string;
-    description: string;
-    feedback: string;
-    finish_time: Date;
-    languages: string;
-    partial_score: boolean;
-    penalty: number;
-    penalty_calc_policy: string;
-    penalty_type: string;
-    points_decay_factor: number;
-    problemset_id: number;
-    rerun_id: number;
-    scoreboard: number;
-    show_penalty: boolean;
-    show_scoreboard_after: boolean;
-    start_time: Date;
-    submissions_gap: number;
-    title: string;
-    window_length?: number;
-    user_registration_requested?: boolean;
-    user_registration_answered?: boolean;
-    user_registration_accepted?: boolean;
-  };
+  export type ContestPublicDetailsResponse = types.ContestPublicDetails;
   export type ContestRegisterForContestRequest = { [key: string]: any };
   export type ContestRegisterForContestResponse = {};
   export type ContestRemoveAdminRequest = { [key: string]: any };
@@ -1530,6 +1587,8 @@ export namespace messages {
       total: { points: number; penalty: number };
     }[];
   };
+  export type ContestSearchUsersRequest = { [key: string]: any };
+  export type ContestSearchUsersResponse = { label: string; value: string }[];
   export type ContestSetRecommendedRequest = { [key: string]: any };
   export type ContestSetRecommendedResponse = {};
   export type ContestStatsRequest = { [key: string]: any };
@@ -2083,7 +2142,7 @@ export namespace messages {
   export type ProblemClarificationsResponse = {
     clarifications: {
       clarification_id: number;
-      contest_alias: string;
+      contest_alias?: string;
       author?: string;
       message: string;
       time: Date;
@@ -2536,6 +2595,7 @@ export namespace messages {
         group: string;
         max_score: number;
         score: number;
+        verdict?: string;
       }[];
       judged_by: string;
       max_score?: number;
@@ -2990,6 +3050,9 @@ export namespace controllers {
     scoreboardMerge: (
       params?: messages.ContestScoreboardMergeRequest,
     ) => Promise<messages.ContestScoreboardMergeResponse>;
+    searchUsers: (
+      params?: messages.ContestSearchUsersRequest,
+    ) => Promise<messages.ContestSearchUsersResponse>;
     setRecommended: (
       params?: messages.ContestSetRecommendedRequest,
     ) => Promise<messages.ContestSetRecommendedResponse>;
