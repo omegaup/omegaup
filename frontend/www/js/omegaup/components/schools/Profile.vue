@@ -6,20 +6,18 @@
     </h3>
     <div class="row">
       <div class="col-md-4">
-        <div class="card" v-if="country">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <strong>{{ T.wordsCountry }}:</strong>
-              {{ country.name }}
-              <omegaup-country-flag
-                v-bind:country="country.id"
-              ></omegaup-country-flag>
-            </li>
-            <li class="list-group-item" v-if="stateName">
-              <strong>{{ T.profileState }}:</strong> {{ stateName }}
-            </li>
-          </ul>
-        </div>
+        <ul class="list-group" v-if="country">
+          <li class="list-group-item">
+            <strong>{{ T.wordsCountry }}:</strong>
+            {{ country.name }}
+            <omegaup-country-flag
+              v-bind:country="country.id"
+            ></omegaup-country-flag>
+          </li>
+          <li class="list-group-item" v-if="stateName">
+            <strong>{{ T.profileState }}:</strong> {{ stateName }}
+          </li>
+        </ul>
         <omegaup-grid-paginator
           v-bind:columns="1"
           v-bind:items="codersOfTheMonth"
@@ -39,10 +37,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <omegaup-school-chart
-              v-bind:data="monthlySolvedProblemsCount"
-              v-bind:school="name"
-            ></omegaup-school-chart>
+            <highcharts v-bind:options="chartOptions"></highcharts>
           </div>
         </div>
       </div>
@@ -98,7 +93,6 @@ import T from '../../lang';
 import * as UI from '../../ui';
 
 import CountryFlag from '../CountryFlag.vue';
-import SchoolChart from './Chart.vue';
 import GridPaginator from '../GridPaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
@@ -108,7 +102,6 @@ import { Chart } from 'highcharts-vue';
 @Component({
   components: {
     'omegaup-country-flag': CountryFlag,
-    'omegaup-school-chart': SchoolChart,
     'omegaup-grid-paginator': GridPaginator,
     'omegaup-username': UserName,
     highcharts: Chart,

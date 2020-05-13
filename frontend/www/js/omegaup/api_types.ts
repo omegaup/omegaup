@@ -937,6 +937,9 @@ export namespace types {
     ranking: number;
     country?: { id: string; name: string };
     state_name?: string;
+    monthly_solved_problems: types.SchoolProblemsSolved[];
+    school_users: types.SchoolUser[];
+    coders_of_the_month: types.SchoolCoderOfTheMonth[];
   }
 
   export interface SchoolRankPayload {
