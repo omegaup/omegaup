@@ -1,9 +1,7 @@
 <template>
-  <div>
-    <span>
-      {{ formattedTimeLeft }}
-    </span>
-  </div>
+  <span>
+    {{ formattedTimeLeft }}
+  </span>
 </template>
 
 <script lang="ts">
@@ -12,17 +10,14 @@ import * as time from '../time';
 
 @Component
 export default class Countdown extends Vue {
-  @Prop() startTime!: Date;
+  @Prop() targetTime!: Date;
 
   timePassed = 0;
   timerInterval = 0;
+  currentTime = Date.now();
 
-  get timeLeft() {
-    if (!this.startTime) {
-      return 0;
-    }
-    const timeLimit = this.startTime.getTime() - Date.now();
-    return timeLimit - this.timePassed;
+  get timeLeft(): number {
+    return this.targetTime.getTime() - this.currentTime;
   }
 
   get formattedTimeLeft(): string {
@@ -40,7 +35,10 @@ export default class Countdown extends Vue {
   }
 
   startTimer(): void {
-    this.timerInterval = window.setInterval(() => (this.timePassed += 1), 1000);
+    this.timerInterval = window.setInterval(
+      () => (this.currentTime = Date.now()),
+      1000,
+    );
   }
 
   mounted() {

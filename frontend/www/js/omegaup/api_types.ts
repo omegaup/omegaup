@@ -486,11 +486,7 @@ export namespace types {
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
     needsBasicInformation?: boolean;
-    privacyStatement?: {
-      markdown: string;
-      statementType: string;
-      gitObjectId?: string;
-    };
+    privacyStatement?: types.Statement;
     requestsUserInformation?: string;
     shouldShowFirstAssociatedIdentityRunWarning?: boolean;
   }
@@ -549,6 +545,13 @@ export namespace types {
     user_registration_requested?: boolean;
     user_registration_answered?: boolean;
     user_registration_accepted?: boolean;
+  }
+
+  export interface ContestStatement {
+    contest_alias: string;
+    privacy_git_object_id?: string;
+    share_user_information?: boolean;
+    statement_type?: string;
   }
 
   export interface CourseAssignment {
@@ -1001,6 +1004,12 @@ export namespace types {
   export interface SelectedTag {
     public: boolean;
     tagname: string;
+  }
+
+  export interface Statement {
+    markdown: string;
+    statementType: string;
+    gitObjectId?: string;
   }
 
   export interface StatsPayload {

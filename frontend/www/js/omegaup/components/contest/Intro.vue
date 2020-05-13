@@ -15,7 +15,7 @@
             <p>
               {{ T.contestWillBeginIn }}
               <omegaup-countdown
-                v-bind:start-time="contest.start_time"
+                v-bind:target-time="contest.start_time"
                 v-on:emit-finish="now = Date.now()"
               ></omegaup-countdown>
             </p>
@@ -63,8 +63,9 @@
               </template>
               <button
                 type="submit"
+                data-start-contest
                 v-bind:disabled="isButtonDisabled"
-                class="btn btn-primary btn-lg start-contest-submit"
+                class="btn btn-primary btn-lg"
               >
                 {{ T.startContest }}
               </button>
@@ -136,23 +137,11 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as markdown from '../../markdown';
 import * as UI from '../../ui';
 import omegaup_Countdown from '../Countdown.vue';
-
-interface Statement {
-  gitObjectId?: string;
-  markdown?: string;
-  statementType?: string;
-}
-
-interface ContestStatement {
-  contest_alias: string;
-  share_user_information: boolean | null;
-  privacy_git_object_id?: string;
-  statement_type?: string;
-}
 
 @Component({
   components: {
@@ -165,7 +154,7 @@ export default class ContestIntro extends Vue {
   @Prop() requestURI!: string;
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
-  @Prop() statement!: Statement;
+  @Prop() statement!: types.Statement;
 
   T = T;
   UI = UI;
@@ -188,11 +177,12 @@ export default class ContestIntro extends Vue {
     const url = encodeURIComponent(window.location.pathname);
     return `/login/?redirect=${url}`;
   }
+
   get consentHtml(): string {
-    if (!this.statement) {
+    const markdown = this.statement?.markdown;
+    if (!markdown) {
       return '';
     }
-    const markdown = this.statement.markdown || '';
     return this.markdownConverter.makeHtml(markdown);
   }
 
@@ -267,9 +257,9 @@ export default class ContestIntro extends Vue {
   }
 
   onStartContest() {
-    const request: ContestStatement = {
+    const request: types.ContestStatement = {
       contest_alias: this.contest.alias,
-      share_user_information: this.shareUserInformation,
+      share_user_information: this.shareUserInformation ?? false,
     };
     if (this.requestsUserInformation !== 'no') {
       request.privacy_git_object_id = this.statement.gitObjectId;
