@@ -53,15 +53,17 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $params = [];
         $sqlFrom = '
               FROM
-                `User_Rank` `ur`';
+                `User_Rank` `ur`
+              WHERE
+                `ur`.`ranking` IS NOT NULL';
         if ($filteredBy === 'state' && is_string($value)) {
             $values = explode('-', $value);
             $params[] = $values[0];
             $params[] = $values[1];
-            $sqlFrom .= ' WHERE `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
+            $sqlFrom .= ' AND `ur`.`country_id` = ? AND `ur`.`state_id` = ?';
         } elseif (!empty($filteredBy)) {
             $params[] = $value;
-            $sqlFrom .= ' WHERE `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
+            $sqlFrom .= ' AND `ur`.`' . \OmegaUp\MySQLConnection::getInstance()->escape(
                 $filteredBy
             ) . '_id` = ?';
         }
@@ -97,7 +99,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
     }
 
     /**
-     * @return array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
+     * @return array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string,name: null|string, username: string}>, total: int}
      */
     public static function getAuthorsRank(
         int $page,
