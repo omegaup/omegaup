@@ -1,6 +1,8 @@
 SELECT
-    p.user_id
-FROM (
+    u.user_id
+FROM
+    Users u
+INNER JOIN (
     SELECT
         i.user_id,
         MAX(r.contest_score) AS max_contest_score,
@@ -25,9 +27,9 @@ FROM (
         i.user_id IS NOT NULL
     GROUP BY
         i.user_id, psp.problem_id
-    ) p
+    ) p ON p.user_id = u.user_id
 GROUP BY
-    p.user_id
+    u.user_id
 HAVING
     SUM(p.max_contest_score) >= (
         SELECT
