@@ -536,7 +536,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'contest' => self::getPublicDetails($contest, $r->identity),
                     'isLoggedIn' => !is_null($r->identity),
-                    'requestURI' => strval($_SERVER['REQUEST_URI']),
+                    'requestURI' => isset($_SERVER['REQUEST_URI']) ? strval(
+                        $_SERVER['REQUEST_URI']
+                    ) : '',
                 ],
                 'title' => 'enterContest',
             ],
