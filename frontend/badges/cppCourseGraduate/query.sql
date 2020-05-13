@@ -1,11 +1,9 @@
 SELECT
-   u.user_id
-from
-	Users u
-INNER JOIN (
+    p.user_id
+FROM (
     SELECT
         i.user_id,
-        MAX(r.contest_score) AS scoreMax,
+        MAX(r.contest_score) AS max_contest_score,
         psp.problem_id
     FROM
         Assignments a
@@ -26,11 +24,11 @@ INNER JOIN (
         c.alias = 'introduccion_a_cpp'
     GROUP BY
         i.user_id, psp.problem_id
-    ) p on p.user_id = u.user_id
+    ) p
 GROUP BY
-    u.user_id
+    p.user_id
 HAVING
-    SUM(p.scoreMax) >= (
+    SUM(p.max_contest_score) >= (
         SELECT
             SUM(psp.points) * 0.6
         FROM

@@ -29,16 +29,19 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             ])
         );
 
-        // Problems 1 and 2 will be assigned to the first assignment, both have
-        // submissions. Problem 3 and 4 will be assigned to second assignment
-        foreach ($problems as $index => $problemData) {
-            $assignmentAliasIndex = ($index === 0 || $index === 1) ? 0 : 1;
+        foreach (array_slice($problems, 0, 2) as $problemData) {
             \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'course_alias' => $courseData['course_alias'],
-                'assignment_alias' => $courseData['assignment_aliases'][
-                    $assignmentAliasIndex
-                ],
+                'assignment_alias' => $courseData['assignment_aliases'][0],
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ]));
+        }
+        foreach (array_slice($problems, 2, 2) as $problemData) {
+            \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $courseData['assignment_aliases'][1],
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
         }
@@ -53,6 +56,7 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
 
         $submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
         {
+            // This user will recive the badge because he will resolve 4 differents problems of the course
             $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
                 $students[0]
             );
@@ -102,10 +106,13 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
                 null,
                 $runResponse['guid']
             );
+
+            // This user will not recibe the badge because he will resolve a problem with multiple solutions
             $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
                 $students[1]
             );
 
+        for ($i = 0; $i < 10; $i++) {
             // Add one run to the first problem in the first assignment.
             $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
                 'auth_token' => $studentLogin->auth_token,
@@ -121,22 +128,7 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
                 null,
                 $runResponse['guid']
             );
-
-            //twice the same problem to verify that the query takes the maximum score of a problem
-            $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-                'problemset_id' => $courseData['assignment_problemset_ids'][0],
-                'problem_alias' => $problems[0]['problem']->alias,
-                'language' => 'c11-gcc',
-                'source' => $submissionSource,
-            ]));
-            \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/ null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
-            );
+        }
         }
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/cppCourseGraduate/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
