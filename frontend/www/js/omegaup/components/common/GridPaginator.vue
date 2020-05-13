@@ -77,9 +77,9 @@ interface SortOption {
 }
 
 /**
-  Creates a two-dimensional paginated table, with the number of columns passed
-  as a prop and the number of rows being calculated taking into account the number
-  of items per page, total items and the number of columns.
+ * Creates a two-dimensional paginated table, with the number of columns passed
+ * as a prop and the number of rows being calculated taking into account the number
+ * of items per page, total items and the number of columns.
  */
 @Component
 export default class GridPaginator extends Vue {
@@ -91,7 +91,7 @@ export default class GridPaginator extends Vue {
   @Prop({ default: () => [] }) sortOptions!: SortOption[];
 
   private T = T;
-  private currentPageNumber: number = 0;
+  private currentPageNumber = 0;
   private currentSortOption =
     this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
 
