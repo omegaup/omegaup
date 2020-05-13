@@ -2672,18 +2672,8 @@ export namespace messages {
     label: string;
     value: string;
   }[];
-  export type SchoolMonthlySolvedProblemsCountRequest = { [key: string]: any };
-  export type SchoolMonthlySolvedProblemsCountResponse = {
-    distinct_problems_solved: types.SchoolProblemsSolved[];
-  };
-  export type SchoolSchoolCodersOfTheMonthRequest = { [key: string]: any };
-  export type SchoolSchoolCodersOfTheMonthResponse = {
-    coders: types.SchoolCoderOfTheMonth[];
-  };
   export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
   export type SchoolSelectSchoolOfTheMonthResponse = {};
-  export type SchoolUsersRequest = { [key: string]: any };
-  export type SchoolUsersResponse = { users: types.SchoolUser[] };
 
   // Scoreboard
   export type ScoreboardRefreshRequest = { [key: string]: any };
@@ -3404,18 +3394,9 @@ export namespace controllers {
     list: (
       params?: messages.SchoolListRequest,
     ) => Promise<messages.SchoolListResponse>;
-    monthlySolvedProblemsCount: (
-      params?: messages.SchoolMonthlySolvedProblemsCountRequest,
-    ) => Promise<messages.SchoolMonthlySolvedProblemsCountResponse>;
-    schoolCodersOfTheMonth: (
-      params?: messages.SchoolSchoolCodersOfTheMonthRequest,
-    ) => Promise<messages.SchoolSchoolCodersOfTheMonthResponse>;
     selectSchoolOfTheMonth: (
       params?: messages.SchoolSelectSchoolOfTheMonthRequest,
     ) => Promise<messages.SchoolSelectSchoolOfTheMonthResponse>;
-    users: (
-      params?: messages.SchoolUsersRequest,
-    ) => Promise<messages.SchoolUsersResponse>;
   }
 
   export interface Scoreboard {

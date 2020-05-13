@@ -186,29 +186,6 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array{coders: list<SchoolCoderOfTheMonth>}
-     *
-     * @omegaup-request-param int $school_id
-     */
-    public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
-        $r->ensureInt('school_id');
-        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
-        if (is_null($school)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
-        }
-
-        return [
-            'coders' => \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
-                intval($school->school_id)
-            )
-        ];
-    }
-
-    /**
-     * Returns rank of best schools in last month
-     *
      * @return list<SchoolCoderOfTheMonth>
      */
     public static function getSchoolCodersOfTheMonth(
@@ -222,31 +199,6 @@ class School extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
             intval($school->school_id)
         );
-    }
-
-    /**
-     * Returns the number of solved problems on the last
-     * months (including the current one)
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array{distinct_problems_solved: list<SchoolProblemsSolved>}
-     *
-     * @omegaup-request-param int $school_id
-     */
-    public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
-        $r->ensureInt('school_id');
-        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
-
-        if (is_null($school)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
-        }
-
-        return [
-            'distinct_problems_solved' => \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
-                intval($r['school_id'])
-            ),
-        ];
     }
 
     /**
@@ -267,31 +219,6 @@ class School extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
             $schoolId
         );
-    }
-
-    /**
-     * Returns the list of current students registered in a certain school
-     * with the number of created problems, solved problems and organized contests.
-     *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array{users: list<SchoolUser>}
-     *
-     * @omegaup-request-param int $school_id
-     */
-    public static function apiUsers(\OmegaUp\Request $r): array {
-        $r->ensureInt('school_id');
-        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
-
-        if (is_null($school)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
-        }
-
-        return [
-            'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
-                intval($school->school_id)
-            ),
-        ];
     }
 
     /**

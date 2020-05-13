@@ -1,63 +1,77 @@
 import Vue from 'vue';
-
-import * as api from '../api';
-import { types } from '../api_types';
 import school_Profile from '../components/schools/Profile.vue';
+import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
+import * as UI from '../ui';
+import T from '../lang';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../types';
-import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolProfileDetailsPayload();
+
+  const solvedProblemsCountData = payload.monthly_solved_problems.map(
+    solvedProblemsCount => solvedProblemsCount.problems_solved,
+  );
+  const solvedProblemsCountCategories = payload.monthly_solved_problems.map(
+    solvedProblemsCount =>
+      `${solvedProblemsCount.year}-${solvedProblemsCount.month}`,
+  );
+
   const schoolProfile = new Vue({
     el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-school-profile', {
         props: {
-          codersOfTheMonth: this.codersOfTheMonth,
+          codersOfTheMonth: payload.coders_of_the_month.map(
+            coder => new SchoolCoderOfTheMonth(coder),
+          ),
           country: payload.country,
-          monthlySolvedProblemsCount: this.monthlySolvedProblemsCount,
           name: payload.school_name,
           rank: payload.ranking,
           stateName: payload.state_name,
-          users: this.users,
+          users: payload.school_users.map(user => new SchoolUser(user)),
+          chartOptions: {
+            chart: {
+              type: 'line',
+            },
+            title: {
+              text: UI.formatString(T.profileSchoolMonthlySolvedProblemsCount, {
+                school: payload.school_name,
+              }),
+            },
+            yAxis: {
+              min: 0,
+              title: {
+                text: T.profileSolvedProblems,
+              },
+            },
+            xAxis: {
+              categories: solvedProblemsCountCategories,
+              title: {
+                text: T.wordsMonths,
+              },
+              labels: {
+                rotation: -45,
+              },
+            },
+            legend: {
+              enabled: false,
+            },
+            tooltip: {
+              headerFormat: '',
+              pointFormat: '<b>{point.y}<b/>',
+            },
+            series: [
+              {
+                data: solvedProblemsCountData,
+              },
+            ],
+          },
         },
       });
-    },
-    data: {
-      codersOfTheMonth: <SchoolCoderOfTheMonth[]>[],
-      monthlySolvedProblemsCount: <types.SchoolProblemsSolved[]>[],
-      users: <SchoolUser[]>[],
     },
     components: {
       'omegaup-school-profile': school_Profile,
     },
   });
-
-  api.School.schoolCodersOfTheMonth({
-    school_id: payload.school_id,
-  })
-    .then(response => {
-      schoolProfile.codersOfTheMonth = response.coders.map(
-        coder => new SchoolCoderOfTheMonth(coder),
-      );
-    })
-    .catch(ui.apiError);
-
-  api.School.users({
-    school_id: payload.school_id,
-  })
-    .then(response => {
-      schoolProfile.users = response.users.map(user => new SchoolUser(user));
-    })
-    .catch(ui.apiError);
-
-  api.School.monthlySolvedProblemsCount({
-    school_id: payload.school_id,
-  })
-    .then(response => {
-      schoolProfile.monthlySolvedProblemsCount =
-        response.distinct_problems_solved;
-    })
-    .catch(ui.apiError);
 });
