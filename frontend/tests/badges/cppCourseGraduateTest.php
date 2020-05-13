@@ -121,6 +121,22 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
                 null,
                 $runResponse['guid']
             );
+
+            //twice the same problem to verify that the query takes the maximum score of a problem
+            $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'problemset_id' => $courseData['assignment_problemset_ids'][0],
+                'problem_alias' => $problems[0]['problem']->alias,
+                'language' => 'c11-gcc',
+                'source' => $submissionSource,
+            ]));
+            \OmegaUp\Test\Factories\Run::gradeRun(
+                /*$runData=*/ null,
+                1,
+                'AC',
+                null,
+                $runResponse['guid']
+            );
         }
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/cppCourseGraduate/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));

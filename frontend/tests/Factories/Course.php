@@ -13,7 +13,7 @@ class Course {
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
         ?int $courseDuration = 120,
-        string $courseAlias = null
+        ?string $courseAlias = null
     ): array {
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -75,7 +75,7 @@ class Course {
         int $startTimeDelay = 0,
         ?int $courseDuration = 120,
         ?int $assignmentDuration = 120,
-        string $courseAlias = null
+        ?string $courseAlias = null
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -145,7 +145,7 @@ class Course {
      */
     public static function createCourseWithAssignments(
         int $nAssignments,
-        string $courseAlias = null
+        ?string $courseAlias = null
     ): array {
         return self::createCourseWithNAssignmentsPerType([
             'homework' => $nAssignments
@@ -158,7 +158,7 @@ class Course {
      */
     public static function createCourseWithNAssignmentsPerType(
         array $assignmentsPerType,
-        string $courseAlias = null
+        ?string $courseAlias = null
     ): array {
         $courseFactoryResult = self::createCourse(
             null,
