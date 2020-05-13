@@ -485,12 +485,14 @@ export namespace types {
 
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
+    isLoggedIn: boolean;
     needsBasicInformation?: boolean;
     privacyStatement?: {
       markdown: string;
       statementType: string;
       gitObjectId?: string;
     };
+    requestURI: string;
     requestsUserInformation?: string;
     shouldShowFirstAssociatedIdentityRunWarning?: boolean;
   }
