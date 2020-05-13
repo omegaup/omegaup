@@ -3,29 +3,35 @@
 import Vue from 'vue';
 
 import * as api from '../api';
+import { types } from '../api_types';
 import T from '../lang';
 import arena_Runs from '../components/arena/Runs.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
+import { Arena } from './arena';
 import { runsStore } from './arena_transitional';
 
 export default class ArenaAdmin {
-  constructor(arena) {
-    var self = this;
+  arena: Arena;
 
-    self.arena = arena;
-    self.arena.problemsetAdmin = true;
+  runsList: Vue;
 
-    self.setUpPagers();
-    self.runsList = new Vue({
+  constructor(arena: Arena) {
+    const self = this;
+
+    this.arena = arena;
+    this.arena.problemsetAdmin = true;
+
+    this.setUpPagers();
+    this.runsList = new Vue({
       el: '#runs table.runs',
       render: function(createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
             contestAlias: arena.options.contestAlias,
             runs: runsStore.state.runs,
-            showContest: self.arena.options.contestAlias == 'admin',
+            showContest: arena.options.contestAlias == 'admin',
             showProblem: !arena.options.isOnlyProblem,
             showDetails: true,
             showDisqualify: true,
@@ -35,24 +41,24 @@ export default class ArenaAdmin {
             problemsetProblems: Object.values(self.arena.problems),
           },
           on: {
-            details: run => {
+            details: (run: types.Run) => {
               window.location.hash += `/show-run:${run.guid}`;
             },
-            disqualify: run => {
+            disqualify: (run: types.Run) => {
               if (!window.confirm(T.runDisqualifyConfirm)) {
                 return;
               }
               api.Run.disqualify({ run_alias: run.guid })
                 .then(data => {
                   run.type = 'disqualified';
-                  self.arena.updateRunFallback(run.guid);
+                  arena.updateRunFallback(run.guid);
                 })
                 .catch(ui.ignoreError);
             },
             'filter-changed': () => {
               self.refreshRuns();
             },
-            rejudge: run => {
+            rejudge: (run: types.Run) => {
               api.Run.rejudge({ run_alias: run.guid, debug: false })
                 .then(data => {
                   run.status = 'rejudging';
@@ -67,129 +73,127 @@ export default class ArenaAdmin {
     });
   }
 
-  setUpPagers() {
-    var self = this;
-
-    $('.clarifpager .clarifpagerprev').on('click', function() {
-      if (self.arena.clarificationsOffset > 0) {
-        self.arena.clarificationsOffset -= self.arena.clarificationsRowcount;
-        if (self.arena.clarificationsOffset < 0) {
-          self.arena.clarificationsOffset = 0;
+  setUpPagers(): void {
+    $('.clarifpager .clarifpagerprev').on('click', () => {
+      if (this.arena.clarificationsOffset > 0) {
+        this.arena.clarificationsOffset -= this.arena.clarificationsRowcount;
+        if (this.arena.clarificationsOffset < 0) {
+          this.arena.clarificationsOffset = 0;
         }
 
-        self.refreshClarifications();
+        this.refreshClarifications();
       }
     });
 
-    $('.clarifpager .clarifpagernext').on('click', function() {
-      self.arena.clarificationsOffset += self.arena.clarificationsRowcount;
-      if (self.arena.clarificationsOffset < 0) {
-        self.arena.clarificationsOffset = 0;
+    $('.clarifpager .clarifpagernext').on('click', () => {
+      this.arena.clarificationsOffset += this.arena.clarificationsRowcount;
+      if (this.arena.clarificationsOffset < 0) {
+        this.arena.clarificationsOffset = 0;
       }
 
-      self.refreshClarifications();
+      this.refreshClarifications();
     });
 
-    self.arena.elements.clarification.on('submit', function(e) {
-      $('input', self.arena.elements.clarification).attr(
+    this.arena.elements.clarification.on('submit', (e: Event) => {
+      $('input', this.arena.elements.clarification).attr(
         'disabled',
         'disabled',
       );
       api.Clarification.create({
-        contest_alias: self.arena.options.contestAlias,
+        contest_alias: this.arena.options.contestAlias,
         problem_alias: $(
           'select[name="problem"]',
-          self.arena.elements.clarification,
+          this.arena.elements.clarification,
         ).val(),
         username: $(
           'select[name="user"]',
-          self.arena.elements.clarification,
+          this.arena.elements.clarification,
         ).val(),
         message: $(
           'textarea[name="message"]',
-          self.arena.elements.clarification,
+          this.arena.elements.clarification,
         ).val(),
       })
-        .then(function(run) {
-          self.arena.hideOverlay();
-          self.refreshClarifications();
+        .then(response => {
+          this.arena.hideOverlay();
+          this.refreshClarifications();
         })
-        .catch(function(run) {
-          alert(run.error);
+        .catch((e: { status: string; error: Error }) => {
+          alert(e.error);
         })
-        .finally(function() {
-          $('input', self.arena.elements.clarification).prop('disabled', false);
+        .finally(() => {
+          $('input', this.arena.elements.clarification).prop('disabled', false);
         });
 
       return false;
     });
   }
 
-  refreshRuns() {
-    var self = this;
-    const runsListComponent = self.runsList.$children[0];
+  refreshRuns(): void {
+    const runsListComponent = <arena_Runs>this.runsList.$children[0];
 
     var options = {
+      assignment_alias: <string | undefined>undefined,
+      contest_alias: <string | undefined>undefined,
+      course_alias: <string | undefined>undefined,
+      problem_alias: runsListComponent.filterProblem || undefined,
       offset: runsListComponent.filterOffset * runsListComponent.rowCount,
       rowcount: runsListComponent.rowCount,
       verdict: runsListComponent.filterVerdict || undefined,
       language: runsListComponent.filterLanguage || undefined,
       username: runsListComponent.filterUsername || undefined,
-      problem_alias: runsListComponent.filterProblem || undefined,
+      show_all: <boolean | undefined>undefined,
       status: runsListComponent.filterStatus || undefined,
     };
 
-    if (self.arena.options.onlyProblemAlias) {
+    if (this.arena.options.onlyProblemAlias) {
       options.show_all = true;
-      options.problem_alias = self.arena.options.onlyProblemAlias;
+      options.problem_alias = this.arena.options.onlyProblemAlias;
       api.Problem.runs(options)
         .then(time.remoteTimeAdapter)
-        .then(self.runsChanged.bind(self))
+        .then(response => this.runsChanged(response))
         .catch(ui.apiError);
-    } else if (self.arena.options.contestAlias === 'admin') {
+    } else if (this.arena.options.contestAlias === 'admin') {
       api.Run.list(options)
         .then(time.remoteTimeAdapter)
-        .then(self.runsChanged.bind(self))
+        .then(response => this.runsChanged(response))
         .catch(ui.ignoreError);
-    } else if (self.arena.options.contestAlias != null) {
-      options.contest_alias = self.arena.options.contestAlias;
+    } else if (this.arena.options.contestAlias != null) {
+      options.contest_alias = this.arena.options.contestAlias;
       api.Contest.runs(options)
         .then(time.remoteTimeAdapter)
-        .then(self.runsChanged.bind(self))
+        .then(response => this.runsChanged(response))
         .catch(ui.apiError);
     } else {
-      options.course_alias = self.arena.options.courseAlias;
-      options.assignment_alias = self.arena.options.assignmentAlias;
+      options.course_alias = this.arena.options.courseAlias || undefined;
+      options.assignment_alias =
+        this.arena.options.assignmentAlias || undefined;
       api.Course.runs(options)
         .then(time.remoteTimeAdapter)
-        .then(self.runsChanged.bind(self))
+        .then(response => this.runsChanged(response))
         .catch(ui.apiError);
     }
   }
 
-  refreshClarifications() {
-    var self = this;
-
-    if (self.arena.options.onlyProblemAlias) {
+  refreshClarifications(): void {
+    if (this.arena.options.onlyProblemAlias) {
       api.Problem.clarifications({
-        problem_alias: self.arena.options.onlyProblemAlias,
-        offset: self.arena.clarificationsOffset,
-        rowcount: self.arena.clarificationsRowcount,
+        problem_alias: this.arena.options.onlyProblemAlias,
+        offset: this.arena.clarificationsOffset,
+        rowcount: this.arena.clarificationsRowcount,
       })
         .then(time.remoteTimeAdapter)
-        .then(self.arena.clarificationsChange.bind(self.arena))
+        .then(response => this.arena.clarificationsChange(response))
         .catch(ui.apiError);
     } else {
-      self.arena.refreshClarifications();
+      this.arena.refreshClarifications();
     }
   }
 
-  runsChanged(data) {
-    var self = this;
-
+  runsChanged(data: { runs: types.Run[] }): void {
     runsStore.commit('clear');
-    for (var i = 0; i < data.runs.length; i++) {
-      self.arena.trackRun(data.runs[i]);
+    for (const run of data.runs) {
+      this.arena.trackRun(run);
     }
   }
 }
