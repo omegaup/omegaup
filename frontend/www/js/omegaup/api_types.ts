@@ -381,6 +381,7 @@ export namespace types {
     length: number;
     page: number;
     ranking: types.AuthorsRank;
+    pagerItems: types.PageItem[];
   }
 
   export interface AuthorsRank {

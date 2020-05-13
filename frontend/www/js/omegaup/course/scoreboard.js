@@ -1,4 +1,4 @@
-import { Arena } from '../arena/arena.js';
+import { Arena } from '../arena/arena';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as UI from '../ui';
