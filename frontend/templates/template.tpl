@@ -13,7 +13,7 @@
 
       <script type="text/json" id="payload">{$payload|json_encode}</script>
       {block name="entrypoint"}{/block}
-      <div {if (!isset($fullWidth) || !$fullWidth)}class="container-xl pt-4 mb-4"{/if}>
+      <div {if (!isset($fullWidth) || !$fullWidth)}class="container-lg pt-4 mb-4"{/if}>
         <div id="main-container"></div>
       </div>
     </main>
