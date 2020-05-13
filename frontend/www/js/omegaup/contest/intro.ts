@@ -8,6 +8,7 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestIntroPayload();
+  const headerPayload = types.payloadParsers.CommonPayload();
   const contestIntro = new Vue({
     el: '#main-container',
     render: function(createElement) {
@@ -16,7 +17,7 @@ OmegaUp.on('ready', () => {
           requestsUserInformation: payload.requestsUserInformation,
           needsBasicInformation: payload.needsBasicInformation,
           contest: payload.contest,
-          isLoggedIn: payload.isLoggedIn,
+          isLoggedIn: headerPayload.isLoggedIn,
           statement: payload.privacyStatement,
         },
         on: {

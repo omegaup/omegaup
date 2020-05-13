@@ -485,7 +485,6 @@ export namespace types {
 
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
-    isLoggedIn: boolean;
     needsBasicInformation?: boolean;
     privacyStatement?: {
       markdown: string;

@@ -8,7 +8,7 @@
  * @psalm-type Clarification=array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null}
- * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, isLoggedIn: bool, needsBasicInformation?: bool, privacyStatement?: array{markdown: string, statementType: string, gitObjectId?: string}, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning?: bool}
+ * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation?: bool, privacyStatement?: array{markdown: string, statementType: string, gitObjectId?: string}, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning?: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
  * @psalm-type Run=array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country_id: null|string, contest_alias: null|string}
@@ -535,7 +535,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'contest' => self::getPublicDetails($contest, $r->identity),
-                    'isLoggedIn' => !is_null($r->identity),
                 ],
                 'title' => 'enterContest',
             ],
