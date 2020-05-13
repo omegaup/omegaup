@@ -82,6 +82,21 @@ export namespace types {
       );
     }
 
+    export function ContestIntroPayload(
+      elementId: string = 'payload',
+    ): types.ContestIntroPayload {
+      return (x => {
+        x.contest = (x => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.contest);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ContestListPayload(
       elementId: string = 'payload',
     ): types.ContestListPayload {
@@ -384,6 +399,7 @@ export namespace types {
     length: number;
     page: number;
     ranking: types.AuthorsRank;
+    pagerItems: types.PageItem[];
   }
 
   export interface AuthorsRank {
@@ -486,6 +502,18 @@ export namespace types {
     navbarSection: string;
   }
 
+  export interface ContestIntroPayload {
+    contest: types.ContestPublicDetails;
+    needsBasicInformation?: boolean;
+    privacyStatement?: {
+      markdown: string;
+      statementType: string;
+      gitObjectId?: string;
+    };
+    requestsUserInformation?: string;
+    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+  }
+
   export interface ContestListItem {
     admission_mode: string;
     alias: string;
@@ -514,6 +542,32 @@ export namespace types {
     };
     isLogged: boolean;
     query: string;
+  }
+
+  export interface ContestPublicDetails {
+    admission_mode: string;
+    alias: string;
+    description: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string;
+    partial_score: boolean;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problemset_id: number;
+    rerun_id: number;
+    scoreboard: number;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+    user_registration_requested?: boolean;
+    user_registration_answered?: boolean;
+    user_registration_accepted?: boolean;
   }
 
   export interface CourseAssignment {
@@ -1307,7 +1361,7 @@ export namespace messages {
       languages?: string;
       last_updated: Date;
       original_finish_time?: Date;
-      partial_score?: number;
+      partial_score: boolean;
       penalty?: number;
       penalty_calc_policy?: string;
       penalty_type?: string;
@@ -1340,7 +1394,7 @@ export namespace messages {
       languages?: string;
       last_updated: Date;
       original_finish_time?: Date;
-      partial_score?: number;
+      partial_score: boolean;
       penalty?: number;
       penalty_calc_policy?: string;
       penalty_type?: string;
@@ -1381,31 +1435,7 @@ export namespace messages {
   };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
-  export type ContestPublicDetailsResponse = {
-    admission_mode: string;
-    alias: string;
-    description: string;
-    feedback: string;
-    finish_time: Date;
-    languages: string;
-    partial_score: boolean;
-    penalty: number;
-    penalty_calc_policy: string;
-    penalty_type: string;
-    points_decay_factor: number;
-    problemset_id: number;
-    rerun_id: number;
-    scoreboard: number;
-    show_penalty: boolean;
-    show_scoreboard_after: boolean;
-    start_time: Date;
-    submissions_gap: number;
-    title: string;
-    window_length?: number;
-    user_registration_requested?: boolean;
-    user_registration_answered?: boolean;
-    user_registration_accepted?: boolean;
-  };
+  export type ContestPublicDetailsResponse = types.ContestPublicDetails;
   export type ContestRegisterForContestRequest = { [key: string]: any };
   export type ContestRegisterForContestResponse = {};
   export type ContestRemoveAdminRequest = { [key: string]: any };

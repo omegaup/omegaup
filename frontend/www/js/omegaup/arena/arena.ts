@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Vue from 'vue';
 
 import * as api from '../api';
@@ -19,7 +21,7 @@ import * as time from '../time';
 import * as typeahead from '../typeahead';
 import * as ui from '../ui';
 
-import ArenaAdmin from './admin_arena.js';
+import ArenaAdmin from './admin_arena';
 import {
   EphemeralGrader,
   EventsSocket,

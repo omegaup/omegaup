@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import Vue from 'vue';
 
 import * as api from '../api';
