@@ -4,9 +4,9 @@
       <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
       {{ name }}
     </h3>
-    <div class="row">
+    <div class="row mb-4">
       <div class="col-md-4">
-        <ul class="list-group" v-if="country">
+        <ul class="list-group mb-3" v-if="country">
           <li class="list-group-item">
             <strong>{{ T.wordsCountry }}:</strong>
             {{ country.name }}
@@ -56,9 +56,11 @@
           <template slot="table-header">
             <thead>
               <tr>
-                <th class="text-center">{{ T.profileContestsTablePlace }}</th>
-                <th>{{ T.username }}</th>
-                <th class="numericColumn">{{ sortByTableTitle }}</th>
+                <th scope="col" class="text-center">
+                  {{ T.profileContestsTablePlace }}
+                </th>
+                <th scope="col">{{ T.username }}</th>
+                <th scope="col" class="text-right">{{ sortByTableTitle }}</th>
               </tr>
             </thead>
           </template>
@@ -94,6 +96,7 @@ import * as UI from '../../ui';
 
 import CountryFlag from '../CountryFlag.vue';
 import GridPaginator from '../GridPaginator.vue';
+// import GridPaginatorv2 from '../common/GridPaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../types';
@@ -103,6 +106,7 @@ import { Chart } from 'highcharts-vue';
   components: {
     'omegaup-country-flag': CountryFlag,
     'omegaup-grid-paginator': GridPaginator,
+    // 'omegaup-common-grid-paginator': GridPaginatorv2,
     'omegaup-username': UserName,
     highcharts: Chart,
   },
