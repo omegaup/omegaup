@@ -14,20 +14,14 @@
           <div v-if="now < contest.start_time.getTime()">
             <p>
               {{ T.contestWillBeginIn }}
-              <span>
-                <omegaup-countdown
-                  v-bind:time-left="timeLeft"
-                ></omegaup-countdown>
-              </span>
+              <omegaup-countdown
+                v-bind:start-time="contest.start_time"
+                v-on:emit-finish="now = Date.now()"
+              ></omegaup-countdown>
             </p>
           </div>
 
-          <div
-            v-if="
-              now > contest.finish_time.getTime() ||
-                now > contest.start_time.getTime()
-            "
-          >
+          <div v-if="now > contest.start_time.getTime()">
             <form
               v-on:submit.prevent="onStartContest"
               v-if="
@@ -77,7 +71,10 @@
             </form>
 
             <!-- Must register -->
-            <form v-else="" v-on:submit.prevent="onRequestAccess">
+            <form
+              v-else=""
+              v-on:submit.prevent="$emit('request-access', contest.alias)"
+            >
               <template v-if="!contest.user_registration_requested">
                 <p>{{ T.mustRegisterToJoinContest }}</p>
                 <button type="submit" class="btn btn-primary btn-lg">
@@ -98,13 +95,13 @@
 
         <template v-else="">
           <!-- Must login to do anything -->
-          <div class="panel">
-            <p>{{ T.mustLoginToJoinContest }}</p>
-            <a
-              v-bind:href="`/login/?redirect=${requestURI}`"
-              class="btn btn-primary"
-              >{{ T.loginHeader }}</a
-            >
+          <div class="card">
+            <div class="card-body">
+              <p>{{ T.mustLoginToJoinContest }}</p>
+              <a v-bind:href="redirectURL" class="btn btn-primary">{{
+                T.loginHeader
+              }}</a>
+            </div>
           </div>
         </template>
       </div>
@@ -137,7 +134,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as markdown from '../../markdown';
@@ -148,6 +145,13 @@ interface Statement {
   gitObjectId?: string;
   markdown?: string;
   statementType?: string;
+}
+
+interface ContestStatement {
+  contest_alias: string;
+  share_user_information: boolean | null;
+  privacy_git_object_id?: string;
+  statement_type?: string;
 }
 
 @Component({
@@ -178,24 +182,18 @@ export default class ContestIntro extends Vue {
   };
   markdownConverter = markdown.markdownConverter();
   shareUserInformation = null;
-  timePassed = 0;
-  timerInterval = 0;
   now = Date.now();
-  clock = '';
 
+  get redirectURL(): string {
+    const url = encodeURIComponent(window.location.pathname);
+    return `/login/?redirect=${url}`;
+  }
   get consentHtml(): string {
     if (!this.statement) {
       return '';
     }
     const markdown = this.statement.markdown || '';
     return this.markdownConverter.makeHtml(markdown);
-  }
-
-  get timeLeft() {
-    if (this.contest && this.contest.start_time) {
-      const timeLimit = this.contest.start_time.getTime() - Date.now();
-      return timeLimit - this.timePassed;
-    }
   }
 
   get differentStartsDescription(): string {
@@ -256,56 +254,29 @@ export default class ContestIntro extends Vue {
     );
   }
 
-  @Watch('timeLeft')
-  onValueChanged(newValue: number): void {
-    if (newValue <= 0) {
-      if (!this.timerInterval) return;
-      clearInterval(this.timerInterval);
-      this.timerInterval = 0;
-      this.now = Date.now();
-    }
-  }
-
-  startTimer(): void {
-    this.timerInterval = window.setInterval(() => (this.timePassed += 1), 1000);
-  }
-
   formatTimeInRules(timeInMinutes?: number): string {
     if (!timeInMinutes) {
       return '';
     }
     const hours = Math.floor(timeInMinutes / 60);
     if (hours <= 0) {
-      return timeInMinutes + 'm';
-    } else {
-      const minutes = timeInMinutes % 60;
-      return `${hours}h${minutes}m`;
+      return `${timeInMinutes}m`;
     }
+    const minutes = timeInMinutes % 60;
+    return `${hours}h${minutes}m`;
   }
 
   onStartContest() {
-    const request = {
+    const request: ContestStatement = {
       contest_alias: this.contest.alias,
       share_user_information: this.shareUserInformation,
     };
-    let userInformationRequest = {};
-    if (this.requestsUserInformation === 'required') {
-      userInformationRequest = {
-        privacy_git_object_id: this.statement.gitObjectId,
-        statement_type: this.statement.statementType,
-      };
+    if (this.requestsUserInformation !== 'no') {
+      request.privacy_git_object_id = this.statement.gitObjectId;
+      request.statement_type = this.statement.statementType;
     }
-    $.extend(request, userInformationRequest);
 
     this.$emit('open-contest', request);
-  }
-
-  onRequestAccess() {
-    this.$emit('request-access', this.contest.alias);
-  }
-
-  mounted() {
-    this.startTimer();
   }
 }
 </script>

@@ -492,7 +492,6 @@ export namespace types {
       statementType: string;
       gitObjectId?: string;
     };
-    requestURI: string;
     requestsUserInformation?: string;
     shouldShowFirstAssociatedIdentityRunWarning?: boolean;
   }

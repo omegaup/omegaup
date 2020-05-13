@@ -18,7 +18,6 @@ OmegaUp.on('ready', () => {
           contest: payload.contest,
           isLoggedIn: payload.isLoggedIn,
           statement: payload.privacyStatement,
-          requestURI: payload.requestURI,
         },
         on: {
           'open-contest': (request: omegaup.Contest): void => {
