@@ -11,7 +11,6 @@ OmegaUp.on('ready', () => {
     el: '#login-password-recover',
     render: function(createElement) {
       return createElement('omegaup-login-password-recover', {
-        props: {},
         on: {
           'forgot-password': function(email: string) {
             api.Reset.create({
@@ -25,7 +24,6 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {},
     components: {
       'omegaup-login-password-recover': recover,
     },

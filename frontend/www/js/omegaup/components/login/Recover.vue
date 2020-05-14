@@ -10,13 +10,13 @@
               type="text"
               name="email"
               class="form-control"
-              v-model="currentEmail"
+              v-model="email"
             />
           </div>
           <div class="form-group">
             <button
               class="btn btn-primary form-control"
-              v-on:click.prevent="$emit('forgot-password', currentEmail)"
+              v-on:click.prevent="$emit('forgot-password', email)"
             >
               {{ T.wordsSend }}
             </button>
@@ -34,15 +34,7 @@ import T from '../../lang';
 
 @Component
 export default class LoginPasswordRecover extends Vue {
-  @Prop({ default: '' }) email!: string;
-
   T = T;
-
-  currentEmail = this.email;
-
-  @Watch('currentEmail')
-  onInitialValidatorChange(newInitial: string): void {
-    this.currentEmail = newInitial;
-  }
+  email: string = '';
 }
 </script>
