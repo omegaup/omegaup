@@ -154,7 +154,7 @@ export default class ContestIntro extends Vue {
   @Prop() requestURI!: string;
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
-  @Prop() statement!: types.Statement;
+  @Prop() statement!: types.PrivacyStatement;
 
   T = T;
   UI = UI;
@@ -257,7 +257,7 @@ export default class ContestIntro extends Vue {
   }
 
   onStartContest() {
-    const request: types.ContestStatement = {
+    const request: types.ConsentStatement = {
       contest_alias: this.contest.alias,
       share_user_information: this.shareUserInformation ?? false,
     };

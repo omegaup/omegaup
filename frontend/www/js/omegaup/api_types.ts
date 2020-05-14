@@ -318,6 +318,24 @@ export namespace types {
       );
     }
 
+    export function ProblemMarkdownPayload(
+      elementId: string = 'payload',
+    ): types.ProblemMarkdownPayload {
+      return (x => {
+        if (x.problemsetter)
+          x.problemsetter = (x => {
+            if (x.creation_date)
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ProblemTagsPayload(
       elementId: string = 'payload',
     ): types.ProblemTagsPayload {
@@ -381,6 +399,7 @@ export namespace types {
     length: number;
     page: number;
     ranking: types.AuthorsRank;
+    pagerItems: types.PageItem[];
   }
 
   export interface AuthorsRank {
@@ -483,10 +502,17 @@ export namespace types {
     navbarSection: string;
   }
 
+  export interface ConsentStatement {
+    contest_alias: string;
+    privacy_git_object_id?: string;
+    share_user_information?: boolean;
+    statement_type?: string;
+  }
+
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
     needsBasicInformation?: boolean;
-    privacyStatement?: types.Statement;
+    privacyStatement?: types.PrivacyStatement;
     requestsUserInformation?: string;
     shouldShowFirstAssociatedIdentityRunWarning?: boolean;
   }
@@ -545,13 +571,6 @@ export namespace types {
     user_registration_requested?: boolean;
     user_registration_answered?: boolean;
     user_registration_accepted?: boolean;
-  }
-
-  export interface ContestStatement {
-    contest_alias: string;
-    privacy_git_object_id?: string;
-    share_user_information?: boolean;
-    statement_type?: string;
   }
 
   export interface CourseAssignment {
@@ -640,6 +659,12 @@ export namespace types {
     label: string;
     page: number;
     url?: string;
+  }
+
+  export interface PrivacyStatement {
+    markdown: string;
+    statementType: string;
+    gitObjectId?: string;
   }
 
   export interface Problem {
@@ -743,7 +768,7 @@ export namespace types {
     extraWallTime: number;
     inputLimit: number;
     languages: string;
-    memoryLimit: number | number;
+    memoryLimit: number;
     outputLimit: number;
     overallWallTimeLimit: number;
     problemsetter?: { creation_date?: Date; name: string; username: string };
@@ -825,12 +850,79 @@ export namespace types {
     tags: string[];
   }
 
+  export interface ProblemMarkdownPayload {
+    alias: string;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
+    source?: string;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
+    title?: string;
+  }
+
   export interface ProblemTagsPayload {
     alias: string;
     allowTags: boolean;
     selectedTags: types.SelectedTag[];
     tags: { name?: string }[];
     title?: string;
+  }
+
+  export interface Problemset {
+    admin?: boolean;
+    admission_mode?: string;
+    alias?: string;
+    assignment_type?: string;
+    contest_alias?: string;
+    courseAssignments?: {
+      name: string;
+      description: string;
+      alias: string;
+      publish_time_delay?: number;
+      assignment_type: string;
+      start_time: Date;
+      finish_time?: Date;
+      max_points: number;
+      order: number;
+      scoreboard_url: string;
+      scoreboard_url_admin: string;
+    }[];
+    description?: string;
+    director?: string;
+    exists?: boolean;
+    feedback?: string;
+    finish_time?: Date;
+    languages?: string[];
+    name?: string;
+    needs_basic_information?: boolean;
+    opened?: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    partial_score?: boolean;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problems?: types.ProblemsetProblem[];
+    problemset_id?: number;
+    requests_user_information?: string;
+    scoreboard?: number;
+    show_scoreboard_after?: boolean;
+    start_time?: Date;
+    submission_deadline?: Date;
+    submissions_gap?: number;
+    title?: string;
+    users?: {
+      access_time?: Date;
+      country?: string;
+      email?: string;
+      opened_interview: boolean;
+      user_id?: number;
+      username: string;
+    }[];
+    window_length?: number;
   }
 
   export interface ProblemsetProblem {
@@ -1006,10 +1098,8 @@ export namespace types {
     tagname: string;
   }
 
-  export interface Statement {
-    markdown: string;
-    statementType: string;
-    gitObjectId?: string;
+  export interface Statements {
+    [key: string]: string;
   }
 
   export interface StatsPayload {
@@ -2319,60 +2409,7 @@ export namespace messages {
   // Problemset
   export type ProblemsetDetailsRequest = { [key: string]: any };
   export type _ProblemsetDetailsServerResponse = any;
-  export type ProblemsetDetailsResponse = {
-    admin?: boolean;
-    admission_mode?: string;
-    alias?: string;
-    assignment_type?: string;
-    contest_alias?: string;
-    courseAssignments?: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: Date;
-      finish_time?: Date;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    description?: string;
-    director?: string;
-    exists?: boolean;
-    feedback?: string;
-    finish_time?: Date;
-    languages?: string[];
-    name?: string;
-    needs_basic_information?: boolean;
-    opened?: boolean;
-    original_contest_alias?: string;
-    original_problemset_id?: number;
-    partial_score?: boolean;
-    penalty?: number;
-    penalty_calc_policy?: string;
-    penalty_type?: string;
-    points_decay_factor?: number;
-    problems?: types.ProblemsetProblem[];
-    problemset_id?: number;
-    requests_user_information?: string;
-    scoreboard?: number;
-    show_scoreboard_after?: boolean;
-    start_time?: Date;
-    submission_deadline?: Date;
-    submissions_gap?: number;
-    title?: string;
-    users?: {
-      access_time?: Date;
-      country?: string;
-      email?: string;
-      opened_interview: boolean;
-      user_id?: number;
-      username: string;
-    }[];
-    window_length?: number;
-  };
+  export type ProblemsetDetailsResponse = types.Problemset;
   export type ProblemsetScoreboardRequest = { [key: string]: any };
   export type _ProblemsetScoreboardServerResponse = any;
   export type ProblemsetScoreboardResponse = types.Scoreboard;

@@ -1499,6 +1499,7 @@ Returns details of a given assignment
 | ------------ | ------- | ----------- |
 | `assignment` | `mixed` |             |
 | `course`     | `mixed` |             |
+| `lang`       | `mixed` |             |
 | `token`      | `mixed` |             |
 | `username`   | `mixed` |             |
 
@@ -2673,6 +2674,7 @@ Entry point for Problem Details API
 | Name                      | Type        | Description |
 | ------------------------- | ----------- | ----------- |
 | `contest_alias`           | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
 | `prevent_problemset_open` | `bool|null` |             |
 | `problem_alias`           | `mixed`     |             |
 | `problemset_id`           | `mixed`     |             |
@@ -2907,6 +2909,7 @@ Returns the solution for a problem if conditions are satisfied.
 | ----------------- | ----------- | ----------- |
 | `contest_alias`   | `mixed`     |             |
 | `forfeit_problem` | `bool|null` |             |
+| `lang`            | `mixed`     |             |
 | `problem_alias`   | `mixed`     |             |
 | `problemset_id`   | `mixed`     |             |
 | `statement_type`  | `mixed`     |             |
@@ -3009,6 +3012,7 @@ Updates problem solution only
 | `email_clarifications`    | `bool|null` |             |
 | `extra_wall_time`         | `mixed`     |             |
 | `input_limit`             | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
 | `languages`               | `mixed`     |             |
 | `memory_limit`            | `mixed`     |             |
 | `message`                 | `mixed`     |             |
@@ -3118,6 +3122,7 @@ and the number of solutions already seen
 | `contest_alias`   | `mixed` |             |
 | `course`          | `mixed` |             |
 | `interview_alias` | `mixed` |             |
+| `lang`            | `mixed` |             |
 | `problemset_id`   | `int`   |             |
 | `token`           | `mixed` |             |
 | `tokens`          | `mixed` |             |
@@ -3125,41 +3130,9 @@ and the number of solutions already seen
 
 ### Returns
 
-| Name                        | Type                                                                                                                                                                                                                                         |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `admin`                     | `boolean`                                                                                                                                                                                                                                    |
-| `admission_mode`            | `string`                                                                                                                                                                                                                                     |
-| `alias`                     | `string`                                                                                                                                                                                                                                     |
-| `assignment_type`           | `string`                                                                                                                                                                                                                                     |
-| `contest_alias`             | `string`                                                                                                                                                                                                                                     |
-| `courseAssignments`         | `{ name: string; description: string; alias: string; publish_time_delay: number; assignment_type: string; start_time: Date; finish_time: Date; max_points: number; order: number; scoreboard_url: string; scoreboard_url_admin: string; }[]` |
-| `description`               | `string`                                                                                                                                                                                                                                     |
-| `director`                  | `string`                                                                                                                                                                                                                                     |
-| `exists`                    | `boolean`                                                                                                                                                                                                                                    |
-| `feedback`                  | `string`                                                                                                                                                                                                                                     |
-| `finish_time`               | `Date`                                                                                                                                                                                                                                       |
-| `languages`                 | `string[]`                                                                                                                                                                                                                                   |
-| `name`                      | `string`                                                                                                                                                                                                                                     |
-| `needs_basic_information`   | `boolean`                                                                                                                                                                                                                                    |
-| `opened`                    | `boolean`                                                                                                                                                                                                                                    |
-| `original_contest_alias`    | `string`                                                                                                                                                                                                                                     |
-| `original_problemset_id`    | `number`                                                                                                                                                                                                                                     |
-| `partial_score`             | `boolean`                                                                                                                                                                                                                                    |
-| `penalty`                   | `number`                                                                                                                                                                                                                                     |
-| `penalty_calc_policy`       | `string`                                                                                                                                                                                                                                     |
-| `penalty_type`              | `string`                                                                                                                                                                                                                                     |
-| `points_decay_factor`       | `number`                                                                                                                                                                                                                                     |
-| `problems`                  | `types.ProblemsetProblem[]`                                                                                                                                                                                                                  |
-| `problemset_id`             | `number`                                                                                                                                                                                                                                     |
-| `requests_user_information` | `string`                                                                                                                                                                                                                                     |
-| `scoreboard`                | `number`                                                                                                                                                                                                                                     |
-| `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                    |
-| `start_time`                | `Date`                                                                                                                                                                                                                                       |
-| `submission_deadline`       | `Date`                                                                                                                                                                                                                                       |
-| `submissions_gap`           | `number`                                                                                                                                                                                                                                     |
-| `title`                     | `string`                                                                                                                                                                                                                                     |
-| `users`                     | `{ access_time: Date; country: string; email: string; opened_interview: boolean; user_id: number; username: string; }[]`                                                                                                                     |
-| `window_length`             | `number`                                                                                                                                                                                                                                     |
+```typescript
+types.Problemset;
+```
 
 ## `/api/problemset/scoreboard/`
 
