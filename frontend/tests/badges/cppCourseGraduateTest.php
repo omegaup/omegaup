@@ -64,58 +64,58 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
     }
 
     public function testCourseCppUserEarnBadge() {
-        {
-            // This user will recive the badge because he will resolve 4 differents problems of the course
-            $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
-                $this->students[0]
-            );
+        // This user will receive the badge because they will resolve 4 differents problems
+        // of the course
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $this->students[0]
+        );
 
-            // Add one run to the first problem in the first assignment.
-            $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-                'problemset_id' => $this->courseData['assignment_problemset_ids'][0],
-                'problem_alias' => $this->problems[0]['problem']->alias,
-                'language' => 'c11-gcc',
-                'source' => $this->submissionSource,
-            ]));
-            \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/ null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
-            );
-            $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-                'problemset_id' => $this->courseData['assignment_problemset_ids'][0],
-                'problem_alias' => $this->problems[1]['problem']->alias,
-                'language' => 'c11-gcc',
-                'source' => $this->submissionSource,
-            ]));
-            \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/ null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
-            );
+        // Add one run to the first problem in the first assignment.
+        $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $this->courseData['assignment_problemset_ids'][0],
+            'problem_alias' => $this->problems[0]['problem']->alias,
+        'language' => 'c11-gcc',
+        'source' => $this->submissionSource,
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            /*$runData=*/ null,
+            1,
+            'AC',
+            null,
+            $runResponse['guid']
+        );
+        $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $this->courseData['assignment_problemset_ids'][0],
+            'problem_alias' => $this->problems[1]['problem']->alias,
+            'language' => 'c11-gcc',
+        'source' => $this->submissionSource,
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            /*$runData=*/ null,
+            1,
+            'AC',
+            null,
+            $runResponse['guid']
+        );
 
-            // Add one run to the third problem in the second assignment
-            $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
-                'auth_token' => $studentLogin->auth_token,
-                'problemset_id' => $this->courseData['assignment_problemset_ids'][1],
-                'problem_alias' => $this->problems[2]['problem']->alias,
-                'language' => 'c11-gcc',
-                'source' => $this->submissionSource,
-            ]));
-            \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/ null,
-                1,
-                'AC',
-                null,
-                $runResponse['guid']
-            );
-        }
+        // Add one run to the third problem in the second assignment
+        $runResponse = \OmegaUp\Controllers\Run::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'problemset_id' => $this->courseData['assignment_problemset_ids'][1],
+            'problem_alias' => $this->problems[2]['problem']->alias,
+            'language' => 'c11-gcc',
+            'source' => $this->submissionSource,
+        ]));
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            /*$runData=*/ null,
+            1,
+            'AC',
+            null,
+            $runResponse['guid']
+        );
+
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/cppCourseGraduate/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$this->students[0]->user_id];
@@ -123,11 +123,11 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
     }
 
     public function testCourseCppUserDoNotEarnBadge() {
-        {
-            // This user will not recibe the badge because he will resolve a problem with multiple solutions
-            $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
-                $this->students[1]
-            );
+        // This user will not receive the badge because they will only solve a problem
+        // with multiple submissions.
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $this->students[1]
+        );
 
         for ($i = 0; $i < 10; $i++) {
             // Add one run to the first problem in the first assignment.
@@ -146,7 +146,7 @@ class CppCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
                 $runResponse['guid']
             );
         }
-        }
+
         $queryPath = static::OMEGAUP_BADGES_ROOT . '/cppCourseGraduate/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [];
