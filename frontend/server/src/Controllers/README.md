@@ -176,10 +176,7 @@
 - [School](#school)
   - [`/api/school/create/`](#apischoolcreate)
   - [`/api/school/list/`](#apischoollist)
-  - [`/api/school/monthlySolvedProblemsCount/`](#apischoolmonthlysolvedproblemscount)
-  - [`/api/school/schoolCodersOfTheMonth/`](#apischoolschoolcodersofthemonth)
   - [`/api/school/selectSchoolOfTheMonth/`](#apischoolselectschoolofthemonth)
-  - [`/api/school/users/`](#apischoolusers)
 - [Scoreboard](#scoreboard)
   - [`/api/scoreboard/refresh/`](#apiscoreboardrefresh)
 - [Session](#session)
@@ -3650,43 +3647,6 @@ Gets a list of schools
 [];
 ```
 
-## `/api/school/monthlySolvedProblemsCount/`
-
-### Description
-
-Returns the number of solved problems on the last
-months (including the current one)
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `school_id` | `int` |             |
-
-### Returns
-
-| Name                       | Type                           |
-| -------------------------- | ------------------------------ |
-| `distinct_problems_solved` | `types.SchoolProblemsSolved[]` |
-
-## `/api/school/schoolCodersOfTheMonth/`
-
-### Description
-
-Returns rank of best schools in last month
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `school_id` | `int` |             |
-
-### Returns
-
-| Name     | Type                            |
-| -------- | ------------------------------- |
-| `coders` | `types.SchoolCoderOfTheMonth[]` |
-
 ## `/api/school/selectSchoolOfTheMonth/`
 
 ### Description
@@ -3702,25 +3662,6 @@ Selects a certain school as school of the month
 ### Returns
 
 _Nothing_
-
-## `/api/school/users/`
-
-### Description
-
-Returns the list of current students registered in a certain school
-with the number of created problems, solved problems and organized contests.
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `school_id` | `int` |             |
-
-### Returns
-
-| Name    | Type                 |
-| ------- | -------------------- |
-| `users` | `types.SchoolUser[]` |
 
 # Scoreboard
 
