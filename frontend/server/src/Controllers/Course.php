@@ -2812,6 +2812,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $course
+     * @omegaup-request-param mixed $lang
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $username
      *

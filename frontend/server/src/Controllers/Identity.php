@@ -766,11 +766,19 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the prefered language as a string (en,es,fra) of the identity given
      * If no identity is given, language is retrived from the browser.
+     *
+     * @omegaup-request-param mixed $lang
      */
     public static function getPreferredLanguage(
-        ?\OmegaUp\DAO\VO\Identities $identity
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\Request $request = null
     ): string {
         // for quick debugging
+        if (!is_null($request) && !empty($request['lang'])) {
+            return self::convertToSupportedLanguage(
+                strval($request['lang'])
+            );
+        }
         if (isset($_GET['lang'])) {
             return self::convertToSupportedLanguage(
                 strval($_GET['lang'])

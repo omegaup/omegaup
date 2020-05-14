@@ -1903,4 +1903,80 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $problem->allow_user_add_tags
         );
     }
+
+    public function testUpdateStatementProblemViaSubmit() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Login API
+        $login = self::login($problemData['author']);
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemData['request']['problem_alias'],
+            ])
+        )['smartyProperties'];
+
+        $this->assertArrayHasKey('problemMarkdownPayload', $response);
+        $this->assertArrayHasKey(
+            'statement',
+            $response['problemMarkdownPayload']
+        );
+
+        $originalStatement = $response['problemMarkdownPayload']['statement'];
+        $newStatement = [
+            'language' => $originalStatement['language'],
+            'images' => [],
+            'markdown' => 'New markdown',
+        ];
+        $markdownPT = 'Markdown in pt language';
+        $contents = json_encode([
+            $newStatement['language'] => $newStatement['markdown'],
+            'pt' => $markdownPT,
+        ]);
+
+        // Updating more than one statement at the same time
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemData['request']['problem_alias'],
+                'request' => 'markdown',
+                'message' => 'Change in statement',
+                'directory' => 'statements',
+                'contents' => $contents,
+            ])
+        )['smartyProperties'];
+
+        // Getting problem details for preferred user language('es')
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+        $this->assertEquals(
+            $newStatement['language'],
+            $response['statement']['language']
+        );
+        $this->assertStringContainsString(
+            $newStatement['markdown'],
+            $response['statement']['markdown']
+        );
+
+        // Getting problem details for an specific language('pt')
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'lang' => 'pt'
+            ])
+        );
+
+        $this->assertEquals('pt', $response['statement']['language']);
+        $this->assertStringContainsString(
+            $markdownPT,
+            $response['statement']['markdown']
+        );
+    }
 }
