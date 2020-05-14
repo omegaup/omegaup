@@ -1,27 +1,23 @@
 <template>
-  <div class="row">
-    <div class="page-header">
-      <h1 class="text-center">
-        <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
-        {{ name }}
-      </h1>
-    </div>
-    <div class="row">
+  <div class="container-lg p-5">
+    <h2 class="text-center mb-4">
+      <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
+      {{ name }}
+    </h2>
+    <div class="row mb-4">
       <div class="col-md-4">
-        <div class="panel panel-default" v-if="country">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <strong>{{ T.wordsCountry }}:</strong>
-              {{ country.name }}
-              <omegaup-country-flag
-                v-bind:country="country.id"
-              ></omegaup-country-flag>
-            </li>
-            <li class="list-group-item" v-if="stateName">
-              <strong>{{ T.profileState }}:</strong> {{ stateName }}
-            </li>
-          </ul>
-        </div>
+        <ul class="list-group mb-3" v-if="country">
+          <li class="list-group-item">
+            <strong>{{ T.wordsCountry }}:</strong>
+            {{ country.name }}
+            <omegaup-country-flag
+              v-bind:country="country.id"
+            ></omegaup-country-flag>
+          </li>
+          <li class="list-group-item" v-if="stateName">
+            <strong>{{ T.profileState }}:</strong> {{ stateName }}
+          </li>
+        </ul>
         <omegaup-grid-paginator
           v-bind:columns="1"
           v-bind:items="codersOfTheMonth"
@@ -39,12 +35,9 @@
         </omegaup-grid-paginator>
       </div>
       <div class="col-md-8">
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <omegaup-school-chart
-              v-bind:data="monthlySolvedProblemsCount"
-              v-bind:school="name"
-            ></omegaup-school-chart>
+        <div class="card">
+          <div class="card-body">
+            <highcharts v-bind:options="chartOptions"></highcharts>
           </div>
         </div>
       </div>
@@ -63,9 +56,11 @@
           <template slot="table-header">
             <thead>
               <tr>
-                <th class="text-center">{{ T.profileContestsTablePlace }}</th>
-                <th>{{ T.username }}</th>
-                <th class="numericColumn">{{ sortByTableTitle }}</th>
+                <th scope="col" class="text-center">
+                  {{ T.profileContestsTablePlace }}
+                </th>
+                <th scope="col">{{ T.username }}</th>
+                <th scope="col" class="text-right">{{ sortByTableTitle }}</th>
               </tr>
             </thead>
           </template>
@@ -97,19 +92,21 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import * as UI from '../../ui';
+
 import CountryFlag from '../CountryFlag.vue';
-import SchoolChart from './Chart.vue';
-import GridPaginator from '../GridPaginator.vue';
+import GridPaginator from '../common/GridPaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
-import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
+import { SchoolCoderOfTheMonth, SchoolUser } from '../../types';
+import { Chart } from 'highcharts-vue';
 
 @Component({
   components: {
     'omegaup-country-flag': CountryFlag,
-    'omegaup-school-chart': SchoolChart,
     'omegaup-grid-paginator': GridPaginator,
     'omegaup-username': UserName,
+    highcharts: Chart,
   },
 })
 export default class SchoolProfile extends Vue {
@@ -120,8 +117,10 @@ export default class SchoolProfile extends Vue {
   @Prop() monthlySolvedProblemsCount!: types.SchoolProblemsSolved[];
   @Prop() users!: SchoolUser[];
   @Prop() codersOfTheMonth!: SchoolCoderOfTheMonth;
+  @Prop() chartOptions!: Chart;
 
   T = T;
+  UI = UI;
   sortBy = 'solved_problems';
   sortOptions = [
     {

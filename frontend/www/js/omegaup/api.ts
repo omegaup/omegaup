@@ -1395,21 +1395,10 @@ export const School = {
   list: apiCall<messages.SchoolListRequest, messages.SchoolListResponse>(
     '/api/school/list/',
   ),
-  monthlySolvedProblemsCount: apiCall<
-    messages.SchoolMonthlySolvedProblemsCountRequest,
-    messages.SchoolMonthlySolvedProblemsCountResponse
-  >('/api/school/monthlySolvedProblemsCount/'),
-  schoolCodersOfTheMonth: apiCall<
-    messages.SchoolSchoolCodersOfTheMonthRequest,
-    messages.SchoolSchoolCodersOfTheMonthResponse
-  >('/api/school/schoolCodersOfTheMonth/'),
   selectSchoolOfTheMonth: apiCall<
     messages.SchoolSelectSchoolOfTheMonthRequest,
     messages.SchoolSelectSchoolOfTheMonthResponse
   >('/api/school/selectSchoolOfTheMonth/'),
-  users: apiCall<messages.SchoolUsersRequest, messages.SchoolUsersResponse>(
-    '/api/school/users/',
-  ),
 };
 
 export const Scoreboard = {
