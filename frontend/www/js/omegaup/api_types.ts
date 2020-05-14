@@ -336,6 +336,14 @@ export namespace types {
       );
     }
 
+    export function ProblemQualityPayload(
+      elementId: string = 'payload',
+    ): types.ProblemQualityPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemTagsPayload(
       elementId: string = 'payload',
     ): types.ProblemTagsPayload {
@@ -542,6 +550,23 @@ export namespace types {
     };
     isLogged: boolean;
     query: string;
+  }
+
+  export interface ContestProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    problem_id: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
   }
 
   export interface ContestPublicDetails {
@@ -853,6 +878,18 @@ export namespace types {
     title?: string;
   }
 
+  export interface ProblemQualityPayload {
+    canNominateProblem: boolean;
+    dismissed: boolean;
+    dismissedBeforeAC: boolean;
+    language?: string;
+    nominated: boolean;
+    nominatedBeforeAC: boolean;
+    problemAlias: string;
+    solved: boolean;
+    tried: boolean;
+  }
+
   export interface ProblemTagsPayload {
     alias: string;
     allowTags: boolean;
@@ -926,17 +963,7 @@ export namespace types {
     order: number;
     points: number;
     problem_id?: number;
-    quality_payload?: {
-      canNominateProblem: boolean;
-      dismissed: boolean;
-      dismissedBeforeAC: boolean;
-      language?: string;
-      nominated: boolean;
-      nominatedBeforeAC: boolean;
-      problemAlias: string;
-      solved: boolean;
-      tried: boolean;
-    };
+    quality_payload?: types.ProblemQualityPayload;
     submissions: number;
     title: string;
     version: string;
@@ -1022,6 +1049,9 @@ export namespace types {
     ranking: number;
     country?: { id: string; name: string };
     state_name?: string;
+    monthly_solved_problems: types.SchoolProblemsSolved[];
+    school_users: types.SchoolUser[];
+    coders_of_the_month: types.SchoolCoderOfTheMonth[];
   }
 
   export interface SchoolRankPayload {
@@ -1268,22 +1298,7 @@ export namespace messages {
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.ContestProblem[];
     points_decay_factor: number;
     problemset_id: number;
     requests_user_information: string;
@@ -2707,18 +2722,8 @@ export namespace messages {
     label: string;
     value: string;
   }[];
-  export type SchoolMonthlySolvedProblemsCountRequest = { [key: string]: any };
-  export type SchoolMonthlySolvedProblemsCountResponse = {
-    distinct_problems_solved: types.SchoolProblemsSolved[];
-  };
-  export type SchoolSchoolCodersOfTheMonthRequest = { [key: string]: any };
-  export type SchoolSchoolCodersOfTheMonthResponse = {
-    coders: types.SchoolCoderOfTheMonth[];
-  };
   export type SchoolSelectSchoolOfTheMonthRequest = { [key: string]: any };
   export type SchoolSelectSchoolOfTheMonthResponse = {};
-  export type SchoolUsersRequest = { [key: string]: any };
-  export type SchoolUsersResponse = { users: types.SchoolUser[] };
 
   // Scoreboard
   export type ScoreboardRefreshRequest = { [key: string]: any };
@@ -3439,18 +3444,9 @@ export namespace controllers {
     list: (
       params?: messages.SchoolListRequest,
     ) => Promise<messages.SchoolListResponse>;
-    monthlySolvedProblemsCount: (
-      params?: messages.SchoolMonthlySolvedProblemsCountRequest,
-    ) => Promise<messages.SchoolMonthlySolvedProblemsCountResponse>;
-    schoolCodersOfTheMonth: (
-      params?: messages.SchoolSchoolCodersOfTheMonthRequest,
-    ) => Promise<messages.SchoolSchoolCodersOfTheMonthResponse>;
     selectSchoolOfTheMonth: (
       params?: messages.SchoolSelectSchoolOfTheMonthRequest,
     ) => Promise<messages.SchoolSelectSchoolOfTheMonthResponse>;
-    users: (
-      params?: messages.SchoolUsersRequest,
-    ) => Promise<messages.SchoolUsersResponse>;
   }
 
   export interface Scoreboard {

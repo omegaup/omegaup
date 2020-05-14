@@ -10,11 +10,11 @@
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
  * @psalm-type SchoolCoderOfTheMonth=array{time: string, username: string, classname: string}
- * @psalm-type SchoolProfileDetailsPayload=array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null}
  * @psalm-type SchoolProblemsSolved=array{month: int, problems_solved: int, year: int}
+ * @psalm-type SchoolUser=array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}
+ * @psalm-type SchoolProfileDetailsPayload=array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null, monthly_solved_problems: list<SchoolProblemsSolved>, school_users: list<SchoolUser>, coders_of_the_month: list<SchoolCoderOfTheMonth>}
  * @psalm-type SchoolRankPayload=array{page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool, pagerItems: list<PageItem>}
  * @psalm-type SchoolOfTheMonthPayload=array{candidatesToSchoolOfTheMonth: list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}, schoolsOfPreviousMonth: list<array{country_id: string, name: string, ranking: int, school_id: int}>, schoolsOfPreviousMonths: list<array{country_id: string, name: string, school_id: int, time: string}>}
- * @psalm-type SchoolUser=array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}
  */
 class School extends \OmegaUp\Controllers\Controller {
     /**
@@ -57,7 +57,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{template: string, smartyProperties: array{payload: SchoolProfileDetailsPayload}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: SchoolProfileDetailsPayload}}
      *
      * @omegaup-request-param int $school_id
      */
@@ -75,6 +75,15 @@ class School extends \OmegaUp\Controllers\Controller {
             'ranking' => intval($school->ranking),
             'country' => null,
             'state_name' => null,
+            'monthly_solved_problems' => self::getMonthlySolvedProblemsCount(
+                intval($school->school_id)
+            ),
+            'school_users' => self::getUsers(
+                intval($school->school_id)
+            ),
+            'coders_of_the_month' => self::getSchoolCodersOfTheMonth(
+                intval($school->school_id)
+            ),
         ];
 
         if (!is_null($school->country_id)) {
@@ -105,7 +114,7 @@ class School extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => $payload,
             ],
-            'template' => 'school.profile.tpl',
+            'entrypoint' => 'school_profile',
         ];
     }
 
@@ -178,74 +187,59 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Returns rank of best schools in last month
      *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array{coders: list<SchoolCoderOfTheMonth>}
-     *
-     * @omegaup-request-param int $school_id
+     * @return list<SchoolCoderOfTheMonth>
      */
-    public static function apiSchoolCodersOfTheMonth(\OmegaUp\Request $r): array {
-        $r->ensureInt('school_id');
-        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+    public static function getSchoolCodersOfTheMonth(
+        int $schoolId
+    ): array {
+        $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
         if (is_null($school)) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        return [
-            'coders' => \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
-                intval($school->school_id)
-            )
-        ];
+        return \OmegaUp\DAO\CoderOfTheMonth::getCodersOfTheMonthFromSchool(
+            intval($school->school_id)
+        );
     }
 
     /**
      * Returns the number of solved problems on the last
      * months (including the current one)
      *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array{distinct_problems_solved: list<SchoolProblemsSolved>}
-     *
-     * @omegaup-request-param int $school_id
+     * @return list<SchoolProblemsSolved>
      */
-    public static function apiMonthlySolvedProblemsCount(\OmegaUp\Request $r): array {
-        $r->ensureInt('school_id');
-        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+    public static function getMonthlySolvedProblemsCount(
+        int $schoolId
+    ): array {
+        $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
 
         if (is_null($school)) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        return [
-            'distinct_problems_solved' => \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
-                intval($r['school_id'])
-            ),
-        ];
+        return \OmegaUp\DAO\Schools::getMonthlySolvedProblemsCount(
+            $schoolId
+        );
     }
 
     /**
      * Returns the list of current students registered in a certain school
      * with the number of created problems, solved problems and organized contests.
      *
-     * @param \OmegaUp\Request $r
-     *
-     * @return array{users: list<SchoolUser>}
-     *
-     * @omegaup-request-param int $school_id
+     * @return list<SchoolUser>
      */
-    public static function apiUsers(\OmegaUp\Request $r): array {
-        $r->ensureInt('school_id');
-        $school = \OmegaUp\DAO\Schools::getByPK(intval($r['school_id']));
+    public static function getUsers(
+        int $schoolId
+    ): array {
+        $school = \OmegaUp\DAO\Schools::getByPK($schoolId);
 
         if (is_null($school)) {
             throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
-        return [
-            'users' => \OmegaUp\DAO\Schools::getUsersFromSchool(
-                intval($school->school_id)
-            ),
-        ];
+        return \OmegaUp\DAO\Schools::getUsersFromSchool(
+            intval($school->school_id)
+        );
     }
 
     /**
