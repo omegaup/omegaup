@@ -77,6 +77,7 @@ rewrite ^/profile/?$ /profile/index.php last;
 rewrite ^/profile/edit/?$ /profile/edit.php last;
 rewrite ^/profile/([a-zA-Z0-9_+.-]+)/?$ /profile/index.php?username=$1 last;
 rewrite ^/rank/?$ /rank/users.php last;
+rewrite ^/rank/authors/?$ /rank/authors.php last;
 rewrite ^/rank/schools/?$ /rank/schools.php last;
 rewrite ^/privacypolicy/?$ /privacypolicy.php last;
 rewrite ^/schoolofthemonth/?$ /schools/schoolofthemonth.php last;

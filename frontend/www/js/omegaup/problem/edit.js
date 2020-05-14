@@ -59,46 +59,6 @@ OmegaUp.on('ready', function() {
     return false;
   });
 
-  $('#markdown form').on('submit', function() {
-    var promises = [];
-    for (var lang in statements) {
-      if (!statements.hasOwnProperty(lang)) continue;
-      if (typeof statements[lang].current === 'undefined') continue;
-      if (statements[lang].current === statements[lang].original) continue;
-      promises.push(
-        new Promise(function(resolve, reject) {
-          api.Problem.updateStatement({
-            problem_alias: problemAlias,
-            statement: statements[lang].current,
-            message: $('#markdown-message').val(),
-            lang: lang,
-          })
-            .then(function(response) {
-              resolve(response);
-            })
-            .catch(T.editFieldRequired);
-        }),
-      );
-    }
-
-    $('.has-error').removeClass('has-error');
-    if ($('#markdown-message').val() == '') {
-      ui.error(T.editFieldRequired);
-      $('#markdown-message-group').addClass('has-error');
-      return false;
-    }
-
-    Promise.all(promises)
-      .then(function(results) {
-        ui.success(T.problemEditUpdatedSuccessfully);
-        for (var lang in statements) {
-          statements[lang].original = statements[lang].current;
-        }
-      })
-      .catch(ui.apiError);
-    return false;
-  });
-
   const problemVersions = new Vue({
     el: '#version div.panel div',
     render: function(createElement) {
@@ -167,6 +127,8 @@ OmegaUp.on('ready', function() {
           markdownContents: this.markdownContents,
           markdownPreview: this.markdownPreview,
           initialLanguage: this.initialLanguage,
+          markdownType: 'solutions',
+          title: payload.title,
         },
         on: {
           'update-markdown-contents': function(
@@ -198,32 +160,6 @@ OmegaUp.on('ready', function() {
               })
               .catch(ui.apiError);
           },
-          'edit-solution': function(solutions, commitMessage, currentLanguage) {
-            let promises = [];
-            for (const lang in solutions) {
-              if (!solutions.hasOwnProperty(lang)) continue;
-              if (solutions[lang] === solutionEdit.solutions[lang]) continue;
-              promises.push(
-                new Promise(function(resolve, reject) {
-                  api.Problem.updateSolution({
-                    problem_alias: problemAlias,
-                    solution: solutions[lang],
-                    message: commitMessage,
-                    lang: lang,
-                  })
-                    .then(resolve)
-                    .catch(ui.apiError);
-                }),
-              );
-            }
-            Promise.all(promises)
-              .then(function() {
-                ui.success(T.problemEditUpdatedSuccessfully);
-              })
-              .catch(function(error) {
-                ui.apiError(error);
-              });
-          },
         },
       });
     },
@@ -232,7 +168,10 @@ OmegaUp.on('ready', function() {
         preview: true,
         imageMapping: {},
       });
-      this.markdownEditor = new Markdown.Editor(markdownConverter, '-solution');
+      this.markdownEditor = new Markdown.Editor(
+        markdownConverter,
+        '-solutions',
+      );
       this.markdownEditor.run();
     },
     data: {
@@ -272,37 +211,116 @@ OmegaUp.on('ready', function() {
   });
   solutionEdit.getInitialContents();
 
+  const markdownPayload = JSON.parse(
+    document.getElementById('problem-markdown-payload').innerText,
+  );
+  const problemMarkdown = new Vue({
+    el: '#markdown div',
+    render: function(createElement) {
+      return createElement('omegaup-problem-markdown', {
+        props: {
+          markdownContents: this.markdownContents,
+          markdownPreview: this.markdownPreview,
+          initialLanguage: this.initialLanguage,
+          markdownType: 'statements',
+          alias: markdownPayload.alias,
+          title: markdownPayload.title,
+          source: markdownPayload.source,
+          username: this.username,
+          name: this.name,
+          classname: this.classname,
+        },
+        on: {
+          'update-markdown-contents': (
+            statements,
+            language,
+            currentMarkdown,
+          ) => {
+            // First update markdown contents to current markdown, otherwise
+            // component won't detect any change if two different language
+            // statements are the same.
+            problemMarkdown.markdownContents = currentMarkdown;
+            if (statements.hasOwnProperty(language)) {
+              problemMarkdown.updateAndRefresh(statements[language]);
+              return;
+            }
+            api.Problem.details({
+              problem_alias: markdownPayload.alias,
+              statement_type: 'markdown',
+              show_solvers: false,
+              lang: language,
+            })
+              .then(response => {
+                if (!response.exists || !response.statement) {
+                  return;
+                }
+                if (response.statement.language !== language) {
+                  response.statement.markdown = '';
+                }
+                problemMarkdown.statements[language] =
+                  response.statement.markdown;
+                problemMarkdown.updateAndRefresh(response.statement.markdown);
+              })
+              .catch(ui.apiError);
+          },
+        },
+      });
+    },
+    mounted: function() {
+      const markdownConverter = markdown.markdownConverter({
+        preview: true,
+        imageMapping: {},
+      });
+      this.markdownEditor = new Markdown.Editor(
+        markdownConverter,
+        '-statements',
+      );
+      this.markdownEditor.run();
+    },
+    data: {
+      markdownContents: null,
+      markdownPreview: '',
+      markdownEditor: null,
+      initialLanguage: null,
+      username: markdownPayload.problemsetter
+        ? markdownPayload.problemsetter.username
+        : null,
+      name: markdownPayload.problemsetter
+        ? markdownPayload.problemsetter.name
+        : null,
+      classname: markdownPayload.problemsetter
+        ? markdownPayload.problemsetter.classname
+        : null,
+      statements: {},
+    },
+    methods: {
+      updateAndRefresh(markdown) {
+        this.markdownContents = markdown;
+        this.markdownPreview = this.markdownEditor
+          .getConverter()
+          .makeHtml(markdown);
+      },
+      getInitialContents() {
+        const self = this;
+        const lang = markdownPayload.statement.language;
+        self.initialLanguage = lang;
+        self.statements[lang] = markdownPayload.statement.markdown;
+        self.updateAndRefresh(markdownPayload.statement.markdown);
+      },
+    },
+    components: {
+      'omegaup-problem-markdown': problem_StatementEdit,
+    },
+  });
+  problemMarkdown.getInitialContents();
+
   var imageMapping = {};
   var markdownConverter = markdown.markdownConverter({
     preview: true,
     imageMapping: imageMapping,
   });
-  var markdownEditor = new Markdown.Editor(markdownConverter, '-statement'); // Global.
-  markdownEditor.run();
 
   function problemCallback(problem) {
-    $('#statement-preview .title').html(ui.escape(problem.title));
-    $('#statement-preview .source').html(ui.escape(problem.source));
-    $('#statement-preview .problemsetter')
-      .attr('href', '/profile/' + problem.problemsetter.username + '/')
-      .html(ui.escape(problem.problemsetter.name));
-
-    if (
-      chosenLanguage == null ||
-      chosenLanguage == problem.statement.language
-    ) {
-      chosenLanguage = problem.statement.language;
-      if (typeof statements[chosenLanguage] == 'undefined') {
-        statements[chosenLanguage] = {
-          original: problem.statement.markdown,
-          current: problem.statement.markdown,
-        };
-      }
-      $('#wmd-input-statement').val(statements[chosenLanguage].current);
-      $('#statement-language').val(problem.statement.language);
-    } else {
-      $('#wmd-input-statement').val('');
-    }
     // Extend the current mapping with any new images.
     for (var filename in problem.statement.images) {
       if (
@@ -313,37 +331,9 @@ OmegaUp.on('ready', function() {
       }
       imageMapping[filename] = problem.statement.images[filename];
     }
-    markdownEditor.refreshPreview();
     if (problem.slow == 1) {
       $('.slow-warning').show();
     }
   }
   problemCallback(payload);
-
-  $('#statement-preview-link').on('show.bs.tab', function(e) {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, $('#wmd-preview').get(0)]);
-  });
-
-  $('#statement-language').on('change', function(e) {
-    chosenLanguage = $('#statement-language').val();
-    api.Problem.details({
-      problem_alias: problemAlias,
-      statement_type: 'markdown',
-      show_solvers: false,
-      lang: chosenLanguage,
-    })
-      .then(problemCallback)
-      .catch(ui.apiError);
-  });
-
-  $('#wmd-input-statement').on('blur', function(e) {
-    var currentLanguage = $('#statement-language').val();
-    if (!statements.hasOwnProperty(currentLanguage)) {
-      statements[currentLanguage] = {
-        original: '',
-        current: '',
-      };
-    }
-    statements[currentLanguage].current = $(this).val();
-  });
 });

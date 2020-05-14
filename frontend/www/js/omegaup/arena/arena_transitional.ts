@@ -8,8 +8,23 @@ import * as time from '../time';
 
 Vue.use(Vuex);
 
-interface ArenaOptions {
+export const scoreboardColors = [
+  '#FB3F51',
+  '#FF5D40',
+  '#FFA240',
+  '#FFC740',
+  '#59EA3A',
+  '#37DD6F',
+  '#34D0BA',
+  '#3AAACF',
+  '#8144D6',
+  '#CD35D3',
+];
+
+export interface ArenaOptions {
+  assignmentAlias: string | null;
   contestAlias: string | null;
+  courseAlias: string | null;
   disableClarifications: boolean;
   disableSockets: boolean;
   isInterview: boolean;
@@ -95,7 +110,7 @@ export const myRunsStore = new Vuex.Store<RunsState>({
   },
 });
 
-export function GetOptionsFromLocation(arenaLocation: URL): ArenaOptions {
+export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
   const options: ArenaOptions = {
     isLockdownMode: false,
     isInterview: false,
@@ -103,7 +118,9 @@ export function GetOptionsFromLocation(arenaLocation: URL): ArenaOptions {
     isOnlyProblem: false,
     disableClarifications: false,
     disableSockets: false,
+    assignmentAlias: null,
     contestAlias: null,
+    courseAlias: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
     onlyProblemAlias: null,
@@ -155,6 +172,24 @@ export function GetOptionsFromLocation(arenaLocation: URL): ArenaOptions {
     }
   }
   return options;
+}
+
+export function getMaxScore(
+  runs: types.Run[],
+  alias: string,
+  previousScore: number,
+): number {
+  let maxScore = previousScore;
+  for (const run of runs) {
+    if (alias != run.alias) {
+      continue;
+    }
+    const score = run.contest_score || 0;
+    if (score > maxScore) {
+      maxScore = score;
+    }
+  }
+  return maxScore;
 }
 
 export class EventsSocket {

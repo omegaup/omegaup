@@ -37,7 +37,14 @@
 			<div class="list"></div>
 		</div>
 		<div class="tab-pane" id="admins">
-			<div></div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="admins"></div>
+				</div>
+				<div class="col-md-6">
+					<div class="groups"></div>
+				</div>
+			</div>
 		</div>
 		<div class="tab-pane" id="clone">
 			<div></div>

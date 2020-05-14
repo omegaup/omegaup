@@ -138,7 +138,7 @@ class LegacyUser extends \OmegaUp\Test\BadgesTestCase {
             'window_length' => '0',
             'scoreboard' => 100,
             'points_decay_factor' => 0,
-            'partial_score' => 1,
+            'partial_score' => 'true',
             'submissions_gap' => 1200,
             'feedback' => 'detailed',
             'penalty_type' => 'contest_start',

@@ -5,8 +5,9 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
- * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank}
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
+ * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
@@ -2549,7 +2550,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Prepare all the properties to be sent to the
      * author rank table view via smarty.
      *
-     * @return array{smartyProperties: array{payload: AuthorRankTablePayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: AuthorRankTablePayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
@@ -2558,16 +2559,25 @@ class User extends \OmegaUp\Controllers\Controller {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
+        $authorsRanking = self::getAuthorsRank(
+            $page,
+            $length
+        );
         return [
             'smartyProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
-                    'ranking' => self::getAuthorsRank(
+                    'ranking' => $authorsRanking,
+                    'pagerItems' => \OmegaUp\Pager::paginate(
+                        $authorsRanking['total'],
+                        $length,
                         $page,
-                        $length
+                        /*$adjacent=*/5,
+                        /*$params=*/[]
                     ),
                 ],
+                'title' => 'omegaupTitleAuthorsRank',
             ],
             'entrypoint' => 'authors_rank',
         ];
