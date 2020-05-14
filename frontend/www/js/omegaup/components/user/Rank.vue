@@ -24,13 +24,6 @@
         <button class="btn btn-primary" type="button" v-on:click="onSubmit">
           {{ T.searchUser }}
         </button>
-        <template v-if="page &gt; 1">
-          <a v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a>
-          <span v-show="shouldShowNextPage">|</span>
-        </template>
-        <a v-bind:href="nextPageFilter" v-show="shouldShowNextPage">{{
-          T.wordsNextPage
-        }}</a>
         <template v-if="Object.keys(availableFilters).length &gt; 0">
           <select class="filter" v-model="filter" v-on:change="onFilterChange">
             <option value="">
@@ -92,14 +85,10 @@
       <div class="card-footer" v-if="isIndex">
         <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
       </div>
-      <div class="card-footer" v-else-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a>
-          <span v-show="shouldShowNextPage">|</span>
-        </template>
-        <a v-bind:href="nextPageFilter" v-show="shouldShowNextPage">{{
-          T.wordsNextPage
-        }}</a>
+      <div class="card-footer" v-else="">
+        <omegaup-common-paginator
+          v-bind:pagerItems="pagerItems"
+        ></omegaup-common-paginator>
       </div>
     </div>
   </div>
@@ -109,12 +98,14 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import { OmegaUp } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 interface Rank {
   country: string;
@@ -130,6 +121,7 @@ interface Rank {
     'omegaup-autocomplete': Autocomplete,
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class UserRank extends Vue {
@@ -141,6 +133,7 @@ export default class UserRank extends Vue {
   @Prop() filter!: string;
   @Prop() ranking!: Rank[];
   @Prop() resultTotal!: number;
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   UI = UI;
@@ -185,14 +178,6 @@ export default class UserRank extends Vue {
         this.filter,
       )}`;
     else return `/rank?page=${this.page - 1}`;
-  }
-
-  get shouldShowNextPage(): boolean {
-    return this.length * this.page < this.resultTotal;
-  }
-
-  get showControls(): boolean {
-    return !this.isIndex && (this.shouldShowNextPage || this.page > 1);
   }
 }
 </script>
