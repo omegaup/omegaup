@@ -336,6 +336,14 @@ export namespace types {
       );
     }
 
+    export function ProblemQualityPayload(
+      elementId: string = 'payload',
+    ): types.ProblemQualityPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemTagsPayload(
       elementId: string = 'payload',
     ): types.ProblemTagsPayload {
@@ -542,6 +550,23 @@ export namespace types {
     };
     isLogged: boolean;
     query: string;
+  }
+
+  export interface ContestProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    problem_id: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
   }
 
   export interface ContestPublicDetails {
@@ -853,6 +878,18 @@ export namespace types {
     title?: string;
   }
 
+  export interface ProblemQualityPayload {
+    canNominateProblem: boolean;
+    dismissed: boolean;
+    dismissedBeforeAC: boolean;
+    language?: string;
+    nominated: boolean;
+    nominatedBeforeAC: boolean;
+    problemAlias: string;
+    solved: boolean;
+    tried: boolean;
+  }
+
   export interface ProblemTagsPayload {
     alias: string;
     allowTags: boolean;
@@ -926,17 +963,7 @@ export namespace types {
     order: number;
     points: number;
     problem_id?: number;
-    quality_payload?: {
-      canNominateProblem: boolean;
-      dismissed: boolean;
-      dismissedBeforeAC: boolean;
-      language?: string;
-      nominated: boolean;
-      nominatedBeforeAC: boolean;
-      problemAlias: string;
-      solved: boolean;
-      tried: boolean;
-    };
+    quality_payload?: types.ProblemQualityPayload;
     submissions: number;
     title: string;
     version: string;
@@ -1262,22 +1289,7 @@ export namespace messages {
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.ContestProblem[];
     points_decay_factor: number;
     problemset_id: number;
     requests_user_information: string;

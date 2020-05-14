@@ -553,39 +553,39 @@ remaining time from the contest, or register the opened time.
 
 ### Returns
 
-| Name                        | Type                                                                                                                                                                                                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `admin`                     | `boolean`                                                                                                                                                                                                                                                   |
-| `admission_mode`            | `string`                                                                                                                                                                                                                                                    |
-| `alias`                     | `string`                                                                                                                                                                                                                                                    |
-| `available_languages`       | `{ [key: string]: string; }`                                                                                                                                                                                                                                |
-| `description`               | `string`                                                                                                                                                                                                                                                    |
-| `director`                  | `string`                                                                                                                                                                                                                                                    |
-| `feedback`                  | `string`                                                                                                                                                                                                                                                    |
-| `finish_time`               | `Date`                                                                                                                                                                                                                                                      |
-| `languages`                 | `string[]`                                                                                                                                                                                                                                                  |
-| `needs_basic_information`   | `boolean`                                                                                                                                                                                                                                                   |
-| `partial_score`             | `boolean`                                                                                                                                                                                                                                                   |
-| `opened`                    | `boolean`                                                                                                                                                                                                                                                   |
-| `original_contest_alias`    | `string`                                                                                                                                                                                                                                                    |
-| `original_problemset_id`    | `number`                                                                                                                                                                                                                                                    |
-| `penalty`                   | `number`                                                                                                                                                                                                                                                    |
-| `penalty_calc_policy`       | `string`                                                                                                                                                                                                                                                    |
-| `penalty_type`              | `string`                                                                                                                                                                                                                                                    |
-| `problems`                  | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; letter: string; order: number; points: number; problem_id: number; submissions: number; title: string; version: string; visibility: number; visits: number; }[]` |
-| `points_decay_factor`       | `number`                                                                                                                                                                                                                                                    |
-| `problemset_id`             | `number`                                                                                                                                                                                                                                                    |
-| `requests_user_information` | `string`                                                                                                                                                                                                                                                    |
-| `rerun_id`                  | `number`                                                                                                                                                                                                                                                    |
-| `scoreboard`                | `number`                                                                                                                                                                                                                                                    |
-| `scoreboard_url`            | `string`                                                                                                                                                                                                                                                    |
-| `scoreboard_url_admin`      | `string`                                                                                                                                                                                                                                                    |
-| `show_penalty`              | `boolean`                                                                                                                                                                                                                                                   |
-| `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                                   |
-| `start_time`                | `Date`                                                                                                                                                                                                                                                      |
-| `submissions_gap`           | `number`                                                                                                                                                                                                                                                    |
-| `title`                     | `string`                                                                                                                                                                                                                                                    |
-| `window_length`             | `number`                                                                                                                                                                                                                                                    |
+| Name                        | Type                         |
+| --------------------------- | ---------------------------- |
+| `admin`                     | `boolean`                    |
+| `admission_mode`            | `string`                     |
+| `alias`                     | `string`                     |
+| `available_languages`       | `{ [key: string]: string; }` |
+| `description`               | `string`                     |
+| `director`                  | `string`                     |
+| `feedback`                  | `string`                     |
+| `finish_time`               | `Date`                       |
+| `languages`                 | `string[]`                   |
+| `needs_basic_information`   | `boolean`                    |
+| `partial_score`             | `boolean`                    |
+| `opened`                    | `boolean`                    |
+| `original_contest_alias`    | `string`                     |
+| `original_problemset_id`    | `number`                     |
+| `penalty`                   | `number`                     |
+| `penalty_calc_policy`       | `string`                     |
+| `penalty_type`              | `string`                     |
+| `problems`                  | `types.ContestProblem[]`     |
+| `points_decay_factor`       | `number`                     |
+| `problemset_id`             | `number`                     |
+| `requests_user_information` | `string`                     |
+| `rerun_id`                  | `number`                     |
+| `scoreboard`                | `number`                     |
+| `scoreboard_url`            | `string`                     |
+| `scoreboard_url_admin`      | `string`                     |
+| `show_penalty`              | `boolean`                    |
+| `show_scoreboard_after`     | `boolean`                    |
+| `start_time`                | `Date`                       |
+| `submissions_gap`           | `number`                     |
+| `title`                     | `string`                     |
+| `window_length`             | `number`                     |
 
 ## `/api/contest/adminList/`
 
