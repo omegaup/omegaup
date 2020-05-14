@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
 import * as UI from '../ui';
 import T from '../lang';
-import { SchoolCoderOfTheMonth, SchoolUser } from '../types';
+import { SchoolCoderOfTheMonth, SchoolUser } from '../linkable_resource';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolProfileDetailsPayload();
