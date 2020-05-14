@@ -861,6 +861,61 @@ export namespace types {
     title?: string;
   }
 
+  export interface Problemset {
+    admin?: boolean;
+    admission_mode?: string;
+    alias?: string;
+    assignment_type?: string;
+    contest_alias?: string;
+    courseAssignments?: {
+      name: string;
+      description: string;
+      alias: string;
+      publish_time_delay?: number;
+      assignment_type: string;
+      start_time: Date;
+      finish_time?: Date;
+      max_points: number;
+      order: number;
+      scoreboard_url: string;
+      scoreboard_url_admin: string;
+    }[];
+    description?: string;
+    director?: string;
+    exists?: boolean;
+    feedback?: string;
+    finish_time?: Date;
+    languages?: string[];
+    name?: string;
+    needs_basic_information?: boolean;
+    opened?: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    partial_score?: boolean;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problems?: types.ProblemsetProblem[];
+    problemset_id?: number;
+    requests_user_information?: string;
+    scoreboard?: number;
+    show_scoreboard_after?: boolean;
+    start_time?: Date;
+    submission_deadline?: Date;
+    submissions_gap?: number;
+    title?: string;
+    users?: {
+      access_time?: Date;
+      country?: string;
+      email?: string;
+      opened_interview: boolean;
+      user_id?: number;
+      username: string;
+    }[];
+    window_length?: number;
+  }
+
   export interface ProblemsetProblem {
     accepted: number;
     alias: string;
@@ -2341,60 +2396,7 @@ export namespace messages {
   // Problemset
   export type ProblemsetDetailsRequest = { [key: string]: any };
   export type _ProblemsetDetailsServerResponse = any;
-  export type ProblemsetDetailsResponse = {
-    admin?: boolean;
-    admission_mode?: string;
-    alias?: string;
-    assignment_type?: string;
-    contest_alias?: string;
-    courseAssignments?: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: Date;
-      finish_time?: Date;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
-    description?: string;
-    director?: string;
-    exists?: boolean;
-    feedback?: string;
-    finish_time?: Date;
-    languages?: string[];
-    name?: string;
-    needs_basic_information?: boolean;
-    opened?: boolean;
-    original_contest_alias?: string;
-    original_problemset_id?: number;
-    partial_score?: boolean;
-    penalty?: number;
-    penalty_calc_policy?: string;
-    penalty_type?: string;
-    points_decay_factor?: number;
-    problems?: types.ProblemsetProblem[];
-    problemset_id?: number;
-    requests_user_information?: string;
-    scoreboard?: number;
-    show_scoreboard_after?: boolean;
-    start_time?: Date;
-    submission_deadline?: Date;
-    submissions_gap?: number;
-    title?: string;
-    users?: {
-      access_time?: Date;
-      country?: string;
-      email?: string;
-      opened_interview: boolean;
-      user_id?: number;
-      username: string;
-    }[];
-    window_length?: number;
-  };
+  export type ProblemsetDetailsResponse = types.Problemset;
   export type ProblemsetScoreboardRequest = { [key: string]: any };
   export type _ProblemsetScoreboardServerResponse = any;
   export type ProblemsetScoreboardResponse = types.Scoreboard;
