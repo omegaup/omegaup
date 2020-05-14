@@ -1,9 +1,9 @@
 <template>
   <div class="container-lg p-5">
-    <h3 class="text-center mb-4">
+    <h2 class="text-center mb-4">
       <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
       {{ name }}
-    </h3>
+    </h2>
     <div class="row mb-4">
       <div class="col-md-4">
         <ul class="list-group mb-3" v-if="country">
@@ -95,8 +95,7 @@ import T from '../../lang';
 import * as UI from '../../ui';
 
 import CountryFlag from '../CountryFlag.vue';
-import GridPaginator from '../GridPaginator.vue';
-// import GridPaginatorv2 from '../common/GridPaginator.vue';
+import GridPaginator from '../common/GridPaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../../types';
@@ -106,7 +105,6 @@ import { Chart } from 'highcharts-vue';
   components: {
     'omegaup-country-flag': CountryFlag,
     'omegaup-grid-paginator': GridPaginator,
-    // 'omegaup-common-grid-paginator': GridPaginatorv2,
     'omegaup-username': UserName,
     highcharts: Chart,
   },
