@@ -98,7 +98,7 @@ import CountryFlag from '../CountryFlag.vue';
 import GridPaginator from '../common/GridPaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
-import { SchoolCoderOfTheMonth, SchoolUser } from '../../types';
+import { SchoolCoderOfTheMonth, SchoolUser } from '../../linkable_resource';
 import { Chart } from 'highcharts-vue';
 
 @Component({

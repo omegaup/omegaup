@@ -510,14 +510,17 @@ export namespace types {
     navbarSection: string;
   }
 
+  export interface ConsentStatement {
+    contest_alias: string;
+    privacy_git_object_id?: string;
+    share_user_information?: boolean;
+    statement_type?: string;
+  }
+
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
     needsBasicInformation?: boolean;
-    privacyStatement?: {
-      markdown: string;
-      statementType: string;
-      gitObjectId?: string;
-    };
+    privacyStatement?: types.PrivacyStatement;
     requestsUserInformation?: string;
     shouldShowFirstAssociatedIdentityRunWarning?: boolean;
   }
@@ -681,6 +684,12 @@ export namespace types {
     label: string;
     page: number;
     url?: string;
+  }
+
+  export interface PrivacyStatement {
+    markdown: string;
+    statementType: string;
+    gitObjectId?: string;
   }
 
   export interface Problem {
