@@ -334,7 +334,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Now run function with valid school_id
         $results = \OmegaUp\Controllers\School::getSchoolCodersOfTheMonth(
-            $school->school_id,
+            $school->school_id
         );
         // Get all usernames and verify that only identity1 username
         // and identity2 username are part of results
