@@ -1089,6 +1089,10 @@ export namespace types {
     tagname: string;
   }
 
+  export interface Statements {
+    [key: string]: string;
+  }
+
   export interface StatsPayload {
     alias: string;
     entity_type: string;

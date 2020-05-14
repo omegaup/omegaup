@@ -122,6 +122,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import user_Username from '../user/Username.vue';
@@ -151,7 +152,7 @@ export default class ProblemStatementEdit extends Vue {
   currentMarkdown = this.markdownContents;
   errors: string[] = [];
   languages = ['es', 'en', 'pt'];
-  statements: omegaup.Statements = {};
+  statements: types.Statements = {};
 
   mounted(): void {
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
