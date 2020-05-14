@@ -33,7 +33,7 @@ export interface ArenaOptions {
   isPractice: boolean;
   onlyProblemAlias: string | null;
   originalContestAlias: string | null;
-  payload: any;
+  payload: types.CommonPayload;
   problemsetId: number | null;
   preferredLanguage: string | null;
   scoreboardToken: string | null;
@@ -126,7 +126,20 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
     onlyProblemAlias: null,
     originalContestAlias: null,
     problemsetId: null,
-    payload: {},
+    payload: {
+      omegaUpLockDown: false,
+      bootstrap4: false,
+      inContest: false,
+      isLoggedIn: false,
+      isReviewer: false,
+      gravatarURL51: '',
+      currentUsername: '',
+      profileProgress: 0,
+      isMainUserIdentity: false,
+      isAdmin: false,
+      lockDownImage: '',
+      navbarSection: '',
+    },
     preferredLanguage: null,
   };
 
@@ -161,9 +174,13 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
   if (arenaLocation.search.indexOf('ws=off') !== -1) {
     options.disableSockets = true;
   }
-  const elementPayload = document.getElementById('payload');
-  if (elementPayload !== null) {
-    const payload = JSON.parse(elementPayload.innerText);
+  if (document.getElementById('payload')) {
+    const payload = <
+      types.CommonPayload & {
+        shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+        preferred_language?: string;
+      }
+    >types.payloadParsers.CommonPayload();
     if (payload !== null) {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
