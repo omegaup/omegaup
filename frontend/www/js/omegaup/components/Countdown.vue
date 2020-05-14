@@ -12,7 +12,6 @@ import * as time from '../time';
 export default class Countdown extends Vue {
   @Prop() targetTime!: Date;
 
-  timePassed = 0;
   timerInterval = 0;
   currentTime = Date.now();
 
@@ -26,23 +25,18 @@ export default class Countdown extends Vue {
 
   @Watch('timeLeft')
   onValueChanged(newValue: number): void {
-    if (newValue <= 0) {
-      if (!this.timerInterval) return;
-      clearInterval(this.timerInterval);
-      this.timerInterval = 0;
-      this.$emit('emit-finish');
-    }
+    if (newValue > 0) return;
+    if (!this.timerInterval) return;
+    clearInterval(this.timerInterval);
+    this.timerInterval = 0;
+    this.$emit('emit-finish');
   }
 
-  startTimer(): void {
+  mounted() {
     this.timerInterval = window.setInterval(
       () => (this.currentTime = Date.now()),
       1000,
     );
-  }
-
-  mounted() {
-    this.startTimer();
   }
 }
 </script>
