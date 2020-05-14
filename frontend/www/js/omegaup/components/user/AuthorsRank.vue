@@ -40,25 +40,12 @@
           </tr>
         </tbody>
       </table>
-      <div class="card-footer" v-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="`/rank/authors/?page=${page - 1}`">
-            {{ T.wordsPrevPage }}</a
-          >
-          <span v-show="showNextPage">|</span>
-        </template>
-        <a
-          v-show="showNextPage"
-          v-bind:href="`/rank/authors/?page=${page + 1}`"
-          >{{ T.wordsNextPage }}</a
-        >
+      <div class="card-footer">
+        <omegaup-common-paginator
+          v-bind:pagerItems="pagerItems"
+        ></omegaup-common-paginator>
       </div>
     </div>
-    <!-- TODO: Usar aquí el Paginador migrado a BS4 y borrar la navegación anterior.
-    <omegaup-common-paginator
-      v-bind:pagerItems="pagerItems"
-    ></omegaup-common-paginator>
-    -->
   </div>
 </template>
 
@@ -70,7 +57,7 @@ import * as UI from '../../ui';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
 import CountryFlag from '../CountryFlag.vue';
-import common_Paginator from '../common/Paginator.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 @Component({
   components: {
@@ -87,13 +74,5 @@ export default class AuthorsRank extends Vue {
 
   T = T;
   UI = UI;
-
-  get showNextPage(): boolean {
-    return this.length * this.page < this.rankingData.total;
-  }
-
-  get showControls(): boolean {
-    return this.showNextPage || this.page > 1;
-  }
 }
 </script>

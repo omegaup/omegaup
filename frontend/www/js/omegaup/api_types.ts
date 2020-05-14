@@ -1069,6 +1069,7 @@ export namespace types {
     rank: types.School[];
     totalRows: number;
     showHeader: boolean;
+    pagerItems: types.PageItem[];
   }
 
   export interface SchoolUser {
@@ -1203,6 +1204,7 @@ export namespace types {
     length: number;
     page: number;
     ranking: types.UserRank;
+    pagerItems: types.PageItem[];
   }
 }
 

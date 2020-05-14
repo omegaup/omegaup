@@ -13,19 +13,6 @@
               })
         }}
       </h5>
-      <div class="card-body" v-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="`/rank/schools/?page=${page - 1}`">
-            {{ T.wordsPrevPage }}</a
-          >
-          <span v-show="showNextPage">|</span>
-        </template>
-        <a
-          v-show="showNextPage"
-          v-bind:href="`/rank/schools/?page=${page + 1}`"
-          >{{ T.wordsNextPage }}</a
-        >
-      </div>
       <table class="table mb-0">
         <thead>
           <tr>
@@ -56,18 +43,10 @@
       <div class="card-footer" v-if="showHeader">
         <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
       </div>
-      <div class="card-footer" v-else-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="`/rank/schools/?page=${page - 1}`">
-            {{ T.wordsPrevPage }}</a
-          >
-          <span v-show="showNextPage">|</span>
-        </template>
-        <a
-          v-show="showNextPage"
-          v-bind:href="`/rank/schools/?page=${page + 1}`"
-          >{{ T.wordsNextPage }}</a
-        >
+      <div class="card-footer" v-else="">
+        <omegaup-common-paginator
+          v-bind:pagerItems="pagerItems"
+        ></omegaup-common-paginator>
       </div>
     </div>
   </div>
@@ -87,13 +66,16 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 @Component({
   components: {
     'omegaup-countryflag': CountryFlag,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class SchoolRank extends Vue {
@@ -102,16 +84,9 @@ export default class SchoolRank extends Vue {
   @Prop() showHeader!: boolean;
   @Prop() totalRows!: number;
   @Prop() rank!: omegaup.SchoolsRank[];
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   UI = UI;
-
-  get showNextPage(): boolean {
-    return this.length * this.page < this.totalRows;
-  }
-
-  get showControls(): boolean {
-    return !this.showHeader && (this.showNextPage || this.page > 1);
-  }
 }
 </script>
