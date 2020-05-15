@@ -69,7 +69,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import { LinkableResource } from '../../types';
+import { LinkableResource } from '../../linkable_resource';
 
 interface SortOption {
   value: string;

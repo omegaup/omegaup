@@ -103,18 +103,18 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $r['auth_token']
         );
         $graduationDate = null;
-        if (!is_null($identityDb->current_identity_school_id)) {
+        if (!is_null($identityDb['current_identity_school_id'])) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $identityDb->current_identity_school_id
+                $identityDb['current_identity_school_id']
             );
             if (!is_null($identitySchool)) {
                 $graduationDate = $identitySchool->graduation_date;
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb->name);
-        $this->assertEquals($r['country_id'], $identityDb->country_id);
-        $this->assertEquals($r['state_id'], $identityDb->state_id);
+        $this->assertEquals($r['name'], $identityDb['name']);
+        $this->assertEquals($r['country_id'], $identityDb['country_id']);
+        $this->assertEquals($r['state_id'], $identityDb['state_id']);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(
             gmdate(
@@ -125,7 +125,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb->language_id);
+        $this->assertEquals($locale->language_id, $identityDb['language_id']);
     }
 
     /**
@@ -323,23 +323,23 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
         $this->getCoderOfTheMonth($today, '-1 month', $category);
 
-        // First run api with invalid school_id
+        // First run function with invalid school_id
         try {
-            \OmegaUp\Controllers\School::apiSchoolCodersOfTheMonth(new \OmegaUp\Request([
-                'school_id' => 1231,
-            ]));
+            \OmegaUp\Controllers\School::getSchoolCodersOfTheMonth(
+                1231
+            );
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'schoolNotFound');
         }
 
-        // Now run api with valid school_id
-        $result = \OmegaUp\Controllers\School::apiSchoolCodersOfTheMonth(new \OmegaUp\Request([
-            'school_id' => $school->school_id,
-        ]));
+        // Now run function with valid school_id
+        $results = \OmegaUp\Controllers\School::getSchoolCodersOfTheMonth(
+            $school->school_id
+        );
         // Get all usernames and verify that only identity1 username
         // and identity2 username are part of results
         $resultCoders = [];
-        foreach ($result['coders'] as $res) {
+        foreach ($results as $res) {
             $resultCoders[] = $res['username'];
         }
 
