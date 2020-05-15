@@ -1,14 +1,17 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title">
-        {{ title }} <span class="badge">{{ items.length }}</span>
-      </h2>
-    </div>
-    <div class="panel-body text-center" v-if="sortOptions.length > 0">
+  <div class="card">
+    <h5 class="card-header">
+      {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
+    </h5>
+    <div class="card-body text-center" v-if="sortOptions.length > 0">
       <div class="form-check form-check-inline">
-        <label v-for="sortOption in sortOptions" class="radio-inline">
+        <label
+          v-bind:key="index"
+          v-for="(sortOption, index) in sortOptions"
+          class="form-check-label mr-4"
+        >
           <input
+            class="form-check-input m-0"
             name="sort-selector"
             type="radio"
             v-bind:value="sortOption.value"
@@ -18,27 +21,27 @@
         </label>
       </div>
     </div>
-    <table class="table table-striped" v-if="items.length &gt; 0">
+    <table class="table table-striped mb-0" v-if="items.length > 0">
       <slot name="table-header"></slot>
       <tbody>
-        <tr v-for="(group, index) in paginatedItems">
-          <td v-if="showPageOffset" class="text-center">
+        <tr v-bind:key="index" v-for="(group, index) in paginatedItems">
+          <th scope="row" v-if="showPageOffset" class="text-center">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
-          </td>
-          <td v-for="item in group">
+          </th>
+          <td v-bind:key="itemIndex" v-for="(item, itemIndex) in group">
             <slot name="item-data" v-bind:item="item">
               <a v-bind:href="item.getUrl()">
                 {{ item.toString() }}
               </a>
             </slot>
           </td>
-          <td class="numericColumn" v-if="!group[0].getBadge().isEmpty()">
+          <td class="text-right" v-if="!group[0].getBadge().isEmpty()">
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="panel-footer text-center" v-if="items.length &gt; 0">
+    <div class="card-footer text-center" v-if="items.length > 0">
       <div class="btn-group" role="group">
         <button
           class="btn btn-primary"
@@ -65,8 +68,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import T from '../lang';
-import { LinkableResource } from '../linkable_resource';
+import T from '../../lang';
+import { LinkableResource } from '../../linkable_resource';
 
 interface SortOption {
   value: string;
@@ -74,9 +77,9 @@ interface SortOption {
 }
 
 /**
-  Creates a two-dimensional paginated table, with the number of columns passed
-  as a prop and the number of rows being calculated taking into account the number
-  of items per page, total items and the number of columns.
+ * Creates a two-dimensional paginated table, with the number of columns passed
+ * as a prop and the number of rows being calculated taking into account the number
+ * of items per page, total items and the number of columns.
  */
 @Component
 export default class GridPaginator extends Vue {
@@ -88,7 +91,7 @@ export default class GridPaginator extends Vue {
   @Prop({ default: () => [] }) sortOptions!: SortOption[];
 
   private T = T;
-  private currentPageNumber: number = 0;
+  private currentPageNumber = 0;
   private currentSortOption =
     this.sortOptions.length > 0 ? this.sortOptions[0].value : '';
 

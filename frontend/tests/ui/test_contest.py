@@ -284,7 +284,7 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.ID, 'start-contest-submit'))).click()
+                    (By.CSS_SELECTOR, 'button[data-start-contest]'))).click()
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "#ranking"]'))).click()
@@ -480,7 +480,7 @@ def enter_contest(driver, contest_alias):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'start-contest-submit'))).click()
+                (By.CSS_SELECTOR, 'button[data-start-contest]'))).click()
 
 
 @util.annotate

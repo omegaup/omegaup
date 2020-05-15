@@ -754,7 +754,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>
+     * @return list<array{classname: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>
      */
     final public static function getForProblemDetails(
         int $problemId,
@@ -764,13 +764,37 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = '
             SELECT
                 s.guid, s.language, r.status, r.verdict, r.runtime, r.penalty,
-                r.memory, r.score, r.contest_score, s.`time`, s.submit_delay
+                r.memory, r.score, r.contest_score, s.`time`, s.submit_delay,
+                i.username,
+                IFNULL(
+                    (
+                        SELECT urc.classname
+                        FROM User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                SELECT
+                                    ur.score
+                                FROM
+                                    User_Rank ur
+                                WHERE
+                                    ur.user_id = i.user_id
+                            )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) AS classname
             FROM
                 Submissions s
             INNER JOIN
                 Runs r
             ON
                 r.run_id = s.current_run_id
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = s.identity_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ?
         ';
@@ -779,7 +803,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, verdict: string}> */
+        /** @var list<array{classname: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

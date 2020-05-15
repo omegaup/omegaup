@@ -5,15 +5,16 @@ namespace OmegaUp\Controllers;
 /**
  *  UserController
  *
- * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, country_id: null|string, name: null|string, username: string}>, total: int}
- * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank}
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
+ * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
- * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank}
+ * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>}
  * @psalm-type CoderOfTheMonth=array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, user_id: int, username: string}
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
@@ -2549,7 +2550,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Prepare all the properties to be sent to the
      * author rank table view via smarty.
      *
-     * @return array{smartyProperties: array{payload: AuthorRankTablePayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: AuthorRankTablePayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
@@ -2558,16 +2559,26 @@ class User extends \OmegaUp\Controllers\Controller {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $length = $r->ensureOptionalInt('length') ?? 100;
 
+        $authorsRanking = self::getAuthorsRank(
+            $page,
+            $length
+        );
         return [
             'smartyProperties' => [
                 'payload' => [
                     'page' => $page,
                     'length' => $length,
-                    'ranking' => self::getAuthorsRank(
+                    'ranking' => $authorsRanking,
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $authorsRanking['total'],
+                        $length,
                         $page,
-                        $length
+                        '/rank/authors/',
+                        /*$adjacent=*/5,
+                        /*$params=*/[]
                     ),
                 ],
+                'title' => 'omegaupTitleAuthorsRank',
             ],
             'entrypoint' => 'authors_rank',
         ];
@@ -3385,6 +3396,12 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $availableFilters = [];
 
+        $ranking = self::getRankByProblemsSolved(
+            $r->identity,
+            $filter,
+            $page,
+            $length
+        );
         $response = [
             'smartyProperties' => [
                 'payload' => [
@@ -3394,11 +3411,14 @@ class User extends \OmegaUp\Controllers\Controller {
                     'availableFilters' => $availableFilters,
                     'isIndex' => false,
                     'isLogged' => false,
-                    'ranking' => self::getRankByProblemsSolved(
-                        $r->identity,
-                        $filter,
+                    'ranking' => $ranking,
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $ranking['total'],
+                        $length,
                         $page,
-                        $length
+                        '/rank/',
+                        /*$adjacent=*/5,
+                        $filter === '' ? [] : [ 'filter' => $filter ]
                     ),
                 ],
             ],

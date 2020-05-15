@@ -1,116 +1,114 @@
 <template>
-  <div>
-    <div class="card">
-      <div class="card-header">
-        <h2 class="card-title">{{ T.wordsReviewingProblem }}</h2>
-      </div>
-      <div class="card-body">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-sm-3">
-              <strong>{{ T.qualityNominationType }}</strong>
-            </div>
-            <div class="col-sm-4">
-              {{ this.nomination }}
-            </div>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">{{ T.wordsReviewingProblem }}</h2>
+    </div>
+    <div class="card-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.qualityNominationType }}</strong>
           </div>
-          <div class="row">
-            <div class="col-sm-3">
-              <strong>{{ T.wordsNominator }}</strong>
-            </div>
-            <div class="col-sm-4">
-              {{ this.nominator.name }} (<a
-                v-bind:href="userUrl(this.nominator.username)"
-                >{{ this.nominator.username }}</a
-              >)
-            </div>
+          <div class="col-sm-4">
+            {{ this.nomination }}
           </div>
-          <div class="row">
-            <div class="col-sm-3">
-              <strong>{{ T.wordsProblem }}</strong>
-            </div>
-            <div class="col-sm-4">
-              {{ this.problem.title }} (<a
-                v-bind:href="problemUrl(this.problem.alias)"
-                >{{ this.problem.alias }}</a
-              >)
-            </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.wordsNominator }}</strong>
           </div>
-          <div class="row">
-            <div class="col-sm-3">
-              <strong>{{ T.wordsAuthor }}</strong>
-            </div>
-            <div class="col-sm-4">
-              {{ this.author.name }} (<a
-                v-bind:href="userUrl(this.author.username)"
-                >{{ this.author.username }}</a
-              >)
-            </div>
+          <div class="col-sm-4">
+            {{ this.nominator.name }} (<a
+              v-bind:href="userUrl(this.nominator.username)"
+              >{{ this.nominator.username }}</a
+            >)
           </div>
-          <div class="row">
-            <div class="col-sm-3">
-              <strong>{{ T.wordsDetails }}</strong>
-            </div>
-            <div class="col-sm-8">
-              <pre class="border rounded bg-light">{{ this.contents }}</pre>
-            </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.wordsProblem }}</strong>
           </div>
-          <div class="row">
-            <div class="col-sm-3">
-              <strong>{{ T.banProblemFormQuestion }}</strong>
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
-                v-bind:title="T.banProblemFormComments"
-              ></span>
-            </div>
-            <div
-              class="col-sm-8"
-              v-bind:class="{
-                'has-error': !rationale,
-                'has-success': rationale,
-              }"
-            >
-              <textarea
-                class="form-control"
-                name="rationale"
-                type="text"
-                v-model="rationale"
-              ></textarea>
-            </div>
+          <div class="col-sm-4">
+            {{ this.problem.title }} (<a
+              v-bind:href="problemUrl(this.problem.alias)"
+              >{{ this.problem.alias }}</a
+            >)
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.wordsAuthor }}</strong>
+          </div>
+          <div class="col-sm-4">
+            {{ this.author.name }} (<a
+              v-bind:href="userUrl(this.author.username)"
+              >{{ this.author.username }}</a
+            >)
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.wordsDetails }}</strong>
+          </div>
+          <div class="col-sm-8">
+            <pre class="border rounded bg-light">{{ this.contents }}</pre>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3">
+            <strong>{{ T.banProblemFormQuestion }}</strong>
+            <span
+              aria-hidden="true"
+              class="glyphicon glyphicon-info-sign"
+              data-placement="top"
+              data-toggle="tooltip"
+              v-bind:title="T.banProblemFormComments"
+            ></span>
           </div>
           <div
-            class="row"
-            v-if="this.nomination == 'demotion' && this.reviewer == true"
+            class="col-sm-8"
+            v-bind:class="{
+              'has-error': !rationale,
+              'has-success': rationale,
+            }"
           >
-            <div class="col-sm-3">
-              <strong>{{ T.wordsVerdict }}</strong>
-            </div>
-            <div class="col-sm-8 text-center">
-              <button
-                class="btn btn-danger"
-                v-bind:disabled="!rationale"
-                v-on:click="showConfirmationDialog('banned')"
-              >
-                {{ T.wordsBanProblem }}
-              </button>
-              <button
-                class="btn btn-success"
-                v-bind:disabled="!rationale"
-                v-on:click="showConfirmationDialog('resolved')"
-              >
-                {{ T.wordsKeepProblem }}
-              </button>
-              <button
-                class="btn btn-warning"
-                v-bind:disabled="!rationale"
-                v-on:click="showConfirmationDialog('warning')"
-              >
-                {{ T.wordsWarningProblem }}
-              </button>
-            </div>
+            <textarea
+              class="form-control"
+              name="rationale"
+              type="text"
+              v-model="rationale"
+            ></textarea>
+          </div>
+        </div>
+        <div
+          class="row"
+          v-if="this.nomination == 'demotion' && this.reviewer == true"
+        >
+          <div class="col-sm-3">
+            <strong>{{ T.wordsVerdict }}</strong>
+          </div>
+          <div class="col-sm-8 text-center">
+            <button
+              class="btn btn-danger"
+              v-bind:disabled="!rationale"
+              v-on:click="showConfirmationDialog('banned')"
+            >
+              {{ T.wordsBanProblem }}
+            </button>
+            <button
+              class="btn btn-success"
+              v-bind:disabled="!rationale"
+              v-on:click="showConfirmationDialog('resolved')"
+            >
+              {{ T.wordsKeepProblem }}
+            </button>
+            <button
+              class="btn btn-warning"
+              v-bind:disabled="!rationale"
+              v-on:click="showConfirmationDialog('warning')"
+            >
+              {{ T.wordsWarningProblem }}
+            </button>
           </div>
         </div>
       </div>

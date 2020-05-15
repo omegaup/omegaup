@@ -1,6 +1,16 @@
+// @ts-nocheck
+
 import Vue from 'vue';
 
 import * as api from '../api';
+import T from '../lang';
+import * as markdown from '../markdown';
+import { omegaup, OmegaUp } from '../omegaup';
+import { types, messages } from '../api_types';
+import * as time from '../time';
+import * as typeahead from '../typeahead';
+import * as ui from '../ui';
+
 import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
@@ -12,74 +22,181 @@ import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
-import T from '../lang';
-import * as markdown from '../markdown';
-import { OmegaUp } from '../omegaup';
-import * as time from '../time';
-import * as typeahead from '../typeahead';
-import * as ui from '../ui';
 
-import ArenaAdmin from './admin_arena.js';
+import ArenaAdmin from './admin_arena';
 import {
+  ArenaOptions,
   EphemeralGrader,
   EventsSocket,
   GetOptionsFromLocation,
+  getMaxScore,
+  scoreboardColors,
   myRunsStore,
   runsStore,
 } from './arena_transitional';
 
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
+
 export { ArenaAdmin, GetOptionsFromLocation };
 
-let ScoreboardColors = [
-  '#FB3F51',
-  '#FF5D40',
-  '#FFA240',
-  '#FFC740',
-  '#59EA3A',
-  '#37DD6F',
-  '#34D0BA',
-  '#3AAACF',
-  '#8144D6',
-  '#CD35D3',
-];
-
-function getMaxScore(runs, alias, previousScore) {
-  let maxScore = previousScore;
-  for (let run of runs) {
-    if (alias != run.alias) {
-      continue;
-    }
-    let score = run.contest_score;
-    if (score > maxScore) {
-      maxScore = score;
-    }
-  }
-  return maxScore;
-}
+// Number of digits after the decimal point to show.
+const digitsAfterDecimalPoint: number = 2;
 
 export class Arena {
-  constructor(options) {
-    let self = this;
+  options: ArenaOptions;
 
-    self.options = options;
+  // Currently opened problem.
+  currentProblem: types.ProblemsetProblem = {
+    accepted: 0,
+    alias: '',
+    commit: '',
+    difficulty: 0,
+    languages: '',
+    letter: '',
+    order: 0,
+    points: 0,
+    submissions: 0,
+    title: '',
+    version: '',
+    visibility: 0,
+    visits: 0,
+  };
 
-    // The current problemset.
-    self.currentProblemset = null;
+  // The current problemset.
+  currentProblemset: types.Problemset | null = null;
 
-    // The interval for clock updates.
-    self.clockInterval = null;
+  // The interval for clock updates.
+  clockInterval = null;
 
-    // The start time of the contest.
-    self.startTime = null;
+  // The start time of the contest.
+  startTime = null;
 
-    // The finish time of the contest.
-    self.finishTime = null;
+  // The finish time of the contest.
+  finishTime = null;
 
-    // The deadline for submissions. self might be different from the end time.
-    self.submissionDeadline = null;
+  // The deadline for submissions. This might be different from the end time.
+  submissionDeadline = null;
 
-    // All runs in self contest/problem.
-    self.myRunsList = new Vue({
+  // The guid of any run that is pending.
+  pendingRuns = {};
+
+  // The set of problems in this contest.
+  problems: {
+    [alias: string]: types.ContestProblem | types.ProblemsetProblem;
+  } = {};
+
+  // WebSocket for real-time updates.
+  socket: EventsSocket | null = null;
+
+  // The offset of each user into the ranking table.
+  currentRanking = {};
+
+  // The previous ranking information. Useful to show diffs.
+  prevRankingState = null;
+
+  // Every time a recent event is shown, have this interval clear it after
+  // 30s.
+  removeRecentEventClassTimeout = null;
+
+  // The last known scoreboard event stream.
+  currentEvents = null;
+
+  // The Markdown-to-HTML converter.
+  markdownConverter: Markdown.Converter = markdown.markdownConverter();
+
+  // If we have admin powers in this contest.
+  problemsetAdmin: boolean = false;
+
+  preferredLanguage: string | null;
+
+  answeredClarifications: number = 0;
+  clarificationsOffset: number = 0;
+  clarificationsRowcount: number = 20;
+  activeTab: string = 'problems';
+  clarifications = {};
+  submissionGap: number = 0;
+
+  // The interval of time that submissions button will be disabled
+  submissionGapInterval: number = 0;
+
+  // Cache scoreboard data for virtual contest
+  originalContestScoreboardEvent = null;
+
+  // Virtual contest refresh interval
+  virtualContestRefreshInterval = null;
+
+  // Ephemeral grader support.
+  ephemeralGrader: EphemeralGrader = new EphemeralGrader();
+
+  // UI elements
+  elements: {
+    clarification: JQuery;
+    clock: JQuery;
+    loadingOverlay: JQuery;
+    ranking: JQuery;
+    socketStatus: JQuery;
+    submitForm: JQuery & { code: JQuery; file: JQuery; language: JQuery };
+  };
+
+  codeEditor:
+    | (Vue & {
+        language: string;
+        code: string;
+        refresh: () => void;
+      })
+    | null = null;
+
+  navbarAssignments: Vue | null = null;
+
+  navbarProblems:
+    | (Vue & {
+        problems: omegaup.ContestProblem[];
+        activeProblem: string;
+      })
+    | null = null;
+
+  navbarMiniRanking:
+    | (Vue & {
+        showRanking: boolean;
+        users: omegaup.UserRank[];
+      })
+    | null = null;
+
+  myRunsList: Vue;
+
+  qualityNominationForm = null;
+
+  commonNavbar:
+    | (Vue & {
+        initialClarifications: omegaup.Clarification[];
+        graderInfo: types.GraderStatus | null;
+        errorMessage: string | null;
+        graderQueueLength: number;
+        notifications: types.Notification[];
+      })
+    | null = null;
+
+  runDetailsView:
+    | (Vue & {
+        data: omegaup.RunDetails;
+      })
+    | null = null;
+
+  scoreboard:
+    | (Vue & {
+        problems: omegaup.Problem[];
+        ranking: omegaup.ScoreboardUser[];
+        lastUpdated: Date;
+      })
+    | null = null;
+
+  summaryView: Vue & { contest: omegaup.Contest };
+
+  constructor(options: ArenaOptions) {
+    this.options = options;
+
+    // All runs in this contest/problem.
+    this.myRunsList = new Vue({
       render: function(createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -95,7 +212,7 @@ export class Arena {
             showPoints: !options.isPractice && !options.isOnlyProblem,
           },
           on: {
-            details: run => {
+            details: (run: types.Run) => {
               window.location.hash += `/show-run:${run.guid}`;
             },
           },
@@ -103,59 +220,33 @@ export class Arena {
       },
       data: {
         isContestFinished: false,
-        isProblemsetOpened: false,
+        isProblemsetOpened: true,
         problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
       },
       components: { 'omegaup-arena-runs': arena_Runs },
     });
     const myRunsListElement = document.querySelector('#problem table.runs');
     if (myRunsListElement) {
-      self.myRunsList.$mount(myRunsListElement);
+      this.myRunsList.$mount(myRunsListElement);
     }
 
-    // The guid of any run that is pending.
-    self.pendingRuns = {};
-
-    // The set of problems in self contest.
-    self.problems = {};
-
-    // WebSocket for real-time updates.
-    self.socket = null;
-
-    // The offset of each user into the ranking table.
-    self.currentRanking = {};
-
-    // The previous ranking information. Useful to show diffs.
-    self.prevRankingState = null;
-
-    // Every time a recent event is shown, have self interval clear it after
-    // 30s.
-    self.removeRecentEventClassTimeout = null;
-
-    // The last known scoreboard event stream.
-    self.currentEvents = null;
-
-    // The Markdown-to-HTML converter.
-    self.markdownConverter = markdown.markdownConverter();
-
     // Currently opened clarification notifications.
-    self.commonNavbar = null;
     if (document.getElementById('common-navbar')) {
-      self.commonNavbar = new Vue({
+      const commonNavbar = (this.commonNavbar = new Vue({
         el: '#common-navbar',
         render: function(createElement) {
           return createElement('omegaup-common-navbar', {
             props: {
-              omegaUpLockDown: this.omegaUpLockDown,
-              inContest: this.inContest,
-              isLoggedIn: this.isLoggedIn,
-              isReviewer: this.isReviewer,
-              gravatarURL51: this.gravatarURL51,
-              currentUsername: this.currentUsername,
-              isAdmin: this.isAdmin,
-              isMainUserIdentity: this.isMainUserIdentity,
-              lockDownImage: this.lockDownImage,
-              navbarSection: this.navbarSection,
+              omegaUpLockDown: options.payload.omegaUpLockDown,
+              inContest: options.payload.inContest,
+              isLoggedIn: options.payload.isLoggedIn,
+              isReviewer: options.payload.isReviewer,
+              gravatarURL51: options.payload.gravatarURL51,
+              currentUsername: options.payload.currentUsername,
+              isAdmin: options.payload.isAdmin,
+              isMainUserIdentity: options.payload.isMainUserIdentity,
+              lockDownImage: options.payload.lockDownImage,
+              navbarSection: options.payload.navbarSection,
               graderInfo: this.graderInfo,
               graderQueueLength: this.graderQueueLength,
               errorMessage: this.errorMessage,
@@ -164,96 +255,74 @@ export class Arena {
           });
         },
         data: {
-          omegaUpLockDown: self.options.payload.omegaUpLockDown,
-          inContest: self.options.payload.inContest,
-          isLoggedIn: self.options.payload.isLoggedIn,
-          isReviewer: self.options.payload.isReviewer,
-          gravatarURL51: self.options.payload.gravatarURL51,
-          currentUsername: self.options.payload.currentUsername,
-          isAdmin: self.options.payload.isAdmin,
-          isMainUserIdentity: self.options.payload.isMainUserIdentity,
-          lockDownImage: self.options.payload.lockDownImage,
-          navbarSection: self.options.payload.navbarSection,
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
           initialClarifications: [],
+          notifications: [],
         },
         components: {
           'omegaup-common-navbar': common_Navbar,
         },
-      });
+      }));
 
-      if (self.options.payload.isAdmin) {
+      if (this.options.payload.isAdmin) {
         api.Notification.myList({})
           .then(data => {
-            self.commonNavbar.notifications = data.notifications;
+            commonNavbar.notifications = data.notifications;
           })
           .catch(ui.apiError);
 
-        function updateGraderStatus() {
+        const updateGraderStatus = () => {
           api.Grader.status()
             .then(stats => {
-              self.commonNavbar.graderInfo = stats.grader;
-              if (stats.status !== 'ok') {
-                self.commonNavbar.errorMessage = T.generalError;
-                return;
-              }
+              commonNavbar.graderInfo = stats.grader;
               if (stats.grader.queue) {
-                self.commonNavbar.graderQueueLength =
+                commonNavbar.graderQueueLength =
                   stats.grader.queue.run_queue_length +
                   stats.grader.queue.running.length;
               }
-              self.commonNavbar.errorMessage = null;
+              commonNavbar.errorMessage = null;
             })
             .catch(stats => {
-              self.commonNavbar.errorMessage = stats.error;
+              commonNavbar.errorMessage = stats.error;
             });
-        }
+        };
 
         updateGraderStatus();
         setInterval(updateGraderStatus, 30000);
       }
     }
 
-    // Currently opened problem.
-    self.currentProblem = null;
-
-    // If we have admin powers in self contest.
-    self.problemsetAdmin = false;
-    self.myRunsList.isProblemsetOpened = true;
-    self.answeredClarifications = 0;
-    self.clarificationsOffset = 0;
-    self.clarificationsRowcount = 20;
-    self.activeTab = 'problems';
-    self.clarifications = {};
-    self.submissionGap = 0;
-
     // Setup preferred language
-    self.preferredLanguage = options.preferredLanguage || null;
+    this.preferredLanguage = options.preferredLanguage || null;
 
     // UI elements
-    self.elements = {
+    this.elements = {
       clarification: $('#clarification'),
       clock: $('#title .clock'),
       loadingOverlay: $('#loading'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
-      submitForm: $('#submit'),
+      submitForm: $.extend($('#submit'), {
+        code: $('#submit textarea[name="code"]'),
+        file: $('#submit input[type="file"]'),
+        language: $('#submit select[name="language"]'),
+      }),
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
-      self.elements.navBar = new Vue({
+      this.navbarProblems = new Vue({
         el: '#arena-navbar-problems',
         render: function(createElement) {
           return createElement('omegaup-arena-navbar-problems', {
             props: {
               problems: this.problems,
               activeProblem: this.activeProblem,
-              inAssignment: this.inAssignment,
+              inAssignment: !!options.courseAlias,
             },
             on: {
-              'navigate-to-problem': function(problemAlias) {
+              'navigate-to-problem': (problemAlias: string) => {
                 window.location.hash = `#problems/${problemAlias}`;
               },
             },
@@ -261,8 +330,7 @@ export class Arena {
         },
         data: {
           problems: [],
-          activeProblem: null,
-          inAssignment: !!self.options.courseAlias,
+          activeProblem: '',
         },
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
@@ -275,7 +343,7 @@ export class Arena {
     }
 
     if (document.getElementById('arena-navbar-miniranking') !== null) {
-      self.elements.miniRanking = new Vue({
+      this.navbarMiniRanking = new Vue({
         el: '#arena-navbar-miniranking',
         render: function(createElement) {
           return createElement('omegaup-arena-navbar-miniranking', {
@@ -295,40 +363,34 @@ export class Arena {
       });
     }
 
-    if (self.elements.ranking.length) {
-      self.elements.rankingTable = new Vue({
-        el: self.elements.ranking[0],
+    if (this.elements.ranking.length) {
+      this.scoreboard = new Vue({
+        el: this.elements.ranking[0],
         render: function(createElement) {
           return createElement('omegaup-scoreboard', {
             props: {
-              scoreboardColors: ScoreboardColors,
+              scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
-              digitsAfterDecimalPoint: this.digitsAfterDecimalPoint,
+              digitsAfterDecimalPoint: digitsAfterDecimalPoint,
             },
           });
         },
         data: {
           problems: [],
           ranking: [],
-          lastUpdated: null,
-          digitsAfterDecimalPoint: self.digitsAfterDecimalPoint,
+          lastUpdated: new Date(0),
         },
         components: {
           'omegaup-scoreboard': arena_Scoreboard,
         },
       });
     }
-    $.extend(self.elements.submitForm, {
-      code: $('textarea[name="code"]', self.elements.submitForm),
-      file: $('input[type="file"]', self.elements.submitForm),
-      language: $('select[name="language"]', self.elements.submitForm),
-    });
 
     // Setup run details view, if available.
     if (document.getElementById('run-details') != null) {
-      self.runDetailsView = new Vue({
+      this.runDetailsView = new Vue({
         el: '#run-details',
         render: function(createElement) {
           return createElement('omegaup-arena-rundetails', {
@@ -345,15 +407,15 @@ export class Arena {
     }
 
     // Setup any global hooks.
-    self.bindGlobalHandlers();
+    this.bindGlobalHandlers();
 
     // Contest summary view model
-    self.summaryView = new Vue({
+    this.summaryView = new Vue({
       render: function(createElement) {
         return createElement('omegaup-arena-contestsummary', {
           props: {
             contest: this.contest,
-            showRanking: !self.options.isPractice,
+            showRanking: !options.isPractice,
           },
         });
       },
@@ -373,54 +435,36 @@ export class Arena {
     });
     const summaryElement = document.getElementById('summary');
     if (summaryElement) {
-      self.summaryView.$mount(summaryElement);
+      this.summaryView.$mount(summaryElement);
     }
 
-    // The interval of time that submissions button will be disabled
-    self.submissionGapInterval = 0;
-
-    // Cache scoreboard data for virtual contest
-    self.originalContestScoreboardEvent = null;
-
-    // Virtual contest refresh interval
-    self.virtualContestRefreshInterval = null;
-
-    // Ephemeral grader support.
-    self.ephemeralGrader = new EphemeralGrader();
-
-    // Number of digits after the decimal point to show.
-    self.digitsAfterDecimalPoint = 2;
-
-    self.qualityNominationForm = null;
-
-    self.elements.assignmentsNav = null;
+    this.navbarAssignments = null;
   }
 
   installLibinteractiveHooks() {
     let self = this;
-    $('.libinteractive-download form').on('submit', function(e) {
-      let form = $(e.target);
+    $('.libinteractive-download form').on('submit', (e: Event) => {
       e.preventDefault();
+
+      let form = $(e.target);
       let alias = self.currentProblem.alias;
       let commit = self.currentProblem.commit;
-      let os = form.find('.download-os').val();
-      let lang = form.find('.download-lang').val();
+      let os = $('.download-os', form).val();
+      let lang = $('.download-lang', form).val();
       let extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
       ui.navigateTo(
-        window.location.protocol +
-          '//' +
-          window.location.host +
-          `/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
+        `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
       );
-
-      return false;
     });
 
-    $('.libinteractive-download .download-lang').on('change', function(e) {
-      var form = e.target;
+    $('.libinteractive-download .download-lang').on('change', (e: Event) => {
+      let form = <HTMLElement>e.target;
       while (!form.classList.contains('libinteractive-download')) {
         form = form.parentElement;
+        if (!form) {
+          return;
+        }
       }
       $(form)
         .find('.libinteractive-extension')
@@ -452,9 +496,9 @@ export class Arena {
           : ''),
     );
 
-    function connect(uris, index) {
+    const connect = (uris: string[], index: number) => {
       self.socket = new EventsSocket(uris[index], self);
-      self.socket.connect().catch(function(e) {
+      self.socket.connect().catch(e => {
         console.log(e);
         // Try the next uri.
         index++;
@@ -463,15 +507,15 @@ export class Arena {
         } else {
           // Out of options. Falling back to polls.
           self.socket = null;
-          setTimeout(function() {
+          setTimeout(() => {
             self.setupPolls();
           }, Math.random() * 15000);
         }
       });
-    }
+    };
 
     self.elements.socketStatus.html('↻').css('color', '#888');
-    connect(uris, 0, 10);
+    connect(uris, 0);
   }
 
   setupPolls() {
@@ -483,7 +527,7 @@ export class Arena {
     self.refreshClarifications();
 
     if (!self.socket) {
-      self.clarificationInterval = setInterval(function() {
+      self.clarificationInterval = setInterval(() => {
         self.clarificationsOffset = 0; // Return pagination to start on refresh
         self.refreshClarifications();
       }, 5 * 60 * 1000);
@@ -521,14 +565,14 @@ export class Arena {
     }
   }
 
-  problemsetLoaded(problemset) {
+  problemsetLoaded(problemset: types.Problemset) {
     let self = this;
     if (problemset.status == 'error') {
       if (!OmegaUp.loggedIn) {
         window.location = '/login/?redirect=' + escape(window.location);
       } else if (problemset.start_time) {
-        let f = (function(x, y) {
-          return function() {
+        let f = ((x, y) => {
+          return () => {
             let t = new Date();
             self.elements.loadingOverlay.html(
               `${x} ${time.formatDelta(y.getTime() - t.getTime())}`,
@@ -589,8 +633,8 @@ export class Arena {
       let problem = problemset.problems[idx];
       let problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
-      if (self.elements.navBar) {
-        self.elements.navBar.problems.push({
+      if (self.navbarProblems) {
+        self.navbarProblems.problems.push({
           alias: problem.alias,
           text: problemName,
           acceptsSubmissions: problem.languages !== '',
@@ -618,26 +662,22 @@ export class Arena {
     if (
       typeof problemset.courseAssignments !== 'undefined' &&
       document.getElementById('arena-navbar-assignments') !== null &&
-      self.elements.assignmentsNav === null
+      self.navbarAssignments === null
     ) {
-      self.elements.assignmentsNav = new Vue({
+      self.navbarAssignments = new Vue({
         el: '#arena-navbar-assignments',
         render: function(createElement) {
           return createElement('omegaup-arena-navbar-assignments', {
             props: {
-              assignments: this.assignments,
-              currentAssignmentAlias: this.currentAssignmentAlias,
+              assignments: problemset.courseAssignments,
+              currentAssignmentAlias: problemset.alias,
             },
             on: {
-              'navigate-to-assignment': function(assignmentAlias) {
+              'navigate-to-assignment': (assignmentAlias: string) => {
                 window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
               },
             },
           });
-        },
-        data: {
-          assignments: problemset.courseAssignments,
-          currentAssignmentAlias: problemset.alias,
         },
         components: {
           'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
@@ -646,7 +686,7 @@ export class Arena {
     }
   }
 
-  initProblems(problemset) {
+  initProblems(problemset: types.Problemset) {
     let self = this;
     self.currentProblemset = problemset;
     self.problemsetAdmin = problemset.admin;
@@ -661,9 +701,9 @@ export class Arena {
       }
       self.problems[alias] = problem;
     }
-    if (self.elements.rankingTable) {
-      self.elements.rankingTable.problems = problems;
-      self.elements.rankingTable.showPenalty = problemset.show_penalty;
+    if (self.scoreboard) {
+      self.scoreboard.problems = problems;
+      self.scoreboard.showPenalty = problemset.show_penalty;
     }
   }
 
@@ -702,7 +742,7 @@ export class Arena {
   updateRunFallback(guid) {
     let self = this;
     if (self.socket != null) return;
-    setTimeout(function() {
+    setTimeout(() => {
       api.Run.status({ run_alias: guid })
         .then(time.remoteTimeAdapter)
         .then(self.updateRun.bind(self))
@@ -742,7 +782,7 @@ export class Arena {
 
     if (self.options.contestAlias != null) {
       api.Problemset.scoreboard(scoreboardParams)
-        .then(function(response) {
+        .then(response => {
           // Differentiate ranking change between virtual and normal contest
           if (self.options.originalContestAlias != null)
             self.virtualRankingChange(response);
@@ -794,7 +834,7 @@ export class Arena {
     // Refresh after time T
     let refreshTime = 30 * 1000; // 30 seconds
 
-    events.forEach(function(evt) {
+    events.forEach(evt => {
       let key = evt.username;
       if (!originalContestRanking.hasOwnProperty(key)) {
         originalContestRanking[key] = {
@@ -849,7 +889,7 @@ export class Arena {
     }
 
     api.Problemset.scoreboardEvents(scoreboardEventsParams)
-      .then(function(response) {
+      .then(response => {
         // Change username to username-virtual
         for (let evt of response.events) {
           evt.username = ui.formatString(T.virtualSuffix, {
@@ -864,7 +904,7 @@ export class Arena {
       })
       .catch(ui.ignoreError);
 
-    self.virtualContestRefreshInterval = setTimeout(function() {
+    self.virtualContestRefreshInterval = setTimeout(() => {
       self.onVirtualRankingChange(virtualContestData);
     }, refreshTime);
   }
@@ -881,7 +921,7 @@ export class Arena {
       api.Problemset.scoreboardEvents({
         problemset_id: self.options.originalProblemsetId,
       })
-        .then(function(response) {
+        .then(response => {
           self.originalContestScoreboardEvent = response.events;
           self.onVirtualRankingChange(data);
         })
@@ -911,8 +951,8 @@ export class Arena {
 
   onRankingChanged(data) {
     let self = this;
-    if (typeof self.elements.miniRanking !== 'undefined') {
-      self.elements.miniRanking.users = [];
+    if (self.navbarMiniRanking) {
+      self.navbarMiniRanking.users = [];
     }
 
     if (self.removeRecentEventClassTimeout) {
@@ -950,8 +990,8 @@ export class Arena {
           self.problems[alias].languages !== ''
         ) {
           const currentPoints = parseFloat(self.problems[alias].points || '0');
-          if (self.elements.navBar) {
-            const currentProblem = self.elements.navBar.problems.find(
+          if (self.navbarProblems) {
+            const currentProblem = self.navbarProblems.problems.find(
               problem => problem.alias === alias,
             );
             currentProblem.bestScore = problem.points;
@@ -963,9 +1003,9 @@ export class Arena {
 
       // update miniranking
       if (i < 10) {
-        if (typeof self.elements.miniRanking !== 'undefined') {
+        if (self.navbarMiniRanking) {
           const username = ui.rankingUsername(rank);
-          self.elements.miniRanking.users.push({
+          self.navbarMiniRanking.users.push({
             position: rank.place,
             username: username,
             country: rank['country'],
@@ -977,16 +1017,16 @@ export class Arena {
       }
     }
 
-    if (self.elements.rankingTable) {
-      self.elements.rankingTable.ranking = ranking;
+    if (self.scoreboard) {
+      self.scoreboard.ranking = ranking;
       if (data.time) {
-        self.elements.rankingTable.lastUpdated = data.time;
+        self.scoreboard.lastUpdated = data.time;
       }
     }
 
     this.currentRanking = newRanking;
     this.prevRankingState = currentRankingState;
-    self.removeRecentEventClassTimeout = setTimeout(function() {
+    self.removeRecentEventClassTimeout = setTimeout(() => {
       $('.recent-event').removeClass('recent-event');
     }, 30000);
   }
@@ -1006,7 +1046,7 @@ export class Arena {
       let curr = data.events[i];
 
       // limit chart to top n users
-      if (this.currentRanking[curr.username] > ScoreboardColors.length - 1)
+      if (this.currentRanking[curr.username] > scoreboardColors.length - 1)
         continue;
 
       if (!dataInSeries[curr.name]) {
@@ -1045,9 +1085,7 @@ export class Arena {
       }
     }
 
-    series.sort(function(a, b) {
-      return a.ranking - b.ranking;
-    });
+    series.sort((a, b) => a.ranking - b.ranking);
 
     navigatorData.push([
       this.finishTime
@@ -1062,7 +1100,7 @@ export class Arena {
     let self = this;
     if (series.length == 0 || self.elements.ranking.length == 0) return;
 
-    Highcharts.setOptions({ colors: ScoreboardColors });
+    Highcharts.setOptions({ colors: scoreboardColors });
 
     window.chart = new Highcharts.StockChart({
       chart: { renderTo: 'ranking-chart', height: 300, spacingTop: 20 },
@@ -1077,7 +1115,7 @@ export class Arena {
         showLastLabel: true,
         showFirstLabel: false,
         min: 0,
-        max: (function(problems) {
+        max: (problems => {
           let total = 0;
           for (let prob in problems) {
             if (!problems.hasOwnProperty(prob)) continue;
@@ -1152,13 +1190,13 @@ export class Arena {
         if (clarifications !== null) {
           clarifications.push(clarification);
         }
-        (function(id, answerNode) {
+        ((id, answerNode) => {
           let responseFormNode = $(
             '#create-response-form',
             answerNode,
           ).removeClass('template');
           let cannedResponse = $('#create-response-canned', answerNode);
-          cannedResponse.on('change', function() {
+          cannedResponse.on('change', () => {
             if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
             } else {
@@ -1175,7 +1213,7 @@ export class Arena {
               true,
             );
           }
-          responseFormNode.on('submit', function() {
+          responseFormNode.on('submit', () => {
             let responseText = null;
             if ($('#create-response-canned', answerNode).val() === 'other') {
               responseText = $('#create-response-text', this).val();
@@ -1190,11 +1228,11 @@ export class Arena {
               answer: responseText,
               public: $('#create-response-is-public', this)[0].checked ? 1 : 0,
             })
-              .then(function() {
+              .then(() => {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
               })
-              .catch(function() {
+              .catch(() => {
                 $('pre', answerNode).html(responseText);
                 $('#create-response-text', answerNode).val('');
               });
@@ -1341,7 +1379,7 @@ export class Arena {
     let langElement = self.elements.submitForm.language;
 
     if (self.preferredLanguage) {
-      $('option', langElement).each(function() {
+      $('option', langElement).each(() => {
         let option = $(this);
         if (option.val() != self.preferredLanguage) return;
         option.prop('selected', true);
@@ -1350,7 +1388,7 @@ export class Arena {
     }
     if (langElement.val()) return;
 
-    $('option', langElement).each(function() {
+    $('option', langElement).each(() => {
       let option = $(this);
 
       option.prop('selected', true);
@@ -1359,7 +1397,7 @@ export class Arena {
     });
   }
 
-  mountEditor(problem) {
+  mountEditor(problem: types.ProblemsetProblem): void {
     let self = this;
     let lang = self.elements.submitForm.language.val();
     let template = '';
@@ -1378,7 +1416,7 @@ export class Arena {
         code: template,
       },
       methods: {
-        refresh: function() {
+        refresh: () => {
           // It's possible for codeMirror not to have been set yet
           // if this method is used before the mounted event handler
           // is called.
@@ -1388,18 +1426,17 @@ export class Arena {
         },
       },
       mounted: function() {
-        let self = this;
         // Wait for sub-components to be mounted...
         this.$nextTick(() => {
           // ... and then fish out a reference to the wrapped
           // CodeMirror instance.
           //
           // The full path is:
-          // - self: this unnamed component
+          // - this: this unnamed component
           // - $children[0]: CodeView instance
           // - $refs['cm-wrapper']: vue-codemirror instance
           // - editor: the actual CodeMirror instance
-          self.codeMirror = self.$children[0].$refs['cm-wrapper'].editor;
+          this.codeMirror = this.$children[0].$refs['cm-wrapper'].editor;
         });
       },
       render: function(createElement) {
@@ -1461,11 +1498,11 @@ export class Arena {
       let newRun = problem[2];
       self.currentProblem = problem = self.problems[problem[1]];
       // Set as active the selected problem
-      if (self.elements.navBar) {
-        self.elements.navBar.activeProblem = self.currentProblem.alias;
+      if (self.navbarProblems) {
+        self.navbarProblems.activeProblem = self.currentProblem.alias;
       }
 
-      function update(problem) {
+      const update = problem => {
         // TODO: Make #problem a component
         $('#summary').hide();
         $('#problem').show();
@@ -1483,11 +1520,7 @@ export class Arena {
         $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
         self.renderProblem(problem);
         let karel_langs = ['kp', 'kj'];
-        if (
-          karel_langs.every(function(x) {
-            return problem.languages.indexOf(x) != -1;
-          })
-        ) {
+        if (karel_langs.every(x => problem.languages.indexOf(x) != -1)) {
           let original_href = $('#problem .karel-js-link a').attr('href');
           let hash_index = original_href.indexOf('#');
           if (hash_index != -1) {
@@ -1524,19 +1557,19 @@ export class Arena {
 
         $('#problem tbody.added').remove();
 
-        function updateRuns(runs) {
+        const updateRuns = runs => {
           if (runs) {
             for (let run of runs) {
               self.trackRun(run);
             }
           }
           self.myRunsList.problemAlias = problem.alias;
-        }
+        };
 
         if (self.options.isPractice || self.options.isOnlyProblem) {
           api.Problem.runs({ problem_alias: problem.alias })
             .then(time.remoteTimeAdapter)
-            .then(function(data) {
+            .then(data => {
               updateRuns(data.runs);
             })
             .catch(ui.apiError);
@@ -1546,7 +1579,7 @@ export class Arena {
         }
 
         self.initSubmissionCountdown();
-      }
+      };
 
       if (problemChanged) {
         // Ping Analytics with updated problem id
@@ -1566,7 +1599,7 @@ export class Arena {
                 self.problemsetAdmin && !self.myRunsList.isProblemsetOpened,
             }),
           )
-            .then(function(problem_ext) {
+            .then(problem_ext => {
               problem.source = problem_ext.source;
               problem.problemsetter = problem_ext.problemsetter;
               problem.statement = problem_ext.statement;
@@ -1603,8 +1636,8 @@ export class Arena {
     } else if (self.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      if (self.elements.navBar) {
-        self.elements.navBar.activeProblem = null;
+      if (self.navbarProblems) {
+        self.navbarProblems.activeProblem = null;
       }
     } else if (self.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
@@ -1658,7 +1691,7 @@ export class Arena {
     }
     self.qualityNominationForm = new Vue({
       el: '#qualitynomination-popup',
-      mounted: function() {
+      mounted: () => {
         ui.reportEvent('quality-nomination', 'shown');
       },
       render: function(createElement) {
@@ -1674,7 +1707,7 @@ export class Arena {
             problemAlias: this.problemAlias,
           },
           on: {
-            submit: function(ev) {
+            submit: ev => {
               const contents = {
                 before_ac: !ev.solved && ev.tried,
                 difficulty:
@@ -1693,7 +1726,7 @@ export class Arena {
                 })
                 .catch(ui.apiError);
             },
-            dismiss: function(ev) {
+            dismiss: ev => {
               const contents = {
                 before_ac: !ev.solved && ev.tried,
               };
@@ -1702,7 +1735,7 @@ export class Arena {
                 nomination: 'dismissal',
                 contents: JSON.stringify(contents),
               })
-                .then(function(data) {
+                .then(data => {
                   ui.info(T.qualityNominationRateProblemDesc);
                   ui.reportEvent('quality-nomination', 'dismiss');
                 })
@@ -1775,8 +1808,7 @@ export class Arena {
     self.ephemeralGrader.send('setSettings', problem.settings);
   }
 
-  detectShowRun() {
-    let self = this;
+  detectShowRun(): void {
     let showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     let showRunMatch = window.location.hash.match(showRunRegex);
     if (showRunMatch) {
@@ -1784,10 +1816,13 @@ export class Arena {
       $('#overlay').show();
       api.Run.details({ run_alias: showRunMatch[1] })
         .then(time.remoteTimeAdapter)
-        .then(function(data) {
-          self.displayRunDetails(showRunMatch[1], data);
+        .then(data => {
+          this.displayRunDetails(showRunMatch[1], data);
         })
-        .catch(ui.apiError);
+        .catch(error => {
+          ui.apiError(error);
+          this.hideOverlay();
+        });
     }
   }
 
@@ -1799,28 +1834,25 @@ export class Arena {
     );
   }
 
-  bindGlobalHandlers() {
-    let self = this;
-    $('#overlay, .close').on('click', self.onCloseSubmit.bind(self));
-    self.elements.submitForm.language.on(
-      'change',
-      self.onLanguageSelect.bind(self),
+  bindGlobalHandlers(): void {
+    $('#overlay, .close').on('click', (e: Event) => this.onCloseSubmit(e));
+    this.elements.submitForm.language.on('change', (e: Event) =>
+      this.onLanguageSelect(e),
     );
-    self.elements.submitForm.on('submit', self.onSubmit.bind(self));
+    this.elements.submitForm.on('submit', (e: Event) => this.onSubmit(e));
   }
 
-  onCloseSubmit(e) {
-    let self = this;
+  onCloseSubmit(e: Event): void {
     if (
       e.target.id !== 'overlay' &&
-      e.target.closest('button.close') === null
+      (<JQuery>e.target).closest('button.close') === null
     ) {
       return;
     }
-    $('#clarification', self.elements.submitForm).hide();
-    self.hideOverlay();
-    self.clearInputFile();
-    return false;
+    $('#clarification', this.elements.submitForm).hide();
+    this.hideOverlay();
+    this.clearInputFile();
+    e.preventDefault();
   }
 
   clearInputFile() {
@@ -1864,8 +1896,8 @@ export class Arena {
       clearInterval(self.submissionGapInterval);
       self.submissionGapInterval = 0;
     }
-    self.submissionGapInterval = setInterval(function() {
-      let submissionGapSecondsRemaining = Math.ceil(
+    self.submissionGapInterval = setInterval(() => {
+      const submissionGapSecondsRemaining = Math.ceil(
         (nextSubmissionTimestamp - Date.now()) / 1000,
       );
       if (submissionGapSecondsRemaining > 0) {
@@ -1885,10 +1917,9 @@ export class Arena {
     }, 1000);
   }
 
-  onLanguageSelect(e) {
-    let self = this;
-    let lang = $(e.target).val();
-    let ext = $('.submit-filename-extension', self.elements.submitForm);
+  onLanguageSelect(e: Event): void {
+    const lang = (<HTMLSelectElement>e.target).value;
+    let ext = $('.submit-filename-extension', this.elements.submitForm);
     if (lang.startsWith('cpp')) {
       ext.text('.cpp');
     } else if (lang.startsWith('c-')) {
@@ -1900,43 +1931,42 @@ export class Arena {
     } else {
       ext.text('');
     }
-    if (self.codeEditor) {
-      self.codeEditor.language = lang;
+    if (this.codeEditor) {
+      this.codeEditor.language = lang;
     }
   }
 
-  onSubmit(e) {
-    let self = this;
+  onSubmit(e: Event): void {
     e.preventDefault();
 
     if (
-      !self.options.isOnlyProblem &&
-      self.problems[self.currentProblem.alias].last_submission +
-        self.submissionGap * 1000 >
+      !this.options.isOnlyProblem &&
+      this.problems[this.currentProblem.alias].last_submission +
+        this.submissionGap * 1000 >
         Date.now()
     ) {
       alert(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-          submissionGap: self.submissionGap,
+          submissionGap: this.submissionGap,
         }),
       );
-      return false;
+      return;
     }
 
-    let submitForm = self.elements.submitForm;
-    let langSelect = self.elements.submitForm.language;
+    let submitForm = this.elements.submitForm;
+    let langSelect = this.elements.submitForm.language;
     if (!langSelect.val()) {
       alert(T.arenaRunSubmitMissingLanguage);
-      return false;
+      return;
     }
 
-    let file = self.elements.submitForm.file[0];
+    let file = <HTMLFileInput>this.elements.submitForm.file[0];
     if (file && file.files && file.files.length > 0) {
       file = file.files[0];
       let reader = new FileReader();
 
-      reader.onload = function(e) {
-        self.submitRun(e.target.result);
+      reader.onload = e => {
+        this.submitRun(e.target.result);
       };
 
       let extension = file.name.split(/\./);
@@ -1959,109 +1989,103 @@ export class Arena {
         extension == 'rb' ||
         extension == 'lua'
       ) {
-        if (file.size >= self.currentProblem.input_limit) {
+        if (file.size >= this.currentProblem.input_limit) {
           alert(
             ui.formatString(T.arenaRunSubmitFilesize, {
-              limit: `${self.currentProblem.input_limit / 1024} KiB`,
+              limit: `${this.currentProblem.input_limit / 1024} KiB`,
             }),
           );
-          return false;
+          return;
         }
         reader.readAsText(file, 'UTF-8');
       } else {
         // 100kB _must_ be enough for anybody.
         if (file.size >= 100 * 1024) {
           alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '100kB' }));
-          return false;
+          return;
         }
         reader.readAsDataURL(file);
       }
 
-      return false;
+      return;
     }
 
-    if (!self.codeEditor.code) {
+    if (!this.codeEditor?.code) {
       alert(T.arenaRunSubmitEmptyCode);
-      return false;
+      return;
     }
-    self.submitRun(self.codeEditor.code);
-
-    return false;
+    this.submitRun(this.codeEditor.code);
   }
 
-  computeProblemsetArg() {
-    let self = this;
-    if (self.options.isOnlyProblem) {
+  computeProblemsetArg(): { contest_alias?: string; problemset_id?: number } {
+    if (this.options.isOnlyProblem) {
       return {};
     }
-    if (self.options.contestAlias) {
-      return { contest_alias: self.options.contestAlias };
+    if (this.options.contestAlias) {
+      return { contest_alias: this.options.contestAlias };
     }
-    return { problemset_id: self.options.problemsetId };
+    if (this.options.problemsetId) {
+      return { problemset_id: this.options.problemsetId };
+    }
+    return {};
   }
 
-  submitRun(code) {
-    let self = this;
-    let problemset = self.options.isPractice ? {} : self.computeProblemsetArg();
-    let lang = self.elements.submitForm.language.val();
+  submitRun(code: string): void {
+    let problemset = this.options.isPractice ? {} : this.computeProblemsetArg();
+    let lang = this.elements.submitForm.language.val();
 
-    $('input', self.elements.submitForm).attr('disabled', 'disabled');
+    $('input', this.elements.submitForm).attr('disabled', 'disabled');
     api.Run.create(
       $.extend(problemset, {
-        problem_alias: self.currentProblem.alias,
+        problem_alias: this.currentProblem.alias,
         language: lang,
         source: code,
       }),
     )
-      .then(function(run) {
+      .then(run => {
         ui.reportEvent('submission', 'submit');
-        if (self.options.isLockdownMode && sessionStorage) {
+        if (this.options.isLockdownMode && sessionStorage) {
           sessionStorage.setItem(`run:${run.guid}`, code);
         }
 
-        if (!self.options.isOnlyProblem) {
-          self.problems[self.currentProblem.alias].last_submission = Date.now();
-          self.problems[self.currentProblem.alias].nextSubmissionTimestamp =
+        if (!this.options.isOnlyProblem) {
+          this.problems[this.currentProblem.alias].last_submission = Date.now();
+          this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
             run.nextSubmissionTimestamp;
         }
         run.username = OmegaUp.username;
         run.status = 'new';
-        run.alias = self.currentProblem.alias;
+        run.alias = this.currentProblem.alias;
         run.contest_score = null;
         run.time = new Date();
         run.penalty = 0;
         run.runtime = 0;
         run.memory = 0;
-        run.language = self.elements.submitForm.language.val();
-        self.updateRun(run);
+        run.language = this.elements.submitForm.language.val();
+        this.updateRun(run);
 
-        $('input', self.elements.submitForm).prop('disabled', false);
-        self.hideOverlay();
-        self.clearInputFile();
-        self.initSubmissionCountdown();
+        $('input', this.elements.submitForm).prop('disabled', false);
+        this.hideOverlay();
+        this.clearInputFile();
+        this.initSubmissionCountdown();
       })
-      .catch(function(run) {
+      .catch(run => {
         alert(run.error);
-        $('input', self.elements.submitForm).prop('disabled', false);
+        $('input', this.elements.submitForm).prop('disabled', false);
         ui.reportEvent('submission', 'submit-fail', run.errorname);
       });
   }
 
-  updateSummary(contest) {
+  updateSummary(contest: omegaup.Contest): void {
     this.summaryView.contest = contest;
   }
 
-  displayRunDetails(guid, data) {
-    let self = this;
+  displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
     let problemAdmin = data.admin;
-    if (data.status == 'error') {
-      self.hideOverlay();
-      return;
-    }
 
     let sourceHTML,
       sourceLink = false;
-    if (data.source.indexOf('data:') === 0) {
+    if (data.source?.indexOf('data:') === 0) {
       sourceLink = true;
       sourceHTML = data.source;
     } else if (data.source == 'lockdownDetailsDisabled') {
@@ -2073,11 +2097,11 @@ export class Arena {
       sourceHTML = data.source;
     }
 
-    function numericSort(key) {
-      function isDigit(x) {
-        return '0' <= x && x <= '9';
-      }
-      return function(x, y) {
+    const numericSort: <T extends { [key: string]: any }>(
+      key: string,
+    ) => (x: T, y: T) => number = (key: string) => {
+      const isDigit = (ch: string) => '0' <= ch && ch <= '9';
+      return (x: T, y: T) => {
         let i = 0,
           j = 0;
         for (; i < x[key].length && j < y[key].length; i++, j++) {
@@ -2099,9 +2123,9 @@ export class Arena {
         }
         return x[key].length - i - (y[key].length - j);
       };
-    }
+    };
     let detailsGroups = data.details && data.details.groups;
-    let groups = null;
+    let groups = undefined;
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
       for (let i = 0; i < detailsGroups.length; i++) {
@@ -2112,30 +2136,32 @@ export class Arena {
       }
       groups = detailsGroups;
     }
-    self.runDetailsView.data = {
-      compile_error: data.compile_error,
-      logs: data.logs,
-      judged_by: data.judged_by,
-      source: sourceHTML,
-      source_link: sourceLink,
-      source_url: window.URL.createObjectURL(
-        new Blob([data.source], { type: 'text/plain' }),
-      ),
-      source_name: `Main.${data.language}`,
-      problem_admin: data.admin,
-      guid: data.guid,
-      groups: groups,
-      language: data.language,
-      feedback:
-        self.options.contestAlias && self.currentProblemset
-          ? self.currentProblemset.feedback
-          : 'detailed',
-    };
-    document.querySelector('.run-details-view').style.display = 'block';
+    if (this.runDetailsView) {
+      this.runDetailsView.data = {
+        compile_error: data.compile_error,
+        logs: data.logs || '',
+        judged_by: data.judged_by || '',
+        source: sourceHTML,
+        source_link: sourceLink,
+        source_url: window.URL.createObjectURL(
+          new Blob([data.source || ''], { type: 'text/plain' }),
+        ),
+        source_name: `Main.${data.language}`,
+        problem_admin: data.admin,
+        guid: data.guid,
+        groups: groups,
+        language: data.language,
+        feedback: <omegaup.SubmissionFeedback>(
+          ((this.options.contestAlias && this.currentProblemset?.feedback) ||
+            'detailed')
+        ),
+      };
+    }
+    (<HTMLElement>document.querySelector('.run-details-view')).style.display =
+      'block';
   }
 
-  trackRun(run) {
-    let self = this;
+  trackRun(run: types.Run): void {
     runsStore.commit('addRun', run);
     if (run.username !== OmegaUp.username) {
       return;
@@ -2144,64 +2170,68 @@ export class Arena {
     if (run.status !== 'ready') {
       return;
     }
-    const problem = self.problems[run.alias];
-    if (typeof problem === 'undefined') {
+    const problem = this.problems[run.alias];
+    if (!problem) {
       return;
     }
-    self.updateProblemScore(run.alias, problems.points, 0);
-    if (typeof problem.quality_payload === 'undefined') {
+    this.updateProblemScore(run.alias, problem.points, 0);
+    const qualityPayload = (<types.ProblemsetProblem>problem).quality_payload;
+    if (!qualityPayload) {
       return;
     }
-    problem.quality_payload.tried |=
-      run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE';
-    problem.quality_payload.solved |= run.verdict === 'AC';
-    if (problem.alias === self.currentProblem.alias) {
-      self.showQualityNominationPopup();
+    if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
+      qualityPayload.tried = true;
+    }
+    if (run.verdict === 'AC') {
+      qualityPayload.solved = true;
+    }
+    if (problem.alias === this.currentProblem.alias) {
+      this.showQualityNominationPopup();
     }
   }
 
-  updateProblemScore(alias, maxScore, previousScore) {
-    let self = this;
+  updateProblemScore(
+    alias: string,
+    maxScore: number,
+    previousScore: number,
+  ): void {
     // It only works for contests
-    if (
-      self.options.contestAlias != null &&
-      typeof self.elements.rankingTable !== 'undefined'
-    ) {
-      self.elements.rankingTable.ranking = self.elements.rankingTable.ranking.map(
-        rank => {
-          let ranking = rank;
-          if (ranking.username == OmegaUp.username) {
-            ranking.problems = rank.problems.map(problem => {
-              let problemRanking = problem;
-              if (problemRanking.alias == alias) {
-                let maxScore = getMaxScore(
-                  myRunsStore.state.runs,
-                  problemRanking.alias,
-                  previousScore,
-                );
-                problemRanking.points = maxScore;
-              }
-              return problemRanking;
-            });
-            ranking.total.points = rank.problems.reduce(
-              (accumulator, problem) => accumulator + problem.points,
-              0,
-            );
-          }
-          return ranking;
-        },
-      );
+    if (this.options.contestAlias != null && this.scoreboard !== null) {
+      this.scoreboard.ranking = this.scoreboard.ranking.map(rank => {
+        let ranking = rank;
+        if (ranking.username == OmegaUp.username) {
+          ranking.problems = rank.problems.map(problem => {
+            let problemRanking = problem;
+            if (problemRanking.alias == alias) {
+              let maxScore = getMaxScore(
+                myRunsStore.state.runs,
+                problemRanking.alias,
+                previousScore,
+              );
+              problemRanking.points = maxScore;
+            }
+            return problemRanking;
+          });
+          ranking.total.points = rank.problems.reduce(
+            (accumulator, problem) => accumulator + problem.points,
+            0,
+          );
+        }
+        return ranking;
+      });
     }
-    if (self.elements.navBar) {
-      const currentProblem = self.elements.navBar.problems.find(
+    if (this.navbarProblems) {
+      const currentProblem = this.navbarProblems.problems.find(
         problem => problem.alias === alias,
       );
-      currentProblem.bestScore = getMaxScore(
-        myRunsStore.state.runs,
-        alias,
-        previousScore,
-      );
-      currentProblem.maxScore = maxScore || '0';
+      if (currentProblem) {
+        currentProblem.bestScore = getMaxScore(
+          myRunsStore.state.runs,
+          alias,
+          previousScore,
+        );
+        currentProblem.maxScore = maxScore;
+      }
     }
   }
 }

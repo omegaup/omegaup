@@ -1004,4 +1004,92 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->createRunInContest($contestData);
     }
+
+    public function testCreateContestWithInitialPartialScoreAndThenUpdated() {
+        // Get a contest, partial_score default value is true
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['partialScore' => true]
+            )
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Explicitly join contest
+        \OmegaUp\Controllers\Contest::apiOpen(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertTrue($contest['partial_score']);
+
+        // Call API to update partial score
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'partial_score' => false,
+            ])
+        );
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertFalse($contest['partial_score']);
+    }
+
+    public function testCreateContestWithInitialPartialScoreFalseAndThenUpdated() {
+        // Get a contest, partial_score value is false
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['partialScore' => false]
+            )
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Explicitly join contest
+        \OmegaUp\Controllers\Contest::apiOpen(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertFalse($contest['partial_score']);
+
+        // Call API to update partial score
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'partial_score' => true,
+            ])
+        );
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertTrue($contest['partial_score']);
+    }
 }

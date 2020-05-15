@@ -4,7 +4,7 @@ import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
 import * as ui from '../ui';
-import { Problem, ContestResult } from '../types';
+import { Problem, ContestResult } from '../linkable_resource';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);

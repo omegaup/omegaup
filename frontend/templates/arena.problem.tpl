@@ -1,5 +1,6 @@
-{include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true inline}
+{include file='head.tpl' bodyid='only-problem' inArena=true inline}
 <script type="text/json" id="payload">{$payload|json_encode}</script>
+{js_include entrypoint="arena_contest"}
   {if !empty($payload['languages'])}
   <ul class="tabs">
     <li><a href="#problems" class="active">{#wordsProblem#}</a></li>

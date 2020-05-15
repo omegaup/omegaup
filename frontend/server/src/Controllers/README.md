@@ -176,10 +176,7 @@
 - [School](#school)
   - [`/api/school/create/`](#apischoolcreate)
   - [`/api/school/list/`](#apischoollist)
-  - [`/api/school/monthlySolvedProblemsCount/`](#apischoolmonthlysolvedproblemscount)
-  - [`/api/school/schoolCodersOfTheMonth/`](#apischoolschoolcodersofthemonth)
   - [`/api/school/selectSchoolOfTheMonth/`](#apischoolselectschoolofthemonth)
-  - [`/api/school/users/`](#apischoolusers)
 - [Scoreboard](#scoreboard)
   - [`/api/scoreboard/refresh/`](#apiscoreboardrefresh)
 - [Session](#session)
@@ -553,39 +550,39 @@ remaining time from the contest, or register the opened time.
 
 ### Returns
 
-| Name                        | Type                                                                                                                                                                                                                                                        |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `admin`                     | `boolean`                                                                                                                                                                                                                                                   |
-| `admission_mode`            | `string`                                                                                                                                                                                                                                                    |
-| `alias`                     | `string`                                                                                                                                                                                                                                                    |
-| `available_languages`       | `{ [key: string]: string; }`                                                                                                                                                                                                                                |
-| `description`               | `string`                                                                                                                                                                                                                                                    |
-| `director`                  | `string`                                                                                                                                                                                                                                                    |
-| `feedback`                  | `string`                                                                                                                                                                                                                                                    |
-| `finish_time`               | `Date`                                                                                                                                                                                                                                                      |
-| `languages`                 | `string[]`                                                                                                                                                                                                                                                  |
-| `needs_basic_information`   | `boolean`                                                                                                                                                                                                                                                   |
-| `partial_score`             | `boolean`                                                                                                                                                                                                                                                   |
-| `opened`                    | `boolean`                                                                                                                                                                                                                                                   |
-| `original_contest_alias`    | `string`                                                                                                                                                                                                                                                    |
-| `original_problemset_id`    | `number`                                                                                                                                                                                                                                                    |
-| `penalty`                   | `number`                                                                                                                                                                                                                                                    |
-| `penalty_calc_policy`       | `string`                                                                                                                                                                                                                                                    |
-| `penalty_type`              | `string`                                                                                                                                                                                                                                                    |
-| `problems`                  | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; letter: string; order: number; points: number; problem_id: number; submissions: number; title: string; version: string; visibility: number; visits: number; }[]` |
-| `points_decay_factor`       | `number`                                                                                                                                                                                                                                                    |
-| `problemset_id`             | `number`                                                                                                                                                                                                                                                    |
-| `requests_user_information` | `string`                                                                                                                                                                                                                                                    |
-| `rerun_id`                  | `number`                                                                                                                                                                                                                                                    |
-| `scoreboard`                | `number`                                                                                                                                                                                                                                                    |
-| `scoreboard_url`            | `string`                                                                                                                                                                                                                                                    |
-| `scoreboard_url_admin`      | `string`                                                                                                                                                                                                                                                    |
-| `show_penalty`              | `boolean`                                                                                                                                                                                                                                                   |
-| `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                                   |
-| `start_time`                | `Date`                                                                                                                                                                                                                                                      |
-| `submissions_gap`           | `number`                                                                                                                                                                                                                                                    |
-| `title`                     | `string`                                                                                                                                                                                                                                                    |
-| `window_length`             | `number`                                                                                                                                                                                                                                                    |
+| Name                        | Type                         |
+| --------------------------- | ---------------------------- |
+| `admin`                     | `boolean`                    |
+| `admission_mode`            | `string`                     |
+| `alias`                     | `string`                     |
+| `available_languages`       | `{ [key: string]: string; }` |
+| `description`               | `string`                     |
+| `director`                  | `string`                     |
+| `feedback`                  | `string`                     |
+| `finish_time`               | `Date`                       |
+| `languages`                 | `string[]`                   |
+| `needs_basic_information`   | `boolean`                    |
+| `partial_score`             | `boolean`                    |
+| `opened`                    | `boolean`                    |
+| `original_contest_alias`    | `string`                     |
+| `original_problemset_id`    | `number`                     |
+| `penalty`                   | `number`                     |
+| `penalty_calc_policy`       | `string`                     |
+| `penalty_type`              | `string`                     |
+| `problems`                  | `types.ContestProblem[]`     |
+| `points_decay_factor`       | `number`                     |
+| `problemset_id`             | `number`                     |
+| `requests_user_information` | `string`                     |
+| `rerun_id`                  | `number`                     |
+| `scoreboard`                | `number`                     |
+| `scoreboard_url`            | `string`                     |
+| `scoreboard_url_admin`      | `string`                     |
+| `show_penalty`              | `boolean`                    |
+| `show_scoreboard_after`     | `boolean`                    |
+| `start_time`                | `Date`                       |
+| `submissions_gap`           | `number`                     |
+| `title`                     | `string`                     |
+| `window_length`             | `number`                     |
 
 ## `/api/contest/adminList/`
 
@@ -723,7 +720,7 @@ Creates a new contest
 | `feedback`                  | `mixed`     |             |
 | `finish_time`               | `mixed`     |             |
 | `languages`                 | `mixed`     |             |
-| `partial_score`             | `mixed`     |             |
+| `partial_score`             | `bool|null` |             |
 | `penalty`                   | `mixed`     |             |
 | `penalty_calc_policy`       | `mixed`     |             |
 | `penalty_type`              | `mixed`     |             |
@@ -849,7 +846,7 @@ Returns a list of contests where current user is participating in
 
 | Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score?: number; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
+| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score: boolean; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
 
 ## `/api/contest/myList/`
 
@@ -869,7 +866,7 @@ Returns a list of contests where current user is the director
 
 | Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score?: number; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
+| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score: boolean; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
 
 ## `/api/contest/open/`
 
@@ -1499,6 +1496,7 @@ Returns details of a given assignment
 | ------------ | ------- | ----------- |
 | `assignment` | `mixed` |             |
 | `course`     | `mixed` |             |
+| `lang`       | `mixed` |             |
 | `token`      | `mixed` |             |
 | `username`   | `mixed` |             |
 
@@ -1937,9 +1935,9 @@ Returns all runs for a course
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                                               |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ run_id: number; guid: string; language: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; judged_by: string; time: Date; submit_delay: number; type: string; username: string; classname: string; alias: string; country_id: string; contest_alias: string; }[]` |
+| Name   | Type                                                                                                                                                                                                                                                                                                                               |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runs` | `{ guid: string; language: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; judged_by: string; time: Date; submit_delay: number; type: string; username: string; classname: string; alias: string; country_id: string; contest_alias: string; }[]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2673,6 +2671,7 @@ Entry point for Problem Details API
 | Name                      | Type        | Description |
 | ------------------------- | ----------- | ----------- |
 | `contest_alias`           | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
 | `prevent_problemset_open` | `bool|null` |             |
 | `problem_alias`           | `mixed`     |             |
 | `problemset_id`           | `mixed`     |             |
@@ -2854,9 +2853,9 @@ Entry point for Problem runs API
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                                                     |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ alias: string; classname?: string; contest_alias?: string; contest_score: number; country_id?: string; guid: string; judged_by?: string; language: string; memory: number; penalty: number; run_id?: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; type?: string; username: string; verdict: string; }[]` |
+| Name   | Type                                                                                                                                                                                                                                                                                                                                   |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runs` | `{ alias: string; classname: string; contest_alias?: string; contest_score: number; country_id?: string; guid: string; judged_by?: string; language: string; memory: number; penalty: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; type?: string; username: string; verdict: string; }[]` |
 
 ## `/api/problem/runsDiff/`
 
@@ -2907,6 +2906,7 @@ Returns the solution for a problem if conditions are satisfied.
 | ----------------- | ----------- | ----------- |
 | `contest_alias`   | `mixed`     |             |
 | `forfeit_problem` | `bool|null` |             |
+| `lang`            | `mixed`     |             |
 | `problem_alias`   | `mixed`     |             |
 | `problemset_id`   | `mixed`     |             |
 | `statement_type`  | `mixed`     |             |
@@ -3009,6 +3009,7 @@ Updates problem solution only
 | `email_clarifications`    | `bool|null` |             |
 | `extra_wall_time`         | `mixed`     |             |
 | `input_limit`             | `mixed`     |             |
+| `lang`                    | `mixed`     |             |
 | `languages`               | `mixed`     |             |
 | `memory_limit`            | `mixed`     |             |
 | `message`                 | `mixed`     |             |
@@ -3118,6 +3119,7 @@ and the number of solutions already seen
 | `contest_alias`   | `mixed` |             |
 | `course`          | `mixed` |             |
 | `interview_alias` | `mixed` |             |
+| `lang`            | `mixed` |             |
 | `problemset_id`   | `int`   |             |
 | `token`           | `mixed` |             |
 | `tokens`          | `mixed` |             |
@@ -3125,41 +3127,9 @@ and the number of solutions already seen
 
 ### Returns
 
-| Name                        | Type                                                                                                                                                                                                                                         |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `admin`                     | `boolean`                                                                                                                                                                                                                                    |
-| `admission_mode`            | `string`                                                                                                                                                                                                                                     |
-| `alias`                     | `string`                                                                                                                                                                                                                                     |
-| `assignment_type`           | `string`                                                                                                                                                                                                                                     |
-| `contest_alias`             | `string`                                                                                                                                                                                                                                     |
-| `courseAssignments`         | `{ name: string; description: string; alias: string; publish_time_delay: number; assignment_type: string; start_time: Date; finish_time: Date; max_points: number; order: number; scoreboard_url: string; scoreboard_url_admin: string; }[]` |
-| `description`               | `string`                                                                                                                                                                                                                                     |
-| `director`                  | `string`                                                                                                                                                                                                                                     |
-| `exists`                    | `boolean`                                                                                                                                                                                                                                    |
-| `feedback`                  | `string`                                                                                                                                                                                                                                     |
-| `finish_time`               | `Date`                                                                                                                                                                                                                                       |
-| `languages`                 | `string[]`                                                                                                                                                                                                                                   |
-| `name`                      | `string`                                                                                                                                                                                                                                     |
-| `needs_basic_information`   | `boolean`                                                                                                                                                                                                                                    |
-| `opened`                    | `boolean`                                                                                                                                                                                                                                    |
-| `original_contest_alias`    | `string`                                                                                                                                                                                                                                     |
-| `original_problemset_id`    | `number`                                                                                                                                                                                                                                     |
-| `partial_score`             | `boolean`                                                                                                                                                                                                                                    |
-| `penalty`                   | `number`                                                                                                                                                                                                                                     |
-| `penalty_calc_policy`       | `string`                                                                                                                                                                                                                                     |
-| `penalty_type`              | `string`                                                                                                                                                                                                                                     |
-| `points_decay_factor`       | `number`                                                                                                                                                                                                                                     |
-| `problems`                  | `types.ProblemsetProblem[]`                                                                                                                                                                                                                  |
-| `problemset_id`             | `number`                                                                                                                                                                                                                                     |
-| `requests_user_information` | `string`                                                                                                                                                                                                                                     |
-| `scoreboard`                | `number`                                                                                                                                                                                                                                     |
-| `show_scoreboard_after`     | `boolean`                                                                                                                                                                                                                                    |
-| `start_time`                | `Date`                                                                                                                                                                                                                                       |
-| `submission_deadline`       | `Date`                                                                                                                                                                                                                                       |
-| `submissions_gap`           | `number`                                                                                                                                                                                                                                     |
-| `title`                     | `string`                                                                                                                                                                                                                                     |
-| `users`                     | `{ access_time: Date; country: string; email: string; opened_interview: boolean; user_id: number; username: string; }[]`                                                                                                                     |
-| `window_length`             | `number`                                                                                                                                                                                                                                     |
+```typescript
+types.Problemset;
+```
 
 ## `/api/problemset/scoreboard/`
 
@@ -3677,43 +3647,6 @@ Gets a list of schools
 [];
 ```
 
-## `/api/school/monthlySolvedProblemsCount/`
-
-### Description
-
-Returns the number of solved problems on the last
-months (including the current one)
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `school_id` | `int` |             |
-
-### Returns
-
-| Name                       | Type                           |
-| -------------------------- | ------------------------------ |
-| `distinct_problems_solved` | `types.SchoolProblemsSolved[]` |
-
-## `/api/school/schoolCodersOfTheMonth/`
-
-### Description
-
-Returns rank of best schools in last month
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `school_id` | `int` |             |
-
-### Returns
-
-| Name     | Type                            |
-| -------- | ------------------------------- |
-| `coders` | `types.SchoolCoderOfTheMonth[]` |
-
 ## `/api/school/selectSchoolOfTheMonth/`
 
 ### Description
@@ -3729,25 +3662,6 @@ Selects a certain school as school of the month
 ### Returns
 
 _Nothing_
-
-## `/api/school/users/`
-
-### Description
-
-Returns the list of current students registered in a certain school
-with the number of created problems, solved problems and organized contests.
-
-### Parameters
-
-| Name        | Type  | Description |
-| ----------- | ----- | ----------- |
-| `school_id` | `int` |             |
-
-### Returns
-
-| Name    | Type                 |
-| ------- | -------------------- |
-| `users` | `types.SchoolUser[]` |
 
 # Scoreboard
 
