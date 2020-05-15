@@ -3475,7 +3475,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $category
      * @omegaup-request-param mixed $date
      *
-     * @return array{smartyProperties: array{payload: IndexPayload}, entrypoint: string}
+     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: IndexPayload}}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3519,6 +3519,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'username' => $r->identity->username,
                     ] : [],
                 ],
+                'fullWidth' => true,
             ],
             'entrypoint' => 'common_index',
         ];
