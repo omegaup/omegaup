@@ -1935,9 +1935,9 @@ Returns all runs for a course
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                                               |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ run_id: number; guid: string; language: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; judged_by: string; time: Date; submit_delay: number; type: string; username: string; classname: string; alias: string; country_id: string; contest_alias: string; }[]` |
+| Name   | Type                                                                                                                                                                                                                                                                                                                               |
+| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runs` | `{ guid: string; language: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; judged_by: string; time: Date; submit_delay: number; type: string; username: string; classname: string; alias: string; country_id: string; contest_alias: string; }[]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2853,9 +2853,9 @@ Entry point for Problem runs API
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                                                     |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ alias: string; classname?: string; contest_alias?: string; contest_score: number; country_id?: string; guid: string; judged_by?: string; language: string; memory: number; penalty: number; run_id?: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; type?: string; username: string; verdict: string; }[]` |
+| Name   | Type                                                                                                                                                                                                                                                                                                                                   |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `runs` | `{ alias: string; classname: string; contest_alias?: string; contest_score: number; country_id?: string; guid: string; judged_by?: string; language: string; memory: number; penalty: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; type?: string; username: string; verdict: string; }[]` |
 
 ## `/api/problem/runsDiff/`
 
