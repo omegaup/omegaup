@@ -46,7 +46,21 @@ export class Arena {
   options: ArenaOptions;
 
   // Currently opened problem.
-  currentProblem: types.ProblemsetProblem | null = null;
+  currentProblem: types.ProblemsetProblem = {
+    accepted: 0,
+    alias: '',
+    commit: '',
+    difficulty: 0,
+    languages: '',
+    letter: '',
+    order: 0,
+    points: 0,
+    submissions: 0,
+    title: '',
+    version: '',
+    visibility: 0,
+    visits: 0,
+  };
 
   // The current problemset.
   currentProblemset: types.Problemset | null = null;
@@ -433,16 +447,14 @@ export class Arena {
       e.preventDefault();
 
       let form = $(e.target);
-      let alias = self.currentProblem?.alias || '';
-      let commit = self.currentProblem?.commit || '';
+      let alias = self.currentProblem.alias;
+      let commit = self.currentProblem.commit;
       let os = $('.download-os', form).val();
       let lang = $('.download-lang', form).val();
       let extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
       ui.navigateTo(
-        <Location>(
-          `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`
-        ),
+        `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
       );
     });
 
@@ -1385,7 +1397,7 @@ export class Arena {
     });
   }
 
-  mountEditor(problem) {
+  mountEditor(problem: types.ProblemsetProblem): void {
     let self = this;
     let lang = self.elements.submitForm.language.val();
     let template = '';
@@ -1864,7 +1876,7 @@ export class Arena {
     $('#submit input[type=submit]')
       .removeAttr('value')
       .prop('disabled', false);
-    let problem = self.problems[self.currentProblem?.alias || ''];
+    let problem = self.problems[self.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
         nextSubmissionTimestamp = new Date(
@@ -1929,7 +1941,7 @@ export class Arena {
 
     if (
       !this.options.isOnlyProblem &&
-      this.problems[this.currentProblem?.alias || ''].last_submission +
+      this.problems[this.currentProblem.alias].last_submission +
         this.submissionGap * 1000 >
         Date.now()
     ) {
@@ -1977,10 +1989,10 @@ export class Arena {
         extension == 'rb' ||
         extension == 'lua'
       ) {
-        if (file.size >= this.currentProblem?.input_limit) {
+        if (file.size >= this.currentProblem.input_limit) {
           alert(
             ui.formatString(T.arenaRunSubmitFilesize, {
-              limit: `${this.currentProblem?.input_limit / 1024} KiB`,
+              limit: `${this.currentProblem.input_limit / 1024} KiB`,
             }),
           );
           return;
@@ -2021,12 +2033,11 @@ export class Arena {
   submitRun(code: string): void {
     let problemset = this.options.isPractice ? {} : this.computeProblemsetArg();
     let lang = this.elements.submitForm.language.val();
-    const problemAlias = this.currentProblem?.alias || '';
 
     $('input', this.elements.submitForm).attr('disabled', 'disabled');
     api.Run.create(
       $.extend(problemset, {
-        problem_alias: problemAlias,
+        problem_alias: this.currentProblem.alias,
         language: lang,
         source: code,
       }),
@@ -2038,13 +2049,13 @@ export class Arena {
         }
 
         if (!this.options.isOnlyProblem) {
-          this.problems[problemAlias].last_submission = Date.now();
-          this.problems[problemAlias].nextSubmissionTimestamp =
+          this.problems[this.currentProblem.alias].last_submission = Date.now();
+          this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
             run.nextSubmissionTimestamp;
         }
         run.username = OmegaUp.username;
         run.status = 'new';
-        run.alias = problemAlias;
+        run.alias = this.currentProblem.alias;
         run.contest_score = null;
         run.time = new Date();
         run.penalty = 0;
@@ -2174,7 +2185,7 @@ export class Arena {
     if (run.verdict === 'AC') {
       qualityPayload.solved = true;
     }
-    if (problem.alias === this.currentProblem?.alias) {
+    if (problem.alias === this.currentProblem.alias) {
       this.showQualityNominationPopup();
     }
   }
