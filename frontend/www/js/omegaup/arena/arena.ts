@@ -69,13 +69,13 @@ export class Arena {
   clockInterval = null;
 
   // The start time of the contest.
-  startTime = null;
+  startTime: Date | null = null;
 
   // The finish time of the contest.
-  finishTime = null;
+  finishTime: Date | null = null;
 
   // The deadline for submissions. This might be different from the end time.
-  submissionDeadline = null;
+  submissionDeadline: Date | null = null;
 
   // The guid of any run that is pending.
   pendingRuns = {};
@@ -547,7 +547,7 @@ export class Arena {
     self.options.problemsetId = problemset.problemset_id;
   }
 
-  initClock(start, finish, deadline) {
+  initClock(start: Date, finish: Date, deadline: Date | null) {
     let self = this;
 
     self.startTime = start;
