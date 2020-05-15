@@ -27,6 +27,7 @@ let config = [
       admin_support: './frontend/www/js/omegaup/admin/support.js',
       admin_user: './frontend/www/js/omegaup/admin/user.js',
       arena: './frontend/www/js/omegaup/arena/arena.ts',
+      arena_admin: './frontend/www/js/omegaup/arena/admin.ts',
       arena_contest: './frontend/www/js/omegaup/arena/contest.ts',
       arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
       arena_virtual: './frontend/www/js/omegaup/arena/virtual.js',

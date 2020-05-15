@@ -36,9 +36,32 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         return new \OmegaUp\DAO\VO\Users($rs);
     }
 
-    public static function getIdentityByToken(string $authToken): ?\OmegaUp\DAO\VO\Identities {
+    /**
+     * @return array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null
+     */
+    public static function getIdentityByToken(string $authToken) {
         $sql = 'SELECT
-                    i.*
+                    i.*,
+                    IFNULL(
+                        (
+                            SELECT `urc`.`classname` FROM
+                                `User_Rank_Cutoffs` `urc`
+                            WHERE
+                                `urc`.`score` <= (
+                                        SELECT
+                                            `ur`.`score`
+                                        FROM
+                                            `User_Rank` `ur`
+                                        WHERE
+                                            `ur`.`user_id` = `i`.`user_id`
+                                    )
+                            ORDER BY
+                                `urc`.`percentile` ASC
+                            LIMIT
+                                1
+                        ),
+                        "user-rank-unranked"
+                    ) `classname`
                 FROM
                     `Identities` i
                 INNER JOIN
@@ -47,16 +70,11 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     at.identity_id = i.identity_id
                 WHERE
                     at.token = ?;';
-        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$authToken]
         );
-
-        if (empty($rs)) {
-            return null;
-        }
-        return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
     public static function expireAuthTokens(int $identity_id): int {

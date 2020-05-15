@@ -1,4 +1,5 @@
-{include file='head.tpl' jsfile={version_hash src='/ux/admin.js'} inArena=true inline}
+{include file='head.tpl' jsfile=null inArena=true inline}
+{js_include entrypoint="arena_admin"}
 			<div id="title">
 				<h1 class="contest-title">Envíos globales</h1>
 			</div>
