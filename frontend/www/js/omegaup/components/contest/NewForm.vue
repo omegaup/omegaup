@@ -25,6 +25,7 @@
             <input
               class="form-control"
               name="title"
+              data-title
               v-bind:placeholder="contestStyleDesc"
               size="30"
               type="text"

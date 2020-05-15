@@ -346,9 +346,7 @@ def create_contest(driver, alias, scoreboard_time_percent=100):
 
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.XPATH,
-             '//form[contains(concat(" ", normalize-space(@class), " "), " '
-             'contest-form ")]//input[@name="title"]'))).send_keys(alias)
+            (By.CSS_SELECTOR, 'input[data-title]'))).send_keys(alias)
     driver.browser.find_element_by_name('alias').send_keys(alias)
     driver.browser.find_element_by_name('description').send_keys(
         'contest description')
