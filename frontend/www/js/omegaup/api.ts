@@ -19,7 +19,10 @@ export function apiCall<
           ? {
               method: 'POST',
               body: Object.keys(params)
-                .filter(key => typeof params[key] !== 'undefined')
+                .filter(
+                  key =>
+                    params[key] !== null && typeof params[key] !== 'undefined',
+                )
                 .map(
                   key =>
                     `${encodeURIComponent(key)}=${encodeURIComponent(
