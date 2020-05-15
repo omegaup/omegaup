@@ -17,8 +17,8 @@ OmegaUp.on('ready', () => {
         props: {
           allLanguages: payload.languages,
           update: false,
-          initialStartTime: startTime.getTime(),
-          initialFinishTime: finishTime.getTime(),
+          initialStartTime: startTime,
+          initialFinishTime: finishTime,
         },
         on: {
           'create-contest': (contest: omegaup.Contest): void => {

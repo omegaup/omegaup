@@ -86,7 +86,9 @@ export default class ContestSummary extends Vue {
     if (!this.contest.start_time || !this.contest.finish_time) {
       return Infinity;
     }
-    return this.contest.finish_time - this.contest.start_time;
+    return (
+      this.contest.finish_time.getTime() - this.contest.start_time.getTime()
+    );
   }
 
   get windowLength(): string {

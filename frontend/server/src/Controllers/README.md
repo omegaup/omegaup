@@ -718,7 +718,7 @@ Creates a new contest
 | `needs_basic_information`   | `bool|null` |             |
 | `description`               | `mixed`     |             |
 | `feedback`                  | `mixed`     |             |
-| `finish_time`               | `int`       |             |
+| `finish_time`               | `mixed`     |             |
 | `languages`                 | `mixed`     |             |
 | `partial_score`             | `bool|null` |             |
 | `penalty`                   | `mixed`     |             |
@@ -729,7 +729,7 @@ Creates a new contest
 | `requests_user_information` | `mixed`     |             |
 | `scoreboard`                | `mixed`     |             |
 | `show_scoreboard_after`     | `mixed`     |             |
-| `start_time`                | `int`       |             |
+| `start_time`                | `mixed`     |             |
 | `submissions_gap`           | `mixed`     |             |
 | `title`                     | `mixed`     |             |
 | `window_length`             | `int|null`  |             |

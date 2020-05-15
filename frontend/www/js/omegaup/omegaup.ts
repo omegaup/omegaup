@@ -161,8 +161,8 @@ export namespace omegaup {
     alias: string;
     title: string;
     window_length?: null | number;
-    start_time: number;
-    finish_time: number;
+    start_time: Date;
+    finish_time: Date;
     admission_mode?: AdmissionMode;
     contestant_must_register?: boolean;
     admin?: boolean;

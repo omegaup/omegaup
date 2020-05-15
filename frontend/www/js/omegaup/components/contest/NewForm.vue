@@ -50,14 +50,14 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormStartDate }}</label>
             <omegaup-datetimepicker
-              v-model="startTimeAsDate"
+              v-model="startTime"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
-              v-model="finishTimeAsDate"
+              v-model="finishTime"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
           </div>
@@ -277,8 +277,8 @@ export default class NewForm extends Vue {
   @Prop() data!: omegaup.Contest;
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
-  @Prop() initialStartTime!: number;
-  @Prop() initialFinishTime!: number;
+  @Prop() initialStartTime!: Date;
+  @Prop() initialFinishTime!: Date;
 
   T = T;
   alias = this.data?.alias ?? '';
@@ -310,22 +310,6 @@ export default class NewForm extends Vue {
     if (!newValue) {
       this.windowLength = null;
     }
-  }
-
-  get startTimeAsDate(): Date {
-    return new Date(this.startTime);
-  }
-
-  get finishTimeAsDate(): Date {
-    return new Date(this.finishTime);
-  }
-
-  set startTimeAsDate(time: Date) {
-    this.startTime = time.getTime();
-  }
-
-  set finishTimeAsDate(time: Date) {
-    this.finishTime = time.getTime();
   }
 
   fillOmi(): void {
@@ -379,8 +363,8 @@ export default class NewForm extends Vue {
       alias: this.alias,
       title: this.title,
       description: this.description,
-      start_time: this.startTime / 1000,
-      finish_time: this.finishTime / 1000,
+      start_time: this.startTime,
+      finish_time: this.finishTime,
       window_length: !this.windowLengthEnabled ? null : this.windowLength,
       points_decay_factor: this.pointsDecayFactor,
       submissions_gap: (this.submissionsGap || 1) * 60,

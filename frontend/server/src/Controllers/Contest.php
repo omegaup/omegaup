@@ -1674,7 +1674,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param int $finish_time
+     * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
      * @omegaup-request-param mixed $penalty
@@ -1685,7 +1685,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $requests_user_information
      * @omegaup-request-param mixed $scoreboard
      * @omegaup-request-param mixed $show_scoreboard_after
-     * @omegaup-request-param int $start_time
+     * @omegaup-request-param mixed $start_time
      * @omegaup-request-param mixed $submissions_gap
      * @omegaup-request-param mixed $title
      * @omegaup-request-param int|null $window_length
