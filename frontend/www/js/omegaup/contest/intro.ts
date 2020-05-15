@@ -16,6 +16,7 @@ OmegaUp.on('ready', () => {
         props: {
           requestsUserInformation: payload.requestsUserInformation,
           needsBasicInformation: payload.needsBasicInformation,
+          hasBeenExplicitlyInvited: payload.hasBeenExplicitlyInvited,
           contest: payload.contest,
           isLoggedIn: headerPayload.isLoggedIn,
           statement: payload.privacyStatement,

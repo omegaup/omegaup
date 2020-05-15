@@ -519,6 +519,7 @@ export namespace types {
 
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
+    hasBeenExplicitlyInvited?: boolean;
     needsBasicInformation?: boolean;
     privacyStatement?: types.PrivacyStatement;
     requestsUserInformation?: string;

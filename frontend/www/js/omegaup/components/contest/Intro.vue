@@ -19,16 +19,34 @@
                 v-on:emit-finish="now = Date.now()"
               ></omegaup-countdown>
             </p>
+            <!-- Anyways, user is able to request access -->
+            <form
+              v-on:submit.prevent="$emit('request-access', contest.alias)"
+              v-if="
+                contest.admission_mode === 'registration' &&
+                  !contest.user_registration_requested &&
+                  !hasBeenExplicitlyInvited
+              "
+            >
+              <template v-if="!contest.user_registration_requested">
+                <p>{{ T.mustRegisterToJoinContest }}</p>
+                <button type="submit" class="btn btn-primary btn-lg">
+                  {{ T.registerForContest }}
+                </button>
+              </template>
+            </form>
+            <!-- Registration pending -->
+            <div v-else-if="!contest.user_registration_answered">
+              <p>{{ T.registrationPending }}</p>
+            </div>
+            <!-- Registration denied -->
+            <div v-else-if="!contest.user_registration_accepted">
+              <p>{{ T.registrationDenied }}</p>
+            </div>
           </div>
 
           <div v-if="now > contest.start_time.getTime()">
-            <form
-              v-on:submit.prevent="onStartContest"
-              v-if="
-                contest.admission_mode !== 'registration' ||
-                  contest.user_registration_accepted
-              "
-            >
+            <form v-on:submit.prevent="onStartContest" v-if="canStartContest">
               <p
                 v-if="
                   !needsBasicInformation && requestsUserInformation === 'no'
@@ -87,7 +105,7 @@
                 <p>{{ T.registrationPending }}</p>
               </div>
               <!-- Registration denied -->
-              <div v-else-if="!contest.user_registration_answered === false">
+              <div v-else-if="!contest.user_registration_accepted">
                 <p>{{ T.registrationDenied }}</p>
               </div>
             </form>
@@ -151,9 +169,9 @@ import omegaup_Countdown from '../Countdown.vue';
 export default class ContestIntro extends Vue {
   @Prop() contest!: omegaup.Contest;
   @Prop() isLoggedIn!: boolean;
-  @Prop() requestURI!: string;
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
+  @Prop() hasBeenExplicitlyInvited!: boolean;
   @Prop() statement!: types.PrivacyStatement;
 
   T = T;
@@ -256,7 +274,17 @@ export default class ContestIntro extends Vue {
     return `${hours}h${minutes}m`;
   }
 
-  onStartContest() {
+  get canStartContest(): boolean {
+    // Contest is public or private
+    if (this.contest.admission_mode !== 'registration') return true;
+    // Whether contest is with registration, user should be accepted
+    if (this.contest.user_registration_accepted) return true;
+    // Or, user was explicitly invited to the contest
+    if (this.hasBeenExplicitlyInvited) return true;
+    return false;
+  }
+
+  onStartContest(): void {
     const request: types.ConsentStatement = {
       contest_alias: this.contest.alias,
       share_user_information: this.shareUserInformation ?? false,

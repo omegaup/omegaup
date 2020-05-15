@@ -11,7 +11,7 @@
  * @psalm-type ContestProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null}
- * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation?: bool, privacyStatement?: PrivacyStatement, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning?: bool}
+ * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, hasBeenExplicitlyInvited?: bool, needsBasicInformation?: bool, privacyStatement?: PrivacyStatement, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning?: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
  * @psalm-type Run=array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country_id: null|string, contest_alias: null|string}
@@ -419,9 +419,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $contest->problemset_id
             );
             if (is_null($req) || !$req->accepted) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'contestNotRegistered'
-                );
+                // Last chance: user has been invited explicitly to contest?
+                if (
+                    is_null(
+                        \OmegaUp\DAO\ProblemsetIdentities::getByPK(
+                            $identity->identity_id,
+                            $contest->problemset_id
+                        )
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                        'contestNotRegistered'
+                    );
+                }
             }
         }
     }
@@ -567,6 +577,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // No session, show the intro if public, so that they can login.
             return $result;
         }
+        $result['smartyProperties']['payload']['hasBeenExplicitlyInvited'] = \OmegaUp\DAO\ProblemsetIdentities::checkProblemsetOpened(
+            $r->identity->identity_id,
+            $contest->problemset_id
+        );
 
         [
             'needsBasicInformation' => $needsBasicInformation,
@@ -859,7 +873,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestAdmin = false;
         $contestAlias = '';
 
-        // If the contest has not started, user should not see it, unless it i
+        // If the contest has not started, user should not see it, unless it is
         // admin or has a token.
         if (is_null($r['token'])) {
             // Crack the request to get the current user
