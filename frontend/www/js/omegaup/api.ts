@@ -23,12 +23,16 @@ export function apiCall<
                   key =>
                     params[key] !== null && typeof params[key] !== 'undefined',
                 )
-                .map(
-                  key =>
-                    `${encodeURIComponent(key)}=${encodeURIComponent(
-                      params[key],
-                    )}`,
-                )
+                .map(key => {
+                  if (params[key] instanceof Date) {
+                    return `${encodeURIComponent(key)}=${encodeURIComponent(
+                      Math.round(params[key].getTime() / 1000),
+                    )}`;
+                  }
+                  return `${encodeURIComponent(key)}=${encodeURIComponent(
+                    params[key],
+                  )}`;
+                })
                 .join('&'),
               headers: {
                 'Content-Type':
