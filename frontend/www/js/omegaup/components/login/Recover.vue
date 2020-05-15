@@ -1,29 +1,18 @@
 <template>
-  <div class="container">
+  <div class="container-lg p-5 ">
     <h1>{{ T.passwordResetRequestTitle }}</h1>
-    <div class="row">
-      <div class="col-md-6 col-md-offset-3">
-        <form>
-          <div class="form-group">
-            <label>{{ T.profileEmail }}</label>
-            <input
-              type="text"
-              name="email"
-              class="form-control"
-              v-model="email"
-            />
-          </div>
-          <div class="form-group">
-            <button
-              class="btn btn-primary form-control"
-              v-on:click.prevent="$emit('forgot-password', email)"
-            >
-              {{ T.wordsSend }}
-            </button>
-          </div>
-        </form>
+    <form>
+      <div class="form-group">
+        <label for="inputEmail4" class="text-left">{{ T.profileEmail }}</label>
+        <input type="text" name="email" class="form-control" v-model="email" />
       </div>
-    </div>
+      <button
+        class="btn btn-primary form-control"
+        v-on:click.prevent="$emit('forgot-password', email)"
+      >
+        {{ T.wordsSend }}
+      </button>
+    </form>
   </div>
 </template>
 
@@ -38,3 +27,9 @@ export default class LoginPasswordRecover extends Vue {
   email: string = '';
 }
 </script>
+
+<style>
+.container-lg {
+  width: 40%;
+}
+</style>

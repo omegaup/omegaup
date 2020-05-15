@@ -8,7 +8,7 @@ import recover from '../components/login/Recover.vue';
 
 OmegaUp.on('ready', () => {
   let loginPaswwordRecover = new Vue({
-    el: '#login-password-recover',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-login-password-recover', {
         on: {
