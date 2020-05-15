@@ -435,15 +435,6 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         // And can access to the contest
         $invitedLogin = self::login($invited);
 
-        $details = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            new \OmegaUp\Request([
-                'contest_alias' => $contestData['request']['alias'],
-                'auth_token' => $invitedLogin->auth_token,
-            ])
-        )['smartyProperties']['payload'];
-
-        $this->assertTrue($details['hasBeenExplicitlyInvited']);
-
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $invitedLogin->auth_token,
@@ -451,14 +442,68 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
 
         // The second one needs request access to the contest
         $uninvitedLogin = self::login($uninvited);
-        $details = \OmegaUp\Controllers\Contest::getContestDetailsForSmarty(
-            new \OmegaUp\Request([
+
+        try {
+            \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
                 'auth_token' => $uninvitedLogin->auth_token,
-            ])
-        )['smartyProperties']['payload'];
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('contestNotRegistered', $e->getMessage());
+        }
+    }
 
-        $this->assertFalse($details['hasBeenExplicitlyInvited']);
+    /**
+     * Once contest admission mode is updated to "open with registration",
+     * all the contestants previously added should be accepted
+     */
+    public function testAddAllContestantsToContestWithRegsitration() {
+        // Create contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Creating 3 identities, and inviting them to the contest
+        $numberOfInvitedContestants = 3;
+        $invitedContestants = [];
+        for ($i = 0; $i < $numberOfInvitedContestants; $i++) {
+            [
+                'identity' => $invitedContestants[],
+            ] = \OmegaUp\Test\Factories\User::createUser();
+        }
+        foreach ($invitedContestants as $contestant) {
+            \OmegaUp\Test\Factories\Contest::addUser($contestData, $contestant);
+        }
+        ['identity' => $uninvited] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Update admission_mode to regsitration
+        $adminLogin = self::login($contestData['director']);
+        \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'admission_mode' => 'registration',
+            'auth_token' => $adminLogin->auth_token,
+        ]));
+
+        // Invited contestants should access without a new request
+        foreach ($invitedContestants as $contestant) {
+            $login = self::login($contestant);
+            $result = \OmegaUp\Controllers\Contest::apiOpen(
+                new \OmegaUp\Request([
+                    'contest_alias' => $contestData['request']['alias'],
+                    'auth_token' => $login->auth_token,
+                ])
+            );
+            $this->assertEquals($result['status'], 'ok');
+        }
+
+        // Uninvited user should not have access
+        $uninvitedLogin = self::login($uninvited);
+
         try {
             \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],

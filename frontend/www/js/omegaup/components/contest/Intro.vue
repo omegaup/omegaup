@@ -24,8 +24,7 @@
               v-on:submit.prevent="$emit('request-access', contest.alias)"
               v-if="
                 contest.admission_mode === 'registration' &&
-                  !contest.user_registration_requested &&
-                  !hasBeenExplicitlyInvited
+                  !contest.user_registration_requested
               "
             >
               <template v-if="!contest.user_registration_requested">
@@ -46,7 +45,13 @@
           </div>
 
           <div v-if="now > contest.start_time.getTime()">
-            <form v-on:submit.prevent="onStartContest" v-if="canStartContest">
+            <form
+              v-on:submit.prevent="onStartContest"
+              v-if="
+                contest.admission_mode !== 'registration' ||
+                  contest.user_registration_accepted
+              "
+            >
               <p
                 v-if="
                   !needsBasicInformation && requestsUserInformation === 'no'
@@ -171,7 +176,6 @@ export default class ContestIntro extends Vue {
   @Prop() isLoggedIn!: boolean;
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
-  @Prop() hasBeenExplicitlyInvited!: boolean;
   @Prop() statement!: types.PrivacyStatement;
 
   T = T;
@@ -272,16 +276,6 @@ export default class ContestIntro extends Vue {
     }
     const minutes = timeInMinutes % 60;
     return `${hours}h${minutes}m`;
-  }
-
-  get canStartContest(): boolean {
-    // Contest is public or private
-    if (this.contest.admission_mode !== 'registration') return true;
-    // Whether contest is with registration, user should be accepted
-    if (this.contest.user_registration_accepted) return true;
-    // Or, user was explicitly invited to the contest
-    if (this.hasBeenExplicitlyInvited) return true;
-    return false;
   }
 
   onStartContest(): void {
