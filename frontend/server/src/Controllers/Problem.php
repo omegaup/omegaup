@@ -15,6 +15,7 @@
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemAdminsPayload=array{admins: list<ProblemAdmin>, alias: string, group_admins: list<ProblemGroupAdmin>}
  * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: string, statement: array{images: array<string, string>, language: string, markdown: string}, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime?: int|string, MemoryLimit: int|string, OutputLimit?: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance?: float}}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
  * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: array{images: array<string, string>, language: string, markdown: string}, title: null|string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
@@ -2957,7 +2958,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{runs: list<array{alias: string, classname?: string, contest_alias?: null|string, contest_score: float|null, country_id?: null|string, guid: string, judged_by?: null|string, language: string, memory: int, penalty: int, run_id?: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type?: null|string, username: string, verdict: string}>}
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias?: null|string, contest_score: float|null, country_id?: null|string, guid: string, judged_by?: null|string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type?: null|string, username: string, verdict: string}>}
      */
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Get user
@@ -2996,16 +2997,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
             }
-            $response['runs'] = \OmegaUp\DAO\Runs::getAllRuns(
-                null,
-                !is_null($r['status']) ? strval($r['status']) : null,
-                !is_null($r['verdict']) ? strval($r['verdict']) : null,
-                $problem->problem_id,
-                !is_null($r['language']) ? strval($r['language']) : null,
-                !is_null($identity) ? intval($identity->identity_id) : null,
-                !is_null($r['offset']) ? intval($r['offset']) : null,
-                !is_null($r['rowcount']) ? intval($r['rowcount']) : null
-            );
+            $response['runs'] = [];
+            foreach (
+                \OmegaUp\DAO\Runs::getAllRuns(
+                    null,
+                    !is_null($r['status']) ? strval($r['status']) : null,
+                    !is_null($r['verdict']) ? strval($r['verdict']) : null,
+                    $problem->problem_id,
+                    !is_null($r['language']) ? strval($r['language']) : null,
+                    !is_null($identity) ? intval($identity->identity_id) : null,
+                    !is_null($r['offset']) ? intval($r['offset']) : null,
+                    !is_null($r['rowcount']) ? intval($r['rowcount']) : null
+                ) as $run
+            ) {
+                unset($run['run_id']);
+                $response['runs'][] = $run;
+            }
         } else {
             // Get all the available runs
             $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
@@ -3018,7 +3025,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $result = [];
             foreach ($runsArray as $run) {
                 $run['alias'] = strval($problem->alias);
-                $run['username'] = $r->identity->username;
                 $result[] = $run;
             }
             $response['runs'] = $result;
@@ -3884,7 +3890,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime?: int|string, MemoryLimit: int|string, OutputLimit?: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance?: float}}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}, template: string}
+     * @return array{smartyProperties: array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: ProblemDetailsPayload, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}, template: string}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $lang

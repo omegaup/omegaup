@@ -94,6 +94,8 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
         );
+        unset($identityDb['classname']);
+        $identityDb = new \OmegaUp\DAO\VO\Identities($identityDb);
         $graduationDate = null;
         if (!is_null($identityDb->current_identity_school_id)) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
@@ -141,6 +143,8 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
         );
+        unset($identityDb['classname']);
+        $identityDb = new \OmegaUp\DAO\VO\Identities($identityDb);
         $graduationDate = null;
         if (!is_null($identityDb->current_identity_school_id)) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
@@ -203,7 +207,7 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Getting identity data from db
         $identity = \OmegaUp\DAO\Identities::getByPK($userDb->main_identity_id);
-        $this->assertEquals($identity->username, $identityDb->username);
-        $this->assertEquals($identity->password, $identityDb->password);
+        $this->assertEquals($identity->username, $identityDb['username']);
+        $this->assertEquals($identity->password, $identityDb['password']);
     }
 }
