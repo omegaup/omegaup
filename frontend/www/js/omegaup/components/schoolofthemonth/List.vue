@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container-lg p-5">
     <ul class="nav nav-tabs">
       <li class="nav-item">
         <a
