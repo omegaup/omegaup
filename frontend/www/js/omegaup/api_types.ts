@@ -542,6 +542,7 @@ export namespace types {
     isReviewer: boolean;
     gravatarURL51: string;
     currentUsername: string;
+    userClassname: string;
     profileProgress: number;
     isMainUserIdentity: boolean;
     isAdmin: boolean;
@@ -2853,6 +2854,7 @@ export namespace messages {
       email?: string;
       user?: dao.Users;
       identity?: dao.Identities;
+      classname: string;
       auth_token?: string;
       is_admin: boolean;
     };

@@ -3706,10 +3706,10 @@ contestant's machine and the server.
 
 ### Returns
 
-| Name      | Type                                                                                                                   |
-| --------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `session` | `{ valid: boolean; email: string; user: dao.Users; identity: dao.Identities; auth_token: string; is_admin: boolean; }` |
-| `time`    | `number`                                                                                                               |
+| Name      | Type                                                                                                                                      |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `session` | `{ valid: boolean; email: string; user: dao.Users; identity: dao.Identities; classname: string; auth_token: string; is_admin: boolean; }` |
+| `time`    | `number`                                                                                                                                  |
 
 ## `/api/session/googleLogin/`
 
