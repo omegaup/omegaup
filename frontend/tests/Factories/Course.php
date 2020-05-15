@@ -12,7 +12,8 @@ class Course {
         string $admissionMode = \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
-        ?int $courseDuration = 120
+        ?int $courseDuration = 120,
+        ?string $courseAlias = null
     ): array {
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -34,7 +35,7 @@ class Course {
             ]));
         }
 
-        $courseAlias = \OmegaUp\Test\Utils::createRandomString();
+        $courseAlias = $courseAlias ?? \OmegaUp\Test\Utils::createRandomString();
         if (is_null($adminLogin)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
@@ -73,7 +74,8 @@ class Course {
         string $showScoreboard = 'false',
         int $startTimeDelay = 0,
         ?int $courseDuration = 120,
-        ?int $assignmentDuration = 120
+        ?int $assignmentDuration = 120,
+        ?string $courseAlias = null
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -87,7 +89,8 @@ class Course {
             $admissionMode,
             $requestsUserInformation,
             $showScoreboard,
-            $courseDuration
+            $courseDuration,
+            $courseAlias
         );
         $courseAlias = $courseFactoryResult['course_alias'];
 
@@ -141,11 +144,12 @@ class Course {
      * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string}
      */
     public static function createCourseWithAssignments(
-        int $nAssignments
+        int $nAssignments,
+        ?string $courseAlias = null
     ): array {
         return self::createCourseWithNAssignmentsPerType([
             'homework' => $nAssignments
-        ]);
+        ], $courseAlias);
     }
 
     /**
@@ -153,9 +157,18 @@ class Course {
      * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string, assignment_problemset_ids: list<int>}
      */
     public static function createCourseWithNAssignmentsPerType(
-        array $assignmentsPerType
+        array $assignmentsPerType,
+        ?string $courseAlias = null
     ): array {
-        $courseFactoryResult = self::createCourse();
+        $courseFactoryResult = self::createCourse(
+            null,
+            null,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            'no',
+            'false',
+            120,
+            $courseAlias
+        );
         $courseAlias = $courseFactoryResult['course_alias'];
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
         if (is_null($course) || is_null($course->course_id)) {
