@@ -17,14 +17,16 @@ OmegaUp.on('ready', () => {
         props: {
           allLanguages: payload.languages,
           update: false,
-          initialStartTime: startTime,
-          initialFinishTime: finishTime,
+          initialStartTime: startTime.getTime(),
+          initialFinishTime: finishTime.getTime(),
         },
         on: {
-          'create-contest': (ev: omegaup.Contest): void => {
-            api.Contest.create(ev)
+          'create-contest': (contest: omegaup.Contest): void => {
+            api.Contest.create(contest)
               .then(data => {
-                window.location.replace(`/contest/${ev.alias}/edit/#problems`);
+                window.location.replace(
+                  `/contest/${contest.alias}/edit/#problems`,
+                );
               })
               .catch(ui.apiError);
           },

@@ -50,14 +50,14 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormStartDate }}</label>
             <omegaup-datetimepicker
-              v-model="startTime"
+              v-model="startTimeAsDate"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormStartDateDesc }}</p>
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
-              v-model="finishTime"
+              v-model="finishTimeAsDate"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
           </div>
@@ -197,7 +197,7 @@
             ><br />
             <multiselect
               v-model="languages"
-              v-bind:options="availableLanguagesKeys"
+              v-bind:options="Object.keys(availableLanguages)"
               v-bind:multiple="true"
               v-bind:placeholder="T.contestNewFormLanguages"
               v-bind:close-on-select="false"
@@ -277,8 +277,8 @@ export default class NewForm extends Vue {
   @Prop() data!: omegaup.Contest;
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
-  @Prop() initialStartTime!: Date;
-  @Prop() initialFinishTime!: Date;
+  @Prop() initialStartTime!: number;
+  @Prop() initialFinishTime!: number;
 
   T = T;
   alias = this.data?.alias ?? '';
@@ -312,8 +312,20 @@ export default class NewForm extends Vue {
     }
   }
 
-  get availableLanguagesKeys(): string[] {
-    return Object.keys(this.availableLanguages);
+  get startTimeAsDate(): Date {
+    return new Date(this.startTime);
+  }
+
+  get finishTimeAsDate(): Date {
+    return new Date(this.finishTime);
+  }
+
+  set startTimeAsDate(time: Date) {
+    this.startTime = time.getTime();
+  }
+
+  set finishTimeAsDate(time: Date) {
+    this.finishTime = time.getTime();
   }
 
   fillOmi(): void {
@@ -363,31 +375,25 @@ export default class NewForm extends Vue {
       this.$emit('emit-update-contest', this);
       return;
     }
-    this.$emit('create-contest', {
+    const contest: omegaup.Contest = {
       alias: this.alias,
       title: this.title,
       description: this.description,
-      start_time: this.startTime
-        ? this.startTime.getTime() / 1000
-        : this.initialStartTime.getTime() / 1000,
-      finish_time: this.finishTime
-        ? this.finishTime.getTime() / 1000
-        : this.initialFinishTime.getTime() / 1000,
-      window_length:
-        this.windowLength === null || !this.windowLengthEnabled
-          ? 0
-          : this.windowLength,
+      start_time: this.startTime / 1000,
+      finish_time: this.finishTime / 1000,
+      window_length: !this.windowLengthEnabled ? null : this.windowLength,
       points_decay_factor: this.pointsDecayFactor,
-      submissions_gap: this.submissionsGap ? this.submissionsGap * 60 : 60,
+      submissions_gap: (this.submissionsGap || 1) * 60,
       languages: this.languages,
       feedback: this.feedback,
       penalty: this.penalty,
       scoreboard: this.scoreboard,
       penalty_type: this.penaltyType,
       show_scoreboard_after: this.showScoreboardAfter,
-      basic_information: this.needsBasicInformation ? 1 : 0,
+      needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
-    });
+    };
+    this.$emit('create-contest', contest);
   }
 }
 </script>

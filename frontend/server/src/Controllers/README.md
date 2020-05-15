@@ -715,10 +715,10 @@ Creates a new contest
 | --------------------------- | ----------- | ----------- |
 | `admission_mode`            | `mixed`     |             |
 | `alias`                     | `mixed`     |             |
-| `basic_information`         | `bool|null` |             |
+| `needs_basic_information`   | `bool|null` |             |
 | `description`               | `mixed`     |             |
 | `feedback`                  | `mixed`     |             |
-| `finish_time`               | `mixed`     |             |
+| `finish_time`               | `int`       |             |
 | `languages`                 | `mixed`     |             |
 | `partial_score`             | `bool|null` |             |
 | `penalty`                   | `mixed`     |             |
@@ -729,10 +729,10 @@ Creates a new contest
 | `requests_user_information` | `mixed`     |             |
 | `scoreboard`                | `mixed`     |             |
 | `show_scoreboard_after`     | `mixed`     |             |
-| `start_time`                | `mixed`     |             |
+| `start_time`                | `int`       |             |
 | `submissions_gap`           | `mixed`     |             |
 | `title`                     | `mixed`     |             |
-| `window_length`             | `mixed`     |             |
+| `window_length`             | `int|null`  |             |
 
 ### Returns
 
@@ -1269,7 +1269,7 @@ Update a Contest
 | --------------------------- | ------------------------ | ----------- |
 | `admission_mode`            | `mixed`                  |             |
 | `alias`                     | `mixed`                  |             |
-| `basic_information`         | `bool|null`              |             |
+| `needs_basic_information`   | `bool|null`              |             |
 | `contest_alias`             | `mixed`                  |             |
 | `description`               | `mixed`                  |             |
 | `feedback`                  | `mixed`                  |             |

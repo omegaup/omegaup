@@ -188,7 +188,7 @@ export default class ContestIntro extends Vue {
 
   get differentStartsDescription(): string {
     return UI.formatString(T.contestIntroDifferentStarts, {
-      window_length: this.formatTimeInRules(this.contest.window_length),
+      window_length: this.formatTimeInRules(this.contest?.window_length ?? 0),
     });
   }
 
@@ -205,8 +205,7 @@ export default class ContestIntro extends Vue {
     }
     const minutesPercentage = Math.floor(
       (contest.scoreboard / 100) *
-        ((contest.finish_time.getTime() - contest.start_time.getTime()) /
-          60000),
+        ((contest.finish_time - contest.start_time) / 60000),
     );
     return UI.formatString(T.contestIntroScoreboardTimePercent, {
       window_length: this.formatTimeInRules(minutesPercentage),

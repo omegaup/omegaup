@@ -355,8 +355,7 @@ def create_contest(driver, alias, scoreboard_time_percent=100):
     scoreboard_element.send_keys(scoreboard_time_percent)
 
     with driver.page_transition():
-        driver.browser.find_element_by_xpath(
-            '//button[@type="submit"]').click()
+        driver.browser.find_element_by_tag_name('form').submit()
 
 
 @util.annotate

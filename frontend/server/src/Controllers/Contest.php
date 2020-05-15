@@ -1671,10 +1671,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param bool|null $basic_information
+     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
-     * @omegaup-request-param mixed $finish_time
+     * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
      * @omegaup-request-param mixed $penalty
@@ -1685,10 +1685,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $requests_user_information
      * @omegaup-request-param mixed $scoreboard
      * @omegaup-request-param mixed $show_scoreboard_after
-     * @omegaup-request-param mixed $start_time
+     * @omegaup-request-param int $start_time
      * @omegaup-request-param mixed $submissions_gap
      * @omegaup-request-param mixed $title
-     * @omegaup-request-param mixed $window_length
+     * @omegaup-request-param int|null $window_length
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -1711,11 +1711,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureOptionalBool('basic_information');
+        $r->ensureOptionalBool('needs_basic_information');
         $r->ensureOptionalBool('partial_score');
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
-            'needs_basic_information' => boolval($r['basic_information']),
+            'needs_basic_information' => boolval($r['needs_basic_information']),
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
@@ -3528,7 +3528,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param bool|null $basic_information
+     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
@@ -3570,7 +3570,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'required',
             ]
         );
-        $r->ensureOptionalBool('basic_information');
+        $r->ensureOptionalBool('needs_basic_information');
 
         self::forbiddenInVirtual($contest);
 
@@ -3661,7 +3661,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 $problemset->needs_basic_information = boolval(
-                    $r['basic_information']
+                    $r['needs_basic_information']
                 );
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);

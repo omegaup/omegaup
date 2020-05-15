@@ -59,8 +59,8 @@ OmegaUp.on('ready', function() {
                   contest_alias: contestAlias,
                   title: ev.title,
                   description: ev.description,
-                  start_time: ev.startTime.getTime() / 1000,
-                  finish_time: ev.finishTime.getTime() / 1000,
+                  start_time: ev.startTime / 1000,
+                  finish_time: ev.finishTime / 1000,
                   window_length:
                     ev.windowLength == '' ||
                     ev.windowLength == null ||
@@ -75,7 +75,7 @@ OmegaUp.on('ready', function() {
                   scoreboard: ev.scoreboard,
                   penalty_type: ev.penaltyType,
                   show_scoreboard_after: ev.showScoreboardAfter,
-                  basic_information: ev.needsBasicInformation ? 1 : 0,
+                  needs_basic_information: ev.needsBasicInformation,
                   requests_user_information: ev.requestsUserInformation,
                 })
                   .then(data => {
