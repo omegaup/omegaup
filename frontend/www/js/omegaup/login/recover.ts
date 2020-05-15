@@ -4,7 +4,7 @@ import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
-import recover from '../components/login/Recover.vue';
+import login_PasswordRecover from '../components/login/PasswordRecover.vue';
 
 OmegaUp.on('ready', () => {
   let loginPaswwordRecover = new Vue({
@@ -25,7 +25,7 @@ OmegaUp.on('ready', () => {
       });
     },
     components: {
-      'omegaup-login-password-recover': recover,
+      'omegaup-login-password-recover': login_PasswordRecover,
     },
   });
 });
