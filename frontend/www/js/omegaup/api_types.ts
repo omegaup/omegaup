@@ -1117,6 +1117,14 @@ export namespace types {
     contest_alias?: string;
   }
 
+  export interface RunMetadata {
+    verdict: string;
+    time: number;
+    sys_time: number;
+    wall_time: number;
+    memory: number;
+  }
+
   export interface School {
     country_id?: string;
     name: string;
@@ -1214,19 +1222,13 @@ export namespace types {
         cases?: {
           contest_score: number;
           max_score: number;
-          meta: { status: string };
+          meta: types.RunMetadata;
           name?: string;
           out_diff: string;
           score: number;
           verdict: string;
         }[];
-        details: {
-          groups: {
-            cases: {
-              meta: { memory: number; time: number; wall_time: number };
-            }[];
-          }[];
-        };
+        details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
       };
       runs: number;
     }[];
@@ -1663,19 +1665,13 @@ export namespace messages {
           cases?: {
             contest_score: number;
             max_score: number;
-            meta: { status: string };
+            meta: types.RunMetadata;
             name?: string;
             out_diff: string;
             score: number;
             verdict: string;
           }[];
-          details: {
-            groups: {
-              cases: {
-                meta: { memory: number; time: number; wall_time: number };
-              }[];
-            }[];
-          };
+          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
         };
         runs: number;
       }[];
@@ -1738,19 +1734,13 @@ export namespace messages {
           cases?: {
             contest_score: number;
             max_score: number;
-            meta: { status: string };
+            meta: types.RunMetadata;
             name?: string;
             out_diff: string;
             score: number;
             verdict: string;
           }[];
-          details: {
-            groups: {
-              cases: {
-                meta: { memory: number; time: number; wall_time: number };
-              }[];
-            }[];
-          };
+          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
         };
         runs: number;
       }[];
@@ -1917,19 +1907,13 @@ export namespace messages {
           cases?: {
             contest_score: number;
             max_score: number;
-            meta: { status: string };
+            meta: types.RunMetadata;
             name?: string;
             out_diff: string;
             score: number;
             verdict: string;
           }[];
-          details: {
-            groups: {
-              cases: {
-                meta: { memory: number; time: number; wall_time: number };
-              }[];
-            }[];
-          };
+          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
         };
         runs: number;
       }[];
@@ -2712,21 +2696,13 @@ export namespace messages {
     alias: string;
     compile_error?: string;
     details?: {
-      compile_meta?: {
-        [key: string]: {
-          memory: number;
-          sys_time: number;
-          time: number;
-          verdict: string;
-          wall_time: number;
-        };
-      };
+      compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
       groups?: {
         cases: {
           contest_score: number;
           max_score: number;
-          meta: { verdict: string };
+          meta: types.RunMetadata;
           name: string;
           score: number;
           verdict: string;
@@ -2784,21 +2760,13 @@ export namespace messages {
   export type RunSourceResponse = {
     compile_error?: string;
     details?: {
-      compile_meta?: {
-        [key: string]: {
-          memory: number;
-          sys_time: number;
-          time: number;
-          verdict: string;
-          wall_time: number;
-        };
-      };
+      compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
       groups?: {
         cases: {
           contest_score: number;
           max_score: number;
-          meta: { verdict: string };
+          meta: types.RunMetadata;
           name: string;
           score: number;
           verdict: string;
