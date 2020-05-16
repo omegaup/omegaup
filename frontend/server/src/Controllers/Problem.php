@@ -6,6 +6,7 @@
  * ProblemsController
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type Statements=array<string, string>
  * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, slow: bool, validator: array{custom_validator: array{limits: array{TimeLimit: int}}, limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}}, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, version: string, visibility: int, visits: int}
@@ -3206,7 +3207,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 /*missingOk=*/true
             );
             if (!is_null($detailsJson)) {
-                /** @var null|array{verdict: string, compile_meta: array{Main: array{verdict: string, time: float, sys_time: float, wall_time: float, memory: int}}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}}>}>} */
+                /** @var null|array{verdict: string, compile_meta: array{Main: RunMetadata}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: RunMetadata}>}>} */
                 $details = json_decode($detailsJson, /*associative=*/true);
                 if (!is_array($details)) {
                     self::$log->error(
