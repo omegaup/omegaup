@@ -245,7 +245,7 @@
                     </div>
                   </a>
                   <a class="dropdown-item" href="/badge/list/">{{
-                    T.navSeeMyBadges
+                    T.navSeeAllBadges
                   }}</a>
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems

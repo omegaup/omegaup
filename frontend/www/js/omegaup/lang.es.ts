@@ -541,7 +541,7 @@ const translations: { [key: string]: string; } = {
   navRecent: "Actividad Reciente",
   navSchoolOfTheMonth: "Escuela del Mes",
   navSchoolRanking: "Ranking de escuelas",
-  navSeeMyBadges: "Ver todas mis insignias",
+  navSeeAllBadges: "Ver todas las insignias",
   navTutorials: "Tutoriales",
   navUserRanking: "Ranking de usuarios",
   navViewProfile: "Mi perfil",
