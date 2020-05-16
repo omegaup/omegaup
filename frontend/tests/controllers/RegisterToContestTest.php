@@ -468,7 +468,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData
         );
 
-        // Creating 3 identities, and inviting them to the contest
+        // Creating 2 identities, and inviting them to the contest
         $invitedContestants = [];
         foreach (range(0, 2) as $number) {
             [
