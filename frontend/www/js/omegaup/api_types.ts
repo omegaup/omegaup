@@ -2775,6 +2775,7 @@ export namespace messages {
       type?: string;
       username: string;
       verdict: string;
+      status: string;
     }[];
   };
   export type RunRejudgeRequest = { [key: string]: any };
