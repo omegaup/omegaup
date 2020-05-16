@@ -2602,12 +2602,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             if (
                 \OmegaUp\DAO\ProblemsetIdentityRequest::replace(
                     new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
-                    'identity_id' => $identityID,
-                    'problemset_id' => $contest->problemset_id,
-                    'request_time' => $time,
-                    'last_update' => $time,
-                    'accepted' => true,
-                    'extra_note' => $note,
+                        'identity_id' => $identityID,
+                        'problemset_id' => $contest->problemset_id,
+                        'request_time' => $time,
+                        'last_update' => $time,
+                        'accepted' => true,
+                        'extra_note' => $note,
                     ])
                 ) > 0
             ) {
