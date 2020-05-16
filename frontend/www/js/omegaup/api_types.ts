@@ -1021,6 +1021,7 @@ export namespace types {
     requests_user_information?: string;
     scoreboard?: number;
     show_scoreboard_after?: boolean;
+    show_penalty?: boolean;
     start_time?: Date;
     submission_deadline?: Date;
     submissions_gap?: number;

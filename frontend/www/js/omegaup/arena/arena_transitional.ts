@@ -36,6 +36,7 @@ export interface ArenaOptions {
   originalProblemsetId?: number;
   payload: types.CommonPayload;
   problemsetId: number | null;
+  problemsetAdmin: boolean;
   preferredLanguage: string | null;
   scoreboardToken: string | null;
   shouldShowFirstAssociatedIdentityRunWarning: boolean;
@@ -127,6 +128,7 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
     onlyProblemAlias: null,
     originalContestAlias: null,
     problemsetId: null,
+    problemsetAdmin: false,
     payload: {
       omegaUpLockDown: false,
       bootstrap4: false,

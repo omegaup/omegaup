@@ -164,7 +164,7 @@ export namespace omegaup {
     needs_basic_information?: boolean;
     opened?: boolean;
     original_contest_alias?: string;
-    original_problemset_id?: string;
+    original_problemset_id?: number;
     partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
@@ -201,7 +201,6 @@ export namespace omegaup {
     acceptsSubmissions: boolean;
     bestScore: number;
     maxScore: number;
-    active: boolean;
   }
 
   export interface ContestResult {

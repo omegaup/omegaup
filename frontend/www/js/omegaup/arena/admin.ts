@@ -66,7 +66,12 @@ OmegaUp.on('ready', () => {
           var problem = contest.problems[idx];
           var problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
-          arenaInstance.problems[problem.alias] = problem;
+          arenaInstance.problems[problem.alias] = {
+            ...problem,
+            languages: problem.languages
+              .split(',')
+              .filter(language => language !== ''),
+          };
           if (arenaInstance.navbarProblems) {
             arenaInstance.navbarProblems.problems.push({
               alias: problem.alias,
@@ -74,7 +79,6 @@ OmegaUp.on('ready', () => {
               text: problemName,
               bestScore: 0,
               maxScore: 0,
-              active: false,
             });
           }
 
