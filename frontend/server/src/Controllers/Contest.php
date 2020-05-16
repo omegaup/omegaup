@@ -859,7 +859,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestAdmin = false;
         $contestAlias = '';
 
-        // If the contest has not started, user should not see it, unless it i
+        // If the contest has not started, user should not see it, unless it is
         // admin or has a token.
         if (is_null($r['token'])) {
             // Crack the request to get the current user
@@ -2543,21 +2543,86 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail'],
             $r->identity
         );
+        if (is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotFound'
+            );
+        }
 
-        // Save the contest to the DB
-        \OmegaUp\DAO\ProblemsetIdentities::replace(
-            new \OmegaUp\DAO\VO\ProblemsetIdentities([
-                'problemset_id' => $contest->problemset_id,
-                'identity_id' => $identity->identity_id,
-                'access_time' => null,
-                'end_time' => null,
-                'score' => 0,
-                'time' => 0,
-                'is_invited' => true,
-            ])
-        );
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
+
+            // Save the contest to the DB
+            \OmegaUp\DAO\ProblemsetIdentities::replace(
+                new \OmegaUp\DAO\VO\ProblemsetIdentities([
+                    'problemset_id' => $contest->problemset_id,
+                    'identity_id' => $identity->identity_id,
+                    'access_time' => null,
+                    'end_time' => null,
+                    'score' => 0,
+                    'time' => 0,
+                    'is_invited' => true,
+                ])
+            );
+
+            if ($contest->admission_mode === 'registration') {
+                // Pre-accept user
+                self::preAcceptAccessRequest(
+                    $contest,
+                    [$identity->identity_id],
+                    $r->user
+                );
+            }
+            // End transaction
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+
+            throw $e;
+        }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * @param list<int> $identitiesIDs
+     */
+    private static function preAcceptAccessRequest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        array $identitiesIDs,
+        \OmegaUp\DAO\VO\Users $admin
+    ): void {
+        $time = \OmegaUp\Time::get();
+        $note = \OmegaUp\Translations::getInstance()->get(
+            'wordsAutoAccepted'
+        ) ?: 'wordsAutoAccepted';
+        foreach ($identitiesIDs as $identityID) {
+            if (
+                \OmegaUp\DAO\ProblemsetIdentityRequest::replace(
+                    new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
+                        'identity_id' => $identityID,
+                        'problemset_id' => $contest->problemset_id,
+                        'request_time' => $time,
+                        'last_update' => $time,
+                        'accepted' => true,
+                        'extra_note' => $note,
+                    ])
+                ) > 0
+            ) {
+                // Save this action in the history
+                \OmegaUp\DAO\ProblemsetIdentityRequestHistory::create(
+                    new \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory([
+                        'identity_id' => $identityID,
+                        'problemset_id' => $contest->problemset_id,
+                        'time' => $time,
+                        'admin_id' => $admin->user_id,
+                        'accepted' => true,
+                    ])
+                );
+            }
+        }
     }
 
     /**
@@ -3575,6 +3640,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::forbiddenInVirtual($contest);
 
         $updateProblemset = true;
+        $updateRequests = false;
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
             \OmegaUp\Validators::validateOptionalInEnum(
@@ -3592,6 +3658,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
 
             $contest->admission_mode = $r['admission_mode'];
+            $updateRequests = $r['admission_mode'] === 'registration';
             // Problemset does not update when admission mode change
             $updateProblemset = false;
         }
@@ -3665,6 +3732,40 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);
+            }
+
+            if ($updateRequests) {
+                // Save the problemset object with data sent by user to the database
+                $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                    intval($contest->problemset_id)
+                );
+                if (
+                    is_null($problemset)
+                    || is_null($problemset->problemset_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemsetNotFound'
+                    );
+                }
+                // Get the list of contestants
+                $identities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset(
+                    $problemset->problemset_id
+                );
+                // Extract IDs
+                $identitiesIDs = array_map(
+                    /**
+                     * @param array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string} $identity
+                     */
+                    function ($identity): int {
+                        return $identity['identity_id'];
+                    },
+                    $identities
+                );
+                self::preAcceptAccessRequest(
+                    $contest,
+                    $identitiesIDs,
+                    $r->user
+                );
             }
 
             // End transaction

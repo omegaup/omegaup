@@ -183,6 +183,7 @@ export namespace omegaup {
     problems?: omegaup.Problem[];
     problemset_id?: number;
     requests_user_information?: omegaup.RequestsUserInformation;
+    user_registration_accepted?: boolean;
     rerun_id?: number;
     scoreboard?: number;
     scoreboard_url?: string;

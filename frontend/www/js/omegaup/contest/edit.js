@@ -172,6 +172,9 @@ OmegaUp.on('ready', function() {
                         ` <a href="/arena/${contestAlias}/">${T.contestEditGoToContest}</a>`,
                     );
                     refresh(ev, api.Contest.adminDetails, 'contest');
+                    if (ev.admissionMode === 'registration') {
+                      refresh(ev, api.Contest.requests, 'requests', 'users');
+                    }
                   })
                   .catch(ui.apiError);
               },
@@ -196,6 +199,7 @@ OmegaUp.on('ready', function() {
                       }
                     });
                     refresh(ev, api.Contest.users, 'users');
+                    refresh(ev, api.Contest.requests, 'requests', 'users');
                     if (contestantsWithError.length === 0) {
                       ui.success(T.bulkUserAddSuccess);
                       return;

@@ -1124,6 +1124,7 @@ const translations: { [key: string]: string; } = {
   wordsAssignment: "(A55ignm3n7)",
   wordsAssignments: "(A55ignm3n75)",
   wordsAuthor: "(Au7h0r)",
+  wordsAutoAccepted: "(U53r ha5 b33n 3xp1ici71y invi73d 70 7h3 c0n7357)",
   wordsBack: "(Back)",
   wordsBadgesObtained: "(Badg35 0b7ain3d)",
   wordsBadgesSeeAll: "(S33 a11 avai1ab13 badg35)",
