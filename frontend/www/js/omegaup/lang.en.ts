@@ -1122,6 +1122,7 @@ const translations: { [key: string]: string; } = {
   wordsAssignment: "Assignment",
   wordsAssignments: "Assignments",
   wordsAuthor: "Author",
+  wordsAutoAccepted: "User has been explicitly invited to the contest",
   wordsBack: "Back",
   wordsBadgesObtained: "Badges obtained",
   wordsBadgesSeeAll: "See all available badges",

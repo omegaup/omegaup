@@ -2596,29 +2596,32 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): void {
         $time = \OmegaUp\Time::get();
         $note = \OmegaUp\Translations::getInstance()->get(
-            'wordAccepted'
-        ) ?: 'wordAccepted';
+            'wordsAutoAccepted'
+        ) ?: 'wordsAutoAccepted';
         foreach ($identitiesIDs as $identityID) {
-            $request = new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
-                'identity_id' => $identityID,
-                'problemset_id' => $contest->problemset_id,
-                'request_time' => $time,
-                'last_update' => $time,
-                'accepted' => true,
-                'extra_note' => $note,
-            ]);
-            \OmegaUp\DAO\ProblemsetIdentityRequest::replace($request);
-
-            // Save this action in the history
-            \OmegaUp\DAO\ProblemsetIdentityRequestHistory::create(
-                new \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory([
-                    'identity_id' => $request->identity_id,
+            if (
+                \OmegaUp\DAO\ProblemsetIdentityRequest::replace(
+                    new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
+                    'identity_id' => $identityID,
                     'problemset_id' => $contest->problemset_id,
-                    'time' => $request->last_update,
-                    'admin_id' => $admin->user_id,
-                    'accepted' => $request->accepted,
-                ])
-            );
+                    'request_time' => $time,
+                    'last_update' => $time,
+                    'accepted' => true,
+                    'extra_note' => $note,
+                    ])
+                ) > 0
+            ) {
+                // Save this action in the history
+                \OmegaUp\DAO\ProblemsetIdentityRequestHistory::create(
+                    new \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory([
+                        'identity_id' => $identityID,
+                        'problemset_id' => $contest->problemset_id,
+                        'time' => $time,
+                        'admin_id' => $admin->user_id,
+                        'accepted' => true,
+                    ])
+                );
+            }
         }
     }
 
@@ -3748,7 +3751,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 $identities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset(
                     $problemset->problemset_id
                 );
-                // Extract ID's
+                // Extract IDs
                 $identitiesIDs = array_map(
                     /**
                      * @param array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string} $identity

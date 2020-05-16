@@ -469,15 +469,15 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Creating 3 identities, and inviting them to the contest
-        $numberOfInvitedContestants = 3;
         $invitedContestants = [];
-        for ($i = 0; $i < $numberOfInvitedContestants; $i++) {
+        foreach (range(0, 2) as $number) {
             [
-                'identity' => $invitedContestants[],
+                'identity' => $invitedContestants[$number],
             ] = \OmegaUp\Test\Factories\User::createUser();
-        }
-        foreach ($invitedContestants as $contestant) {
-            \OmegaUp\Test\Factories\Contest::addUser($contestData, $contestant);
+            \OmegaUp\Test\Factories\Contest::addUser(
+                $contestData,
+                $invitedContestants[$number]
+            );
         }
         ['identity' => $uninvited] = \OmegaUp\Test\Factories\User::createUser();
 

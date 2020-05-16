@@ -19,29 +19,6 @@
                 v-on:emit-finish="now = Date.now()"
               ></omegaup-countdown>
             </p>
-            <!-- Anyways, user is able to request access -->
-            <form
-              v-on:submit.prevent="$emit('request-access', contest.alias)"
-              v-if="
-                contest.admission_mode === 'registration' &&
-                  !contest.user_registration_requested
-              "
-            >
-              <template v-if="!contest.user_registration_requested">
-                <p>{{ T.mustRegisterToJoinContest }}</p>
-                <button type="submit" class="btn btn-primary btn-lg">
-                  {{ T.registerForContest }}
-                </button>
-              </template>
-            </form>
-            <!-- Registration pending -->
-            <div v-else-if="!contest.user_registration_answered">
-              <p>{{ T.registrationPending }}</p>
-            </div>
-            <!-- Registration denied -->
-            <div v-else-if="!contest.user_registration_accepted">
-              <p>{{ T.registrationDenied }}</p>
-            </div>
           </div>
 
           <div v-if="now > contest.start_time.getTime()">
