@@ -48,7 +48,7 @@
 {/if}
 
 {if isset($inArena) && $inArena}
-		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
+    <link rel="stylesheet" type="text/css" href="{version_hash src="/css/arena.css"}" />
 {elseif !isset($headerPayload) || !$headerPayload.bootstrap4}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/style.css"}">
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
@@ -76,7 +76,7 @@
 {if isset($inArena) && $inArena}
 		<!-- Generated from http://ajaxload.info/ -->
 		{if !isset($bodyid) or $bodyid != 'only-problem'}
-		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
+		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/media/loading.gif" alt="loading" /></div>
 		{/if}
 {/if}
 {if isset($headerPayload) && $headerPayload.bootstrap4}
