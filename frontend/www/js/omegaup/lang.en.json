@@ -57,6 +57,8 @@
 	"badge_coderOfTheMonth_name": "Coder Of The Month",
 	"badge_contestManager_description": "User has managed at least one contest.",
 	"badge_contestManager_name": "Contest Manager",
+	"badge_cppCourseGraduate_description": "The user has solved more than 60% of C++ course.",
+	"badge_cppCourseGraduate_name": "C++ Course Graduate",
 	"badge_cppExpert_description": "The user has solved more than 10 problems in C++.",
 	"badge_cppExpert_name": "C++ Expert User",
 	"badge_feedbackProvider_description": "User has provided feedback for at least one problem.",

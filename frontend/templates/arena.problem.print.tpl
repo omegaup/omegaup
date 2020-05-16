@@ -5,11 +5,11 @@
 <title>omegaUp &mdash; {$title|htmlspecialchars}</title>
 <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}"></script>
 <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.5.0.min.js"}"></script>
+<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.5.1.min.js"}"></script>
 
 <link rel="stylesheet" href="{version_hash src="/third_party/css/reset.css"}" />
 <link rel="stylesheet" href="{version_hash src="/css/common.css"}" />
-<link rel="stylesheet" href="{version_hash src="/ux/arena.css"}" />
+<link rel="stylesheet" href="{version_hash src="/css/arena.css"}" />
 <link rel="stylesheet" href="{version_hash src="/css/report.css"}" />
 </head>
 <body id="report">

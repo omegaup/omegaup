@@ -7,12 +7,13 @@
  *
  * @author joemmanuel
  *
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type School=array{country_id: string|null, name: string, ranking: int|null, school_id: int, score: float}
  * @psalm-type SchoolCoderOfTheMonth=array{time: string, username: string, classname: string}
  * @psalm-type SchoolProblemsSolved=array{month: int, problems_solved: int, year: int}
  * @psalm-type SchoolUser=array{username: string, classname: string, created_problems: int, solved_problems: int, organized_contests: int}
  * @psalm-type SchoolProfileDetailsPayload=array{school_id: int, school_name: string, ranking: int, country: array{id: string, name: string}|null, state_name: string|null, monthly_solved_problems: list<SchoolProblemsSolved>, school_users: list<SchoolUser>, coders_of_the_month: list<SchoolCoderOfTheMonth>}
- * @psalm-type SchoolRankPayload=array{page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool}
+ * @psalm-type SchoolRankPayload=array{page: int, length: int, rank: list<School>, totalRows: int, showHeader: bool, pagerItems: list<PageItem>}
  * @psalm-type SchoolOfTheMonthPayload=array{candidatesToSchoolOfTheMonth: list<array{country_id: string, name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>, isMentor: bool, options?: array{canChooseSchool: bool, schoolIsSelected: bool}, schoolsOfPreviousMonth: list<array{country_id: string, name: string, ranking: int, school_id: int}>, schoolsOfPreviousMonths: list<array{country_id: string, name: string, school_id: int, time: string}>}
  */
 class School extends \OmegaUp\Controllers\Controller {
@@ -302,6 +303,14 @@ class School extends \OmegaUp\Controllers\Controller {
                     'showHeader' => false,
                     'rank' => $schoolRank['rank'],
                     'totalRows' => $schoolRank['totalRows'],
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $schoolRank['totalRows'],
+                        $length,
+                        $page,
+                        '/rank/schools/',
+                        5,
+                        []
+                    ),
                 ],
             ],
             'entrypoint' => 'schools_rank',

@@ -284,6 +284,45 @@ export namespace types {
       );
     }
 
+    export function ProblemDetailsPayload(
+      elementId: string = 'payload',
+    ): types.ProblemDetailsPayload {
+      return (x => {
+        x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
+        if (x.problemsetter)
+          x.problemsetter = (x => {
+            if (x.creation_date)
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
+        if (x.runs)
+          x.runs = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.runs);
+        if (x.solvers)
+          x.solvers = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.solvers);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ProblemEditPayload(
       elementId: string = 'payload',
     ): types.ProblemEditPayload {
@@ -503,6 +542,7 @@ export namespace types {
     isReviewer: boolean;
     gravatarURL51: string;
     currentUsername: string;
+    userClassname: string;
     profileProgress: number;
     isMainUserIdentity: boolean;
     isAdmin: boolean;
@@ -786,6 +826,77 @@ export namespace types {
     visits: number;
   }
 
+  export interface ProblemDetailsPayload {
+    accepted: number;
+    admin?: boolean;
+    alias: string;
+    commit: string;
+    creation_date: Date;
+    difficulty?: number;
+    email_clarifications: boolean;
+    histogram: {
+      difficulty: number;
+      difficulty_histogram?: string;
+      quality: number;
+      quality_histogram?: string;
+    };
+    input_limit: number;
+    languages: string[];
+    order: string;
+    points: number;
+    preferred_language?: string;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
+    quality_seal: boolean;
+    runs?: {
+      alias: string;
+      contest_score?: number;
+      guid: string;
+      language: string;
+      memory: number;
+      penalty: number;
+      runtime: number;
+      score: number;
+      status: string;
+      submit_delay: number;
+      time: Date;
+      username: string;
+      verdict: string;
+    }[];
+    score: number;
+    settings: {
+      cases: { [key: string]: { in: string; out: string; weight?: number } };
+      limits: {
+        ExtraWallTime?: number | string;
+        MemoryLimit: number | string;
+        OutputLimit?: number | string;
+        OverallWallTimeLimit: string;
+        TimeLimit: string;
+      };
+      validator: { name: string; tolerance?: number };
+    };
+    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+    solution_status?: string;
+    solvers?: {
+      language: string;
+      memory: number;
+      runtime: number;
+      time: Date;
+      username: string;
+    }[];
+    source?: string;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
+    submissions: number;
+    title: string;
+    user: { admin: boolean; logged_in: boolean; reviewer: boolean };
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
   export interface ProblemEditPayload {
     alias: string;
     allowUserAddTags: boolean;
@@ -986,7 +1097,6 @@ export namespace types {
   }
 
   export interface Run {
-    run_id: number;
     guid: string;
     language: string;
     status: string;
@@ -995,7 +1105,7 @@ export namespace types {
     penalty: number;
     memory: number;
     score: number;
-    contest_score: number;
+    contest_score?: number;
     judged_by?: string;
     time: Date;
     submit_delay: number;
@@ -1069,6 +1179,7 @@ export namespace types {
     rank: types.School[];
     totalRows: number;
     showHeader: boolean;
+    pagerItems: types.PageItem[];
   }
 
   export interface SchoolUser {
@@ -1203,6 +1314,7 @@ export namespace types {
     length: number;
     page: number;
     ranking: types.UserRank;
+    pagerItems: types.PageItem[];
   }
 }
 
@@ -1967,7 +2079,6 @@ export namespace messages {
   export type _CourseRunsServerResponse = any;
   export type CourseRunsResponse = {
     runs: {
-      run_id: number;
       guid: string;
       language: string;
       status: string;
@@ -2337,7 +2448,7 @@ export namespace messages {
   export type ProblemRunsResponse = {
     runs: {
       alias: string;
-      classname?: string;
+      classname: string;
       contest_alias?: string;
       contest_score?: number;
       country_id?: string;
@@ -2346,7 +2457,6 @@ export namespace messages {
       language: string;
       memory: number;
       penalty: number;
-      run_id?: number;
       runtime: number;
       score: number;
       status: string;
@@ -2665,6 +2775,7 @@ export namespace messages {
       type?: string;
       username: string;
       verdict: string;
+      status: string;
     }[];
   };
   export type RunRejudgeRequest = { [key: string]: any };
@@ -2744,6 +2855,7 @@ export namespace messages {
       email?: string;
       user?: dao.Users;
       identity?: dao.Identities;
+      classname: string;
       auth_token?: string;
       is_admin: boolean;
     };

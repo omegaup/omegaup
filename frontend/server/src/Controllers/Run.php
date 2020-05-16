@@ -1351,7 +1351,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of latest runs overall
      *
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string}>}
+     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string, status: string}>}
      *
      * @omegaup-request-param mixed $language
      * @omegaup-request-param int $offset
