@@ -9,7 +9,7 @@
 
     <link rel="stylesheet" href="{version_hash src="/third_party/css/reset.css"}" />
     <link rel="stylesheet" href="{version_hash src="/css/common.css"}" />
-    <link rel="stylesheet" href="{version_hash src="/ux/arena.css"}" />
+    <link rel="stylesheet" href="{version_hash src="/css/arena.css"}" />
     <link rel="stylesheet" href="{version_hash src="/css/report.css"}" />
   </head>
   <body id="report">
