@@ -1,1 +1,2 @@
-{include file='arena.scoreboard.tpl' jsfile={version_hash src='/ux/scoreboard.js'} titleClassName="contest-title" inline}
+{include file='arena.scoreboard.tpl' jsfile=null titleClassName="contest-title" inline}
+{js_include entrypoint="arena_scoreboard"}
