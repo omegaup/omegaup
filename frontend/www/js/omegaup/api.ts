@@ -19,13 +19,20 @@ export function apiCall<
           ? {
               method: 'POST',
               body: Object.keys(params)
-                .filter(key => typeof params[key] !== 'undefined')
-                .map(
+                .filter(
                   key =>
-                    `${encodeURIComponent(key)}=${encodeURIComponent(
-                      params[key],
-                    )}`,
+                    params[key] !== null && typeof params[key] !== 'undefined',
                 )
+                .map(key => {
+                  if (params[key] instanceof Date) {
+                    return `${encodeURIComponent(key)}=${encodeURIComponent(
+                      Math.round(params[key].getTime() / 1000),
+                    )}`;
+                  }
+                  return `${encodeURIComponent(key)}=${encodeURIComponent(
+                    params[key],
+                  )}`;
+                })
                 .join('&'),
               headers: {
                 'Content-Type':

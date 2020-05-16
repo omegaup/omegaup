@@ -134,6 +134,7 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
       isReviewer: false,
       gravatarURL51: '',
       currentUsername: '',
+      userClassname: 'user-rank-unranked',
       profileProgress: 0,
       isMainUserIdentity: false,
       isAdmin: false,
