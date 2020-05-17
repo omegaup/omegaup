@@ -1125,6 +1125,7 @@ const translations: { [key: string]: string; } = {
   wordsAssignment: "Trabajo",
   wordsAssignments: "Tareas",
   wordsAuthor: "Autor",
+  wordsAutoAccepted: "El usuario ha sido invitado explicamente al concurso",
   wordsBack: "Atr\u00e1s",
   wordsBadgesObtained: "Insignias obtenidas",
   wordsBadgesSeeAll: "Ver todas las insignias disponibles",

@@ -705,6 +705,22 @@ export namespace types {
     }[];
   }
 
+  export interface InteractiveSettings {
+    idl: string;
+    module_name: string;
+    language: string;
+    main_source: string;
+    templates: { [key: string]: string };
+  }
+
+  export interface LimitsSettings {
+    ExtraWallTime: string;
+    MemoryLimit: number | string;
+    OutputLimit: number | string;
+    OverallWallTimeLimit: string;
+    TimeLimit: string;
+  }
+
   export interface Notification {
     contents: types.NotificationContents;
     notification_id: number;
@@ -783,29 +799,7 @@ export namespace types {
       verdict: string;
     }[];
     score: number;
-    settings: {
-      cases: { [key: string]: { in: string; out: string; weight?: number } };
-      limits: {
-        ExtraWallTime: string;
-        MemoryLimit: number | string;
-        OutputLimit: number | string;
-        OverallWallTimeLimit: string;
-        TimeLimit: string;
-      };
-      slow: boolean;
-      validator: {
-        custom_validator: { limits: { TimeLimit: number } };
-        limits?: {
-          ExtraWallTime: string;
-          MemoryLimit: number | string;
-          OutputLimit: number | string;
-          OverallWallTimeLimit: string;
-          TimeLimit: string;
-        };
-        name: string;
-        tolerance: number;
-      };
-    };
+    settings: types.ProblemSettings;
     solvers?: {
       language: string;
       memory: number;
@@ -814,11 +808,7 @@ export namespace types {
       username: string;
     }[];
     source?: string;
-    statement: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
+    statement: types.ProblemStatement;
     submissions: number;
     title: string;
     version: string;
@@ -863,17 +853,7 @@ export namespace types {
       verdict: string;
     }[];
     score: number;
-    settings: {
-      cases: { [key: string]: { in: string; out: string; weight?: number } };
-      limits: {
-        ExtraWallTime?: number | string;
-        MemoryLimit: number | string;
-        OutputLimit?: number | string;
-        OverallWallTimeLimit: string;
-        TimeLimit: string;
-      };
-      validator: { name: string; tolerance?: number };
-    };
+    settings: types.ProblemSettings;
     shouldShowFirstAssociatedIdentityRunWarning?: boolean;
     solution_status?: string;
     solvers?: {
@@ -884,11 +864,7 @@ export namespace types {
       username: string;
     }[];
     source?: string;
-    statement: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
+    statement: types.ProblemStatement;
     submissions: number;
     title: string;
     user: { admin: boolean; logged_in: boolean; reviewer: boolean };
@@ -909,11 +885,7 @@ export namespace types {
     overallWallTimeLimit: number;
     problemsetter?: { creation_date?: Date; name: string; username: string };
     source: string;
-    statement: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
+    statement: types.ProblemStatement;
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };
@@ -990,11 +962,7 @@ export namespace types {
     alias: string;
     problemsetter?: { creation_date?: Date; name: string; username: string };
     source?: string;
-    statement: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
+    statement: types.ProblemStatement;
     title?: string;
   }
 
@@ -1008,6 +976,27 @@ export namespace types {
     problemAlias: string;
     solved: boolean;
     tried: boolean;
+  }
+
+  export interface ProblemSettings {
+    cases: { [key: string]: { in: string; out: string; weight?: number } };
+    limits: types.LimitsSettings;
+    interactive?: types.InteractiveSettings;
+    validator: {
+      name: string;
+      tolerance?: number;
+      custom_validator?: {
+        source: string;
+        language: string;
+        limits?: types.LimitsSettings;
+      };
+    };
+  }
+
+  export interface ProblemStatement {
+    images: { [key: string]: string };
+    language: string;
+    markdown: string;
   }
 
   export interface ProblemTagsPayload {
@@ -1117,6 +1106,14 @@ export namespace types {
     contest_alias?: string;
   }
 
+  export interface RunMetadata {
+    verdict: string;
+    time: number;
+    sys_time: number;
+    wall_time: number;
+    memory: number;
+  }
+
   export interface School {
     country_id?: string;
     name: string;
@@ -1214,19 +1211,13 @@ export namespace types {
         cases?: {
           contest_score: number;
           max_score: number;
-          meta: { status: string };
+          meta: types.RunMetadata;
           name?: string;
           out_diff: string;
           score: number;
           verdict: string;
         }[];
-        details: {
-          groups: {
-            cases: {
-              meta: { memory: number; time: number; wall_time: number };
-            }[];
-          }[];
-        };
+        details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
       };
       runs: number;
     }[];
@@ -1663,19 +1654,13 @@ export namespace messages {
           cases?: {
             contest_score: number;
             max_score: number;
-            meta: { status: string };
+            meta: types.RunMetadata;
             name?: string;
             out_diff: string;
             score: number;
             verdict: string;
           }[];
-          details: {
-            groups: {
-              cases: {
-                meta: { memory: number; time: number; wall_time: number };
-              }[];
-            }[];
-          };
+          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
         };
         runs: number;
       }[];
@@ -1738,19 +1723,13 @@ export namespace messages {
           cases?: {
             contest_score: number;
             max_score: number;
-            meta: { status: string };
+            meta: types.RunMetadata;
             name?: string;
             out_diff: string;
             score: number;
             verdict: string;
           }[];
-          details: {
-            groups: {
-              cases: {
-                meta: { memory: number; time: number; wall_time: number };
-              }[];
-            }[];
-          };
+          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
         };
         runs: number;
       }[];
@@ -1917,19 +1896,13 @@ export namespace messages {
           cases?: {
             contest_score: number;
             max_score: number;
-            meta: { status: string };
+            meta: types.RunMetadata;
             name?: string;
             out_diff: string;
             score: number;
             verdict: string;
           }[];
-          details: {
-            groups: {
-              cases: {
-                meta: { memory: number; time: number; wall_time: number };
-              }[];
-            }[];
-          };
+          details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
         };
         runs: number;
       }[];
@@ -2383,29 +2356,7 @@ export namespace messages {
       verdict: string;
     }[];
     score?: number;
-    settings?: {
-      cases: { [key: string]: { in: string; out: string; weight?: number } };
-      limits: {
-        ExtraWallTime: string;
-        MemoryLimit: number | string;
-        OutputLimit: number | string;
-        OverallWallTimeLimit: string;
-        TimeLimit: string;
-      };
-      slow: boolean;
-      validator: {
-        custom_validator: { limits: { TimeLimit: number } };
-        limits?: {
-          ExtraWallTime: string;
-          MemoryLimit: number | string;
-          OutputLimit: number | string;
-          OverallWallTimeLimit: string;
-          TimeLimit: string;
-        };
-        name: string;
-        tolerance: number;
-      };
-    };
+    settings?: types.ProblemSettings;
     solvers?: {
       language: string;
       memory: number;
@@ -2414,11 +2365,7 @@ export namespace messages {
       username: string;
     }[];
     source?: string;
-    statement?: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
+    statement?: types.ProblemStatement;
     submissions?: number;
     title?: string;
     version?: string;
@@ -2486,11 +2433,7 @@ export namespace messages {
   export type ProblemSolutionRequest = { [key: string]: any };
   export type ProblemSolutionResponse = {
     exists: boolean;
-    solution?: {
-      language: string;
-      markdown: string;
-      images: { [key: string]: string };
-    };
+    solution?: types.ProblemStatement;
   };
   export type ProblemStatsRequest = { [key: string]: any };
   export type ProblemStatsResponse = {
@@ -2574,13 +2517,7 @@ export namespace messages {
     nominator: { name?: string; username: string };
     original_contents?: {
       source?: string;
-      statements: {
-        [key: string]: {
-          language: string;
-          markdown: string;
-          images: { [key: string]: string };
-        };
-      };
+      statements: { [key: string]: types.ProblemStatement };
       tags?: { source: string; name: string }[];
     };
     problem: { alias: string; title: string };
@@ -2712,21 +2649,13 @@ export namespace messages {
     alias: string;
     compile_error?: string;
     details?: {
-      compile_meta?: {
-        [key: string]: {
-          memory: number;
-          sys_time: number;
-          time: number;
-          verdict: string;
-          wall_time: number;
-        };
-      };
+      compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
       groups?: {
         cases: {
           contest_score: number;
           max_score: number;
-          meta: { verdict: string };
+          meta: types.RunMetadata;
           name: string;
           score: number;
           verdict: string;
@@ -2775,6 +2704,7 @@ export namespace messages {
       type?: string;
       username: string;
       verdict: string;
+      status: string;
     }[];
   };
   export type RunRejudgeRequest = { [key: string]: any };
@@ -2783,21 +2713,13 @@ export namespace messages {
   export type RunSourceResponse = {
     compile_error?: string;
     details?: {
-      compile_meta?: {
-        [key: string]: {
-          memory: number;
-          sys_time: number;
-          time: number;
-          verdict: string;
-          wall_time: number;
-        };
-      };
+      compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
       groups?: {
         cases: {
           contest_score: number;
           max_score: number;
-          meta: { verdict: string };
+          meta: types.RunMetadata;
           name: string;
           score: number;
           verdict: string;

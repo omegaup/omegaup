@@ -15,6 +15,7 @@
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score?: float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country_id: null|string, contest_alias: null|string}
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  */
 class Contest extends \OmegaUp\Controllers\Controller {
     const SHOW_INTRO = true;
@@ -859,7 +860,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contestAdmin = false;
         $contestAlias = '';
 
-        // If the contest has not started, user should not see it, unless it i
+        // If the contest has not started, user should not see it, unless it is
         // admin or has a token.
         if (is_null($r['token'])) {
             // Crack the request to get the current user
@@ -2543,21 +2544,86 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail'],
             $r->identity
         );
+        if (is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'userNotFound'
+            );
+        }
 
-        // Save the contest to the DB
-        \OmegaUp\DAO\ProblemsetIdentities::replace(
-            new \OmegaUp\DAO\VO\ProblemsetIdentities([
-                'problemset_id' => $contest->problemset_id,
-                'identity_id' => $identity->identity_id,
-                'access_time' => null,
-                'end_time' => null,
-                'score' => 0,
-                'time' => 0,
-                'is_invited' => true,
-            ])
-        );
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
+
+            // Save the contest to the DB
+            \OmegaUp\DAO\ProblemsetIdentities::replace(
+                new \OmegaUp\DAO\VO\ProblemsetIdentities([
+                    'problemset_id' => $contest->problemset_id,
+                    'identity_id' => $identity->identity_id,
+                    'access_time' => null,
+                    'end_time' => null,
+                    'score' => 0,
+                    'time' => 0,
+                    'is_invited' => true,
+                ])
+            );
+
+            if ($contest->admission_mode === 'registration') {
+                // Pre-accept user
+                self::preAcceptAccessRequest(
+                    $contest,
+                    [$identity->identity_id],
+                    $r->user
+                );
+            }
+            // End transaction
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+
+            throw $e;
+        }
 
         return ['status' => 'ok'];
+    }
+
+    /**
+     * @param list<int> $identitiesIDs
+     */
+    private static function preAcceptAccessRequest(
+        \OmegaUp\DAO\VO\Contests $contest,
+        array $identitiesIDs,
+        \OmegaUp\DAO\VO\Users $admin
+    ): void {
+        $time = \OmegaUp\Time::get();
+        $note = \OmegaUp\Translations::getInstance()->get(
+            'wordsAutoAccepted'
+        ) ?: 'wordsAutoAccepted';
+        foreach ($identitiesIDs as $identityID) {
+            if (
+                \OmegaUp\DAO\ProblemsetIdentityRequest::replace(
+                    new \OmegaUp\DAO\VO\ProblemsetIdentityRequest([
+                        'identity_id' => $identityID,
+                        'problemset_id' => $contest->problemset_id,
+                        'request_time' => $time,
+                        'last_update' => $time,
+                        'accepted' => true,
+                        'extra_note' => $note,
+                    ])
+                ) > 0
+            ) {
+                // Save this action in the history
+                \OmegaUp\DAO\ProblemsetIdentityRequestHistory::create(
+                    new \OmegaUp\DAO\VO\ProblemsetIdentityRequestHistory([
+                        'identity_id' => $identityID,
+                        'problemset_id' => $contest->problemset_id,
+                        'time' => $time,
+                        'admin_id' => $admin->user_id,
+                        'accepted' => true,
+                    ])
+                );
+            }
+        }
     }
 
     /**
@@ -2990,7 +3056,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -3022,7 +3088,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
      */
     private static function getScoreboard(
         \OmegaUp\DAO\VO\Contests $contest,
@@ -3575,6 +3641,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         self::forbiddenInVirtual($contest);
 
         $updateProblemset = true;
+        $updateRequests = false;
         // Update contest DAO
         if (!is_null($r['admission_mode'])) {
             \OmegaUp\Validators::validateOptionalInEnum(
@@ -3592,6 +3659,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
 
             $contest->admission_mode = $r['admission_mode'];
+            $updateRequests = $r['admission_mode'] === 'registration';
             // Problemset does not update when admission mode change
             $updateProblemset = false;
         }
@@ -3665,6 +3733,40 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);
+            }
+
+            if ($updateRequests) {
+                // Save the problemset object with data sent by user to the database
+                $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                    intval($contest->problemset_id)
+                );
+                if (
+                    is_null($problemset)
+                    || is_null($problemset->problemset_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemsetNotFound'
+                    );
+                }
+                // Get the list of contestants
+                $identities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset(
+                    $problemset->problemset_id
+                );
+                // Extract IDs
+                $identitiesIDs = array_map(
+                    /**
+                     * @param array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string} $identity
+                     */
+                    function ($identity): int {
+                        return $identity['identity_id'];
+                    },
+                    $identities
+                );
+                self::preAcceptAccessRequest(
+                    $contest,
+                    $identitiesIDs,
+                    $r->user
+                );
             }
 
             // End transaction
@@ -4101,7 +4203,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $filterBy
      *
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
      */
     public static function apiReport(\OmegaUp\Request $r): array {
         return self::getContestReportDetails($r);
@@ -4114,7 +4216,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $filterBy
      *
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
      */
     private static function getContestReportDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -4154,7 +4256,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $filterBy
      *
-     * @return array{contestReport: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>}
+     * @return array{contestReport: list<array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>}
      */
     public static function getContestReportDetailsForSmarty(\OmegaUp\Request $r) {
         $contestReport = self::getContestReportDetails($r)['ranking'];
@@ -4272,7 +4374,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     foreach ($problemData['run_details']['cases'] as $caseData) {
                         // If case is correct
                         if (
-                            strcmp($caseData['meta']['status'], 'OK') === 0 &&
+                            strcmp($caseData['meta']['verdict'], 'OK') === 0 &&
                             strcmp($caseData['out_diff'], '') === 0
                         ) {
                             $csvRow[] = '1';

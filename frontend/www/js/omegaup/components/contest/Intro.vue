@@ -87,7 +87,7 @@
                 <p>{{ T.registrationPending }}</p>
               </div>
               <!-- Registration denied -->
-              <div v-else-if="!contest.user_registration_answered === false">
+              <div v-else-if="!contest.user_registration_accepted">
                 <p>{{ T.registrationDenied }}</p>
               </div>
             </form>
@@ -151,7 +151,6 @@ import omegaup_Countdown from '../Countdown.vue';
 export default class ContestIntro extends Vue {
   @Prop() contest!: omegaup.Contest;
   @Prop() isLoggedIn!: boolean;
-  @Prop() requestURI!: string;
   @Prop() requestsUserInformation!: string;
   @Prop() needsBasicInformation!: boolean;
   @Prop() statement!: types.PrivacyStatement;
@@ -256,7 +255,7 @@ export default class ContestIntro extends Vue {
     return `${hours}h${minutes}m`;
   }
 
-  onStartContest() {
+  onStartContest(): void {
     const request: types.ConsentStatement = {
       contest_alias: this.contest.alias,
       share_user_information: this.shareUserInformation ?? false,
