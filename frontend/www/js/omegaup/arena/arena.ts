@@ -1398,47 +1398,18 @@ export class Arena {
   }
 
   mountEditor(problem: types.ProblemsetProblem): void {
-    let self = this;
-    let lang = self.elements.submitForm.language.val();
+    const lang = <string>(this.elements.submitForm.language.val() ?? '');
     let template = '';
-    if (problem.templates && lang && problem.templates[lang]) {
-      template = problem.templates[lang];
+    if (lang && problem.settings?.interactive?.templates?.[lang]) {
+      template = problem.settings.interactive.templates[lang];
     }
-    if (self.codeEditor) {
-      self.codeEditor.code = template;
+    if (this.codeEditor) {
+      this.codeEditor.code = template;
       return;
     }
 
-    self.codeEditor = new Vue({
-      el: self.elements.submitForm.code[0],
-      data: {
-        language: lang,
-        code: template,
-      },
-      methods: {
-        refresh: () => {
-          // It's possible for codeMirror not to have been set yet
-          // if this method is used before the mounted event handler
-          // is called.
-          if (this.codeMirror) {
-            this.codeMirror.refresh();
-          }
-        },
-      },
-      mounted: function() {
-        // Wait for sub-components to be mounted...
-        this.$nextTick(() => {
-          // ... and then fish out a reference to the wrapped
-          // CodeMirror instance.
-          //
-          // The full path is:
-          // - this: this unnamed component
-          // - $children[0]: CodeView instance
-          // - $refs['cm-wrapper']: vue-codemirror instance
-          // - editor: the actual CodeMirror instance
-          this.codeMirror = this.$children[0].$refs['cm-wrapper'].editor;
-        });
-      },
+    const codeEditor = (this.codeEditor = new Vue({
+      el: this.elements.submitForm.code[0],
       render: function(createElement) {
         return createElement('omegaup-arena-code-view', {
           props: {
@@ -1446,19 +1417,28 @@ export class Arena {
             value: this.code,
           },
           on: {
-            input: value => {
-              this.code = value;
+            input: (value: string) => {
+              codeEditor.code = value;
             },
-            change: value => {
-              this.code = value;
+            change: (value: string) => {
+              codeEditor.code = value;
             },
           },
         });
       },
+      data: {
+        language: lang,
+        code: template,
+      },
+      methods: {
+        refresh: () => {
+          (<arena_CodeView>codeEditor.$children[0]).refresh();
+        },
+      },
       components: {
         'omegaup-arena-code-view': arena_CodeView,
       },
-    });
+    }));
   }
 
   onHashChanged() {
