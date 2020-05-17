@@ -181,7 +181,9 @@ export default class ArenaAdmin {
         rowcount: this.arena.clarificationsRowcount,
       })
         .then(time.remoteTimeAdapter)
-        .then(response => this.arena.clarificationsChange(response))
+        .then(response =>
+          this.arena.clarificationsChange(response.clarifications),
+        )
         .catch(ui.apiError);
     } else {
       this.arena.refreshClarifications();

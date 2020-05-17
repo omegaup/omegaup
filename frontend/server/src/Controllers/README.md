@@ -2607,9 +2607,9 @@ Entry point for Problem clarifications API
 
 ### Returns
 
-| Name             | Type                                                                                                                                   |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `clarifications` | `{ clarification_id: number; contest_alias: string; author: string; message: string; time: Date; answer: string; public: boolean; }[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/problem/create/`
 
