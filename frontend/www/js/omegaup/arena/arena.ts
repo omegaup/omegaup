@@ -568,35 +568,42 @@ export class Arena {
     }
   }
 
-  problemsetLoaded(problemset: types.Problemset) {
-    let self = this;
-    if (problemset.status == 'error') {
-      if (!OmegaUp.loggedIn) {
-        window.location = '/login/?redirect=' + escape(window.location);
-      } else if (problemset.start_time) {
-        let f = ((x, y) => {
-          return () => {
-            let t = new Date();
-            self.elements.loadingOverlay.html(
-              `${x} ${time.formatDelta(y.getTime() - t.getTime())}`,
-            );
-            if (t.getTime() < y.getTime()) {
-              setTimeout(f, 1000);
-            } else {
-              api.Problemset.details({ problemset_id: x })
-                .then(problemsetLoaded.bind(self))
-                .catch(ui.ignoreError);
-            }
-          };
-        })(self.options.problemsetId, problemset.start_time);
-        setTimeout(f, 1000);
-      } else {
-        self.elements.loadingOverlay.html('404');
-      }
+  problemsetLoadedError(e: { start_time?: string }): void {
+    console.error(e);
+    if (!OmegaUp.loggedIn) {
+      window.location.href = `/login/?redirect=${encodeURIComponent(
+        window.location.pathname,
+      )}`;
       return;
     }
+    if (e.start_time) {
+      const problemsetId = this.options.problemsetId;
+      const problemsetStartTime = time.remoteDate(new Date(e.start_time));
+
+      const problemsetCallback = () => {
+        const now = Date.now();
+        this.elements.loadingOverlay.text(
+          `${problemsetId} ${time.formatDelta(
+            problemsetStartTime.getTime() - now,
+          )}`,
+        );
+        if (now < problemsetStartTime.getTime()) {
+          setTimeout(problemsetCallback, 1000);
+        } else {
+          api.Problemset.details({ problemset_id: problemsetId })
+            .then(result => this.problemsetLoaded(result))
+            .catch(e => this.problemsetLoadedError(e));
+        }
+      };
+      setTimeout(problemsetCallback, 1000);
+      return;
+    }
+    this.elements.loadingOverlay.html('404');
+  }
+
+  problemsetLoaded(problemset: types.Problemset): void {
     if (
-      self.options.isPractice &&
+      this.options.isPractice &&
       problemset.finish_time &&
       Date.now() < problemset.finish_time.getTime()
     ) {
@@ -604,40 +611,40 @@ export class Arena {
       return;
     }
 
-    if (problemset.hasOwnProperty('problemset_id')) {
-      self.options.problemsetId = problemset.problemset_id;
+    if (typeof problemset.problemset_id !== 'undefined') {
+      this.options.problemsetId = problemset.problemset_id;
     }
 
-    if (problemset.hasOwnProperty('original_contest_alias')) {
-      self.options.originalContestAlias = problemset.original_contest_alias;
+    if (typeof problemset.original_contest_alias !== 'undefined') {
+      this.options.originalContestAlias = problemset.original_contest_alias;
     }
 
-    if (problemset.hasOwnProperty('original_problemset_id')) {
-      self.options.originalProblemsetId = problemset.original_problemset_id;
+    if (typeof problemset.original_problemset_id !== 'undefined') {
+      this.options.originalProblemsetId = problemset.original_problemset_id;
     }
 
     $('#title .contest-title').html(
       ui.escape(problemset.title || problemset.name),
     );
-    self.updateSummary(problemset);
-    self.submissionGap = parseInt(problemset.submission_gap);
+    this.updateSummary(problemset);
+    this.submissionGap = parseInt(problemset.submission_gap);
 
-    if (!(self.submissionGap > 0)) self.submissionGap = 0;
+    if (!(this.submissionGap > 0)) this.submissionGap = 0;
 
-    self.initClock(
+    this.initClock(
       problemset.start_time,
       problemset.finish_time,
       problemset.submission_deadline,
     );
-    self.initProblems(problemset);
+    this.initProblems(problemset);
 
-    let problemSelect = $('select', self.elements.clarification);
+    let problemSelect = $('select', this.elements.clarification);
     for (let idx in problemset.problems) {
       let problem = problemset.problems[idx];
       let problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
-      if (self.navbarProblems) {
-        self.navbarProblems.problems.push({
+      if (this.navbarProblems) {
+        this.navbarProblems.problems.push({
           alias: problem.alias,
           text: problemName,
           acceptsSubmissions: problem.languages !== '',
@@ -652,22 +659,23 @@ export class Arena {
         .appendTo(problemSelect);
     }
 
-    if (!self.options.isPractice && !self.options.isInterview) {
-      self.setupPolls();
+    if (!this.options.isPractice && !this.options.isInterview) {
+      this.setupPolls();
     }
 
     // Trigger the event (useful on page load).
-    self.onHashChanged();
+    this.onHashChanged();
 
-    self.elements.loadingOverlay.fadeOut('slow');
+    this.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
 
     if (
       typeof problemset.courseAssignments !== 'undefined' &&
       document.getElementById('arena-navbar-assignments') !== null &&
-      self.navbarAssignments === null
+      this.navbarAssignments === null
     ) {
-      self.navbarAssignments = new Vue({
+      const courseAlias = this.options.courseAlias;
+      this.navbarAssignments = new Vue({
         el: '#arena-navbar-assignments',
         render: function(createElement) {
           return createElement('omegaup-arena-navbar-assignments', {
@@ -677,9 +685,7 @@ export class Arena {
             },
             on: {
               'navigate-to-assignment': (assignmentAlias: string) => {
-                window.location.pathname = `/course/${
-                  self.options.courseAlias
-                }/assignment/${assignmentAlias}/${
+                window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAlias}/${
                   problemset.admin ? 'admin/' : ''
                 }`;
               },
@@ -693,24 +699,22 @@ export class Arena {
     }
   }
 
-  initProblems(problemset: types.Problemset) {
-    let self = this;
-    self.currentProblemset = problemset;
-    self.problemsetAdmin = problemset.admin;
-    self.myRunsList.isProblemsetOpened =
-      !problemset.hasOwnProperty('opened') || problemset.opened;
-    let problems = problemset.problems;
-    for (let i = 0; i < problems.length; i++) {
-      let problem = problems[i];
+  initProblems(problemset: types.Problemset): void {
+    this.currentProblemset = problemset;
+    this.problemsetAdmin = problemset.admin ?? false;
+    this.myRunsList.isProblemsetOpened =
+      !problemset.hasOwnProperty('opened') || (problemset.opened ?? false);
+    const problems = problemset.problems ?? [];
+    for (const problem of problems) {
       let alias = problem.alias;
       if (typeof problem.runs === 'undefined') {
         problem.runs = [];
       }
-      self.problems[alias] = problem;
+      this.problems[alias] = problem;
     }
-    if (self.scoreboard) {
-      self.scoreboard.problems = problems;
-      self.scoreboard.showPenalty = problemset.show_penalty;
+    if (this.scoreboard) {
+      this.scoreboard.problems = problems;
+      this.scoreboard.showPenalty = problemset.show_penalty;
     }
   }
 
