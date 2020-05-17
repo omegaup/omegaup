@@ -543,7 +543,7 @@ const translations: { [key: string]: string; } = {
   navRecent: "(La7357 ac7ivi7y)",
   navSchoolOfTheMonth: "(Sch001 0f 7h3 M0n7h)",
   navSchoolRanking: "(Sch001 ranking)",
-  navSeeAllBadges: "(S33 a11 badg35)",
+  navSeeBadges: "(S33 badg35)",
   navTutorials: "(Tu70ria15)",
   navUserRanking: "(U53r ranking)",
   navViewProfile: "(My pr0fi13)",
