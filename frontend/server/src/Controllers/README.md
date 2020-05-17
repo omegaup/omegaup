@@ -1925,9 +1925,9 @@ Returns all runs for a course
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                               |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ guid: string; language: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; judged_by: string; time: Date; submit_delay: number; type: string; username: string; classname: string; alias: string; country_id: string; contest_alias: string; }[]` |
+| Name   | Type          |
+| ------ | ------------- |
+| `runs` | `types.Run[]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2670,35 +2670,35 @@ Entry point for Problem Details API
 
 ### Returns
 
-| Name                   | Type                                                                                                                                                                                                                                |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `accepted`             | `number`                                                                                                                                                                                                                            |
-| `admin`                | `boolean`                                                                                                                                                                                                                           |
-| `alias`                | `string`                                                                                                                                                                                                                            |
-| `allow_user_add_tags`  | `boolean`                                                                                                                                                                                                                           |
-| `commit`               | `string`                                                                                                                                                                                                                            |
-| `creation_date`        | `Date`                                                                                                                                                                                                                              |
-| `difficulty`           | `number`                                                                                                                                                                                                                            |
-| `email_clarifications` | `boolean`                                                                                                                                                                                                                           |
-| `exists`               | `boolean`                                                                                                                                                                                                                           |
-| `input_limit`          | `number`                                                                                                                                                                                                                            |
-| `languages`            | `string[]`                                                                                                                                                                                                                          |
-| `order`                | `string`                                                                                                                                                                                                                            |
-| `points`               | `number`                                                                                                                                                                                                                            |
-| `preferred_language`   | `string`                                                                                                                                                                                                                            |
-| `problemsetter`        | `{ creation_date: Date; name: string; username: string; }`                                                                                                                                                                          |
-| `quality_seal`         | `boolean`                                                                                                                                                                                                                           |
-| `runs`                 | `{ alias: string; contest_score: number; guid: string; language: string; memory: number; penalty: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; username: string; verdict: string; }[]` |
-| `score`                | `number`                                                                                                                                                                                                                            |
-| `settings`             | `types.ProblemSettings`                                                                                                                                                                                                             |
-| `solvers`              | `{ language: string; memory: number; runtime: number; time: Date; username: string; }[]`                                                                                                                                            |
-| `source`               | `string`                                                                                                                                                                                                                            |
-| `statement`            | `types.ProblemStatement`                                                                                                                                                                                                            |
-| `submissions`          | `number`                                                                                                                                                                                                                            |
-| `title`                | `string`                                                                                                                                                                                                                            |
-| `version`              | `string`                                                                                                                                                                                                                            |
-| `visibility`           | `number`                                                                                                                                                                                                                            |
-| `visits`               | `number`                                                                                                                                                                                                                            |
+| Name                   | Type                                                                                     |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `accepted`             | `number`                                                                                 |
+| `admin`                | `boolean`                                                                                |
+| `alias`                | `string`                                                                                 |
+| `allow_user_add_tags`  | `boolean`                                                                                |
+| `commit`               | `string`                                                                                 |
+| `creation_date`        | `Date`                                                                                   |
+| `difficulty`           | `number`                                                                                 |
+| `email_clarifications` | `boolean`                                                                                |
+| `exists`               | `boolean`                                                                                |
+| `input_limit`          | `number`                                                                                 |
+| `languages`            | `string[]`                                                                               |
+| `order`                | `string`                                                                                 |
+| `points`               | `number`                                                                                 |
+| `preferred_language`   | `string`                                                                                 |
+| `problemsetter`        | `{ creation_date: Date; name: string; username: string; }`                               |
+| `quality_seal`         | `boolean`                                                                                |
+| `runs`                 | `types.Run[]`                                                                            |
+| `score`                | `number`                                                                                 |
+| `settings`             | `types.ProblemSettings`                                                                  |
+| `solvers`              | `{ language: string; memory: number; runtime: number; time: Date; username: string; }[]` |
+| `source`               | `string`                                                                                 |
+| `statement`            | `types.ProblemStatement`                                                                 |
+| `submissions`          | `number`                                                                                 |
+| `title`                | `string`                                                                                 |
+| `version`              | `string`                                                                                 |
+| `visibility`           | `number`                                                                                 |
+| `visits`               | `number`                                                                                 |
 
 ## `/api/problem/list/`
 
@@ -2843,9 +2843,9 @@ Entry point for Problem runs API
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                                   |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ alias: string; classname: string; contest_alias?: string; contest_score: number; country_id?: string; guid: string; judged_by?: string; language: string; memory: number; penalty: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; type?: string; username: string; verdict: string; }[]` |
+| Name   | Type          |
+| ------ | ------------- |
+| `runs` | `types.Run[]` |
 
 ## `/api/problem/runsDiff/`
 
@@ -3457,6 +3457,7 @@ Create a new run
 | Name                      | Type     |
 | ------------------------- | -------- |
 | `guid`                    | `string` |
+| `submit_delay`            | `number` |
 | `submission_deadline`     | `Date`   |
 | `nextSubmissionTimestamp` | `Date`   |
 
@@ -3522,9 +3523,9 @@ Gets a list of latest runs overall
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                                               |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ alias: string; classname: string; contest_alias: string; contest_score: number; country_id: string; guid: string; judged_by: string; language: string; memory: number; penalty: number; run_id: number; runtime: number; score: number; submit_delay: number; time: Date; type: string; username: string; verdict: string; status: string; }[]` |
+| Name   | Type          |
+| ------ | ------------- |
+| `runs` | `types.Run[]` |
 
 ## `/api/run/rejudge/`
 
@@ -3578,16 +3579,9 @@ Get basic details of a run
 
 ### Returns
 
-| Name            | Type     |
-| --------------- | -------- |
-| `alias`         | `string` |
-| `contest_score` | `number` |
-| `memory`        | `number` |
-| `penalty`       | `number` |
-| `runtime`       | `number` |
-| `score`         | `number` |
-| `submit_delay`  | `number` |
-| `time`          | `Date`   |
+```typescript
+types.Run;
+```
 
 # School
 

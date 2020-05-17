@@ -746,13 +746,12 @@ export class Arena {
     self.elements.clock.text(clock);
   }
 
-  updateRunFallback(guid) {
-    let self = this;
-    if (self.socket != null) return;
+  updateRunFallback(guid: string): void {
+    if (this.socket != null) return;
     setTimeout(() => {
       api.Run.status({ run_alias: guid })
         .then(time.remoteTimeAdapter)
-        .then(self.updateRun.bind(self))
+        .then(response => this.updateRun(response))
         .catch(ui.ignoreError);
     }, 5000);
   }
@@ -2032,26 +2031,34 @@ export class Arena {
         source: code,
       }),
     )
-      .then(run => {
+      .then(response => {
         ui.reportEvent('submission', 'submit');
         if (this.options.isLockdownMode && sessionStorage) {
-          sessionStorage.setItem(`run:${run.guid}`, code);
+          sessionStorage.setItem(`run:${response.guid}`, code);
         }
 
+        const currentProblem = this.problems[this.currentProblem.alias];
         if (!this.options.isOnlyProblem) {
           this.problems[this.currentProblem.alias].last_submission = Date.now();
           this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
-            run.nextSubmissionTimestamp;
+            response.nextSubmissionTimestamp;
         }
-        run.username = OmegaUp.username;
-        run.status = 'new';
-        run.alias = this.currentProblem.alias;
-        run.contest_score = null;
-        run.time = new Date();
-        run.penalty = 0;
-        run.runtime = 0;
-        run.memory = 0;
-        run.language = this.elements.submitForm.language.val();
+        const run = {
+          guid: response.guid,
+          submit_delay: response.submit_delay,
+          username: this.options.payload.currentUsername,
+          classname: this.options.payload.userClassname,
+          country: 'xx',
+          status: 'new',
+          alias: this.currentProblem.alias,
+          time: new Date(),
+          penalty: 0,
+          runtime: 0,
+          memory: 0,
+          verdict: 'JE',
+          score: 0,
+          language: <string>(this.elements.submitForm.language.val() ?? ''),
+        };
         this.updateRun(run);
 
         $('input', this.elements.submitForm).prop('disabled', false);
@@ -2060,9 +2067,11 @@ export class Arena {
         this.initSubmissionCountdown();
       })
       .catch(run => {
-        alert(run.error);
+        alert(run.error ?? run);
         $('input', this.elements.submitForm).prop('disabled', false);
-        ui.reportEvent('submission', 'submit-fail', run.errorname);
+        if (run.errorname) {
+          ui.reportEvent('submission', 'submit-fail', run.errorname);
+        }
       });
   }
 

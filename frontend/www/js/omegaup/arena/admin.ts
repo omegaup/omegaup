@@ -167,6 +167,7 @@ OmegaUp.on('ready', () => {
           memory: 0,
           username: arenaInstance.options.payload.currentUsername,
           classname: arenaInstance.options.payload.userClassname,
+          country: arenaInstance.options.payload.userCountry,
           language: String($('#submit select[name="language"]').val()),
           verdict: 'JE',
         });
