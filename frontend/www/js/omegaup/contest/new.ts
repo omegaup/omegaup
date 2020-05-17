@@ -2,7 +2,7 @@ import { omegaup, OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import T from '../lang';
 import Vue from 'vue';
-import contest_New from '../components/contest/NewForm.vue';
+import contest_NewForm from '../components/contest/NewForm.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -19,6 +19,8 @@ OmegaUp.on('ready', () => {
           update: false,
           initialStartTime: startTime,
           initialFinishTime: finishTime,
+          initialAlias: '',
+          initialTitle: '',
         },
         on: {
           'create-contest': (contest: omegaup.Contest): void => {
@@ -34,7 +36,7 @@ OmegaUp.on('ready', () => {
       });
     },
     components: {
-      'omegaup-contest-new': contest_New,
+      'omegaup-contest-new': contest_NewForm,
     },
   });
 });

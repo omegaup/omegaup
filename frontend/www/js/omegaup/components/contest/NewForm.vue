@@ -197,7 +197,7 @@
             ><br />
             <multiselect
               v-model="languages"
-              v-bind:options="Object.keys(availableLanguages)"
+              v-bind:options="Object.keys(allLanguages)"
               v-bind:multiple="true"
               v-bind:placeholder="T.contestNewFormLanguages"
               v-bind:close-on-select="false"
@@ -274,35 +274,46 @@ import Multiselect from 'vue-multiselect';
   },
 })
 export default class NewForm extends Vue {
-  @Prop() data!: omegaup.Contest;
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
-  @Prop() initialStartTime!: Date;
+  @Prop() initialAlias!: string;
+  @Prop() initialDescription!: string;
+  @Prop() initialFeedback!: string;
   @Prop() initialFinishTime!: Date;
+  @Prop() initialLanguages!: Array<string>;
+  @Prop() initialNeedsBasicInformation!: boolean;
+  @Prop() initialPenalty!: number;
+  @Prop() initialPenaltyType!: string;
+  @Prop() initialPointsDecayFactor!: number;
+  @Prop() initialRequestsUserInformation!: string;
+  @Prop() initialScoreboard!: number;
+  @Prop() initialShowScoreboardAfter!: boolean;
+  @Prop() initialStartTime!: Date;
+  @Prop() initialSubmissionsGap!: number;
+  @Prop() initialTitle!: string;
+  @Prop() initialWindowLength!: null | number;
 
   T = T;
-  alias = this.data?.alias ?? '';
-  availableLanguages = this.data?.available_languages ?? this.allLanguages;
-  contest = this.data ?? null;
-  description = this.data?.description ?? '';
-  feedback = this.data?.feedback ?? 'none';
-  finishTime = this.data?.finish_time ?? this.initialFinishTime;
-  scoreboard = this.data?.scoreboard ?? 100;
-  languages = this.data?.languages ?? [];
-  needsBasicInformation = this.data?.needs_basic_information ?? false;
-  penalty = this.data?.penalty ?? 0;
-  penaltyType = this.data?.penalty_type ?? 'none';
-  pointsDecayFactor = this.data?.points_decay_factor ?? 0.0;
-  requestsUserInformation = this.data?.requests_user_information ?? 'no';
-  startTime = this.data?.start_time ?? this.initialStartTime;
-  showScoreboardAfter = this.data?.show_scoreboard_after ?? true;
-  submissionsGap = this.data?.submissions_gap
-    ? this.data.submissions_gap / 60
+  alias = this.initialAlias;
+  description = this.initialDescription ?? '';
+  feedback = this.initialFeedback ?? 'none';
+  finishTime = this.initialFinishTime;
+  languages = this.initialLanguages ?? [];
+  needsBasicInformation = this.initialNeedsBasicInformation ?? false;
+  penalty = this.initialPenalty ?? 0;
+  penaltyType = this.initialPenaltyType ?? 'none';
+  pointsDecayFactor = this.initialPointsDecayFactor ?? 0.0;
+  requestsUserInformation = this.initialRequestsUserInformation ?? 'no';
+  scoreboard = this.initialScoreboard ?? 100;
+  showScoreboardAfter = this.initialShowScoreboardAfter ?? true;
+  startTime = this.initialStartTime;
+  submissionsGap = this.initialSubmissionsGap
+    ? this.initialSubmissionsGap / 60
     : 1;
-  title = this.data?.title ?? '';
+  title = this.initialTitle;
+  windowLength = this.initialWindowLength ?? null;
+  windowLengthEnabled = this.initialWindowLength !== null;
   titlePlaceHolder = '';
-  windowLength = this.data?.window_length ?? null;
-  windowLengthEnabled = this.data?.window_length ?? false;
   contestStyleDesc = '';
 
   @Watch('windowLengthEnabled')
