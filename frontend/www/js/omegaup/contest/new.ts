@@ -19,8 +19,6 @@ OmegaUp.on('ready', () => {
           update: false,
           initialStartTime: startTime,
           initialFinishTime: finishTime,
-          initialAlias: '',
-          initialTitle: '',
         },
         on: {
           'create-contest': (contest: omegaup.Contest): void => {

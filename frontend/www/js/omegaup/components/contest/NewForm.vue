@@ -276,7 +276,7 @@ import Multiselect from 'vue-multiselect';
 export default class NewForm extends Vue {
   @Prop() update!: boolean;
   @Prop() allLanguages!: string[];
-  @Prop() initialAlias!: string;
+  @Prop({ default: '' }) initialAlias!: string;
   @Prop() initialDescription!: string;
   @Prop() initialFeedback!: string;
   @Prop() initialFinishTime!: Date;
@@ -290,8 +290,8 @@ export default class NewForm extends Vue {
   @Prop() initialShowScoreboardAfter!: boolean;
   @Prop() initialStartTime!: Date;
   @Prop() initialSubmissionsGap!: number;
-  @Prop() initialTitle!: string;
-  @Prop() initialWindowLength!: null | number;
+  @Prop({ default: '' }) initialTitle!: string;
+  @Prop({ default: null }) initialWindowLength!: null | number;
 
   T = T;
   alias = this.initialAlias;
