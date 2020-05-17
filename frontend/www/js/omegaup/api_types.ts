@@ -476,8 +476,9 @@ export namespace types {
 
   export interface Clarification {
     answer?: string;
-    author: string;
+    author?: string;
     clarification_id: number;
+    contest_alias?: string;
     message: string;
     problem_alias: string;
     public: boolean;
@@ -2307,15 +2308,7 @@ export namespace messages {
   export type ProblemClarificationsRequest = { [key: string]: any };
   export type _ProblemClarificationsServerResponse = any;
   export type ProblemClarificationsResponse = {
-    clarifications: {
-      clarification_id: number;
-      contest_alias?: string;
-      author?: string;
-      message: string;
-      time: Date;
-      answer?: string;
-      public: boolean;
-    }[];
+    clarifications: types.Clarification[];
   };
   export type ProblemCreateRequest = { [key: string]: any };
   export type ProblemCreateResponse = {};
