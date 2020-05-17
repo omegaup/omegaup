@@ -192,7 +192,7 @@
                   >
                 </li>
                 <li>
-                  <a href="/badge/list/">{{ T.navSeeBadges }}</a>
+                  <a href="/badge/list/">{{ T.navViewBadges }}</a>
                 </li>
                 <li>
                   <a href="/problem/mine/">{{ T.navMyProblems }}</a>
