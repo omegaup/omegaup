@@ -1167,9 +1167,9 @@ Returns the Scoreboard events
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `events` | `{ country: string; delta: number; is_invited: boolean; total: { points: number; penalty: number; }; name: string; username: string; problem: { alias: string; points: number; penalty: number; }; }[]` |
+| Name     | Type                      |
+| -------- | ------------------------- |
+| `events` | `types.ScoreboardEvent[]` |
 
 ## `/api/contest/scoreboardMerge/`
 

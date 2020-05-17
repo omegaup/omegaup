@@ -1197,6 +1197,16 @@ export namespace types {
     title?: string;
   }
 
+  export interface ScoreboardEvent {
+    country?: string;
+    delta: number;
+    is_invited: boolean;
+    total: { points: number; penalty: number };
+    name?: string;
+    username: string;
+    problem: { alias: string; points: number; penalty: number };
+  }
+
   export interface ScoreboardRankingEntry {
     country?: string;
     is_invited: boolean;
@@ -1743,15 +1753,7 @@ export namespace messages {
   };
   export type ContestScoreboardEventsRequest = { [key: string]: any };
   export type ContestScoreboardEventsResponse = {
-    events: {
-      country?: string;
-      delta: number;
-      is_invited: boolean;
-      total: { points: number; penalty: number };
-      name?: string;
-      username: string;
-      problem: { alias: string; points: number; penalty: number };
-    }[];
+    events: types.ScoreboardEvent[];
   };
   export type ContestScoreboardMergeRequest = { [key: string]: any };
   export type ContestScoreboardMergeResponse = {

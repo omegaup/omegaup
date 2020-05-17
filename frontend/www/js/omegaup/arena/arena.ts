@@ -36,6 +36,7 @@ import {
 } from './arena_transitional';
 
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
+import * as Highcharts from 'highcharts/highstock';
 
 export { ArenaAdmin, GetOptionsFromLocation };
 
@@ -89,17 +90,17 @@ export class Arena {
   socket: EventsSocket | null = null;
 
   // The offset of each user into the ranking table.
-  currentRanking = {};
+  currentRanking: { [username: string]: number } = {};
 
   // The previous ranking information. Useful to show diffs.
-  prevRankingState = null;
+  prevRankingState: { [username: string]: { place: number } } = {};
 
   // Every time a recent event is shown, have this interval clear it after
   // 30s.
   removeRecentEventClassTimeout = null;
 
   // The last known scoreboard event stream.
-  currentEvents = null;
+  currentEvents: types.ScoreboardEvent[] = [];
 
   // The Markdown-to-HTML converter.
   markdownConverter: Markdown.Converter = markdown.markdownConverter();
@@ -191,6 +192,8 @@ export class Arena {
     | null = null;
 
   summaryView: Vue & { contest: omegaup.Contest };
+
+  rankingChart: Highcharts.Chart | null = null;
 
   constructor(options: ArenaOptions) {
     this.options = options;
@@ -800,7 +803,7 @@ export class Arena {
       (self.options.courseAlias && self.options.assignmentAlias)
     ) {
       api.Problemset.scoreboard(scoreboardParams)
-        .then(self.rankingChange.bind(self))
+        .then(response => self.rankingChange(response))
         .catch(ui.ignoreError);
     }
   }
@@ -903,8 +906,7 @@ export class Arena {
         }
 
         // Merge original contest and virtual contest scoreboard events
-        response.events = response.events.concat(originalContestEvents);
-        self.onRankingEvents(response);
+        self.onRankingEvents(response.events.concat(originalContestEvents));
       })
       .catch(ui.ignoreError);
 
@@ -935,85 +937,82 @@ export class Arena {
     }
   }
 
-  rankingChange(data, rankingEvent = true) {
-    let self = this;
-    self.onRankingChanged(data);
+  rankingChange(scoreboard: types.Scoreboard, rankingEvent = true): void {
+    this.onRankingChanged(scoreboard);
     let scoreboardEventsParams = {
       problemset_id:
-        self.options.problemsetId || self.currentProblemset.problemset_id,
+        this.options.problemsetId || this.currentProblemset.problemset_id,
     };
-    if (self.options.scoreboardToken) {
-      scoreboardEventsParams.token = self.options.scoreboardToken;
+    if (this.options.scoreboardToken) {
+      scoreboardEventsParams.token = this.options.scoreboardToken;
     }
 
     if (rankingEvent) {
       api.Problemset.scoreboardEvents(scoreboardEventsParams)
-        .then(self.onRankingEvents.bind(self))
+        .then(response => this.onRankingEvents(response.events))
         .catch(ui.ignoreError);
     }
   }
 
-  onRankingChanged(data) {
-    let self = this;
-    if (self.navbarMiniRanking) {
-      self.navbarMiniRanking.users = [];
+  onRankingChanged(scoreboard: types.Scoreboard): void {
+    if (this.navbarMiniRanking) {
+      this.navbarMiniRanking.users = [];
     }
 
-    if (self.removeRecentEventClassTimeout) {
-      clearTimeout(self.removeRecentEventClassTimeout);
-      self.removeRecentEventClassTimeout = null;
+    if (this.removeRecentEventClassTimeout) {
+      clearTimeout(this.removeRecentEventClassTimeout);
+      this.removeRecentEventClassTimeout = null;
     }
 
-    let ranking = data.ranking || [];
-    let newRanking = {};
-    let order = {};
-    let currentRankingState = {};
+    const ranking: types.ScoreboardRankingEntry[] = scoreboard.ranking || [];
+    const newRanking: { [username: string]: number } = {};
+    const order: { [problemAlias: string]: number } = {};
+    const currentRankingState: { [username: string]: { place: number } } = {};
 
-    for (let i = 0; i < data.problems.length; i++) {
-      order[data.problems[i].alias] = i;
+    for (let i = 0; i < scoreboard.problems.length; i++) {
+      order[scoreboard.problems[i].alias] = i;
     }
 
-    // Push data to ranking table
+    // Push scoreboard to ranking table
     for (let i = 0; i < ranking.length; i++) {
       let rank = ranking[i];
       newRanking[rank.username] = i;
 
       let username = ui.rankingUsername(rank);
-      currentRankingState[username] = { place: rank.place, accepted: {} };
+      currentRankingState[username] = { place: rank.place };
 
       // Update problem scores.
       let totalRuns = 0;
-      for (let alias in order) {
-        if (!order.hasOwnProperty(alias)) continue;
+      for (const alias of Object.keys(order)) {
         let problem = rank.problems[order[alias]];
         totalRuns += problem.runs;
 
         if (
-          self.problems[alias] &&
+          this.problems[alias] &&
           rank.username == OmegaUp.username &&
-          self.problems[alias].languages !== ''
+          this.problems[alias].languages !== ''
         ) {
-          const currentPoints = parseFloat(self.problems[alias].points || '0');
-          if (self.navbarProblems) {
-            const currentProblem = self.navbarProblems.problems.find(
+          const currentPoints = parseFloat(this.problems[alias].points || '0');
+          if (this.navbarProblems) {
+            const currentProblem = this.navbarProblems.problems.find(
               problem => problem.alias === alias,
             );
             currentProblem.bestScore = problem.points;
             currentProblem.maxScore = currentPoints;
           }
-          self.updateProblemScore(alias, currentPoints, problem.points);
+          this.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
 
       // update miniranking
       if (i < 10) {
-        if (self.navbarMiniRanking) {
+        if (this.navbarMiniRanking) {
           const username = ui.rankingUsername(rank);
-          self.navbarMiniRanking.users.push({
+          this.navbarMiniRanking.users.push({
             position: rank.place,
             username: username,
-            country: rank['country'],
-            classname: rank['classname'],
+            country: rank.country,
+            classname: rank.classname,
             points: rank.total.points,
             penalty: rank.total.penalty,
           });
@@ -1021,75 +1020,77 @@ export class Arena {
       }
     }
 
-    if (self.scoreboard) {
-      self.scoreboard.ranking = ranking;
-      if (data.time) {
-        self.scoreboard.lastUpdated = data.time;
+    if (this.scoreboard) {
+      this.scoreboard.ranking = ranking;
+      if (scoreboard.time) {
+        this.scoreboard.lastUpdated = scoreboard.time;
       }
     }
 
     this.currentRanking = newRanking;
     this.prevRankingState = currentRankingState;
-    self.removeRecentEventClassTimeout = setTimeout(() => {
+    this.removeRecentEventClassTimeout = setTimeout(() => {
       $('.recent-event').removeClass('recent-event');
     }, 30000);
   }
 
-  onRankingEvents(data) {
-    let dataInSeries = {};
-    let navigatorData = [[this.startTime.getTime(), 0]];
-    let series = [];
-    let usernames = {};
+  onRankingEvents(events: types.ScoreboardEvent[]): void {
+    const startTime = this.startTime?.getTime() ?? 0;
+
+    const dataInSeries: { [name: string]: number[][] } = {};
+    const navigatorData: number[][] = [[startTime, 0]];
+    const series: (Highcharts.SeriesLineOptions & { rank: number })[] = [];
+    const usernames: { [name: string]: string } = {};
 
     // Don't trust input data (data might not be sorted)
-    data.events.sort((a, b) => a.delta - b.delta);
+    events.sort((a, b) => a.delta - b.delta);
 
-    this.currentEvents = data;
+    this.currentEvents = events;
+
     // group points by person
-    for (let i = 0, l = data.events.length; i < l; i++) {
-      let curr = data.events[i];
-
+    for (const curr of events) {
       // limit chart to top n users
       if (this.currentRanking[curr.username] > scoreboardColors.length - 1)
         continue;
 
-      if (!dataInSeries[curr.name]) {
-        dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
-        usernames[curr.name] = curr.username;
+      const name = curr.name ?? curr.username;
+
+      if (!dataInSeries[name]) {
+        dataInSeries[name] = [[startTime, 0]];
+        usernames[name] = curr.username;
       }
-      dataInSeries[curr.name].push([
-        this.startTime.getTime() + curr.delta * 60 * 1000,
+      dataInSeries[name].push([
+        startTime + curr.delta * 60 * 1000,
         curr.total.points,
       ]);
 
       // check if to add to navigator
       if (curr.total.points > navigatorData[navigatorData.length - 1][1]) {
         navigatorData.push([
-          this.startTime.getTime() + curr.delta * 60 * 1000,
+          startTime + curr.delta * 60 * 1000,
           curr.total.points,
         ]);
       }
     }
 
     // convert datas to series
-    for (let i in dataInSeries) {
-      if (dataInSeries.hasOwnProperty(i)) {
-        dataInSeries[i].push([
-          this.finishTime
-            ? Math.min(this.finishTime.getTime(), Date.now())
-            : Date.now(),
-          dataInSeries[i][dataInSeries[i].length - 1][1],
-        ]);
-        series.push({
-          name: i,
-          rank: this.currentRanking[usernames[i]],
-          data: dataInSeries[i],
-          step: true,
-        });
-      }
+    for (const name of Object.keys(dataInSeries)) {
+      dataInSeries[name].push([
+        this.finishTime
+          ? Math.min(this.finishTime.getTime(), Date.now())
+          : Date.now(),
+        dataInSeries[name][dataInSeries[name].length - 1][1],
+      ]);
+      series.push({
+        type: 'line',
+        name: name,
+        rank: this.currentRanking[usernames[name]],
+        data: dataInSeries[name],
+        step: 'right',
+      });
     }
 
-    series.sort((a, b) => a.ranking - b.ranking);
+    series.sort((a, b) => a.rank - b.rank);
 
     navigatorData.push([
       this.finishTime
@@ -1100,58 +1101,63 @@ export class Arena {
     this.createChart(series, navigatorData);
   }
 
-  createChart(series, navigatorSeries) {
-    let self = this;
-    if (series.length == 0 || self.elements.ranking.length == 0) return;
+  createChart(
+    series: Highcharts.SeriesLineOptions[],
+    navigatorSeries: number[][],
+  ): void {
+    if (series.length == 0 || this.elements.ranking.length == 0) return;
 
-    Highcharts.setOptions({ colors: scoreboardColors });
+    this.rankingChart = Highcharts.stockChart(
+      <HTMLElement>document.getElementById('ranking-chart'),
+      <Highcharts.Options>{
+        chart: { height: 300, spacingTop: 20 },
 
-    window.chart = new Highcharts.StockChart({
-      chart: { renderTo: 'ranking-chart', height: 300, spacingTop: 20 },
+        colors: scoreboardColors,
 
-      xAxis: {
-        ordinal: false,
-        min: self.startTime.getTime(),
-        max: Math.min(self.finishTime.getTime(), Date.now()),
-      },
-
-      yAxis: {
-        showLastLabel: true,
-        showFirstLabel: false,
-        min: 0,
-        max: (problems => {
-          let total = 0;
-          for (let prob in problems) {
-            if (!problems.hasOwnProperty(prob)) continue;
-            total += parseInt(problems[prob].points, 10);
-          }
-          return total;
-        })(self.problems),
-      },
-
-      plotOptions: {
-        series: {
-          animation: false,
-          lineWidth: 3,
-          states: { hover: { lineWidth: 3 } },
-          marker: { radius: 5, symbol: 'circle', lineWidth: 1 },
+        xAxis: {
+          ordinal: false,
+          min: this.startTime?.getTime() ?? Date.now(),
+          max: Math.min(this.finishTime?.getTime() || Infinity, Date.now()),
         },
-      },
 
-      navigator: {
-        series: {
-          type: 'line',
-          step: true,
-          lineWidth: 3,
-          lineColor: '#333',
-          data: navigatorSeries,
+        yAxis: {
+          showLastLabel: true,
+          showFirstLabel: false,
+          min: 0,
+          max: (problems => {
+            let total = 0;
+            for (let prob in problems) {
+              if (!problems.hasOwnProperty(prob)) continue;
+              total += problems[prob].points;
+            }
+            return total;
+          })(this.problems),
         },
+
+        plotOptions: {
+          series: {
+            animation: false,
+            lineWidth: 3,
+            states: { hover: { lineWidth: 3 } },
+            marker: { radius: 5, symbol: 'circle', lineWidth: 1 },
+          },
+        },
+
+        navigator: {
+          series: {
+            type: 'line',
+            step: true,
+            lineWidth: 3,
+            lineColor: '#333',
+            data: navigatorSeries,
+          },
+        },
+
+        rangeSelector: { enabled: false },
+
+        series: series,
       },
-
-      rangeSelector: { enabled: false },
-
-      series: series,
-    });
+    );
   }
 
   refreshClarifications(): void {
