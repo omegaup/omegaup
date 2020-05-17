@@ -33,6 +33,7 @@ export interface ArenaOptions {
   isPractice: boolean;
   onlyProblemAlias: string | null;
   originalContestAlias: string | null;
+  originalProblemsetId?: number;
   payload: types.CommonPayload;
   problemsetId: number | null;
   preferredLanguage: string | null;

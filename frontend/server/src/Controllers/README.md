@@ -1143,14 +1143,9 @@ Returns the Scoreboard
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: types.RunMetadata; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+```typescript
+types.Scoreboard;
+```
 
 ## `/api/contest/scoreboardEvents/`
 
@@ -1532,14 +1527,9 @@ Gets Scoreboard for an assignment
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: types.RunMetadata; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+```typescript
+types.Scoreboard;
+```
 
 ## `/api/course/assignmentScoreboardEvents/`
 
@@ -1557,9 +1547,9 @@ Returns the Scoreboard events
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `events` | `{ country: string; delta: number; is_invited: boolean; name: string; problem: { alias: string; penalty: number; points: number; }; total: { penalty: number; points: number; }; username: string; }[]` |
+| Name     | Type                      |
+| -------- | ------------------------- |
+| `events` | `types.ScoreboardEvent[]` |
 
 ## `/api/course/clone/`
 
@@ -3173,9 +3163,9 @@ Returns the Scoreboard events
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `events` | `{ country: string; delta: number; is_invited: boolean; total: { points: number; penalty: number; }; name: string; username: string; problem: { alias: string; points: number; penalty: number; }; }[]` |
+| Name     | Type                      |
+| -------- | ------------------------- |
+| `events` | `types.ScoreboardEvent[]` |
 
 # QualityNomination
 

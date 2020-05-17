@@ -416,26 +416,6 @@ export namespace omegaup {
     totalPoints: number;
   }
 
-  export interface ScoreboardUser extends User {
-    country?: string;
-    is_invited: boolean;
-    place: number;
-    problems: ScoreboardUserProblem[];
-    total: {
-      penalty: number;
-      points: number;
-    };
-  }
-
-  export interface ScoreboardUserProblem {
-    alias: string;
-    penalty: number;
-    pending?: boolean;
-    percent: number;
-    points: number;
-    runs: number;
-  }
-
   export interface Statement {
     images: string[];
     language: string;
