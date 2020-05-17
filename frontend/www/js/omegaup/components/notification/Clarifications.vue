@@ -134,21 +134,21 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 
 @Component
 export default class Clarifications extends Vue {
-  @Prop() initialClarifications!: omegaup.Clarification[];
+  @Prop() initialClarifications!: types.Clarification[];
   T = T;
 
   flashInterval: number = 0;
-  clarifications: omegaup.Clarification[] = this.initialClarifications;
+  clarifications: types.Clarification[] = this.initialClarifications;
 
   @Watch('initialClarifications')
   onPropertyChanged(
-    newValue: Array<omegaup.Clarification>,
-    oldValue: Array<omegaup.Clarification>,
+    newValue: types.Clarification[],
+    oldValue: types.Clarification[],
   ): void {
     this.clarifications = newValue;
     const audio = <HTMLMediaElement>(
@@ -161,8 +161,8 @@ export default class Clarifications extends Vue {
 
   @Watch('clarifications')
   onPropertyChange(
-    newValue: Array<omegaup.Clarification>,
-    oldValue: Array<omegaup.Clarification>,
+    newValue: types.Clarification[],
+    oldValue: types.Clarification[],
   ): void {
     if (newValue.length > 0) {
       if (this.flashInterval) return;
@@ -177,7 +177,7 @@ export default class Clarifications extends Vue {
     }
   }
 
-  anchor(clarification: omegaup.Clarification): string {
+  anchor(clarification: types.Clarification): string {
     return `#clarifications/clarification-${clarification.clarification_id}`;
   }
 
@@ -189,7 +189,7 @@ export default class Clarifications extends Vue {
     }
   }
 
-  onCloseClicked(clarification: omegaup.Clarification): void {
+  onCloseClicked(clarification: types.Clarification): void {
     const id = `clarification-${clarification.clarification_id}`;
     this.clarifications = this.clarifications.filter(
       element => element.clarification_id !== clarification.clarification_id,

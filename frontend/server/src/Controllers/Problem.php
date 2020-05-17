@@ -5,6 +5,7 @@
 /**
  * ProblemsController
  *
+ * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
@@ -3038,7 +3039,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{clarifications: list<array{clarification_id: int, contest_alias: null|string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>}
+     * @return array{clarifications: list<Clarification>}
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         // Get user

@@ -125,16 +125,6 @@ export namespace omegaup {
     verdict: string;
   }
 
-  export interface Clarification {
-    clarification_id: number;
-    problem_alias: string;
-    author: string;
-    message: string;
-    answer?: string;
-    public: number;
-    receiver?: string;
-  }
-
   export interface CoderOfTheMonth extends Profile {
     date?: string;
     ProblemsSolved?: number;
