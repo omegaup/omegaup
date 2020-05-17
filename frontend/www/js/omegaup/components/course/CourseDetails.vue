@@ -61,7 +61,9 @@
                   <td>
                     <a
                       v-bind:href="
-                        `/course/${course.alias}/assignment/${homework.alias}`
+                        `/course/${course.alias}/assignment/${homework.alias}/${
+                          course.is_admin ? 'admin/' : ''
+                        }`
                       "
                     >
                       {{ homework.name }}
@@ -131,7 +133,9 @@
                   <td>
                     <a
                       v-bind:href="
-                        `/course/${course.alias}/assignment/${exam.alias}`
+                        `/course/${course.alias}/assignment/${exam.alias}/${
+                          course.is_admin ? 'admin/' : ''
+                        }`
                       "
                     >
                       {{ exam.name }}
