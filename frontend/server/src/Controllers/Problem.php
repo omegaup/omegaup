@@ -6,17 +6,22 @@
  * ProblemsController
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
+ * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
+ * @psalm-type ProblemSettings=array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: LimitsSettings, interactive?: InteractiveSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type Statements=array<string, string>
- * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, slow: bool, validator: array{custom_validator: array{limits: array{TimeLimit: int}}, limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}}, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemAdminsPayload=array{admins: list<ProblemAdmin>, alias: string, group_admins: list<ProblemGroupAdmin>}
- * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: string, statement: array{images: array<string, string>, language: string, markdown: string}, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
- * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime?: int|string, MemoryLimit: int|string, OutputLimit?: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance?: float}}, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
- * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: array{images: array<string, string>, language: string, markdown: string}, title: null|string}
+ * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: string, statement: ProblemStatement, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: ProblemStatement, title: null|string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -1114,95 +1119,94 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param array{limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance: float, limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}}} $a
-     * @param array{limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance: float, limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}}} $b
+     * Returns whether $a and $b are different.
+     *
+     * @param LimitsSettings $a
+     * @param LimitsSettings $b
+     */
+    private static function diffLimitsSettings(array $a, array $b): bool {
+        if (
+            self::parseDuration($a['TimeLimit']) !==
+            self::parseDuration($b['TimeLimit'])
+        ) {
+            return true;
+        }
+        if (
+            self::parseDuration($a['ExtraWallTime']) !==
+            self::parseDuration($b['ExtraWallTime'])
+        ) {
+            return true;
+        }
+        if (
+            self::parseDuration($a['OverallWallTimeLimit']) !==
+            self::parseDuration($b['OverallWallTimeLimit'])
+        ) {
+            return true;
+        }
+        if (
+            self::parseSize($a['MemoryLimit']) !==
+            self::parseSize($b['MemoryLimit'])
+        ) {
+            return true;
+        }
+        if (
+            self::parseSize($a['OutputLimit']) !==
+            self::parseSize($b['OutputLimit'])
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns whether $a and $b are different.
+     *
+     * @param array{limits: LimitsSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}} $a
+     * @param array{limits: LimitsSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}} $b
      */
     private static function diffProblemSettings(array $a, array $b): bool {
-        if (
-            self::parseDuration($a['limits']['TimeLimit']) !==
-            self::parseDuration($b['limits']['TimeLimit'])
-        ) {
-            return true;
-        }
-        if (
-            self::parseDuration($a['limits']['ExtraWallTime']) !==
-            self::parseDuration($b['limits']['ExtraWallTime'])
-        ) {
-            return true;
-        }
-        if (
-            self::parseDuration($a['limits']['OverallWallTimeLimit']) !==
-            self::parseDuration($b['limits']['OverallWallTimeLimit'])
-        ) {
-            return true;
-        }
-        if (
-            self::parseSize($a['limits']['MemoryLimit']) !==
-            self::parseSize($b['limits']['MemoryLimit'])
-        ) {
-            return true;
-        }
-        if (
-            self::parseSize($a['limits']['OutputLimit']) !==
-            self::parseSize($b['limits']['OutputLimit'])
-        ) {
+        if (self::diffLimitsSettings($a['limits'], $b['limits'])) {
             return true;
         }
         if ($a['validator']['name'] !== $b['validator']['name']) {
             return true;
         }
-        if ($a['validator']['tolerance'] !== $b['validator']['tolerance']) {
-            return true;
-        }
         if (
-            empty($a['validator']['limits']) !==
-            empty($b['validator']['limits'])
+            isset($a['validator']['tolerance']) !==
+            isset($b['validator']['tolerance'])
         ) {
             return true;
         }
-        // No further checks are necessary.
         if (
-            empty($a['validator']['limits']) ||
-            empty($b['validator']['limits'])
+            isset($a['validator']['tolerance']) &&
+            isset($b['validator']['tolerance']) &&
+            $a['validator']['tolerance'] !== $b['validator']['tolerance']
         ) {
+            return true;
+        }
+        if (
+            empty($a['validator']['custom_validator']) !==
+            empty($b['validator']['custom_validator'])
+        ) {
+            return true;
+        }
+        if (
+            empty($a['validator']['custom_validator']['limits']) !==
+            empty($b['validator']['custom_validator']['limits'])
+        ) {
+            return true;
+        }
+        if (
+            empty($a['validator']['custom_validator']['limits']) ||
+            empty($b['validator']['custom_validator']['limits'])
+        ) {
+            // No further checks are necessary.
             return false;
         }
-
-        if (
-            self::parseDuration($a['validator']['limits']['TimeLimit']) !==
-            self::parseDuration($b['validator']['limits']['TimeLimit'])
-        ) {
-            return true;
-        }
-        if (
-            self::parseDuration($a['validator']['limits']['ExtraWallTime']) !==
-            self::parseDuration($b['validator']['limits']['ExtraWallTime'])
-        ) {
-            return true;
-        }
-        if (
-            self::parseDuration(
-                $a['validator']['limits']['OverallWallTimeLimit']
-            ) !==
-            self::parseDuration(
-                $b['validator']['limits']['OverallWallTimeLimit']
-            )
-        ) {
-            return true;
-        }
-        if (
-            self::parseSize($a['validator']['limits']['MemoryLimit']) !==
-            self::parseSize($b['validator']['limits']['MemoryLimit'])
-        ) {
-            return true;
-        }
-        if (
-            self::parseSize($a['validator']['limits']['OutputLimit']) !==
-            self::parseSize($b['validator']['limits']['OutputLimit'])
-        ) {
-            return true;
-        }
-        return false;
+        return self::diffLimitsSettings(
+            $a['validator']['custom_validator']['limits'],
+            $b['validator']['custom_validator']['limits']
+        );
     }
 
     /**
@@ -1270,7 +1274,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->commit
         );
         unset($problemSettings['cases']);
-        unset($problemSettings['slow']);
         $originalProblemSettings = self::arrayDeepCopy($problemSettings);
         self::updateProblemSettings($problemSettings, $params);
         $settingsUpdated = self::diffProblemSettings(
@@ -1427,7 +1430,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             strval($problem->alias)
         );
-        /** @var array{cases: array<string, mixed>, interactive?: array{idl: string, language: string, main_source: string, module_name: string, templates: array<string, string>}, limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}} $distribSettings */
+        /** @var ProblemSettings */
         $distribSettings = json_decode(
             $problemArtifacts->get('settings.distrib.json'),
             /*assoc=*/true
@@ -1973,7 +1976,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Gets the distributable problem settings for the problem, using the cache
      * if needed.
      *
-     * @return array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|string, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float, custom_validator: array{limits: array{TimeLimit: int}}}, slow: bool}
+     * @return ProblemSettings
      */
     private static function getProblemSettingsDistrib(
         \OmegaUp\DAO\VO\Problems $problem,
@@ -1982,7 +1985,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            /** @return array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float, custom_validator: array{limits: array{TimeLimit: int}}}, slow: bool} */
+            /** @return ProblemSettings */
             function () use ($problem): array {
                 return \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
                     'alias' => strval($problem->alias),
@@ -1998,10 +2001,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @param array{alias: string, commit: string} $params
      *
-     * @return array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float, custom_validator: array{limits: array{TimeLimit: int}}}, slow: bool}
+     * @return ProblemSettings
      */
     public static function getProblemSettingsDistribImpl(array $params): array {
-        /** @var array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime: string, TimeLimit: string, OverallWallTimeLimit: string, MemoryLimit: int|int, OutputLimit: int|string}, validator: array{limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float, custom_validator: array{limits: array{TimeLimit: int}}}, slow: bool} */
+        /** @var ProblemSettings */
         return json_decode(
             (new \OmegaUp\ProblemArtifacts(
                 $params['alias'],
@@ -2147,7 +2150,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, exists: true, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, slow: bool, validator: array{custom_validator: array{limits: array{TimeLimit: int}}, limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, name: string, tolerance: float}}, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: array{images: array<string, string>, language: string, markdown: string}, submissions: int, title: string, version: string, visibility: int, visits: int}|array{exists: false}
+     * @return array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, exists: true, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}|array{exists: false}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $lang
@@ -2474,7 +2477,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{exists: bool, solution?: array{language: string, markdown: string, images: array<string, string>}}
+     * @return array{exists: bool, solution?: ProblemStatement}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param bool|null $forfeit_problem
@@ -2738,13 +2741,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problem->alias,
             $problem->commit
-        );
-
-        // Update problem fields.
-        /** @var array{Cases: list<array{Cases: list<array{Name: string, Weight: int}>, Name: string}>, Limits: array{ExtraWallTime: string, MemoryLimit: int, OutputLimit: int, OverallWallTimeLimit: string, TimeLimit: string}, Slow: null, Validator: array{Name: string, Tolerance: string, Limits: array{ExtraWallTime: string, MemoryLimit: int, OutputLimit: int, OverallWallTimeLimit: string, TimeLimit: string}}}*/
-        $problemSettings = json_decode(
-            $problemArtifacts->get('settings.json'),
-            /*assoc=*/true
         );
 
         $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
@@ -3206,7 +3202,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 /*missingOk=*/true
             );
             if (!is_null($detailsJson)) {
-                /** @var null|array{verdict: string, compile_meta: array{Main: array{verdict: string, time: float, sys_time: float, wall_time: float, memory: int}}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}}>}>} */
+                /** @var null|array{verdict: string, compile_meta: array{Main: RunMetadata}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: RunMetadata}>}>} */
                 $details = json_decode($detailsJson, /*associative=*/true);
                 if (!is_array($details)) {
                     self::$log->error(
@@ -3794,7 +3790,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a Problem settings object with default values.
      *
-     * @return array{limits: array{ExtraWallTime: string, MemoryLimit: string, OutputLimit: string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance: float}} The Problem settings object.
+     * @return array{limits: LimitsSettings, validator: array{name: string, tolerance: float}} The Problem settings object.
      */
     private static function getDefaultProblemSettings(): array {
         return [
@@ -3815,7 +3811,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates the Problem's settings with the values from the request.
      *
-     * @param array{limits: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, validator: array{name: string, tolerance: float, limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}}} $problemSettings the original problem settings.
+     * @param array{limits: LimitsSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}} $problemSettings the original problem settings.
      * @param \OmegaUp\ProblemParams $params the params
      * @psalm-suppress ReferenceConstraintViolation for some reason, psalm cannot correctly infer the type for $problemSettings['validator']['limit']
      */
@@ -3842,8 +3838,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problemSettings['validator']['name'] = "{$params->validator}";
         }
         if ($problemSettings['validator']['name'] === 'custom') {
-            if (empty($problemSettings['validator']['limits'])) {
-                $problemSettings['validator']['limits'] = [
+            if (empty($problemSettings['validator']['custom_validator'])) {
+                $problemSettings['validator']['custom_validator'] = [];
+            }
+            if (
+                empty(
+                    $problemSettings['validator']['custom_validator']['limits']
+                )
+            ) {
+                $problemSettings['validator']['custom_validator']['limits'] = [
                     'ExtraWallTime' => '0s',
                     'MemoryLimit' => '256MiB',
                     'OutputLimit' => '10KiB',
@@ -3851,10 +3854,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            $problemSettings['validator']['limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            $problemSettings['validator']['custom_validator']['limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
         } else {
-            if (!empty($problemSettings['validator']['limits'])) {
-                unset($problemSettings['validator']['limits']);
+            if (!empty($problemSettings['validator']['custom_validator'])) {
+                unset($problemSettings['validator']['custom_validator']);
             }
         }
     }
@@ -4453,7 +4456,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: string, statement: array{images: array<string, string>, language: string, markdown: string}, timeLimit: float, title: string, validator: string, validatorTimeLimit: float|int, visibility: int}
+     * @return array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: string, statement: ProblemStatement, timeLimit: float, title: string, validator: string, validatorTimeLimit: float|int, visibility: int}
      */
     private static function getProblemEditDetails(
         \OmegaUp\DAO\VO\Problems $problem,
