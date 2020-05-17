@@ -674,7 +674,11 @@ export class Arena {
             },
             on: {
               'navigate-to-assignment': (assignmentAlias: string) => {
-                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
+                window.location.pathname = `/course/${
+                  self.options.courseAlias
+                }/assignment/${assignmentAlias}/${
+                  problemset.admin ? 'admin/' : ''
+                }`;
               },
             },
           });
