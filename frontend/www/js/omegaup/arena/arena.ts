@@ -168,7 +168,7 @@ export class Arena {
 
   commonNavbar:
     | (Vue & {
-        initialClarifications: omegaup.Clarification[];
+        initialClarifications: types.Clarification[];
         graderInfo: types.GraderStatus | null;
         errorMessage: string | null;
         graderQueueLength: number;
@@ -1154,15 +1154,14 @@ export class Arena {
     });
   }
 
-  refreshClarifications() {
-    let self = this;
+  refreshClarifications(): void {
     api.Contest.clarifications({
-      contest_alias: self.options.contestAlias,
-      offset: self.clarificationsOffset,
-      rowcount: self.clarificationsRowcount,
+      contest_alias: this.options.contestAlias,
+      offset: this.clarificationsOffset,
+      rowcount: this.clarificationsRowcount,
     })
       .then(time.remoteTimeAdapter)
-      .then(self.clarificationsChange.bind(self))
+      .then(response => this.clarificationsChange(response.clarifications))
       .catch(ui.ignoreError);
   }
 
@@ -1207,7 +1206,7 @@ export class Arena {
               $('#create-response-text', answerNode).hide();
             }
           });
-          if (clarification.public == 1) {
+          if (clarification.public) {
             $('#create-response-is-public', responseFormNode).attr(
               'checked',
               'checked',
@@ -1272,39 +1271,35 @@ export class Arena {
       $('.answer pre', r).show();
       $(r).addClass('resolved');
     }
-    if (clarification.public == 1) {
+    if (clarification.public) {
       $('#create-response-is-public', r).prop('checked', true);
     }
   }
 
-  clarificationsChange(data) {
-    let self = this;
-    if (data.status != 'ok') {
-      return;
-    }
+  clarificationsChange(clarifications: types.Clarification[]): void {
     $('.clarifications tr.inserted').remove();
     if (
-      data.clarifications.length > 0 &&
-      data.clarifications.length < self.clarificationsRowcount
+      clarifications.length > 0 &&
+      clarifications.length < this.clarificationsRowcount
     ) {
-      $('#clarifications-count').html(`(${data.clarifications.length})`);
-    } else if (data.clarifications.length >= self.clarificationsRowcount) {
-      $('#clarifications-count').html(`(${data.clarifications.length}+)`);
+      $('#clarifications-count').html(`(${clarifications.length})`);
+    } else if (clarifications.length >= this.clarificationsRowcount) {
+      $('#clarifications-count').html(`(${clarifications.length}+)`);
     }
 
-    let previouslyAnswered = self.answeredClarifications;
-    self.answeredClarifications = 0;
-    self.clarifications = {};
+    let previouslyAnswered = this.answeredClarifications;
+    this.answeredClarifications = 0;
+    this.clarifications = {};
 
-    for (let i = data.clarifications.length - 1; i >= 0; i--) {
-      self.updateClarification(data.clarifications[i]);
+    for (let i = clarifications.length - 1; i >= 0; i--) {
+      this.updateClarification(clarifications[i]);
     }
 
-    if (self.commonNavbar !== null) {
-      self.commonNavbar.initialClarifications = data.clarifications
+    if (this.commonNavbar !== null) {
+      this.commonNavbar.initialClarifications = clarifications
         .filter(clarification =>
           // Removing all unsolved clarifications.
-          self.problemsetAdmin
+          this.problemsetAdmin
             ? clarification.answer === null
             : clarification.answer !== null &&
               // Removing all unanswered clarifications.
@@ -1315,8 +1310,8 @@ export class Arena {
         .reverse();
     }
     if (
-      self.answeredClarifications > previouslyAnswered &&
-      self.activeTab != 'clarifications'
+      this.answeredClarifications > previouslyAnswered &&
+      this.activeTab != 'clarifications'
     ) {
       $('#clarifications-count').css('font-weight', 'bold');
     }
