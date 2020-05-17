@@ -1212,9 +1212,8 @@ export const Problemset = {
   >('/api/problemset/scoreboard/', x => {
     if (x.finish_time)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    if (x.start_time)
-      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),
   scoreboardEvents: apiCall<

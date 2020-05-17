@@ -121,7 +121,7 @@ export class Arena {
   submissionGapInterval: number = 0;
 
   // Cache scoreboard data for virtual contest
-  originalContestScoreboardEvent = null;
+  originalContestScoreboardEvents: types.ScoreboardEvent[] | null = null;
 
   // Virtual contest refresh interval
   virtualContestRefreshInterval = null;
@@ -186,7 +186,7 @@ export class Arena {
   scoreboard:
     | (Vue & {
         problems: omegaup.Problem[];
-        ranking: omegaup.ScoreboardUser[];
+        ranking: types.ScoreboardRankingEntry[];
         lastUpdated: Date;
       })
     | null = null;
@@ -808,24 +808,29 @@ export class Arena {
     }
   }
 
-  onVirtualRankingChange(virtualContestData) {
-    let self = this;
+  onVirtualRankingChange(virtualContestData: types.Scoreboard): void {
     // This clones virtualContestData to data so that virtualContestData values
     // won't be overriden by processes below
-    let data = JSON.parse(JSON.stringify(virtualContestData));
-    let events = self.originalContestScoreboardEvent;
-    let currentDelta =
-      (new Date().getTime() - self.startTime.getTime()) / (1000 * 60);
+    const data = <types.Scoreboard>(
+      JSON.parse(JSON.stringify(virtualContestData.ranking))
+    );
+    const dataRanking = <
+      (types.ScoreboardRankingEntry & { virtual?: boolean })[]
+    >data.ranking;
+    const events = this.originalContestScoreboardEvents ?? [];
+    const currentDelta =
+      (new Date().getTime() - (this.startTime?.getTime() ?? 0)) / (1000 * 60);
 
-    for (let rank of data.ranking) rank.virtual = true;
+    for (const rank of dataRanking) rank.virtual = true;
 
-    let problemOrder = {};
-    let problems = [];
-    let initialProblems = [];
+    let problemOrder: { [problemAlias: string]: number } = {};
+    let problems: { order: number; alias: string }[] = [];
+    let initialProblems: types.ScoreboardRankingProblem[] = [];
 
-    for (let problem of Object.values(self.problems)) {
+    for (const problem of Object.values(this.problems)) {
       problemOrder[problem.alias] = problems.length;
       initialProblems.push({
+        alias: problem.alias,
         penalty: 0,
         percent: 0,
         points: 0,
@@ -835,24 +840,27 @@ export class Arena {
     }
 
     // Calculate original contest scoreboard with current delta time
-    let originalContestRanking = {};
-    let originalContestEvents = [];
+    const originalContestRanking: {
+      [username: string]: types.ScoreboardRankingEntry;
+    } = {};
+    const originalContestEvents: types.ScoreboardEvent[] = [];
 
     // Refresh after time T
     let refreshTime = 30 * 1000; // 30 seconds
 
     events.forEach(evt => {
-      let key = evt.username;
+      const key = evt.username;
       if (!originalContestRanking.hasOwnProperty(key)) {
         originalContestRanking[key] = {
           country: evt.country,
           name: evt.name,
           username: evt.username,
+          classname: evt.classname,
+          is_invited: evt.is_invited,
           problems: Array.from(initialProblems),
           total: {
             penalty: 0,
             points: 0,
-            runs: 0,
           },
           place: 0,
         };
@@ -865,40 +873,40 @@ export class Arena {
         return;
       }
       originalContestEvents.push(evt);
-      let problem =
+      const problem =
         originalContestRanking[key].problems[problemOrder[evt.problem.alias]];
       originalContestRanking[key].problems[problemOrder[evt.problem.alias]] = {
+        alias: evt.problem.alias,
         penalty: evt.problem.penalty,
         points: evt.problem.points,
-        runs: problem ? problem.runs + 1 : 1, // If problem appeared in event for than one, it
-        // means a problem has been solved multiple times
+        percent: evt.problem.points,
+        // If problem appeared in event for than one, it means a problem has
+        // been solved multiple times
+        runs: problem ? problem.runs + 1 : 1,
       };
       originalContestRanking[key].total = evt.total;
     });
     // Merge original contest scoreboard ranking with virtual contest
-    for (let ranking of Object.values(originalContestRanking))
-      data.ranking.push(ranking);
+    for (const ranking of Object.values(originalContestRanking)) {
+      dataRanking.push(ranking);
+    }
 
     // Re-sort rank
-    data.ranking.sort((rank1, rank2) => {
+    dataRanking.sort((rank1, rank2) => {
       return rank2.total.points - rank1.total.points;
     });
 
     // Override ranking
-    data.ranking.forEach((rank, index) => (rank.place = index + 1));
-    self.onRankingChanged(data);
+    dataRanking.forEach((rank, index) => (rank.place = index + 1));
+    this.onRankingChanged(data);
 
-    let scoreboardEventsParams = {
-      problemset_id: self.options.problemsetId,
-    };
-    if (self.options.scoreboardToken) {
-      scoreboardEventsParams.token = self.options.scoreboardToken;
-    }
-
-    api.Problemset.scoreboardEvents(scoreboardEventsParams)
+    api.Problemset.scoreboardEvents({
+      problemset_id: this.options.problemsetId,
+      token: this.options.scoreboardToken,
+    })
       .then(response => {
         // Change username to username-virtual
-        for (let evt of response.events) {
+        for (const evt of response.events) {
           evt.username = ui.formatString(T.virtualSuffix, {
             username: evt.username,
           });
@@ -906,49 +914,46 @@ export class Arena {
         }
 
         // Merge original contest and virtual contest scoreboard events
-        self.onRankingEvents(response.events.concat(originalContestEvents));
+        this.onRankingEvents(response.events.concat(originalContestEvents));
       })
       .catch(ui.ignoreError);
 
-    self.virtualContestRefreshInterval = setTimeout(() => {
-      self.onVirtualRankingChange(virtualContestData);
+    this.virtualContestRefreshInterval = setTimeout(() => {
+      this.onVirtualRankingChange(virtualContestData);
     }, refreshTime);
   }
 
-  virtualRankingChange(data) {
-    // Merge original contest scoreboard and virtual contest
-    let self = this;
-
+  /**
+   * Merge original contest scoreboard and virtual contest
+   */
+  virtualRankingChange(scoreboard: types.Scoreboard): void {
     // Stop existing scoreboard simulation
-    if (self.virtualContestRefreshInterval != null)
-      clearTimeout(self.virtualContestRefreshInterval);
+    if (this.virtualContestRefreshInterval != null)
+      clearTimeout(this.virtualContestRefreshInterval);
 
-    if (self.originalContestScoreboardEvent == null) {
+    if (this.originalContestScoreboardEvents == null) {
       api.Problemset.scoreboardEvents({
-        problemset_id: self.options.originalProblemsetId,
+        problemset_id: this.options.originalProblemsetId,
       })
         .then(response => {
-          self.originalContestScoreboardEvent = response.events;
-          self.onVirtualRankingChange(data);
+          this.originalContestScoreboardEvents = response.events;
+          this.onVirtualRankingChange(scoreboard);
         })
         .catch(ui.apiError);
     } else {
-      self.onVirtualRankingChange(data);
+      this.onVirtualRankingChange(scoreboard);
     }
   }
 
   rankingChange(scoreboard: types.Scoreboard, rankingEvent = true): void {
     this.onRankingChanged(scoreboard);
-    let scoreboardEventsParams = {
-      problemset_id:
-        this.options.problemsetId || this.currentProblemset.problemset_id,
-    };
-    if (this.options.scoreboardToken) {
-      scoreboardEventsParams.token = this.options.scoreboardToken;
-    }
 
     if (rankingEvent) {
-      api.Problemset.scoreboardEvents(scoreboardEventsParams)
+      api.Problemset.scoreboardEvents({
+        problemset_id:
+          this.options.problemsetId || this.currentProblemset?.problemset_id,
+        token: this.options.scoreboardToken,
+      })
         .then(response => this.onRankingEvents(response.events))
         .catch(ui.ignoreError);
     }
