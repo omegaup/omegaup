@@ -15,8 +15,6 @@ stage_install() {
 	pip3 install --user wheel
 	pip3 install --user mysqlclient
 
-	curl -sSfL -o ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit \
-		https://phar.phpunit.de/phpunit-8.5.2.phar
 	composer install
 
 	install_omegaup_gitserver

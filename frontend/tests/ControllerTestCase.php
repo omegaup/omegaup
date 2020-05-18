@@ -69,7 +69,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         self::logout();
     }
 
-    public static function logout() {
+    public static function logout(): void {
         if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
             \OmegaUp\Controllers\Session::invalidateCache();
         }
@@ -86,10 +86,8 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      * Override session_start, validating that it is called once.
      */
     public function mockSessionManager(): void {
-        $sessionManagerMock =
-            $this->getMockBuilder('\\OmegaUp\\SessionManager')->getMock();
         \OmegaUp\Controllers\Session::setSessionManagerForTesting(
-            $sessionManagerMock
+            $this->getMockBuilder(\OmegaUp\SessionManager::class)->getMock()
         );
     }
 
@@ -98,25 +96,21 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function assertLogin(
         \OmegaUp\DAO\VO\Identities $identity,
-        ?string $authToken = null
-    ) {
+        string $authToken
+    ): void {
         $authTokens = \OmegaUp\DAO\AuthTokens::getByIdentityId(
-            $identity->identity_id
+            intval($identity->identity_id)
         );
 
-        if (!is_null($authToken)) {
-            $exists = false;
-            foreach ($authTokens as $token) {
-                if (strcmp($token->token, $authToken) === 0) {
-                    $exists = true;
-                    break;
-                }
+        $exists = false;
+        foreach ($authTokens as $token) {
+            if (strcmp(strval($token->token), $authToken) === 0) {
+                $exists = true;
+                break;
             }
-
-            $this->assertTrue($exists, "Token {$authToken} not in DB.");
         }
 
-        // @todo check last access time
+        $this->assertTrue($exists, "Token {$authToken} not in DB.");
     }
 
     /**
@@ -154,33 +148,33 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      *
      * @param \OmegaUp\Request $r
      */
-    public function assertContest(\OmegaUp\Request $r) {
+    public function assertContest(\OmegaUp\Request $r): void {
         // Validate that data was written to DB by getting the contest by title
-        $contests = \OmegaUp\DAO\Contests::getByTitle($r['title']);
+        $contests = \OmegaUp\DAO\Contests::getByTitle(strval($r['title']));
+        $this->assertNotEmpty($contests);
         $contest = $contests[0];
 
         // Assert that we found our contest
-        $this->assertNotNull($contest);
         $this->assertNotNull($contest->contest_id);
 
         // Assert data was correctly saved
         $this->assertEquals($r['description'], $contest->description);
 
         $this->assertGreaterThanOrEqual(
-            $r['start_time'] - 1,
+            intval($r['start_time']) - 1,
             $contest->start_time->time
         );
         $this->assertGreaterThanOrEqual(
-            $r['start_time'],
+            intval($r['start_time']),
             $contest->start_time->time + 1
         );
 
         $this->assertGreaterThanOrEqual(
-            $r['finish_time'] - 1,
+            intval($r['finish_time']) - 1,
             $contest->finish_time->time
         );
         $this->assertGreaterThanOrEqual(
-            $r['finish_time'],
+            intval($r['finish_time']),
             $contest->finish_time->time + 1
         );
 
@@ -210,27 +204,31 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Find a string into a keyed array
      *
-     * @param array $array
+     * @param list<array<string, string>> $array
      * @param string $key
      * @param string $needle
      */
-    public function assertArrayContainsInKey($array, $key, $needle) {
+    public function assertArrayContainsInKey($array, $key, $needle): void {
         foreach ($array as $a) {
             if ($a[$key] === $needle) {
                 return;
             }
         }
-        $this->fail("$needle not found in array");
+        $this->fail("{$needle} not found in array");
     }
 
     /**
      * Find a string into a keyed array. Should appear exactly once.
      *
-     * @param array $array
+     * @param list<array<string, string>> $array
      * @param string $key
      * @param string $needle
      */
-    public function assertArrayContainsInKeyExactlyOnce($array, $key, $needle) {
+    public function assertArrayContainsInKeyExactlyOnce(
+        $array,
+        $key,
+        $needle
+    ): void {
         $count = 0;
         foreach ($array as $a) {
             if ($a[$key] === $needle) {
@@ -326,14 +324,14 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Asserts that string is not present in keyed array
      *
-     * @param array $array
+     * @param list<array<string, string>> $array
      * @param string $key
      * @param string $needle
      */
-    public function assertArrayNotContainsInKey($array, $key, $needle) {
+    public function assertArrayNotContainsInKey($array, $key, $needle): void {
         foreach ($array as $a) {
             if ($a[$key] === $needle) {
-                $this->fail("$needle found in array");
+                $this->fail("{$needle} found in array");
             }
         }
     }
@@ -341,12 +339,16 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Checks that two sets (given by char delimited strings) are equal.
      */
-    public function assertEqualSets($expected, $actual, $delim = ',') {
-        $expected_set = explode($delim, $expected);
-        sort($expected_set);
-        $actual_set = explode($delim, $actual);
-        sort($actual_set);
-        $this->assertEquals($expected_set, $actual_set);
+    public function assertEqualSets(
+        string $expected,
+        string $actual,
+        string $delim = ','
+    ): void {
+        $expectedSet = explode($delim, $expected);
+        sort($expectedSet);
+        $actualSet = explode($delim, $actual);
+        sort($actualSet);
+        $this->assertEquals($expectedSet, $actualSet);
     }
 
     /**
@@ -362,10 +364,13 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      * of is_uploaded_file and move_uploaded_file. PHPUnit will intercept those
      * calls and use our owns instead (mock).  Moreover, it will validate that
      * they were actually called.
+     *
+     * @psalm-suppress InternalMethod It's fine to call PHPUnit mock internals.
+     * That's they way they are declared in the docs.
      */
     public function createFileUploaderMock(): \OmegaUp\FileUploader {
         // Create fileUploader mock
-        $fileUploaderMock = $this->getMockBuilder('\\OmegaUp\\FileUploader')
+        $fileUploaderMock = $this->getMockBuilder(\OmegaUp\FileUploader::class)
                 ->getMock();
 
         // Detour isUploadedFile function inside \OmegaUp\FileUploader to our
@@ -396,40 +401,39 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      * Redefinition of \OmegaUp\FileUploader::moveUploadedFile
      */
     public function moveUploadedFile(): bool {
+        /** @var string */
         $filename = func_get_arg(0);
+        /** @var string */
         $targetpath = func_get_arg(1);
 
         return copy($filename, $targetpath);
     }
 
-    protected function detourBroadcasterCalls($times = null) {
+    protected function detourBroadcasterCalls(
+        ?\PHPUnit\Framework\MockObject\Rule\InvokedCount $times = null
+    ): void {
         if (is_null($times)) {
             $times = $this->once();
         }
 
-        $broadcasterMock = $this->getMockBuilder('\\OmegaUp\\Broadcaster')
-            ->getMock();
+        $broadcasterMock = $this->getMockBuilder(\OmegaUp\Broadcaster::class)
+                                ->getMock();
+        /**
+         * @psalm-suppress InternalMethod It's fine to call PHPUnit mock
+         * internals.  That's they way they are declared in the docs.
+         */
         $broadcasterMock
             ->expects($times)
             ->method('broadcastClarification');
         \OmegaUp\Controllers\Clarification::$broadcaster = $broadcasterMock;
     }
 
-    /**
-     * Log a message to STDERR
-     *
-     * @param string $message Message to log
-     */
-    public static function logToErr($message) {
-        fwrite(STDERR, $message . "\n");
-    }
-
-    public static function log($message) {
+    public static function log(string $message): void {
         if (is_null(self::$logObj)) {
             self::$logObj = \Logger::getLogger('tests');
         }
 
-        self::$logObj->info('[INFO] ' . $message);
+        self::$logObj->info($message);
     }
 }
 
