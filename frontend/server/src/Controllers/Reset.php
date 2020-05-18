@@ -60,7 +60,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
             $user->reset_sent_at = null;
             \OmegaUp\DAO\Users::update($user);
         }
-
+        error_log($body);
         return [
             'message' => \OmegaUp\Translations::getInstance()->get(
                 'passwordResetRequestSuccess'
