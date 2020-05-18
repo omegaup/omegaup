@@ -269,7 +269,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         $adminLogin = self::login($contestIdentityAdmin);
         \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
-            'basic_information' => 1,
+            'needs_basic_information' => 1,
             'auth_token' => $adminLogin->auth_token,
         ]));
 

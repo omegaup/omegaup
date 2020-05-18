@@ -715,7 +715,7 @@ Creates a new contest
 | --------------------------- | ----------- | ----------- |
 | `admission_mode`            | `mixed`     |             |
 | `alias`                     | `mixed`     |             |
-| `basic_information`         | `bool|null` |             |
+| `needs_basic_information`   | `bool|null` |             |
 | `description`               | `mixed`     |             |
 | `feedback`                  | `mixed`     |             |
 | `finish_time`               | `mixed`     |             |
@@ -732,7 +732,7 @@ Creates a new contest
 | `start_time`                | `mixed`     |             |
 | `submissions_gap`           | `mixed`     |             |
 | `title`                     | `mixed`     |             |
-| `window_length`             | `mixed`     |             |
+| `window_length`             | `int|null`  |             |
 
 ### Returns
 
@@ -1264,7 +1264,7 @@ Update a Contest
 | --------------------------- | ------------------------ | ----------- |
 | `admission_mode`            | `mixed`                  |             |
 | `alias`                     | `mixed`                  |             |
-| `basic_information`         | `bool|null`              |             |
+| `needs_basic_information`   | `bool|null`              |             |
 | `contest_alias`             | `mixed`                  |             |
 | `description`               | `mixed`                  |             |
 | `feedback`                  | `mixed`                  |             |

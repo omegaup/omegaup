@@ -1,31 +1,43 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-heading" v-if="!update">
+  <div class="card panel panel-primary">
+    <div class="card-header bg-primary text-white panel-heading" v-if="!update">
       <h3 class="panel-title">{{ T.contestNew }}</h3>
     </div>
-    <div class="panel-body">
-      <div class="btn-group bottom-margin" v-if="update">
-        <button class="btn btn-default" v-on:click="fillOmi()">
+    <div class="card-body panel-body">
+      <div class="btn-group bottom-margin mb-3">
+        <button class="btn btn-default btn-secondary" v-on:click="fillOmi()">
           {{ T.contestNewFormOmiStyle }}
         </button>
-        <button class="btn btn-default" v-on:click="fillPreIoi()">
+        <button class="btn btn-default btn-secondary" v-on:click="fillPreIoi()">
           {{ T.contestNewForm }}
         </button>
-        <button class="btn btn-default" v-on:click="fillConacup()">
+        <button
+          class="btn btn-default btn-secondary"
+          v-on:click="fillConacup()"
+        >
           {{ T.contestNewFormConacupStyle }}
         </button>
       </div>
-      <form class="new_contest_form" v-on:submit.prevent="onSubmit">
+      <form class="contest-form" v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsTitle }}</label>
-            <input class="form-control" size="30" type="text" v-model="title" />
+            <input
+              class="form-control"
+              name="title"
+              data-title
+              v-bind:placeholder="contestStyleDesc"
+              size="30"
+              type="text"
+              v-model="title"
+            />
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
             <input
               class="form-control"
-              disabled="update"
+              name="alias"
+              v-bind:disabled="update"
               type="text"
               v-model="alias"
             />
@@ -55,6 +67,7 @@
             <label>{{ T.contestNewFormDescription }}</label>
             <textarea
               class="form-control"
+              name="description"
               cols="30"
               rows="10"
               v-model="description"
@@ -83,6 +96,7 @@
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
               class="form-control scoreboard-time-percent"
+              name="scoreboard"
               size="3"
               type="text"
               v-model="scoreboard"
@@ -98,7 +112,6 @@
               size="2"
               type="text"
               v-model="submissionsGap"
-              value="1"
             />
             <p class="help-block">
               {{ T.contestNewFormSubmissionsSeparationDesc }}
@@ -182,18 +195,14 @@
           <div class="form-group col-md-6">
             <label>{{ T.wordsLanguages }}</label
             ><br />
-            <select
-              class="form-control selectpicker"
-              multiple="multiple"
+            <multiselect
               v-model="languages"
+              v-bind:options="Object.keys(allLanguages)"
+              v-bind:multiple="true"
+              v-bind:placeholder="T.contestNewFormLanguages"
+              v-bind:close-on-select="false"
             >
-              <option
-                v-bind:value="lang"
-                v-for="(language, lang) in availableLanguages"
-              >
-                {{ language }}
-              </option>
-            </select>
+            </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
           </div>
         </div>
@@ -230,11 +239,12 @@
           </div>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary" type="submit" v-if="update">
-            {{ T.contestNewFormUpdateContest }}
-          </button>
-          <button class="btn btn-primary" type="submit" v-else="">
-            {{ T.contestNewFormScheduleContest }}
+          <button class="btn btn-primary" type="submit">
+            {{
+              update
+                ? T.contestNewFormUpdateContest
+                : T.contestNewFormScheduleContest
+            }}
           </button>
         </div>
       </form>
@@ -242,46 +252,76 @@
   </div>
 </template>
 
+<style lang="scss">
+@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+
+.multiselect__tag {
+  background: #678dd7;
+}
+</style>
+
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
+import Multiselect from 'vue-multiselect';
 
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
+    Multiselect,
   },
 })
 export default class NewForm extends Vue {
-  @Prop() data!: omegaup.Contest;
   @Prop() update!: boolean;
+  @Prop() allLanguages!: string[];
+  @Prop({ default: '' }) initialAlias!: string;
+  @Prop({ default: '' }) initialDescription!: string;
+  @Prop({ default: 'none' }) initialFeedback!: string;
+  @Prop() initialFinishTime!: Date;
+  @Prop({ default: () => [] }) initialLanguages!: Array<string>;
+  @Prop({ default: false }) initialNeedsBasicInformation!: boolean;
+  @Prop({ default: 0 }) initialPenalty!: number;
+  @Prop({ default: 'none' }) initialPenaltyType!: string;
+  @Prop({ default: 0.0 }) initialPointsDecayFactor!: number;
+  @Prop({ default: 'no' }) initialRequestsUserInformation!: string;
+  @Prop({ default: 100 }) initialScoreboard!: number;
+  @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
+  @Prop() initialStartTime!: Date;
+  @Prop() initialSubmissionsGap!: number;
+  @Prop({ default: '' }) initialTitle!: string;
+  @Prop({ default: null }) initialWindowLength!: null | number;
 
   T = T;
-  alias = this.data.alias;
-  availableLanguages = this.data.available_languages;
-  contest = this.data;
-  contestantMustRegister = this.data.contestant_must_register;
-  description = this.data.description;
-  feedback = this.data.feedback;
-  finishTime = this.data.finish_time;
-  scoreboard = this.data.scoreboard;
-  languages = this.data.languages;
-  needsBasicInformation = this.data.needs_basic_information;
-  penalty = this.data.penalty;
-  penaltyType = this.data.penalty_type;
-  penaltyCalcPolicy = this.data.penalty_calc_policy;
-  pointsDecayFactor = this.data.points_decay_factor;
-  requestsUserInformation = this.data.requests_user_information;
-  startTime = this.data.start_time;
-  showPenalty = this.data.show_penalty;
-  showScoreboardAfter = this.data.show_scoreboard_after;
-  submissionsGap = this.data.submissions_gap;
-  title = this.data.title;
+  alias = this.initialAlias;
+  description = this.initialDescription;
+  feedback = this.initialFeedback;
+  finishTime = this.initialFinishTime;
+  languages = this.initialLanguages;
+  needsBasicInformation = this.initialNeedsBasicInformation;
+  penalty = this.initialPenalty;
+  penaltyType = this.initialPenaltyType;
+  pointsDecayFactor = this.initialPointsDecayFactor;
+  requestsUserInformation = this.initialRequestsUserInformation;
+  scoreboard = this.initialScoreboard;
+  showScoreboardAfter = this.initialShowScoreboardAfter;
+  startTime = this.initialStartTime;
+  submissionsGap = this.initialSubmissionsGap
+    ? this.initialSubmissionsGap / 60
+    : 1;
+  title = this.initialTitle;
+  windowLength = this.initialWindowLength;
+  windowLengthEnabled = this.initialWindowLength !== null;
   titlePlaceHolder = '';
-  windowLength = this.data.window_length || 0;
-  windowLengthEnabled =
-    this.data.window_length != 0 && this.data.window_length != null;
+  contestStyleDesc = '';
+
+  @Watch('windowLengthEnabled')
+  onPropertyChange(newValue: boolean): void {
+    if (!newValue) {
+      this.windowLength = null;
+    }
+  }
 
   fillOmi(): void {
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
@@ -294,6 +334,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.contestStyleDesc = T.contestNewFormTitlePlaceholderOmiStyle;
   }
 
   fillPreIoi(): void {
@@ -307,6 +348,7 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.contestStyleDesc = T.contestNewFormTitlePlaceholderIoiStyle;
   }
 
   fillConacup(): void {
@@ -320,14 +362,33 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
+    this.contestStyleDesc = T.contestNewFormTitlePlaceholderConacupStyle;
   }
 
   onSubmit() {
-    this.$emit('emit-update-contest', this);
-  }
-
-  mounted() {
-    $('.selectpicker', this.$el).selectpicker();
+    if (this.update) {
+      this.$emit('emit-update-contest', this);
+      return;
+    }
+    const contest: omegaup.Contest = {
+      alias: this.alias,
+      title: this.title,
+      description: this.description,
+      start_time: this.startTime,
+      finish_time: this.finishTime,
+      window_length: !this.windowLengthEnabled ? null : this.windowLength,
+      points_decay_factor: this.pointsDecayFactor,
+      submissions_gap: (this.submissionsGap || 1) * 60,
+      languages: this.languages,
+      feedback: this.feedback,
+      penalty: this.penalty,
+      scoreboard: this.scoreboard,
+      penalty_type: this.penaltyType,
+      show_scoreboard_after: this.showScoreboardAfter,
+      needs_basic_information: this.needsBasicInformation,
+      requests_user_information: this.requestsUserInformation,
+    };
+    this.$emit('create-contest', contest);
   }
 }
 </script>

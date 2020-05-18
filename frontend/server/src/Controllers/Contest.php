@@ -14,6 +14,7 @@
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation?: bool, privacyStatement?: PrivacyStatement, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning?: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
+ * @psalm-type ContestNewPayload=array{languages: array<string, string>}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
@@ -762,7 +763,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{LANGUAGES: list<string>, IS_UPDATE: bool}, template: string}
+     * @return array{smartyProperties: array{payload: ContestNewPayload}, entrypoint: string}
      */
     public static function getContestNewForSmarty(
         \OmegaUp\Request $r
@@ -770,12 +771,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         return [
             'smartyProperties' => [
-                'LANGUAGES' => array_keys(
-                    \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
-                ),
-                'IS_UPDATE' => false,
+                'payload' => [
+                    'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
+                ],
             ],
-            'template' => 'contest.new.tpl',
+            'entrypoint' => 'contest_new',
         ];
     }
 
@@ -1676,7 +1676,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param bool|null $basic_information
+     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
      * @omegaup-request-param mixed $finish_time
@@ -1693,7 +1693,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $start_time
      * @omegaup-request-param mixed $submissions_gap
      * @omegaup-request-param mixed $title
-     * @omegaup-request-param mixed $window_length
+     * @omegaup-request-param int|null $window_length
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -1716,11 +1716,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureOptionalBool('basic_information');
+        $r->ensureOptionalBool('needs_basic_information');
         $r->ensureOptionalBool('partial_score');
 
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
-            'needs_basic_information' => boolval($r['basic_information']),
+            'needs_basic_information' => boolval($r['needs_basic_information']),
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
@@ -3598,7 +3598,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param bool|null $basic_information
+     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
@@ -3640,7 +3640,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'required',
             ]
         );
-        $r->ensureOptionalBool('basic_information');
+        $r->ensureOptionalBool('needs_basic_information');
 
         self::forbiddenInVirtual($contest);
 
@@ -3733,7 +3733,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 $problemset->needs_basic_information = boolval(
-                    $r['basic_information']
+                    $r['needs_basic_information']
                 );
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);

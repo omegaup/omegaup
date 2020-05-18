@@ -49,6 +49,7 @@ let config = [
       contest_list: './frontend/www/js/omegaup/contest/list.js',
       contest_list_participant:
         './frontend/www/js/omegaup/contest/list_participant.js',
+      contest_new: './frontend/www/js/omegaup/contest/new.ts',
       contest_print: './frontend/www/js/omegaup/contest/print.ts',
       contest_report: './frontend/www/js/omegaup/contest/report.js',
       contest_scoreboardmerge:

@@ -162,7 +162,7 @@ class Contest {
             'penalty_type' => 'contest_start',
             'languages' => $params->languages,
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
-            'basic_information' => $params->basicInformation,
+            'needs_basic_information' => $params->basicInformation,
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
         ]);
