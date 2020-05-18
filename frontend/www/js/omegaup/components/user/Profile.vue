@@ -126,7 +126,7 @@ import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
 import gridPaginator from '../GridPaginator.vue';
-import { Problem, ContestResult } from '../../types.ts';
+import { Problem, ContestResult } from '../../linkable_resource';
 
 @Component({
   components: {

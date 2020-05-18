@@ -110,6 +110,9 @@
                 <a href="/rank/">{{ T.navUserRanking }}</a>
               </li>
               <li>
+                <a href="/rank/authors/">{{ T.navAuthorRanking }}</a>
+              </li>
+              <li>
                 <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
               </li>
               <li>
@@ -187,6 +190,9 @@
                     ><span class="glyphicon glyphicon-user"></span>
                     {{ T.navViewProfile }}</a
                   >
+                </li>
+                <li>
+                  <a href="/badge/list/">{{ T.navViewBadges }}</a>
                 </li>
                 <li>
                   <a href="/problem/mine/">{{ T.navMyProblems }}</a>
@@ -408,7 +414,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_Clarifications from '../notification/Clarifications.vue';
@@ -436,10 +441,10 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
-  @Prop() initialClarifications!: omegaup.Clarification[];
+  @Prop() initialClarifications!: types.Clarification[];
 
   notifications: types.Notification[] = [];
-  clarifications: omegaup.Clarification[] = this.initialClarifications;
+  clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {

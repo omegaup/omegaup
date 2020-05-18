@@ -13,7 +13,7 @@
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
 		<title>{if isset($htmlTitle)}{$htmlTitle} &ndash; {/if}omegaUp</title>
-		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.5.0.min.js"}"></script>
+		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.5.1.min.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
@@ -27,7 +27,7 @@
 		<script type="text/javascript" src="{version_hash src="/third_party/js/jquery.tableSort.js"}" defer></script>
 {/if}
 
-{if isset($jsfile)}
+{if isset($jsfile) && !is_null($jsfile)}
 		<script type="text/javascript" src="{$jsfile}" defer></script>
 {/if}
 {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
@@ -48,7 +48,7 @@
 {/if}
 
 {if isset($inArena) && $inArena}
-		<link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
+    <link rel="stylesheet" type="text/css" href="{version_hash src="/css/arena.css"}" />
 {elseif !isset($headerPayload) || !$headerPayload.bootstrap4}
 		<link rel="stylesheet" type="text/css" href="{version_hash src="/css/style.css"}">
 		<!-- Bootstrap table plugin from https://github.com/wenzhixin/bootstrap-table/releases -->
@@ -76,7 +76,7 @@
 {if isset($inArena) && $inArena}
 		<!-- Generated from http://ajaxload.info/ -->
 		{if !isset($bodyid) or $bodyid != 'only-problem'}
-		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/ux/loading.gif" alt="loading" /></div>
+		<div id="loading" style="text-align: center; position: fixed; width: 100%; margin-top: -8px; top: 50%;"><img src="/media/loading.gif" alt="loading" /></div>
 		{/if}
 {/if}
 {if isset($headerPayload) && $headerPayload.bootstrap4}

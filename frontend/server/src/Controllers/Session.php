@@ -25,7 +25,7 @@ class ScopedFacebook {
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
-    /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
+    /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool} */
     private static $_currentSession = null;
     /** @var null|\OmegaUp\SessionManager */
     private static $_sessionManager = null;
@@ -63,7 +63,7 @@ class Session extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     * @return array{session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
         return [
@@ -104,7 +104,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{valid: bool, email: ?string, user: ?\OmegaUp\DAO\VO\Users, identity: ?\OmegaUp\DAO\VO\Identities, auth_token: ?string, is_admin: bool}
+     * @return array{valid: bool, email: ?string, user: ?\OmegaUp\DAO\VO\Users, identity: ?\OmegaUp\DAO\VO\Identities, classname: string, auth_token: ?string, is_admin: bool}
      */
     public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
         if (
@@ -131,7 +131,6 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
-                /** @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
                 function () use ($r) {
                     return self::getCurrentSessionImpl($r);
                 },
@@ -146,7 +145,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
+     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
      */
     private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
         if (empty($r['auth_token'])) {
@@ -155,26 +154,31 @@ class Session extends \OmegaUp\Controllers\Controller {
                 'email' => null,
                 'user' => null,
                 'identity' => null,
+                'classname' => 'user-rank-unranked',
                 'auth_token' => null,
                 'is_admin' => false,
             ];
         }
         $authToken = strval($r['auth_token']);
 
-        $currentIdentity = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
+        $currentIdentityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $authToken
         );
-        if (is_null($currentIdentity)) {
+        if (is_null($currentIdentityExt)) {
             // Means user has auth token, but does not exist in DB
             return [
                 'valid' => false,
                 'email' => null,
                 'user' => null,
                 'identity' => null,
+                'classname' => 'user-rank-unranked',
                 'auth_token' => null,
                 'is_admin' => false,
             ];
         }
+        $identityClassname = $currentIdentityExt['classname'];
+        unset($currentIdentityExt['classname']);
+        $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
 
         if (is_null($currentIdentity->user_id)) {
             $currentUser = null;
@@ -196,6 +200,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             'email' => !empty($email) ? $email->email : '',
             'user' => $currentUser,
             'identity' => $currentIdentity,
+            'classname' => $identityClassname,
             'auth_token' => $authToken,
             'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
                 $currentIdentity

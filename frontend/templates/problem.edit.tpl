@@ -33,62 +33,14 @@
   </div>
 
   <div class="tab-pane" id="markdown">
-    <div class="panel panel-primary">
-      <form class="panel-body form" method="post" action="{$smarty.server.REQUEST_URI}" enctype="multipart/form-data">
-        <input type="hidden" name="problem_alias" id="problem-alias" value="{$smarty.get.problem}" />
-        <input type="hidden" name="request" value="markdown" />
-        <div class="row">
-          <label for="statement-language">{#statementLanguage#}</label>
-          <select name="statement-language" id="statement-language">
-            <option value="es">{#statementLanguageEs#}</option>
-            <option value="en">{#statementLanguageEn#}</option>
-            <option value="pt">{#statementLanguagePt#}</option>
-          </select>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="panel">
-              <ul class="nav nav-tabs">
-                <li class="active"><a href="#statement-source" data-toggle="tab">Source</a></li>
-                <li><a id="statement-preview-link" href="#statement-preview" data-toggle="tab">Preview</a></li>
-              </ul>
-
-              <div class="tab-content">
-                <div class="tab-pane active" id="statement-source">
-                  <div id="wmd-button-bar-statement"></div>
-                  <textarea class="wmd-input" id="wmd-input-statement" name="wmd-input-statement"></textarea>
-                </div>
-
-                <div class="tab-pane" id="statement-preview">
-                  <h1 style="text-align: center;" class="title"></h1>
-                  <div class="no-bottom-margin statement" id="wmd-preview-statement"></div>
-                  <hr/>
-                  <div><em>{#wordsSource#}: <span class="source"></span></em></div>
-                  <div><em>{#wordsProblemsetter#}: <a class="problemsetter"></a></em></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="form-group  col-md-6" id="markdown-message-group">
-            <label class="control-label" for="markdown-message">{#problemEditCommitMessage#}</label>
-            <input id="markdown-message" name="message" type="text" class="form-control" />
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-12">
-            <button type='submit' class="btn btn-primary">{#problemEditFormUpdateMarkdown#}</button>
-          </div>
-        </div>
-      </form>
-    </div>
+    <div></div>
+    <script type="text/json" id="problem-markdown-payload">{$problemMarkdownPayload|json_encode}</script>
+    <input type="hidden" name="problem_alias" id="problem-alias" value="{$smarty.get.problem}" />
   </div>
 
   <div class="tab-pane" id="admins">
-    <div id="problem-admins"></div>
+    <div class="admins"></div>
+    <div class="groups"></div>
     <script type="text/json" id="problem-admins-payload">{$problemAdminsPayload|json_encode}</script>
     {js_include entrypoint="problem_admins"}
   </div>

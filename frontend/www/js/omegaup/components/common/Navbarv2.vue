@@ -136,6 +136,9 @@
                 <a class="dropdown-item" href="/rank/">{{
                   T.navUserRanking
                 }}</a>
+                <a class="dropdown-item" href="/rank/authors/">{{
+                  T.navAuthorRanking
+                }}</a>
                 <a class="dropdown-item" href="/rank/schools/">{{
                   T.navSchoolRanking
                 }}</a>
@@ -241,6 +244,9 @@
                       ></div>
                     </div>
                   </a>
+                  <a class="dropdown-item" href="/badge/list/">{{
+                    T.navViewBadges
+                  }}</a>
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems
                   }}</a>
@@ -296,7 +302,6 @@ nav.navbar {
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_List from '../notification/List.vue';
@@ -334,9 +339,9 @@ export default class Navbar extends Vue {
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
   @Prop({ default: 0 }) profileProgress!: number;
-  @Prop() initialClarifications!: omegaup.Clarification[];
+  @Prop() initialClarifications!: types.Clarification[];
 
-  clarifications: omegaup.Clarification[] = this.initialClarifications;
+  clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {
