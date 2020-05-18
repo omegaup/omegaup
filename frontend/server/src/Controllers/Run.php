@@ -6,6 +6,7 @@
  * RunController
  *
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
     // All languages that runs can have.
@@ -341,7 +342,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
+     * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -358,7 +359,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         ] = self::validateCreateRequest($r);
 
         self::$log->info('New run being submitted!!');
-        $response = [];
 
         /** @var null|int */
         $problemsetId = null;
@@ -466,6 +466,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $run = new \OmegaUp\DAO\VO\Runs([
             'version' => $problem->current_version,
+            'commit' => $problem->commit,
             'status' => 'new',
             'runtime' => 0,
             'penalty' => $submitDelay,
@@ -519,6 +520,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         $problem->submissions++;
         \OmegaUp\DAO\Problems::update($problem);
 
+        $response = [
+            'guid' => strval($submission->guid),
+            'submit_delay' => $submitDelay,
+        ];
         if ($isPractice) {
             $response['submission_deadline'] = new \OmegaUp\Timestamp(0);
         } else {
@@ -548,7 +553,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (is_null($submission->guid)) {
             throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
         }
-        $response['guid'] = $submission->guid;
 
         // Expire rank cache
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
@@ -591,7 +595,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{alias: string, contest_score: float|null, memory: int, penalty: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp}
+     * @return Run
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -626,13 +630,15 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Fill response
         $filtered = (
             $submission->asFilteredArray([
-                'guid', 'language', 'time', 'submit_delay',
+                'guid', 'language', 'time', 'submit_delay', 'type',
             ]) +
             $run->asFilteredArray([
                 'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
             ])
         );
+        $filtered['guid'] = strval($filtered['guid']);
         $filtered['alias'] = strval($problem->alias);
+        $filtered['contest_alias'] = null;
         /** @var \OmegaUp\Timestamp $filtered['time'] */
         $filtered['time'] = new \OmegaUp\Timestamp($filtered['time']);
         $filtered['score'] = round(floatval($filtered['score']), 4);
@@ -640,6 +646,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         $filtered['penalty'] = intval($filtered['penalty']);
         $filtered['memory'] = intval($filtered['memory']);
         $filtered['submit_delay'] = intval($filtered['submit_delay']);
+        $filtered['language'] = strval($filtered['language']);
+        $filtered['status'] = strval($filtered['status']);
+        $filtered['type'] = strval($filtered['type']);
+        $filtered['verdict'] = strval($filtered['verdict']);
         if (!is_null($filtered['contest_score'])) {
             $filtered['contest_score'] = round(
                 floatval(
@@ -650,7 +660,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         if ($submission->identity_id == $r->identity->identity_id) {
             $filtered['username'] = $r->identity->username;
+        } else {
+            $filtered['username'] = '';
         }
+        $filtered['classname'] = 'user-rank-unranked';
+        $filtered['country'] = 'xx';
         return $filtered;
     }
 
@@ -1351,7 +1365,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of latest runs overall
      *
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country_id: null|string, guid: string, judged_by: null|string, language: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submit_delay: int, time: \OmegaUp\Timestamp, type: null|string, username: string, verdict: string, status: string}>}
+     * @return array{runs: list<Run>}
      *
      * @omegaup-request-param mixed $language
      * @omegaup-request-param int $offset

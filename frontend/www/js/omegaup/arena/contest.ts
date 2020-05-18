@@ -113,7 +113,7 @@ OmegaUp.on('ready', () => {
       contest_alias: arenaInstance.options.contestAlias,
     })
       .then(result => arenaInstance.problemsetLoaded(result))
-      .catch(ui.ignoreError);
+      .catch(e => arenaInstance.problemsetLoadedError(e));
 
     $('.clarifpager .clarifpagerprev').on('click', () => {
       if (arenaInstance.clarificationsOffset > 0) {

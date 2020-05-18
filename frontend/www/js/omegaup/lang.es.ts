@@ -545,6 +545,7 @@ const translations: { [key: string]: string; } = {
   navSchoolRanking: "Ranking de escuelas",
   navTutorials: "Tutoriales",
   navUserRanking: "Ranking de usuarios",
+  navViewBadges: "Ver insignias",
   navViewProfile: "Mi perfil",
   noCoders: "No hay coders",
   nominationsRangeHeader: "Nominaciones de calidad (del %(lowCount) al %(highCount))",

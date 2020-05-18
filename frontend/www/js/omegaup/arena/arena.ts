@@ -1,6 +1,6 @@
-// @ts-nocheck
-
 import Vue from 'vue';
+import Vuex, { StoreOptions } from 'vuex';
+import * as Highcharts from 'highcharts/highstock';
 
 import * as api from '../api';
 import T from '../lang';
@@ -24,49 +24,162 @@ import notification_Clarifications from '../components/notification/Clarificatio
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 
 import ArenaAdmin from './admin_arena';
-import {
-  ArenaOptions,
-  EphemeralGrader,
-  EventsSocket,
-  GetOptionsFromLocation,
-  getMaxScore,
-  scoreboardColors,
-  myRunsStore,
-  runsStore,
-} from './arena_transitional';
 
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
 
-export { ArenaAdmin, GetOptionsFromLocation };
+export { ArenaAdmin };
+
+Vue.use(Vuex);
+
+export interface ArenaOptions {
+  assignmentAlias: string | null;
+  contestAlias: string | null;
+  courseAlias: string | null;
+  disableClarifications: boolean;
+  disableSockets: boolean;
+  isInterview: boolean;
+  isLockdownMode: boolean;
+  isOnlyProblem: boolean;
+  isPractice: boolean;
+  onlyProblemAlias: string | null;
+  originalContestAlias: string | null;
+  originalProblemsetId?: number;
+  payload: types.CommonPayload;
+  problemsetId: number | null;
+  problemsetAdmin: boolean;
+  preferredLanguage: string | null;
+  scoreboardToken: string | null;
+  shouldShowFirstAssociatedIdentityRunWarning: boolean;
+}
+
+export interface Problem {
+  title: string;
+  alias: string;
+  commit: string;
+  languages: string[];
+  letter?: string;
+  points: number;
+  input_limit?: number;
+  quality_payload?: types.ProblemQualityPayload;
+  runs?: types.Run[];
+  source?: string;
+  settings?: types.ProblemSettings;
+  statement?: types.ProblemStatement;
+  problemsetter?: { creation_date?: Date; name: string; username: string };
+  lastSubmission?: Date;
+  nextSubmissionTimestamp?: Date;
+}
+
+export interface RunsState {
+  // The list of runs.
+  runs: types.Run[];
+
+  // The mapping of run GUIDs to indices on the runs array.
+  index: Record<string, number>;
+}
+
+export const runsStore = new Vuex.Store<RunsState>({
+  state: {
+    runs: [],
+    index: {},
+  },
+  mutations: {
+    addRun(state, run: types.Run) {
+      if (state.index.hasOwnProperty(run.guid)) {
+        Vue.set(
+          state.runs,
+          state.index[run.guid],
+          Object.assign({}, state.runs[state.index[run.guid]], run),
+        );
+        return;
+      }
+      Vue.set(state.index, run.guid, state.runs.length);
+      state.runs.push(run);
+    },
+    clear(state) {
+      state.runs.splice(0);
+      state.index = {};
+    },
+  },
+});
+
+const myRunsStore = new Vuex.Store<RunsState>({
+  state: {
+    runs: [],
+    index: {},
+  },
+  mutations: {
+    addRun(state, run: types.Run) {
+      if (state.index.hasOwnProperty(run.guid)) {
+        Vue.set(
+          state.runs,
+          state.index[run.guid],
+          Object.assign({}, state.runs[state.index[run.guid]], run),
+        );
+        return;
+      }
+      Vue.set(state.index, run.guid, state.runs.length);
+      state.runs.push(run);
+    },
+    clear(state) {
+      state.runs.splice(0);
+      state.index = {};
+    },
+  },
+});
 
 // Number of digits after the decimal point to show.
 const digitsAfterDecimalPoint: number = 2;
+
+const scoreboardColors = [
+  '#FB3F51',
+  '#FF5D40',
+  '#FFA240',
+  '#FFC740',
+  '#59EA3A',
+  '#37DD6F',
+  '#34D0BA',
+  '#3AAACF',
+  '#8144D6',
+  '#CD35D3',
+];
+
+function getMaxScore(
+  runs: types.Run[],
+  alias: string,
+  previousScore: number,
+): number {
+  let maxScore = previousScore;
+  for (const run of runs) {
+    if (alias != run.alias) {
+      continue;
+    }
+    const score = run.contest_score || 0;
+    if (score > maxScore) {
+      maxScore = score;
+    }
+  }
+  return maxScore;
+}
 
 export class Arena {
   options: ArenaOptions;
 
   // Currently opened problem.
-  currentProblem: types.ProblemsetProblem = {
-    accepted: 0,
+  currentProblem: Problem = {
+    title: '',
     alias: '',
     commit: '',
-    difficulty: 0,
-    languages: '',
-    letter: '',
-    order: 0,
+    source: '',
+    languages: [],
     points: 0,
-    submissions: 0,
-    title: '',
-    version: '',
-    visibility: 0,
-    visits: 0,
   };
 
   // The current problemset.
   currentProblemset: types.Problemset | null = null;
 
   // The interval for clock updates.
-  clockInterval = null;
+  clockInterval: ReturnType<typeof setTimeout> | null = null;
 
   // The start time of the contest.
   startTime: Date | null = null;
@@ -82,24 +195,27 @@ export class Arena {
 
   // The set of problems in this contest.
   problems: {
-    [alias: string]: types.ContestProblem | types.ProblemsetProblem;
+    [alias: string]: Problem;
   } = {};
 
   // WebSocket for real-time updates.
   socket: EventsSocket | null = null;
 
   // The offset of each user into the ranking table.
-  currentRanking = {};
+  currentRanking: { [username: string]: number } = {};
 
   // The previous ranking information. Useful to show diffs.
-  prevRankingState = null;
+  prevRankingState: { [username: string]: { place: number } } = {};
+
+  // The previous location hash.
+  previousHash: string = '';
 
   // Every time a recent event is shown, have this interval clear it after
   // 30s.
-  removeRecentEventClassTimeout = null;
+  removeRecentEventClassTimeout: ReturnType<typeof setTimeout> | null = null;
 
   // The last known scoreboard event stream.
-  currentEvents = null;
+  currentEvents: types.ScoreboardEvent[] = [];
 
   // The Markdown-to-HTML converter.
   markdownConverter: Markdown.Converter = markdown.markdownConverter();
@@ -113,17 +229,22 @@ export class Arena {
   clarificationsOffset: number = 0;
   clarificationsRowcount: number = 20;
   activeTab: string = 'problems';
-  clarifications = {};
+  clarifications: { [key: number]: JQuery } = {};
   submissionGap: number = 0;
 
+  // Clarification refresh interval.
+  clarificationInterval: ReturnType<typeof setTimeout> | null = null;
+
+  rankingInterval: ReturnType<typeof setTimeout> | null = null;
+
   // The interval of time that submissions button will be disabled
-  submissionGapInterval: number = 0;
+  submissionGapInterval: ReturnType<typeof setTimeout> | null = null;
 
   // Cache scoreboard data for virtual contest
-  originalContestScoreboardEvent = null;
+  originalContestScoreboardEvents: types.ScoreboardEvent[] | null = null;
 
   // Virtual contest refresh interval
-  virtualContestRefreshInterval = null;
+  virtualContestRefreshInterval: ReturnType<typeof setTimeout> | null = null;
 
   // Ephemeral grader support.
   ephemeralGrader: EphemeralGrader = new EphemeralGrader();
@@ -151,7 +272,7 @@ export class Arena {
   navbarProblems:
     | (Vue & {
         problems: omegaup.ContestProblem[];
-        activeProblem: string;
+        activeProblem: string | null;
       })
     | null = null;
 
@@ -162,13 +283,19 @@ export class Arena {
       })
     | null = null;
 
-  myRunsList: Vue;
+  myRunsList: Vue & {
+    isContestFinished: boolean;
+    isProblemsetOpened: boolean;
+    problemAlias: string;
+  };
 
-  qualityNominationForm = null;
+  qualityNominationForm:
+    | (Vue & { qualityPayload: types.ProblemQualityPayload })
+    | null = null;
 
   commonNavbar:
     | (Vue & {
-        initialClarifications: omegaup.Clarification[];
+        initialClarifications: types.Clarification[];
         graderInfo: types.GraderStatus | null;
         errorMessage: string | null;
         graderQueueLength: number;
@@ -185,12 +312,15 @@ export class Arena {
   scoreboard:
     | (Vue & {
         problems: omegaup.Problem[];
-        ranking: omegaup.ScoreboardUser[];
+        ranking: types.ScoreboardRankingEntry[];
+        showPenalty: boolean;
         lastUpdated: Date;
       })
     | null = null;
 
   summaryView: Vue & { contest: omegaup.Contest };
+
+  rankingChart: Highcharts.Chart | null = null;
 
   constructor(options: ArenaOptions) {
     this.options = options;
@@ -367,13 +497,14 @@ export class Arena {
       this.scoreboard = new Vue({
         el: this.elements.ranking[0],
         render: function(createElement) {
-          return createElement('omegaup-scoreboard', {
+          return createElement('omegaup-arena-scoreboard', {
             props: {
               scoreboardColors: scoreboardColors,
               problems: this.problems,
               ranking: this.ranking,
               lastUpdated: this.lastUpdated,
               digitsAfterDecimalPoint: digitsAfterDecimalPoint,
+              showPenalty: this.showPenalty,
             },
           });
         },
@@ -381,9 +512,10 @@ export class Arena {
           problems: [],
           ranking: [],
           lastUpdated: new Date(0),
+          showPenalty: true,
         },
         components: {
-          'omegaup-scoreboard': arena_Scoreboard,
+          'omegaup-arena-scoreboard': arena_Scoreboard,
         },
       });
     }
@@ -441,17 +573,16 @@ export class Arena {
     this.navbarAssignments = null;
   }
 
-  installLibinteractiveHooks() {
-    let self = this;
+  installLibinteractiveHooks(): void {
     $('.libinteractive-download form').on('submit', (e: Event) => {
       e.preventDefault();
 
-      let form = $(e.target);
-      let alias = self.currentProblem.alias;
-      let commit = self.currentProblem.commit;
-      let os = $('.download-os', form).val();
-      let lang = $('.download-lang', form).val();
-      let extension = os == 'unix' ? '.tar.bz2' : '.zip';
+      const form = $(<HTMLElement>e.target);
+      const alias = this.currentProblem.alias;
+      const commit = this.currentProblem.commit;
+      const os = $('.download-os', form).val();
+      const lang = $('.download-lang', form).val();
+      const extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
       ui.navigateTo(
         `${window.location.protocol}//${window.location.host}/templates/${alias}/${commit}/${alias}_${os}_${lang}${extension}`,
@@ -461,44 +592,40 @@ export class Arena {
     $('.libinteractive-download .download-lang').on('change', (e: Event) => {
       let form = <HTMLElement>e.target;
       while (!form.classList.contains('libinteractive-download')) {
-        form = form.parentElement;
-        if (!form) {
+        if (!form.parentElement) {
           return;
         }
+        form = form.parentElement;
       }
       $(form)
         .find('.libinteractive-extension')
-        .html($(e.target).val());
+        .html(<string>$(<HTMLElement>e.target).val());
     });
   }
 
-  connectSocket() {
-    let self = this;
+  connectSocket(): boolean {
     if (
-      self.options.isPractice ||
-      self.options.disableSockets ||
-      self.options.contestAlias == 'admin'
+      this.options.isPractice ||
+      this.options.disableSockets ||
+      this.options.contestAlias == 'admin'
     ) {
-      self.elements.socketStatus.html('✗').css('color', '#800');
+      this.elements.socketStatus.html('✗').css('color', '#800');
       return false;
     }
 
-    let protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    let uris = [];
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const uris = [];
     // Backendv2 uri
     uris.push(
-      protocol +
-        window.location.host +
-        '/events/?filter=/problemset/' +
-        self.options.problemsetId +
-        (self.options.scoreboardToken
-          ? '/' + self.options.scoreboardToken
+      `${protocol}${window.location.host}/events/?filter=/problemset/${this.options.problemsetId}` +
+        (this.options.scoreboardToken
+          ? `/${this.options.scoreboardToken}`
           : ''),
     );
 
     const connect = (uris: string[], index: number) => {
-      self.socket = new EventsSocket(uris[index], self);
-      self.socket.connect().catch(e => {
+      this.socket = new EventsSocket(uris[index], this);
+      this.socket.connect().catch(e => {
         console.log(e);
         // Try the next uri.
         index++;
@@ -506,135 +633,148 @@ export class Arena {
           connect(uris, index);
         } else {
           // Out of options. Falling back to polls.
-          self.socket = null;
+          this.socket = null;
           setTimeout(() => {
-            self.setupPolls();
+            this.setupPolls();
           }, Math.random() * 15000);
         }
       });
     };
 
-    self.elements.socketStatus.html('↻').css('color', '#888');
+    this.elements.socketStatus.html('↻').css('color', '#888');
     connect(uris, 0);
+    return false;
   }
 
-  setupPolls() {
-    let self = this;
-    self.refreshRanking();
-    if (!self.options.contestAlias) {
+  setupPolls(): void {
+    this.refreshRanking();
+    if (!this.options.contestAlias) {
       return;
     }
-    self.refreshClarifications();
+    this.refreshClarifications();
 
-    if (!self.socket) {
-      self.clarificationInterval = setInterval(() => {
-        self.clarificationsOffset = 0; // Return pagination to start on refresh
-        self.refreshClarifications();
+    if (!this.socket) {
+      this.clarificationInterval = setInterval(() => {
+        this.clarificationsOffset = 0; // Return pagination to start on refresh
+        this.refreshClarifications();
       }, 5 * 60 * 1000);
 
-      self.rankingInterval = setInterval(
-        self.refreshRanking.bind(self),
+      this.rankingInterval = setInterval(
+        () => this.refreshRanking(),
         5 * 60 * 1000,
       );
     }
   }
 
-  initProblemsetId(problemset) {
-    let self = this;
-    if (!problemset.hasOwnProperty('problemset_id')) {
+  initProblemsetId(problemset: types.Problemset): void {
+    if (!problemset.problemset_id) {
       return;
     }
-    self.options.problemsetId = problemset.problemset_id;
+    this.options.problemsetId = problemset.problemset_id;
   }
 
-  initClock(start: Date, finish: Date, deadline: Date | null) {
-    let self = this;
-
-    self.startTime = start;
-    self.finishTime = finish;
+  initClock(start: Date, finish: Date | null, deadline: Date | null): void {
+    this.startTime = start;
+    this.finishTime = finish;
     // Once the clock is ready, we can now connect to the socket.
-    self.connectSocket();
-    if (self.options.isPractice || !self.finishTime) {
-      self.elements.clock.html('&infin;');
+    this.connectSocket();
+    if (this.options.isPractice || !this.finishTime) {
+      this.elements.clock.html('&infin;');
       return;
     }
-    if (deadline) self.submissionDeadline = deadline;
-    if (!self.clockInterval) {
-      self.updateClock();
-      self.clockInterval = setInterval(self.updateClock.bind(self), 1000);
+    if (deadline) this.submissionDeadline = deadline;
+    if (!this.clockInterval) {
+      this.updateClock();
+      this.clockInterval = setInterval(this.updateClock.bind(this), 1000);
     }
   }
 
-  problemsetLoaded(problemset: types.Problemset) {
-    let self = this;
-    if (problemset.status == 'error') {
-      if (!OmegaUp.loggedIn) {
-        window.location = '/login/?redirect=' + escape(window.location);
-      } else if (problemset.start_time) {
-        let f = ((x, y) => {
-          return () => {
-            let t = new Date();
-            self.elements.loadingOverlay.html(
-              `${x} ${time.formatDelta(y.getTime() - t.getTime())}`,
-            );
-            if (t.getTime() < y.getTime()) {
-              setTimeout(f, 1000);
-            } else {
-              api.Problemset.details({ problemset_id: x })
-                .then(problemsetLoaded.bind(self))
-                .catch(ui.ignoreError);
-            }
-          };
-        })(self.options.problemsetId, problemset.start_time);
-        setTimeout(f, 1000);
-      } else {
-        self.elements.loadingOverlay.html('404');
-      }
+  problemsetLoadedError(e: { start_time?: string }): void {
+    console.error(e);
+    if (!OmegaUp.loggedIn) {
+      window.location.href = `/login/?redirect=${encodeURIComponent(
+        window.location.pathname,
+      )}`;
       return;
     }
+    if (e.start_time) {
+      const problemsetId = this.options.problemsetId;
+      const problemsetStartTime = time.remoteDate(new Date(e.start_time));
+
+      const problemsetCallback = () => {
+        const now = Date.now();
+        this.elements.loadingOverlay.text(
+          `${problemsetId} ${time.formatDelta(
+            problemsetStartTime.getTime() - now,
+          )}`,
+        );
+        if (now < problemsetStartTime.getTime()) {
+          setTimeout(problemsetCallback, 1000);
+        } else {
+          api.Problemset.details({ problemset_id: problemsetId })
+            .then(result => this.problemsetLoaded(result))
+            .catch(e => this.problemsetLoadedError(e));
+        }
+      };
+      setTimeout(problemsetCallback, 1000);
+      return;
+    }
+    this.elements.loadingOverlay.html('404');
+  }
+
+  problemsetLoaded(problemset: types.Problemset): void {
     if (
-      self.options.isPractice &&
+      this.options.isPractice &&
       problemset.finish_time &&
       Date.now() < problemset.finish_time.getTime()
     ) {
-      window.location = window.location.pathname.replace(/\/practice.*/, '/');
+      window.location.pathname = window.location.pathname.replace(
+        /\/practice.*/,
+        '/',
+      );
       return;
     }
 
-    if (problemset.hasOwnProperty('problemset_id')) {
-      self.options.problemsetId = problemset.problemset_id;
+    if (typeof problemset.problemset_id !== 'undefined') {
+      this.options.problemsetId = problemset.problemset_id;
     }
 
-    if (problemset.hasOwnProperty('original_contest_alias')) {
-      self.options.originalContestAlias = problemset.original_contest_alias;
+    if (typeof problemset.original_contest_alias !== 'undefined') {
+      this.options.originalContestAlias = problemset.original_contest_alias;
     }
 
-    if (problemset.hasOwnProperty('original_problemset_id')) {
-      self.options.originalProblemsetId = problemset.original_problemset_id;
+    if (typeof problemset.original_problemset_id !== 'undefined') {
+      this.options.originalProblemsetId = problemset.original_problemset_id;
     }
 
-    $('#title .contest-title').html(
-      ui.escape(problemset.title || problemset.name),
+    $('#title .contest-title').text(problemset.title ?? problemset.name ?? '');
+    this.updateSummary({
+      ...problemset,
+      alias: <string>problemset.alias,
+      title: <string>problemset.title,
+      start_time: <Date>problemset.start_time,
+      admission_mode: <omegaup.AdmissionMode | undefined>(
+        problemset.admission_mode
+      ),
+      requests_user_information: <omegaup.RequestsUserInformation | undefined>(
+        problemset.requests_user_information
+      ),
+    });
+    this.submissionGap = Math.max(0, problemset.submissions_gap ?? 60);
+
+    this.initClock(
+      <Date>problemset.start_time,
+      problemset.finish_time ?? null,
+      problemset.submission_deadline ?? null,
     );
-    self.updateSummary(problemset);
-    self.submissionGap = parseInt(problemset.submission_gap);
+    this.initProblems(problemset);
 
-    if (!(self.submissionGap > 0)) self.submissionGap = 0;
+    const problemSelect = $('select', this.elements.clarification);
+    for (const problem of problemset.problems ?? []) {
+      const problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
-    self.initClock(
-      problemset.start_time,
-      problemset.finish_time,
-      problemset.submission_deadline,
-    );
-    self.initProblems(problemset);
-
-    let problemSelect = $('select', self.elements.clarification);
-    for (let idx in problemset.problems) {
-      let problem = problemset.problems[idx];
-      let problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
-
-      if (self.navbarProblems) {
-        self.navbarProblems.problems.push({
+      if (this.navbarProblems) {
+        this.navbarProblems.problems.push({
           alias: problem.alias,
           text: problemName,
           acceptsSubmissions: problem.languages !== '',
@@ -649,22 +789,23 @@ export class Arena {
         .appendTo(problemSelect);
     }
 
-    if (!self.options.isPractice && !self.options.isInterview) {
-      self.setupPolls();
+    if (!this.options.isPractice && !this.options.isInterview) {
+      this.setupPolls();
     }
 
     // Trigger the event (useful on page load).
-    self.onHashChanged();
+    this.onHashChanged();
 
-    self.elements.loadingOverlay.fadeOut('slow');
+    this.elements.loadingOverlay.fadeOut('slow');
     $('#root').fadeIn('slow');
 
     if (
       typeof problemset.courseAssignments !== 'undefined' &&
       document.getElementById('arena-navbar-assignments') !== null &&
-      self.navbarAssignments === null
+      this.navbarAssignments === null
     ) {
-      self.navbarAssignments = new Vue({
+      const courseAlias = this.options.courseAlias;
+      this.navbarAssignments = new Vue({
         el: '#arena-navbar-assignments',
         render: function(createElement) {
           return createElement('omegaup-arena-navbar-assignments', {
@@ -674,7 +815,9 @@ export class Arena {
             },
             on: {
               'navigate-to-assignment': (assignmentAlias: string) => {
-                window.location.pathname = `/course/${self.options.courseAlias}/assignment/${assignmentAlias}/`;
+                window.location.pathname = `/course/${courseAlias}/assignment/${assignmentAlias}/${
+                  problemset.admin ? 'admin/' : ''
+                }`;
               },
             },
           });
@@ -686,139 +829,139 @@ export class Arena {
     }
   }
 
-  initProblems(problemset: types.Problemset) {
-    let self = this;
-    self.currentProblemset = problemset;
-    self.problemsetAdmin = problemset.admin;
-    self.myRunsList.isProblemsetOpened =
-      !problemset.hasOwnProperty('opened') || problemset.opened;
-    let problems = problemset.problems;
-    for (let i = 0; i < problems.length; i++) {
-      let problem = problems[i];
-      let alias = problem.alias;
-      if (typeof problem.runs === 'undefined') {
-        problem.runs = [];
-      }
-      self.problems[alias] = problem;
+  initProblems(problemset: types.Problemset): void {
+    this.currentProblemset = problemset;
+    this.problemsetAdmin = problemset.admin ?? false;
+    this.myRunsList.isProblemsetOpened =
+      !problemset.hasOwnProperty('opened') || (problemset.opened ?? false);
+    const problemsetProblems = problemset.problems ?? [];
+    for (const problemsetProblem of problemsetProblems) {
+      const alias = problemsetProblem.alias;
+      this.problems[alias] = {
+        ...problemsetProblem,
+        languages: problemsetProblem.languages
+          .split(',')
+          .filter(language => language !== ''),
+      };
     }
-    if (self.scoreboard) {
-      self.scoreboard.problems = problems;
-      self.scoreboard.showPenalty = problemset.show_penalty;
+    if (this.scoreboard) {
+      this.scoreboard.problems = problemsetProblems;
+      this.scoreboard.showPenalty = problemset.show_penalty ?? false;
     }
   }
 
-  updateClock() {
-    let self = this;
-    let countdownTime = self.submissionDeadline || self.finishTime;
-    if (self.startTime === null || countdownTime === null || !OmegaUp.ready) {
+  updateClock(): void {
+    const countdownTime = this.submissionDeadline || this.finishTime;
+    if (this.startTime === null || countdownTime === null || !OmegaUp.ready) {
       return;
     }
 
-    let now = Date.now();
+    const now = Date.now();
     let clock = '';
-    if (now < self.startTime.getTime()) {
-      clock = `-${time.formatDelta(self.startTime.getTime() - now)}`;
+    if (now < this.startTime.getTime()) {
+      clock = `-${time.formatDelta(this.startTime.getTime() - now)}`;
     } else if (now > countdownTime.getTime()) {
-      // Contest for self user is over
+      // Contest for this user is over
       clock = '00:00:00';
-      clearInterval(self.clockInterval);
-      self.clockInterval = null;
+      if (this.clockInterval) {
+        clearInterval(this.clockInterval);
+        this.clockInterval = null;
+      }
 
       // Show go-to-practice-mode messages on contest end
-      if (now > self.finishTime.getTime()) {
-        if (self.options.contestAlias) {
+      if (this.finishTime && now > this.finishTime.getTime()) {
+        if (this.options.contestAlias) {
           ui.warning(
-            `<a href="/arena/${self.options.contestAlias}/practice/">${T.arenaContestEndedUsePractice}</a>`,
+            `<a href="/arena/${this.options.contestAlias}/practice/">${T.arenaContestEndedUsePractice}</a>`,
           );
-          self.myRunsList.isContestFinished = true;
+          this.myRunsList.isContestFinished = true;
         }
       }
     } else {
       clock = time.formatDelta(countdownTime.getTime() - now);
     }
-    self.elements.clock.text(clock);
+    this.elements.clock.text(clock);
   }
 
-  updateRunFallback(guid) {
-    let self = this;
-    if (self.socket != null) return;
+  updateRunFallback(guid: string): void {
+    if (this.socket != null) return;
     setTimeout(() => {
       api.Run.status({ run_alias: guid })
         .then(time.remoteTimeAdapter)
-        .then(self.updateRun.bind(self))
+        .then(response => this.updateRun(response))
         .catch(ui.ignoreError);
     }, 5000);
   }
 
-  updateRun(run) {
-    let self = this;
+  updateRun(run: types.Run): void {
+    this.trackRun(run);
 
-    self.trackRun(run);
-
-    if (self.socket != null) return;
+    if (this.socket != null) return;
 
     if (run.status != 'ready') {
-      self.updateRunFallback(run.guid);
+      this.updateRunFallback(run.guid);
       return;
     }
     if (
-      !self.options.isPractice &&
-      !self.options.isOnlyProblem &&
-      self.options.contestAlias != 'admin'
+      !this.options.isPractice &&
+      !this.options.isOnlyProblem &&
+      this.options.contestAlias != 'admin'
     ) {
-      self.refreshRanking();
+      this.refreshRanking();
     }
   }
 
-  refreshRanking() {
-    let self = this;
-    let scoreboardParams = {
+  refreshRanking(): void {
+    const scoreboardParams = {
       problemset_id:
-        self.options.problemsetId || self.currentProblemset.problemset_id,
+        this.options.problemsetId || this.currentProblemset?.problemset_id,
+      token: this.options.scoreboardToken,
     };
-    if (self.options.scoreboardToken) {
-      scoreboardParams.token = self.options.scoreboardToken;
-    }
 
-    if (self.options.contestAlias != null) {
+    if (this.options.contestAlias != null) {
       api.Problemset.scoreboard(scoreboardParams)
         .then(response => {
           // Differentiate ranking change between virtual and normal contest
-          if (self.options.originalContestAlias != null)
-            self.virtualRankingChange(response);
-          else self.rankingChange(response);
+          if (this.options.originalContestAlias != null)
+            this.virtualRankingChange(response);
+          else this.rankingChange(response);
         })
         .catch(ui.ignoreError);
     } else if (
-      self.options.problemsetAdmin ||
-      self.options.contestAlias != null ||
-      self.problemsetAdmin ||
-      (self.options.courseAlias && self.options.assignmentAlias)
+      this.options.problemsetAdmin ||
+      this.options.contestAlias != null ||
+      this.problemsetAdmin ||
+      (this.options.courseAlias && this.options.assignmentAlias)
     ) {
       api.Problemset.scoreboard(scoreboardParams)
-        .then(self.rankingChange.bind(self))
+        .then(response => this.rankingChange(response))
         .catch(ui.ignoreError);
     }
   }
 
-  onVirtualRankingChange(virtualContestData) {
-    let self = this;
+  onVirtualRankingChange(virtualContestData: types.Scoreboard): void {
     // This clones virtualContestData to data so that virtualContestData values
     // won't be overriden by processes below
-    let data = JSON.parse(JSON.stringify(virtualContestData));
-    let events = self.originalContestScoreboardEvent;
-    let currentDelta =
-      (new Date().getTime() - self.startTime.getTime()) / (1000 * 60);
+    const data = <types.Scoreboard>(
+      JSON.parse(JSON.stringify(virtualContestData.ranking))
+    );
+    const dataRanking = <
+      (types.ScoreboardRankingEntry & { virtual?: boolean })[]
+    >data.ranking;
+    const events = this.originalContestScoreboardEvents ?? [];
+    const currentDelta =
+      (new Date().getTime() - (this.startTime?.getTime() ?? 0)) / (1000 * 60);
 
-    for (let rank of data.ranking) rank.virtual = true;
+    for (const rank of dataRanking) rank.virtual = true;
 
-    let problemOrder = {};
-    let problems = [];
-    let initialProblems = [];
+    const problemOrder: { [problemAlias: string]: number } = {};
+    const problems: { order: number; alias: string }[] = [];
+    const initialProblems: types.ScoreboardRankingProblem[] = [];
 
-    for (let problem of Object.values(self.problems)) {
+    for (const problem of Object.values(this.problems)) {
       problemOrder[problem.alias] = problems.length;
       initialProblems.push({
+        alias: problem.alias,
         penalty: 0,
         percent: 0,
         points: 0,
@@ -828,24 +971,27 @@ export class Arena {
     }
 
     // Calculate original contest scoreboard with current delta time
-    let originalContestRanking = {};
-    let originalContestEvents = [];
+    const originalContestRanking: {
+      [username: string]: types.ScoreboardRankingEntry;
+    } = {};
+    const originalContestEvents: types.ScoreboardEvent[] = [];
 
     // Refresh after time T
     let refreshTime = 30 * 1000; // 30 seconds
 
     events.forEach(evt => {
-      let key = evt.username;
+      const key = evt.username;
       if (!originalContestRanking.hasOwnProperty(key)) {
         originalContestRanking[key] = {
           country: evt.country,
           name: evt.name,
           username: evt.username,
+          classname: evt.classname,
+          is_invited: evt.is_invited,
           problems: Array.from(initialProblems),
           total: {
             penalty: 0,
             points: 0,
-            runs: 0,
           },
           place: 0,
         };
@@ -858,40 +1004,40 @@ export class Arena {
         return;
       }
       originalContestEvents.push(evt);
-      let problem =
+      const problem =
         originalContestRanking[key].problems[problemOrder[evt.problem.alias]];
       originalContestRanking[key].problems[problemOrder[evt.problem.alias]] = {
+        alias: evt.problem.alias,
         penalty: evt.problem.penalty,
         points: evt.problem.points,
-        runs: problem ? problem.runs + 1 : 1, // If problem appeared in event for than one, it
-        // means a problem has been solved multiple times
+        percent: evt.problem.points,
+        // If problem appeared in event for than one, it means a problem has
+        // been solved multiple times
+        runs: problem ? problem.runs + 1 : 1,
       };
       originalContestRanking[key].total = evt.total;
     });
     // Merge original contest scoreboard ranking with virtual contest
-    for (let ranking of Object.values(originalContestRanking))
-      data.ranking.push(ranking);
+    for (const ranking of Object.values(originalContestRanking)) {
+      dataRanking.push(ranking);
+    }
 
     // Re-sort rank
-    data.ranking.sort((rank1, rank2) => {
+    dataRanking.sort((rank1, rank2) => {
       return rank2.total.points - rank1.total.points;
     });
 
     // Override ranking
-    data.ranking.forEach((rank, index) => (rank.place = index + 1));
-    self.onRankingChanged(data);
+    dataRanking.forEach((rank, index) => (rank.place = index + 1));
+    this.onRankingChanged(data);
 
-    let scoreboardEventsParams = {
-      problemset_id: self.options.problemsetId,
-    };
-    if (self.options.scoreboardToken) {
-      scoreboardEventsParams.token = self.options.scoreboardToken;
-    }
-
-    api.Problemset.scoreboardEvents(scoreboardEventsParams)
+    api.Problemset.scoreboardEvents({
+      problemset_id: this.options.problemsetId,
+      token: this.options.scoreboardToken,
+    })
       .then(response => {
         // Change username to username-virtual
-        for (let evt of response.events) {
+        for (const evt of response.events) {
           evt.username = ui.formatString(T.virtualSuffix, {
             username: evt.username,
           });
@@ -899,117 +1045,115 @@ export class Arena {
         }
 
         // Merge original contest and virtual contest scoreboard events
-        response.events = response.events.concat(originalContestEvents);
-        self.onRankingEvents(response);
+        this.onRankingEvents(response.events.concat(originalContestEvents));
       })
       .catch(ui.ignoreError);
 
-    self.virtualContestRefreshInterval = setTimeout(() => {
-      self.onVirtualRankingChange(virtualContestData);
+    this.virtualContestRefreshInterval = setTimeout(() => {
+      this.onVirtualRankingChange(virtualContestData);
     }, refreshTime);
   }
 
-  virtualRankingChange(data) {
-    // Merge original contest scoreboard and virtual contest
-    let self = this;
-
+  /**
+   * Merge original contest scoreboard and virtual contest
+   */
+  virtualRankingChange(scoreboard: types.Scoreboard): void {
     // Stop existing scoreboard simulation
-    if (self.virtualContestRefreshInterval != null)
-      clearTimeout(self.virtualContestRefreshInterval);
+    if (this.virtualContestRefreshInterval != null)
+      clearTimeout(this.virtualContestRefreshInterval);
 
-    if (self.originalContestScoreboardEvent == null) {
+    if (this.originalContestScoreboardEvents == null) {
       api.Problemset.scoreboardEvents({
-        problemset_id: self.options.originalProblemsetId,
+        problemset_id: this.options.originalProblemsetId,
       })
         .then(response => {
-          self.originalContestScoreboardEvent = response.events;
-          self.onVirtualRankingChange(data);
+          this.originalContestScoreboardEvents = response.events;
+          this.onVirtualRankingChange(scoreboard);
         })
         .catch(ui.apiError);
     } else {
-      self.onVirtualRankingChange(data);
+      this.onVirtualRankingChange(scoreboard);
     }
   }
 
-  rankingChange(data, rankingEvent = true) {
-    let self = this;
-    self.onRankingChanged(data);
-    let scoreboardEventsParams = {
-      problemset_id:
-        self.options.problemsetId || self.currentProblemset.problemset_id,
-    };
-    if (self.options.scoreboardToken) {
-      scoreboardEventsParams.token = self.options.scoreboardToken;
-    }
+  rankingChange(
+    scoreboard: types.Scoreboard,
+    rankingEvent: boolean = true,
+  ): void {
+    this.onRankingChanged(scoreboard);
 
     if (rankingEvent) {
-      api.Problemset.scoreboardEvents(scoreboardEventsParams)
-        .then(self.onRankingEvents.bind(self))
+      api.Problemset.scoreboardEvents({
+        problemset_id:
+          this.options.problemsetId || this.currentProblemset?.problemset_id,
+        token: this.options.scoreboardToken,
+      })
+        .then(response => this.onRankingEvents(response.events))
         .catch(ui.ignoreError);
     }
   }
 
-  onRankingChanged(data) {
-    let self = this;
-    if (self.navbarMiniRanking) {
-      self.navbarMiniRanking.users = [];
+  onRankingChanged(scoreboard: types.Scoreboard): void {
+    if (this.navbarMiniRanking) {
+      this.navbarMiniRanking.users = [];
     }
 
-    if (self.removeRecentEventClassTimeout) {
-      clearTimeout(self.removeRecentEventClassTimeout);
-      self.removeRecentEventClassTimeout = null;
+    if (this.removeRecentEventClassTimeout) {
+      clearTimeout(this.removeRecentEventClassTimeout);
+      this.removeRecentEventClassTimeout = null;
     }
 
-    let ranking = data.ranking || [];
-    let newRanking = {};
-    let order = {};
-    let currentRankingState = {};
+    const ranking: types.ScoreboardRankingEntry[] = scoreboard.ranking || [];
+    const newRanking: { [username: string]: number } = {};
+    const order: { [problemAlias: string]: number } = {};
+    const currentRankingState: { [username: string]: { place: number } } = {};
 
-    for (let i = 0; i < data.problems.length; i++) {
-      order[data.problems[i].alias] = i;
+    for (let i = 0; i < scoreboard.problems.length; i++) {
+      order[scoreboard.problems[i].alias] = i;
     }
 
-    // Push data to ranking table
+    // Push scoreboard to ranking table
     for (let i = 0; i < ranking.length; i++) {
-      let rank = ranking[i];
+      const rank = ranking[i];
       newRanking[rank.username] = i;
 
-      let username = ui.rankingUsername(rank);
-      currentRankingState[username] = { place: rank.place, accepted: {} };
+      const username = ui.rankingUsername(rank);
+      currentRankingState[username] = { place: rank.place ?? 0 };
 
       // Update problem scores.
       let totalRuns = 0;
-      for (let alias in order) {
-        if (!order.hasOwnProperty(alias)) continue;
-        let problem = rank.problems[order[alias]];
+      for (const alias of Object.keys(order)) {
+        const problem = rank.problems[order[alias]];
         totalRuns += problem.runs;
 
         if (
-          self.problems[alias] &&
+          this.problems[alias] &&
           rank.username == OmegaUp.username &&
-          self.problems[alias].languages !== ''
+          this.problems[alias].languages.length > 0
         ) {
-          const currentPoints = parseFloat(self.problems[alias].points || '0');
-          if (self.navbarProblems) {
-            const currentProblem = self.navbarProblems.problems.find(
+          const currentPoints = this.problems[alias].points;
+          if (this.navbarProblems) {
+            const currentProblem = this.navbarProblems.problems.find(
               problem => problem.alias === alias,
             );
-            currentProblem.bestScore = problem.points;
-            currentProblem.maxScore = currentPoints;
+            if (currentProblem) {
+              currentProblem.bestScore = problem.points;
+              currentProblem.maxScore = currentPoints;
+            }
           }
-          self.updateProblemScore(alias, currentPoints, problem.points);
+          this.updateProblemScore(alias, currentPoints, problem.points);
         }
       }
 
       // update miniranking
       if (i < 10) {
-        if (self.navbarMiniRanking) {
+        if (this.navbarMiniRanking) {
           const username = ui.rankingUsername(rank);
-          self.navbarMiniRanking.users.push({
+          this.navbarMiniRanking.users.push({
             position: rank.place,
             username: username,
-            country: rank['country'],
-            classname: rank['classname'],
+            country: rank.country,
+            classname: rank.classname,
             points: rank.total.points,
             penalty: rank.total.penalty,
           });
@@ -1017,75 +1161,77 @@ export class Arena {
       }
     }
 
-    if (self.scoreboard) {
-      self.scoreboard.ranking = ranking;
-      if (data.time) {
-        self.scoreboard.lastUpdated = data.time;
+    if (this.scoreboard) {
+      this.scoreboard.ranking = ranking;
+      if (scoreboard.time) {
+        this.scoreboard.lastUpdated = scoreboard.time;
       }
     }
 
     this.currentRanking = newRanking;
     this.prevRankingState = currentRankingState;
-    self.removeRecentEventClassTimeout = setTimeout(() => {
+    this.removeRecentEventClassTimeout = setTimeout(() => {
       $('.recent-event').removeClass('recent-event');
     }, 30000);
   }
 
-  onRankingEvents(data) {
-    let dataInSeries = {};
-    let navigatorData = [[this.startTime.getTime(), 0]];
-    let series = [];
-    let usernames = {};
+  onRankingEvents(events: types.ScoreboardEvent[]): void {
+    const startTime = this.startTime?.getTime() ?? 0;
+
+    const dataInSeries: { [name: string]: number[][] } = {};
+    const navigatorData: number[][] = [[startTime, 0]];
+    const series: (Highcharts.SeriesLineOptions & { rank: number })[] = [];
+    const usernames: { [name: string]: string } = {};
 
     // Don't trust input data (data might not be sorted)
-    data.events.sort((a, b) => a.delta - b.delta);
+    events.sort((a, b) => a.delta - b.delta);
 
-    this.currentEvents = data;
+    this.currentEvents = events;
+
     // group points by person
-    for (let i = 0, l = data.events.length; i < l; i++) {
-      let curr = data.events[i];
-
+    for (const curr of events) {
       // limit chart to top n users
       if (this.currentRanking[curr.username] > scoreboardColors.length - 1)
         continue;
 
-      if (!dataInSeries[curr.name]) {
-        dataInSeries[curr.name] = [[this.startTime.getTime(), 0]];
-        usernames[curr.name] = curr.username;
+      const name = curr.name ?? curr.username;
+
+      if (!dataInSeries[name]) {
+        dataInSeries[name] = [[startTime, 0]];
+        usernames[name] = curr.username;
       }
-      dataInSeries[curr.name].push([
-        this.startTime.getTime() + curr.delta * 60 * 1000,
+      dataInSeries[name].push([
+        startTime + curr.delta * 60 * 1000,
         curr.total.points,
       ]);
 
       // check if to add to navigator
       if (curr.total.points > navigatorData[navigatorData.length - 1][1]) {
         navigatorData.push([
-          this.startTime.getTime() + curr.delta * 60 * 1000,
+          startTime + curr.delta * 60 * 1000,
           curr.total.points,
         ]);
       }
     }
 
     // convert datas to series
-    for (let i in dataInSeries) {
-      if (dataInSeries.hasOwnProperty(i)) {
-        dataInSeries[i].push([
-          this.finishTime
-            ? Math.min(this.finishTime.getTime(), Date.now())
-            : Date.now(),
-          dataInSeries[i][dataInSeries[i].length - 1][1],
-        ]);
-        series.push({
-          name: i,
-          rank: this.currentRanking[usernames[i]],
-          data: dataInSeries[i],
-          step: true,
-        });
-      }
+    for (const name of Object.keys(dataInSeries)) {
+      dataInSeries[name].push([
+        this.finishTime
+          ? Math.min(this.finishTime.getTime(), Date.now())
+          : Date.now(),
+        dataInSeries[name][dataInSeries[name].length - 1][1],
+      ]);
+      series.push({
+        type: 'line',
+        name: name,
+        rank: this.currentRanking[usernames[name]],
+        data: dataInSeries[name],
+        step: 'right',
+      });
     }
 
-    series.sort((a, b) => a.ranking - b.ranking);
+    series.sort((a, b) => a.rank - b.rank);
 
     navigatorData.push([
       this.finishTime
@@ -1096,84 +1242,86 @@ export class Arena {
     this.createChart(series, navigatorData);
   }
 
-  createChart(series, navigatorSeries) {
-    let self = this;
-    if (series.length == 0 || self.elements.ranking.length == 0) return;
+  createChart(
+    series: Highcharts.SeriesLineOptions[],
+    navigatorSeries: number[][],
+  ): void {
+    if (series.length == 0 || this.elements.ranking.length == 0) return;
 
-    Highcharts.setOptions({ colors: scoreboardColors });
+    this.rankingChart = Highcharts.stockChart(
+      <HTMLElement>document.getElementById('ranking-chart'),
+      <Highcharts.Options>{
+        chart: { height: 300, spacingTop: 20 },
 
-    window.chart = new Highcharts.StockChart({
-      chart: { renderTo: 'ranking-chart', height: 300, spacingTop: 20 },
+        colors: scoreboardColors,
 
-      xAxis: {
-        ordinal: false,
-        min: self.startTime.getTime(),
-        max: Math.min(self.finishTime.getTime(), Date.now()),
-      },
-
-      yAxis: {
-        showLastLabel: true,
-        showFirstLabel: false,
-        min: 0,
-        max: (problems => {
-          let total = 0;
-          for (let prob in problems) {
-            if (!problems.hasOwnProperty(prob)) continue;
-            total += parseInt(problems[prob].points, 10);
-          }
-          return total;
-        })(self.problems),
-      },
-
-      plotOptions: {
-        series: {
-          animation: false,
-          lineWidth: 3,
-          states: { hover: { lineWidth: 3 } },
-          marker: { radius: 5, symbol: 'circle', lineWidth: 1 },
+        xAxis: {
+          ordinal: false,
+          min: this.startTime?.getTime() ?? Date.now(),
+          max: Math.min(this.finishTime?.getTime() || Infinity, Date.now()),
         },
-      },
 
-      navigator: {
-        series: {
-          type: 'line',
-          step: true,
-          lineWidth: 3,
-          lineColor: '#333',
-          data: navigatorSeries,
+        yAxis: {
+          showLastLabel: true,
+          showFirstLabel: false,
+          min: 0,
+          max: (problems => {
+            let total = 0;
+            for (const problem of Object.values(problems)) {
+              total += problem.points;
+            }
+            return total;
+          })(this.problems),
         },
+
+        plotOptions: {
+          series: {
+            animation: false,
+            lineWidth: 3,
+            states: { hover: { lineWidth: 3 } },
+            marker: { radius: 5, symbol: 'circle', lineWidth: 1 },
+          },
+        },
+
+        navigator: {
+          series: {
+            type: 'line',
+            step: true,
+            lineWidth: 3,
+            lineColor: '#333',
+            data: navigatorSeries,
+          },
+        },
+
+        rangeSelector: { enabled: false },
+
+        series: series,
       },
-
-      rangeSelector: { enabled: false },
-
-      series: series,
-    });
+    );
   }
 
-  refreshClarifications() {
-    let self = this;
+  refreshClarifications(): void {
     api.Contest.clarifications({
-      contest_alias: self.options.contestAlias,
-      offset: self.clarificationsOffset,
-      rowcount: self.clarificationsRowcount,
+      contest_alias: this.options.contestAlias,
+      offset: this.clarificationsOffset,
+      rowcount: this.clarificationsRowcount,
     })
       .then(time.remoteTimeAdapter)
-      .then(self.clarificationsChange.bind(self))
+      .then(response => this.clarificationsChange(response.clarifications))
       .catch(ui.ignoreError);
   }
 
-  updateClarification(clarification) {
-    let self = this;
-    let r = null;
-    let anchor = `clarifications/clarification-${clarification.clarification_id}`;
-    if (self.commonNavbar === null) {
+  updateClarification(clarification: types.Clarification): void {
+    let r: JQuery | null = null;
+    const anchor = `clarifications/clarification-${clarification.clarification_id}`;
+    if (this.commonNavbar === null) {
       return;
     }
-    const clarifications = self.commonNavbar.initialClarifications;
-    if (self.clarifications[clarification.clarification_id]) {
-      r = self.clarifications[clarification.clarification_id];
-      if (self.problemsetAdmin) {
-        self.commonNavbar.initialClarifications = clarifications.filter(
+    const clarifications = this.commonNavbar.initialClarifications;
+    if (this.clarifications[clarification.clarification_id]) {
+      r = this.clarifications[clarification.clarification_id];
+      if (this.problemsetAdmin) {
+        this.commonNavbar.initialClarifications = clarifications.filter(
           notification =>
             notification.clarification_id !== clarification.clarification_id,
         );
@@ -1186,16 +1334,16 @@ export class Arena {
         .removeClass('template')
         .addClass('inserted');
 
-      if (self.problemsetAdmin) {
+      if (this.problemsetAdmin) {
         if (clarifications !== null) {
           clarifications.push(clarification);
         }
         ((id, answerNode) => {
-          let responseFormNode = $(
+          const responseFormNode = $(
             '#create-response-form',
             answerNode,
           ).removeClass('template');
-          let cannedResponse = $('#create-response-canned', answerNode);
+          const cannedResponse = $('#create-response-canned', answerNode);
           cannedResponse.on('change', () => {
             if (cannedResponse.val() === 'other') {
               $('#create-response-text', answerNode).show();
@@ -1203,7 +1351,7 @@ export class Arena {
               $('#create-response-text', answerNode).hide();
             }
           });
-          if (clarification.public == 1) {
+          if (clarification.public) {
             $('#create-response-is-public', responseFormNode).attr(
               'checked',
               'checked',
@@ -1214,19 +1362,20 @@ export class Arena {
             );
           }
           responseFormNode.on('submit', () => {
-            let responseText = null;
+            let responseText: string = '';
             if ($('#create-response-canned', answerNode).val() === 'other') {
-              responseText = $('#create-response-text', this).val();
+              responseText = String($('#create-response-text', this).val());
             } else {
-              responseText = $(
-                '#create-response-canned>option:selected',
-                this,
-              ).html();
+              responseText = String(
+                $('#create-response-canned>option:selected', this).html(),
+              );
             }
             api.Clarification.update({
               clarification_id: id,
               answer: responseText,
-              public: $('#create-response-is-public', this)[0].checked ? 1 : 0,
+              public: (<HTMLInputElement>(
+                $('#create-response-is-public', this)[0]
+              )).checked,
             })
               .then(() => {
                 $('pre', answerNode).html(responseText);
@@ -1243,21 +1392,21 @@ export class Arena {
     }
 
     $('.anchor', r).attr('name', anchor);
-    $('.contest', r).html(clarification.contest_alias);
-    $('.problem', r).html(clarification.problem_alias);
-    if (self.problemsetAdmin) $('.author', r).html(clarification.author);
-    $('.time', r).html(
-      Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', clarification.time.getTime()),
-    );
-    $('.message', r).html(ui.escape(clarification.message));
-    $('.answer pre', r).html(ui.escape(clarification.answer));
+    $('.contest', r).text(clarification.contest_alias || '');
+    $('.problem', r).text(clarification.problem_alias);
+    if (this.problemsetAdmin) {
+      $('.author', r).text(clarification.author || '');
+    }
+    $('.time', r).html(time.formatTimestamp(clarification.time));
+    $('.message', r).text(clarification.message);
+    $('.answer pre', r).text(clarification.answer ?? '');
     if (clarification.answer) {
-      self.answeredClarifications++;
+      this.answeredClarifications++;
     }
 
-    if (!self.clarifications[clarification.clarification_id]) {
+    if (!this.clarifications[clarification.clarification_id]) {
       $('.clarifications tbody.clarification-list').prepend(r);
-      self.clarifications[clarification.clarification_id] = r;
+      this.clarifications[clarification.clarification_id] = r;
     }
     if (clarification.answer == null) {
       $('.answer pre', r).hide();
@@ -1268,39 +1417,35 @@ export class Arena {
       $('.answer pre', r).show();
       $(r).addClass('resolved');
     }
-    if (clarification.public == 1) {
+    if (clarification.public) {
       $('#create-response-is-public', r).prop('checked', true);
     }
   }
 
-  clarificationsChange(data) {
-    let self = this;
-    if (data.status != 'ok') {
-      return;
-    }
+  clarificationsChange(clarifications: types.Clarification[]): void {
     $('.clarifications tr.inserted').remove();
     if (
-      data.clarifications.length > 0 &&
-      data.clarifications.length < self.clarificationsRowcount
+      clarifications.length > 0 &&
+      clarifications.length < this.clarificationsRowcount
     ) {
-      $('#clarifications-count').html(`(${data.clarifications.length})`);
-    } else if (data.clarifications.length >= self.clarificationsRowcount) {
-      $('#clarifications-count').html(`(${data.clarifications.length}+)`);
+      $('#clarifications-count').html(`(${clarifications.length})`);
+    } else if (clarifications.length >= this.clarificationsRowcount) {
+      $('#clarifications-count').html(`(${clarifications.length}+)`);
     }
 
-    let previouslyAnswered = self.answeredClarifications;
-    self.answeredClarifications = 0;
-    self.clarifications = {};
+    const previouslyAnswered = this.answeredClarifications;
+    this.answeredClarifications = 0;
+    this.clarifications = {};
 
-    for (let i = data.clarifications.length - 1; i >= 0; i--) {
-      self.updateClarification(data.clarifications[i]);
+    for (let i = clarifications.length - 1; i >= 0; i--) {
+      this.updateClarification(clarifications[i]);
     }
 
-    if (self.commonNavbar !== null) {
-      self.commonNavbar.initialClarifications = data.clarifications
+    if (this.commonNavbar !== null) {
+      this.commonNavbar.initialClarifications = clarifications
         .filter(clarification =>
           // Removing all unsolved clarifications.
-          self.problemsetAdmin
+          this.problemsetAdmin
             ? clarification.answer === null
             : clarification.answer !== null &&
               // Removing all unanswered clarifications.
@@ -1311,14 +1456,14 @@ export class Arena {
         .reverse();
     }
     if (
-      self.answeredClarifications > previouslyAnswered &&
-      self.activeTab != 'clarifications'
+      this.answeredClarifications > previouslyAnswered &&
+      this.activeTab != 'clarifications'
     ) {
       $('#clarifications-count').css('font-weight', 'bold');
     }
   }
 
-  updateAllowedLanguages(lang_array) {
+  updateAllowedLanguages(languages: string[]): void {
     const allowedLanguages = [
       { language: '', name: '' },
       { language: 'kp', name: 'Karel (Pascal)' },
@@ -1345,51 +1490,48 @@ export class Arena {
       { language: 'lua', name: 'Lua (5.2)' },
     ];
 
-    let self = this;
+    const canSubmit = languages.length != 0;
 
-    let can_submit = lang_array.length != 0;
-
-    $('.runs').toggle(can_submit);
-    $('.data').toggle(can_submit);
-    $('.best-solvers').toggle(can_submit);
+    $('.runs').toggle(canSubmit);
+    $('.data').toggle(canSubmit);
+    $('.best-solvers').toggle(canSubmit);
 
     // refresh options in select
-    const languageSelect = document.querySelector('select[name="language"]');
+    const languageSelect = <HTMLSelectElement>(
+      document.querySelector('select[name="language"]')
+    );
     while (languageSelect.firstChild)
       languageSelect.removeChild(languageSelect.firstChild);
 
-    const languageArray =
-      typeof lang_array === 'string' ? lang_array.split(',') : lang_array;
-    languageArray.push('');
+    languages.push('');
 
     allowedLanguages
       .filter(item => {
-        return languageArray.includes(item.language);
+        return languages.includes(item.language);
       })
       .forEach(optionItem => {
-        let optionNode = document.createElement('option');
+        const optionNode = document.createElement('option');
         optionNode.value = optionItem.language;
         optionNode.appendChild(document.createTextNode(optionItem.name));
         languageSelect.appendChild(optionNode);
       });
   }
 
-  selectDefaultLanguage() {
-    let self = this;
-    let langElement = self.elements.submitForm.language;
+  selectDefaultLanguage(): void {
+    const langElement = this.elements.submitForm.language;
 
-    if (self.preferredLanguage) {
-      $('option', langElement).each(() => {
-        let option = $(this);
-        if (option.val() != self.preferredLanguage) return;
+    if (this.preferredLanguage) {
+      $('option', langElement).each((index, value) => {
+        const option = $(value);
+        if (option.val() != this.preferredLanguage) return;
         option.prop('selected', true);
         return false;
       });
     }
     if (langElement.val()) return;
 
-    $('option', langElement).each(() => {
-      let option = $(this);
+    $('option', langElement).each((index, value) => {
+      const option = $(value);
 
       option.prop('selected', true);
       langElement.trigger('change');
@@ -1397,48 +1539,19 @@ export class Arena {
     });
   }
 
-  mountEditor(problem: types.ProblemsetProblem): void {
-    let self = this;
-    let lang = self.elements.submitForm.language.val();
+  mountEditor(problem: Problem): void {
+    const lang = <string>(this.elements.submitForm.language.val() ?? '');
     let template = '';
-    if (problem.templates && lang && problem.templates[lang]) {
-      template = problem.templates[lang];
+    if (lang && problem.settings?.interactive?.templates?.[lang]) {
+      template = problem.settings.interactive.templates[lang];
     }
-    if (self.codeEditor) {
-      self.codeEditor.code = template;
+    if (this.codeEditor) {
+      this.codeEditor.code = template;
       return;
     }
 
-    self.codeEditor = new Vue({
-      el: self.elements.submitForm.code[0],
-      data: {
-        language: lang,
-        code: template,
-      },
-      methods: {
-        refresh: () => {
-          // It's possible for codeMirror not to have been set yet
-          // if this method is used before the mounted event handler
-          // is called.
-          if (this.codeMirror) {
-            this.codeMirror.refresh();
-          }
-        },
-      },
-      mounted: function() {
-        // Wait for sub-components to be mounted...
-        this.$nextTick(() => {
-          // ... and then fish out a reference to the wrapped
-          // CodeMirror instance.
-          //
-          // The full path is:
-          // - this: this unnamed component
-          // - $children[0]: CodeView instance
-          // - $refs['cm-wrapper']: vue-codemirror instance
-          // - editor: the actual CodeMirror instance
-          this.codeMirror = this.$children[0].$refs['cm-wrapper'].editor;
-        });
-      },
+    const codeEditor = (this.codeEditor = new Vue({
+      el: this.elements.submitForm.code[0],
       render: function(createElement) {
         return createElement('omegaup-arena-code-view', {
           props: {
@@ -1446,31 +1559,39 @@ export class Arena {
             value: this.code,
           },
           on: {
-            input: value => {
-              this.code = value;
+            input: (value: string) => {
+              codeEditor.code = value;
             },
-            change: value => {
-              this.code = value;
+            change: (value: string) => {
+              codeEditor.code = value;
             },
           },
         });
       },
+      data: {
+        language: lang,
+        code: template,
+      },
+      methods: {
+        refresh: () => {
+          (<arena_CodeView>codeEditor.$children[0]).refresh();
+        },
+      },
       components: {
         'omegaup-arena-code-view': arena_CodeView,
       },
-    });
+    }));
   }
 
-  onHashChanged() {
-    let self = this;
+  onHashChanged(): void {
     let tabChanged = false;
     let foundHash = false;
-    let tabs = ['summary', 'problems', 'ranking', 'clarifications', 'runs'];
+    const tabs = ['summary', 'problems', 'ranking', 'clarifications', 'runs'];
 
-    for (let i = 0; i < tabs.length; i++) {
-      if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
-        tabChanged = self.activeTab != tabs[i];
-        self.activeTab = tabs[i];
+    for (const tabName of tabs) {
+      if (window.location.hash.indexOf(`#${tabName}`) == 0) {
+        tabChanged = this.activeTab != tabName;
+        this.activeTab = tabName;
         foundHash = true;
 
         break;
@@ -1479,30 +1600,32 @@ export class Arena {
 
     if (!foundHash) {
       // Change the URL to the deafult tab but don't break the back button.
-      window.history.replaceState({}, '', '#' + self.activeTab);
+      window.history.replaceState({}, '', `#${this.activeTab}`);
     }
 
-    let problem = /#problems\/([^\/]+)(\/new-run)?/.exec(window.location.hash);
+    const problemMatch = /#problems\/([^\/]+)(\/new-run)?/.exec(
+      window.location.hash,
+    );
     // Check if we were already viewing this problem to avoid reloading
     // it and repainting the screen.
     let problemChanged = true;
     if (
-      self.previousHash == window.location.hash + '/new-run' ||
-      window.location.hash == self.previousHash + '/new-run'
+      this.previousHash == `${window.location.hash}/new-run` ||
+      window.location.hash == `${this.previousHash}/new-run`
     ) {
       problemChanged = false;
     }
-    self.previousHash = window.location.hash;
+    this.previousHash = window.location.hash;
 
-    if (problem && self.problems[problem[1]]) {
-      let newRun = problem[2];
-      self.currentProblem = problem = self.problems[problem[1]];
+    if (problemMatch && this.problems[problemMatch[1]]) {
+      const newRun = problemMatch[2];
+      const problem = (this.currentProblem = this.problems[problemMatch[1]]);
       // Set as active the selected problem
-      if (self.navbarProblems) {
-        self.navbarProblems.activeProblem = self.currentProblem.alias;
+      if (this.navbarProblems) {
+        this.navbarProblems.activeProblem = this.currentProblem.alias;
       }
 
-      const update = problem => {
+      const update = (problem: Problem) => {
         // TODO: Make #problem a component
         $('#summary').hide();
         $('#problem').show();
@@ -1511,30 +1634,39 @@ export class Arena {
         );
         $('#problem .data .points').text(problem.points);
         $('#problem .memory_limit').text(
-          `${problem.settings.limits.MemoryLimit / 1024 / 1024} MiB`,
+          `${problem.settings?.limits.MemoryLimit ??
+            (1024 * 1024) / 1024 / 1024} MiB`,
         );
-        $('#problem .time_limit').text(problem.settings.limits.TimeLimit);
+        $('#problem .time_limit').text(
+          problem.settings?.limits.TimeLimit ?? '',
+        );
         $('#problem .overall_wall_time_limit').text(
-          problem.settings.limits.OverallWallTimeLimit,
+          problem.settings?.limits.OverallWallTimeLimit ?? '',
         );
-        $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
-        self.renderProblem(problem);
-        let karel_langs = ['kp', 'kj'];
-        if (karel_langs.every(x => problem.languages.indexOf(x) != -1)) {
-          let original_href = $('#problem .karel-js-link a').attr('href');
-          let hash_index = original_href.indexOf('#');
-          if (hash_index != -1) {
-            original_href = original_href.substring(0, hash_index);
+        if (problem.input_limit) {
+          $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
+        } else {
+          $('#problem .input_limit').text('');
+        }
+        this.renderProblem(problem);
+        const karelLangs = ['kp', 'kj'];
+        if (karelLangs.every(x => problem.languages.indexOf(x) != -1)) {
+          let originalHref = $('#problem .karel-js-link a').attr('href');
+          if (originalHref) {
+            const hashIndex = originalHref.indexOf('#');
+            if (hashIndex != -1) {
+              originalHref = originalHref.substring(0, hashIndex);
+            }
           }
-          if (problem.settings.cases.sample) {
+          if (problem.settings?.cases.sample) {
             $('#problem .karel-js-link a').attr(
               'href',
-              original_href +
-                '#mundo:' +
-                encodeURIComponent(problem.settings.cases.sample.in),
+              `${originalHref}#mundo:${encodeURIComponent(
+                problem.settings.cases.sample.in,
+              )}`,
             );
           } else {
-            $('#problem .karel-js-link a').attr('href', original_href);
+            $('#problem .karel-js-link a').attr('href', originalHref ?? null);
           }
           $('#problem .karel-js-link').removeClass('hide');
         } else {
@@ -1557,16 +1689,16 @@ export class Arena {
 
         $('#problem tbody.added').remove();
 
-        const updateRuns = runs => {
+        const updateRuns = (runs?: types.Run[]) => {
           if (runs) {
-            for (let run of runs) {
-              self.trackRun(run);
+            for (const run of runs) {
+              this.trackRun(run);
             }
           }
-          self.myRunsList.problemAlias = problem.alias;
+          this.myRunsList.problemAlias = problem.alias;
         };
 
-        if (self.options.isPractice || self.options.isOnlyProblem) {
+        if (this.options.isPractice || this.options.isOnlyProblem) {
           api.Problem.runs({ problem_alias: problem.alias })
             .then(time.remoteTimeAdapter)
             .then(data => {
@@ -1575,39 +1707,40 @@ export class Arena {
             .catch(ui.apiError);
         } else {
           updateRuns(problem.runs);
-          self.showQualityNominationPopup();
+          this.showQualityNominationPopup();
         }
 
-        self.initSubmissionCountdown();
+        this.initSubmissionCountdown();
       };
 
       if (problemChanged) {
         // Ping Analytics with updated problem id
-        let page = window.location.pathname + window.location.hash;
-        if (typeof ga == 'function') {
-          ga('set', 'page', page);
-          ga('send', 'pageview');
+        const page = window.location.pathname + window.location.hash;
+        if (typeof window.ga == 'function') {
+          window.ga('set', 'page', page);
+          window.ga('send', 'pageview');
         }
         if (problem.statement) {
           update(problem);
         } else {
-          let problemset = self.computeProblemsetArg();
+          const problemset = this.computeProblemsetArg();
           api.Problem.details(
             $.extend(problemset, {
               problem_alias: problem.alias,
               prevent_problemset_open:
-                self.problemsetAdmin && !self.myRunsList.isProblemsetOpened,
+                this.problemsetAdmin && !this.myRunsList.isProblemsetOpened,
             }),
           )
             .then(problem_ext => {
               problem.source = problem_ext.source;
               problem.problemsetter = problem_ext.problemsetter;
-              problem.statement = problem_ext.statement;
+              if (problem_ext.statement) {
+                problem.statement = problem_ext.statement;
+              }
               problem.settings = problem_ext.settings;
-              problem.input_limit = problem_ext.input_limit;
+              problem.input_limit = problem_ext.input_limit ?? 10240;
               problem.runs = problem_ext.runs;
-              problem.templates = problem_ext.templates;
-              self.preferredLanguage = problem_ext.preferred_language;
+              this.preferredLanguage = problem_ext.preferred_language ?? null;
               update(problem);
             })
             .catch(ui.apiError);
@@ -1616,58 +1749,56 @@ export class Arena {
 
       if (newRun) {
         $('#overlay form').hide();
-        $('input', self.elements.submitForm).show();
-        self.elements.submitForm.show();
+        $('input', this.elements.submitForm).show();
+        this.elements.submitForm.show();
         $('#overlay').show();
-        if (self.codeEditor) {
+        if (this.codeEditor) {
           // It might not be mounted yet if we refresh directly onto
           // a /new-run view. This code executes directly, whereas
           // codeEditor is mounted after update() finishes.
           //
           // Luckily in this case we don't require the call to refresh
           // for the display to update correctly!
-          self.codeEditor.refresh();
+          this.codeEditor.refresh();
         }
-        if (self.options.shouldShowFirstAssociatedIdentityRunWarning) {
-          self.options.shouldShowFirstAssociatedIdentityRunWarning = false;
+        if (this.options.shouldShowFirstAssociatedIdentityRunWarning) {
+          this.options.shouldShowFirstAssociatedIdentityRunWarning = false;
           ui.warning(T.firstSumbissionWithIdentity);
         }
       }
-    } else if (self.activeTab == 'problems') {
+    } else if (this.activeTab == 'problems') {
       $('#problem').hide();
       $('#summary').show();
-      if (self.navbarProblems) {
-        self.navbarProblems.activeProblem = null;
+      if (this.navbarProblems) {
+        this.navbarProblems.activeProblem = null;
       }
-    } else if (self.activeTab == 'clarifications') {
+    } else if (this.activeTab == 'clarifications') {
       if (window.location.hash == '#clarifications/new') {
         $('#overlay form').hide();
         $('#overlay, #clarification').show();
       }
     }
-    self.detectShowRun();
+    this.detectShowRun();
 
     if (tabChanged) {
       $('.tabs a.active').removeClass('active');
-      $('.tabs a[href="#' + self.activeTab + '"]').addClass('active');
+      $(`.tabs a[href="#${this.activeTab}"]`).addClass('active');
       $('.tab').hide();
-      $('#' + self.activeTab).show();
+      $(`#${this.activeTab}`).show();
 
-      if (self.activeTab == 'ranking') {
-        if (self.currentEvents) {
-          self.onRankingEvents(self.currentEvents);
+      if (this.activeTab == 'ranking') {
+        if (this.currentEvents) {
+          this.onRankingEvents(this.currentEvents);
         }
-      } else if (self.activeTab == 'clarifications') {
+      } else if (this.activeTab == 'clarifications') {
         $('#clarifications-count').css('font-weight', 'normal');
       }
     }
   }
 
-  showQualityNominationPopup() {
-    let self = this;
-
-    let qualityPayload = self.currentProblem.quality_payload;
-    if (typeof qualityPayload === 'undefined') {
+  showQualityNominationPopup(): void {
+    const qualityPayload = this.currentProblem.quality_payload;
+    if (!qualityPayload) {
       // Quality Nomination only works for Courses
       return;
     }
@@ -1675,21 +1806,11 @@ export class Arena {
       // Only real users can perform this action.
       return;
     }
-    if (self.qualityNominationForm !== null) {
-      self.qualityNominationForm.nominated = qualityPayload.nominated;
-      self.qualityNominationForm.nominatedBeforeAC =
-        qualityPayload.nominatedBeforeAC;
-      self.qualityNominationForm.solved = qualityPayload.solved;
-      self.qualityNominationForm.tried = qualityPayload.tried;
-      self.qualityNominationForm.dismissed = qualityPayload.dismissed;
-      self.qualityNominationForm.dismissedBeforeAC =
-        qualityPayload.dismissedBeforeAC;
-      self.qualityNominationForm.canNominateProblem =
-        qualityPayload.canNominateProblem;
-      self.qualityNominationForm.problemAlias = qualityPayload.problemAlias;
+    if (this.qualityNominationForm !== null) {
+      this.qualityNominationForm.qualityPayload = qualityPayload;
       return;
     }
-    self.qualityNominationForm = new Vue({
+    this.qualityNominationForm = new Vue({
       el: '#qualitynomination-popup',
       mounted: () => {
         ui.reportEvent('quality-nomination', 'shown');
@@ -1697,27 +1818,29 @@ export class Arena {
       render: function(createElement) {
         return createElement('qualitynomination-popup', {
           props: {
-            nominated: this.nominated,
-            nominatedBeforeAC: this.nominatedBeforeAC,
-            solved: this.solved,
-            tried: this.tried,
-            dismissed: this.dismissed,
-            dismissedBeforeAC: this.dismissedBeforeAC,
-            canNominateProblem: this.canNominateProblem,
-            problemAlias: this.problemAlias,
+            nominated: this.qualityPayload.nominated,
+            nominatedBeforeAC: this.qualityPayload.nominatedBeforeAC,
+            solved: this.qualityPayload.solved,
+            tried: this.qualityPayload.tried,
+            dismissed: this.qualityPayload.dismissed,
+            dismissedBeforeAC: this.qualityPayload.dismissedBeforeAC,
+            canNominateProblem: this.qualityPayload.canNominateProblem,
+            problemAlias: this.qualityPayload.problemAlias,
           },
           on: {
-            submit: ev => {
+            submit: (popup: qualitynomination_Popup) => {
               const contents = {
-                before_ac: !ev.solved && ev.tried,
+                before_ac: !popup.solved && popup.tried,
                 difficulty:
-                  ev.difficulty !== '' ? Number.parseInt(ev.difficulty, 10) : 0,
-                tags: ev.tags.length > 0 ? ev.tags : [],
+                  popup.difficulty !== ''
+                    ? Number.parseInt(popup.difficulty, 10)
+                    : 0,
+                tags: popup.tags.length > 0 ? popup.tags : [],
                 quality:
-                  ev.quality !== '' ? Number.parseInt(ev.quality, 10) : 0,
+                  popup.quality !== '' ? Number.parseInt(popup.quality, 10) : 0,
               };
               api.QualityNomination.create({
-                problem_alias: qualityPayload.problemAlias,
+                problem_alias: popup.problemAlias,
                 nomination: 'suggestion',
                 contents: JSON.stringify(contents),
               })
@@ -1726,12 +1849,12 @@ export class Arena {
                 })
                 .catch(ui.apiError);
             },
-            dismiss: ev => {
+            dismiss: (popup: qualitynomination_Popup) => {
               const contents = {
-                before_ac: !ev.solved && ev.tried,
+                before_ac: !popup.solved && popup.tried,
               };
               api.QualityNomination.create({
-                problem_alias: qualityPayload.problemAlias,
+                problem_alias: popup.problemAlias,
                 nomination: 'dismissal',
                 contents: JSON.stringify(contents),
               })
@@ -1745,14 +1868,7 @@ export class Arena {
         });
       },
       data: {
-        nominated: qualityPayload.nominated,
-        nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
-        solved: qualityPayload.solved,
-        tried: qualityPayload.tried,
-        dismissed: qualityPayload.dismissed,
-        dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
-        canNominateProblem: qualityPayload.canNominateProblem,
-        problemAlias: qualityPayload.problemAlias,
+        qualityPayload: qualityPayload,
       },
       components: {
         'qualitynomination-popup': qualitynomination_Popup,
@@ -1760,73 +1876,73 @@ export class Arena {
     });
   }
 
-  renderProblem(problem) {
-    let self = this;
-    self.currentProblem = problem;
-    let statement = document.querySelector('#problem div.statement');
-    statement.innerHTML = self.markdownConverter.makeHtmlWithImages(
-      problem.statement.markdown,
-      problem.statement.images,
-      problem.settings,
+  renderProblem(problem: Problem): void {
+    this.currentProblem = problem;
+    const statementElement = <HTMLElement>(
+      document.querySelector('#problem div.statement')
     );
-    const creationDate = document.querySelector(
-      '#problem .problem-creation-date',
+    if (problem.statement) {
+      statementElement.innerHTML = this.markdownConverter.makeHtmlWithImages(
+        problem.statement.markdown,
+        problem.statement.images,
+        problem.settings,
+      );
+    }
+    const creationDateElement = <HTMLElement>(
+      document.querySelector('#problem .problem-creation-date')
     );
-    if (problem.problemsetter && creationDate) {
-      creationDate.innerText = ui.formatString(T.wordsUploadedOn, {
-        date: time.formatDate(
-          new Date(problem.problemsetter.creation_date * 1000),
-        ),
+    if (problem.problemsetter?.creation_date && creationDateElement) {
+      creationDateElement.innerText = ui.formatString(T.wordsUploadedOn, {
+        date: time.formatDate(problem.problemsetter.creation_date),
       });
     }
 
     ui.renderSampleToClipboardButton();
 
-    let libinteractiveInterfaceName = statement.querySelector(
-      'span.libinteractive-interface-name',
+    const libinteractiveInterfaceNameElement = <HTMLElement>(
+      statementElement.querySelector('span.libinteractive-interface-name')
     );
     if (
-      libinteractiveInterfaceName &&
-      problem.settings &&
-      problem.settings.interactive &&
-      problem.settings.interactive.module_name
+      libinteractiveInterfaceNameElement &&
+      problem.settings?.interactive?.module_name
     ) {
-      libinteractiveInterfaceName.innerText = problem.settings.interactive.module_name.replace(
+      libinteractiveInterfaceNameElement.innerText = problem.settings.interactive.module_name.replace(
         /\.idl$/,
         '',
       );
     }
-    self.installLibinteractiveHooks();
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
+    this.installLibinteractiveHooks();
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, statementElement]);
 
-    self.mountEditor(problem);
+    this.mountEditor(problem);
 
-    let languageArray = problem.languages;
-    self.updateAllowedLanguages(languageArray);
-    self.selectDefaultLanguage();
+    const languageArray = problem.languages;
+    this.updateAllowedLanguages(languageArray);
+    this.selectDefaultLanguage();
 
-    self.ephemeralGrader.send('setSettings', problem.settings);
+    this.ephemeralGrader.send('setSettings', problem.settings);
   }
 
   detectShowRun(): void {
-    let showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
-    let showRunMatch = window.location.hash.match(showRunRegex);
-    if (showRunMatch) {
-      $('#overlay form').hide();
-      $('#overlay').show();
-      api.Run.details({ run_alias: showRunMatch[1] })
-        .then(time.remoteTimeAdapter)
-        .then(data => {
-          this.displayRunDetails(showRunMatch[1], data);
-        })
-        .catch(error => {
-          ui.apiError(error);
-          this.hideOverlay();
-        });
+    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
+    const showRunMatch = window.location.hash.match(showRunRegex);
+    if (!showRunMatch) {
+      return;
     }
+    $('#overlay form').hide();
+    $('#overlay').show();
+    api.Run.details({ run_alias: showRunMatch[1] })
+      .then(time.remoteTimeAdapter)
+      .then(data => {
+        this.displayRunDetails(showRunMatch[1], data);
+      })
+      .catch(error => {
+        ui.apiError(error);
+        this.hideOverlay();
+      });
   }
 
-  hideOverlay() {
+  hideOverlay(): void {
     $('#overlay').hide();
     window.location.hash = window.location.hash.substring(
       0,
@@ -1844,8 +1960,8 @@ export class Arena {
 
   onCloseSubmit(e: Event): void {
     if (
-      e.target.id !== 'overlay' &&
-      (<JQuery>e.target).closest('button.close') === null
+      (<HTMLElement>e.target).id !== 'overlay' &&
+      (<JQuery>(e.target as unknown)).closest('button.close') === null
     ) {
       return;
     }
@@ -1855,50 +1971,51 @@ export class Arena {
     e.preventDefault();
   }
 
-  clearInputFile() {
-    let self = this;
+  clearInputFile(): void {
     // This worked, nay, was required, on older browsers.
     // It stopped working sometime in 2017, and now .val(null)
     // is enough to clear the input field.
     // Leaving this here for now in case some older browsers
     // still require it.
-    self.elements.submitForm.file.replaceWith(
-      (self.elements.submitForm.file = self.elements.submitForm.file.clone(
+    this.elements.submitForm.file.replaceWith(
+      (this.elements.submitForm.file = this.elements.submitForm.file.clone(
         true,
       )),
     );
-    self.elements.submitForm.file.val(null);
+    // @ts-ignore Apparently TypeScript does not like the new way of doing
+    // things.
+    this.elements.submitForm.file.val(null);
   }
 
-  initSubmissionCountdown() {
-    let self = this;
+  initSubmissionCountdown(): void {
     let nextSubmissionTimestamp = new Date(0);
     $('#submit input[type=submit]')
       .removeAttr('value')
       .prop('disabled', false);
-    let problem = self.problems[self.currentProblem.alias];
+    const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
         nextSubmissionTimestamp = new Date(
-          problem.nextSubmissionTimestamp * 1000,
+          problem.nextSubmissionTimestamp.getTime() * 1000,
         );
       } else if (
         typeof problem.runs !== 'undefined' &&
+        typeof this.currentProblemset?.submissions_gap !== 'undefined' &&
         problem.runs.length > 0
       ) {
         nextSubmissionTimestamp = new Date(
           problem.runs[problem.runs.length - 1].time.getTime() +
-            self.currentProblemset.submissions_gap * 1000,
+            this.currentProblemset.submissions_gap * 1000,
         );
       }
     }
-    if (self.submissionGapInterval) {
-      clearInterval(self.submissionGapInterval);
-      self.submissionGapInterval = 0;
+    if (this.submissionGapInterval) {
+      clearInterval(this.submissionGapInterval);
+      this.submissionGapInterval = null;
     }
-    self.submissionGapInterval = setInterval(() => {
+    this.submissionGapInterval = setInterval(() => {
       const submissionGapSecondsRemaining = Math.ceil(
-        (nextSubmissionTimestamp - Date.now()) / 1000,
+        (nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
       );
       if (submissionGapSecondsRemaining > 0) {
         $('#submit input[type=submit]')
@@ -1912,14 +2029,16 @@ export class Arena {
         $('#submit input[type=submit]')
           .removeAttr('value')
           .prop('disabled', false);
-        clearInterval(self.submissionGapInterval);
+        clearInterval(
+          <ReturnType<typeof setTimeout>>this.submissionGapInterval,
+        );
       }
     }, 1000);
   }
 
   onLanguageSelect(e: Event): void {
     const lang = (<HTMLSelectElement>e.target).value;
-    let ext = $('.submit-filename-extension', this.elements.submitForm);
+    const ext = $('.submit-filename-extension', this.elements.submitForm);
     if (lang.startsWith('cpp')) {
       ext.text('.cpp');
     } else if (lang.startsWith('c-')) {
@@ -1941,7 +2060,8 @@ export class Arena {
 
     if (
       !this.options.isOnlyProblem &&
-      this.problems[this.currentProblem.alias].last_submission +
+      (this.problems[this.currentProblem.alias].lastSubmission?.getTime() ??
+        0) +
         this.submissionGap * 1000 >
         Date.now()
     ) {
@@ -1953,24 +2073,26 @@ export class Arena {
       return;
     }
 
-    let submitForm = this.elements.submitForm;
-    let langSelect = this.elements.submitForm.language;
+    const submitForm = this.elements.submitForm;
+    const langSelect = this.elements.submitForm.language;
     if (!langSelect.val()) {
       alert(T.arenaRunSubmitMissingLanguage);
       return;
     }
 
-    let file = <HTMLFileInput>this.elements.submitForm.file[0];
-    if (file && file.files && file.files.length > 0) {
-      file = file.files[0];
-      let reader = new FileReader();
+    const file = (<HTMLInputElement>this.elements.submitForm.file[0])
+      ?.files?.[0];
+    if (file) {
+      const reader = new FileReader();
 
       reader.onload = e => {
-        this.submitRun(e.target.result);
+        const result = e.target?.result ?? null;
+        if (result === null) return;
+        this.submitRun(result as string);
       };
 
-      let extension = file.name.split(/\./);
-      extension = extension[extension.length - 1];
+      const extensionArray = file.name.split(/\./);
+      const extension = extensionArray[extensionArray.length - 1];
 
       if (
         langSelect.val() != 'cat' ||
@@ -1989,7 +2111,10 @@ export class Arena {
         extension == 'rb' ||
         extension == 'lua'
       ) {
-        if (file.size >= this.currentProblem.input_limit) {
+        if (
+          this.currentProblem.input_limit &&
+          file.size >= this.currentProblem.input_limit
+        ) {
           alert(
             ui.formatString(T.arenaRunSubmitFilesize, {
               limit: `${this.currentProblem.input_limit / 1024} KiB`,
@@ -2031,8 +2156,10 @@ export class Arena {
   }
 
   submitRun(code: string): void {
-    let problemset = this.options.isPractice ? {} : this.computeProblemsetArg();
-    let lang = this.elements.submitForm.language.val();
+    const problemset = this.options.isPractice
+      ? {}
+      : this.computeProblemsetArg();
+    const lang = this.elements.submitForm.language.val();
 
     $('input', this.elements.submitForm).attr('disabled', 'disabled');
     api.Run.create(
@@ -2042,26 +2169,34 @@ export class Arena {
         source: code,
       }),
     )
-      .then(run => {
+      .then(response => {
         ui.reportEvent('submission', 'submit');
         if (this.options.isLockdownMode && sessionStorage) {
-          sessionStorage.setItem(`run:${run.guid}`, code);
+          sessionStorage.setItem(`run:${response.guid}`, code);
         }
 
+        const currentProblem = this.problems[this.currentProblem.alias];
         if (!this.options.isOnlyProblem) {
-          this.problems[this.currentProblem.alias].last_submission = Date.now();
+          this.problems[this.currentProblem.alias].lastSubmission = new Date();
           this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
-            run.nextSubmissionTimestamp;
+            response.nextSubmissionTimestamp;
         }
-        run.username = OmegaUp.username;
-        run.status = 'new';
-        run.alias = this.currentProblem.alias;
-        run.contest_score = null;
-        run.time = new Date();
-        run.penalty = 0;
-        run.runtime = 0;
-        run.memory = 0;
-        run.language = this.elements.submitForm.language.val();
+        const run = {
+          guid: response.guid,
+          submit_delay: response.submit_delay,
+          username: this.options.payload.currentUsername,
+          classname: this.options.payload.userClassname,
+          country: 'xx',
+          status: 'new',
+          alias: this.currentProblem.alias,
+          time: new Date(),
+          penalty: 0,
+          runtime: 0,
+          memory: 0,
+          verdict: 'JE',
+          score: 0,
+          language: <string>(this.elements.submitForm.language.val() ?? ''),
+        };
         this.updateRun(run);
 
         $('input', this.elements.submitForm).prop('disabled', false);
@@ -2070,9 +2205,11 @@ export class Arena {
         this.initSubmissionCountdown();
       })
       .catch(run => {
-        alert(run.error);
+        alert(run.error ?? run);
         $('input', this.elements.submitForm).prop('disabled', false);
-        ui.reportEvent('submission', 'submit-fail', run.errorname);
+        if (run.errorname) {
+          ui.reportEvent('submission', 'submit-fail', run.errorname);
+        }
       });
   }
 
@@ -2081,7 +2218,7 @@ export class Arena {
   }
 
   displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
-    let problemAdmin = data.admin;
+    const problemAdmin = data.admin;
 
     let sourceHTML,
       sourceLink = false;
@@ -2097,9 +2234,7 @@ export class Arena {
       sourceHTML = data.source;
     }
 
-    const numericSort: <T extends { [key: string]: any }>(
-      key: string,
-    ) => (x: T, y: T) => number = (key: string) => {
+    const numericSort = <T extends { [key: string]: any }>(key: string) => {
       const isDigit = (ch: string) => '0' <= ch && ch <= '9';
       return (x: T, y: T) => {
         let i = 0,
@@ -2124,15 +2259,15 @@ export class Arena {
         return x[key].length - i - (y[key].length - j);
       };
     };
-    let detailsGroups = data.details && data.details.groups;
+    const detailsGroups = data.details && data.details.groups;
     let groups = undefined;
     if (detailsGroups && detailsGroups.length) {
       detailsGroups.sort(numericSort('group'));
-      for (let i = 0; i < detailsGroups.length; i++) {
-        if (!detailsGroups[i].cases) {
+      for (const detailGroup of detailsGroups) {
+        if (!detailGroup.cases) {
           continue;
         }
-        detailsGroups[i].cases.sort(numericSort('name'));
+        detailGroup.cases.sort(numericSort('name'));
       }
       groups = detailsGroups;
     }
@@ -2175,7 +2310,7 @@ export class Arena {
       return;
     }
     this.updateProblemScore(run.alias, problem.points, 0);
-    const qualityPayload = (<types.ProblemsetProblem>problem).quality_payload;
+    const qualityPayload = problem.quality_payload;
     if (!qualityPayload) {
       return;
     }
@@ -2198,12 +2333,12 @@ export class Arena {
     // It only works for contests
     if (this.options.contestAlias != null && this.scoreboard !== null) {
       this.scoreboard.ranking = this.scoreboard.ranking.map(rank => {
-        let ranking = rank;
+        const ranking = rank;
         if (ranking.username == OmegaUp.username) {
           ranking.problems = rank.problems.map(problem => {
-            let problemRanking = problem;
+            const problemRanking = problem;
             if (problemRanking.alias == alias) {
-              let maxScore = getMaxScore(
+              const maxScore = getMaxScore(
                 myRunsStore.state.runs,
                 problemRanking.alias,
                 previousScore,
@@ -2233,5 +2368,218 @@ export class Arena {
         currentProblem.maxScore = maxScore;
       }
     }
+  }
+}
+
+export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
+  const options: ArenaOptions = {
+    isLockdownMode: false,
+    isInterview: false,
+    isPractice: false,
+    isOnlyProblem: false,
+    disableClarifications: false,
+    disableSockets: false,
+    assignmentAlias: null,
+    contestAlias: null,
+    courseAlias: null,
+    scoreboardToken: null,
+    shouldShowFirstAssociatedIdentityRunWarning: false,
+    onlyProblemAlias: null,
+    originalContestAlias: null,
+    problemsetId: null,
+    problemsetAdmin: false,
+    payload: {
+      omegaUpLockDown: false,
+      bootstrap4: false,
+      inContest: false,
+      isLoggedIn: false,
+      isReviewer: false,
+      gravatarURL51: '',
+      currentUsername: '',
+      userClassname: 'user-rank-unranked',
+      userCountry: 'xx',
+      profileProgress: 0,
+      isMainUserIdentity: false,
+      isAdmin: false,
+      lockDownImage: '',
+      navbarSection: '',
+    },
+    preferredLanguage: null,
+  };
+
+  if (
+    document.getElementsByTagName('body')[0].className.indexOf('lockdown') !==
+    -1
+  ) {
+    options.isLockdownMode = true;
+    window.onbeforeunload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = T.lockdownMessageWarning;
+    };
+  }
+
+  if (arenaLocation.pathname.indexOf('/practice') !== -1) {
+    options.isPractice = true;
+  }
+
+  if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
+    options.isOnlyProblem = true;
+    const match = /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    if (match) {
+      options.onlyProblemAlias = match[1];
+    }
+  } else {
+    const match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    if (match) {
+      options.contestAlias = match[1];
+    }
+  }
+
+  if (arenaLocation.search.indexOf('ws=off') !== -1) {
+    options.disableSockets = true;
+  }
+  if (document.getElementById('payload')) {
+    const payload = <
+      types.CommonPayload & {
+        shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+        preferred_language?: string;
+      }
+    >types.payloadParsers.CommonPayload();
+    if (payload !== null) {
+      options.shouldShowFirstAssociatedIdentityRunWarning =
+        payload.shouldShowFirstAssociatedIdentityRunWarning || false;
+      options.preferredLanguage = payload.preferred_language || null;
+      options.payload = payload;
+    }
+  }
+  return options;
+}
+
+export class EventsSocket {
+  uri: string;
+  arena: Arena;
+  shouldRetry: boolean = false;
+  socket: WebSocket | null = null;
+  socketKeepalive: ReturnType<typeof setTimeout> | null = null;
+  retries: number = 10;
+
+  constructor(uri: string, arena: Arena) {
+    this.uri = uri;
+    this.arena = arena;
+  }
+
+  connect(): Promise<void> {
+    this.shouldRetry = false;
+    return new Promise((accept, reject) => {
+      try {
+        const socket = new WebSocket(this.uri, 'com.omegaup.events');
+
+        socket.onmessage = message => this.onmessage(message);
+        socket.onopen = (e: Event) => {
+          this.shouldRetry = true;
+          this.arena.elements.socketStatus.html('&bull;').css('color', '#080');
+          this.socketKeepalive = setInterval(
+            () => socket.send('"ping"'),
+            30000,
+          );
+          accept();
+        };
+        socket.onclose = (e: Event) => {
+          this.onclose(e);
+          reject(e);
+        };
+
+        this.socket = socket;
+      } catch (e) {
+        reject(e);
+        return;
+      }
+    });
+  }
+
+  onmessage(message: MessageEvent) {
+    const data = JSON.parse(message.data);
+
+    if (data.message == '/run/update/') {
+      data.run.time = time.remoteTime(data.run.time * 1000);
+      this.arena.updateRun(data.run);
+    } else if (data.message == '/clarification/update/') {
+      if (!this.arena.options.disableClarifications) {
+        data.clarification.time = time.remoteTime(
+          data.clarification.time * 1000,
+        );
+        this.arena.updateClarification(data.clarification);
+      }
+    } else if (data.message == '/scoreboard/update/') {
+      data.time = time.remoteTime(data.time * 1000);
+      if (this.arena.problemsetAdmin && data.scoreboard_type != 'admin') {
+        if (this.arena.options.originalContestAlias == null) return;
+        this.arena.virtualRankingChange(data.scoreboard);
+        return;
+      }
+      this.arena.rankingChange(data.scoreboard);
+    }
+  }
+
+  onclose(e: Event) {
+    this.socket = null;
+    if (this.socketKeepalive) {
+      clearInterval(this.socketKeepalive);
+      this.socketKeepalive = null;
+    }
+    if (this.shouldRetry && this.retries > 0) {
+      this.retries--;
+      this.arena.elements.socketStatus.html('↻').css('color', '#888');
+      setTimeout(() => this.connect(), Math.random() * 15000);
+      return;
+    }
+
+    this.arena.elements.socketStatus.html('✗').css('color', '#800');
+  }
+}
+
+export class EphemeralGrader {
+  ephemeralEmbeddedGraderElement: null | HTMLIFrameElement;
+  messageQueue: { method: string; params: any[] }[];
+  loaded: boolean;
+
+  constructor() {
+    this.ephemeralEmbeddedGraderElement = <null | HTMLIFrameElement>(
+      document.getElementById('ephemeral-embedded-grader')
+    );
+    this.messageQueue = [];
+    this.loaded = false;
+
+    if (!this.ephemeralEmbeddedGraderElement) return;
+
+    this.ephemeralEmbeddedGraderElement.onload = () => {
+      this.loaded = true;
+      this.messageQueue.slice(0).forEach(message => {
+        this._sendInternal(message);
+      });
+    };
+  }
+
+  send(method: string, ...params: any[]): void {
+    const message = {
+      method: method,
+      params: params,
+    };
+
+    if (!this.loaded) {
+      this.messageQueue.push(message);
+      return;
+    }
+    this._sendInternal(message);
+  }
+
+  _sendInternal(message: { method: string; params: any[] }): void {
+    if (!this.ephemeralEmbeddedGraderElement) {
+      return;
+    }
+    (<Window>this.ephemeralEmbeddedGraderElement.contentWindow).postMessage(
+      message,
+      `${window.location.origin}/grader/ephemeral/embedded/`,
+    );
   }
 }

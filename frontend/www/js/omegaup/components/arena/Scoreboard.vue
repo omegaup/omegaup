@@ -21,7 +21,7 @@
             <a
               v-bind:href="'#problems/' + problem.alias"
               v-bind:title="problem.alias"
-              >{{ UI.columnName(index) }}</a
+              >{{ ui.columnName(index) }}</a
             >
           </th>
           <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
@@ -39,11 +39,11 @@
           ></td>
           <td class="position">{{ user.place || '—' }}</td>
           <td class="user">
-            {{ UI.rankingUsername(user) }}
+            {{ ui.rankingUsername(user) }}
             <img
               alt=""
               height="11"
-              v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
+              v-bind:src="`/media/flags/${user.country.toLowerCase()}.png`"
               v-bind:title="user.country"
               v-if="user.country"
               width="16"
@@ -153,21 +153,23 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+
+import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class ArenaScoreboard extends Vue {
   @Prop() scoreboardColors!: string[];
   @Prop() problems!: omegaup.Problem[];
-  @Prop() ranking!: omegaup.ScoreboardUser[];
+  @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() lastUpdated!: Date;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
 
   T = T;
-  UI = UI;
+  ui = ui;
   onlyShowExplicitlyInvited = true;
 
   get lastUpdatedString(): string {
@@ -180,20 +182,20 @@ export default class ArenaScoreboard extends Vue {
       : '';
   }
 
-  renderPoints(p: omegaup.ScoreboardUserProblem): string {
+  renderPoints(p: types.ScoreboardRankingProblem): string {
     return (
       (p.points > 0 ? '+' : '') + p.points.toFixed(this.digitsAfterDecimalPoint)
     );
   }
 
-  totalRuns(u: omegaup.ScoreboardUser): number {
+  totalRuns(u: types.ScoreboardRankingEntry): number {
     return u.problems.reduce(
-      (acc: number, val: omegaup.ScoreboardUserProblem) => acc + val.runs,
+      (acc: number, val: types.ScoreboardRankingProblem) => acc + val.runs,
       0,
     );
   }
 
-  problemClass(p: omegaup.ScoreboardUserProblem, alias: string): string {
+  problemClass(p: types.ScoreboardRankingProblem, alias: string): string {
     if (p.percent === 100) {
       return `${alias} accepted`;
     } else if (p.pending) {

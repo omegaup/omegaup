@@ -5,6 +5,7 @@
 /**
  * ProblemsController
  *
+ * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
@@ -13,14 +14,15 @@
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type Statements=array<string, string>
- * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
+ * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemAdminsPayload=array{admins: list<ProblemAdmin>, alias: string, group_admins: list<ProblemGroupAdmin>}
  * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: string, statement: ProblemStatement, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
- * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
  * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: ProblemStatement, title: null|string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
@@ -2150,7 +2152,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, exists: true, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<array{alias: string, contest_score: float|null, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, username: string, verdict: string}>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}|array{exists: false}
+     * @return array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, exists: true, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}|array{exists: false}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $lang
@@ -2954,7 +2956,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{runs: list<array{alias: string, classname: string, contest_alias?: null|string, contest_score: float|null, country_id?: null|string, guid: string, judged_by?: null|string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type?: null|string, username: string, verdict: string}>}
+     * @return array{runs: list<Run>}
      */
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Get user
@@ -3021,6 +3023,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $result = [];
             foreach ($runsArray as $run) {
                 $run['alias'] = strval($problem->alias);
+                $run['country'] = 'xx';
                 $result[] = $run;
             }
             $response['runs'] = $result;
@@ -3038,7 +3041,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{clarifications: list<array{clarification_id: int, contest_alias: null|string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>}
+     * @return array{clarifications: list<Clarification>}
      */
     public static function apiClarifications(\OmegaUp\Request $r): array {
         // Get user
