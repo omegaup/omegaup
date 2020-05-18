@@ -6,6 +6,13 @@
     },
     "require-dev": {
         "vimeo/psalm": "^3.11.2",
-        "jetbrains/phpstorm-stubs": "^2019.3"
+        "jetbrains/phpstorm-stubs": "^2019.3",
+        "phpunit/phpunit": "^8.5.2"
+    },
+    "scripts": {
+      "test": [
+        "Composer\\Config::disableProcessTimeout",
+        "./stuff/mysql_types.sh"
+      ]
     }
 }

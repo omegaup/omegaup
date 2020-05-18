@@ -1,0 +1,56 @@
+name: CI
+
+on: [pull_request]
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_USER: omegaup
+          MYSQL_ROOT_PASSWORD: omegaup
+          MYSQL_PASSWORD: omegaup
+          MYSQL_DATABASE: omegaup-test
+
+    steps:
+      - actions/checkout@v2
+
+      - name: Setup database
+        run: python3 stuff/db-migrate.py migrate --databases=omegaup-test
+
+      - name: Setup gitserver
+        run: |
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.9/omegaup-gitserver.tar.xz'
+          curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
+
+          # omegaup-gitserver depends on libinteractive.
+          DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar'
+          TARGET='/usr/share/java/libinteractive.jar'
+          sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run tests
+        run: composer test
+
+      - name: Validate database schema
+        run: |
+          python3 stuff/policy-tool.py --database=omegaup-test validate
+          python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
+
+      - name: Run Psalm
+        run: |
+          # Create optional directories to simplify psalm config.
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          touch 'frontend/server/config.php'
+          touch 'frontend/tests/test_config.php'
+          ./vendor/bin/psalm
