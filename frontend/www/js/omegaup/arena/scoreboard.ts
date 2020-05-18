@@ -26,6 +26,7 @@ OmegaUp.on('ready', () => {
     onlyProblemAlias: null,
     originalContestAlias: null,
     preferredLanguage: null,
+    problemsetAdmin: false,
     problemsetId: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
   };
