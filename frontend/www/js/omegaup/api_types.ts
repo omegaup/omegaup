@@ -544,6 +544,7 @@ export namespace types {
     gravatarURL51: string;
     currentUsername: string;
     userClassname: string;
+    userCountry: string;
     profileProgress: number;
     isMainUserIdentity: boolean;
     isAdmin: boolean;
@@ -784,21 +785,7 @@ export namespace types {
     preferred_language?: string;
     problemsetter?: { creation_date?: Date; name: string; username: string };
     quality_seal: boolean;
-    runs?: {
-      alias: string;
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      username: string;
-      verdict: string;
-    }[];
+    runs?: types.Run[];
     score: number;
     settings: types.ProblemSettings;
     solvers?: {
@@ -838,21 +825,7 @@ export namespace types {
     preferred_language?: string;
     problemsetter?: { creation_date?: Date; name: string; username: string };
     quality_seal: boolean;
-    runs?: {
-      alias: string;
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      username: string;
-      verdict: string;
-    }[];
+    runs?: types.Run[];
     score: number;
     settings: types.ProblemSettings;
     shouldShowFirstAssociatedIdentityRunWarning?: boolean;
@@ -1096,14 +1069,13 @@ export namespace types {
     memory: number;
     score: number;
     contest_score?: number;
-    judged_by?: string;
     time: Date;
     submit_delay: number;
     type?: string;
     username: string;
     classname: string;
     alias: string;
-    country_id?: string;
+    country: string;
     contest_alias?: string;
   }
 
@@ -1982,28 +1954,7 @@ export namespace messages {
   };
   export type CourseRunsRequest = { [key: string]: any };
   export type _CourseRunsServerResponse = any;
-  export type CourseRunsResponse = {
-    runs: {
-      guid: string;
-      language: string;
-      status: string;
-      verdict: string;
-      runtime: number;
-      penalty: number;
-      memory: number;
-      score: number;
-      contest_score: number;
-      judged_by?: string;
-      time: Date;
-      submit_delay: number;
-      type?: string;
-      username: string;
-      classname: string;
-      alias: string;
-      country_id?: string;
-      contest_alias?: string;
-    }[];
-  };
+  export type CourseRunsResponse = { runs: types.Run[] };
   export type CourseStudentProgressRequest = { [key: string]: any };
   export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
@@ -2264,21 +2215,7 @@ export namespace messages {
     preferred_language?: string;
     problemsetter?: { creation_date?: Date; name: string; username: string };
     quality_seal?: boolean;
-    runs?: {
-      alias: string;
-      contest_score?: number;
-      guid: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      username: string;
-      verdict: string;
-    }[];
+    runs?: types.Run[];
     score?: number;
     settings?: types.ProblemSettings;
     solvers?: {
@@ -2316,28 +2253,7 @@ export namespace messages {
   export type ProblemRemoveTagResponse = {};
   export type ProblemRunsRequest = { [key: string]: any };
   export type _ProblemRunsServerResponse = any;
-  export type ProblemRunsResponse = {
-    runs: {
-      alias: string;
-      classname: string;
-      contest_alias?: string;
-      contest_score?: number;
-      country_id?: string;
-      guid: string;
-      judged_by?: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      runtime: number;
-      score: number;
-      status: string;
-      submit_delay: number;
-      time: Date;
-      type?: string;
-      username: string;
-      verdict: string;
-    }[];
-  };
+  export type ProblemRunsResponse = { runs: types.Run[] };
   export type ProblemRunsDiffRequest = { [key: string]: any };
   export type ProblemRunsDiffResponse = {
     diff: {
@@ -2556,6 +2472,7 @@ export namespace messages {
   export type _RunCreateServerResponse = any;
   export type RunCreateResponse = {
     guid: string;
+    submit_delay: number;
     submission_deadline: Date;
     nextSubmissionTimestamp: Date;
   };
@@ -2600,29 +2517,7 @@ export namespace messages {
   export type RunDisqualifyResponse = {};
   export type RunListRequest = { [key: string]: any };
   export type _RunListServerResponse = any;
-  export type RunListResponse = {
-    runs: {
-      alias: string;
-      classname: string;
-      contest_alias?: string;
-      contest_score?: number;
-      country_id?: string;
-      guid: string;
-      judged_by?: string;
-      language: string;
-      memory: number;
-      penalty: number;
-      run_id: number;
-      runtime: number;
-      score: number;
-      submit_delay: number;
-      time: Date;
-      type?: string;
-      username: string;
-      verdict: string;
-      status: string;
-    }[];
-  };
+  export type RunListResponse = { runs: types.Run[] };
   export type RunRejudgeRequest = { [key: string]: any };
   export type RunRejudgeResponse = {};
   export type RunSourceRequest = { [key: string]: any };
@@ -2657,16 +2552,7 @@ export namespace messages {
   };
   export type RunStatusRequest = { [key: string]: any };
   export type _RunStatusServerResponse = any;
-  export type RunStatusResponse = {
-    alias: string;
-    contest_score?: number;
-    memory: number;
-    penalty: number;
-    runtime: number;
-    score: number;
-    submit_delay: number;
-    time: Date;
-  };
+  export type RunStatusResponse = types.Run;
 
   // School
   export type SchoolCreateRequest = { [key: string]: any };

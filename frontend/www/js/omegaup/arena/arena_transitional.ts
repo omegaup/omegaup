@@ -136,6 +136,7 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
       gravatarURL51: '',
       currentUsername: '',
       userClassname: 'user-rank-unranked',
+      userCountry: 'xx',
       profileProgress: 0,
       isMainUserIdentity: false,
       isAdmin: false,
