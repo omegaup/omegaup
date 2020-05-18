@@ -1521,8 +1521,8 @@ export class Arena {
     const langElement = this.elements.submitForm.language;
 
     if (this.preferredLanguage) {
-      $('option', langElement).each(() => {
-        const option = $(this);
+      $('option', langElement).each((index, value) => {
+        const option = $(value);
         if (option.val() != this.preferredLanguage) return;
         option.prop('selected', true);
         return false;
@@ -1530,8 +1530,8 @@ export class Arena {
     }
     if (langElement.val()) return;
 
-    $('option', langElement).each(() => {
-      const option = $(this);
+    $('option', langElement).each((index, value) => {
+      const option = $(value);
 
       option.prop('selected', true);
       langElement.trigger('change');
