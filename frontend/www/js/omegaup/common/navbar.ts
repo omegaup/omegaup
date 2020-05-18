@@ -3,6 +3,7 @@ import common_NavbarV2 from '../components/common/Navbarv2.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import { types } from '../api_types';
+import * as UI from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -22,10 +23,25 @@ OmegaUp.on('ready', () => {
           isMainUserIdentity: this.isMainUserIdentity,
           lockDownImage: this.lockDownImage,
           navbarSection: this.navbarSection,
+          notifications: this.notifications,
           graderInfo: this.graderInfo,
           graderQueueLength: this.graderQueueLength,
           errorMessage: this.errorMessage,
           initialClarifications: this.initialClarifications,
+        },
+        on: {
+          'read-notifications': (notifications: types.Notification[]) => {
+            api.Notification.readNotifications({
+              notifications: notifications.map(
+                notification => notification.notification_id,
+              ),
+            })
+              .then(() => api.Notification.myList())
+              .then(data => {
+                commonNavbar.notifications = data.notifications;
+              })
+              .catch(UI.apiError);
+          },
         },
       });
     },
@@ -40,6 +56,7 @@ OmegaUp.on('ready', () => {
       isMainUserIdentity: payload.isMainUserIdentity,
       lockDownImage: payload.lockDownImage,
       navbarSection: payload.navbarSection,
+      notifications: <types.Notification[]>[],
       graderInfo: <types.GraderStatus | null>null,
       graderQueueLength: -1,
       errorMessage: <string | null>null,
@@ -51,6 +68,14 @@ OmegaUp.on('ready', () => {
         : common_Navbar,
     },
   });
+
+  if (payload.isLoggedIn) {
+    api.Notification.myList()
+      .then(data => {
+        commonNavbar.notifications = data.notifications;
+      })
+      .catch(UI.apiError);
+  }
 
   if (payload.isAdmin) {
     const updateGraderStatus = () => {

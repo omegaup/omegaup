@@ -19,13 +19,20 @@ export function apiCall<
           ? {
               method: 'POST',
               body: Object.keys(params)
-                .filter(key => typeof params[key] !== 'undefined')
-                .map(
+                .filter(
                   key =>
-                    `${encodeURIComponent(key)}=${encodeURIComponent(
-                      params[key],
-                    )}`,
+                    params[key] !== null && typeof params[key] !== 'undefined',
                 )
+                .map(key => {
+                  if (params[key] instanceof Date) {
+                    return `${encodeURIComponent(key)}=${encodeURIComponent(
+                      Math.round(params[key].getTime() / 1000),
+                    )}`;
+                  }
+                  return `${encodeURIComponent(key)}=${encodeURIComponent(
+                    params[key],
+                  )}`;
+                })
                 .join('&'),
               headers: {
                 'Content-Type':
@@ -1205,9 +1212,8 @@ export const Problemset = {
   >('/api/problemset/scoreboard/', x => {
     if (x.finish_time)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    if (x.start_time)
-      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),
   scoreboardEvents: apiCall<
@@ -1395,21 +1401,10 @@ export const School = {
   list: apiCall<messages.SchoolListRequest, messages.SchoolListResponse>(
     '/api/school/list/',
   ),
-  monthlySolvedProblemsCount: apiCall<
-    messages.SchoolMonthlySolvedProblemsCountRequest,
-    messages.SchoolMonthlySolvedProblemsCountResponse
-  >('/api/school/monthlySolvedProblemsCount/'),
-  schoolCodersOfTheMonth: apiCall<
-    messages.SchoolSchoolCodersOfTheMonthRequest,
-    messages.SchoolSchoolCodersOfTheMonthResponse
-  >('/api/school/schoolCodersOfTheMonth/'),
   selectSchoolOfTheMonth: apiCall<
     messages.SchoolSelectSchoolOfTheMonthRequest,
     messages.SchoolSelectSchoolOfTheMonthResponse
   >('/api/school/selectSchoolOfTheMonth/'),
-  users: apiCall<messages.SchoolUsersRequest, messages.SchoolUsersResponse>(
-    '/api/school/users/',
-  ),
 };
 
 export const Scoreboard = {

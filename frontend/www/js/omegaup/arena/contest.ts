@@ -1,51 +1,44 @@
-omegaup.OmegaUp.on('ready', function() {
-  var arenaInstance = new arena.Arena(
-    arena.GetOptionsFromLocation(window.location),
-  );
-  var adminInstance = null;
+import * as api from '../api';
+import { types } from '../api_types';
+import { Arena, GetOptionsFromLocation } from './arena';
+import ArenaAdmin from './admin_arena';
+import { OmegaUp } from '../omegaup';
+import * as time from '../time';
+import * as ui from '../ui';
 
-  Highcharts.setOptions({ global: { useUTC: false } });
+OmegaUp.on('ready', () => {
+  const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
 
-  function onlyProblemLoaded(problem) {
+  const onlyProblemLoaded = (problem: types.ProblemDetailsPayload) => {
     arenaInstance.renderProblem(problem);
 
-    for (var i = 0; i < problem.solvers.length; i++) {
-      var solver = problem.solvers[i];
-      var prob = $('.solver-list .template')
+    for (const solver of problem.solvers ?? []) {
+      const prob = $('.solver-list .template')
         .clone()
         .removeClass('template');
       $('.user', prob)
         .attr('href', '/profile/' + solver.username)
         .text(solver.username);
       $('.language', prob).text(solver.language);
-      $('.runtime', prob).text(
-        (parseFloat(solver.runtime) / 1000.0).toFixed(2),
-      );
-      $('.memory', prob).text(
-        (parseFloat(solver.memory) / (1024 * 1024)).toFixed(2),
-      );
-      $('.time', prob).text(
-        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', solver.time * 1000),
-      );
+      $('.runtime', prob).text((solver.runtime / 1000.0).toFixed(2));
+      $('.memory', prob).text((solver.memory / (1024 * 1024)).toFixed(2));
+      $('.time', prob).text(time.formatTimestamp(solver.time));
       $('.solver-list').append(prob);
     }
 
     if (problem.user.logged_in) {
-      omegaup.API.Problem.runs({ problem_alias: problem.alias })
-        .then(function(data) {
-          onlyProblemUpdateRuns(data.runs, 'score', 100);
+      api.Problem.runs({ problem_alias: problem.alias })
+        .then(result => {
+          onlyProblemUpdateRuns(result.runs, 'score', 100);
         })
-        .catch(omegaup.UI.apiError);
+        .catch(ui.apiError);
     }
 
     if (problem.user.admin) {
-      adminInstance = new arena.ArenaAdmin(
-        arenaInstance,
-        arenaInstance.options.onlyProblemAlias,
-      );
+      const adminInstance = new ArenaAdmin(arenaInstance);
       adminInstance.refreshRuns();
       adminInstance.refreshClarifications();
-      setInterval(function() {
+      setInterval(() => {
         adminInstance.refreshRuns();
         adminInstance.refreshClarifications();
       }, 5 * 60 * 1000);
@@ -53,25 +46,26 @@ omegaup.OmegaUp.on('ready', function() {
 
     // Trigger the event (useful on page load).
     onlyProblemHashChanged();
-  }
+  };
 
-  function onlyProblemUpdateRuns(runs, score_column, multiplier) {
-    for (var idx in runs) {
-      if (!runs.hasOwnProperty(idx)) continue;
-      arenaInstance.trackRun(runs[idx]);
+  const onlyProblemUpdateRuns = (
+    runs: types.Run[],
+    scoreColumn: string,
+    multiplier: number,
+  ): void => {
+    for (const run of runs) {
+      arenaInstance.trackRun(run);
     }
-  }
+  };
 
-  function onlyProblemHashChanged() {
-    var self = this;
-    var tabChanged = false;
-    var foundHash = false;
-    var tabs = ['problems', 'solution', 'clarifications', 'runs'];
+  const onlyProblemHashChanged = () => {
+    let tabChanged = false;
+    let foundHash = false;
 
-    for (var i = 0; i < tabs.length; i++) {
-      if (window.location.hash.indexOf('#' + tabs[i]) == 0) {
-        tabChanged = arenaInstance.activeTab != tabs[i];
-        arenaInstance.activeTab = tabs[i];
+    for (const tab of ['problems', 'solution', 'clarifications', 'runs']) {
+      if (window.location.hash.indexOf(`#${tab}`) == 0) {
+        tabChanged = arenaInstance.activeTab != tab;
+        arenaInstance.activeTab = tab;
         foundHash = true;
 
         break;
@@ -80,21 +74,22 @@ omegaup.OmegaUp.on('ready', function() {
 
     if (!foundHash) {
       // Change the URL to the deafult tab but don't break the back button.
-      window.history.replaceState({}, '', '#' + arenaInstance.activeTab);
+      window.history.replaceState({}, '', `#${arenaInstance.activeTab}`);
     }
 
     if (arenaInstance.activeTab == 'problems') {
       if (window.location.hash.indexOf('/new-run') !== -1) {
-        if (!omegaup.OmegaUp.loggedIn) {
-          window.location = '/login/?redirect=' + escape(window.location);
+        if (!OmegaUp.loggedIn) {
+          window.location.href = `/login/?redirect=${escape(
+            window.location.href,
+          )}`;
           return;
         }
         $('#overlay form').hide();
         $('#submit input').show();
         $('#submit').show();
         $('#overlay').show();
-        arenaInstance.codeEditor.code = arenaInstance.currentProblem.template;
-        arenaInstance.codeEditor.refresh();
+        arenaInstance.mountEditor(arenaInstance.currentProblem);
       }
     }
     arenaInstance.detectShowRun();
@@ -109,20 +104,18 @@ omegaup.OmegaUp.on('ready', function() {
         $('#clarifications-count').css('font-weight', 'normal');
       }
     }
-  }
+  };
 
   if (arenaInstance.options.isOnlyProblem) {
-    onlyProblemLoaded(
-      JSON.parse(document.getElementById('payload').firstChild.nodeValue),
-    );
+    onlyProblemLoaded(types.payloadParsers.ProblemDetailsPayload());
   } else {
-    omegaup.API.Contest.details({
+    api.Contest.details({
       contest_alias: arenaInstance.options.contestAlias,
     })
-      .then(arenaInstance.problemsetLoaded.bind(arenaInstance))
-      .catch(omegaup.UI.ignoreError);
+      .then(result => arenaInstance.problemsetLoaded(result))
+      .catch(e => arenaInstance.problemsetLoadedError(e));
 
-    $('.clarifpager .clarifpagerprev').on('click', function() {
+    $('.clarifpager .clarifpagerprev').on('click', () => {
       if (arenaInstance.clarificationsOffset > 0) {
         arenaInstance.clarificationsOffset -=
           arenaInstance.clarificationsRowcount;
@@ -135,7 +128,7 @@ omegaup.OmegaUp.on('ready', function() {
       }
     });
 
-    $('.clarifpager .clarifpagernext').on('click', function() {
+    $('.clarifpager .clarifpagernext').on('click', () => {
       arenaInstance.clarificationsOffset +=
         arenaInstance.clarificationsRowcount;
       if (arenaInstance.clarificationsOffset < 0) {
@@ -147,28 +140,28 @@ omegaup.OmegaUp.on('ready', function() {
     });
   }
 
-  $('#clarification').on('submit', function(e) {
+  $('#clarification').on('submit', e => {
     $('#clarification input').attr('disabled', 'disabled');
-    omegaup.API.Clarification.create({
+    api.Clarification.create({
       contest_alias: arenaInstance.options.contestAlias,
       problem_alias: $('#clarification select[name="problem"]').val(),
       message: $('#clarification textarea[name="message"]').val(),
     })
-      .then(function(run) {
+      .then(response => {
         arenaInstance.hideOverlay();
         arenaInstance.refreshClarifications();
       })
-      .catch(function(run) {
-        alert(run.error);
+      .catch(e => {
+        alert(e.error);
       })
-      .finally(function() {
+      .finally(() => {
         $('#clarification input').prop('disabled', false);
       });
 
     return false;
   });
 
-  window.addEventListener('hashchange', function() {
+  window.addEventListener('hashchange', () => {
     if (arenaInstance.options.isOnlyProblem) {
       onlyProblemHashChanged();
     } else {

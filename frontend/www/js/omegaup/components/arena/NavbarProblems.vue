@@ -83,7 +83,7 @@ import T from '../../lang';
 @Component
 export default class ArenaNavbarProblems extends Vue {
   @Prop() problems!: omegaup.ContestProblem[];
-  @Prop() activeProblem!: string;
+  @Prop() activeProblem!: string | null;
   @Prop() inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
 

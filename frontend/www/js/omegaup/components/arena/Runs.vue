@@ -377,7 +377,8 @@ export default class Runs extends Vue {
       run.status == 'ready' &&
       run.verdict != 'JE' &&
       run.verdict != 'VE' &&
-      run.verdict != 'CE'
+      run.verdict != 'CE' &&
+      typeof run.contest_score !== 'undefined'
     ) {
       return run.contest_score.toFixed(2);
     }

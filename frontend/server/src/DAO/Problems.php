@@ -311,6 +311,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $sql .= " ORDER BY p.problem_id {$collation} {$order} ";
         } elseif ($orderBy == 'points' && $order == 'desc') {
             $sql .= ' ORDER BY `points` DESC, `accepted` ASC, `submissions` DESC ';
+        } elseif (($orderBy == 'difficulty' || $orderBy == 'quality') && $order == 'asc') {
+            $sql .= " ORDER BY p.{$orderBy} IS NULL, p.{$orderBy} ASC";
         } else {
             $sql .= " ORDER BY `{$orderBy}` {$collation} {$order} ";
         }

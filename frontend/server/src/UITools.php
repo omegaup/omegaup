@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  */
 class UITools {
     /** @var ?\Smarty */
@@ -221,6 +221,7 @@ class UITools {
         [
             'email' => $email,
             'identity' => $identity,
+            'classname' => $userClassname,
             'user' => $user,
             'is_admin' => $isAdmin,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
@@ -244,6 +245,10 @@ class UITools {
                 $identity->username :
                 ''
             ),
+            'userClassname' => $userClassname,
+            'userCountry' => (!is_null(
+                $identity
+            ) ? $identity->country_id : null) ?? 'xx',
             'profileProgress' => \OmegaUp\Controllers\User::getProfileProgress(
                 $user
             ),

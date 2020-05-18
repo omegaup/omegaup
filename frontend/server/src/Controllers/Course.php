@@ -9,6 +9,12 @@
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode?: string, alias: string, assignments?: list<CourseAssignment>, basic_information_required: bool, description: string, finish_time?: \OmegaUp\Timestamp|null, isCurator?: bool, is_admin?: bool, name: string, requests_user_information: string, school_id?: int|null, school_name?: null|string, show_scoreboard?: bool, start_time?: \OmegaUp\Timestamp, student_count?: int}
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
+ * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+ * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -2339,7 +2345,56 @@ class Course extends \OmegaUp\Controllers\Controller {
             true  /*onlyIntroDetails*/
         );
         $requestUserInformation = $courseDetails['requests_user_information'];
-        $inContest = false;
+
+        $isCourseAdmin = \OmegaUp\Authorization::isCourseAdmin(
+            $r->identity,
+            $course
+        );
+        if ($isCourseAdmin && !$showAssignment) {
+            return [
+                'smartyProperties' => [
+                    'showRanking' => true,
+                    'payload' => [
+                        'details' => self::getCommonCourseDetails(
+                            $course,
+                            $r->identity,
+                            /*$onlyIntroDetails=*/ false
+                        ),
+                        'progress' => \OmegaUp\DAO\Courses::getAssignmentsProgress(
+                            $course->course_id,
+                            $r->identity->identity_id
+                        ),
+                    ],
+                ],
+                'template' => 'course.details.tpl',
+                'inContest' => false,
+            ];
+        }
+
+        if ($showAssignment) {
+            return [
+                'smartyProperties' => [
+                    'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
+                        $r->identity,
+                        $course,
+                        $group
+                    ),
+                    'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
+                        !is_null($r->user) &&
+                        !\OmegaUp\Controllers\User::isMainIdentity(
+                            $r->user,
+                            $r->identity
+                        ) &&
+                        \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                            $r->user
+                        ),
+                    ],
+                ],
+                'template' => 'arena.contest.course.tpl',
+                'inContest' => true,
+            ];
+        }
+
         if (
             $shouldShowIntro
             || !$hasAcceptedTeacher
@@ -2395,54 +2450,39 @@ class Course extends \OmegaUp\Controllers\Controller {
             if (!is_null($teacherStatement)) {
                 $acceptTeacherStatement['gitObjectId'] = $teacherStatement['git_object_id'];
             }
-
-            $smartyProperties = [
-                'coursePayload' => array_merge(
-                    $registrationResponse,
-                    [
-                        'name' => $courseDetails['name'],
-                        'description' => $courseDetails['description'],
-                        'alias' => $courseDetails['alias'],
-                        'currentUsername' => $r->identity->username,
-                        'needsBasicInformation' => $needsBasicInformation,
-                        'requestsUserInformation' =>
-                            $courseDetails['requests_user_information'],
-                        'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
-                        'statements' => [
-                            'privacy' => $privacyStatement,
-                            'acceptTeacher' => $acceptTeacherStatement,
-                        ],
-                        'isFirstTimeAccess' => !$hasSharedUserInformation,
-                        'shouldShowResults' => $shouldShowIntro,
-                    ]
-                ),
+            return [
+                'smartyProperties' => [
+                    'coursePayload' => array_merge(
+                        $registrationResponse,
+                        [
+                            'name' => $courseDetails['name'],
+                            'description' => $courseDetails['description'],
+                            'alias' => $courseDetails['alias'],
+                            'currentUsername' => $r->identity->username,
+                            'needsBasicInformation' => $needsBasicInformation,
+                            'requestsUserInformation' =>
+                                $courseDetails['requests_user_information'],
+                            'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
+                            'statements' => [
+                                'privacy' => $privacyStatement,
+                                'acceptTeacher' => $acceptTeacherStatement,
+                            ],
+                            'isFirstTimeAccess' => !$hasSharedUserInformation,
+                            'shouldShowResults' => $shouldShowIntro,
+                        ]
+                    ),
+                ],
+                'template' => 'arena.course.intro.tpl',
+                'inContest' => false,
             ];
-            $template = 'arena.course.intro.tpl';
-        } elseif ($showAssignment) {
-            $smartyProperties = [
+        }
+
+        return [
+            'smartyProperties' => [
                 'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
                     $r->identity,
                     $course,
                     $group
-                ),
-                'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
-                    !is_null($r->user) &&
-                    !\OmegaUp\Controllers\User::isMainIdentity(
-                        $r->user,
-                        $r->identity
-                    ) &&
-                    \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
-                        $r->user
-                    ),
-                ],
-            ];
-            $template = 'arena.contest.course.tpl';
-            $inContest = true;
-        } else {
-            $smartyProperties = [
-                'showRanking' => \OmegaUp\Authorization::isCourseAdmin(
-                    $r->identity,
-                    $course
                 ),
                 'payload' => [
                     'details' => self::getCommonCourseDetails(
@@ -2455,14 +2495,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity->identity_id
                     ),
                 ],
-            ];
-            $template = 'course.details.tpl';
-        }
-
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => $template,
-            'inContest' => $inContest,
+            ],
+            'template' => 'course.details.tpl',
+            'inContest' => false,
         ];
     }
 
@@ -2783,6 +2818,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $course
+     * @omegaup-request-param mixed $lang
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $username
      *
@@ -2932,7 +2968,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $username
      * @omegaup-request-param mixed $verdict
      *
-     * @return array{runs: list<array{run_id: int, guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float, judged_by: null|string, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country_id: null|string, contest_alias: null|string}>}
+     * @return array{runs: list<Run>}
      */
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -2958,8 +2994,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $result = [];
-
         foreach ($runs as $run) {
+            unset($run['run_id']);
             $run['contest_score'] = floatval($run['contest_score']);
             $result[] = $run;
         }
@@ -3198,7 +3234,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $token
      *
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     * @return Scoreboard
      */
     public static function apiAssignmentScoreboard(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3262,7 +3298,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
-     * @return array{events: list<array{country: null|string, delta: float, is_invited: bool, name: null|string, problem: array{alias: string, penalty: float, points: float}, total: array{penalty: float, points: float}, username: string}>}
+     * @return array{events: list<ScoreboardEvent>}
      */
     public static function apiAssignmentScoreboardEvents(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
