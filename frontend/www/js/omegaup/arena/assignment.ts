@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
     assignment: arenaInstance.options.assignmentAlias,
   })
     .then(results => arenaInstance.problemsetLoaded(results))
-    .catch(ui.apiError);
+    .catch(e => arenaInstance.problemsetLoadedError(e));
 
   window.addEventListener('hashchange', () => arenaInstance.onHashChanged());
 });

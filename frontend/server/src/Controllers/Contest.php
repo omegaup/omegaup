@@ -884,7 +884,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 $exception->addCustomMessageToArray(
                     'start_time',
-                    date('r', $contest->start_time->time)
+                    date('c', $contest->start_time->time)
                 );
 
                 throw $exception;
