@@ -481,10 +481,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         $sql = '
             INSERT IGNORE INTO
                 Runs (
-                    submission_id, version, verdict
+                    submission_id, version, commit, verdict
                 )
             SELECT
-                s.submission_id, ?, "JE"
+                s.submission_id, ?, ?, "JE"
             FROM
                 Submissions s
             WHERE
@@ -495,6 +495,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         ';
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
             $problemsetProblem->version,
+            $problemsetProblem->commit,
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
         ]);

@@ -725,6 +725,35 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
+     * @return \OmegaUp\DAO\VO\Runs|null
+     */
+    final public static function getByGUID(string $guid) {
+        $sql = '
+            SELECT
+                `r`.*
+            FROM
+                `Runs` `r`
+            INNER JOIN
+                `Submissions` `s`
+            ON
+                `r`.`submission_id` = `s`.`submission_id`
+            WHERE
+                `s`.`guid` = ?
+            LIMIT
+                1;
+        ';
+
+        /** @var array{commit: string, contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string}|null */
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$guid]);
+
+        if (is_null($row)) {
+            return null;
+        }
+
+        return new \OmegaUp\DAO\VO\Runs($row);
+    }
+
+    /**
      * @return list<\OmegaUp\DAO\VO\Runs>
      */
     final public static function getByProblem(
@@ -743,7 +772,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.problem_id = ?;
         ';
         $params = [$problemId];
-        /** @var list<array{contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}> $rs */
+        /** @var list<array{commit: string, contest_score: float, judged_by: string, memory: int, penalty: int, run_id: int, runtime: int, score: float, submission_id: int, status: string, time: int, verdict: string, version: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
         $runs = [];
         foreach ($rs as $row) {
@@ -882,7 +911,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ';
 
         $result = [];
-        /** @var array{contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string} $row */
+        /** @var array{commit: string, contest_score: float|null, judged_by: null|string, memory: int, penalty: int, run_id: int, runtime: int, score: float, status: string, submission_id: int, time: \OmegaUp\Timestamp, verdict: string, version: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -1012,10 +1041,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         $sql = '
             INSERT IGNORE INTO
                 Runs (
-                    submission_id, version, verdict
+                    submission_id, version, commit, verdict
                 )
             SELECT
-                s.submission_id, ?, "JE"
+                s.submission_id, ?, ?, "JE"
             FROM
                 Submissions s
             WHERE
@@ -1023,10 +1052,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             ORDER BY
                 s.submission_id;
         ';
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            $sql,
-            [$problem->current_version, $problem->problem_id]
-        );
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
+            $problem->current_version,
+            $problem->commit,
+            $problem->problem_id,
+        ]);
     }
 
     /**
