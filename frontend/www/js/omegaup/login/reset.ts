@@ -20,12 +20,12 @@ OmegaUp.on('ready', () => {
           resetToken: payload.resetToken,
         },
         on: {
-          'reset-password': function(
+          'reset-password': (
             email: string,
             resetToken: string,
             password: string,
             passwordConfirmation: string,
-          ) {
+          ) => {
             api.Reset.update({
               email: email,
               reset_token: resetToken,
