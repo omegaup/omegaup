@@ -12,6 +12,7 @@
       {assign var='navbarSection' value='arena'}
     {else}
       <meta name="google-signin-client_id" content="{$GOOGLECLIENTID}" />
+      <script src="https://apis.google.com/js/api.js"></script>
     {/if}
 
     <script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>

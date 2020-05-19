@@ -1,12 +1,17 @@
-import { OmegaUp } from '../js/omegaup/omegaup';
-/// <reference path="../../node_modules/@types/gapi.auth2/index.d.ts" />
-declare let gapi: any;
+import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
-  let clientId = document.querySelector('meta[name="google-signin-client_id"]');
-  if (!clientId || !window.gapi) {
+  const clientId = document.querySelector(
+    'meta[name="google-signin-client_id"]',
+  );
+  if (!clientId) {
     redirect();
     return;
+  }
+
+  interface Reason {
+    error: string;
+    details: string;
   }
 
   // All possible paths need to end with redirect().
@@ -14,20 +19,19 @@ OmegaUp.on('ready', () => {
     // ['then'] is used instead of .then(), since these are not real ES6
     // Promise objects, therefore they don't have an .else() or .finally().
     // That trips up the linter.
+
     gapi.auth2.init({})['then'](
-      function(auth: any) {
+      (auth: gapi.auth2.GoogleAuth) => {
         auth.signOut()['then'](
-          function() {
+          () => {
             redirect();
           },
-          function(error: any) {
-            console.error(error);
+          (error: Promise<String>) => {
             redirect();
           },
         );
       },
-      function(error: any) {
-        console.error(error);
+      (error: Reason) => {
         redirect();
       },
     );
@@ -35,7 +39,7 @@ OmegaUp.on('ready', () => {
 });
 
 function redirect() {
-  let params = new URL(document.location.toString()).searchParams;
+  const params = new URL(document.location.toString()).searchParams;
   let pathname = params.get('redirect');
   if (!pathname || pathname.indexOf('/') !== 0) {
     pathname = '/';
