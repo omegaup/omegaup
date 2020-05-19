@@ -955,6 +955,55 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
+    public static function recalculateScoreWhenPartialScoreChanges(
+        \OmegaUp\DAO\VO\Problemsets $problemset,
+        bool $partialScore
+    ): int {
+        if ($partialScore) {
+            $sql = '
+                UPDATE
+                  Runs r
+                INNER JOIN
+                  Submissions s
+                  ON s.submission_id = r.submission_id
+                INNER JOIN
+                  Problemset_Problems p
+                  ON p.problemset_id = s.problemset_id
+                INNER JOIN
+                  Contests c
+                  ON c.problemset_id = p.problemset_id
+                SET
+                  r.contest_score = r.score * p.points
+                WHERE
+                  s.problemset_id = ?;
+            ';
+        } else {
+            $sql = '
+                UPDATE
+                  Runs r
+                INNER JOIN
+                  Submissions s
+                  ON s.submission_id = r.submission_id
+                INNER JOIN
+                  Problemset_Problems p
+                  ON p.problemset_id = s.problemset_id
+                INNER JOIN
+                  Contests c
+                  ON c.problemset_id = p.problemset_id
+                SET
+                  r.contest_score = IF(r.score <> 1, 0, r.score * p.points)
+                WHERE
+                  s.problemset_id = ?;
+            ';
+        }
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$problemset->problemset_id]
+        );
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
     /**
      * Recalculate contest runs with the following rules:
      *

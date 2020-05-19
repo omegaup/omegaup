@@ -58,18 +58,22 @@ class Utils {
     /**
      * Given a run guid, set a score for its run
      *
-     * @param ?int    $runID       The ID of the run.
-     * @param ?string $runGuid     The GUID of the submission.
-     * @param float   $points      The score of the run
-     * @param string  $verdict     The verdict of the run.
-     * @param ?int    $submitDelay The number of minutes worth of penalty.
+     * @param ?int    $runID            The ID of the run.
+     * @param ?string $runGuid          The GUID of the submission.
+     * @param float   $points           The score of the run
+     * @param string  $verdict          The verdict of the run.
+     * @param ?int    $submitDelay      The number of minutes worth of penalty.
+     * @param int     $problemsetPoints The max score of the run for the problemset.
+     * @param bool    $partialScore     Indicates whether contest accepts partial score.
      */
     public static function gradeRun(
         ?int $runId = null,
         ?string $runGuid,
         float $points = 1,
         string $verdict = 'AC',
-        ?int $submitDelay = null
+        ?int $submitDelay = null,
+        int $problemsetPoints = 100,
+        bool $partialScore = true
     ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
@@ -99,7 +103,9 @@ class Utils {
 
         $run->verdict = $verdict;
         $run->score = $points;
-        $run->contest_score = $points * 100;
+        $run->contest_score = !$partialScore && $points != 1
+          ? 0
+          : ($points * $problemsetPoints);
         $run->status = 'ready';
         $run->judged_by = 'J1';
 

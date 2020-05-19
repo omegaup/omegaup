@@ -207,11 +207,13 @@ class Run {
      * Given a run, set a score to a given run
      *
      * @param ?array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}  $runData     The run.
-     * @param float   $points      The score of the run
-     * @param string  $verdict     The verdict of the run.
-     * @param ?int    $submitDelay The number of minutes worth of penalty.
-     * @param ?string $runGuid     The GUID of the submission.
-     * @param ?int    $runID       The ID of the run.
+     * @param float   $points           The score of the run
+     * @param string  $verdict          The verdict of the run.
+     * @param ?int    $submitDelay      The number of minutes worth of penalty.
+     * @param ?string $runGuid          The GUID of the submission.
+     * @param ?int    $runID            The ID of the run.
+     * @param int     $problemsetPoints The max score of the run for the problemset.
+     * @param bool    $partialScore     Indicates whether contest accepts partial score.
      */
     public static function gradeRun(
         ?array $runData,
@@ -219,7 +221,9 @@ class Run {
         string $verdict = 'AC',
         ?int $submitDelay = null,
         ?string $runGuid = null,
-        ?int $runId = null
+        ?int $runId = null,
+        int $problemsetPoints = 100,
+        bool $partialScore = true
     ): void {
         if (!is_null($runGuid)) {
             $guid = $runGuid;
@@ -233,7 +237,9 @@ class Run {
             $guid,
             $points,
             $verdict,
-            $submitDelay
+            $submitDelay,
+            $problemsetPoints,
+            $partialScore
         );
     }
 }

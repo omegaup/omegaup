@@ -1006,6 +1006,12 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCreateContestWithInitialPartialScoreAndThenUpdated() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
         // Get a contest, partial_score default value is true
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
@@ -1013,7 +1019,16 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $login = self::login($contestData['director']);
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Add user to contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $login = self::login($identity);
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(
@@ -1031,14 +1046,32 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertTrue($contest['partial_score']);
 
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.05, 'PA', 10);
+
+        $directorLogin = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+        $this->assertEquals(5, $response['runs'][0]['contest_score']);
+
         // Call API to update partial score
-        $response = \OmegaUp\Controllers\Contest::apiUpdate(
+        \OmegaUp\Controllers\Contest::apiUpdate(
             new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
+                'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'partial_score' => false,
             ])
         );
+
+        $login = self::login($identity);
+
         $contest = \OmegaUp\Controllers\Contest::apiDetails(
             new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
@@ -1047,9 +1080,24 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertFalse($contest['partial_score']);
+
+        $response = \OmegaUp\Controllers\Contest::apiRuns(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+            ])
+        );
+
+        $this->assertEquals(0, $response['runs'][0]['contest_score']);
     }
 
     public function testCreateContestWithInitialPartialScoreFalseAndThenUpdated() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
         // Get a contest, partial_score value is false
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
@@ -1057,7 +1105,19 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             )
         );
 
-        $login = self::login($contestData['director']);
+        $problemsetPoints = 1;
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData,
+            $problemsetPoints
+        );
+
+        // Add user to contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $login = self::login($identity);
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(
@@ -1075,14 +1135,42 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertFalse($contest['partial_score']);
 
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/0.05,
+            /*$verdict=*/'PA',
+            /*$submitDelay=*/null,
+            /*$runGuid=*/null,
+            /*$runId=*/null,
+            $problemsetPoints,
+            /*$partialScore=*/false
+        );
+
+        $directorLogin = self::login($contestData['director']);
+
+        $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
+        $this->assertEquals(0, $response['runs'][0]['contest_score']);
+
         // Call API to update partial score
         $response = \OmegaUp\Controllers\Contest::apiUpdate(
             new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
+                'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'partial_score' => true,
             ])
         );
+
+        $login = self::login($identity);
+
         $contest = \OmegaUp\Controllers\Contest::apiDetails(
             new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
@@ -1091,5 +1179,14 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertTrue($contest['partial_score']);
+
+        $response = \OmegaUp\Controllers\Contest::apiRuns(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+            ])
+        );
+
+        $this->assertEquals(0.05, $response['runs'][0]['contest_score']);
     }
 }

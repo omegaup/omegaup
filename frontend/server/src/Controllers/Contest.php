@@ -3719,19 +3719,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Begin a new transaction
             \OmegaUp\DAO\DAO::transBegin();
 
-            // Save the contest object with data sent by user to the database
-            self::updateContest($contest, $originalContest, $r->identity);
+            // Save the problemset object with data sent by user to the database
+            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                intval($contest->problemset_id)
+            );
+
+            if (is_null($problemset) || is_null($problemset->problemset_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemsetNotFound'
+                );
+            }
+
+            self::updateContest(
+                $contest,
+                $originalContest,
+                $r->identity,
+                $problemset
+            );
 
             if ($updateProblemset) {
-                // Save the problemset object with data sent by user to the database
-                $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-                    intval($contest->problemset_id)
-                );
-                if (is_null($problemset)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'problemsetNotFound'
-                    );
-                }
+                // Save the contest object with data sent by user to the database
                 $problemset->needs_basic_information = boolval(
                     $r['needs_basic_information']
                 );
@@ -3740,18 +3747,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             }
 
             if ($updateRequests) {
-                // Save the problemset object with data sent by user to the database
-                $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-                    intval($contest->problemset_id)
-                );
-                if (
-                    is_null($problemset)
-                    || is_null($problemset->problemset_id)
-                ) {
-                    throw new \OmegaUp\Exceptions\NotFoundException(
-                        'problemsetNotFound'
-                    );
-                }
                 // Get the list of contestants
                 $identities = \OmegaUp\DAO\ProblemsetIdentities::getIdentitiesByProblemset(
                     $problemset->problemset_id
@@ -3861,12 +3856,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
     /**
      * This function reviews changes in penalty type, admission mode, finish
-     * time and window length to recalcualte information previously stored
+     * time, window length and partial score to recalcualte information
+     * previously stored
      */
     private static function updateContest(
         \OmegaUp\DAO\VO\Contests $contest,
         \OmegaUp\DAO\VO\Contests $originalContest,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problemsets $problemset
     ): void {
         if ($originalContest->admission_mode !== $contest->admission_mode) {
             $timestamp = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
@@ -3893,6 +3890,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $contest
                 );
             }
+        }
+
+        if ($originalContest->partial_score !== $contest->partial_score) {
+            // When partial score changes, we need to recalculate contest score
+            \OmegaUp\DAO\Runs::recalculateScoreWhenPartialScoreChanges(
+                $problemset,
+                $contest->partial_score
+            );
         }
 
         \OmegaUp\DAO\Contests::update($contest);
