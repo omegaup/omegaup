@@ -354,6 +354,9 @@ def main() -> None:
         default=database_utils.default_config_file(),
         help='.my.cnf file that stores credentials')
     parser.add_argument(
+        '--hostname', default=None, type=str,
+        help='Hostname of the MySQL server')
+    parser.add_argument(
         '--username', default='root', help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
     parser.add_argument('--verbose', action='store_true')
@@ -454,7 +457,8 @@ def main() -> None:
     auth = database_utils.authentication(
         config_file=args.mysql_config_file,
         username=args.username,
-        password=args.password)
+        password=args.password,
+        hostname=args.hostname)
     args.func(args, auth)
 
 
