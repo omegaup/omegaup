@@ -22,7 +22,8 @@ mv "${OMEGAUP_ROOT}/frontend/tests/controllers/mysql_types.log" \
 mv "${OMEGAUP_ROOT}/frontend/tests/controllers/mysql_types.log" \
 	"${OMEGAUP_ROOT}/frontend/tests/controllers/mysql_types.log.2"
 
-cat "${OMEGAUP_ROOT}/frontend/tests/controllers/mysql_types.log.1" \
+sort --unique \
+	"${OMEGAUP_ROOT}/frontend/tests/controllers/mysql_types.log.1" \
 	"${OMEGAUP_ROOT}/frontend/tests/controllers/mysql_types.log.2" > \
 	"${OMEGAUP_ROOT}/frontend/tests/controllers/mysql_types.log"
 
