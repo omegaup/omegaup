@@ -112,7 +112,8 @@
 		</div>
 	</div>
 </div>
-
+<div id="login-sign-in"></div>
+{js_include entrypoint="login_sign_in"}
 <script type="text/javascript" src="{version_hash src="/js/login.js"}" defer></script>
 {if $GOOGLECLIENTID != ""}
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
