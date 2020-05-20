@@ -4,8 +4,6 @@
 
 stage_before_install() {
 	init_submodules
-
-	# In addition to the newer PHP version, this needs MySQL 8.
 	install_mysql8
 }
 
@@ -15,8 +13,6 @@ stage_install() {
 	pip3 install --user wheel
 	pip3 install --user mysqlclient
 
-	curl -sSfL -o ~/.phpenv/versions/$(phpenv version-name)/bin/phpunit \
-		https://phar.phpunit.de/phpunit-8.5.2.phar
 	composer install
 
 	install_omegaup_gitserver
@@ -36,26 +32,9 @@ stage_before_script() {
 stage_script() {
 	./stuff/mysql_types.sh
 
-	python3 stuff/policy-tool.py --database=omegaup-test validate
-	if [[ "${UBUNTU}" == "focal" ]]; then
-		python3 stuff/database_schema.py --database=omegaup-test validate --all < /dev/null
-	fi
-
 	# Create optional directories to simplify psalm config.
 	mkdir -p frontend/www/{phpminiadmin,preguntas}
 	touch 'frontend/server/config.php'
 	touch 'frontend/tests/test_config.php'
 	./vendor/bin/psalm
-}
-
-stage_after_success() {
-	if [[ "${UBUNTU}" != "focal" ]]; then
-		bash <(curl -s https://codecov.io/bash)
-	fi
-}
-
-stage_after_failure() {
-	if [[ "${UBUNTU}" != "focal" ]]; then
-		cat frontend/tests/controllers/gitserver.log
-	fi
 }
