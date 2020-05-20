@@ -126,7 +126,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `r`.`penalty`,
                 `r`.`memory`,
                 `r`.`score`,
-                `r`.`contest_score`,
+                IF(
+                    ISNULL(`c`.`partial_score`) = 0 AND `c`.`partial_score` <> 1 AND `r`.`score` <> 1,
+                        0,
+                        `r`.`contest_score`
+                ) AS `contest_score`,
                 `s`.`time`,
                 `s`.`submit_delay`,
                 `s`.`type`,
@@ -593,7 +597,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             SELECT
                 r.score,
                 r.penalty,
-                r.contest_score,
+                IF(
+                    ISNULL(c.partial_score) = 0 AND c.partial_score <> 1 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
                 s.problem_id,
                 s.identity_id,
                 s.type,
@@ -611,6 +619,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Runs r
             ON
                 s.current_run_id = r.run_id
+            LEFT JOIN
+                Contests c
+            ON
+                c.problemset_id = pp.problemset_id
             WHERE
                 pp.problemset_id = ? AND
                 r.status = \'ready\' AND
@@ -791,8 +803,21 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                s.guid, s.language, r.status, r.verdict, r.runtime, r.penalty,
-                r.memory, r.score, r.contest_score, s.`time`, s.submit_delay,
+                s.guid,
+                s.language,
+                r.status,
+                r.verdict,
+                r.runtime,
+                r.penalty,
+                r.memory,
+                r.score,
+                IF(
+                    ISNULL(c.partial_score) = 0 AND c.partial_score <> 1 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
+                s.`time`,
+                s.submit_delay,
                 i.username, IFNULL(i.country_id, "xx") AS country,
                 c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
                 IFNULL(
@@ -831,7 +856,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LEFT JOIN
                 Contests c
             ON
-                c.contest_id = ps.problemset_id
+                c.problemset_id = ps.problemset_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ?
         ';
@@ -952,55 +977,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
-        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
-    }
-
-    public static function recalculateScoreWhenPartialScoreChanges(
-        \OmegaUp\DAO\VO\Problemsets $problemset,
-        bool $partialScore
-    ): int {
-        if ($partialScore) {
-            $sql = '
-                UPDATE
-                  Runs r
-                INNER JOIN
-                  Submissions s
-                  ON s.submission_id = r.submission_id
-                INNER JOIN
-                  Problemset_Problems p
-                  ON p.problemset_id = s.problemset_id
-                INNER JOIN
-                  Contests c
-                  ON c.problemset_id = p.problemset_id
-                SET
-                  r.contest_score = r.score * p.points
-                WHERE
-                  s.problemset_id = ?;
-            ';
-        } else {
-            $sql = '
-                UPDATE
-                  Runs r
-                INNER JOIN
-                  Submissions s
-                  ON s.submission_id = r.submission_id
-                INNER JOIN
-                  Problemset_Problems p
-                  ON p.problemset_id = s.problemset_id
-                INNER JOIN
-                  Contests c
-                  ON c.problemset_id = p.problemset_id
-                SET
-                  r.contest_score = IF(r.score <> 1, 0, r.score * p.points)
-                WHERE
-                  s.problemset_id = ?;
-            ';
-        }
-
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            $sql,
-            [$problemset->problemset_id]
-        );
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 

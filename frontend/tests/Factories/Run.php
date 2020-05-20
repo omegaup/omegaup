@@ -213,7 +213,6 @@ class Run {
      * @param ?string $runGuid          The GUID of the submission.
      * @param ?int    $runID            The ID of the run.
      * @param int     $problemsetPoints The max score of the run for the problemset.
-     * @param bool    $partialScore     Indicates whether contest accepts partial score.
      */
     public static function gradeRun(
         ?array $runData,
@@ -222,8 +221,7 @@ class Run {
         ?int $submitDelay = null,
         ?string $runGuid = null,
         ?int $runId = null,
-        int $problemsetPoints = 100,
-        bool $partialScore = true
+        int $problemsetPoints = 100
     ): void {
         if (!is_null($runGuid)) {
             $guid = $runGuid;
@@ -238,8 +236,7 @@ class Run {
             $points,
             $verdict,
             $submitDelay,
-            $problemsetPoints,
-            $partialScore
+            $problemsetPoints
         );
     }
 }

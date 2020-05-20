@@ -615,6 +615,23 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
+        $problemset = null;
+        if (!is_null($submission->problemset_id)) {
+            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                $submission->problemset_id
+            );
+        }
+        $contest = null;
+        $problemsetProblem = null;
+        if (!is_null($problemset) && !is_null($problemset->contest_id)) {
+            $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
+            if (!is_null($contest)) {
+                $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
+                    $problemset->contest_id,
+                    $problem->problem_id
+                );
+            }
+        }
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
@@ -651,12 +668,15 @@ class Run extends \OmegaUp\Controllers\Controller {
         $filtered['type'] = strval($filtered['type']);
         $filtered['verdict'] = strval($filtered['verdict']);
         if (!is_null($filtered['contest_score'])) {
-            $filtered['contest_score'] = round(
-                floatval(
-                    $filtered['contest_score']
-                ),
-                2
-            );
+            $contestScore = round(floatval($filtered['contest_score']), 2);
+            if (
+                !is_null($contest)
+                && !$contest->partial_score
+                && $filtered['score'] != 1
+            ) {
+                $contestScore = 0;
+            }
+            $filtered['contest_score'] = $contestScore;
         }
         if ($submission->identity_id == $r->identity->identity_id) {
             $filtered['username'] = $r->identity->username;
