@@ -920,7 +920,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $order
      * @omegaup-request-param mixed $problems
      *
      * @return array{status: string}
@@ -965,31 +964,52 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // Update problems order
-        /** @var array{alias: string, order: int}[] */
-        $problems = json_decode($r['problems'], true);
-        foreach ($problems as $problem) {
-            $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
-                $problem['alias']
+        /** @var null|list<string> */
+        $aliases = json_decode($r['problems'], true);
+        if (!is_array($aliases) || empty($aliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
             );
-            if (
-                is_null($currentProblem) ||
-                is_null($currentProblem->problem_id)
-            ) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'problemNotFound'
+        }
+        /** @var mixed $alias */
+        foreach ($aliases as $alias) {
+            if (!is_string($alias)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'problems'
+                );
+            }
+        }
+
+        \OmegaUp\DAO\DAO::transBegin();
+        $order = 1;
+        try {
+            foreach ($aliases as $alias) {
+                $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
+                    $alias
+                );
+
+                if (
+                    is_null($currentProblem) ||
+                    is_null($currentProblem->problem_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemNotFound'
+                    );
+                }
+
+                \OmegaUp\DAO\ProblemsetProblems::updateProblemsOrder(
+                    $problemSet->problemset_id,
+                    $currentProblem->problem_id,
+                    $order++
                 );
             }
 
-            $order = 1;
-            if (is_numeric($r['order'])) {
-                $order = intval($r['order']);
-            }
-            \OmegaUp\DAO\ProblemsetProblems::updateProblemsOrder(
-                $problemSet->problemset_id,
-                $currentProblem->problem_id,
-                $problem['order']
-            );
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         return [

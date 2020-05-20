@@ -432,18 +432,13 @@ OmegaUp.on('ready', function() {
               })
               .catch(UI.apiError);
           },
-          sort: function(assignment, assignmentProblems) {
-            let index = 1;
-            for (let problem of assignmentProblems) {
-              problem.order = index;
-              index++;
-            }
+          sort: function(assignmentAlias, problemsAliases) {
             api.Course.updateProblemsOrder({
               course_alias: courseAlias,
-              assignment_alias: assignment.alias,
-              problems: JSON.stringify(assignmentProblems),
+              assignment_alias: assignmentAlias,
+              problems: JSON.stringify(problemsAliases),
             })
-              .then(function(response) {})
+              .then(function() {})
               .catch(UI.apiError);
           },
           tags: function(tags) {
