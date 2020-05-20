@@ -32,7 +32,7 @@ OmegaUp.on('ready', () => {
               password: password,
               password_confirmation: passwordConfirmation,
             })
-              .then(function(data) {
+              .then(data => {
                 UI.success(data.message ?? '');
               })
               .catch(UI.apiError);
