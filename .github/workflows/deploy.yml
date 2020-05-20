@@ -1,0 +1,28 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+      - release
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install yarn dependencies
+        run: yarn install
+
+      - name: Build webpack resources
+        run: yarn build
+
+      - name: Upload webpack artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: webpack-artifacts
+          path: frontend/www/*/dist
