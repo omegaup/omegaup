@@ -44,7 +44,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
-            'problems' => $problems['problems'],
+            'problems' => json_encode($problems['problems']),
         ]));
 
         $problems = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
@@ -70,7 +70,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAlias,
             'assignment_alias' => $assignmentAlias,
-            'problems' => $problems['problems'],
+            'problems' => json_encode($problems['problems']),
         ]));
 
         $problems = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([

@@ -939,6 +939,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['assignment_alias'],
             'assignment_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problems'],
+            'problems'
+        );
         $course = self::validateCourseExists($r['course_alias']);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -963,7 +967,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Update problems order
         /** @var array{alias: string, order: int}[] */
-        $problems = $r['problems'];
+        $problems = json_decode($r['problems'], true);
         foreach ($problems as $problem) {
             $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
                 $problem['alias']
@@ -1009,6 +1013,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['course_alias'],
             'course_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['assignments'],
+            'assignments'
+        );
         $course = self::validateCourseExists($r['course_alias']);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1020,9 +1028,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        // Update assignments order
         /** @var array{name: string, description: string, alias: string, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, order: int, scoreboard_url: string, scoreboard_url_admin: string, has_runs: bool}[] */
-        $assignments = $r['assignments'];
+        $assignments = json_decode($r['assignments'], true /*assoc*/);
 
         foreach ($assignments as $assignment) {
             $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(

@@ -199,7 +199,7 @@ OmegaUp.on('ready', function() {
             }
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: homeworks,
+              assignments: JSON.stringify(homeworks),
             }).catch(UI.apiError);
           },
           'sort-tests': function(courseAlias, tests) {
@@ -209,7 +209,7 @@ OmegaUp.on('ready', function() {
             }
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: tests,
+              assignments: JSON.stringify(tests),
             })
               .then(function(response) {})
               .catch(UI.apiError);
@@ -438,7 +438,7 @@ OmegaUp.on('ready', function() {
             api.Course.updateProblemsOrder({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
-              problems: assignmentProblems,
+              problems: JSON.stringify(assignmentProblems),
             })
               .then(function(response) {})
               .catch(UI.apiError);

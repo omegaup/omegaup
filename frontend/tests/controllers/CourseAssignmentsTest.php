@@ -22,7 +22,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'assignments' => $assignments['assignments'],
+            'assignments' => json_encode($assignments['assignments']),
         ]));
 
         // Getting one more time assignments list with original order
@@ -60,7 +60,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'assignments' => $assignments['assignments'],
+            'assignments' => json_encode($assignments['assignments']),
         ]));
         $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
