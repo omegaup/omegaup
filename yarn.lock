@@ -6557,6 +6557,11 @@ uuid@^3.0.1, uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
   integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
 
+v-clipboard@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/v-clipboard/-/v-clipboard-2.2.3.tgz#f5db3d7004145041b6d7d06ca48236de4cee3a41"
+  integrity sha512-Wg+ObZoYK6McHb5OOCFWvm0R7xHp0/p0G1ocx/8bO22jvA/yVY05rADbfiztwCokXBNfQuGv/XSd1ozcTFgekw==
+
 v-tooltip@^3.0.0-alpha.7:
   version "3.0.0-alpha.11"
   resolved "https://registry.yarnpkg.com/v-tooltip/-/v-tooltip-3.0.0-alpha.11.tgz#e278dfb068246acdd7b633baba2135599b3b22ab"
