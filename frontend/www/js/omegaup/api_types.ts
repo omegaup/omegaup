@@ -769,7 +769,7 @@ export namespace types {
     group_admins: types.ProblemGroupAdmin[];
   }
 
-  export interface ProblemCases {
+  export interface ProblemCasesContents {
     [key: string]: { [key: string]: string };
   }
 
@@ -1090,7 +1090,7 @@ export namespace types {
   export interface RunDetails {
     admin: boolean;
     alias: string;
-    cases?: types.ProblemCases;
+    cases?: types.ProblemCasesContents;
     compile_error?: string;
     details?: {
       compile_meta?: { [key: string]: types.RunMetadata };
