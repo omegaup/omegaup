@@ -10,7 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
     interview_alias: arenaInstance.options.contestAlias,
   })
     .then(arenaInstance.problemsetLoaded.bind(arenaInstance))
-    .catch(omegaup.UI.apiError);
+    .catch(arenaInstance.problemsetLoadedError.bind(arenaInstance));
 
   window.addEventListener(
     'hashchange',

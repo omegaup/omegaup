@@ -125,16 +125,6 @@ export namespace omegaup {
     verdict: string;
   }
 
-  export interface Clarification {
-    clarification_id: number;
-    problem_alias: string;
-    author: string;
-    message: string;
-    answer?: string;
-    public: number;
-    receiver?: string;
-  }
-
   export interface CoderOfTheMonth extends Profile {
     date?: string;
     ProblemsSolved?: number;
@@ -160,7 +150,7 @@ export namespace omegaup {
   export interface Contest {
     alias: string;
     title: string;
-    window_length?: number;
+    window_length?: null | number;
     start_time: Date;
     finish_time?: Date;
     admission_mode?: AdmissionMode;
@@ -174,7 +164,7 @@ export namespace omegaup {
     needs_basic_information?: boolean;
     opened?: boolean;
     original_contest_alias?: string;
-    original_problemset_id?: string;
+    original_problemset_id?: number;
     partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
@@ -182,7 +172,8 @@ export namespace omegaup {
     points_decay_factor?: number;
     problems?: omegaup.Problem[];
     problemset_id?: number;
-    requests_user_information?: omegaup.RequestsUserInformation;
+    requests_user_information?: string;
+    user_registration_accepted?: boolean;
     rerun_id?: number;
     scoreboard?: number;
     scoreboard_url?: string;
@@ -210,7 +201,6 @@ export namespace omegaup {
     acceptsSubmissions: boolean;
     bestScore: number;
     maxScore: number;
-    active: boolean;
   }
 
   export interface ContestResult {
@@ -423,26 +413,6 @@ export namespace omegaup {
     place: number;
     totalPenalty: number;
     totalPoints: number;
-  }
-
-  export interface ScoreboardUser extends User {
-    country?: string;
-    is_invited: boolean;
-    place: number;
-    problems: ScoreboardUserProblem[];
-    total: {
-      penalty: number;
-      points: number;
-    };
-  }
-
-  export interface ScoreboardUserProblem {
-    alias: string;
-    penalty: number;
-    pending?: boolean;
-    percent: number;
-    points: number;
-    runs: number;
   }
 
   export interface Statement {

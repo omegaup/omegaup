@@ -52,9 +52,8 @@ export default class Notification extends Vue {
       case 'demotion':
         if (this.notification.contents.status == 'banned') {
           return '/media/banned.svg';
-        } else {
-          return '/media/warning.svg';
         }
+        return '/media/warning.svg';
       case 'general_notification':
         return '/media/email.svg';
       default:
@@ -82,8 +81,7 @@ export default class Notification extends Vue {
       case 'general_notification':
         return this.notification.contents.url || '';
       case 'badge':
-        // TODO: Add link to badge page.
-        return '';
+        return `/badge/${this.notification.contents.badge}/`;
       case 'demotion':
         // TODO: Add link to problem page.
         return '';

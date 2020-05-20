@@ -50,7 +50,7 @@
     <link rel="shortcut icon" href="/favicon.ico" />
 
     {if isset($inArena) && $inArena}
-      <link rel="stylesheet" type="text/css" href="{version_hash src="/ux/arena.css"}" />
+      <link rel="stylesheet" type="text/css" href="{version_hash src="/css/arena.css"}" />
     {/if}
 
     {if !empty($ENABLED_EXPERIMENTS)}

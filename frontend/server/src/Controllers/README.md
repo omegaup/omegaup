@@ -715,7 +715,7 @@ Creates a new contest
 | --------------------------- | ----------- | ----------- |
 | `admission_mode`            | `mixed`     |             |
 | `alias`                     | `mixed`     |             |
-| `basic_information`         | `bool|null` |             |
+| `needs_basic_information`   | `bool|null` |             |
 | `description`               | `mixed`     |             |
 | `feedback`                  | `mixed`     |             |
 | `finish_time`               | `mixed`     |             |
@@ -732,7 +732,7 @@ Creates a new contest
 | `start_time`                | `mixed`     |             |
 | `submissions_gap`           | `mixed`     |             |
 | `title`                     | `mixed`     |             |
-| `window_length`             | `mixed`     |             |
+| `window_length`             | `int|null`  |             |
 
 ### Returns
 
@@ -1037,14 +1037,14 @@ Returns a detailed report of the contest
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: { status: string; }; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: { memory: number; time: number; wall_time: number; }; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: types.RunMetadata; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
+| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ## `/api/contest/requests/`
 
@@ -1143,14 +1143,9 @@ Returns the Scoreboard
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: { status: string; }; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: { memory: number; time: number; wall_time: number; }; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+```typescript
+types.Scoreboard;
+```
 
 ## `/api/contest/scoreboardEvents/`
 
@@ -1167,9 +1162,9 @@ Returns the Scoreboard events
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `events` | `{ country: string; delta: number; is_invited: boolean; total: { points: number; penalty: number; }; name: string; username: string; problem: { alias: string; points: number; penalty: number; }; }[]` |
+| Name     | Type                      |
+| -------- | ------------------------- |
+| `events` | `types.ScoreboardEvent[]` |
 
 ## `/api/contest/scoreboardMerge/`
 
@@ -1269,7 +1264,7 @@ Update a Contest
 | --------------------------- | ------------------------ | ----------- |
 | `admission_mode`            | `mixed`                  |             |
 | `alias`                     | `mixed`                  |             |
-| `basic_information`         | `bool|null`              |             |
+| `needs_basic_information`   | `bool|null`              |             |
 | `contest_alias`             | `mixed`                  |             |
 | `description`               | `mixed`                  |             |
 | `feedback`                  | `mixed`                  |             |
@@ -1532,14 +1527,9 @@ Gets Scoreboard for an assignment
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: { status: string; }; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: { memory: number; time: number; wall_time: number; }; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+```typescript
+types.Scoreboard;
+```
 
 ## `/api/course/assignmentScoreboardEvents/`
 
@@ -1557,9 +1547,9 @@ Returns the Scoreboard events
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `events` | `{ country: string; delta: number; is_invited: boolean; name: string; problem: { alias: string; penalty: number; points: number; }; total: { penalty: number; points: number; }; username: string; }[]` |
+| Name     | Type                      |
+| -------- | ------------------------- |
+| `events` | `types.ScoreboardEvent[]` |
 
 ## `/api/course/clone/`
 
@@ -1935,9 +1925,9 @@ Returns all runs for a course
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                               |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ guid: string; language: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; judged_by: string; time: Date; submit_delay: number; type: string; username: string; classname: string; alias: string; country_id: string; contest_alias: string; }[]` |
+| Name   | Type          |
+| ------ | ------------- |
+| `runs` | `types.Run[]` |
 
 ## `/api/course/studentProgress/`
 
@@ -2607,9 +2597,9 @@ Entry point for Problem clarifications API
 
 ### Returns
 
-| Name             | Type                                                                                                                                   |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `clarifications` | `{ clarification_id: number; contest_alias: string; author: string; message: string; time: Date; answer: string; public: boolean; }[]` |
+| Name             | Type                    |
+| ---------------- | ----------------------- |
+| `clarifications` | `types.Clarification[]` |
 
 ## `/api/problem/create/`
 
@@ -2680,35 +2670,35 @@ Entry point for Problem Details API
 
 ### Returns
 
-| Name                   | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `accepted`             | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `admin`                | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `alias`                | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `allow_user_add_tags`  | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `commit`               | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `creation_date`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| `difficulty`           | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `email_clarifications` | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `exists`               | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `input_limit`          | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `languages`            | `string[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `order`                | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `points`               | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `preferred_language`   | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `problemsetter`        | `{ creation_date: Date; name: string; username: string; }`                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `quality_seal`         | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `runs`                 | `{ alias: string; contest_score: number; guid: string; language: string; memory: number; penalty: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; username: string; verdict: string; }[]`                                                                                                                                                                                                                                                               |
-| `score`                | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `settings`             | `{ cases: { [key: string]: { in: string; out: string; weight?: number; }; }; limits: { ExtraWallTime: string; MemoryLimit: number|string; OutputLimit: number|string; OverallWallTimeLimit: string; TimeLimit: string; }; slow: boolean; validator: { custom_validator: { limits: { TimeLimit: number; }; }; limits?: { ExtraWallTime: string; MemoryLimit: number|string; OutputLimit: number|string; OverallWallTimeLimit: string; TimeLimit: string; }; name: string; tolerance: number; }; }` |
-| `solvers`              | `{ language: string; memory: number; runtime: number; time: Date; username: string; }[]`                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `source`               | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `statement`            | `{ images: { [key: string]: string; }; language: string; markdown: string; }`                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `submissions`          | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `title`                | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `version`              | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `visibility`           | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `visits`               | `number`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Name                   | Type                                                                                     |
+| ---------------------- | ---------------------------------------------------------------------------------------- |
+| `accepted`             | `number`                                                                                 |
+| `admin`                | `boolean`                                                                                |
+| `alias`                | `string`                                                                                 |
+| `allow_user_add_tags`  | `boolean`                                                                                |
+| `commit`               | `string`                                                                                 |
+| `creation_date`        | `Date`                                                                                   |
+| `difficulty`           | `number`                                                                                 |
+| `email_clarifications` | `boolean`                                                                                |
+| `exists`               | `boolean`                                                                                |
+| `input_limit`          | `number`                                                                                 |
+| `languages`            | `string[]`                                                                               |
+| `order`                | `string`                                                                                 |
+| `points`               | `number`                                                                                 |
+| `preferred_language`   | `string`                                                                                 |
+| `problemsetter`        | `{ creation_date: Date; name: string; username: string; }`                               |
+| `quality_seal`         | `boolean`                                                                                |
+| `runs`                 | `types.Run[]`                                                                            |
+| `score`                | `number`                                                                                 |
+| `settings`             | `types.ProblemSettings`                                                                  |
+| `solvers`              | `{ language: string; memory: number; runtime: number; time: Date; username: string; }[]` |
+| `source`               | `string`                                                                                 |
+| `statement`            | `types.ProblemStatement`                                                                 |
+| `submissions`          | `number`                                                                                 |
+| `title`                | `string`                                                                                 |
+| `version`              | `string`                                                                                 |
+| `visibility`           | `number`                                                                                 |
+| `visits`               | `number`                                                                                 |
 
 ## `/api/problem/list/`
 
@@ -2853,9 +2843,9 @@ Entry point for Problem runs API
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                                   |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ alias: string; classname: string; contest_alias?: string; contest_score: number; country_id?: string; guid: string; judged_by?: string; language: string; memory: number; penalty: number; runtime: number; score: number; status: string; submit_delay: number; time: Date; type?: string; username: string; verdict: string; }[]` |
+| Name   | Type          |
+| ------ | ------------- |
+| `runs` | `types.Run[]` |
 
 ## `/api/problem/runsDiff/`
 
@@ -2913,10 +2903,10 @@ Returns the solution for a problem if conditions are satisfied.
 
 ### Returns
 
-| Name       | Type                                                                          |
-| ---------- | ----------------------------------------------------------------------------- |
-| `exists`   | `boolean`                                                                     |
-| `solution` | `{ language: string; markdown: string; images: { [key: string]: string; }; }` |
+| Name       | Type                     |
+| ---------- | ------------------------ |
+| `exists`   | `boolean`                |
+| `solution` | `types.ProblemStatement` |
 
 ## `/api/problem/stats/`
 
@@ -3173,9 +3163,9 @@ Returns the Scoreboard events
 
 ### Returns
 
-| Name     | Type                                                                                                                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `events` | `{ country: string; delta: number; is_invited: boolean; total: { points: number; penalty: number; }; name: string; username: string; problem: { alias: string; points: number; penalty: number; }; }[]` |
+| Name     | Type                      |
+| -------- | ------------------------- |
+| `events` | `types.ScoreboardEvent[]` |
 
 # QualityNomination
 
@@ -3273,19 +3263,19 @@ nominator or a member of the reviewer group.
 
 ### Returns
 
-| Name                   | Type                                                                                                                                                                           |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `author`               | `{ name: string; username: string; }`                                                                                                                                          |
-| `contents`             | `{ before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }`               |
-| `nomination`           | `string`                                                                                                                                                                       |
-| `nomination_status`    | `string`                                                                                                                                                                       |
-| `nominator`            | `{ name: string; username: string; }`                                                                                                                                          |
-| `original_contents`    | `{ source: string; statements: { [key: string]: { language: string; markdown: string; images: { [key: string]: string; }; }; }; tags?: { source: string; name: string; }[]; }` |
-| `problem`              | `{ alias: string; title: string; }`                                                                                                                                            |
-| `qualitynomination_id` | `number`                                                                                                                                                                       |
-| `reviewer`             | `boolean`                                                                                                                                                                      |
-| `time`                 | `Date`                                                                                                                                                                         |
-| `votes`                | `{ time: Date; user: { name: string; username: string; }; vote: number; }[]`                                                                                                   |
+| Name                   | Type                                                                                                                                                             |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `author`               | `{ name: string; username: string; }`                                                                                                                            |
+| `contents`             | `{ before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }` |
+| `nomination`           | `string`                                                                                                                                                         |
+| `nomination_status`    | `string`                                                                                                                                                         |
+| `nominator`            | `{ name: string; username: string; }`                                                                                                                            |
+| `original_contents`    | `{ source: string; statements: { [key: string]: types.ProblemStatement; }; tags?: { source: string; name: string; }[]; }`                                        |
+| `problem`              | `{ alias: string; title: string; }`                                                                                                                              |
+| `qualitynomination_id` | `number`                                                                                                                                                         |
+| `reviewer`             | `boolean`                                                                                                                                                        |
+| `time`                 | `Date`                                                                                                                                                           |
+| `votes`                | `{ time: Date; user: { name: string; username: string; }; vote: number; }[]`                                                                                     |
 
 ## `/api/qualityNomination/list/`
 
@@ -3467,6 +3457,7 @@ Create a new run
 | Name                      | Type     |
 | ------------------------- | -------- |
 | `guid`                    | `string` |
+| `submit_delay`            | `number` |
 | `submission_deadline`     | `Date`   |
 | `nextSubmissionTimestamp` | `Date`   |
 
@@ -3484,17 +3475,17 @@ Gets the details of a run. Includes admin details if admin.
 
 ### Returns
 
-| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `admin`         | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `alias`         | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `details`       | `{ compile_meta?: { [key: string]: { memory: number; sys_time: number; time: number; verdict: string; wall_time: number; }; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: { verdict: string; }; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; verdict?: string; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
-| `guid`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `judged_by`     | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `language`      | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `logs`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `admin`         | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `alias`         | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `details`       | `{ compile_meta?: { [key: string]: types.RunMetadata; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; verdict?: string; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
+| `guid`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `judged_by`     | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `language`      | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `logs`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ## `/api/run/disqualify/`
 
@@ -3532,9 +3523,9 @@ Gets a list of latest runs overall
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                                                                                                                                                               |
-| ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `runs` | `{ alias: string; classname: string; contest_alias: string; contest_score: number; country_id: string; guid: string; judged_by: string; language: string; memory: number; penalty: number; run_id: number; runtime: number; score: number; submit_delay: number; time: Date; type: string; username: string; verdict: string; }[]` |
+| Name   | Type          |
+| ------ | ------------- |
+| `runs` | `types.Run[]` |
 
 ## `/api/run/rejudge/`
 
@@ -3568,11 +3559,11 @@ Used in the arena, any contestant can view its own codes and compile errors
 
 ### Returns
 
-| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `details`       | `{ compile_meta?: { [key: string]: { memory: number; sys_time: number; time: number; verdict: string; wall_time: number; }; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: { verdict: string; }; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
-| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `details`       | `{ compile_meta?: { [key: string]: types.RunMetadata; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
+| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
 ## `/api/run/status/`
 
@@ -3588,16 +3579,9 @@ Get basic details of a run
 
 ### Returns
 
-| Name            | Type     |
-| --------------- | -------- |
-| `alias`         | `string` |
-| `contest_score` | `number` |
-| `memory`        | `number` |
-| `penalty`       | `number` |
-| `runtime`       | `number` |
-| `score`         | `number` |
-| `submit_delay`  | `number` |
-| `time`          | `Date`   |
+```typescript
+types.Run;
+```
 
 # School
 

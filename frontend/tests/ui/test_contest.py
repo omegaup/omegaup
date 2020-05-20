@@ -333,7 +333,7 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 
 
 @util.annotate
-def create_contest(driver, contest_alias, scoreboard_time_percent=100):
+def create_contest(driver, alias, scoreboard_time_percent=100):
     '''Creates a new contest.'''
 
     driver.wait.until(
@@ -346,17 +346,17 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100):
 
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.ID, ('title')))).send_keys(contest_alias)
-    driver.browser.find_element_by_id('alias').send_keys(
-        contest_alias)
-    driver.browser.find_element_by_id('description').send_keys(
+            (By.CSS_SELECTOR, 'input[data-title]'))).send_keys(alias)
+    driver.browser.find_element_by_name('alias').send_keys(alias)
+    driver.browser.find_element_by_name('description').send_keys(
         'contest description')
-    scoreboard_element = driver.browser.find_element_by_id('scoreboard')
+    scoreboard_element = driver.browser.find_element_by_name('scoreboard')
     scoreboard_element.clear()
     scoreboard_element.send_keys(scoreboard_time_percent)
 
     with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
+        driver.browser.find_element_by_css_selector(
+            'form.contest-form').submit()
 
 
 @util.annotate

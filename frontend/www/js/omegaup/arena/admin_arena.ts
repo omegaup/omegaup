@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import Vue from 'vue';
 
 import * as api from '../api';
@@ -9,8 +7,7 @@ import arena_Runs from '../components/arena/Runs.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
-import { Arena } from './arena';
-import { runsStore } from './arena_transitional';
+import { Arena, runsStore } from './arena';
 
 export default class ArenaAdmin {
   arena: Arena;
@@ -183,7 +180,9 @@ export default class ArenaAdmin {
         rowcount: this.arena.clarificationsRowcount,
       })
         .then(time.remoteTimeAdapter)
-        .then(response => this.arena.clarificationsChange(response))
+        .then(response =>
+          this.arena.clarificationsChange(response.clarifications),
+        )
         .catch(ui.apiError);
     } else {
       this.arena.refreshClarifications();
