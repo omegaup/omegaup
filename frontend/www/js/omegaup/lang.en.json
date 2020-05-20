@@ -214,7 +214,7 @@
 	"contestNewFormNoPenalty": "Users with the same score will end up in a draw, regardless of the time it has taken each one.",
 	"contestNewFormOmiStyle": "OMI - IOI Style",
 	"contestNewFormPartialScore": "Partial score",
-	"contestNewFormPartialScoreDesc": "The score of submissions will be calculated by the weight of all case with AC verdict. Otherwise, the score will be 0 in case of at least one case is wrong.",
+	"contestNewFormPartialScoreDesc": "The score for the submissions will be 100% of the points for that problem when the verdict is AC. Otherwise, the score will be 0 whether at least one case is incorrect.",
 	"contestNewFormPenaltyDesc": "Integer amount of minutes to penalize an incorrect submission.",
 	"contestNewFormPenaltyType": "Penalty type",
 	"contestNewFormPenaltyTypeDesc": "Indicates how the submission penalty is calculated: minutes since the beginning of the contest, minutes since the problem was opened, or program execution time (milliseconds).",

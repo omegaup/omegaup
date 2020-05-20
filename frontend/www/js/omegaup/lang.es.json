@@ -214,7 +214,7 @@
 	"contestNewFormNoPenalty": "Usuarios con el mismo puntaje quedar\u00e1n empatados, sin importar el tiempo que le haya tomado a cada uno.",
 	"contestNewFormOmiStyle": "Estilo OMI - IOI",
 	"contestNewFormPartialScore": "Puntaje parcial",
-	"contestNewFormPartialScoreDesc": "El puntaje de los env\u00edos se calcular\u00e1 de acuerdo a la suma de cada caso con veredicto AC. De lo contrario, la puntuaci\u00f3n ser\u00e1 0 en caso de que al menos un caso sea incorrecto",
+	"contestNewFormPartialScoreDesc": "El puntaje de los env\u00edos ser\u00e1 el 100% de los puntos para ese problema cuando el veredicto es AC. De lo contrario, la puntuaci\u00f3n ser\u00e1 0 si al menos un caso es incorrecto",
 	"contestNewFormPenaltyDesc": "Entero indicando el n\u00famero de minutos con que se penaliza por enviar una respuesta incorrecta.",
 	"contestNewFormPenaltyType": "Tipo de Penalty",
 	"contestNewFormPenaltyTypeDesc": "Indica c\u00f3mo se calcula la penalizaci\u00f3n por env\u00edo: tiempo desde que inicia el concurso, tiempo desde que se abre el problema, o tiempo de ejecuci\u00f3n del programa.",

@@ -215,7 +215,7 @@ const translations: { [key: string]: string; } = {
   contestNewFormNoPenalty: "(U53r5 wi7h 7h3 5am3 5c0r3 wi11 3nd up in a draw, r3gard1355 0f 7h3 7im3 i7 ha5 7ak3n 3ach 0n3.)",
   contestNewFormOmiStyle: "(OMI - IOI S7y13)",
   contestNewFormPartialScore: "(Par7ia1 5c0r3)",
-  contestNewFormPartialScoreDesc: "(Th3 5c0r3 0f 5ubmi55i0n5 wi11 b3 ca1cu1a73d by 7h3 w3igh7 0f a11 ca53 wi7h AC v3rdic7. O7h3rwi53, 7h3 5c0r3 wi11 b3 0 in ca53 0f a7 13a57 0n3 ca53 i5 wr0ng.)",
+  contestNewFormPartialScoreDesc: "(Th3 5c0r3 f0r 7h3 5ubmi55i0n5 wi11 b3 100% 0f 7h3 p0in75 f0r 7ha7 pr0b13m wh3n 7h3 v3rdic7 i5 AC. O7h3rwi53, 7h3 5c0r3 wi11 b3 0 wh37h3r a7 13a57 0n3 ca53 i5 inc0rr3c7.)",
   contestNewFormPenaltyDesc: "(In73g3r am0un7 0f minu735 70 p3na1iz3 an inc0rr3c7 5ubmi55i0n.)",
   contestNewFormPenaltyType: "(P3na17y 7yp3)",
   contestNewFormPenaltyTypeDesc: "(Indica735 h0w 7h3 5ubmi55i0n p3na17y i5 ca1cu1a73d: minu735 5inc3 7h3 b3ginning 0f 7h3 c0n7357, minu735 5inc3 7h3 pr0b13m wa5 0p3n3d, 0r pr0gram 3x3cu7i0n 7im3 (mi11i53c0nd5).)",
