@@ -69,7 +69,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($course->admission_mode, 'registration');
     }
 
-    public function testCourseIsPresentInStudentList() {
+    public function testCourseWithRegistrationModeIsNotPresentInStudentList() {
         $course = self::createCourseWithRegistrationMode()['course'];
         ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
         $studentLogin = self::login($student);
@@ -81,7 +81,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertArrayContainsWithPredicate(
+        $this->assertArrayNotContainsWithPredicate(
             $coursesList['student'],
             function ($studentCourse) use ($course): bool {
                 return $studentCourse['alias'] === $course->alias;
