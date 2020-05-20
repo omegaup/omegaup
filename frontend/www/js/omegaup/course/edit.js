@@ -195,27 +195,17 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           new: onNewAssignment,
-          'sort-homeworks': function(courseAlias, homeworks) {
-            let index = 1;
-            for (let homework of homeworks) {
-              homework.order = index++;
-            }
+          'sort-homeworks': function(courseAlias, homeworksAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: JSON.stringify(homeworks),
+              assignments: JSON.stringify(homeworksAliases),
             }).catch(UI.apiError);
           },
-          'sort-tests': function(courseAlias, tests) {
-            let index = 1;
-            for (let test of tests) {
-              test.order = index++;
-            }
+          'sort-tests': function(courseAlias, testsAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: JSON.stringify(tests),
-            })
-              .then(function(response) {})
-              .catch(UI.apiError);
+              assignments: JSON.stringify(testsAliases),
+            }).catch(UI.apiError);
           },
         },
       });

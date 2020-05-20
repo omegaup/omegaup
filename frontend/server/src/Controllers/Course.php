@@ -983,8 +983,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\DAO\DAO::transBegin();
-        $order = 1;
         try {
+            $order = 1;
             foreach ($aliases as $alias) {
                 $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
                     $alias
@@ -1005,7 +1005,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $order++
                 );
             }
-
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
@@ -1048,28 +1047,51 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        /** @var array{name: string, description: string, alias: string, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, order: int, scoreboard_url: string, scoreboard_url_admin: string, has_runs: bool}[] */
-        $assignments = json_decode($r['assignments'], true /*assoc*/);
-
-        foreach ($assignments as $assignment) {
-            $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
-                $assignment['alias'],
-                $course->course_id
+        /** @var null|list<string> */
+        $aliases = json_decode($r['assignments'], true);
+        if (!is_array($aliases) || empty($aliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
             );
-
-            if (
-                empty($currentAssignment) ||
-                is_null($currentAssignment->assignment_id)
-            ) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'assignmentNotFound'
+        }
+        /** @var mixed $alias */
+        foreach ($aliases as $alias) {
+            if (!is_string($alias)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'assignments'
                 );
             }
+        }
 
-            \OmegaUp\DAO\Assignments::updateAssignmentsOrder(
-                $currentAssignment->assignment_id,
-                intval($assignment['order'])
-            );
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
+            $order = 1;
+            foreach ($aliases as $alias) {
+                $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+                    $alias,
+                    $course->course_id
+                );
+
+                if (
+                    empty($currentAssignment) ||
+                    is_null($currentAssignment->assignment_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'assignmentNotFound'
+                    );
+                }
+
+                \OmegaUp\DAO\Assignments::updateAssignmentsOrder(
+                    $currentAssignment->assignment_id,
+                    $order++
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         return [
