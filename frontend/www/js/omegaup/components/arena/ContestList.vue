@@ -1,10 +1,25 @@
 <template>
-  <div class="panel contest-list">
-    <div class="panel-heading panel-default">
-      <div class="text-right">
-        <form action="/arena/" method="GET">
-          <div class="form-inline">
-            <div class="form-group">
+  <div class="card contest-list">
+    <div class="card-header">
+      <h1>{{ T.arenaPageTitle }}</h1>
+      <p>{{ T.arenaPageIntroduction }}</p>
+      <div class="row">
+        <div class="col-md-6">
+          <p>
+            {{ T.frontPageIntroduction }}
+            <a
+              href="http://blog.omegaup.com/category/omegaup/omegaup-101/"
+              target="_blank"
+            >
+              <small
+                ><u>{{ T.frontPageIntroductionButton }}</u></small
+              ></a
+            >
+          </p>
+        </div>
+        <div class="col-md-6">
+          <form action="/arena/" method="GET">
+            <div class="input-group">
               <input
                 class="form-control"
                 type="text"
@@ -13,93 +28,85 @@
                 v-model="query"
                 v-bind:placeholder="T.wordsKeyword"
               />
+              <div class="input-group-append">
+                <input
+                  class="btn btn-primary btn-md active"
+                  type="submit"
+                  v-bind:value="T.wordsSearch"
+                />
+              </div>
             </div>
-            <input
-              class="btn btn-primary btn-lg active"
-              type="submit"
-              v-bind:value="T.wordsSearch"
-            />
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-      <h1>{{ T.arenaPageTitle }}</h1>
-      <p>{{ T.arenaPageIntroduction }}</p>
-      <p>
-        {{ T.frontPageIntroduction }}
-        <a
-          href="http://blog.omegaup.com/category/omegaup/omegaup-101/"
-          target="_blank"
-        >
-          <small
-            ><u>{{ T.frontPageIntroductionButton }}</u></small
-          ></a
-        >
-      </p>
     </div>
 
-    <div class="panel-body">
-      <ul class="nav nav-pills arena-tabs">
+    <div class="card-body">
+      <ul class="nav nav-pills nav-fill arena-tabs">
         <li
           class="nav-item"
-          v-bind:class="{ active: showTab === 'participating' }"
           v-if="isLogged"
           v-on:click="showTab = 'participating'"
         >
-          <a class="nav-link tab-participating" data-toggle="tab">
+          <a
+            class="nav-link tab-participating"
+            v-bind:class="{ active: showTab === 'participating' }"
+            data-toggle="tab"
+          >
             {{ T.arenaMyActiveContests }}</a
           >
         </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'recommended_current' }"
-          v-on:click="showTab = 'recommended_current'"
-        >
-          <a class="nav-link tab-recommended-current" data-toggle="tab">
+        <li class="nav-item" v-on:click="showTab = 'recommended_current'">
+          <a
+            class="nav-link tab-recommended-current"
+            v-bind:class="{ active: showTab === 'recommended_current' }"
+            data-toggle="tab"
+          >
             {{ T.arenaRecommendedCurrentContests }}</a
           >
         </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'current' }"
-          v-on:click="showTab = 'current'"
-        >
-          <a class="nav-link tab-current" data-toggle="tab">
+        <li class="nav-item" v-on:click="showTab = 'current'">
+          <a
+            class="nav-link tab-current"
+            v-bind:class="{ active: showTab === 'current' }"
+            data-toggle="tab"
+          >
             {{ T.arenaCurrentContests }}</a
           >
         </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'public' }"
-          v-on:click="showTab = 'public'"
-        >
-          <a class="nav-link tab-public" data-toggle="tab">
+        <li class="nav-item" v-on:click="showTab = 'public'">
+          <a
+            class="nav-link tab-public"
+            v-bind:class="{ active: showTab === 'public' }"
+            data-toggle="tab"
+          >
             {{ T.arenaCurrentPublicContests }}</a
           >
         </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'future' }"
-          v-on:click="showTab = 'future'"
-        >
-          <a class="nav-link tab-future" data-toggle="tab">
+        <li class="nav-item" v-on:click="showTab = 'future'">
+          <a
+            class="nav-link tab-future"
+            v-bind:class="{ active: showTab === 'future' }"
+            data-toggle="tab"
+          >
             {{ T.arenaFutureContests }}</a
           >
         </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'recommended_past' }"
-          v-on:click="showTab = 'recommended_past'"
-        >
-          <a class="nav-link tab-recommended-past" data-toggle="tab">
+        <li class="nav-item" v-on:click="showTab = 'recommended_past'">
+          <a
+            class="nav-link tab-recommended-past"
+            v-bind:class="{ active: showTab === 'recommended_past' }"
+            data-toggle="tab"
+          >
             {{ T.arenaRecommendedOldContests }}</a
           >
         </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'past' }"
-          v-on:click="showTab = 'past'"
-        >
-          <a class="nav-link tab-past" data-toggle="tab">
+        <li class="nav-item" v-on:click="showTab = 'past'">
+          <a
+            class="nav-link tab-past"
+            v-bind:class="{ active: showTab === 'past' }"
+            data-toggle="tab"
+          >
             {{ T.arenaOldContests }}</a
           >
         </li>
@@ -189,6 +196,15 @@
     </div>
   </div>
 </template>
+
+<style>
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: #aaa;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';

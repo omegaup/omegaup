@@ -1,74 +1,76 @@
 <template>
-  <div class="panel panel-primary">
+  <div class="card" v-bind:class="{ 'bg-primary': contests.length !== 0 }">
     <div v-if="contests.length === 0">
       <div class="empty-category">{{ T.contestListEmpty }}</div>
     </div>
-    <div class="panel" v-else="">
+    <div class="card" v-else="">
       <h5 v-if="recommended">{{ T.arenaPageRecommendedContestsText }}</h5>
-      <div class="panel-body">
+      <div class="card-body">
         <table class="contest-list table">
           <thead>
             <tr>
-              <th class="col-md-6">{{ T.wordsContest }}</th>
-              <th class="col-md-2" v-if="showTimes">{{ T.wordsStartTime }}</th>
-              <th class="col-md-2" v-if="showTimes">{{ T.wordsEndTime }}</th>
-              <th class="col-md-2" v-if="showTimes">{{ T.wordsDuration }}</th>
-              <th class="col-md-2" colspan="2" v-if="showPractice"></th>
-              <th class="col-md-2" v-if="showVirtual"></th>
-              <th class="col-md-2" v-if="showPublicUpdated">
+              <th>{{ T.wordsContest }}</th>
+              <th v-if="showTimes">{{ T.wordsStartTime }}</th>
+              <th v-if="showTimes">{{ T.wordsEndTime }}</th>
+              <th v-if="showTimes">{{ T.wordsDuration }}</th>
+              <th colspan="2" v-if="showPractice"></th>
+              <th v-if="showVirtual"></th>
+              <th v-if="showPublicUpdated">
                 {{ T.wordsPublicUpdated }}
               </th>
             </tr>
           </thead>
-          <tbody v-for="contest in page" class="contest-list row">
-            <tr>
-              <td class="col-md-6">
-                <a v-bind:href="`/arena/${contest.alias}/`">
-                  <span>{{ ui.contestTitle(contest) }}</span>
-                  <span
-                    class="glyphicon glyphicon-ok"
-                    aria-hidden="true"
-                    v-if="contest.recommended"
-                  ></span>
-                </a>
-              </td>
-              <td class="no-wrap col-md-2" v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.start_time.iso())">{{
-                  contest.start_time.long()
-                }}</a>
-              </td>
-              <td class="no-wrap col-md-2" v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.finish_time.iso())">{{
-                  contest.finish_time.long()
-                }}</a>
-              </td>
-              <td class="no-wrap col-md-2" v-if="showTimes">
-                {{ time.toDDHHMM(contest.duration) }}
-              </td>
-              <td class="col-md-2" v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/practice/`">
-                  <span>{{ T.wordsPractice }}</span>
-                </a>
-              </td>
-              <td class="col-md-2" v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/#ranking`">
-                  <span>{{ T.wordsContestsResults }}</span>
-                </a>
-              </td>
-              <td class="col-md-2" v-if="!ui.isVirtual(contest) && showVirtual">
-                <a v-bind:href="`/arena/${contest.alias}/virtual/`">
-                  <span>{{ T.virtualContest }}</span>
-                </a>
-              </td>
-              <td class="no-wrap col-md-2" v-if="showPublicUpdated">
-                {{ contest.last_updated.long() }}
-              </td>
-            </tr>
-            <tr>
-              <td colspan="5" class="forcebreaks forcebreaks-arena">
-                {{ contest.description }}
-              </td>
-            </tr>
+          <tbody class="contest-list">
+            <template v-for="contest in page">
+              <tr>
+                <td class="">
+                  <a v-bind:href="`/arena/${contest.alias}/`">
+                    <span>{{ ui.contestTitle(contest) }}</span>
+                    <span
+                      class="glyphicon glyphicon-ok"
+                      aria-hidden="true"
+                      v-if="contest.recommended"
+                    ></span>
+                  </a>
+                </td>
+                <td v-if="showTimes">
+                  <a v-bind:href="getTimeLink(contest.start_time.iso())">{{
+                    contest.start_time.long()
+                  }}</a>
+                </td>
+                <td v-if="showTimes">
+                  <a v-bind:href="getTimeLink(contest.finish_time.iso())">{{
+                    contest.finish_time.long()
+                  }}</a>
+                </td>
+                <td v-if="showTimes">
+                  {{ time.toDDHHMM(contest.duration) }}
+                </td>
+                <td v-if="showPractice">
+                  <a v-bind:href="`/arena/${contest.alias}/practice/`">
+                    <span>{{ T.wordsPractice }}</span>
+                  </a>
+                </td>
+                <td v-if="showPractice">
+                  <a v-bind:href="`/arena/${contest.alias}/#ranking`">
+                    <span>{{ T.wordsContestsResults }}</span>
+                  </a>
+                </td>
+                <td v-if="!ui.isVirtual(contest) && showVirtual">
+                  <a v-bind:href="`/arena/${contest.alias}/virtual/`">
+                    <span>{{ T.virtualContest }}</span>
+                  </a>
+                </td>
+                <td v-if="showPublicUpdated">
+                  {{ contest.last_updated.long() }}
+                </td>
+              </tr>
+              <tr>
+                <td colspan="5">
+                  {{ contest.description }}
+                </td>
+              </tr>
+            </template>
           </tbody>
           <tfoot>
             <tr v-if="hasNext || hasPrevious" align="center">
