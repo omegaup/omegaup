@@ -22,6 +22,10 @@ define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 EOF
 fi
 
+if [[ "${CONTINUOUS_INTEGRATION}" == "true" ]]; then
+	exit 0
+fi
+
 if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file=/home/ubuntu/.my.cnf exists ; then
   mysql --defaults-file=/home/ubuntu/.my.cnf \
     -e "CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
