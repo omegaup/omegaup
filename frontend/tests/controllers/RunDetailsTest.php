@@ -215,6 +215,12 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $acRunData['response']['guid'],
             $this->admin
         );
+
+        // Asserts contest alias in problem details is the same that the provided
+        $this->assertEquals(
+            $this->contestData['request']['alias'],
+            $acRunData['details']['runs'][0]['contest_alias']
+        );
     }
 
     /**
@@ -283,6 +289,12 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCanSeeRunDetails(
             $acRunData['response']['guid'],
             $this->identity
+        );
+
+        // Asserts contest alias in problem details is the same that the provided
+        $this->assertEquals(
+            $this->contestData['request']['alias'],
+            $acRunData['details']['runs'][0]['contest_alias']
         );
     }
 }
