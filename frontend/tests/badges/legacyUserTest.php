@@ -77,7 +77,6 @@ class LegacyUser extends \OmegaUp\Test\BadgesTestCase {
             )
         );
         $date = date_format($date, 'Y-m-d');
-        print($date);
         \OmegaUp\Time::setTimeForTesting(strtotime($date));
 
         $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
