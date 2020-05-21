@@ -1,0 +1,41 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+      - release
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install yarn dependencies
+        run: yarn install
+
+      - name: Build webpack resources
+        run: yarn build
+
+      - name: Upload webpack artifacts
+        run: |
+          mkdir -p build/webpack-artifacts
+
+          # Upload a tarball with the build artifacts.
+          TARBALL="build/webpack-artifacts/${{ github.sha }}.tar.xz"
+          tar --xz --create --file "${TARBALL}" -C frontend/www js/dist css/dist media/dist
+          AWS_ACCESS_KEY_ID=${{ secrets.AWS_BUILD_ARTIFACTS_ACCESS_KEY_ID }} \
+          AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_BUILD_ARTIFACTS_SECRET_ACCESS_KEY }} \
+            aws s3 cp \
+            "${TARBALL}" \
+            "s3://omegaup-build-artifacts/webpack-artifacts/${{ github.sha }}.tar.xz"
+
+          # Start a deployment now that the build artifacts are done.
+          curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/deployments \
+            --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            --data "{\"ref\":\"${{ github.ref }}\",\"required_contexts\":[]}"

@@ -26,11 +26,6 @@ jobs:
     - env: TEST_SUITE=phpunit
       services:
         - mysql
-    - env: TEST_SUITE=lint
-      addons:
-        apt:
-          packages:
-            - *common_packages
     - env: TEST_SUITE=selenium
       addons:
         apt:
