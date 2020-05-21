@@ -40,15 +40,16 @@ class Course {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
+        $courseStartTime = \OmegaUp\Time::get();
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'start_time' => \OmegaUp\Time::get(),
+            'start_time' => $courseStartTime,
             'finish_time' => !is_null(
                 $courseDuration
-            ) ? \OmegaUp\Time::get() + $courseDuration : null,
+            ) ? $courseStartTime + $courseDuration : null,
             'admission_mode' => $admissionMode,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
@@ -93,6 +94,9 @@ class Course {
             $courseAlias
         );
         $courseAlias = $courseFactoryResult['course_alias'];
+        $courseStartTime = intval(
+            $courseFactoryResult['request']['start_time']
+        );
 
         // Create the assignment
         $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
@@ -109,10 +113,10 @@ class Course {
             'name' => \OmegaUp\Test\Utils::createRandomString(),
             'alias' => $assignmentAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
-            'start_time' => \OmegaUp\Time::get() + $startTimeDelay,
+            'start_time' => $courseStartTime + $startTimeDelay,
             'finish_time' => !is_null(
                 $assignmentDuration
-            ) ? \OmegaUp\Time::get() + $assignmentDuration : null,
+            ) ? $courseStartTime + $assignmentDuration : null,
             'course_alias' => $courseAlias,
             'assignment_type' => 'homework',
             'course' => $course,
@@ -170,7 +174,11 @@ class Course {
             $courseAlias
         );
         $courseAlias = $courseFactoryResult['course_alias'];
+        $courseStartTime = intval(
+            $courseFactoryResult['request']['start_time']
+        );
         $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
+
         if (is_null($course) || is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
@@ -189,8 +197,8 @@ class Course {
                     'name' => \OmegaUp\Test\Utils::createRandomString(),
                     'alias' => $assignmentAlias,
                     'description' => \OmegaUp\Test\Utils::createRandomString(),
-                    'start_time' => (\OmegaUp\Time::get()),
-                    'finish_time' => (\OmegaUp\Time::get() + 120),
+                    'start_time' => $courseStartTime,
+                    'finish_time' => $courseStartTime + 120,
                     'course_alias' => $courseAlias,
                     'assignment_type' => $assignmentType,
                     'order' => $order++,

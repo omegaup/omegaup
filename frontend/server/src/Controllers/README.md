@@ -2019,7 +2019,6 @@ _Nothing_
 | ------------------ | ------- | ----------- |
 | `assignment_alias` | `mixed` |             |
 | `course_alias`     | `mixed` |             |
-| `order`            | `mixed` |             |
 | `problems`         | `mixed` |             |
 
 ### Returns

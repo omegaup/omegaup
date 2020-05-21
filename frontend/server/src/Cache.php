@@ -11,7 +11,7 @@ abstract class CacheAdapter {
 
     public static function getInstance(): CacheAdapter {
         if (is_null(CacheAdapter::$_instance)) {
-            if (function_exists('apcu_clear_cache')) {
+            if (function_exists('apcu_enabled') && \apcu_enabled()) {
                 CacheAdapter::$_instance = new APCCacheAdapter();
             } else {
                 CacheAdapter::$_instance = new InProcessCacheAdapter();
@@ -21,10 +21,11 @@ abstract class CacheAdapter {
     }
 
     /**
+     * @psalm-template T
      * @param string $key
-     * @param mixed $defaultVar
+     * @param T $defaultVar
      * @param int $ttl
-     * @return mixed
+     * @return T
      */
     abstract public function entry(string $key, $defaultVar, int $ttl = 0);
 
@@ -58,15 +59,16 @@ abstract class CacheAdapter {
  */
 class APCCacheAdapter extends CacheAdapter {
     /**
+     * @psalm-template T
      * @param string $key
-     * @param mixed $defaultVar
+     * @param T $defaultVar
      * @param int $ttl
-     * @return mixed
+     * @return T
      */
     public function entry(string $key, $defaultVar, int $ttl = 0) {
+        /** @var T */
         return apcu_entry(
             $key,
-            /** @return mixed */
             function (string $key) use ($defaultVar) {
                 return $defaultVar;
             },
@@ -123,15 +125,17 @@ class InProcessCacheAdapter extends CacheAdapter {
     private $cache = [];
 
     /**
+     * @psalm-template T
      * @param string $key
-     * @param mixed $defaultVar
+     * @param T $defaultVar
      * @param int $ttl
-     * @return mixed
+     * @return T
      */
     public function entry(string $key, $defaultVar, int $ttl = 0) {
         if (!array_key_exists($key, $this->cache)) {
             $this->cache[$key] = $defaultVar;
         }
+        /** @var T */
         return $this->cache[$key];
     }
 
@@ -424,8 +428,7 @@ class Cache {
      * @param string $prefix
      */
     private static function getVersion(string $prefix): int {
-        $key = "v{$prefix}";
-        return intval(CacheAdapter::getInstance()->entry($key, 0));
+        return CacheAdapter::getInstance()->entry("v{$prefix}", 0);
     }
 
     /**

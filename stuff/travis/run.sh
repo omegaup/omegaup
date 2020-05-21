@@ -10,9 +10,6 @@ case "$1" in
 phpunit)
 	. "${OMEGAUP_ROOT}/stuff/travis/phpunit.sh"
 	;;
-lint)
-	. "${OMEGAUP_ROOT}/stuff/travis/lint.sh"
-	;;
 selenium)
 	. "${OMEGAUP_ROOT}/stuff/travis/selenium.sh"
 	;;
