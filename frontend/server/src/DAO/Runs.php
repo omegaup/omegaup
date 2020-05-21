@@ -127,7 +127,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `r`.`memory`,
                 `r`.`score`,
                 IF(
-                    ISNULL(`c`.`partial_score`) = 0 AND `c`.`partial_score` <> 1 AND `r`.`score` <> 1,
+                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
                         0,
                         `r`.`contest_score`
                 ) AS `contest_score`,
@@ -598,7 +598,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.score,
                 r.penalty,
                 IF(
-                    ISNULL(c.partial_score) = 0 AND c.partial_score <> 1 AND r.score <> 1,
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,
@@ -812,7 +812,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.memory,
                 r.score,
                 IF(
-                    ISNULL(c.partial_score) = 0 AND c.partial_score <> 1 AND r.score <> 1,
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
                         0,
                         r.contest_score
                 ) AS contest_score,

@@ -1008,14 +1008,14 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with different partial score values.
      *
-     * @return list<list<bool, int>>
+     * @return list<list<bool, int, float, float>>
      */
     public function partialScoreValueProvider(): array {
         return [
-            [/*$initialPartialScore=*/false, /*$problemsetProblemPoints=*/1],
-            [/*$initialPartialScore=*/true, /*$problemsetProblemPoints=*/1],
-            [/*$initialPartialScore=*/false, /*$problemsetProblemPoints=*/100],
-            [/*$initialPartialScore=*/true, /*$problemsetProblemPoints=*/100],
+            [false, 1, 0, 0.05],
+            [true, 1, 0.05, 0],
+            [false, 100, 0, 5],
+            [true, 100, 5, 0],
         ];
     }
 
@@ -1024,7 +1024,9 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateContestWhenPartialScoreIsUpdated(
         bool $initialPartialScore,
-        int $problemsetProblemPoints
+        int $problemsetProblemPoints,
+        float $expectedContestScoreBeforeUpdate,
+        float $expectedContestScoreAfterUpdate
     ) {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -1074,11 +1076,9 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData,
             $identity
         );
-        $points = 0.05;
-        $expectedContestScore = $points * $problemsetProblemPoints;
         \OmegaUp\Test\Factories\Run::gradeRun(
             $runData,
-            $points,
+            0.05,
             /*$verdict=*/'PA',
             /*$submitDelay=*/null,
             /*$runGuid=*/null,
@@ -1092,7 +1092,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestData['request']['alias'],
             $directorLogin->auth_token,
             $runData['response']['guid'],
-            $expectedContestScore,
+            $expectedContestScoreBeforeUpdate,
             $partialScore
         );
 
@@ -1118,13 +1118,11 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($partialScore, $contest['partial_score']);
 
-        $expectedContestScore = $points * $problemsetProblemPoints;
-
         $this->assertAPIsShowCorrectContestScore(
             $contestData['request']['alias'],
             $directorLogin->auth_token,
             $runData['response']['guid'],
-            $expectedContestScore,
+            $expectedContestScoreAfterUpdate,
             $partialScore
         );
     }
@@ -1154,9 +1152,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $directorToken,
             ])
         )['ranking'][0]['problems'][0];
-        if (!$partialScore && $run['score'] !== 1) {
-            $expectedContestScore = 0;
-        }
         $this->assertEquals($expectedContestScore, $run['contest_score']);
         $this->assertEquals($expectedContestScore, $status['contest_score']);
         $this->assertEquals($expectedContestScore, $scoreboard['points']);

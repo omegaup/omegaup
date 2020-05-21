@@ -622,15 +622,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
         $contest = null;
-        $problemsetProblem = null;
         if (!is_null($problemset) && !is_null($problemset->contest_id)) {
             $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
-            if (!is_null($contest)) {
-                $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
-                    $problemset->contest_id,
-                    $problem->problem_id
-                );
-            }
         }
 
         if (
@@ -668,15 +661,18 @@ class Run extends \OmegaUp\Controllers\Controller {
         $filtered['type'] = strval($filtered['type']);
         $filtered['verdict'] = strval($filtered['verdict']);
         if (!is_null($filtered['contest_score'])) {
-            $contestScore = round(floatval($filtered['contest_score']), 2);
             if (
-                !is_null($contest)
-                && !$contest->partial_score
-                && $filtered['score'] != 1
+                is_null($contest)
+                || $contest->partial_score
+                || $filtered['score'] == 1
             ) {
-                $contestScore = 0;
+                $filtered['contest_score'] = round(
+                    floatval($filtered['contest_score']),
+                    2
+                );
+            } else {
+                $filtered['contest_score'] = 0;
             }
-            $filtered['contest_score'] = $contestScore;
         }
         if ($submission->identity_id == $r->identity->identity_id) {
             $filtered['username'] = $r->identity->username;
