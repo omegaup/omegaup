@@ -964,22 +964,25 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        /** @var null|list<string> */
-        $aliases = json_decode($r['problems'], true);
-        if (!is_array($aliases) || empty($aliases)) {
+        /** @var null|mixed */
+        $rawAliases = json_decode($r['problems'], true);
+        if (!is_array($rawAliases) || empty($rawAliases)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'problems'
             );
         }
+
+        $aliases = [];
         /** @var mixed $alias */
-        foreach ($aliases as $alias) {
+        foreach ($rawAliases as $alias) {
             if (!is_string($alias)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'problems'
                 );
             }
+            $aliases[] = $alias;
         }
 
         \OmegaUp\DAO\DAO::transBegin();
@@ -1047,22 +1050,25 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        /** @var null|list<string> */
-        $aliases = json_decode($r['assignments'], true);
-        if (!is_array($aliases) || empty($aliases)) {
+        /** @var null|mixed */
+        $rawAliases = json_decode($r['assignments'], true);
+        if (!is_array($rawAliases) || empty($rawAliases)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
                 'assignments'
             );
         }
+
+        $aliases = [];
         /** @var mixed $alias */
-        foreach ($aliases as $alias) {
+        foreach ($rawAliases as $alias) {
             if (!is_string($alias)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'assignments'
                 );
             }
+            $aliases[] = $alias;
         }
 
         \OmegaUp\DAO\DAO::transBegin();
