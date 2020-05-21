@@ -920,7 +920,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $order
      * @omegaup-request-param mixed $problems
      *
      * @return array{status: string}
@@ -938,6 +937,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['assignment_alias'],
             'assignment_alias'
+        );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problems'],
+            'problems'
         );
         $course = self::validateCourseExists($r['course_alias']);
         if (is_null($course->course_id)) {
@@ -961,31 +964,54 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        // Update problems order
-        /** @var array{alias: string, order: int}[] */
-        $problems = $r['problems'];
-        foreach ($problems as $problem) {
-            $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
-                $problem['alias']
+        /** @var null|mixed */
+        $rawAliases = json_decode($r['problems'], true);
+        if (!is_array($rawAliases) || empty($rawAliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'problems'
             );
-            if (
-                is_null($currentProblem) ||
-                is_null($currentProblem->problem_id)
-            ) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'problemNotFound'
+        }
+
+        $aliases = [];
+        /** @var mixed $alias */
+        foreach ($rawAliases as $alias) {
+            if (!is_string($alias)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'problems'
                 );
             }
+            $aliases[] = $alias;
+        }
 
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
             $order = 1;
-            if (is_numeric($r['order'])) {
-                $order = intval($r['order']);
+            foreach ($aliases as $alias) {
+                $currentProblem = \OmegaUp\DAO\Problems::getByAlias(
+                    $alias
+                );
+
+                if (
+                    is_null($currentProblem) ||
+                    is_null($currentProblem->problem_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemNotFound'
+                    );
+                }
+
+                \OmegaUp\DAO\ProblemsetProblems::updateProblemsOrder(
+                    $problemSet->problemset_id,
+                    $currentProblem->problem_id,
+                    $order++
+                );
             }
-            \OmegaUp\DAO\ProblemsetProblems::updateProblemsOrder(
-                $problemSet->problemset_id,
-                $currentProblem->problem_id,
-                $problem['order']
-            );
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         return [
@@ -1009,6 +1035,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['course_alias'],
             'course_alias'
         );
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['assignments'],
+            'assignments'
+        );
         $course = self::validateCourseExists($r['course_alias']);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -1020,29 +1050,54 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        // Update assignments order
-        /** @var array{name: string, description: string, alias: string, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, order: int, scoreboard_url: string, scoreboard_url_admin: string, has_runs: bool}[] */
-        $assignments = $r['assignments'];
-
-        foreach ($assignments as $assignment) {
-            $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
-                $assignment['alias'],
-                $course->course_id
+        /** @var null|mixed */
+        $rawAliases = json_decode($r['assignments'], true);
+        if (!is_array($rawAliases) || empty($rawAliases)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                'assignments'
             );
+        }
 
-            if (
-                empty($currentAssignment) ||
-                is_null($currentAssignment->assignment_id)
-            ) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'assignmentNotFound'
+        $aliases = [];
+        /** @var mixed $alias */
+        foreach ($rawAliases as $alias) {
+            if (!is_string($alias)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalid',
+                    'assignments'
                 );
             }
+            $aliases[] = $alias;
+        }
 
-            \OmegaUp\DAO\Assignments::updateAssignmentsOrder(
-                $currentAssignment->assignment_id,
-                intval($assignment['order'])
-            );
+        \OmegaUp\DAO\DAO::transBegin();
+        try {
+            $order = 1;
+            foreach ($aliases as $alias) {
+                $currentAssignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
+                    $alias,
+                    $course->course_id
+                );
+
+                if (
+                    empty($currentAssignment) ||
+                    is_null($currentAssignment->assignment_id)
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'assignmentNotFound'
+                    );
+                }
+
+                \OmegaUp\DAO\Assignments::updateAssignmentsOrder(
+                    $currentAssignment->assignment_id,
+                    $order++
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
         }
 
         return [
