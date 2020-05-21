@@ -42,7 +42,7 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: composer validate
 
-      - name: Install dependencies
+      - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
 
       - name: Setup database
@@ -103,30 +103,18 @@ jobs:
       - name: Run JavaScript tests
         run: yarn test
 
-      - name: Upload webpack artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: webpack-artifacts
-          path: frontend/www/*/dist
-
   lint:
     runs-on: ubuntu-latest
-    needs: build-yarn
 
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
 
-      - name: Download webpack artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: webpack-artifacts
-
       - name: Install yarn dependencies
         run: yarn install
 
-      - name: Install dependencies
+      - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
 
       - name: Run linters
