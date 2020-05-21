@@ -14,15 +14,15 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             'course_alias' => $courseData['course_alias']
         ]));
 
-        // Setting original order
-        $i = 1;
-        foreach ($assignments['assignments'] as $index => $assignment) {
-            $assignments['assignments'][$index]['order'] = $i++;
+        $aliases = [];
+        foreach ($assignments['assignments'] as $assignment) {
+            $aliases[] = $assignment['alias'];
         }
+
         \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'assignments' => $assignments['assignments'],
+            'assignments' => json_encode($aliases),
         ]));
 
         // Getting one more time assignments list with original order
@@ -52,15 +52,18 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Reordering assignments
-        $assignments['assignments'][0]['order'] = 5;
-        $assignments['assignments'][1]['order'] = 3;
-        $assignments['assignments'][2]['order'] = 1;
-        $assignments['assignments'][3]['order'] = 2;
-        $assignments['assignments'][4]['order'] = 4;
+        $aliases = [
+            $assignments['assignments'][2]['alias'],
+            $assignments['assignments'][3]['alias'],
+            $assignments['assignments'][1]['alias'],
+            $assignments['assignments'][4]['alias'],
+            $assignments['assignments'][0]['alias'],
+        ];
+
         \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias'],
-            'assignments' => $assignments['assignments'],
+            'assignments' => json_encode($aliases),
         ]));
         $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,

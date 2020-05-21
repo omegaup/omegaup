@@ -225,7 +225,11 @@ export default class CourseProblemList extends Vue {
       0,
       this.assignmentProblems.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort', this.assignment, this.assignmentProblems);
+    this.$emit(
+      'sort',
+      this.assignment.alias,
+      this.assignmentProblems.map(problem => problem.alias),
+    );
   }
 
   @Watch('assignment')

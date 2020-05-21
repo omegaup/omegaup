@@ -163,7 +163,11 @@ export default class CourseAssignmentList extends Vue {
       0,
       this.homeworks.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort-homeworks', this.courseAlias, this.homeworks);
+    this.$emit(
+      'sort-homeworks',
+      this.courseAlias,
+      this.homeworks.map(homework => homework.alias),
+    );
   }
 
   sortTests(event: any): void {
@@ -172,7 +176,11 @@ export default class CourseAssignmentList extends Vue {
       0,
       this.tests.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort-tests', this.courseAlias, this.tests);
+    this.$emit(
+      'sort-tests',
+      this.courseAlias,
+      this.tests.map(test => test.alias),
+    );
   }
 }
 </script>

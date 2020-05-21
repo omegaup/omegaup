@@ -195,27 +195,17 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           new: onNewAssignment,
-          'sort-homeworks': function(courseAlias, homeworks) {
-            let index = 1;
-            for (let homework of homeworks) {
-              homework.order = index++;
-            }
+          'sort-homeworks': function(courseAlias, homeworksAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: homeworks,
+              assignments: JSON.stringify(homeworksAliases),
             }).catch(UI.apiError);
           },
-          'sort-tests': function(courseAlias, tests) {
-            let index = 1;
-            for (let test of tests) {
-              test.order = index++;
-            }
+          'sort-tests': function(courseAlias, testsAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: tests,
-            })
-              .then(function(response) {})
-              .catch(UI.apiError);
+              assignments: JSON.stringify(testsAliases),
+            }).catch(UI.apiError);
           },
         },
       });
@@ -432,18 +422,13 @@ OmegaUp.on('ready', function() {
               })
               .catch(UI.apiError);
           },
-          sort: function(assignment, assignmentProblems) {
-            let index = 1;
-            for (let problem of assignmentProblems) {
-              problem.order = index;
-              index++;
-            }
+          sort: function(assignmentAlias, problemsAliases) {
             api.Course.updateProblemsOrder({
               course_alias: courseAlias,
-              assignment_alias: assignment.alias,
-              problems: assignmentProblems,
+              assignment_alias: assignmentAlias,
+              problems: JSON.stringify(problemsAliases),
             })
-              .then(function(response) {})
+              .then(function() {})
               .catch(UI.apiError);
           },
           tags: function(tags) {
