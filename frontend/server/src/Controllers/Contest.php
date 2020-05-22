@@ -4049,10 +4049,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ),
                     2
                 );
+                $run['score'] = round(floatval($run['score']), 4);
             } else {
                 $run['contest_score'] = 0;
+                $run['score'] = 0;
             }
-            $run['score'] = round(floatval($run['score']), 4);
             $result[] = $run;
         }
 

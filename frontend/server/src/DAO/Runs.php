@@ -125,7 +125,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `r`.`runtime`,
                 `r`.`penalty`,
                 `r`.`memory`,
-                `r`.`score`,
+                IF(
+                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
+                        0,
+                        `r`.`score`
+                ) AS `score`,
                 IF(
                     COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
                         0,
@@ -595,7 +599,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                r.score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
                 r.penalty,
                 IF(
                     COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
@@ -826,7 +834,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.runtime,
                 r.penalty,
                 r.memory,
-                r.score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
                 IF(
                     COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
                         0,
@@ -949,7 +961,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 r.penalty,
                 r.run_id,
                 r.runtime,
-                r.score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
                 r.status,
                 r.submission_id,
                 r.time,

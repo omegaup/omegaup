@@ -672,6 +672,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 );
             } else {
                 $filtered['contest_score'] = 0;
+                $filtered['score'] = 0;
             }
         }
         if ($submission->identity_id == $r->identity->identity_id) {
