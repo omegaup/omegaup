@@ -34,8 +34,18 @@ jobs:
             "${TARBALL}" \
             "s3://omegaup-build-artifacts/webpack-artifacts/${{ github.sha }}.tar.xz"
 
+          case "${{ github.ref }}" in
+            refs/heads/release)
+              ENVIRONMENT=production
+              ;;
+
+            *)
+              ENVIRONMENT=staging
+              ;;
+          esac
+
           # Start a deployment now that the build artifacts are done.
           curl --request POST \
             --url https://api.github.com/repos/${{ github.repository }}/deployments \
             --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            --data "{\"ref\":\"${{ github.ref }}\",\"required_contexts\":[]}"
+            --data "{\"ref\":\"${{ github.ref }}\",\"required_contexts\":[],\"environment\":\"${ENVIRONMENT}\"}"
