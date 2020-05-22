@@ -144,13 +144,7 @@ def test_user_ranking_contest(driver):
                     (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
         with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     '//div[contains(concat(" ", normalize-space(@class), " "'
-                     '), " contest-list")]//a[contains(concat(" ", '
-                     'normalize-space(@class), " "), " tab-current ")]'
-                     ))).click()
+            select_list_of_current_contests()
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, '.contest-list a[href="/arena/%s/"]' %
@@ -175,6 +169,17 @@ def test_user_ranking_contest(driver):
         users_full_set = {user1, user2, user3, driver.user_username,
                           uninvited_identity.username}
         compare_contestants_list(driver, users_full_set)
+
+
+@util.no_javascript_errors()
+@util.annotate
+def select_list_of_current_contests(driver):
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-contests]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-list-current]'))).click()
 
 
 @util.no_javascript_errors()
@@ -441,20 +446,20 @@ def enter_contest(driver, contest_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "'
-             '), " contest-list")]//a[contains(concat(" ", '
-             'normalize-space(@class), " "), " tab-past ")]'))).click()
+            (By.CSS_SELECTOR, 'a[data-contests]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-list-past]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, '.contest-list .list-past')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "'
-             '), " contest-list")]//a[contains(concat(" ", '
-             'normalize-space(@class), " "), " tab-current ")]'))).click()
+            (By.CSS_SELECTOR, 'a[data-contests]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-list-current]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, '.contest-list .list-current')))
