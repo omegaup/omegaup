@@ -78,8 +78,10 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
-            new \OmegaUp\Request()
+        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+            1,
+            100,
+            null
         );
         $this->assertCount(1, $results['submissions']);
         $this->assertEquals(1, $results['totalRows']);
@@ -112,8 +114,10 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Timestamp(strtotime($runCreationDate))
         );
 
-        $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
-            new \OmegaUp\Request()
+        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+            1,
+            100,
+            null
         );
         $this->assertCount(1, $results['submissions']);
         $this->assertEquals(1, $results['totalRows']);
@@ -143,10 +147,10 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
-            new \OmegaUp\Request([
-                'username' => $identity->username
-            ])
+        $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+            1,
+            100,
+            $identity->identity_id
         );
         $this->assertEquals(2, $results['totalRows']);
         $this->assertCount(2, $results['submissions']);
@@ -181,10 +185,10 @@ class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         try {
-            $results = \OmegaUp\Controllers\Submission::apiLatestSubmissions(
-                new \OmegaUp\Request([
-                    'username' => $identity->username
-                ])
+            $results = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+                1,
+                100,
+                $identity->identity_id
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userInformationIsPrivate', $e->getMessage());
