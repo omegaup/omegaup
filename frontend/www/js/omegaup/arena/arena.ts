@@ -626,6 +626,7 @@ export class Arena {
     const connect = (uris: string[], index: number) => {
       this.socket = new EventsSocket(uris[index], this);
       this.socket.connect().catch(e => {
+        console.log(e);
         // Try the next uri.
         index++;
         if (index < uris.length) {
