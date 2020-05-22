@@ -1033,13 +1033,12 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $submission->problemset_id,
                 $submission->problem_id
             );
-            if (is_null($problemsetProblem)) {
-                $details['contest_score'] = $details['score'];
-            } else {
+            if (!is_null($problemsetProblem)) {
                 $details['contest_score'] = $details['score'] * $problemsetProblem->points;
             }
         } else {
             $details['contest_score'] = 0;
+            $details['score'] = 0;
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;
