@@ -156,7 +156,10 @@ OmegaUp.on('ready', function() {
     el: '#assignments div.list',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentlist', {
-        props: { assignments: this.assignments, courseAlias: courseAlias },
+        props: {
+          assignments: this.assignments,
+          courseAlias: courseAlias,
+        },
         on: {
           edit: function(assignment) {
             assignmentDetails.show = true;
@@ -199,13 +202,21 @@ OmegaUp.on('ready', function() {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
               assignments: JSON.stringify(homeworksAliases),
-            }).catch(UI.apiError);
+            })
+              .then(() => {
+                UI.success(T.homeworksOrderUpdated);
+              })
+              .catch(UI.apiError);
           },
           'sort-tests': function(courseAlias, testsAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
               assignments: JSON.stringify(testsAliases),
-            }).catch(UI.apiError);
+            })
+              .then(() => {
+                UI.success(T.testsOrderUpdated);
+              })
+              .catch(UI.apiError);
           },
         },
       });
@@ -428,7 +439,9 @@ OmegaUp.on('ready', function() {
               assignment_alias: assignmentAlias,
               problems: JSON.stringify(problemsAliases),
             })
-              .then(function() {})
+              .then(() => {
+                UI.success(T.problemsOrderUpdated);
+              })
               .catch(UI.apiError);
           },
           tags: function(tags) {
