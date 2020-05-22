@@ -831,7 +831,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LEFT JOIN
                 Contests c
             ON
-                c.contest_id = ps.problemset_id
+                c.problemset_id = ps.problemset_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ?
         ';
