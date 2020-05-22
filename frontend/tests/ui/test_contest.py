@@ -447,10 +447,6 @@ def enter_contest(driver, contest_alias):
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, 'a[data-contests]'))).click()
-
     select_contests_list(driver, 'data-list-past')
     select_contests_list(driver, 'data-list-current')
 
