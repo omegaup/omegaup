@@ -1731,7 +1731,9 @@ export class Arena {
           this.showQualityNominationPopup();
         }
 
-        this.initSubmissionCountdown();
+        if (!this.options.courseAlias) {
+          this.initSubmissionCountdown();
+        }
       };
 
       if (problemChanged) {
@@ -2080,6 +2082,7 @@ export class Arena {
     e.preventDefault();
 
     if (
+      !this.options.courseAlias &&
       !this.options.isOnlyProblem &&
       (this.problems[this.currentProblem.alias].lastSubmission?.getTime() ??
         0) +
@@ -2223,7 +2226,9 @@ export class Arena {
         $('input', this.elements.submitForm).prop('disabled', false);
         this.hideOverlay();
         this.clearInputFile();
-        this.initSubmissionCountdown();
+        if (!this.options.courseAlias) {
+          this.initSubmissionCountdown();
+        }
       })
       .catch(run => {
         alert(run.error ?? run);
