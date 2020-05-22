@@ -2641,25 +2641,6 @@ export namespace messages {
   export type SessionGoogleLoginRequest = { [key: string]: any };
   export type SessionGoogleLoginResponse = { [key: string]: string };
 
-  // Submission
-  export type SubmissionLatestSubmissionsRequest = { [key: string]: any };
-  export type _SubmissionLatestSubmissionsServerResponse = any;
-  export type SubmissionLatestSubmissionsResponse = {
-    submissions: {
-      time: Date;
-      username: string;
-      school_id?: number;
-      school_name?: string;
-      alias: string;
-      title: string;
-      language: string;
-      verdict: string;
-      runtime: number;
-      memory: number;
-    }[];
-    totalRows: number;
-  };
-
   // Tag
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
@@ -3358,12 +3339,6 @@ export namespace controllers {
     googleLogin: (
       params?: messages.SessionGoogleLoginRequest,
     ) => Promise<messages.SessionGoogleLoginResponse>;
-  }
-
-  export interface Submission {
-    latestSubmissions: (
-      params?: messages.SubmissionLatestSubmissionsRequest,
-    ) => Promise<messages.SubmissionLatestSubmissionsResponse>;
   }
 
   export interface Tag {
