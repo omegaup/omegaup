@@ -626,7 +626,6 @@ export class Arena {
     const connect = (uris: string[], index: number) => {
       this.socket = new EventsSocket(uris[index], this);
       this.socket.connect().catch(e => {
-        console.log(e);
         // Try the next uri.
         index++;
         if (index < uris.length) {
@@ -1732,8 +1731,6 @@ export class Arena {
         }
 
         if (!this.options.courseAlias) {
-          console.log('Estoy saltándome el null ya que tengo');
-          console.log(this.options);
           this.initSubmissionCountdown();
         }
       };
@@ -2229,8 +2226,6 @@ export class Arena {
         this.hideOverlay();
         this.clearInputFile();
         if (!this.options.courseAlias) {
-          console.log('Estoy saltándome el null ya que tengo');
-          console.log(this.options);
           this.initSubmissionCountdown();
         }
       })
