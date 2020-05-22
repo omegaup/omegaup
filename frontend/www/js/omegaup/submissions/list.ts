@@ -26,15 +26,4 @@ OmegaUp.on('ready', () => {
       'omegaup-submissions-list': submissions_List,
     },
   });
-
-  // api.Submission.latestSubmissions({
-  //   offset: submissionsList.page,
-  //   rowcount: submissionsList.length,
-  //   username: payload.user,
-  // })
-  //   .then(data => {
-  //     submissionsList.totalRows = data.totalRows;
-  //     submissionsList.submissions = data.submissions;
-  //   })
-  //   .catch(UI.apiError);
 });

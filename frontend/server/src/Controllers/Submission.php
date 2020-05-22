@@ -113,7 +113,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * Gets the details for the latest submissions of
      * a certain user with pagination
      *
-     * @return array{smartyProperties: array{submissionsPayload: array{page: int, length: int, includeUser: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -123,24 +123,58 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('length');
 
-        $identity = self::resolveTargetIdentity($r);
+        \OmegaUp\Validators::validateValidUsername(
+            $r['username'],
+            'username'
+        );
+
+        $identity = \OmegaUp\DAO\Identities::FindByUsername($r['username']);
         if (is_null($identity)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        $user = \OmegaUp\DAO\Users::FindByUsername($r['username']);
+        if (
+            !is_null(
+                $user
+            ) &&
+            ($user->main_identity_id == $identity->identity_id) &&
+            $user->is_private
+        ) {
+            // Only the user's main identity is private.
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userInformationIsPrivate'
+            );
         }
 
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
 
+        $latestSubmissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+            $page,
+            $length,
+            $identity->identity_id
+        );
         return [
             'smartyProperties' => [
-                'submissionsPayload' => [
+                'payload' => [
                     'page' => $page,
                     'length' => $length,
-                    'user' => $identity->username,
                     'includeUser' => false,
+                    'submissions' => $latestSubmissions['submissions'],
+                    'totalRows' => $latestSubmissions['totalRows'],
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $latestSubmissions['totalRows'],
+                        $length,
+                        $page,
+                        "/submissions/{$identity->username}/",
+                        2,
+                        []
+                    ),
                 ],
+                'title' => 'omegaupTitleLatestSubmissions',
             ],
-            'template' => 'submissions.user_list.tpl',
+            'entrypoint' => 'submissions_list',
         ];
     }
 }
