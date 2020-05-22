@@ -894,6 +894,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
+            $contest,
             /*$showDetails=*/$showRunDetails !== 'none'
         );
 
@@ -971,6 +972,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         return self::getOptionalRunDetails(
             $submission,
             $run,
+            /*$contest*/ null,
             /*$showDetails=*/ false
         );
     }
@@ -999,6 +1001,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Runs $run,
+        ?\OmegaUp\DAO\VO\Contests $contest,
         bool $showDetails
     ): array {
         $response = [];
@@ -1023,6 +1026,19 @@ class Run extends \OmegaUp\Controllers\Controller {
             is_string($details['compile_error'])
         ) {
             $response['compile_error'] = $details['compile_error'];
+        }
+        if (is_null($contest) || $contest->partial_score || $run->score == 1) {
+            $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
+                $submission->problemset_id,
+                $submission->problem_id
+            );
+            if (is_null($problemsetProblem)) {
+                $details['contest_score'] = $details['score'];
+            } else {
+                $details['contest_score'] = $details['score'] * $problemsetProblem->points;
+            }
+        } else {
+            $details['contest_score'] = 0;
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;

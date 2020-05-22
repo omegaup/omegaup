@@ -1031,11 +1031,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Get admin
-        [
-            'identity' => $admin,
-        ] = \OmegaUp\Test\Factories\User::createAdminUser();
-
         $partialScore = $initialPartialScore;
 
         // Get a contest, partial_score default value is $partialScore
@@ -1097,23 +1092,16 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $directorLogin = self::login($contestData['director']);
-        $adminLogin = self::login($admin);
-        $runList = \OmegaUp\Controllers\Run::apiList(new \OmegaUp\Request([
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'auth_token' => $adminLogin->auth_token,
-        ]))['runs'][0];
-        $this->assertEquals(
-            $expectedContestScoreBeforeUpdate,
-            $runList['contest_score']
-        );
 
         $this->assertAPIsShowCorrectContestScore(
             $contestData['request']['alias'],
+            $contestData['contest']->problemset_id,
             $problemData['request']['problem_alias'],
             $directorLogin->auth_token,
             $runData['response']['guid'],
             $expectedContestScoreBeforeUpdate,
-            $partialScore
+            $partialScore,
+            $identity->username
         );
 
         $partialScore = !$initialPartialScore;
@@ -1137,33 +1125,28 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($partialScore, $contest['partial_score']);
-        $adminLogin = self::login($admin);
-        $runList = \OmegaUp\Controllers\Run::apiList(new \OmegaUp\Request([
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'auth_token' => $adminLogin->auth_token,
-        ]))['runs'][0];
-        $this->assertEquals(
-            $expectedContestScoreAfterUpdate,
-            $runList['contest_score']
-        );
 
         $this->assertAPIsShowCorrectContestScore(
             $contestData['request']['alias'],
+            $contestData['contest']->problemset_id,
             $problemData['request']['problem_alias'],
             $directorLogin->auth_token,
             $runData['response']['guid'],
             $expectedContestScoreAfterUpdate,
-            $partialScore
+            $partialScore,
+            $identity->username
         );
     }
 
     private function assertAPIsShowCorrectContestScore(
         string $contestAlias,
+        int $problemsetId,
         string $problemAlias,
         string $directorToken,
         string $runGuid,
         float $expectedContestScore,
-        bool $partialScore
+        bool $partialScore,
+        string $contestantUsername
     ) {
         $run = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestAlias,
@@ -1190,10 +1173,28 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'show_all' => true,
             ])
         )['runs'][0];
+        $details = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'run_alias' => $runGuid,
+            'auth_token' => $directorToken,
+        ]))['details'];
+        $bestScore = \OmegaUp\Controllers\Problem::apiBestScore(
+            new \OmegaUp\Request([
+                'auth_token' => $directorToken,
+                'problem_alias' => $problemAlias,
+                'problemset_id' => $problemsetId,
+                'username' => $contestantUsername,
+            ])
+        )['score'];
+
+        // This function gets details to download contest runs details
+        [$download] = \OmegaUp\DAO\Runs::getByProblemset($problemsetId);
 
         $this->assertEquals($expectedContestScore, $run['contest_score']);
         $this->assertEquals($expectedContestScore, $status['contest_score']);
         $this->assertEquals($expectedContestScore, $scoreboard['points']);
+        $this->assertEquals($expectedContestScore, $details['contest_score']);
+        $this->assertEquals($expectedContestScore, $bestScore);
+        $this->assertEquals($expectedContestScore, $download['contest_score']);
         $this->assertEquals(
             $expectedContestScore,
             $problemRun['contest_score']
@@ -1203,5 +1204,17 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         } else {
             $this->assertArrayNotHasKey('run_details', $report);
         }
+
+        // Get admin
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $adminLogin = self::login($admin);
+        $runList = \OmegaUp\Controllers\Run::apiList(new \OmegaUp\Request([
+            'problem_alias' => $problemAlias,
+            'auth_token' => $adminLogin->auth_token,
+        ]))['runs'][0];
+        $this->assertEquals(
+            $expectedContestScore,
+            $runList['contest_score']
+        );
     }
 }
