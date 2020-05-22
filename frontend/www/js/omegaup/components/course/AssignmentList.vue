@@ -198,7 +198,7 @@ export default class CourseAssignmentList extends Vue {
   }
 
   saveNewOrder(type: string): void {
-    let param = null;
+    let param: string[] = [];
     if (type === 'homeworks') {
       param = this.homeworks.map(homework => homework.alias);
       this.homeworksOrderChanged = false;
