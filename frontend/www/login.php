@@ -1,9 +1,10 @@
 <?php
-require_once('../server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__, 1) . '/server/bootstrap.php');
 
 $triedToLogin = false;
 $emailVerified = true;
-
+/*
 if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     // user wants to login natively
     try {
@@ -21,12 +22,12 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
         $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
             $e
         );
-        /** @var array<string, mixed> */
+        /** @var array<string, mixed>
         $response = $apiException->asResponseArray();
     }
 
     $triedToLogin = true;
-} elseif (
+} /*elseif (
     OMEGAUP_VALIDATE_CAPTCHA &&
     isset($_POST['request']) &&
     $_POST['request'] == 'register'
@@ -41,24 +42,21 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
         )
     );
 }
-
+*/
 if (isset($_GET['linkedin'])) {
     if (isset($_GET['code']) && isset($_GET['state'])) {
         /** @var array<string, mixed> */
         $response = \OmegaUp\Controllers\Session::LoginViaLinkedIn();
+        shouldRedirect($_GET['redirect']);
     }
-    $triedToLogin = true;
 } elseif (isset($_GET['fb'])) {
     /** @var array<string, mixed> */
     $response = \OmegaUp\Controllers\Session::LoginViaFacebook();
-    $triedToLogin = true;
-}
-
-if (isset($_GET['shva'])) {
-    $triedToLogin = true;
+    shouldRedirect($_GET['redirect']);
 }
 
 function shouldRedirect(string $url): bool {
+    print($url);
     $redirectParsedUrl = parse_url($url);
     // If a malformed URL is given, don't redirect.
     if ($redirectParsedUrl === false) {
@@ -78,7 +76,7 @@ function shouldRedirect(string $url): bool {
     return $redirect_url == OMEGAUP_URL;
 }
 
-if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
+/*if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
     if (
         !empty($_GET['redirect']) &&
         is_string($_GET['redirect']) &&
@@ -100,14 +98,19 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
             )
         );
     }
-}
+}*/
 
-// Only generate Login URLs if we actually need them.
-$smarty->assign('FB_URL', \OmegaUp\Controllers\Session::getFacebookLoginUrl());
-$smarty->assign(
-    'LINKEDIN_URL',
-    \OmegaUp\Controllers\Session::getLinkedInLoginUrl()
+\OmegaUp\UITools::render(
+    function (\OmegaUp\Request $r): array {
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'facebookURL' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                    'linkedinURL' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
+                    ],
+            ],
+            'template' => '../templates/login.tpl',
+        ];
+    }
 );
-$smarty->assign('VALIDATE_RECAPTCHA', OMEGAUP_VALIDATE_CAPTCHA);
-$smarty->assign('payload', ['validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA]);
-$smarty->display('../templates/login.tpl');

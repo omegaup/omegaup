@@ -739,6 +739,11 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
+"@types/grecaptcha@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/grecaptcha/-/grecaptcha-3.0.1.tgz#359c46be0baeac15ae4021f002d1c0c9374ae3e4"
+  integrity sha512-eMA/2quQoxwSe8oOBB1H6KNXNqginzt9BHAt2vVVUoQswZNct2QwSAmEMsN/VHj/XSNxM3p+Py15B7omEaAC9w==
+
 "@types/jquery@*", "@types/jquery@^3.3.29":
   version "3.3.31"
   resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.31.tgz#27c706e4bf488474e1cb54a71d8303f37c93451b"
@@ -6632,6 +6637,16 @@ vue-form-wizard@^0.8.4:
   resolved "https://registry.yarnpkg.com/vue-form-wizard/-/vue-form-wizard-0.8.4.tgz#ddf864c9709b7ba2a6323f59e5d6d17536b7800e"
   integrity sha512-/Zk1+B7bz7qHFJ16mwu021lpPXWf/9Tlr2mTNG3J7M0Hdy3rgA802lWsbKYySns0B0qtsD8BYGjQ2Wyxgg+4uw==
 
+vue-gapi@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/vue-gapi/-/vue-gapi-0.3.0.tgz#9ce11feabbfe66af287c2a1b3b04e7e3cf9b700b"
+  integrity sha512-XBDjMioUUJStau/krUgm2pgunMAs1Qx4QqDEDULZ1zGNJz/NmDKCyCQkcirIOT0d7AWtsH2FFBbc1eX+usNgig==
+
+vue-google-oauth2@^1.5.4:
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/vue-google-oauth2/-/vue-google-oauth2-1.5.4.tgz#1969701ef68b1cc65e9f96196109693fbcbd4132"
+  integrity sha512-KEZgPntPfzYyL8gLRNLAXggizkuBKCHZEmibVA5UgkxmUwr3KVqKLM442FHX4yFVMnd8/EpJBVisrdg1DBpbng==
+
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
   resolved "https://registry.yarnpkg.com/vue-hot-reload-api/-/vue-hot-reload-api-2.3.4.tgz#532955cc1eb208a3d990b3a9f9a70574657e08f2"
@@ -6664,6 +6679,11 @@ vue-property-decorator@^8.0.0, vue-property-decorator@^8.2.1:
   integrity sha512-77YtTbZHd5CNiPzbqv51kEgL48yvD2dUDfF28vEyw3MbQ9bBAb/tDyFzskcqjNRbWyXk1vq4oM2CK/LfhxuIBg==
   dependencies:
     vue-class-component "^7.1.0"
+
+vue-recaptcha@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/vue-recaptcha/-/vue-recaptcha-1.3.0.tgz#e668e54f798c6333057ef38b4425a72f451ce478"
+  integrity sha512-9Qf1niyHq4QbEUhsvdUkS8BoOyhYwpp8v+imUSj67ffDo9RQ6h8Ekq8EGnw/GKViXCwWalp7EEY/n/fOtU0FyA==
 
 vue-resize@^0.4.5:
   version "0.4.5"

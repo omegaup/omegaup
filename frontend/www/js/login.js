@@ -47,6 +47,7 @@ omegaup.OmegaUp.on('ready', function() {
 
 function signInCallback(googleUser) {
   // Only log in if the user actually clicked the sign-in button.
+  console.log('entro');
   omegaup.API.Session.googleLogin({
     storeToken: googleUser.getAuthResponse().id_token,
   })
