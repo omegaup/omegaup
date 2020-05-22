@@ -437,6 +437,25 @@ export namespace types {
       );
     }
 
+    export function SubmissionsListPayload(
+      elementId: string = 'payload',
+    ): types.SubmissionsListPayload {
+      return (x => {
+        x.submissions = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.submissions);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
@@ -1247,6 +1266,28 @@ export namespace types {
     distribution?: { [key: number]: number };
     size_of_bucket?: number;
     total_points?: number;
+  }
+
+  export interface Submission {
+    time: Date;
+    username: string;
+    school_id?: number;
+    school_name?: string;
+    alias: string;
+    title: string;
+    language: string;
+    verdict: string;
+    runtime: number;
+    memory: number;
+  }
+
+  export interface SubmissionsListPayload {
+    page: number;
+    length: number;
+    includeUser: boolean;
+    pagerItems: types.PageItem[];
+    submissions: types.Submission[];
+    totalRows: number;
   }
 
   export interface UserListItem {

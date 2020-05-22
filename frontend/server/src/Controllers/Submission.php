@@ -4,6 +4,10 @@
 
 /**
  * SubmissionController
+ *
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type Submission=array{time: \OmegaUp\Timestamp, username: string, school_id: int|null, school_name: string|null, alias: string, title: string, language: string, verdict: string, runtime: int, memory: int}
+ * @psalm-type SubmissionsListPayload=array{page: int, length: int, includeUser: bool, pagerItems: list<PageItem>, submissions: list<Submission>, totalRows: int}
  */
 class Submission extends \OmegaUp\Controllers\Controller {
     public static function getSource(string $guid): string {
@@ -65,7 +69,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for the latest submissions with pagination
      *
-     * @return array{smartyProperties: array{submissionsPayload: array{page: int, length: int, includeUser: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -77,15 +81,31 @@ class Submission extends \OmegaUp\Controllers\Controller {
         $page = is_null($r['page']) ? 1 : intval($r['page']);
         $length = is_null($r['length']) ? 100 : intval($r['length']);
 
+        $latestSubmissions = \OmegaUp\DAO\Submissions::getLatestSubmissions(
+            $page,
+            $length,
+            null
+        );
         return [
             'smartyProperties' => [
-                'submissionsPayload' => [
+                'payload' => [
                     'page' => $page,
                     'length' => $length,
                     'includeUser' => true,
+                    'submissions' => $latestSubmissions['submissions'],
+                    'totalRows' => $latestSubmissions['totalRows'],
+                    'pagerItems' => \OmegaUp\Pager::paginateWithUrl(
+                        $latestSubmissions['totalRows'],
+                        $length,
+                        $page,
+                        '/submissions/',
+                        2,
+                        []
+                    ),
                 ],
+                'title' => 'omegaupTitleLatestSubmissions',
             ],
-            'template' => 'submissions.list.tpl',
+            'entrypoint' => 'submissions_list',
         ];
     }
 
