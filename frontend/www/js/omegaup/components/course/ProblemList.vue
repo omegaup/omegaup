@@ -68,6 +68,16 @@
         </tr>
       </tbody>
     </table>
+    <div>
+      <a
+        class="btn btn-primary"
+        v-bind:class="{ disabled: !problemsOrderChanged }"
+        role="button"
+        v-on:click="saveNewOrder"
+      >
+        {{ T.wordsSaveNewOrder }}
+      </a>
+    </div>
     <div class="panel-footer" v-show="showForm">
       <form>
         <div class="row">
@@ -205,6 +215,7 @@ export default class CourseProblemList extends Vue {
   taggedProblemAlias = '';
   problemAlias = '';
   showTopicsAndLevel = false;
+  problemsOrderChanged = false;
 
   get tags(): string[] {
     let t = this.topics.slice();
@@ -225,11 +236,16 @@ export default class CourseProblemList extends Vue {
       0,
       this.assignmentProblems.splice(event.oldIndex, 1)[0],
     );
+    this.problemsOrderChanged = true;
+  }
+
+  saveNewOrder() {
     this.$emit(
       'sort',
       this.assignment.alias,
       this.assignmentProblems.map(problem => problem.alias),
     );
+    this.problemsOrderChanged = false;
   }
 
   @Watch('assignment')
