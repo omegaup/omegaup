@@ -267,6 +267,10 @@ class Utils {
             \OmegaUp\MySQLConnection::getInstance()->Execute(
                 'ALTER TABLE Identities auto_increment = 100000;'
             );
+            // Make sure the contest_id and problemset_id never matches in tests.
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'ALTER TABLE Contests auto_increment = 100000;'
+            );
             self::setUpDefaultDataConfig();
         } catch (\Exception $e) {
             echo 'Cleanup DB error. Tests will continue anyways:';

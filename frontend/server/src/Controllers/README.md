@@ -182,8 +182,6 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
-- [Submission](#submission)
-  - [`/api/submission/latestSubmissions/`](#apisubmissionlatestsubmissions)
 - [Tag](#tag)
   - [`/api/tag/list/`](#apitaglist)
 - [Time](#time)
@@ -2019,7 +2017,6 @@ _Nothing_
 | ------------------ | ------- | ----------- |
 | `assignment_alias` | `mixed` |             |
 | `course_alias`     | `mixed` |             |
-| `order`            | `mixed` |             |
 | `problems`         | `mixed` |             |
 
 ### Returns
@@ -3710,31 +3707,6 @@ contestant's machine and the server.
 ```typescript
 { [key: string]: string; }
 ```
-
-# Submission
-
-SubmissionController
-
-## `/api/submission/latestSubmissions/`
-
-### Description
-
-Returns the latest submissions
-
-### Parameters
-
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `offset`   | `int`   |             |
-| `rowcount` | `int`   |             |
-| `username` | `mixed` |             |
-
-### Returns
-
-| Name          | Type                                                                                                                                                                            |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `submissions` | `{ time: Date; username: string; school_id: number; school_name: string; alias: string; title: string; language: string; verdict: string; runtime: number; memory: number; }[]` |
-| `totalRows`   | `number`                                                                                                                                                                        |
 
 # Tag
 

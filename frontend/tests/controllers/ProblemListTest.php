@@ -784,11 +784,11 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
-            if ($responseProblem['score'] != '0') {
-                $this->fail(
-                    'Expecting score to be not set for non-logged in users'
-                );
-            }
+            $this->assertEquals(
+                '0',
+                $responseProblem['score'],
+                'Expecting score to be not set for non-logged in users'
+            );
         }
     }
 
@@ -796,14 +796,18 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * Test List API with query param
      */
     public function testListWithAliasQuery() {
-        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
-        ]));
-        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
-        ]));
+        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
+            ])
+        );
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            ])
+        );
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         // Expect public problem only
@@ -822,11 +826,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $userLogin->auth_token,
             'query' => substr($problemDataPrivate['request']['title'], 2, 5),
         ]));
-        $this->assertEquals(0, count($response['results']));
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPublic['request']['problem_alias']
+        );
 
         // Expect 1 problem, admin can see private problem
         {
-            ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+            ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
             $adminLogin = self::login($identityAdmin);
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,

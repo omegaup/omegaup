@@ -1425,25 +1425,6 @@ export const Session = {
   >('/api/session/googleLogin/'),
 };
 
-export const Submission = {
-  latestSubmissions: apiCall<
-    messages.SubmissionLatestSubmissionsRequest,
-    messages._SubmissionLatestSubmissionsServerResponse,
-    messages.SubmissionLatestSubmissionsResponse
-  >('/api/submission/latestSubmissions/', x => {
-    x.submissions = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.submissions);
-    return x;
-  }),
-};
-
 export const Tag = {
   list: apiCall<messages.TagListRequest, messages.TagListResponse>(
     '/api/tag/list/',
