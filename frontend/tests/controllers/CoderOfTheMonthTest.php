@@ -163,7 +163,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             ->modify('first day of last month')
             ->format('Y-m-d');
 
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
         $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
         $this->createRuns($extraIdentity, $runCreationDate, 1 /*numRuns*/);
@@ -228,8 +227,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'category' => $category,
         ]));
 
-        // Just one Coder of The Month, the one calculated on the previous test.
-        $this->assertNotEmpty($response['coders']);
+        // There are no previous Coders of The Month.
+        $this->assertEmpty($response['coders']);
 
         // Adding parameter date should return the same value, it helps
         // to test getMonthlyList function.
@@ -239,7 +238,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'date' => date('Y-m-d', \OmegaUp\Time::get()),
             'category' => $category,
         ]));
-        $this->assertNotEmpty($response['coders']);
+        $this->assertEmpty($response['coders']);
     }
 
     /**
@@ -291,7 +290,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 '-4 month'
             )
         );
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
         $this->createRuns($identity1, $runCreationDate, 1 /*numRuns*/);
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
@@ -403,10 +401,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCoderOfTheMonthAfterYear(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
-        // Cleaning Rank and Runs tables in order to avoid this test fails in
-        // the moment of calculate the coder of the month
-        \OmegaUp\Test\Utils::deleteAllRanks();
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         [
             'user' => $userLastYear,
             'identity' => $identity,
@@ -565,7 +559,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         self::updateIdentity($identity2, $gender);
         ['identity' => $identity3] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity3, $gender);
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 2);
         $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 4);
         $this->createRuns($identity2, $runCreationDate->format('Y-m-d'), 4);
