@@ -29,7 +29,8 @@
                 role="button"
                 aria-haspopup="true"
                 aria-expanded="false"
-              >{{ activeTab }}</a>
+                >{{ activeTab }}</a
+              >
               <div class="dropdown-menu">
                 <a
                   class="dropdown-item tab-participating"

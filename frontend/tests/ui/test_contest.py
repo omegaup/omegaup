@@ -144,7 +144,7 @@ def test_user_ranking_contest(driver):
                     (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
         with driver.page_transition():
-            select_list_of_current_contests()
+            select_contests_list(driver, 'data-list-current')
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, '.contest-list a[href="/arena/%s/"]' %
@@ -173,13 +173,16 @@ def test_user_ranking_contest(driver):
 
 @util.no_javascript_errors()
 @util.annotate
-def select_list_of_current_contests(driver):
+def select_contests_list(driver, selected_list):
+    '''This function allows us select one item of the contest list types
+    because now it needs to click on dropdown button first
+    '''
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, 'a[data-contests]'))).click()
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, 'a[data-list-current]'))).click()
+            (By.CSS_SELECTOR, 'a[%s]' % selected_list))).click()
 
 
 @util.no_javascript_errors()
@@ -447,19 +450,10 @@ def enter_contest(driver, contest_alias):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR, 'a[data-contests]'))).click()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, 'a[data-list-past]'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '.contest-list .list-past')))
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, 'a[data-contests]'))).click()
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, 'a[data-list-current]'))).click()
+    select_contests_list(driver, 'data-list-past')
+    select_contests_list(driver, 'data-list-current')
+
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, '.contest-list .list-current')))
