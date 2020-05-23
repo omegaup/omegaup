@@ -1,27 +1,6 @@
 <template>
-  <div class="panel contest-list">
-    <div class="panel-heading panel-default">
-      <div class="text-right">
-        <form action="/arena/" method="GET">
-          <div class="form-inline">
-            <div class="form-group">
-              <input
-                class="form-control"
-                type="text"
-                name="query"
-                autocomplete="off"
-                v-model="query"
-                v-bind:placeholder="T.wordsKeyword"
-              />
-            </div>
-            <input
-              class="btn btn-primary btn-lg active"
-              type="submit"
-              v-bind:value="T.wordsSearch"
-            />
-          </div>
-        </form>
-      </div>
+  <div class="card contest-list">
+    <div class="card-header">
       <h1>{{ T.arenaPageTitle }}</h1>
       <p>{{ T.arenaPageIntroduction }}</p>
       <p>
@@ -37,73 +16,119 @@
       </p>
     </div>
 
-    <div class="panel-body">
-      <ul class="nav nav-pills arena-tabs">
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'participating' }"
-          v-if="isLogged"
-          v-on:click="showTab = 'participating'"
-        >
-          <a class="nav-link tab-participating" data-toggle="tab">
-            {{ T.arenaMyActiveContests }}</a
-          >
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'recommended_current' }"
-          v-on:click="showTab = 'recommended_current'"
-        >
-          <a class="nav-link tab-recommended-current" data-toggle="tab">
-            {{ T.arenaRecommendedCurrentContests }}</a
-          >
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'current' }"
-          v-on:click="showTab = 'current'"
-        >
-          <a class="nav-link tab-current" data-toggle="tab">
-            {{ T.arenaCurrentContests }}</a
-          >
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'public' }"
-          v-on:click="showTab = 'public'"
-        >
-          <a class="nav-link tab-public" data-toggle="tab">
-            {{ T.arenaCurrentPublicContests }}</a
-          >
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'future' }"
-          v-on:click="showTab = 'future'"
-        >
-          <a class="nav-link tab-future" data-toggle="tab">
-            {{ T.arenaFutureContests }}</a
-          >
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'recommended_past' }"
-          v-on:click="showTab = 'recommended_past'"
-        >
-          <a class="nav-link tab-recommended-past" data-toggle="tab">
-            {{ T.arenaRecommendedOldContests }}</a
-          >
-        </li>
-        <li
-          class="nav-item"
-          v-bind:class="{ active: showTab === 'past' }"
-          v-on:click="showTab = 'past'"
-        >
-          <a class="nav-link tab-past" data-toggle="tab">
-            {{ T.arenaOldContests }}</a
-          >
-        </li>
-      </ul>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-6">
+          <ul class="nav nav-pills arena-tabs">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link active dropdown-toggle"
+                data-toggle="dropdown"
+                data-contests
+                href="#"
+                role="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+                >{{ activeTab }}</a
+              >
+              <div class="dropdown-menu">
+                <a
+                  class="dropdown-item tab-participating"
+                  v-bind:class="{ active: showTab === 'participating' }"
+                  v-if="isLogged"
+                  v-on:click="showTab = 'participating'"
+                  data-toggle="tab"
+                  data-list-participating
+                  href="#"
+                >
+                  {{ T.arenaMyActiveContests }}</a
+                >
+                <a
+                  class="dropdown-item tab-recommended-current"
+                  v-bind:class="{ active: showTab === 'recommended_current' }"
+                  v-on:click="showTab = 'recommended_current'"
+                  data-toggle="tab"
+                  data-list-recommended-current
+                  href="#"
+                >
+                  {{ T.arenaRecommendedCurrentContests }}</a
+                >
+                <a
+                  class="dropdown-item tab-current"
+                  v-bind:class="{ active: showTab === 'current' }"
+                  v-on:click="showTab = 'current'"
+                  data-toggle="tab"
+                  data-list-current
+                  href="#"
+                >
+                  {{ T.arenaCurrentContests }}</a
+                >
+                <a
+                  class="dropdown-item tab-public"
+                  v-bind:class="{ active: showTab === 'public' }"
+                  v-on:click="showTab = 'public'"
+                  data-toggle="tab"
+                  data-list-public
+                  href="#"
+                >
+                  {{ T.arenaCurrentPublicContests }}</a
+                >
+                <a
+                  class="dropdown-item tab-future"
+                  v-bind:class="{ active: showTab === 'future' }"
+                  v-on:click="showTab = 'future'"
+                  data-toggle="tab"
+                  data-list-future
+                  href="#"
+                >
+                  {{ T.arenaFutureContests }}</a
+                >
+                <a
+                  class="dropdown-item tab-recommended-past"
+                  v-bind:class="{ active: showTab === 'recommended_past' }"
+                  v-on:click="showTab = 'recommended_past'"
+                  data-toggle="tab"
+                  data-list-recommended-past
+                  href="#"
+                >
+                  {{ T.arenaRecommendedOldContests }}</a
+                >
+                <a
+                  class="dropdown-item tab-past"
+                  v-bind:class="{ active: showTab === 'past' }"
+                  v-on:click="showTab = 'past'"
+                  data-toggle="tab"
+                  data-list-past
+                  href="#"
+                >
+                  {{ T.arenaOldContests }}</a
+                >
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <form action="/arena/" method="GET">
+            <div class="input-group">
+              <input
+                class="form-control"
+                type="text"
+                name="query"
+                autocomplete="off"
+                v-model="query"
+                v-bind:placeholder="T.wordsKeyword"
+              />
+              <div class="input-group-append">
+                <input
+                  class="btn btn-primary btn-md active"
+                  type="submit"
+                  v-bind:value="T.wordsSearch"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
 
       <div class="tab-content">
         <div
@@ -190,6 +215,15 @@
   </div>
 </template>
 
+<style>
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: #aaa;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -209,6 +243,27 @@ export default class ArenaContestList extends Vue {
   T = T;
   showTab = '';
   query = this.initialQuery;
+
+  get activeTab(): string {
+    switch (this.showTab) {
+      case 'participating':
+        return T.arenaMyActiveContests;
+      case 'recommended_current':
+        return T.arenaRecommendedCurrentContests;
+      case 'current':
+        return T.arenaCurrentContests;
+      case 'public':
+        return T.arenaCurrentPublicContests;
+      case 'future':
+        return T.arenaFutureContests;
+      case 'recommended_past':
+        return T.arenaRecommendedOldContests;
+      case 'past':
+        return T.arenaOldContests;
+      default:
+        return T.arenaMyActiveContests;
+    }
+  }
 
   mounted() {
     for (const [timeType, contests] of Object.entries(this.contests)) {
