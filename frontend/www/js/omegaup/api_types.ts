@@ -247,6 +247,51 @@ export namespace types {
       );
     }
 
+    export function CourseListPayload(
+      elementId: string = 'payload',
+    ): types.CourseListPayload {
+      return (x => {
+        x.courses = (x => {
+          if (x instanceof Object) {
+            Object.keys(x).forEach(
+              y =>
+                (x[y] = (x => {
+                  x.filteredCourses = (x => {
+                    if (x instanceof Object) {
+                      Object.keys(x).forEach(
+                        y =>
+                          (x[y] = (x => {
+                            x.courses = (x => {
+                              if (!Array.isArray(x)) {
+                                return x;
+                              }
+                              return x.map(x => {
+                                if (x.finish_time)
+                                  x.finish_time = ((x: number) =>
+                                    new Date(x * 1000))(x.finish_time);
+                                x.start_time = ((x: number) =>
+                                  new Date(x * 1000))(x.start_time);
+                                return x;
+                              });
+                            })(x.courses);
+                            return x;
+                          })(x[y])),
+                      );
+                    }
+                    return x;
+                  })(x.filteredCourses);
+                  return x;
+                })(x[y])),
+            );
+          }
+          return x;
+        })(x.courses);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -701,6 +746,30 @@ export namespace types {
     show_scoreboard?: boolean;
     start_time?: Date;
     student_count?: number;
+  }
+
+  export interface CourseListPayload {
+    courses: {
+      [key: number]: {
+        accessMode: string;
+        activeTab: string;
+        filteredCourses: {
+          [key: number]: { courses: types.FilteredCourse[]; timeType: string };
+        };
+      };
+    };
+  }
+
+  export interface CoursesList {
+    [key: string]: types.FilteredCourse[];
+  }
+
+  export interface FilteredCourse {
+    alias: string;
+    counts: { [key: string]: number };
+    finish_time?: Date;
+    name: string;
+    start_time: Date;
   }
 
   export interface GraderStatus {
@@ -1936,29 +2005,7 @@ export namespace messages {
   };
   export type CourseListCoursesRequest = { [key: string]: any };
   export type _CourseListCoursesServerResponse = any;
-  export type CourseListCoursesResponse = {
-    admin: {
-      alias: string;
-      counts: { [key: string]: number };
-      finish_time?: Date;
-      name: string;
-      start_time: Date;
-    }[];
-    public: {
-      alias: string;
-      counts: { [key: string]: number };
-      finish_time?: Date;
-      name: string;
-      start_time: Date;
-    }[];
-    student: {
-      alias: string;
-      counts: { [key: string]: number };
-      finish_time?: Date;
-      name: string;
-      start_time: Date;
-    }[];
-  };
+  export type CourseListCoursesResponse = types.CoursesList;
   export type CourseListSolvedProblemsRequest = { [key: string]: any };
   export type CourseListSolvedProblemsResponse = {
     user_problems: {

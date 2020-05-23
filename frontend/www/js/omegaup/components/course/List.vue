@@ -1,11 +1,11 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-heading">
-      <h3 class="panel-title">{{ T.courseList }}</h3>
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">{{ T.courseList }}</h3>
     </div>
 
-    <div class="page-header" v-if="isMainUserIdentity">
-      <div class="pull-right">
+    <div class="m-3" v-if="isMainUserIdentity">
+      <div class="float-right">
         <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
       </div>
       <h1>&nbsp;</h1>
@@ -14,9 +14,9 @@
       v-for="typeCourses in courses"
       v-if="typeCourses.activeTab !== ''"
     >
-      <div class="page-header">
+      <div class="ml-3">
         <h1>
-          <span>{{ typeCourses.description }}</span>
+          <span>{{ getDescription(typeCourses.accessMode) }}</span>
         </h1>
       </div>
 
@@ -46,5 +46,12 @@ export default class CourseList extends Vue {
 
   T = T;
   UI = UI;
+
+  getDescription(admissionMode: string): string {
+    if (admissionMode === 'public') return T.courseListPublicCourses;
+    if (admissionMode === 'student') return T.courseListIStudy;
+    if (admissionMode === 'admin') return T.courseListAdminCourses;
+    return '';
+  }
 }
 </script>

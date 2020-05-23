@@ -15,6 +15,9 @@
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
+ * @psalm-type FilteredCourse=array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CoursesList=array<string, list<FilteredCourse>>
+ * @psalm-type CourseListPayload=array{courses: array<int, array{accessMode: string, activeTab: string, filteredCourses: array<int, array{courses: list<FilteredCourse>, timeType: string>}>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -1383,7 +1386,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Returns courses for which the current user is an admin and
      * for in which the user is a student.
      *
-     * @return array{admin: list<array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}>, public: list<array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}>, student: list<array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}>}
+     * @return CoursesList
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
@@ -1403,10 +1406,24 @@ class Course extends \OmegaUp\Controllers\Controller {
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
+        return self::getCoursesList($r->identity, $page, $pageSize);
+    }
+
+    /**
+     * @return CoursesList
+     */
+    private static function getCoursesList(
+        \OmegaUp\DAO\VO\Identities $identity,
+        int $page,
+        int $pageSize
+    ) {
+        if (is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         // TODO(pablo): Cache
         // Courses the user is an admin for.
         $adminCourses = [];
-        if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+        if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             $adminCourses = \OmegaUp\DAO\Courses::getAll(
                 $page,
                 $pageSize,
@@ -1415,7 +1432,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         } else {
             $adminCourses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
-                $r->identity->identity_id,
+                $identity->identity_id,
                 $page,
                 $pageSize
             );
@@ -1423,7 +1440,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Courses the user is a student in.
         $studentCourses = \OmegaUp\DAO\Courses::getCoursesForStudent(
-            $r->identity->identity_id
+            $identity->identity_id
         );
 
         $response = [
@@ -2326,6 +2343,64 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $result['payload']['student'] = $r['student'];
         return $result;
+    }
+
+    /**
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload}}
+     */
+    public static function getCourseListDetailsForSamrty(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        $courses = self::getCoursesList($r->identity, $page, $pageSize);
+        $coursesTypes = ['public', 'student', 'admin'];
+
+        $filteredCourses = [];
+        foreach ($coursesTypes as $index => $courseType) {
+            $filteredCourses[$index] = [
+                'accessMode' => $courseType,
+                'filteredCourses' => [
+                    ['courses' => [], 'timeType' => 'current'],
+                    ['courses' => [], 'timeType' => 'past'],
+                ],
+                'activeTab' => '',
+            ];
+            foreach ($courses[$courseType] as $course) {
+                if (
+                    is_null($course['finish_time'])
+                    || $course['finish_time']->time > \OmegaUp\Time::get()
+                ) {
+                    $filteredCourses[$index]['filteredCourses'][0]['courses'][] = $course;
+                    $filteredCourses[$index]['activeTab'] = 'current';
+                } else {
+                    $filteredCourses[$index]['filteredCourses'][1]['courses'][] = $course;
+                }
+            }
+            if (
+                $filteredCourses[$index]['activeTab'] === ''
+                && !empty(
+                    $filteredCourses[$index]['filteredCourses'][1]['courses']
+                )
+            ) {
+                $filteredCourses[$index]['activeTab'] = 'past';
+            }
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'courses' => $filteredCourses,
+                ]
+            ],
+            'entrypoint' => 'course_list',
+        ];
     }
 
     /**
