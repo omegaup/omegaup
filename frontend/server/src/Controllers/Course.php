@@ -2287,7 +2287,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course
      */
-    public static function getCourseSubmissionsListForSamrty(\OmegaUp\Request $r) {
+    public static function getCourseSubmissionsListForSmarty(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course'],
