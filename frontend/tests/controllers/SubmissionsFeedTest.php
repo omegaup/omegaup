@@ -7,7 +7,6 @@
 
 class SubmissionsFeedTest extends \OmegaUp\Test\ControllerTestCase {
     public function testSubmissionsFeed() {
-        \OmegaUp\Test\Utils::cleanupDB();
         /**
          * Create 3 users, 3 problems and 1 contest.
          *
