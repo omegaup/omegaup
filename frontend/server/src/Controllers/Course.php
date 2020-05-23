@@ -15,6 +15,8 @@
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
+ * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
+ * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -2278,6 +2280,53 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     public static function getCourseDetailsForSmarty(\OmegaUp\Request $r): array {
         return self::getIntroDetails($r);
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload}, title: string}
+     *
+     * @omegaup-request-param mixed $course
+     */
+    public static function getCourseSubmissionsListForSamrty(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course'],
+            'course'
+        );
+        $course = self::validateCourseExists($r['course']);
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+            $r['course']
+        );
+        $userSolvedProblems = [];
+        foreach ($solvedProblems as $problem) {
+            $userSolvedProblems[$problem['username']][] = $problem;
+        }
+
+        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
+            $r['course']
+        );
+        $userUnsolvedProblems = [];
+        foreach ($unsolvedProblems as $problem) {
+            $userUnsolvedProblems[$problem['username']][] = $problem;
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'solvedProblems' => $userSolvedProblems,
+                    'unsolvedProblems' => $userUnsolvedProblems,
+                ],
+            ],
+            'title' => '',
+            'entrypoint' => 'course_submissions_list',
+        ];
     }
 
     /**

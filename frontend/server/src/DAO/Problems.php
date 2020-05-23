@@ -595,9 +595,18 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     Problems p
                 ON
                     p.problem_id = s.problem_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.problemset_id = s.problemset_id
+                INNER JOIN
+                    Courses cc
+                ON
+                    cc.course_id = a.course_id
                 WHERE
                     r.verdict = 'AC'
                     AND p.visibility = ?
+                    AND cc.alias = ?
                 GROUP BY
                     p.problem_id, s.identity_id
                 ) rp
@@ -613,7 +622,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var list<array{alias: string, title: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
+            [
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                $courseAlias,
+                $courseAlias,
+            ]
         );
     }
 
@@ -656,8 +669,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     Problems pp
                 ON
                     pp.problem_id = s.problem_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.problemset_id = s.problemset_id
+                INNER JOIN
+                    Courses cc
+                ON
+                    cc.course_id = a.course_id
                 WHERE
                     pp.visibility = ?
+                    AND cc.alias = ?
                 GROUP BY
                     pp.problem_id, s.identity_id
                 HAVING
@@ -679,7 +701,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var list<array{alias: string, title: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
+            [
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                $courseAlias,
+                $courseAlias,
+            ]
         );
     }
 
