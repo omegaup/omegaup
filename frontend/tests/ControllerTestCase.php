@@ -59,6 +59,8 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
 
         //Clean $_REQUEST before each test
         unset($_REQUEST);
+
+        \OmegaUp\MySQLConnection::getInstance()->StartTrans();
     }
 
     /**
@@ -67,6 +69,10 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     public function tearDown(): void {
         parent::tearDown();
         self::logout();
+
+        \OmegaUp\MySQLConnection::getInstance()->FailTrans();
+        \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
+        \OmegaUp\Test\Utils::cleanupDBForTearDown();
     }
 
     public static function logout(): void {
@@ -470,17 +476,9 @@ class ScopedScoreboardTestRun {
     }
 }
 
-class ScopedEmailSender implements \OmegaUp\EmailSender {
+class FakeEmailSender implements \OmegaUp\EmailSender {
     /** @var array{email: string[], subject: string, body: string}[] */
-    public static $listEmails = [];
-
-    public function __construct() {
-        \OmegaUp\Email::setEmailSenderForTesting($this);
-    }
-
-    public function __destruct() {
-        \OmegaUp\Email::setEmailSenderForTesting(null);
-    }
+    public $listEmails = [];
 
     /**
      * @param string[] $emails
@@ -492,11 +490,21 @@ class ScopedEmailSender implements \OmegaUp\EmailSender {
         string $subject,
         string $body
     ): void {
-        self::$listEmails[] = [
+        $this->listEmails[] = [
             'email' => $emails,
             'subject' => $subject,
             'body' => $body,
         ];
+    }
+}
+
+class ScopedEmailSender {
+    public function __construct(\OmegaUp\EmailSender &$sender) {
+        \OmegaUp\Email::setEmailSenderForTesting($sender);
+    }
+
+    public function __destruct() {
+        \OmegaUp\Email::setEmailSenderForTesting(null);
     }
 }
 
