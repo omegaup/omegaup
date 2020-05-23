@@ -65,7 +65,7 @@ let config = [
       group_identities: './frontend/www/js/omegaup/group/identities.js',
       group_members: './frontend/www/js/omegaup/group/members.js',
       course_submissions_list:
-        './frontend/www/js/omegaup/course/submissions_list.js',
+        './frontend/www/js/omegaup/course/submissions_list.ts',
       group_list: './frontend/www/js/omegaup/group/list.js',
       login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
       login_password_reset: './frontend/www/js/omegaup/login/reset.ts',

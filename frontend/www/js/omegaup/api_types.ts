@@ -247,6 +247,14 @@ export namespace types {
       );
     }
 
+    export function CourseSubmissionsListPayload(
+      elementId: string = 'payload',
+    ): types.CourseSubmissionsListPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -701,6 +709,17 @@ export namespace types {
     show_scoreboard?: boolean;
     start_time?: Date;
     student_count?: number;
+  }
+
+  export interface CourseProblemTried {
+    alias: string;
+    title: string;
+    username: string;
+  }
+
+  export interface CourseSubmissionsListPayload {
+    solvedProblems: { [key: string]: types.CourseProblemTried[] };
+    unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
   }
 
   export interface GraderStatus {

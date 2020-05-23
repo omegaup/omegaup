@@ -351,6 +351,7 @@ const translations: { [key: string]: string; } = {
   courseStudentsEmpty: "No students",
   courseStudentsProgress: "Students' progress",
   courseStudentsProgressExportToSpreadsheet: "Export students' progress to spreadsheet",
+  courseSubmissionsList: "Course submissions list",
   courseUpdateAlreadyHasRuns: "Length of an assignment can't be changed once a solution has been judged.",
   courseViewProgress: "View progress",
   createSchoolFailed: "School creation failed.",
