@@ -351,6 +351,7 @@ const translations: { [key: string]: string; } = {
   courseStudentsEmpty: "(N0 57ud3n75)",
   courseStudentsProgress: "(S7ud3n75' pr0gr355)",
   courseStudentsProgressExportToSpreadsheet: "(Exp0r7 57ud3n75' pr0gr355 70 5pr3ad5h337)",
+  courseSubmissionsList: "(C0ur53 5ubmi55i0n5 1i57)",
   courseUpdateAlreadyHasRuns: "(L3ng7h 0f an a55ignm3n7 can'7 b3 chang3d 0nc3 a 501u7i0n ha5 b33n judg3d.)",
   courseViewProgress: "(Vi3w pr0gr355)",
   createSchoolFailed: "(Sch001 cr3a7i0n fai13d.)",

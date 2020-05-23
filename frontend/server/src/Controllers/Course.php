@@ -2283,7 +2283,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload}, title: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload, title: string}}
      *
      * @omegaup-request-param mixed $course
      */
@@ -2323,8 +2323,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'solvedProblems' => $userSolvedProblems,
                     'unsolvedProblems' => $userUnsolvedProblems,
                 ],
+                'title' => 'courseSubmissionsList',
             ],
-            'title' => '',
             'entrypoint' => 'course_submissions_list',
         ];
     }
