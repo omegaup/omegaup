@@ -12,6 +12,8 @@ namespace {
     @include_once(OMEGAUP_ROOT . '/tests/test_config.php');
     require_once(OMEGAUP_ROOT . '/tests/test_config.default.php');
     require_once(OMEGAUP_ROOT . '/server/config.default.php');
+    // This is required before bootstrap.php is invoked.
+    @mkdir(OMEGAUP_TEST_ROOT, 0755, true);
     require_once(OMEGAUP_ROOT . '/server/bootstrap.php');
     // Load api caller
     require_once(OMEGAUP_ROOT . '/tests/ApiCallerMock.php');
