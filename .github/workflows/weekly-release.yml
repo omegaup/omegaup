@@ -1,0 +1,26 @@
+name: Weekly Release
+
+# Run every Monday at 3:00 UTC. This translates to Sunday 20:00 PT.
+on:
+  schedule:
+    - cron: '0 3 * * 1'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Merge master into release
+        run: |
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+          if git cat-file -e master:.pause-release 2>/dev/null; then
+            echo '::warning::Skipping release since there is a `.pause-release` file.'
+            exit 1
+          fi
+
+          curl --request POST \
+            --url https://api.github.com/repos/${{ github.repository }}/merges \
+            --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            --data "{\"base\":\"release\",\"head\":\"master\",\"commit_message\":\"Merge branch 'master' of github.com:omegaup/omegaup into release\"}"
