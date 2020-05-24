@@ -139,28 +139,29 @@ class Utils {
         \OmegaUp\Controllers\Run::$defaultSubmissionGap = 0;
     }
 
-    public static function cleanupLogs(): void {
-        file_put_contents(OMEGAUP_LOG_FILE, '');
-        file_put_contents(OMEGAUP_MYSQL_TYPES_LOG_FILE, '');
-        file_put_contents(__DIR__ . '/controllers/gitserver.log', '');
+    public static function cleanupProblemFiles(): void {
+        $problemsGitPath = '/tmp/omegaup/problems.git';
+        self::cleanPath($problemsGitPath);
     }
 
     public static function cleanupFilesAndDB(): void {
+        // Clean log files
+        file_put_contents(OMEGAUP_LOG_FILE, '');
+        file_put_contents(OMEGAUP_MYSQL_TYPES_LOG_FILE, '');
+        file_put_contents(__DIR__ . '/controllers/gitserver.log', '');
         // Clean problems and runs path
         $runsPath = OMEGAUP_TEST_ROOT . 'submissions';
         // We need to have this directory be NOT within the /opt/omegaup directory
         // since we intend to share it through VirtualBox, and that does not support
         // mmapping files, which is needed for libgit2.
-        $problemsGitPath = '/tmp/omegaup/problems.git';
         self::cleanPath(IMAGES_PATH);
         self::cleanPath($runsPath);
         self::cleanPath(TEMPLATES_PATH);
-        self::cleanPath($problemsGitPath);
         for ($i = 0; $i < 256; $i++) {
             mkdir(sprintf('%s/%02x', $runsPath, $i), 0775, true);
         }
         // Clean DB
-        self::CleanupDB();
+        self::cleanupDB();
     }
 
     private static function cleanupDB(): void {

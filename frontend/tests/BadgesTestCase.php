@@ -26,7 +26,6 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
     public function setUp(): void {
         parent::setUp();
         \OmegaUp\Time::setTimeForTesting(null);
-        \OmegaUp\Test\Utils::cleanupFilesAndDB();
         $this->originalFileUploader = \OmegaUp\FileHandler::getFileUploader();
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
