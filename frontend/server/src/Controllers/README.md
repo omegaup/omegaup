@@ -1721,11 +1721,9 @@ for in which the user is a student.
 
 ### Returns
 
-| Name      | Type                                                                                                          |
-| --------- | ------------------------------------------------------------------------------------------------------------- |
-| `admin`   | `{ alias: string; counts: { [key: string]: number; }; finish_time: Date; name: string; start_time: Date; }[]` |
-| `public`  | `{ alias: string; counts: { [key: string]: number; }; finish_time: Date; name: string; start_time: Date; }[]` |
-| `student` | `{ alias: string; counts: { [key: string]: number; }; finish_time: Date; name: string; start_time: Date; }[]` |
+```typescript
+types.CoursesList;
+```
 
 ## `/api/course/listSolvedProblems/`
 
