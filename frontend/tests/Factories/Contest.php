@@ -128,6 +128,13 @@ class ContestParams {
     }
 }
 
+/**
+ * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
+ * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
+ * @psalm-type ProblemSettings=array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: LimitsSettings, interactive?: InteractiveSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
+ */
 class Contest {
     /**
      * Returns a Request object with complete context to create a contest.
@@ -162,7 +169,7 @@ class Contest {
             'penalty_type' => 'contest_start',
             'languages' => $params->languages,
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
-            'basic_information' => $params->basicInformation,
+            'needs_basic_information' => $params->basicInformation,
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
         ]);
@@ -303,15 +310,17 @@ class Contest {
      * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
      * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
      * @param \OmegaUp\DAO\VO\Identities $user
+     *
+     * @return array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, exists: true, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}|array{exists: false}
      */
     public static function openProblemInContest(
         $contestData,
         $problemData,
         $user
-    ): void {
+    ): array {
         $login = \OmegaUp\Test\ControllerTestCase::login($user);
 
-        \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+        return \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => strval($problemData['request']['problem_alias']),

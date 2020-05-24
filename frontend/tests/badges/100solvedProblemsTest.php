@@ -6,7 +6,7 @@
  * @author carlosabcs
  */
 class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
-    public function test100SolvedProblems() {
+    public function test100SolvedProblems(): void {
         // Creates two users, one solves 99 problems the other 101.
         ['user' => $user99, 'identity' => $identity99] = \OmegaUp\Test\Factories\User::createUser();
         ['user' => $user101, 'identity' => $identity101] = \OmegaUp\Test\Factories\User::createUser();
@@ -33,7 +33,7 @@ class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
         $this->assertEquals($expected, $results);
     }
 
-    public function test100RunsToSameProblem() {
+    public function test100RunsToSameProblem(): void {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         for ($i = 0; $i < 101; $i++) {

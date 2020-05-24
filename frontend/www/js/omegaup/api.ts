@@ -690,17 +690,6 @@ export const Course = {
         return x;
       });
     })(x.admin);
-    x.public = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.public);
     x.student = (x => {
       if (!Array.isArray(x)) {
         return x;
@@ -712,6 +701,17 @@ export const Course = {
         return x;
       });
     })(x.student);
+    x.public = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.public);
     return x;
   }),
   listSolvedProblems: apiCall<
@@ -1423,25 +1423,6 @@ export const Session = {
     messages.SessionGoogleLoginRequest,
     messages.SessionGoogleLoginResponse
   >('/api/session/googleLogin/'),
-};
-
-export const Submission = {
-  latestSubmissions: apiCall<
-    messages.SubmissionLatestSubmissionsRequest,
-    messages._SubmissionLatestSubmissionsServerResponse,
-    messages.SubmissionLatestSubmissionsResponse
-  >('/api/submission/latestSubmissions/', x => {
-    x.submissions = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.submissions);
-    return x;
-  }),
 };
 
 export const Tag = {
