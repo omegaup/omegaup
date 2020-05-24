@@ -29,6 +29,7 @@
     "jquery": "^3.5.1",
     "jsdom": "^15.2.1",
     "node-sass": "^4.13.1",
+    "nyc": "^15.0.1",
     "remove-source-webpack-plugin": "^0.1.1",
     "sass-loader": "^8.0.0",
     "sortablejs": "^1.7.0",
@@ -49,7 +50,8 @@
     "wrapper-webpack-plugin": "^2.0.0"
   },
   "scripts": {
-    "test": "jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
+    "test": "nyc jasmine JASMINE_CONFIG_PATH=frontend/www/tests/jasmine.json",
+    "posttest": "nyc report --reporter=json",
     "dev": "cross-env webpack --config-name=frontend --watch --mode=development --display=minimal --display-chunk=false --color=true",
     "dev-all": "cross-env webpack --watch --mode=development --display=minimal --display-chunk=false --color=true",
     "build": "cross-env webpack --hide-modules --mode=production",
