@@ -2019,7 +2019,7 @@ export class Arena {
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
         nextSubmissionTimestamp = new Date(
-          problem.nextSubmissionTimestamp.getTime() * 1000,
+          problem.nextSubmissionTimestamp.getTime(),
         );
       } else if (
         typeof problem.runs !== 'undefined' &&
