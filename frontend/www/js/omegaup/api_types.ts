@@ -255,41 +255,39 @@ export namespace types {
           x.admin = (x => {
             x.filteredCourses = (x => {
               x.current = (x => {
-                if (x.courses)
-                  x.courses = (x => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map(x => {
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
                       );
-                      return x;
-                    });
-                  })(x.courses);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
                 return x;
               })(x.current);
               x.past = (x => {
-                if (x.courses)
-                  x.courses = (x => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map(x => {
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
                       );
-                      return x;
-                    });
-                  })(x.courses);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
                 return x;
               })(x.past);
               return x;
@@ -299,41 +297,39 @@ export namespace types {
           x.student = (x => {
             x.filteredCourses = (x => {
               x.current = (x => {
-                if (x.courses)
-                  x.courses = (x => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map(x => {
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
                       );
-                      return x;
-                    });
-                  })(x.courses);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
                 return x;
               })(x.current);
               x.past = (x => {
-                if (x.courses)
-                  x.courses = (x => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map(x => {
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
                       );
-                      return x;
-                    });
-                  })(x.courses);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
                 return x;
               })(x.past);
               return x;
@@ -343,41 +339,39 @@ export namespace types {
           x.public = (x => {
             x.filteredCourses = (x => {
               x.current = (x => {
-                if (x.courses)
-                  x.courses = (x => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map(x => {
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
                       );
-                      return x;
-                    });
-                  })(x.courses);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
                 return x;
               })(x.current);
               x.past = (x => {
-                if (x.courses)
-                  x.courses = (x => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map(x => {
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
                       );
-                      return x;
-                    });
-                  })(x.courses);
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
                 return x;
               })(x.past);
               return x;
@@ -389,6 +383,14 @@ export namespace types {
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CourseSubmissionsListPayload(
+      elementId: string = 'payload',
+    ): types.CourseSubmissionsListPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
@@ -854,27 +856,38 @@ export namespace types {
         accessMode: string;
         activeTab: string;
         filteredCourses: {
-          current: { courses?: types.FilteredCourse[]; timeType: string };
-          past: { courses?: types.FilteredCourse[]; timeType: string };
+          current: { courses: types.FilteredCourse[]; timeType: string };
+          past: { courses: types.FilteredCourse[]; timeType: string };
         };
       };
       student: {
         accessMode: string;
         activeTab: string;
         filteredCourses: {
-          current: { courses?: types.FilteredCourse[]; timeType: string };
-          past: { courses?: types.FilteredCourse[]; timeType: string };
+          current: { courses: types.FilteredCourse[]; timeType: string };
+          past: { courses: types.FilteredCourse[]; timeType: string };
         };
       };
       public: {
         accessMode: string;
         activeTab: string;
         filteredCourses: {
-          current: { courses?: types.FilteredCourse[]; timeType: string };
-          past: { courses?: types.FilteredCourse[]; timeType: string };
+          current: { courses: types.FilteredCourse[]; timeType: string };
+          past: { courses: types.FilteredCourse[]; timeType: string };
         };
       };
     };
+  }
+
+  export interface CourseProblemTried {
+    alias: string;
+    title: string;
+    username: string;
+  }
+
+  export interface CourseSubmissionsListPayload {
+    solvedProblems: { [key: string]: types.CourseProblemTried[] };
+    unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
   }
 
   export interface CoursesList {

@@ -17,7 +17,9 @@
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CoursesList=array{admin: list<FilteredCourse>, student: list<FilteredCourse>, public: list<FilteredCourse>}
- * @psalm-type CourseListPayload=array{courses: array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses?: list<FilteredCourse>, timeType: string}, past: array{courses?: list<FilteredCourse>, timeType: string}}}, student: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses?: list<FilteredCourse>, timeType: string}, past: array{courses?: list<FilteredCourse>, timeType: string}}}, public: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses?: list<FilteredCourse>, timeType: string}, past: array{courses?: list<FilteredCourse>, timeType: string}}}}}
+ * @psalm-type CourseListPayload=array{courses: array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, student: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, public: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}}}
+ * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
+ * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -2298,6 +2300,53 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload, title: string}}
+     *
+     * @omegaup-request-param mixed $course
+     */
+    public static function getCourseSubmissionsListForSmarty(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course'],
+            'course'
+        );
+        $course = self::validateCourseExists($r['course']);
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+
+        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+            $r['course']
+        );
+        $userSolvedProblems = [];
+        foreach ($solvedProblems as $problem) {
+            $userSolvedProblems[$problem['username']][] = $problem;
+        }
+
+        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
+            $r['course']
+        );
+        $userUnsolvedProblems = [];
+        foreach ($unsolvedProblems as $problem) {
+            $userUnsolvedProblems[$problem['username']][] = $problem;
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'solvedProblems' => $userSolvedProblems,
+                    'unsolvedProblems' => $userUnsolvedProblems,
+                ],
+                'title' => 'courseSubmissionsList',
+            ],
+            'entrypoint' => 'course_submissions_list',
+        ];
+    }
+
+    /**
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $student
      *
@@ -2366,8 +2415,14 @@ class Course extends \OmegaUp\Controllers\Controller {
         foreach ($coursesTypes as $courseType) {
             $filteredCourses[$courseType] = [
                 'filteredCourses' => [
-                    'current' => ['timeType' => 'current'],
-                    'past' => ['timeType' => 'past'],
+                    'current' => [
+                        'courses' => [],
+                        'timeType' => 'current',
+                    ],
+                    'past' => [
+                        'courses' => [],
+                        'timeType' => 'past',
+                    ],
                 ],
                 'accessMode' => $courseType,
                 'activeTab' => '',

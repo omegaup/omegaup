@@ -617,8 +617,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'problem_alias' => $r['problem_alias'],
         ], /*$isRequired=*/ false);
 
-        \OmegaUp\DAO\DAO::transBegin();
         try {
+            \OmegaUp\DAO\DAO::transBegin();
             \OmegaUp\Controllers\Problem::updateProblem(
                 $r->identity,
                 $r->user,
@@ -640,7 +640,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     ])
                 );
             }
-            \OmegaUp\DAO\DAO::transEnd();
             if ($r['status'] == 'banned' || $r['status'] == 'warning') {
                 self::sendNotificationEmail(
                     $problem,
@@ -649,6 +648,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     strval($r['status'])
                 );
             }
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to resolve demotion request', $e);

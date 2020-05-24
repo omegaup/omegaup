@@ -611,7 +611,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{contestListPayload: ContestListPayload}, template: string}
+     * @return array{smartyProperties: array{payload: ContestListPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -702,13 +702,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'contestListPayload' => [
+                'payload' => [
                     'query' => $r['query'],
                     'isLogged' => !is_null($r->identity),
                     'contests' => $contests,
                 ],
+                'title' => 'wordsContests',
             ],
-            'template' => 'arena.index.tpl',
+            'entrypoint' => 'arena_contest_list',
         ];
     }
 
