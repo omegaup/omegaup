@@ -1,8 +1,10 @@
-name: Daily Release
+name: daily-release
 
 # Run every day at 3:00 UTC. This translates to 20:00 PT.
 # TODO(#1624): Make this daily once we have better coverage of the frontend.
 on:
+  repository_dispatch:
+    types: daily-release
   schedule:
     - cron: '0 3 * * 0'
 
@@ -13,19 +15,26 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Merge master into release
+      - name: Fetch all refs
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
 
-          if ! git diff --quiet release:frontend/database master:frontend/database; then
+      - name: Check for database modifications
+        run: |
+          if ! git diff --quiet origin/release:frontend/database origin/master:frontend/database; then
             echo '::warning::Skipping release since there are database modifications'
             exit 1
           fi
-          if git cat-file -e master:.pause-release 2>/dev/null; then
+
+      - name: Check for presence of .pause-release
+        run: |
+          if git cat-file -e origin/master:.pause-release 2>/dev/null; then
             echo '::warning::Skipping release since there is a `.pause-release` file.'
             exit 1
           fi
 
+      - name: Merge master into release
+        run: |
           curl --request POST \
             --url https://api.github.com/repos/${{ github.repository }}/merges \
             --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
