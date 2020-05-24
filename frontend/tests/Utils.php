@@ -118,8 +118,8 @@ class Utils {
             'details.json',
             json_encode([
                 'verdict' => $verdict,
-                'contest_score' => $points,
-                'score' => $points,
+                'contest_score' => $run->contest_score,
+                'score' => $run->score,
                 'judged_by' => 'RunsFactory.php',
             ])
         );
