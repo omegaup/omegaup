@@ -6,7 +6,7 @@
     "platform": {
       "php": "7.2.19"
     },
-    "process-timeout": 600
+    "process-timeout": 1200
   },
   "require-dev": {
       "vimeo/psalm": "3.11.2",

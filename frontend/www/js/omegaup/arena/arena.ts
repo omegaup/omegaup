@@ -1339,51 +1339,70 @@ export class Arena {
           clarifications.push(clarification);
         }
         ((id, answerNode) => {
-          const responseFormNode = $(
-            '#create-response-form',
+          const responseFormNode = $('.create-response-form', answerNode)
+            .first()
+            .removeClass('template');
+          const cannedResponse = $(
+            '.create-response-canned',
             answerNode,
-          ).removeClass('template');
-          const cannedResponse = $('#create-response-canned', answerNode);
+          ).first();
           cannedResponse.on('change', () => {
             if (cannedResponse.val() === 'other') {
-              $('#create-response-text', answerNode).show();
+              $('.create-response-text', answerNode)
+                .first()
+                .show();
             } else {
-              $('#create-response-text', answerNode).hide();
+              $('.create-response-text', answerNode)
+                .first()
+                .hide();
             }
           });
           if (clarification.public) {
-            $('#create-response-is-public', responseFormNode).attr(
-              'checked',
-              'checked',
-            );
-            $('#create-response-is-public', responseFormNode).prop(
-              'checked',
-              true,
-            );
+            $('.create-response-is-public', responseFormNode)
+              .first()
+              .attr('checked', 'checked');
+            $('.create-response-is-public', responseFormNode)
+              .first()
+              .prop('checked', true);
           }
           responseFormNode.on('submit', () => {
             let responseText: string = '';
-            if ($('#create-response-canned', answerNode).val() === 'other') {
-              responseText = String($('#create-response-text', this).val());
+            if (
+              $('.create-response-canned', answerNode)
+                .first()
+                .val() === 'other'
+            ) {
+              responseText = String(
+                $('.create-response-text', responseFormNode)
+                  .first()
+                  .val(),
+              );
             } else {
               responseText = String(
-                $('#create-response-canned>option:selected', this).html(),
+                $(
+                  '.create-response-canned>option:selected',
+                  responseFormNode,
+                ).html(),
               );
             }
             api.Clarification.update({
               clarification_id: id,
               answer: responseText,
               public: (<HTMLInputElement>(
-                $('#create-response-is-public', this)[0]
+                $('.create-response-is-public', responseFormNode)[0]
               )).checked,
             })
               .then(() => {
                 $('pre', answerNode).html(responseText);
-                $('#create-response-text', answerNode).val('');
+                $('.create-response-text', answerNode)
+                  .first()
+                  .val('');
               })
               .catch(() => {
                 $('pre', answerNode).html(responseText);
-                $('#create-response-text', answerNode).val('');
+                $('.create-response-text', answerNode)
+                  .first()
+                  .val('');
               });
             return false;
           });
@@ -1418,7 +1437,9 @@ export class Arena {
       $(r).addClass('resolved');
     }
     if (clarification.public) {
-      $('#create-response-is-public', r).prop('checked', true);
+      $('.create-response-is-public', r)
+        .first()
+        .prop('checked', true);
     }
   }
 
@@ -1710,7 +1731,9 @@ export class Arena {
           this.showQualityNominationPopup();
         }
 
-        this.initSubmissionCountdown();
+        if (!this.options.courseAlias) {
+          this.initSubmissionCountdown();
+        }
       };
 
       if (problemChanged) {
@@ -2059,6 +2082,7 @@ export class Arena {
     e.preventDefault();
 
     if (
+      !this.options.courseAlias &&
       !this.options.isOnlyProblem &&
       (this.problems[this.currentProblem.alias].lastSubmission?.getTime() ??
         0) +
@@ -2202,7 +2226,9 @@ export class Arena {
         $('input', this.elements.submitForm).prop('disabled', false);
         this.hideOverlay();
         this.clearInputFile();
-        this.initSubmissionCountdown();
+        if (!this.options.courseAlias) {
+          this.initSubmissionCountdown();
+        }
       })
       .catch(run => {
         alert(run.error ?? run);

@@ -36,8 +36,6 @@ namespace {
     \OmegaUp\Test\Utils::cleanupFilesAndDB();
     // Clean APC cache
     \OmegaUp\Cache::clearCacheForTesting();
-    \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
-    \OmegaUp\Test\Factories\QualityNomination::initTags();
 
     \OmegaUp\Grader::setInstanceForTesting(new \OmegaUp\Test\NoOpGrader());
 }

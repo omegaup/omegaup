@@ -14,16 +14,6 @@ init_submodules() {
 		frontend/server/libs/third_party/sodium_compat
 }
 
-init_frontend_submodules() {
-	git submodule update --init --recursive \
-		frontend/server/libs/third_party/log4php \
-		frontend/www/third_party/js/csv.js \
-		frontend/www/third_party/js/iso-3166-2.js \
-		frontend/www/third_party/js/mathjax \
-		frontend/www/third_party/js/pagedown \
-		frontend/www/third_party/wenk
-}
-
 install_mysql8() {
 	sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 8C718D3B5072E1F5
 	wget https://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
@@ -62,9 +52,4 @@ install_omegaup_gitserver() {
 	DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar'
 	TARGET='/usr/share/java/libinteractive.jar'
 	sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
-}
-
-setup_phpenv() {
-	phpenv rehash
-	echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 }
