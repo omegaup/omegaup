@@ -14,7 +14,7 @@
           }}</span>
         </div>
         <div class="col-xs-6 solved" v-if="problem.acceptsSubmissions">
-          <span
+          <span v-if="partialScore"
             >({{
               parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
             }}
@@ -23,6 +23,18 @@
               parseFloat(problem.maxScore).toFixed(digitsAfterDecimalPoint)
             }})</span
           >
+          <template v-else="">
+            <font-awesome-icon
+              icon="check"
+              v-bind:style="{ color: 'green' }"
+              v-if="problem.bestScore == problem.maxScore"
+            />
+            <font-awesome-icon
+              icon="times"
+              v-bind:style="{ color: 'red' }"
+              v-else-if="problem.hasRuns"
+            />
+          </template>
         </div>
       </div>
       <div class="row">
@@ -80,12 +92,28 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
-@Component
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+})
 export default class ArenaNavbarProblems extends Vue {
   @Prop() problems!: omegaup.ContestProblem[];
   @Prop() activeProblem!: string | null;
   @Prop() inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+  @Prop({ default: true }) partialScore!: boolean;
 
   T = T;
 
