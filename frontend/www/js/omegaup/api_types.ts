@@ -247,6 +247,153 @@ export namespace types {
       );
     }
 
+    export function CourseListPayload(
+      elementId: string = 'payload',
+    ): types.CourseListPayload {
+      return (x => {
+        x.courses = (x => {
+          x.admin = (x => {
+            x.filteredCourses = (x => {
+              x.current = (x => {
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.current);
+              x.past = (x => {
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.past);
+              return x;
+            })(x.filteredCourses);
+            return x;
+          })(x.admin);
+          x.student = (x => {
+            x.filteredCourses = (x => {
+              x.current = (x => {
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.current);
+              x.past = (x => {
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.past);
+              return x;
+            })(x.filteredCourses);
+            return x;
+          })(x.student);
+          x.public = (x => {
+            x.filteredCourses = (x => {
+              x.current = (x => {
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.current);
+              x.past = (x => {
+                x.courses = (x => {
+                  if (!Array.isArray(x)) {
+                    return x;
+                  }
+                  return x.map(x => {
+                    if (x.finish_time)
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    return x;
+                  });
+                })(x.courses);
+                return x;
+              })(x.past);
+              return x;
+            })(x.filteredCourses);
+            return x;
+          })(x.public);
+          return x;
+        })(x.courses);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CourseSubmissionsListPayload(
+      elementId: string = 'payload',
+    ): types.CourseSubmissionsListPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -431,6 +578,25 @@ export namespace types {
           x.max_wait_time = ((x: number) => new Date(x * 1000))(
             x.max_wait_time,
           );
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function SubmissionsListPayload(
+      elementId: string = 'payload',
+    ): types.SubmissionsListPayload {
+      return (x => {
+        x.submissions = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.submissions);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -682,6 +848,60 @@ export namespace types {
     show_scoreboard?: boolean;
     start_time?: Date;
     student_count?: number;
+  }
+
+  export interface CourseListPayload {
+    courses: {
+      admin: {
+        accessMode: string;
+        activeTab: string;
+        filteredCourses: {
+          current: { courses: types.FilteredCourse[]; timeType: string };
+          past: { courses: types.FilteredCourse[]; timeType: string };
+        };
+      };
+      student: {
+        accessMode: string;
+        activeTab: string;
+        filteredCourses: {
+          current: { courses: types.FilteredCourse[]; timeType: string };
+          past: { courses: types.FilteredCourse[]; timeType: string };
+        };
+      };
+      public: {
+        accessMode: string;
+        activeTab: string;
+        filteredCourses: {
+          current: { courses: types.FilteredCourse[]; timeType: string };
+          past: { courses: types.FilteredCourse[]; timeType: string };
+        };
+      };
+    };
+  }
+
+  export interface CourseProblemTried {
+    alias: string;
+    title: string;
+    username: string;
+  }
+
+  export interface CourseSubmissionsListPayload {
+    solvedProblems: { [key: string]: types.CourseProblemTried[] };
+    unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
+  }
+
+  export interface CoursesList {
+    admin: types.FilteredCourse[];
+    student: types.FilteredCourse[];
+    public: types.FilteredCourse[];
+  }
+
+  export interface FilteredCourse {
+    alias: string;
+    counts: { [key: string]: number };
+    finish_time?: Date;
+    name: string;
+    start_time: Date;
   }
 
   export interface GraderStatus {
@@ -1247,6 +1467,28 @@ export namespace types {
     distribution?: { [key: number]: number };
     size_of_bucket?: number;
     total_points?: number;
+  }
+
+  export interface Submission {
+    time: Date;
+    username: string;
+    school_id?: number;
+    school_name?: string;
+    alias: string;
+    title: string;
+    language: string;
+    verdict: string;
+    runtime: number;
+    memory: number;
+  }
+
+  export interface SubmissionsListPayload {
+    page: number;
+    length: number;
+    includeUser: boolean;
+    pagerItems: types.PageItem[];
+    submissions: types.Submission[];
+    totalRows: number;
   }
 
   export interface UserListItem {
@@ -1895,29 +2137,7 @@ export namespace messages {
   };
   export type CourseListCoursesRequest = { [key: string]: any };
   export type _CourseListCoursesServerResponse = any;
-  export type CourseListCoursesResponse = {
-    admin: {
-      alias: string;
-      counts: { [key: string]: number };
-      finish_time?: Date;
-      name: string;
-      start_time: Date;
-    }[];
-    public: {
-      alias: string;
-      counts: { [key: string]: number };
-      finish_time?: Date;
-      name: string;
-      start_time: Date;
-    }[];
-    student: {
-      alias: string;
-      counts: { [key: string]: number };
-      finish_time?: Date;
-      name: string;
-      start_time: Date;
-    }[];
-  };
+  export type CourseListCoursesResponse = types.CoursesList;
   export type CourseListSolvedProblemsRequest = { [key: string]: any };
   export type CourseListSolvedProblemsResponse = {
     user_problems: {
@@ -2599,25 +2819,6 @@ export namespace messages {
   };
   export type SessionGoogleLoginRequest = { [key: string]: any };
   export type SessionGoogleLoginResponse = { [key: string]: string };
-
-  // Submission
-  export type SubmissionLatestSubmissionsRequest = { [key: string]: any };
-  export type _SubmissionLatestSubmissionsServerResponse = any;
-  export type SubmissionLatestSubmissionsResponse = {
-    submissions: {
-      time: Date;
-      username: string;
-      school_id?: number;
-      school_name?: string;
-      alias: string;
-      title: string;
-      language: string;
-      verdict: string;
-      runtime: number;
-      memory: number;
-    }[];
-    totalRows: number;
-  };
 
   // Tag
   export type TagListRequest = { [key: string]: any };
@@ -3317,12 +3518,6 @@ export namespace controllers {
     googleLogin: (
       params?: messages.SessionGoogleLoginRequest,
     ) => Promise<messages.SessionGoogleLoginResponse>;
-  }
-
-  export interface Submission {
-    latestSubmissions: (
-      params?: messages.SubmissionLatestSubmissionsRequest,
-    ) => Promise<messages.SubmissionLatestSubmissionsResponse>;
   }
 
   export interface Tag {

@@ -8,6 +8,9 @@ namespace OmegaUp\Test;
  * @author joemmanuel
  */
 class Utils {
+    /** @var bool */
+    public static $committed = false;
+
     public static function cleanup(): void {
         /** @var string $p */
         foreach ($_REQUEST as $p) {
@@ -22,37 +25,6 @@ class Utils {
     private static function cleanPath(string $path): void {
         \OmegaUp\FileHandler::deleteDirRecursively($path);
         mkdir($path, 0755, true);
-    }
-
-    public static function deleteAllSuggestions(): void {
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            "DELETE FROM `QualityNominations` WHERE `nomination` = 'suggestion';"
-        );
-    }
-
-    public static function deleteAllRanks(): void {
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            'DELETE FROM `User_Rank`;'
-        );
-    }
-
-    public static function deleteAllPreviousRuns(): void {
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            'DELETE FROM `Submission_Log`;'
-        );
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            'UPDATE `Submissions` SET `current_run_id` = NULL;'
-        );
-        \OmegaUp\MySQLConnection::getInstance()->Execute('DELETE FROM `Runs`;');
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            'DELETE FROM `Submissions`;'
-        );
-    }
-
-    public static function deleteAllProblemsOfTheWeek(): void {
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            'DELETE FROM `Problem_Of_The_Week`;'
-        );
     }
 
     /**
@@ -139,7 +111,7 @@ class Utils {
         );
     }
 
-    public static function setUpDefaultDataConfig(): void {
+    private static function setUpDefaultDataConfig(): void {
         // Create a test default user for manual UI operations
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
         ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
@@ -191,7 +163,7 @@ class Utils {
         self::CleanupDB();
     }
 
-    public static function cleanupDB(): void {
+    private static function cleanupDB(): void {
         // Tables to truncate
         $tables = [
             'ACLs',
@@ -216,6 +188,7 @@ class Utils {
             'Notifications',
             'PrivacyStatement_Consent_Log',
             'Problems',
+            'Problem_Of_The_Week',
             'Problems_Forfeited',
             'Problems_Languages',
             'Problems_Tags',
@@ -284,7 +257,19 @@ class Utils {
                 'SET foreign_key_checks = 1;'
             );
         }
-        self::commit();
+        try {
+            \OmegaUp\MySQLConnection::getInstance()->StartTrans();
+        } finally {
+            \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
+        }
+    }
+
+    public static function cleanupDBForTearDown(): void {
+        if (!self::$committed) {
+            return;
+        }
+        self::cleanupDB();
+        self::$committed = false;
     }
 
     private static function shellExec(string $command): void {
@@ -313,12 +298,10 @@ class Utils {
         }
     }
 
-    public static function commit(): void {
-        try {
-            \OmegaUp\MySQLConnection::getInstance()->StartTrans();
-        } finally {
-            \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
-        }
+    private static function commit(): void {
+        \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
+        \OmegaUp\MySQLConnection::getInstance()->StartTrans();
+        self::$committed = true;
     }
 
     public static function runUpdateRanks(
@@ -371,6 +354,21 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/assign_badges.py' .
              ' --verbose ' .
+             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
+             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
+             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
+             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
+        );
+    }
+
+    public static function runCanonicalizeTags(): void {
+        // Ensure everything is commited before invoking external script
+        self::commit();
+        self::shellExec(
+            ('python3 ' .
+             escapeshellarg(strval(OMEGAUP_ROOT)) .
+             '/../stuff/canonicalize_tags.py' .
+             ' --quiet ' .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .

@@ -63,6 +63,16 @@
           </tr>
         </tbody>
       </table>
+      <div>
+        <a
+          class="btn btn-primary"
+          v-bind:class="{ disabled: !homeworksOrderChanged }"
+          role="button"
+          v-on:click="saveNewOrder('homeworks')"
+        >
+          {{ T.wordsSaveNewOrder }}
+        </a>
+      </div>
       <hr />
       <table class="table table-striped">
         <thead>
@@ -108,6 +118,16 @@
           </tr>
         </tbody>
       </table>
+      <div>
+        <a
+          class="btn btn-primary"
+          v-bind:class="{ disabled: !testsOrderChanged }"
+          role="button"
+          v-on:click="saveNewOrder('tests')"
+        >
+          {{ T.wordsSaveNewOrder }}
+        </a>
+      </div>
     </div>
     <div class="panel-footer">
       <form class="new">
@@ -139,6 +159,8 @@ export default class CourseAssignmentList extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() courseAlias!: string;
 
+  testsOrderChanged = false;
+  homeworksOrderChanged = false;
   T = T;
 
   get homeworks(): omegaup.Assignment[] {
@@ -163,11 +185,7 @@ export default class CourseAssignmentList extends Vue {
       0,
       this.homeworks.splice(event.oldIndex, 1)[0],
     );
-    this.$emit(
-      'sort-homeworks',
-      this.courseAlias,
-      this.homeworks.map(homework => homework.alias),
-    );
+    this.homeworksOrderChanged = true;
   }
 
   sortTests(event: any): void {
@@ -176,11 +194,19 @@ export default class CourseAssignmentList extends Vue {
       0,
       this.tests.splice(event.oldIndex, 1)[0],
     );
-    this.$emit(
-      'sort-tests',
-      this.courseAlias,
-      this.tests.map(test => test.alias),
-    );
+    this.testsOrderChanged = true;
+  }
+
+  saveNewOrder(type: string): void {
+    let param: string[] = [];
+    if (type === 'homeworks') {
+      param = this.homeworks.map(homework => homework.alias);
+      this.homeworksOrderChanged = false;
+    } else {
+      param = this.tests.map(test => test.alias);
+      this.testsOrderChanged = false;
+    }
+    this.$emit(`sort-${type}`, this.courseAlias, param);
   }
 }
 </script>
