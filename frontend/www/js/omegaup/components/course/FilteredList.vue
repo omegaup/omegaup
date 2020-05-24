@@ -3,9 +3,9 @@
     <ul class="nav nav-tabs">
       <li
         class="nav-item"
-        v-if="filteredCourses.courses.length > 0"
+        v-if="filteredCourses.courses"
         v-on:click="showTab = filteredCourses.timeType"
-        v-for="filteredCourses in courses.filteredCourses"
+        v-for="(filteredCourses, timeType) in courses.filteredCourses"
       >
         <a
           data-toggle="tab"

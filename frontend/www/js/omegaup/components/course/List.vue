@@ -11,12 +11,12 @@
       <h1>&nbsp;</h1>
     </div>
     <template
-      v-for="typeCourses in courses"
+      v-for="(typeCourses, accessMode) in courses"
       v-if="typeCourses.activeTab !== ''"
     >
       <div class="ml-3">
         <h1>
-          <span>{{ getDescription(typeCourses.accessMode) }}</span>
+          <span>{{ getDescription(accessMode) }}</span>
         </h1>
       </div>
 
