@@ -43,6 +43,8 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function setUp(): void {
         parent::setUp();
+
+        self::log("===== Start {$this->toString()}");
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
         \OmegaUp\Controllers\Session::setCookieOnRegisterSessionForTesting(
             false
@@ -60,6 +62,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         //Clean $_REQUEST before each test
         unset($_REQUEST);
 
+        \OmegaUp\Test\Utils::cleanupProblemFiles();
         \OmegaUp\MySQLConnection::getInstance()->StartTrans();
     }
 
@@ -73,6 +76,8 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         \OmegaUp\MySQLConnection::getInstance()->FailTrans();
         \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
         \OmegaUp\Test\Utils::cleanupDBForTearDown();
+
+        self::log("===== Stop {$this->toString()}");
     }
 
     public static function logout(): void {
