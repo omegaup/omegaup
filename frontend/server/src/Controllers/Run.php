@@ -1028,15 +1028,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         ) {
             $response['compile_error'] = $details['compile_error'];
         }
-        if (is_null($contest) || $contest->partial_score || $run->score == 1) {
-            $problemsetProblem = \OmegaUp\DAO\ProblemsetProblems::getByPK(
-                $submission->problemset_id,
-                $submission->problem_id
-            );
-            if (!is_null($problemsetProblem)) {
-                $details['contest_score'] = $details['score'] * $problemsetProblem->points;
-            }
-        } else {
+        if (!is_null($contest) && !$contest->partial_score && $run->score < 1) {
             $details['contest_score'] = 0;
             $details['score'] = 0;
         }

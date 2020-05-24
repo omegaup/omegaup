@@ -1008,7 +1008,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with different partial score values.
      *
-     * @return list<list<bool, int, float, float>>
+     * @return list<array{0: bool, 1: int, 2: float, 3: float}>
      */
     public function partialScoreValueProvider(): array {
         return [
@@ -1148,31 +1148,43 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         bool $partialScore,
         string $contestantUsername
     ) {
-        $run = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
+        $runs = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
             'contest_alias' => $contestAlias,
             'auth_token' => $directorToken,
-        ]))['runs'][0];
+        ]))['runs'];
+        $this->assertCount(1, $runs);
+        $run = $runs[0];
         $status = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
             'run_alias' => $runGuid,
             'auth_token' => $directorToken,
         ]));
-        $report = \OmegaUp\Controllers\Contest::apiReport(new \OmegaUp\Request([
-            'contest_alias' => $contestAlias,
-            'auth_token' => $directorToken,
-        ]))['ranking'][0]['problems'][0];
-        $scoreboard = \OmegaUp\Controllers\Contest::apiScoreboard(
+        $reportRankingProblems = \OmegaUp\Controllers\Contest::apiReport(
             new \OmegaUp\Request([
                 'contest_alias' => $contestAlias,
                 'auth_token' => $directorToken,
             ])
-        )['ranking'][0]['problems'][0];
-        $problemRun = \OmegaUp\Controllers\Problem::apiRuns(
+        )['ranking'];
+        $this->assertCount(1, $reportRankingProblems);
+        $this->assertCount(1, $reportRankingProblems[0]['problems']);
+        $report = $reportRankingProblems[0]['problems'][0];
+        $scoreboardProblems = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestAlias,
+                'auth_token' => $directorToken,
+            ])
+        )['ranking'];
+        $this->assertCount(1, $scoreboardProblems);
+        $this->assertCount(1, $scoreboardProblems[0]['problems']);
+        $scoreboard = $scoreboardProblems[0]['problems'][0];
+        $problemRuns = \OmegaUp\Controllers\Problem::apiRuns(
             new \OmegaUp\Request([
                 'problem_alias' => $problemAlias,
                 'auth_token' => $directorToken,
                 'show_all' => true,
             ])
-        )['runs'][0];
+        )['runs'];
+        $this->assertCount(1, $problemRuns);
+        $problemRun = $problemRuns[0];
         $details = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
             'run_alias' => $runGuid,
             'auth_token' => $directorToken,
@@ -1208,10 +1220,12 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get admin
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
         $adminLogin = self::login($admin);
-        $runList = \OmegaUp\Controllers\Run::apiList(new \OmegaUp\Request([
+        $runsList = \OmegaUp\Controllers\Run::apiList(new \OmegaUp\Request([
             'problem_alias' => $problemAlias,
             'auth_token' => $adminLogin->auth_token,
-        ]))['runs'][0];
+        ]))['runs'];
+        $this->assertCount(1, $runsList);
+        $runList = $runsList[0];
         $this->assertEquals(
             $expectedContestScore,
             $runList['contest_score']
