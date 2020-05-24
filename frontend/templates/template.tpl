@@ -65,7 +65,7 @@
 
   <body class="d-flex flex-column h-100">
     {include file='navbar_v2.tpl' headerPayload=$headerPayload inline}
-	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg pt-4 mb-4"{/if}>
+	  <main role="main" {if (!isset($fullWidth) || !$fullWidth)}class="container-lg p-5"{/if}>
       {if (!isset($inArena) || !$inArena) && isset($ERROR_MESSAGE)}
         <div class="alert alert-danger">
           {$ERROR_MESSAGE}

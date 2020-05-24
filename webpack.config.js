@@ -57,7 +57,7 @@ let config = [
       course_details: './frontend/www/js/omegaup/course/details.js',
       course_edit: './frontend/www/js/omegaup/course/edit.js',
       course_intro: './frontend/www/js/omegaup/course/intro.js',
-      course_list: './frontend/www/js/omegaup/course/list.js',
+      course_list: './frontend/www/js/omegaup/course/list.ts',
       course_new: './frontend/www/js/omegaup/course/new.js',
       course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
       course_student: './frontend/www/js/omegaup/course/student.js',
@@ -65,7 +65,7 @@ let config = [
       group_identities: './frontend/www/js/omegaup/group/identities.js',
       group_members: './frontend/www/js/omegaup/group/members.js',
       course_submissions_list:
-        './frontend/www/js/omegaup/course/submissions_list.js',
+        './frontend/www/js/omegaup/course/submissions_list.ts',
       group_list: './frontend/www/js/omegaup/group/list.js',
       login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
       login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
@@ -95,7 +95,7 @@ let config = [
         './frontend/www/js/omegaup/schools/schoolofthemonth.ts',
       school_profile: './frontend/www/js/omegaup/schools/profile.ts',
       schools_rank: './frontend/www/js/omegaup/schools/rank.ts',
-      submissions_list: './frontend/www/js/omegaup/submissions/list.js',
+      submissions_list: './frontend/www/js/omegaup/submissions/list.ts',
       user_basic_edit: './frontend/www/js/omegaup/user/basicedit.js',
       user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',
       user_manage_identities:

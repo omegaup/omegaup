@@ -7,9 +7,7 @@ import arena_ContestList from '../components/arena/ContestList.vue';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
-  const payload = types.payloadParsers.ContestListPayload(
-    'arena-contest-list-payload',
-  );
+  const payload = types.payloadParsers.ContestListPayload();
   for (const contestList of Object.values(payload.contests)) {
     if (!contestList) {
       // The `participating` entry could be undefined.
@@ -22,7 +20,7 @@ OmegaUp.on('ready', () => {
     });
   }
   const contestList = new Vue({
-    el: '#arena-contest-list',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {

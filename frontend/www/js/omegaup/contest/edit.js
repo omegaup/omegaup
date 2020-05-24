@@ -75,6 +75,7 @@ OmegaUp.on('ready', function() {
                   scoreboard: ev.scoreboard,
                   penalty_type: ev.penaltyType,
                   show_scoreboard_after: ev.showScoreboardAfter,
+                  partial_score: ev.partialScore,
                   needs_basic_information: ev.needsBasicInformation,
                   requests_user_information: ev.requestsUserInformation,
                 })

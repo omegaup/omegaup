@@ -615,6 +615,16 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
+        $problemset = null;
+        if (!is_null($submission->problemset_id)) {
+            $problemset = \OmegaUp\DAO\Problemsets::getByPK(
+                $submission->problemset_id
+            );
+        }
+        $contest = null;
+        if (!is_null($problemset) && !is_null($problemset->contest_id)) {
+            $contest = \OmegaUp\DAO\Contests::getByPK($problemset->contest_id);
+        }
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
@@ -651,12 +661,19 @@ class Run extends \OmegaUp\Controllers\Controller {
         $filtered['type'] = strval($filtered['type']);
         $filtered['verdict'] = strval($filtered['verdict']);
         if (!is_null($filtered['contest_score'])) {
-            $filtered['contest_score'] = round(
-                floatval(
-                    $filtered['contest_score']
-                ),
-                2
-            );
+            if (
+                is_null($contest)
+                || $contest->partial_score
+                || $filtered['score'] == 1
+            ) {
+                $filtered['contest_score'] = round(
+                    floatval($filtered['contest_score']),
+                    2
+                );
+            } else {
+                $filtered['contest_score'] = 0;
+                $filtered['score'] = 0;
+            }
         }
         if ($submission->identity_id == $r->identity->identity_id) {
             $filtered['username'] = $r->identity->username;
@@ -878,6 +895,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $details = self::getOptionalRunDetails(
             $submission,
             $run,
+            $contest,
             /*$showDetails=*/$showRunDetails !== 'none'
         );
 
@@ -955,6 +973,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         return self::getOptionalRunDetails(
             $submission,
             $run,
+            /*$contest*/ null,
             /*$showDetails=*/ false
         );
     }
@@ -983,6 +1002,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getOptionalRunDetails(
         \OmegaUp\DAO\VO\Submissions $submission,
         \OmegaUp\DAO\VO\Runs $run,
+        ?\OmegaUp\DAO\VO\Contests $contest,
         bool $showDetails
     ): array {
         $response = [];
@@ -1007,6 +1027,10 @@ class Run extends \OmegaUp\Controllers\Controller {
             is_string($details['compile_error'])
         ) {
             $response['compile_error'] = $details['compile_error'];
+        }
+        if (!is_null($contest) && !$contest->partial_score && $run->score < 1) {
+            $details['contest_score'] = 0;
+            $details['score'] = 0;
         }
         if (!OMEGAUP_LOCKDOWN && $showDetails) {
             $response['details'] = $details;

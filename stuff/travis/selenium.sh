@@ -58,7 +58,7 @@ stage_install() {
 	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = '';"
 
 	yarn install
-	yarn build-development
+	yarn build
 
 	stuff/travis/nginx/gitserver-start.sh
 

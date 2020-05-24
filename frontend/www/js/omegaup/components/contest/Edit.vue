@@ -66,6 +66,7 @@
           v-bind:initial-scoreboard="contest.scoreboard"
           v-bind:initial-penalty-type="contest.penalty_type"
           v-bind:initial-show-scoreboard-after="contest.show_scoreboard_after"
+          v-bind:initial-partial-score="contest.partial_score"
           v-bind:initial-needs-basic-information="
             contest.needs_basic_information
           "

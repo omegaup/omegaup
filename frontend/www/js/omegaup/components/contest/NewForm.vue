@@ -5,17 +5,17 @@
     </div>
     <div class="card-body panel-body">
       <div class="btn-group bottom-margin mb-3">
-        <button class="btn btn-default btn-secondary" v-on:click="fillOmi()">
+        <button class="btn btn-default btn-secondary" v-on:click="fillOmi">
           {{ T.contestNewFormOmiStyle }}
         </button>
-        <button class="btn btn-default btn-secondary" v-on:click="fillPreIoi()">
+        <button class="btn btn-default btn-secondary" v-on:click="fillPreIoi">
           {{ T.contestNewForm }}
         </button>
-        <button
-          class="btn btn-default btn-secondary"
-          v-on:click="fillConacup()"
-        >
+        <button class="btn btn-default btn-secondary" v-on:click="fillConacup">
           {{ T.contestNewFormConacupStyle }}
+        </button>
+        <button class="btn btn-default btn-secondary" v-on:click="fillIcpc">
+          {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
       <form class="contest-form" v-on:submit.prevent="onSubmit">
@@ -26,7 +26,7 @@
               class="form-control"
               name="title"
               data-title
-              v-bind:placeholder="contestStyleDesc"
+              v-bind:placeholder="titlePlaceHolder"
               size="30"
               type="text"
               v-model="title"
@@ -149,7 +149,7 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label>{{ T.wordsFeedback }}</label>
             <select class="form-control" v-model="feedback">
               <option value="none">
@@ -166,6 +166,32 @@
               {{ T.contestNewFormImmediateFeedbackDesc }}
             </p>
           </div>
+          <div class="form-group col-md-4">
+            <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
+            <select class="form-control" v-model="showScoreboardAfter">
+              <option v-bind:value="true">
+                {{ T.wordsYes }}
+              </option>
+              <option v-bind:value="false">
+                {{ T.wordsNo }}
+              </option>
+            </select>
+            <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
+          </div>
+          <div class="form-group col-md-4">
+            <label>{{ T.contestNewFormPartialScore }}</label>
+            <select class="form-control" v-model="partialScore">
+              <option v-bind:value="true">
+                {{ T.wordsYes }}
+              </option>
+              <option v-bind:value="false">
+                {{ T.wordsNo }}
+              </option>
+            </select>
+            <p class="help-block">{{ T.contestNewFormPartialScoreDesc }}</p>
+          </div>
+        </div>
+        <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPointDecrementFactor }}</label>
             <input
@@ -177,20 +203,6 @@
             <p class="help-block">
               {{ T.contestNewFormPointDecrementFactorDesc }}
             </p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
-            <select class="form-control" v-model="showScoreboardAfter">
-              <option v-bind:value="true">
-                {{ T.wordsYes }}
-              </option>
-              <option v-bind:value="false">
-                {{ T.wordsNo }}
-              </option>
-            </select>
-            <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.wordsLanguages }}</label
@@ -288,6 +300,7 @@ export default class NewForm extends Vue {
   @Prop({ default: 'no' }) initialRequestsUserInformation!: string;
   @Prop({ default: 100 }) initialScoreboard!: number;
   @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
+  @Prop({ default: true }) initialPartialScore!: boolean;
   @Prop() initialStartTime!: Date;
   @Prop() initialSubmissionsGap!: number;
   @Prop({ default: '' }) initialTitle!: string;
@@ -306,6 +319,7 @@ export default class NewForm extends Vue {
   requestsUserInformation = this.initialRequestsUserInformation;
   scoreboard = this.initialScoreboard;
   showScoreboardAfter = this.initialShowScoreboardAfter;
+  partialScore = this.initialPartialScore;
   startTime = this.initialStartTime;
   submissionsGap = this.initialSubmissionsGap
     ? this.initialSubmissionsGap / 60
@@ -314,7 +328,6 @@ export default class NewForm extends Vue {
   windowLength = this.initialWindowLength;
   windowLengthEnabled = this.initialWindowLength !== null;
   titlePlaceHolder = '';
-  contestStyleDesc = '';
 
   @Watch('windowLengthEnabled')
   onPropertyChange(newValue: boolean): void {
@@ -324,6 +337,7 @@ export default class NewForm extends Vue {
   }
 
   fillOmi(): void {
+    this.languages = [];
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;
@@ -334,10 +348,10 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.contestStyleDesc = T.contestNewFormTitlePlaceholderOmiStyle;
   }
 
   fillPreIoi(): void {
+    this.languages = [];
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
     this.windowLengthEnabled = true;
     this.windowLength = 180;
@@ -348,10 +362,10 @@ export default class NewForm extends Vue {
     this.penalty = 0;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.contestStyleDesc = T.contestNewFormTitlePlaceholderIoiStyle;
   }
 
   fillConacup(): void {
+    this.languages = [];
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;
@@ -362,7 +376,28 @@ export default class NewForm extends Vue {
     this.penalty = 20;
     this.penaltyType = 'none';
     this.showScoreboardAfter = true;
-    this.contestStyleDesc = T.contestNewFormTitlePlaceholderConacupStyle;
+  }
+
+  fillIcpc(): void {
+    const languagesKeys = Object.keys(this.allLanguages);
+    this.languages = languagesKeys.filter(
+      lang =>
+        lang.includes('c11') ||
+        lang.includes('cpp') ||
+        lang.includes('py') ||
+        lang.includes('java'),
+    );
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderICPCStyle;
+    this.windowLengthEnabled = false;
+    this.windowLength = null;
+    this.scoreboard = 80;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 1;
+    this.feedback = 'none';
+    this.penalty = 20;
+    this.penaltyType = 'contest_start';
+    this.showScoreboardAfter = true;
+    this.partialScore = false;
   }
 
   onSubmit() {
@@ -385,6 +420,7 @@ export default class NewForm extends Vue {
       scoreboard: this.scoreboard,
       penalty_type: this.penaltyType,
       show_scoreboard_after: this.showScoreboardAfter,
+      partial_score: this.partialScore,
       needs_basic_information: this.needsBasicInformation,
       requests_user_information: this.requestsUserInformation,
     };

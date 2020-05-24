@@ -182,8 +182,6 @@
 - [Session](#session)
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
-- [Submission](#submission)
-  - [`/api/submission/latestSubmissions/`](#apisubmissionlatestsubmissions)
 - [Tag](#tag)
   - [`/api/tag/list/`](#apitaglist)
 - [Time](#time)
@@ -1723,11 +1721,9 @@ for in which the user is a student.
 
 ### Returns
 
-| Name      | Type                                                                                                          |
-| --------- | ------------------------------------------------------------------------------------------------------------- |
-| `admin`   | `{ alias: string; counts: { [key: string]: number; }; finish_time: Date; name: string; start_time: Date; }[]` |
-| `public`  | `{ alias: string; counts: { [key: string]: number; }; finish_time: Date; name: string; start_time: Date; }[]` |
-| `student` | `{ alias: string; counts: { [key: string]: number; }; finish_time: Date; name: string; start_time: Date; }[]` |
+```typescript
+types.CoursesList;
+```
 
 ## `/api/course/listSolvedProblems/`
 
@@ -2019,7 +2015,6 @@ _Nothing_
 | ------------------ | ------- | ----------- |
 | `assignment_alias` | `mixed` |             |
 | `course_alias`     | `mixed` |             |
-| `order`            | `mixed` |             |
 | `problems`         | `mixed` |             |
 
 ### Returns
@@ -3710,31 +3705,6 @@ contestant's machine and the server.
 ```typescript
 { [key: string]: string; }
 ```
-
-# Submission
-
-SubmissionController
-
-## `/api/submission/latestSubmissions/`
-
-### Description
-
-Returns the latest submissions
-
-### Parameters
-
-| Name       | Type    | Description |
-| ---------- | ------- | ----------- |
-| `offset`   | `int`   |             |
-| `rowcount` | `int`   |             |
-| `username` | `mixed` |             |
-
-### Returns
-
-| Name          | Type                                                                                                                                                                            |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `submissions` | `{ time: Date; username: string; school_id: number; school_name: string; alias: string; title: string; language: string; verdict: string; runtime: number; memory: number; }[]` |
-| `totalRows`   | `number`                                                                                                                                                                        |
 
 # Tag
 
