@@ -2318,20 +2318,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+        $usersProblems = \OmegaUp\DAO\Problems::getProblemsByUsersInACourse(
             $r['course']
         );
         $userSolvedProblems = [];
-        foreach ($solvedProblems as $problem) {
-            $userSolvedProblems[$problem['username']][] = $problem;
-        }
-
-        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
-            $r['course']
-        );
         $userUnsolvedProblems = [];
-        foreach ($unsolvedProblems as $problem) {
-            $userUnsolvedProblems[$problem['username']][] = $problem;
+        foreach ($usersProblems as $userProblem) {
+            if ($userProblem['solved']) {
+                $userSolvedProblems[$userProblem['username']][] = $userProblem;
+                continue;
+            }
+            $userUnsolvedProblems[$userProblem['username']][] = $userProblem;
         }
 
         return [
@@ -3543,12 +3540,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+        $usersProblems = \OmegaUp\DAO\Problems::getProblemsByUsersInACourse(
             $r['course_alias']
         );
         $userProblems = [];
-        foreach ($solvedProblems as $problem) {
-            $userProblems[$problem['username']][] = $problem;
+        foreach ($usersProblems as $userProblem) {
+            if (!$userProblem['solved']) {
+                continue;
+            }
+            $userProblems[$userProblem['username']][] = $userProblem;
         }
         return ['user_problems' => $userProblems];
     }
@@ -3573,13 +3573,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-
-        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
+        $usersProblems = \OmegaUp\DAO\Problems::getProblemsByUsersInACourse(
             $r['course_alias']
         );
         $userProblems = [];
-        foreach ($unsolvedProblems as $problem) {
-            $userProblems[$problem['username']][] = $problem;
+        foreach ($usersProblems as $userProblem) {
+            if ($userProblem['solved']) {
+                continue;
+            }
+            $userProblems[$userProblem['username']][] = $userProblem;
         }
         return ['user_problems' => $userProblems];
     }
