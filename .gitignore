@@ -101,3 +101,6 @@ frontend/www/docs/pas
 # Ignore omegaup.db
 omegaup.db
 .my.cnf
+
+# Ignore backend stuff
+stuff/docker/go/*/
