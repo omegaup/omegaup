@@ -4043,8 +4043,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         foreach ($runs as $run) {
             unset($run['run_id']);
-            $run['score'] = round(floatval($run['score']), 4);
-            $run['contest_score'] = round(floatval($run['contest_score']), 2);
+            if ($contest->partial_score || $run['score'] == 1) {
+                $run['contest_score'] = round(
+                    floatval(
+                        $run['contest_score']
+                    ),
+                    2
+                );
+                $run['score'] = round(floatval($run['score']), 4);
+            } else {
+                $run['contest_score'] = 0;
+                $run['score'] = 0;
+            }
             $result[] = $run;
         }
 

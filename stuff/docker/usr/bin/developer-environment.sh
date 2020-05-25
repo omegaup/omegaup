@@ -26,7 +26,7 @@ if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file=/home/ubuntu/.my.cnf e
   mysql --defaults-file=/home/ubuntu/.my.cnf \
     -e "CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
   mysql --defaults-file=/home/ubuntu/.my.cnf \
-    -e 'GRANT ALL PRIVILEGES ON `omegaup-test`.* TO "omegaup"@"%";'
+    -e 'GRANT ALL PRIVILEGES ON `omegaup-test%`.* TO "omegaup"@"%";'
   /opt/omegaup/stuff/bootstrap-environment.py \
     --mysql-config-file=/home/ubuntu/.my.cnf \
     --purge --verbose --root-url=http://localhost:8000/
