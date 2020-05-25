@@ -6,7 +6,18 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
-	stopOnFailure="false">
+	stopOnFailure="false"
+>
+	<testsuites>
+		<testsuite name="Controllers">
+			<directory>./controllers/</directory>
+		</testsuite>
+
+		<testsuite name="Badges">
+			<directory>./badges/</directory>
+		</testsuite>
+	</testsuites>
+
 	<filter>
 		<whitelist processUncoveredFilesFromWhitelist="true">
 			<directory suffix=".php">../server/</directory>

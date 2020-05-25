@@ -2023,9 +2023,7 @@ export class Arena {
     const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
-        nextSubmissionTimestamp = new Date(
-          problem.nextSubmissionTimestamp.getTime(),
-        );
+        nextSubmissionTimestamp = problem.nextSubmissionTimestamp;
       } else if (
         typeof problem.runs !== 'undefined' &&
         typeof this.currentProblemset?.submissions_gap !== 'undefined' &&

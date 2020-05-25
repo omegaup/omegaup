@@ -18,13 +18,6 @@ jobs:
         run: |
           git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
 
-      - name: Check for database modifications
-        run: |
-          if ! git diff --quiet origin/release:frontend/database origin/master:frontend/database; then
-            echo '::warning::Skipping release since there are database modifications'
-            exit 1
-          fi
-
       - name: Check for presence of .pause-release
         run: |
           if git cat-file -e origin/master:.pause-release 2>/dev/null; then
