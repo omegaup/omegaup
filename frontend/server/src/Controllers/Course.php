@@ -2326,9 +2326,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         foreach ($usersProblems as $userProblem) {
             if ($userProblem['solved']) {
                 $userSolvedProblems[$userProblem['username']][] = $userProblem;
-                continue;
+            } else {
+                $userUnsolvedProblems[$userProblem['username']][] = $userProblem;
             }
-            $userUnsolvedProblems[$userProblem['username']][] = $userProblem;
         }
 
         return [
