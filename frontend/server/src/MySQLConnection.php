@@ -76,7 +76,7 @@ class MySQLConnection {
         $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
         if (
-            !$this->_connection->real_connect(
+            !@$this->_connection->real_connect(
                 'p:' . OMEGAUP_DB_HOST,
                 OMEGAUP_DB_USER,
                 OMEGAUP_DB_PASS,
