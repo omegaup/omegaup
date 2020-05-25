@@ -1,16 +1,5 @@
 <template>
   <div class="card">
-    <div class="card-header">
-      <h5 class="card-title">
-        <span class="badge badge-secondary">{{ badges.length }}</span>
-        <a
-          class="badges-link"
-          href="/badge/list/"
-          v-if="this.showAllBadgesLink"
-          >{{ T.wordsBadgesSeeAll }}</a
-        >
-      </h5>
-    </div>
     <div class="card-body">
       <div class="badges-container">
         <omegaup-badge
@@ -19,6 +8,14 @@
           v-for="badge in badges"
         ></omegaup-badge>
       </div>
+    </div>
+     <div class="card-footer">
+      <a
+        class="badges-link"
+        href="/badge/list/"
+        v-if="this.showAllBadgesLink"
+        >{{ T.wordsBadgesSeeAll }}</a
+      >
     </div>
     <div v-show="!badges"><img src="/media/wait.gif" /></div>
   </div>
@@ -34,7 +31,7 @@
 
 a.badges-link {
   color: #337ab7;
-  font-size: 14px;
+  font-size: 1rem;
 }
 </style>
 
