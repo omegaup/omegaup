@@ -558,14 +558,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return list<array{alias: string, solved: bool, title: string, username: string}>
+     * @return list<array{alias: string, solved: int, title: string, username: string}>
      */
     public static function getProblemsByUsersInACourse(string $courseAlias) {
         $sql  = '
            SELECT
                 rp.alias,
                 rp.title,
-                rp.solved,
+                IF(ISNULL(rp.solved), FALSE, IF(rp.solved, TRUE, FALSE)) AS solved,
                 i.username
             FROM
                 Identities i
@@ -609,7 +609,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 i.username ASC,
                 rp.problem_id DESC;';
 
-        /** @var list<array{alias: string, solved: bool, title: string, username: string}> */
+        /** @var list<array{alias: string, solved: int, title: string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
