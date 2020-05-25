@@ -8,13 +8,13 @@
       v-for="problem in problems"
     >
       <div class="row">
-        <div class="col-xs-6 problem-type">
+        <div class="col-xs-5 problem-type">
           <span v-if="inAssignment">{{
             getProblemTypeTitle(problem.acceptsSubmissions)
           }}</span>
         </div>
-        <div class="col-xs-6 solved" v-if="problem.acceptsSubmissions">
-          <span v-if="partialScore"
+        <div class="col-xs-7 solved" v-if="problem.acceptsSubmissions">
+          <span
             >({{
               parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
             }}
@@ -23,18 +23,16 @@
               parseFloat(problem.maxScore).toFixed(digitsAfterDecimalPoint)
             }})</span
           >
-          <template v-else="">
-            <font-awesome-icon
-              icon="check"
-              v-bind:style="{ color: 'green' }"
-              v-if="problem.bestScore == problem.maxScore"
-            />
-            <font-awesome-icon
-              icon="times"
-              v-bind:style="{ color: 'red' }"
-              v-else-if="problem.hasRuns"
-            />
-          </template>
+          <font-awesome-icon
+            icon="check"
+            v-bind:style="{ color: 'green' }"
+            v-if="problem.bestScore == problem.maxScore"
+          />
+          <font-awesome-icon
+            icon="times"
+            v-bind:style="{ color: 'red' }"
+            v-else-if="problem.hasRuns"
+          />
         </div>
       </div>
       <div class="row">
@@ -113,7 +111,6 @@ export default class ArenaNavbarProblems extends Vue {
   @Prop() activeProblem!: string | null;
   @Prop() inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
-  @Prop({ default: true }) partialScore!: boolean;
 
   T = T;
 

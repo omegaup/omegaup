@@ -337,7 +337,6 @@ export class Arena {
               !options.isPractice &&
               !options.isOnlyProblem,
             isProblemsetOpened: this.isProblemsetOpened,
-            partialScore: options.partialScore,
             problemAlias: this.problemAlias,
             runs: myRunsStore.state.runs,
             showDetails: true,
@@ -452,7 +451,7 @@ export class Arena {
               problems: this.problems,
               activeProblem: this.activeProblem,
               inAssignment: !!options.courseAlias,
-              partialScore: options.partialScore,
+              digitsAfterDecimalPoint: options.partialScore ? 2 : 0,
             },
             on: {
               'navigate-to-problem': (problemAlias: string) => {

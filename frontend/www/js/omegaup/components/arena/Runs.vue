@@ -264,7 +264,6 @@ export default class Runs extends Vue {
   @Prop({ default: false }) showRejudge!: boolean;
   @Prop({ default: false }) showUser!: boolean;
   @Prop({ default: null }) contestAlias!: string | null;
-  @Prop({ default: true }) partialScore!: boolean;
   @Prop({ default: null }) problemAlias!: string | null;
   @Prop({ default: null }) problemsetProblems!: types.ProblemsetProblem[];
   @Prop({ default: null }) username!: string | null;
@@ -381,9 +380,6 @@ export default class Runs extends Vue {
       run.verdict != 'CE' &&
       typeof run.contest_score !== 'undefined'
     ) {
-      if (run.score != 1 && !this.partialScore) {
-        return '0';
-      }
       return run.contest_score.toFixed(2);
     }
     return '—';
