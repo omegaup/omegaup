@@ -7,9 +7,6 @@ OMEGAUP_ROOT="$(/usr/bin/git rev-parse --show-toplevel)"
 
 # Load the correct provider.
 case "$1" in
-phpunit)
-	. "${OMEGAUP_ROOT}/stuff/travis/phpunit.sh"
-	;;
 selenium)
 	. "${OMEGAUP_ROOT}/stuff/travis/selenium.sh"
 	;;

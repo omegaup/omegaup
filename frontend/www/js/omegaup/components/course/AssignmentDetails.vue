@@ -69,23 +69,6 @@
             ></label>
           </div>
           <div class="form-group col-md-4">
-            <label
-              >{{ T.courseNewFormEndDate }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
-                v-bind:title="T.courseAssignmentNewFormEndDateDesc"
-              ></span>
-              <omegaup-datetimepicker
-                v-bind:enabled="!unlimitedDuration"
-                v-bind:readonly="false"
-                v-model="finishTime"
-              ></omegaup-datetimepicker
-            ></label>
-          </div>
-          <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormUnlimitedDuration }}
               <span
@@ -112,6 +95,23 @@
                 />{{ T.wordsNo }}</label
               >
             </div>
+          </div>
+          <div class="form-group col-md-4">
+            <label
+              >{{ T.courseNewFormEndDate }}
+              <span
+                aria-hidden="true"
+                class="glyphicon glyphicon-info-sign"
+                data-placement="top"
+                data-toggle="tooltip"
+                v-bind:title="T.courseAssignmentNewFormEndDateDesc"
+              ></span>
+              <omegaup-datetimepicker
+                v-bind:enabled="!unlimitedDuration"
+                v-bind:readonly="false"
+                v-model="finishTime"
+              ></omegaup-datetimepicker
+            ></label>
           </div>
         </div>
         <div class="row">
