@@ -66,6 +66,7 @@
           v-bind:initial-scoreboard="contest.scoreboard"
           v-bind:initial-penalty-type="contest.penalty_type"
           v-bind:initial-show-scoreboard-after="contest.show_scoreboard_after"
+          v-bind:initial-partial-score="contest.partial_score"
           v-bind:initial-needs-basic-information="
             contest.needs_basic_information
           "
@@ -82,6 +83,7 @@
       <div class="tab-pane active problems" v-if="showTab === 'problems'">
         <omegaup-contest-add-problem
           v-bind:contest-alias="contest.alias"
+          v-bind:initialPoints="contest.partial_score ? 100 : 1"
           v-bind:data="problems"
           v-on:emit-add-problem="
             addProblemComponent => $emit('add-problem', addProblemComponent)

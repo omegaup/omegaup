@@ -50,6 +50,7 @@ export interface ArenaOptions {
   preferredLanguage: string | null;
   scoreboardToken: string | null;
   shouldShowFirstAssociatedIdentityRunWarning: boolean;
+  partialScore: boolean;
 }
 
 export interface Problem {
@@ -450,6 +451,7 @@ export class Arena {
               problems: this.problems,
               activeProblem: this.activeProblem,
               inAssignment: !!options.courseAlias,
+              digitsAfterDecimalPoint: options.partialScore ? 2 : 0,
             },
             on: {
               'navigate-to-problem': (problemAlias: string) => {
@@ -780,6 +782,7 @@ export class Arena {
           acceptsSubmissions: problem.languages !== '',
           bestScore: 0,
           maxScore: problem.points,
+          hasRuns: false,
         });
       }
 
@@ -1137,6 +1140,7 @@ export class Arena {
               problem => problem.alias === alias,
             );
             if (currentProblem) {
+              currentProblem.hasRuns = problem.runs > 0;
               currentProblem.bestScore = problem.points;
               currentProblem.maxScore = currentPoints;
             }
@@ -2018,9 +2022,7 @@ export class Arena {
     const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
-        nextSubmissionTimestamp = new Date(
-          problem.nextSubmissionTimestamp.getTime() * 1000,
-        );
+        nextSubmissionTimestamp = problem.nextSubmissionTimestamp;
       } else if (
         typeof problem.runs !== 'undefined' &&
         typeof this.currentProblemset?.submissions_gap !== 'undefined' &&
@@ -2412,6 +2414,7 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
     shouldShowFirstAssociatedIdentityRunWarning: false,
     onlyProblemAlias: null,
     originalContestAlias: null,
+    partialScore: true,
     problemsetId: null,
     problemsetAdmin: false,
     payload: {
@@ -2468,6 +2471,7 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
     const payload = <
       types.CommonPayload & {
         shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+        contest?: omegaup.Contest;
         preferred_language?: string;
       }
     >types.payloadParsers.CommonPayload();
@@ -2475,6 +2479,7 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
       options.shouldShowFirstAssociatedIdentityRunWarning =
         payload.shouldShowFirstAssociatedIdentityRunWarning || false;
       options.preferredLanguage = payload.preferred_language || null;
+      options.partialScore = payload.contest?.partial_score ?? true;
       options.payload = payload;
     }
   }

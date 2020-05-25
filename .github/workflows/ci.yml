@@ -1,9 +1,13 @@
 name: CI
 
-on: [pull_request]
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
 
 jobs:
-  phpunit:
+  php:
     runs-on: ubuntu-latest
 
     services:
@@ -23,7 +27,7 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup gitserver
+      - name: Download gitserver
         run: |
           DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.9/omegaup-gitserver.tar.xz'
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
@@ -33,7 +37,7 @@ jobs:
           TARGET='/usr/share/java/libinteractive.jar'
           sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
 
-      - name: Setup Python dependencies
+      - name: Install Python dependencies
         run: |
           python3 -m pip install --user setuptools
           python3 -m pip install --user wheel
@@ -45,12 +49,17 @@ jobs:
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
 
-      - name: Setup database
+      - name: Create database users
         run: |
           mysql \
             -uroot --skip-password --protocol=TCP \
-            -e "CREATE USER 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
-          python3 stuff/db-migrate.py validate
+            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
+
+      - name: Validate database migration scripts
+        run: python3 stuff/db-migrate.py validate
+
+      - name: Create test database
+        run: |
           python3 stuff/db-migrate.py \
             --username=root --password= --hostname=localhost \
             migrate --databases=omegaup-test
@@ -77,16 +86,16 @@ jobs:
           ./vendor/bin/psalm
 
       - name: Upload code coverage
-        run: bash <(curl -s https://codecov.io/bash)
+        run: bash <(curl -s https://codecov.io/bash) -cF php
 
       - name: Upload artifacts
         if: ${{ always() }}
         uses: actions/upload-artifact@v2
         with:
           name: test-logs
-          path: frontend/tests/controllers/*.log
+          path: frontend/tests/runfiles/*/*.log
 
-  build-yarn:
+  javascript:
     runs-on: ubuntu-latest
 
     steps:
@@ -102,6 +111,11 @@ jobs:
 
       - name: Run JavaScript tests
         run: yarn test
+
+      - name: Upload code coverage
+        run: |
+          yarn coverage
+          bash <(curl -s https://codecov.io/bash) -cF javascript
 
   lint:
     runs-on: ubuntu-latest

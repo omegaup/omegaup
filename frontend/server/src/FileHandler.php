@@ -39,12 +39,10 @@ class FileHandler {
     }
 
     public static function deleteDirRecursively(string $pathName): void {
-        self::$log->debug("Trying to delete dir recursively: {$pathName}");
         self::rrmdir($pathName);
     }
 
     public static function deleteFile(string $pathName): void {
-        self::$log->debug("Trying to delete file: {$pathName}");
         if (!@unlink($pathName)) {
             $errors = error_get_last();
             if (is_null($errors)) {

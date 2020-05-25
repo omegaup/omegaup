@@ -251,7 +251,8 @@ class Contest {
      */
     public static function addProblemToContest(
         $problemData,
-        $contestData
+        $contestData,
+        int $points = 100
     ): void {
         // Log in as contest director
         $login = \OmegaUp\Test\ControllerTestCase::login(
@@ -263,7 +264,7 @@ class Contest {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
-            'points' => 100,
+            'points' => $points,
             'order_in_contest' => 1,
         ]));
     }
