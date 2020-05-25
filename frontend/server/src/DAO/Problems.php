@@ -609,13 +609,19 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 i.username ASC,
                 rp.problem_id DESC;';
 
-        /** @var list<array{alias: string, solved: int, title: string, username: string}> */
-        $problemsUsers = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
-        );
-        foreach ($problemsUsers as &$problemUser) {
-            $problemUser['solved'] = boolval($problemUser['solved']);
+        $problemsUsers = [];
+        foreach (
+            /** @var list<array{alias: string, solved: int, title: string, username: string}> */
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
+            ) as $problemsUser
+        ) {
+            $problemsUser['alias'] = strval($problemsUser['alias']);
+            $problemsUser['title'] = strval($problemsUser['title']);
+            $problemsUser['username'] = strval($problemsUser['username']);
+            $problemsUser['solved'] = boolval($problemsUser['solved']);
+            $problemsUsers[] = $problemsUser;
         }
 
         return $problemsUsers;
