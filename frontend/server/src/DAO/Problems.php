@@ -565,7 +565,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
            SELECT
                 rp.alias,
                 rp.title,
-                IF(ISNULL(rp.solved), FALSE, IF(rp.solved, TRUE, FALSE)) AS solved,
+                IFNULL(rp.solved, FALSE) AS solved,
                 i.username
             FROM
                 Identities i
