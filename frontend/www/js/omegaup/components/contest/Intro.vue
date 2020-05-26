@@ -187,7 +187,7 @@ export default class ContestIntro extends Vue {
 
   get differentStartsDescription(): string {
     return UI.formatString(T.contestIntroDifferentStarts, {
-      window_length: this.formatTimeInRules(this.contest.window_length),
+      window_length: this.formatTimeInRules(this.contest?.window_length ?? 0),
     });
   }
 

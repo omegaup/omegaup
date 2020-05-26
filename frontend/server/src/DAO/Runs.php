@@ -125,8 +125,16 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 `r`.`runtime`,
                 `r`.`penalty`,
                 `r`.`memory`,
-                `r`.`score`,
-                `r`.`contest_score`,
+                IF(
+                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
+                        0,
+                        `r`.`score`
+                ) AS `score`,
+                IF(
+                    COALESCE(`c`.`partial_score`, 1) = 0 AND `r`.`score` <> 1,
+                        0,
+                        `r`.`contest_score`
+                ) AS `contest_score`,
                 `s`.`time`,
                 `s`.`submit_delay`,
                 `s`.`type`,
@@ -591,9 +599,17 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                r.score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
                 r.penalty,
-                r.contest_score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
                 s.problem_id,
                 s.identity_id,
                 s.type,
@@ -611,6 +627,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Runs r
             ON
                 s.current_run_id = r.run_id
+            LEFT JOIN
+                Contests c
+            ON
+                c.problemset_id = pp.problemset_id
             WHERE
                 pp.problemset_id = ? AND
                 r.status = \'ready\' AND
@@ -638,13 +658,21 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): ?float {
         $sql = '
             SELECT
-                r.contest_score
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score
             FROM
                 Submissions s
             INNER JOIN
                 Runs r
             ON
                 s.current_run_id = r.run_id
+            LEFT JOIN
+                Contests c
+            ON
+                c.problemset_id = s.problemset_id
             WHERE
                 s.identity_id = ? AND s.problemset_id = ? AND s.problem_id = ? AND
                 r.status = "ready" AND s.`type` = "normal"
@@ -694,7 +722,11 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 s.guid,
                 s.language,
                 r.verdict,
-                r.contest_score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
                 i.username,
                 p.alias
             FROM
@@ -711,6 +743,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Identities i
             ON
                 i.identity_id = s.identity_id
+            LEFT JOIN
+                Contests c
+            ON
+                c.problemset_id = s.problemset_id
             WHERE
                 s.problemset_id = ?
             ORDER BY
@@ -791,8 +827,25 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                s.guid, s.language, r.status, r.verdict, r.runtime, r.penalty,
-                r.memory, r.score, r.contest_score, s.`time`, s.submit_delay,
+                s.guid,
+                s.language,
+                r.status,
+                r.verdict,
+                r.runtime,
+                r.penalty,
+                r.memory,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
+                s.`time`,
+                s.submit_delay,
                 i.username, IFNULL(i.country_id, "xx") AS country,
                 c.alias AS contest_alias, IFNULL(s.`type`, "normal") AS `type`,
                 IFNULL(
@@ -831,7 +884,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             LEFT JOIN
                 Contests c
             ON
-                c.contest_id = ps.problemset_id
+                c.problemset_id = ps.problemset_id
             WHERE
                 s.problem_id = ? AND s.identity_id = ?
         ';
@@ -889,7 +942,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\Runs[]
+     * @return list<\OmegaUp\DAO\VO\Runs>
      */
     final public static function searchWithRunIdGreaterThan(
         int $problemId,
@@ -897,13 +950,37 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
-                r.*
+                r.commit,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.contest_score
+                ) AS contest_score,
+                r.judged_by,
+                r.memory,
+                r.penalty,
+                r.run_id,
+                r.runtime,
+                IF(
+                    COALESCE(c.partial_score, 1) = 0 AND r.score <> 1,
+                        0,
+                        r.score
+                ) AS score,
+                r.status,
+                r.submission_id,
+                r.time,
+                r.verdict,
+                r.version
             FROM
                 Submissions s
             INNER JOIN
                 Runs r
             ON
                 r.run_id = s.current_run_id
+            LEFT JOIN
+                Contests c
+            ON
+                c.problemset_id = s.problemset_id
             WHERE
                 s.problem_id = ? AND s.submission_id >= ?
             ORDER BY
@@ -918,7 +995,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 [$problemId, $submissionId]
             ) as $row
         ) {
-            array_push($result, new \OmegaUp\DAO\VO\Runs($row));
+            $result[] = new \OmegaUp\DAO\VO\Runs($row);
         }
         return $result;
     }

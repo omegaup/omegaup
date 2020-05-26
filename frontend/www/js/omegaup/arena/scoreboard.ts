@@ -29,6 +29,7 @@ OmegaUp.on('ready', () => {
     problemsetAdmin: false,
     problemsetId: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
+    partialScore: true,
   };
   const arenaInstance = new Arena(options);
   const getRankingByTokenRefresh = 5 * 60 * 1000; // 5 minutes

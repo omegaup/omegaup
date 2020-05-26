@@ -8,7 +8,7 @@ branches:
     - release
 
 php:
-  - 7.2.19
+  - 7.4.3
 
 # Common sources and packages. If a matrix entry needs these, it should
 # explicitly add both of the sources and package YAML references in its addons
@@ -23,18 +23,6 @@ addons:
 
 jobs:
   include:
-    - env: TEST_SUITE=phpunit
-      services:
-        - mysql
-    - env: TEST_SUITE=phpunit UBUNTU=focal
-      php: 7.4.3
-      services:
-        - mysql
-    - env: TEST_SUITE=lint
-      addons:
-        apt:
-          packages:
-            - *common_packages
     - env: TEST_SUITE=selenium
       addons:
         apt:

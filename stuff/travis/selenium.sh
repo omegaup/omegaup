@@ -4,7 +4,14 @@
 
 stage_before_install() {
 	init_submodules
-	init_frontend_submodules
+
+	git submodule update --init --recursive \
+		frontend/server/libs/third_party/log4php \
+		frontend/www/third_party/js/csv.js \
+		frontend/www/third_party/js/iso-3166-2.js \
+		frontend/www/third_party/js/mathjax \
+		frontend/www/third_party/js/pagedown \
+		frontend/www/third_party/wenk
 
 	# Install pre-dependencies
 	sudo ln -sf python3.6 /usr/bin/python3
@@ -42,7 +49,8 @@ stage_install() {
 
 	wait_for_mysql
 
-	setup_phpenv
+	phpenv rehash
+	echo "include_path='.:/home/travis/.phpenv/versions/$(phpenv version-name)/lib/php/pear/:/home/travis/.phpenv/versions/$(phpenv version-name)/share/pear'" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 
 	mysql -e 'CREATE DATABASE IF NOT EXISTS `omegaup`;'
 	mysql -uroot -e "GRANT ALL ON *.* TO 'travis'@'localhost' WITH GRANT OPTION;"
@@ -50,7 +58,7 @@ stage_install() {
 	mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = '';"
 
 	yarn install
-	yarn build-development
+	yarn build
 
 	stuff/travis/nginx/gitserver-start.sh
 

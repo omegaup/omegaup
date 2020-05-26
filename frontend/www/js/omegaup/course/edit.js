@@ -1,5 +1,6 @@
 import course_AddStudents from '../components/course/AddStudents.vue';
 import course_Admins from '../components/common/Admins.vue';
+import course_AdmissionMode from '../components/course/AdmissionMode.vue';
 import course_GroupAdmins from '../components/common/GroupAdmins.vue';
 import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_AssignmentList from '../components/course/AssignmentList.vue';
@@ -14,12 +15,14 @@ import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import Sortable from 'sortablejs';
+import Clipboard from 'v-clipboard';
 
 Vue.directive('Sortable', {
   inserted: function(el, binding) {
     new Sortable(el, binding.value || {});
   },
 });
+Vue.use(Clipboard);
 
 OmegaUp.on('ready', function() {
   let vuePath = [];
@@ -153,7 +156,10 @@ OmegaUp.on('ready', function() {
     el: '#assignments div.list',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentlist', {
-        props: { assignments: this.assignments, courseAlias: courseAlias },
+        props: {
+          assignments: this.assignments,
+          courseAlias: courseAlias,
+        },
         on: {
           edit: function(assignment) {
             assignmentDetails.show = true;
@@ -192,26 +198,24 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           new: onNewAssignment,
-          'sort-homeworks': function(courseAlias, homeworks) {
-            let index = 1;
-            for (let homework of homeworks) {
-              homework.order = index++;
-            }
+          'sort-homeworks': function(courseAlias, homeworksAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: homeworks,
-            }).catch(UI.apiError);
-          },
-          'sort-tests': function(courseAlias, tests) {
-            let index = 1;
-            for (let test of tests) {
-              test.order = index++;
-            }
-            api.Course.updateAssignmentsOrder({
-              course_alias: courseAlias,
-              assignments: tests,
+              assignments: JSON.stringify(homeworksAliases),
             })
-              .then(function(response) {})
+              .then(() => {
+                UI.success(T.homeworksOrderUpdated);
+              })
+              .catch(UI.apiError);
+          },
+          'sort-tests': function(courseAlias, testsAliases) {
+            api.Course.updateAssignmentsOrder({
+              course_alias: courseAlias,
+              assignments: JSON.stringify(testsAliases),
+            })
+              .then(() => {
+                UI.success(T.testsOrderUpdated);
+              })
               .catch(UI.apiError);
           },
         },
@@ -429,18 +433,15 @@ OmegaUp.on('ready', function() {
               })
               .catch(UI.apiError);
           },
-          sort: function(assignment, assignmentProblems) {
-            let index = 1;
-            for (let problem of assignmentProblems) {
-              problem.order = index;
-              index++;
-            }
+          sort: function(assignmentAlias, problemsAliases) {
             api.Course.updateProblemsOrder({
               course_alias: courseAlias,
-              assignment_alias: assignment.alias,
-              problems: assignmentProblems,
+              assignment_alias: assignmentAlias,
+              problems: JSON.stringify(problemsAliases),
             })
-              .then(function(response) {})
+              .then(() => {
+                UI.success(T.problemsOrderUpdated);
+              })
               .catch(UI.apiError);
           },
           tags: function(tags) {
@@ -464,20 +465,21 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  let publish = new Vue({
-    el: '#publish div',
+  let editAdmissionMode = new Vue({
+    el: '#admission-mode div',
     render: function(createElement) {
-      return createElement('omegaup-common-publish', {
+      return createElement('omegaup-course-admission-mode', {
         props: {
           initialAdmissionMode: this.admissionMode,
           shouldShowPublicOption: this.shouldShowPublicOption,
           admissionModeDescription: this.admissionModeDescription,
+          courseAlias: courseAlias,
         },
         on: {
-          'emit-update-admission-mode': function(publishComponent) {
+          'emit-update-admission-mode': function(admissionMode) {
             api.Course.update({
               course_alias: courseAlias,
-              admission_mode: publishComponent.admissionMode,
+              admission_mode: admissionMode,
             })
               .then(() => {
                 UI.success(T.courseEditCourseEdited);
@@ -493,7 +495,7 @@ OmegaUp.on('ready', function() {
       admissionModeDescription: T.courseEditAdmissionModeDescription,
     },
     components: {
-      'omegaup-common-publish': common_Publish,
+      'omegaup-course-admission-mode': course_AdmissionMode,
     },
   });
 
@@ -643,8 +645,8 @@ OmegaUp.on('ready', function() {
         .text(course.name)
         .attr('href', '/course/' + courseAlias + '/');
       details.course = course;
-      publish.admissionMode = course.admission_mode;
-      publish.shouldShowPublicOption = course.isCurator;
+      editAdmissionMode.admissionMode = course.admission_mode;
+      editAdmissionMode.shouldShowPublicOption = course.isCurator;
       clone.initialName = course.name;
     })
     .catch(UI.apiError);

@@ -150,7 +150,7 @@ export namespace omegaup {
   export interface Contest {
     alias: string;
     title: string;
-    window_length?: number;
+    window_length?: null | number;
     start_time: Date;
     finish_time?: Date;
     admission_mode?: AdmissionMode;
@@ -172,7 +172,7 @@ export namespace omegaup {
     points_decay_factor?: number;
     problems?: omegaup.Problem[];
     problemset_id?: number;
-    requests_user_information?: omegaup.RequestsUserInformation;
+    requests_user_information?: string;
     user_registration_accepted?: boolean;
     rerun_id?: number;
     scoreboard?: number;
@@ -201,6 +201,7 @@ export namespace omegaup {
     acceptsSubmissions: boolean;
     bestScore: number;
     maxScore: number;
+    hasRuns?: boolean;
   }
 
   export interface ContestResult {

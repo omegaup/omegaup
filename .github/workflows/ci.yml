@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: omegaup
+          MYSQL_PASSWORD: omegaup
+          MYSQL_DATABASE: omegaup-test
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Download gitserver
+        run: |
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.9/omegaup-gitserver.tar.xz'
+          curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
+
+          # omegaup-gitserver depends on libinteractive.
+          DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar'
+          TARGET='/usr/share/java/libinteractive.jar'
+          sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user setuptools
+          python3 -m pip install --user wheel
+          python3 -m pip install --user mysqlclient
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Create database users
+        run: |
+          mysql \
+            -uroot --skip-password --protocol=TCP \
+            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
+
+      - name: Validate database migration scripts
+        run: python3 stuff/db-migrate.py validate
+
+      - name: Create test database
+        run: |
+          python3 stuff/db-migrate.py \
+            --username=root --password= --hostname=localhost \
+            migrate --databases=omegaup-test
+
+      - name: Validate database schema
+        run: |
+          python3 stuff/policy-tool.py \
+            --username=root --password= --hostname=localhost --database=omegaup-test \
+            validate
+          python3 stuff/database_schema.py \
+            --username=root --password= --hostname=localhost --database=omegaup-test \
+            validate --all < /dev/null
+
+      - name: Run tests
+        timeout-minutes: 20
+        run: ./stuff/mysql_types.sh
+
+      - name: Run Psalm
+        run: |
+          # Create optional directories to simplify psalm config.
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          touch 'frontend/server/config.php'
+          touch 'frontend/tests/test_config.php'
+          ./vendor/bin/psalm
+
+      - name: Upload code coverage
+        run: bash <(curl -s https://codecov.io/bash) -cF php
+
+      - name: Upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-logs
+          path: frontend/tests/runfiles/*/*.log
+
+  javascript:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install yarn dependencies
+        run: yarn install
+
+      - name: Build webpack resources
+        run: yarn build
+
+      - name: Run JavaScript tests
+        run: yarn test
+
+      - name: Upload code coverage
+        run: |
+          yarn coverage
+          bash <(curl -s https://codecov.io/bash) -cF javascript
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install yarn dependencies
+        run: yarn install
+
+      - name: Install composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run linters
+        run: |
+          # Create optional directories to simplify psalm config.
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          touch 'frontend/server/config.php'
+          touch 'frontend/tests/test_config.php'
+
+          ./stuff/lint.sh validate --all < /dev/null

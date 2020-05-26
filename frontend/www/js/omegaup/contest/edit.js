@@ -68,14 +68,15 @@ OmegaUp.on('ready', function() {
                       ? 0
                       : ev.windowLength,
                   points_decay_factor: ev.pointsDecayFactor,
-                  submissions_gap: ev.submissionsGap,
+                  submissions_gap: ev.submissionsGap * 60,
                   languages: ev.languages[0] == '' ? [] : ev.languages,
                   feedback: ev.feedback,
                   penalty: ev.penalty,
                   scoreboard: ev.scoreboard,
                   penalty_type: ev.penaltyType,
                   show_scoreboard_after: ev.showScoreboardAfter,
-                  basic_information: ev.needsBasicInformation ? 1 : 0,
+                  partial_score: ev.partialScore,
+                  needs_basic_information: ev.needsBasicInformation,
                   requests_user_information: ev.requestsUserInformation,
                 })
                   .then(data => {

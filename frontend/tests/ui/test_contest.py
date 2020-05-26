@@ -144,13 +144,7 @@ def test_user_ranking_contest(driver):
                     (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
         with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     '//div[contains(concat(" ", normalize-space(@class), " "'
-                     '), " contest-list")]//a[contains(concat(" ", '
-                     'normalize-space(@class), " "), " tab-current ")]'
-                     ))).click()
+            select_contests_list(driver, 'data-list-current')
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, '.contest-list a[href="/arena/%s/"]' %
@@ -175,6 +169,20 @@ def test_user_ranking_contest(driver):
         users_full_set = {user1, user2, user3, driver.user_username,
                           uninvited_identity.username}
         compare_contestants_list(driver, users_full_set)
+
+
+@util.no_javascript_errors()
+@util.annotate
+def select_contests_list(driver, selected_list):
+    '''This function allows us select one item of the contest list types
+    because now it needs to click on dropdown button first
+    '''
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-contests]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[%s]' % selected_list))).click()
 
 
 @util.no_javascript_errors()
@@ -333,7 +341,7 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 
 
 @util.annotate
-def create_contest(driver, contest_alias, scoreboard_time_percent=100):
+def create_contest(driver, alias, scoreboard_time_percent=100):
     '''Creates a new contest.'''
 
     driver.wait.until(
@@ -346,17 +354,17 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100):
 
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.ID, ('title')))).send_keys(contest_alias)
-    driver.browser.find_element_by_id('alias').send_keys(
-        contest_alias)
-    driver.browser.find_element_by_id('description').send_keys(
+            (By.CSS_SELECTOR, 'input[data-title]'))).send_keys(alias)
+    driver.browser.find_element_by_name('alias').send_keys(alias)
+    driver.browser.find_element_by_name('description').send_keys(
         'contest description')
-    scoreboard_element = driver.browser.find_element_by_id('scoreboard')
+    scoreboard_element = driver.browser.find_element_by_name('scoreboard')
     scoreboard_element.clear()
     scoreboard_element.send_keys(scoreboard_time_percent)
 
     with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
+        driver.browser.find_element_by_css_selector(
+            'form.contest-form').submit()
 
 
 @util.annotate
@@ -439,26 +447,9 @@ def enter_contest(driver, contest_alias):
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//ul[contains(@class, "arena-tabs")]'
-                       '/li[contains(@class, "active")]')))
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "'
-             '), " contest-list")]//a[contains(concat(" ", '
-             'normalize-space(@class), " "), " tab-past ")]'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '.contest-list .list-past')))
+    select_contests_list(driver, 'data-list-past')
+    select_contests_list(driver, 'data-list-current')
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "'
-             '), " contest-list")]//a[contains(concat(" ", '
-             'normalize-space(@class), " "), " tab-current ")]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, '.contest-list .list-current')))

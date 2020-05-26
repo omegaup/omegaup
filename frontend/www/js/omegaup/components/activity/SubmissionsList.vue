@@ -1,9 +1,9 @@
 <template>
   <div class="row">
     <div class="col-md-12 no-right-padding">
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileSolvedProblems }}</h2>
+      <div class="card mb-5">
+        <div class="card-header">
+          <h2 class="card-title">{{ T.profileSolvedProblems }}</h2>
         </div>
         <table
           class="table table-striped"
@@ -26,9 +26,9 @@
         </table>
         <div v-show="!solvedProblems"><img src="/media/wait.gif" /></div>
       </div>
-      <div class="panel panel-default">
-        <div class="panel-heading">
-          <h2 class="panel-title">{{ T.profileUnsolvedProblems }}</h2>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">{{ T.profileUnsolvedProblems }}</h2>
         </div>
         <table
           class="table table-striped"
