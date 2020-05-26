@@ -2717,8 +2717,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         /** @var array{user_id?: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
         foreach (
             \OmegaUp\DAO\UserRoles::getCourseAdmins(
-                $course,
-                true
+                $course
             ) as $admin
         ) {
             if (!isset($admin['user_id']) || $admin['role'] === 'site-admin') {
@@ -2731,11 +2730,14 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'contents' =>  json_encode(
                         [
                             'type' => \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
-                            'course' => [
-                                'alias' => $course->alias,
-                                'name' => $course->name,
+                            'body' => [
+                                'localizationString' => 'notificationCourseRegistrationRequest',
+                                'localizationParams' => [
+                                    'username' => $r->identity->username,
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/edit/#students",
                             ],
-                            'username' => $r->identity->username,
                         ]
                     ),
                 ])

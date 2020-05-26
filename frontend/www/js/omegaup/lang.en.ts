@@ -559,7 +559,7 @@ const translations: { [key: string]: string; } = {
   noCoders: "No coders.",
   nominationsRangeHeader: "Quality nominations (from %(lowCount) to %(highCount))",
   notRegisteredInContest: "You are not registered for this contest.",
-  notificationCourseRegistrationRequest: "The user <strong>%(username)</strong> has requested access to course <a href='%(courseLink)'>%(courseName)</a>.",
+  notificationCourseRegistrationRequest: "The user <strong>%(username)</strong> has requested access to course %(courseName).",
   notificationNewBadge: "You have received a new badge: <a href='%(badgeLink)'>%(badgeName)</a>",
   notificationsMarkAllAsRead: "Mark all as read",
   notificationsNoNewNotifications: "No new notifications.",

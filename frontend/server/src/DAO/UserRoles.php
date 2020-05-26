@@ -15,12 +15,9 @@ namespace OmegaUp\DAO;
  */
 class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     /**
-     * @return list<array{user_id?: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
+     * @return list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
-    private static function getAdmins(
-        int $aclId,
-        bool $includeId = false
-    ): array {
+    private static function getAdmins(int $aclId): array {
         $sql = '
             SELECT
                 i.user_id, i.username, ur.acl_id AS acl
@@ -61,38 +58,33 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
         $admins = [];
         foreach ($rawAdmins as &$admin) {
             if ($admin['acl'] === \OmegaUp\Authorization::SYSTEM_ACL) {
-                $newAdmin = [
+                $admins[] = [
+                    'user_id' => $admin['user_id'],
                     'username' => $admin['username'],
                     'role' => 'site-admin',
                 ];
             } elseif ($admin['username'] === $owner['username']) {
                 $found = true;
-                $newAdmin = [
+                $admins[] = [
+                    'user_id' => $admin['user_id'],
                     'username' => $admin['username'],
                     'role' => 'owner',
                 ];
             } else {
-                $newAdmin = [
+                $admins[] = [
+                    'user_id' => $admin['user_id'],
                     'username' => $admin['username'],
                     'role' => 'admin',
                 ];
             }
-
-            if ($includeId) {
-                $newAdmin['user_id'] = $admin['user_id'];
-            }
-            $admins[] = $newAdmin;
         }
 
         if (!$found) {
-            $newAdmin = [
+            $admins[] = [
+                'user_id' => $owner['user_id'],
                 'username' => $owner['username'],
                 'role' => 'owner',
             ];
-            if ($includeId) {
-                $newAdmin['user_id'] = $owner['user_id'];
-            }
-            $admins[] = $newAdmin;
         }
 
         return $admins;
@@ -137,13 +129,12 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     }
 
     /**
-     * @return list<array{user_id?: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
+     * @return list<array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
     public static function getCourseAdmins(
-        \OmegaUp\DAO\VO\Courses $course,
-        bool $includeId = true
+        \OmegaUp\DAO\VO\Courses $course
     ): array {
-        return self::getAdmins(intval($course->acl_id), $includeId);
+        return self::getAdmins(intval($course->acl_id));
     }
 
     /**

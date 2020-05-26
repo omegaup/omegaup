@@ -967,8 +967,11 @@ export namespace types {
     message?: string;
     status?: string;
     url?: string;
-    course?: { alias: string; name: string };
-    username?: string;
+    body?: {
+      localizationString: string;
+      localizationParams: string[];
+      url: string;
+    };
   }
 
   export interface PageItem {

@@ -188,12 +188,8 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $response['notifications'][0]['contents']['type']
         );
         $this->assertEquals(
-            $course->alias,
-            $response['notifications'][0]['contents']['course']['alias']
-        );
-        $this->assertEquals(
             $course->name,
-            $response['notifications'][0]['contents']['course']['name']
+            $response['notifications'][0]['contents']['body']['localizationParams']['courseName']
         );
     }
 

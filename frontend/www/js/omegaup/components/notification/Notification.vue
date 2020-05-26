@@ -9,8 +9,12 @@
         ❌
       </button>
     </div>
-    <div class="d-flex align-items-center pt-1">
-      <img v-if="showIcon" class="d-block" width="80" v-bind:src="iconUrl" />
+    <div
+      class="w-100 d-flex align-items-center pt-1"
+      v-bind:class="{ 'notification-link': url }"
+      v-on:click="redirectToUrl"
+    >
+      <img class="d-block" width="80" v-bind:src="iconUrl" />
       <div v-if="htmlText" v-html="htmlText"></div>
       <div v-else-if="url">
         <a v-bind:href="url">
@@ -24,7 +28,7 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .close {
   font-size: inherit;
 }
@@ -32,6 +36,13 @@
 .notification-date {
   font-size: 0.8rem;
   color: #666;
+}
+
+.notification-link {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 }
 </style>
 
@@ -46,13 +57,6 @@ import * as time from '../../time';
 export default class Notification extends Vue {
   @Prop() notification!: types.Notification;
 
-  get showIcon(): boolean {
-    if (this.notification.contents.type === 'course-registration-request') {
-      return false;
-    }
-    return true;
-  }
-
   get iconUrl(): string {
     switch (this.notification.contents.type) {
       case 'badge':
@@ -65,7 +69,7 @@ export default class Notification extends Vue {
       case 'general_notification':
         return '/media/email.svg';
       default:
-        return 'media/info.png';
+        return '/media/info.png';
     }
   }
 
@@ -88,12 +92,13 @@ export default class Notification extends Vue {
           badgeName: T[`badge_${this.notification.contents.badge}_name`],
         });
       case 'course-registration-request':
-        return ui.formatString(T.notificationCourseRegistrationRequest, {
-          username: this.notification.contents.username || '',
-          courseLink: `/course/${this.notification.contents.course?.alias ||
-            ''}/edit/#students`,
-          courseName: this.notification.contents.course?.name || '',
-        });
+        return this.notification.contents.body
+          ? ui.formatString(
+              T[this.notification.contents.body.localizationString],
+              this.notification.contents.body.localizationParams,
+            )
+          : '';
+        return '';
       default:
         return '';
     }
@@ -103,6 +108,8 @@ export default class Notification extends Vue {
     switch (this.notification.contents.type) {
       case 'general_notification':
         return this.notification.contents.url || '';
+      case 'course-registration-request':
+        return this.notification.contents.body?.url || '';
       case 'demotion':
         // TODO: Add link to problem page.
         return '';
@@ -113,6 +120,12 @@ export default class Notification extends Vue {
 
   get date() {
     return time.formatDate(this.notification.timestamp);
+  }
+
+  redirectToUrl(): void {
+    if (this.url) {
+      ui.navigateTo(this.url);
+    }
   }
 }
 </script>
