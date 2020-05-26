@@ -1002,7 +1002,7 @@ export namespace types {
   }
 
   export interface ProblemCasesContents {
-    [key: string]: { [key: string]: string };
+    [key: string]: { in: string; out: string };
   }
 
   export interface ProblemDetails {

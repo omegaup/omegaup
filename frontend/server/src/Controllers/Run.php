@@ -6,7 +6,7 @@
  * RunController
  *
  * @author joemmanuel
- * @psalm-type ProblemCasesContents=array<string, array<string, string>>
+ * @psalm-type ProblemCasesContents=array<string, array{in: string, out: string}>
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type RunDetails=array{admin: bool, alias: string, cases?: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -939,17 +939,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['judged_by'] = strval($run->judged_by);
         }
 
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
-            $problem->alias,
-            $run->commit
-        );
-
         $cases = self::getProblemCasesMetadata(
             'cases',
             $problem->alias,
             $run->commit
         );
-        /** @var int $responseSize */
+        /** @var int */
         $responseSize = array_reduce(
             $cases,
             /**
@@ -970,19 +965,17 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_ALL) {
             $response['cases'] = self::getProblemCasesContents(
-                $problemArtifacts,
                 'cases',
                 $problem->alias,
-                $run->version
+                $run->commit
             );
             $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_ALL;
             return $response;
         }
         $response['cases'] = self::getProblemCasesContents(
-            $problemArtifacts,
             'examples',
             $problem->alias,
-            $run->version
+            $run->commit
         );
         $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_EXAMPLES;
 
@@ -993,7 +986,6 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return ProblemCasesContents
      */
     private static function getProblemCasesContents(
-        \OmegaUp\ProblemArtifacts $problemArtifacts,
         string $directory,
         string $problemAlias,
         string $version
@@ -1003,13 +995,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             "{$problemAlias}-{$version}-{$directory}",
             /** @return ProblemCasesContents */
             function () use (
-                $problemArtifacts,
                 $directory,
                 $problemAlias,
                 $version
             ) {
                 return self::getProblemCasesContentsImpl(
-                    $problemArtifacts,
                     $directory,
                     $problemAlias,
                     $version
@@ -1023,11 +1013,15 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @return ProblemCasesContents
      */
     private static function getProblemCasesContentsImpl(
-        \OmegaUp\ProblemArtifacts $problemArtifacts,
         string $directory,
         string $problemAlias,
         string $version
     ): array {
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problemAlias,
+            $version
+        );
+
         $existingCases = self::getProblemCasesMetadata(
             $directory,
             $problemAlias,
@@ -1035,20 +1029,41 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
         $response = [];
         foreach ($existingCases as $file) {
-            /** @var array{contents: string, id: string, size: int} $problemContent */
+            /** @var array{contents: string, id: string, size: int} */
             $problemContent = json_decode(
                 $problemArtifacts->get($file['path']),
                 /*$assoc=*/true
             );
             [$_, $filename] = explode("{$directory}/", $file['path']);
             $extension = pathinfo($filename, PATHINFO_EXTENSION);
-            $basename = basename($filename, ".{$extension}");
-            if (!isset($response[$basename])) {
-                $response[$basename] = [];
+            \OmegaUp\Validators::validateInEnum(
+                $extension,
+                'extension',
+                ['in', 'out']
+            );
+            $caseName = basename($filename, ".{$extension}");
+            if (!isset($response[$caseName])) {
+                $response[$caseName] = [
+                    'in' => '',
+                    'out' => '',
+                ];
             }
-            /* @var string $contents */
-            $contents = base64_decode($problemContent['contents']);
-            $response[$basename][$extension] = $contents;
+            /* @var string|bool(false) */
+            $contents = base64_decode(
+                $problemContent['contents'],
+                /*strict=*/ true
+            );
+            if (!$contents) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidContents',
+                    'contents'
+                );
+            }
+            if ($extension === 'in') {
+                $response[$caseName]['in'] = $contents;
+            } else {
+                $response[$caseName]['out'] = $contents;
+            }
         }
         return $response;
     }
