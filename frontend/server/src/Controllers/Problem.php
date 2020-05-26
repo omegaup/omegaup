@@ -23,6 +23,7 @@
  * @psalm-type ProblemAdminsPayload=array{admins: list<ProblemAdmin>, alias: string, group_admins: list<ProblemGroupAdmin>}
  * @psalm-type ProblemEditPayload=array{alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, inputLimit: int, languages: string, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: string, statement: ProblemStatement, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetailsPayloadv2=array{problem: array{alias: string, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, quality_seal: bool, source: null|string, title: string, visibility: int}}
  * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: ProblemStatement, title: null|string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
@@ -4007,6 +4008,220 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
         $details['user'] = ['logged_in' => false, 'admin' => false, 'reviewer' => false];
         $result['payload'] = $details;
+
+        if (
+            is_null($r->identity)
+            || is_null($r->identity->user_id)
+            || is_null($problem->problem_id)
+        ) {
+            return [
+                'smartyProperties' => $result,
+                'template' => 'arena.problem.tpl',
+            ];
+        }
+        $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
+            $problem->problem_id,
+            $r->identity->user_id
+        );
+        $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
+            $r->identity,
+            $problem
+        );
+        $isQualityReviewer = \OmegaUp\Authorization::isQualityReviewer(
+            $r->identity
+        );
+
+        $result['nomination_payload']['reviewer'] = $isQualityReviewer;
+        $result['nomination_payload']['already_reviewed'] = \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
+            $r->identity,
+            $problem
+        );
+
+        $nominationStatus['tried'] = false;
+        $nominationStatus['solved'] = false;
+
+        foreach ($details['runs'] ?? [] as $run) {
+            if ($run['verdict'] === 'AC') {
+                $nominationStatus['solved'] = true;
+                break;
+            } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'VE' && $run['verdict'] !== 'CE') {
+                $nominationStatus['tried'] = true;
+            }
+        }
+        $nominationStatus['problem_alias'] = $details['alias'];
+        $nominationStatus['language'] = $details['statement']['language'];
+        $nominationStatus['can_nominate_problem'] = !is_null($r->user);
+        $user = [
+            'logged_in' => true,
+            'admin' => $isProblemAdmin,
+            'reviewer' => $isQualityReviewer,
+        ];
+        $result['quality_payload'] = $nominationStatus;
+        $result['problem_admin'] = $isProblemAdmin;
+        $result['payload']['user'] = $user;
+        $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
+            !is_null($r->user) && !\OmegaUp\Controllers\User::isMainIdentity(
+                $r->user,
+                $r->identity
+            ) && \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
+                $r->user
+            );
+        $result['payload']['solution_status'] = self::getProblemSolutionStatus(
+            $problem,
+            $r->identity
+        );
+        return [
+            'smartyProperties' => $result,
+            'template' => 'arena.problem.tpl',
+        ];
+    }
+
+    // array{smartyProperties: array{input_limit: string, karel_problem: bool, memory_limit: string, overall_wall_time_limit: string, payload: ProblemDetailsPayload, points: float, problem_admin: bool, problem_alias: string, problemsetter: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, nomination_payload: array{problem_alias: string, reviewer: bool, already_reviewed: bool}, solvers: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source: null|string, time_limit: string, title: string, quality_seal: bool, visibility: int}, template: string}
+    /**
+     * @return array{smartyProperties: array{payload: ProblemDetailsPayloadv2, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param bool|null $prevent_problemset_open
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param mixed $statement_type
+     */
+    public static function getProblemDetailsForSmartyV2(
+        \OmegaUp\Request $r
+    ): array {
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing. Not logged user can access here
+            $r->identity = null;
+        }
+        $preventProblemsetOpen = $r->ensureOptionalBool(
+            'prevent_problemset_open'
+        ) ?? false;
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['contest_alias'],
+            'contest_alias'
+        );
+        \OmegaUp\Validators::validateValidAlias(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        [
+            'problem' => $problem,
+            'problemset' => $problemset,
+        ] = self::getValidProblemAndProblemset(
+            $r->identity,
+            !is_null($r['contest_alias']) ? strval($r['contest_alias']) : null,
+            $r['problem_alias'],
+            !is_null($r['statement_type']) ? strval($r['statement_type']) : '',
+            !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
+        );
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        // Get problem details from API
+        $details = self::getProblemDetails(
+            $r->identity,
+            $problem,
+            $problemset,
+            \OmegaUp\Controllers\Identity::getPreferredLanguage($r->identity),
+            /*showSolvers=*/true,
+            $preventProblemsetOpen,
+            $r['contest_alias']
+        );
+        if (is_null($details)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $memoryLimit = intval(
+            $details['settings']['limits']['MemoryLimit']
+        ) / 1024 / 1024;
+        $result = [
+            'problem_alias' => $details['alias'],
+            'visibility' => $details['visibility'],
+            'quality_seal' => $details['quality_seal'],
+            'source' => (
+                isset($details['source']) ?
+                strval($details['source']) :
+                null
+            ),
+            'problemsetter' => $details['problemsetter'] ?? null,
+            'title' => $details['title'],
+            'points' => $details['points'],
+            'time_limit' => $details['settings']['limits']['TimeLimit'],
+            'overall_wall_time_limit' => $details['settings']['limits']['OverallWallTimeLimit'],
+            'memory_limit' => "{$memoryLimit} MiB",
+            'input_limit' => ($details['input_limit'] / 1024) . ' KiB',
+            'solvers' => isset($details['solvers']) ? $details['solvers'] : [],
+            'quality_payload' => [
+                'solved' => false,
+                'tried' => false,
+                'nominated' => false,
+                'dismissed' => false,
+            ],
+            'nomination_payload' => [
+                'problem_alias' => $details['alias'],
+                'reviewer' => false,
+                'already_reviewed' => false,
+            ],
+            'karel_problem' => count(array_intersect(
+                $details['languages'],
+                ['kp', 'kj']
+            )) == 2,
+            'problem_admin' => false,
+        ];
+        if (
+            isset($details['settings']['cases']) &&
+            isset($details['settings']['cases']['sample']) &&
+            isset($details['settings']['cases']['sample']['in'])
+        ) {
+            $result['sample_input'] = strval(
+                $details['settings']['cases']['sample']['in']
+            );
+        }
+        $details['histogram'] = [
+            'difficulty_histogram' => $problem->difficulty_histogram,
+            'quality_histogram' => $problem->quality_histogram,
+            'quality' => floatval($problem->quality),
+            'difficulty' => floatval($problem->difficulty),
+        ];
+        $details['user'] = ['logged_in' => false, 'admin' => false, 'reviewer' => false];
+        $result['payload'] = $details;
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'problem' => [
+                        'alias' => $details['alias'],
+                        'limits' => [
+                            'input_limit' => (
+                                $details['input_limit'] / 1024
+                            ) . ' KiB',
+                            'memory_limit' => (
+                                intval(
+                                    $details['settings']['limits']['MemoryLimit']
+                                ) / 1024 / 1024
+                            ) . ' MiB',
+                            'overall_wall_time_limit' => $details['settings']['limits']['OverallWallTimeLimit'],
+                            'time_limit' => $details['settings']['limits']['TimeLimit'],
+                        ],
+                        'points' => $details['points'],
+                        'quality_seal' => $details['quality_seal'],
+                        'source' => (
+                            isset($details['source']) ?
+                            strval($details['source']) :
+                            null
+                        ),
+                        'title' => $details['title'],
+                        'visibility' => $details['visibility'],
+                    ],
+                ],
+                'title' => 'omegaUpTitleProblem',
+            ],
+            'entrypoint' => 'problem_details',
+        ];
 
         if (
             is_null($r->identity)

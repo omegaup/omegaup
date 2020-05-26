@@ -591,6 +591,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleMyProblemsList: "(MyPr0b13m5Li57)",
   omegaupTitleOmegaUpForSchools: "(W31c0m3 70 0m3gaUp f0r Sch0015)",
   omegaupTitlePrivacyPolicy: "(Privacy P01icy)",
+  omegaupTitleProblem: "(Pr0b13m)",
   omegaupTitleProblemEdit: "(Pr0b13mEdi7)",
   omegaupTitleProblemNew: "(Pr0b13mN3w)",
   omegaupTitleProblemStats: "(Pr0b13mS7a75)",

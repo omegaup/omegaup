@@ -1079,6 +1079,23 @@ export namespace types {
     visits: number;
   }
 
+  export interface ProblemDetailsPayloadv2 {
+    problem: {
+      alias: string;
+      limits: {
+        input_limit: string;
+        memory_limit: string;
+        overall_wall_time_limit: string;
+        time_limit: string;
+      };
+      points: number;
+      quality_seal: boolean;
+      source?: string;
+      title: string;
+      visibility: number;
+    };
+  }
+
   export interface ProblemEditPayload {
     alias: string;
     allowUserAddTags: boolean;

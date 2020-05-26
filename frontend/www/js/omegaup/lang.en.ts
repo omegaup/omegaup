@@ -591,6 +591,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleMyProblemsList: "MyProblemsList",
   omegaupTitleOmegaUpForSchools: "Welcome to omegaUp for Schools",
   omegaupTitlePrivacyPolicy: "Privacy Policy",
+  omegaupTitleProblem: "Problem",
   omegaupTitleProblemEdit: "ProblemEdit",
   omegaupTitleProblemNew: "ProblemNew",
   omegaupTitleProblemStats: "ProblemStats",

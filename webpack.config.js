@@ -70,6 +70,7 @@ let config = [
       login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
       login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
       problem_admins: './frontend/www/js/omegaup/problem/admins.ts',
+      problem_details: './frontend/www/js/omegaup/problem/details.ts',
       problem_edit: './frontend/www/js/omegaup/problem/edit.js',
       problem_edit_form: './frontend/www/js/omegaup/problem/edit.ts',
       problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
