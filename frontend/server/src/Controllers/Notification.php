@@ -5,7 +5,7 @@
 /**
  * BadgesController
  *
- * @psalm-type NotificationContents=array{type: string, badge?: string, message?: string, status?: string, url?: string}
+ * @psalm-type NotificationContents=array{type: string, badge?: string, message?: string, status?: string, url?: string, course?: array{alias: string, name: string}, username?: string}
  * @psalm-type Notification=array{contents: NotificationContents, notification_id: int, timestamp: \OmegaUp\Timestamp}
  */
 class Notification extends \OmegaUp\Controllers\Controller {

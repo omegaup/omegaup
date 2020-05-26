@@ -967,6 +967,8 @@ export namespace types {
     message?: string;
     status?: string;
     url?: string;
+    course?: { alias: string; name: string };
+    username?: string;
   }
 
   export interface PageItem {

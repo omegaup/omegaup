@@ -143,7 +143,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Uers only can register into a course with registration mode
+     * Users only can register into a course with registration mode
      */
     public function testRegisterForCourse() {
         $course = self::createCourseWithRegistrationMode()['course'];
@@ -163,6 +163,38 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertNotEmpty($registration);
+    }
+
+    public function testGetNotificationForRegistrationRequest() {
+        $course = self::createCourseWithRegistrationMode()['course'];
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        $studentLogin = self::login($student);
+
+        \OmegaUp\Controllers\Course::apiRegisterForCourse(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+
+        $adminLogin = self::login(self::$curator);
+        $response = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+        ]));
+
+        $this->assertCount(1, $response['notifications']);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
+            $response['notifications'][0]['contents']['type']
+        );
+        $this->assertEquals(
+            $course->alias,
+            $response['notifications'][0]['contents']['course']['alias']
+        );
+        $this->assertEquals(
+            $course->name,
+            $response['notifications'][0]['contents']['course']['name']
+        );
     }
 
     /**

@@ -10,8 +10,9 @@
       </button>
     </div>
     <div class="d-flex align-items-center pt-1">
-      <img class="d-block" width="80" v-bind:src="iconUrl" />
-      <div v-if="url">
+      <img v-if="showIcon" class="d-block" width="80" v-bind:src="iconUrl" />
+      <div v-if="htmlText" v-html="htmlText"></div>
+      <div v-else-if="url">
         <a v-bind:href="url">
           {{ text }}
         </a>
@@ -45,6 +46,13 @@ import * as time from '../../time';
 export default class Notification extends Vue {
   @Prop() notification!: types.Notification;
 
+  get showIcon(): boolean {
+    if (this.notification.contents.type === 'course-registration-request') {
+      return false;
+    }
+    return true;
+  }
+
   get iconUrl(): string {
     switch (this.notification.contents.type) {
       case 'badge':
@@ -63,10 +71,6 @@ export default class Notification extends Vue {
 
   get text(): string {
     switch (this.notification.contents.type) {
-      case 'badge':
-        return ui.formatString(T.notificationNewBadge, {
-          badgeName: T[`badge_${this.notification.contents.badge}_name`],
-        });
       case 'demotion':
         return this.notification.contents.message || '';
       case 'general_notification':
@@ -76,12 +80,29 @@ export default class Notification extends Vue {
     }
   }
 
+  get htmlText(): string {
+    switch (this.notification.contents.type) {
+      case 'badge':
+        return ui.formatString(T.notificationNewBadge, {
+          badgeLink: `/badge/${this.notification.contents.badge}/`,
+          badgeName: T[`badge_${this.notification.contents.badge}_name`],
+        });
+      case 'course-registration-request':
+        return ui.formatString(T.notificationCourseRegistrationRequest, {
+          username: this.notification.contents.username || '',
+          courseLink: `/course/${this.notification.contents.course?.alias ||
+            ''}/edit/#students`,
+          courseName: this.notification.contents.course?.name || '',
+        });
+      default:
+        return '';
+    }
+  }
+
   get url(): string {
     switch (this.notification.contents.type) {
       case 'general_notification':
         return this.notification.contents.url || '';
-      case 'badge':
-        return `/badge/${this.notification.contents.badge}/`;
       case 'demotion':
         // TODO: Add link to problem page.
         return '';

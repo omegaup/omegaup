@@ -15,12 +15,15 @@ namespace OmegaUp\DAO;
  */
 class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     /**
-     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     * @return list<array{user_id?: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
-    private static function getAdmins(int $aclId): array {
+    private static function getAdmins(
+        int $aclId,
+        bool $includeId = false
+    ): array {
         $sql = '
             SELECT
-                i.username, ur.acl_id AS acl
+                i.user_id, i.username, ur.acl_id AS acl
             FROM
                 User_Roles ur
             INNER JOIN
@@ -33,7 +36,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             $aclId,
         ];
 
-        /** @var list<array{acl: int, username: string}> */
+        /** @var list<array{acl: int, user_id: int|null, username: string}> */
         $rawAdmins = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -41,7 +44,7 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
 
         $sql = '
             SELECT
-                i.username
+                i.user_id, i.username
             FROM
                 ACLs a
             INNER JOIN
@@ -51,36 +54,45 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
             WHERE
                 a.acl_id = ?;';
         $params = [$aclId];
-        /** @var string */
-        $owner = \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $params);
+        /** @var array{user_id: int|null, username: string} */
+        $owner = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
 
         $found = false;
         $admins = [];
         foreach ($rawAdmins as &$admin) {
-            if ($admin['acl'] == \OmegaUp\Authorization::SYSTEM_ACL) {
-                $admins[] = [
+            if ($admin['acl'] === \OmegaUp\Authorization::SYSTEM_ACL) {
+                $newAdmin = [
                     'username' => $admin['username'],
                     'role' => 'site-admin',
                 ];
-            } elseif ($admin['username'] == $owner) {
+            } elseif ($admin['username'] === $owner['username']) {
                 $found = true;
-                $admins[] = [
+                $newAdmin = [
                     'username' => $admin['username'],
                     'role' => 'owner',
                 ];
             } else {
-                $admins[] = [
+                $newAdmin = [
                     'username' => $admin['username'],
                     'role' => 'admin',
                 ];
             }
+
+            if ($includeId) {
+                $newAdmin['user_id'] = $admin['user_id'];
+            }
+            $admins[] = $newAdmin;
         }
 
         if (!$found) {
-            $admins[] = [
-                'username' => $owner,
+            $newAdmin = [
+                'username' => $owner['username'],
                 'role' => 'owner',
             ];
+            if ($includeId) {
+                $newAdmin['user_id'] = $owner['user_id'];
+            }
+            $admins[] = $newAdmin;
         }
 
         return $admins;
@@ -125,10 +137,13 @@ class UserRoles extends \OmegaUp\DAO\Base\UserRoles {
     }
 
     /**
-     * @return list<array{role: 'admin'|'owner'|'site-admin', username: string}>
+     * @return list<array{user_id?: int|null, role: 'admin'|'owner'|'site-admin', username: string}>
      */
-    public static function getCourseAdmins(\OmegaUp\DAO\VO\Courses $course): array {
-        return self::getAdmins(intval($course->acl_id));
+    public static function getCourseAdmins(
+        \OmegaUp\DAO\VO\Courses $course,
+        bool $includeId = true
+    ): array {
+        return self::getAdmins(intval($course->acl_id), $includeId);
     }
 
     /**
