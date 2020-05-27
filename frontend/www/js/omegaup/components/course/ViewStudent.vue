@@ -92,7 +92,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as time from '../../ui';
+import * as time from '../../time';
 
 @Component
 export default class CourseViewStudent extends Vue {
