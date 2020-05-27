@@ -339,13 +339,16 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         }
 
         if (!is_null($query)) {
-            /*Because renamed columns in the query*/
+            // Some columns are renamed in the query.
             if ($column == 'author_username') {
                 $column = 'authorIdentity.username';
             } elseif ($column == 'nominator_username') {
                 $column = 'nominatorIdentity.username';
             }
-            $sqlSearch = " {$column} = '{$query}'";
+            $sqlSearch = \OmegaUp\MySQLConnection::getInstance()->escape(
+                $column
+            ) . " LIKE CONCAT('%', ?, '%')";
+            $params[] = $query;
         } else {
             $sqlSearch = '';
         }
