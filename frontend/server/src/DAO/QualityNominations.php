@@ -262,7 +262,9 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         int $page,
         int $rowcount,
         array $types = ['demotion', 'promotion'],
-        string $status = 'all'
+        string $status = 'all',
+        ?string $query = null,
+        ?string $column = null
     ): array {
         $offset = ($page - 1) * $rowcount;
         $sqlFrom = '
@@ -336,8 +338,28 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $params[] = $nominatorUserId;
         }
 
+        if (!is_null($query)) {
+            /*Because renamed columns in the query*/
+            if ($column == 'author_username') {
+                $column = 'authorIdentity.username';
+            } elseif ($column == 'nominator_username') {
+                $column = 'nominatorIdentity.username';
+            }
+            $sqlSearch = " {$column} = '{$query}'";
+        } else {
+            $sqlSearch = '';
+        }
+
         if (!empty($conditions)) {
-            $sqlFrom .= ' WHERE ' . implode(' AND ', $conditions);
+            $sqlFrom .= ' WHERE ' . implode(
+                ' AND ',
+                $conditions
+            );
+            if (!is_null($query)) {
+                $sqlFrom .= " AND {$sqlSearch} ";
+            }
+        } else {
+            $sqlFrom .= " WHERE {$sqlSearch} ";
         }
 
         if ($status != 'all') {

@@ -809,6 +809,108 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Check that can search nominations.
+     */
+    public function testSearchNominations() {
+        $problemsData = [\OmegaUp\Test\Factories\Problem::createProblem(),
+        \OmegaUp\Test\Factories\Problem::createProblem(),
+        \OmegaUp\Test\Factories\Problem::createProblem()];
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        foreach ($problemsData as $problemData) {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'demotion',
+                'contents' => json_encode([
+                     'statements' => [
+                        'es' => [
+                            'markdown' => 'a + b',
+                        ],
+                     ],
+                     'rationale' => 'qwert',
+                     'reason' => 'offensive',
+                ]),
+            ]));
+            $alias[] = $problemData['request']['problem_alias'];
+            $authors[] = $problemData['request']['author_username'];
+        }
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+            ])
+        );
+
+        $this->assertEquals(3, count($response['nominations']));
+        /*Search for alias*/
+        foreach ($alias as $value) {
+            $response = \OmegaUp\Controllers\QualityNomination::apiList(
+                new \OmegaUp\Request([
+                    'auth_token' => $reviewerLogin->auth_token,
+                    'query' => $value,
+                    'column' => 'alias'
+                ])
+            );
+            $this->assertEquals(1, count($response['nominations']));
+        }
+        /*Search for author*/
+        foreach ($authors as $author) {
+            $response = \OmegaUp\Controllers\QualityNomination::apiList(
+                new \OmegaUp\Request([
+                    'auth_token' => $reviewerLogin->auth_token,
+                    'query' => $author,
+                    'column' => 'author_username'
+                ])
+            );
+            $this->assertEquals(1, count($response['nominations']));
+        }
+
+        /*Search for nominator*/
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'query' => $identity->username,
+                'column' => 'nominator_username'
+            ])
+        );
+        $this->assertEquals(3, count($response['nominations']));
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        foreach ($problemsData as $problemData) {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'demotion',
+                'contents' => json_encode([
+                     'statements' => [
+                        'es' => [
+                            'markdown' => 'a + b',
+                        ],
+                     ],
+                     'rationale' => 'qwert',
+                     'reason' => 'offensive',
+                ]),
+            ]));
+        }
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'query' => $identity->username,
+                'column' => 'nominator_username'
+            ])
+        );
+        $this->assertEquals(3, count($response['nominations']));
+    }
+
+    /**
      * @dataProvider qualityNominationsDemotionStatusProvider
      * Check that a demotion can be banned and then reopned by a reviewer.
      */
