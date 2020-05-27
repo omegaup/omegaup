@@ -871,8 +871,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'column',
                 ['alias','nominator_username','author_username']
             );
-            $query = $r['query'];
-            $column = $r['column'];
+            $query = strval($r['query']);
+            $column = strval($r['column']);
             $params = [
                 'query' => $query,
                 'column' => $column,
