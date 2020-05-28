@@ -2737,6 +2737,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                                     'courseName' => $course->name,
                                 ],
                                 'url' => "/course/{$course->alias}/edit/#students",
+                                'iconUrl' => '/media/info.png',
                             ],
                         ]
                     ),

@@ -971,6 +971,7 @@ export namespace types {
       localizationString: string;
       localizationParams: string[];
       url: string;
+      iconUrl: string;
     };
   }
 

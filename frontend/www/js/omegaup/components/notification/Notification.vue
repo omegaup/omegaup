@@ -61,6 +61,10 @@ export default class Notification extends Vue {
   markdownConverter = markdown.markdownConverter();
 
   get iconUrl(): string {
+    if (this.notification.contents.body) {
+      return this.notification.contents.body.iconUrl;
+    }
+
     switch (this.notification.contents.type) {
       case 'badge':
         return `/media/dist/badges/${this.notification.contents.badge}.svg`;
