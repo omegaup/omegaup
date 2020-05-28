@@ -338,7 +338,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $params[] = $nominatorUserId;
         }
 
-        if (!is_null($query)) {
+        if (!is_null($query) && !is_null($column)) {
             // Some columns are renamed in the query.
             if ($column == 'author_username') {
                 $column = 'authorIdentity.username';

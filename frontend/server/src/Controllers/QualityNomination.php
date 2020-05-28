@@ -865,7 +865,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ['promotion', 'demotion']
         );
 
-        if (!is_null($r['query'])) {
+        if (!is_null($r['query']) && !is_null($r['column'])) {
             \OmegaUp\Validators::validateOptionalInEnum(
                 $r['column'],
                 'column',
