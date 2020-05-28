@@ -5,14 +5,17 @@
       <div class="notification-date">
         {{ date }}
       </div>
-      <button class="close" v-on:click.prevent="$emit('remove', notification)">
+      <button
+        class="close"
+        v-on:click.prevent="$emit('remove', notification, null)"
+      >
         ❌
       </button>
     </div>
     <div
       class="w-100 d-flex align-items-center pt-1"
       v-bind:class="{ 'notification-link': url }"
-      v-on:click="redirectToUrl"
+      v-on:click="$emit('remove', notification, url)"
     >
       <img class="d-block" width="80" v-bind:src="iconUrl" />
       <div v-if="htmlText" v-html="htmlText"></div>
