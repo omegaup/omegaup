@@ -2714,13 +2714,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             ])
         );
 
-        /** @var array{user_id?: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
+        /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
         foreach (
             \OmegaUp\DAO\UserRoles::getCourseAdmins(
                 $course
             ) as $admin
         ) {
-            if (!isset($admin['user_id']) || $admin['role'] === 'site-admin') {
+            if (empty($admin['user_id']) || $admin['role'] === 'site-admin') {
                 continue;
             }
 
