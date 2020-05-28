@@ -1637,6 +1637,27 @@ class Course extends \OmegaUp\Controllers\Controller {
             ])
         );
 
+        if (!is_null($targetIdentity->user_id)) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $targetIdentity->user_id,
+                    'contents' =>  json_encode(
+                        [
+                            'type' => $request->accepted ? \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED : \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED,
+                            'body' => [
+                                'localizationString' => $request->accepted ? 'notificationCourseRegistrationAccepted' : 'notificationCourseRegistrationRejected',
+                                'localizationParams' => [
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => $request->accepted ? "/course/{$course->alias}/" : '',
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
+
         self::$log->info(
             "Arbitrated course for user, username={$targetIdentity->username}, state={$request->accepted}"
         );
