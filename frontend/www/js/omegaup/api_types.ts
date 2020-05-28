@@ -1147,6 +1147,7 @@ export namespace types {
 
   export interface ProblemInfo {
     alias: string;
+    karel_problem: boolean;
     limits: {
       input_limit: string;
       memory_limit: string;
@@ -1155,7 +1156,10 @@ export namespace types {
     };
     points: number;
     quality_seal: boolean;
+    sample_input: string;
+    settings: types.ProblemSettings;
     source?: string;
+    statement: types.ProblemStatement;
     title: string;
     visibility: number;
   }

@@ -7,6 +7,7 @@
       {$smarty.const.NEW_RELIC_SCRIPT}
     {/if}
 
+    {* FIXME: ¿Cómo hago para settear esta variable desde el PHP getBlablaForSmarty? *}
     {if isset($inArena) && $inArena}
       {assign var='LOAD_MATHJAX' value='true'}
       {assign var='navbarSection' value='arena'}

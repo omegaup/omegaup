@@ -9,9 +9,9 @@
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
- * @psalm-type ProblemInfo=array{alias: string, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, quality_seal: bool, source: null|string, title: string, visibility: int}
  * @psalm-type ProblemSettings=array{cases: array<string, array{in: string, out: string, weight?: float}>, limits: LimitsSettings, interactive?: InteractiveSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}}
  * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemInfo=array{alias: string, karel_problem: bool, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, quality_seal: bool, sample_input: string, settings: ProblemSettings, source: null|string, statement: ProblemStatement, title: string, visibility: int}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{source: string, name: string}>, title: string, visibility: int, quality_seal: bool}
  * @psalm-type Statements=array<string, string>
@@ -4191,11 +4191,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $details['user'] = ['logged_in' => false, 'admin' => false, 'reviewer' => false];
         $result['payload'] = $details;
 
+        $sampleInput = '';
+        if (
+            isset($details['settings']['cases']) &&
+            isset($details['settings']['cases']['sample']) &&
+            isset($details['settings']['cases']['sample']['in'])
+        ) {
+            $sample_input = strval(
+                $details['settings']['cases']['sample']['in']
+            );
+        }
+
         return [
             'smartyProperties' => [
                 'payload' => [
                     'problem' => [
                         'alias' => $details['alias'],
+                        'karel_problem' => count(
+                            array_intersect(
+                                $details['languages'],
+                                ['kp', 'kj']
+                            )
+                        ) === 2,
                         'limits' => [
                             'input_limit' => (
                                 $details['input_limit'] / 1024
@@ -4210,6 +4227,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         ],
                         'points' => $details['points'],
                         'quality_seal' => $details['quality_seal'],
+                        'sample_input' => $sampleInput,
+                        'settings' => $details['settings'],
+                        'statement' => $details['statement'],
                         'source' => (
                             isset($details['source']) ?
                             strval($details['source']) :
