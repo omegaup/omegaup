@@ -16,15 +16,15 @@
         </div>
         <div class="form-group">
           <div class="tag-list pull-left">
-            <a
-              class="tag pull-left"
-              href="#tags"
+            <button
+              type="button"
+              class="btn btn-outline-primary m-1"
               v-bind:data-key="tag.name"
               v-for="tag in tags"
               v-on:click="onAddTag(tag.name, public)"
             >
               {{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}
-            </a>
+            </button>
           </div>
         </div>
         <div class="form-group">

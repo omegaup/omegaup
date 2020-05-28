@@ -4759,7 +4759,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $validator_time_limit
      * @omegaup-request-param mixed $visibility
      *
-     * @return array{smartyProperties: array{problemNewPayload: ProblemFormPayload}, template: string}
+     * @return array{smartyProperties: array{payload: ProblemFormPayload}, entrypoint: string}
      */
     public static function getProblemNewForSmarty(
         \OmegaUp\Request $r
@@ -4799,7 +4799,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 }
                 return [
                     'smartyProperties' => [
-                        'problemNewPayload' => array_merge(
+                        'payload' => array_merge(
                             [
                                 'title' => strval($r['title']),
                                 'alias' => strval($r['problem_alias']),
@@ -4831,7 +4831,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             self::getCommonPayloadForSmarty()
                         ),
                     ],
-                    'template' => 'problem.new.tpl',
+                    'entrypoint' => 'problem_new',
                 ];
             }
         }
@@ -4840,7 +4840,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'problemNewPayload' => array_merge(
+                'payload' => array_merge(
                     [
                         'title' => '',
                         'alias' => '',
@@ -4867,7 +4867,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     self::getCommonPayloadForSmarty()
                 ),
             ],
-            'template' => 'problem.new.tpl',
+            'entrypoint' => 'problem_new',
         ];
     }
 

@@ -1,7 +1,7 @@
 <template>
-  <div class="panel panel-primary problem-form">
-    <div class="panel-heading" v-if="!isUpdate">
-      <h3 class="panel-title">
+  <div class="card problem-form">
+    <div class="card-header" v-if="!isUpdate">
+      <h3 class="card-title">
         {{ T.problemNew }}
       </h3>
     </div>
@@ -15,7 +15,7 @@
         </strong>
       </p>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <form
         method="POST"
         class="form"

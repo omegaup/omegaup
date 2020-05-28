@@ -7,14 +7,12 @@ import * as ui from '../ui';
 import * as api from '../api';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.ProblemFormPayload(
-    'problem-new-payload',
-  );
+  const payload = types.payloadParsers.ProblemFormPayload();
   if (payload.statusError) {
     ui.error(payload.statusError);
   }
   const problemNew = new Vue({
-    el: '#problem-new',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-problem-new', {
         props: {
