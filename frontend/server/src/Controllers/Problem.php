@@ -4398,7 +4398,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'template' => 'problem.edit.tpl',
-            //'entrypoint' => 'problem_edit',
         ];
         $result['smartyProperties']['payload'] = array_merge(
             [
