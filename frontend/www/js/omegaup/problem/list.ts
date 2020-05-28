@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import problem_List from '../components/problem/List.vue';
-import { OmegaUp } from '../omegaup.js';
 import { types } from '../api_types';
-import { omegaup } from '../omegaup.ts';
+import { omegaup, OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
 import * as UI from '../ui';
