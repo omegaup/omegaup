@@ -19,6 +19,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING],
         ];
     }
+
     public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login(
@@ -806,6 +807,83 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $problem['visibility'],
             'Problem should have remained public'
         );
+    }
+
+    /**
+     * A PHPUnit data provider for all the tests that can accept a column for search nominations.
+     *
+     * @return list<array{0: string, 1:string, 2: int}>
+     */
+    public function qualityNominationsDemotionSearchColumnsProvider(): array {
+        return [
+            ['alias', 'problem_1', 1],
+            ['author_username', 'user_test_author', 1],
+            ['nominator_username', 'user_test_nominator',1],
+            ['nominator_username', 'invalid_user_test_nominator', 0],
+        ];
+    }
+
+    /**
+     * Check that can search nominations.
+     * @dataProvider qualityNominationsDemotionSearchColumnsProvider
+     */
+    public function testSearchNominations(
+        string $column,
+        string $query,
+        int $valueExpected
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
+        ));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_nominator'
+            ]
+        ));
+        $login = self::login($identity);
+
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'rationale' => 'qwert',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+            ])
+        );
+
+        $this->assertCount(1, $response['nominations']);
+        // Search for $column
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'query' => $query,
+                'column' => $column
+            ])
+        );
+        $this->assertCount($valueExpected, $response['nominations']);
     }
 
     /**
