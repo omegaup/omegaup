@@ -15,7 +15,11 @@ init_submodules() {
 }
 
 install_mysql8() {
-	sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 8C718D3B5072E1F5
+	for _ in `seq 30`; do
+		sudo apt-key adv --keyserver keys.gnupg.net --recv-keys 8C718D3B5072E1F5 && \
+			break || \
+			sleep 1
+	done
 	wget https://repo.mysql.com/mysql-apt-config_0.8.13-1_all.deb
 	sudo dpkg -i mysql-apt-config_0.8.13-1_all.deb
 	sudo apt-get update -q
