@@ -82,7 +82,7 @@ let config = [
       qualitynomination_popup:
         './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
       qualitynomination_list:
-        './frontend/www/js/omegaup/qualitynomination/list.js',
+        './frontend/www/js/omegaup/qualitynomination/list.ts',
       qualitynomination_demotionpopup:
         './frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
       qualitynomination_details:

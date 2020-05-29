@@ -100,6 +100,46 @@ function typeahead<T extends { label: string; value: string }>(
     .trigger('change');
 }
 
+export function nominationTypeahead(
+  elem: JQuery<HTMLElement>,
+  cb?: CallbackType<types.NominationListItem>,
+) {
+  if (!cb) {
+    cb = (event: Event, val: types.NominationListItem) =>
+      $(<EventTarget>event.target).val(val.problem.alias);
+  }
+  elem
+    .typeahead<types.NominationListItem>(
+      {
+        minLength: 3,
+        highlight: false,
+      },
+      {
+        source: typeaheadWrapper(
+          (options: { query: string }) =>
+            new Promise<types.NominationListItem[]>((resolve, reject) =>
+              api.QualityNomination.list({ query: options.query })
+                .then(data => resolve(data.nominations ?? []))
+                .catch(reject),
+            ),
+        ),
+        async: true,
+        limit: 10,
+        display: 'alias',
+        templates: {
+          suggestion: val =>
+            ui.formatString(
+              '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
+              val,
+            ),
+        },
+      },
+    )
+    .on('typeahead:select', cb)
+    .on('typeahead:autocomplete', cb)
+    .trigger('change');
+}
+
 export function problemTypeahead(
   elem: JQuery<HTMLElement>,
   cb?: CallbackType<types.ProblemListItem>,

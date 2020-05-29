@@ -11,6 +11,30 @@
       </h3>
     </div>
     <div class="panel-body">
+      <div>
+        <omegaup-autocomplete
+          v-bind:init="el => typeahead.nominationTypeahead(el)"
+          v-model="query"
+          v-bind:placeholder="T.wordsKeyword"
+          name="query"
+        ></omegaup-autocomplete>
+        <select name="column" class="form-control" v-model="selectColumn">
+          <option
+            v-for="(columnText, columnIndex) in columns"
+            v-bind:value="columnIndex"
+          >
+            {{ columnText }}</option
+          >
+        </select>
+        <button
+          class="btn btn-primary"
+          v-on:click.prevent="
+            $emit('goToPage', 1, showAll ? 'all' : 'open', query, selectColumn)
+          "
+        >
+          {{ T.wordsSearch }}
+        </button>
+      </div>
       <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
         {{ T.addUsersToReviewerGroup }}
       </a>
@@ -19,7 +43,15 @@
           <input
             type="checkbox"
             v-model="showAll"
-            v-on:change="$emit('goToPage', 1, showAll ? 'all' : 'open')"
+            v-on:change="
+              $emit(
+                'goToPage',
+                1,
+                showAll ? 'all' : 'open',
+                query,
+                selectColumn,
+              )
+            "
           />
           {{ T.qualityNominationShowAll }}
         </label>
@@ -38,7 +70,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="nomination in nominations">
+        <tr v-for="nomination in nominations.nominations">
           <td>
             <a v-bind:href="problemUrl(nomination.problem.alias)">{{
               nomination.problem.title
@@ -69,7 +101,7 @@
       </tbody>
     </table>
     <omegaup-common-paginator
-      v-bind:pager-items="pagerItems"
+      v-bind:pager-items="nominations.pagerItems"
       v-on:page-changed="
         page => $emit('goToPage', page, this.showAll ? 'all' : 'open')
       "
@@ -84,23 +116,34 @@ import T from '../../lang';
 import * as UI from '../../ui';
 import paginador from '../common/Paginator.vue';
 import { types } from '../../api_types';
+import Autocomplete from '../Autocomplete.vue';
+import * as typeahead from '../../typeahead';
 
 @Component({
   components: {
     'omegaup-common-paginator': paginador,
+    'omegaup-autocomplete': Autocomplete,
   },
 })
 export default class QualityNominationList extends Vue {
   @Prop() pages!: number;
   @Prop() length!: number;
   @Prop() myView!: boolean;
-  @Prop() nominations!: omegaup.Nomination[];
-  @Prop() pagerItems!: types.PageItem[];
+  @Prop() nominations!: types.NominationList;
   @Prop() isAdmin!: boolean;
 
   showAll = true;
   T = T;
   UI = UI;
+  typeahead = typeahead;
+
+  query = '';
+  selectColumn = '';
+  columns = {
+    alias: T.wordsAlias,
+    nominator_username: T.wordsNominator,
+    author_username: T.wordsAuthor,
+  };
 
   problemUrl(problemAlias: string): string {
     return `/arena/problem/${problemAlias}/`;
