@@ -200,6 +200,7 @@ module.exports = {
           compilerOptions: {
             whitespace: 'condense',
           },
+          optimizeSSR: false,
         },
       },
       {
