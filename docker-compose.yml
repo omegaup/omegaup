@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20200503
+    image: omegaup/dev-php:20200528
     restart: always
     volumes:
       - type: bind
