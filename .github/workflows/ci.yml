@@ -106,9 +106,6 @@ jobs:
       - name: Install yarn dependencies
         run: yarn install
 
-      - name: Build webpack resources
-        run: yarn build
-
       - name: Run JavaScript tests
         run: yarn test:coverage
 
