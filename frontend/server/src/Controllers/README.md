@@ -3066,10 +3066,10 @@ Entry point for Problem Versions API
 
 ### Returns
 
-| Name        | Type              |
-| ----------- | ----------------- |
-| `published` | `string`          |
-| `log`       | `types.Version[]` |
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `published` | `string`                 |
+| `log`       | `types.ProblemVersion[]` |
 
 # ProblemForfeited
 

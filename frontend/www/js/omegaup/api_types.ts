@@ -1136,7 +1136,7 @@ export namespace types {
     inputLimit: number;
     languages: string;
     loadMathjax: boolean;
-    log: types.Version[];
+    log: types.ProblemVersion[];
     memoryLimit: number;
     message?: string;
     outputLimit: number;
@@ -1152,6 +1152,7 @@ export namespace types {
       version?: string;
     };
     selectedTags: { public: boolean; tagname: string }[];
+    solution: types.ProblemStatement;
     source: string;
     statement: types.ProblemStatement;
     statusError?: string;
@@ -1276,6 +1277,16 @@ export namespace types {
     selectedTags: types.SelectedTag[];
     tags: { name?: string }[];
     title?: string;
+  }
+
+  export interface ProblemVersion {
+    author: { email?: string; name?: string; time?: Date };
+    commit: string;
+    committer: { name?: string; email?: string; time?: Date };
+    message?: string;
+    parents?: string[];
+    tree?: { [key: string]: string };
+    version?: string;
   }
 
   export interface ProblemsEditPayload {
@@ -1649,16 +1660,6 @@ export namespace types {
     page: number;
     ranking: types.UserRank;
     pagerItems: types.PageItem[];
-  }
-
-  export interface Version {
-    author: { email?: string; name?: string; time?: Date };
-    commit: string;
-    committer: { name?: string; email?: string; time?: Date };
-    message?: string;
-    parents?: string[];
-    tree?: { [key: string]: string };
-    version?: string;
   }
 }
 
@@ -2627,7 +2628,7 @@ export namespace messages {
   export type _ProblemVersionsServerResponse = any;
   export type ProblemVersionsResponse = {
     published?: string;
-    log: types.Version[];
+    log: types.ProblemVersion[];
   };
 
   // ProblemForfeited
