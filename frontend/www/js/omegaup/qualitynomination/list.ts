@@ -15,7 +15,7 @@ OmegaUp.on('ready', function() {
   );
 
   let nominationsList = new Vue({
-    el: '#qualitynomination-list',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-qualitynomination-list', {
         props: {

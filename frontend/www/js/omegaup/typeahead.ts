@@ -118,7 +118,7 @@ export function nominationTypeahead(
         source: typeaheadWrapper(
           (options: { query: string }) =>
             new Promise<types.NominationListItem[]>((resolve, reject) =>
-              api.QualityNomination.list({ query: options.query })
+              api.QualityNomination.list({ rowcount: 1000, status: 'all' })
                 .then(data => resolve(data.nominations ?? []))
                 .catch(reject),
             ),
@@ -128,10 +128,7 @@ export function nominationTypeahead(
         display: 'alias',
         templates: {
           suggestion: val =>
-            ui.formatString(
-              '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
-              val,
-            ),
+            ui.formatString('<div data-value="%(value)">(%(value))</div>', val),
         },
       },
     )

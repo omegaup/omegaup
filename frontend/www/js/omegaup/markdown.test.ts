@@ -1,17 +1,16 @@
-'use strict';
+import expect from 'expect';
 
-require('../dist/commons.js');
-var omegaup = require('../dist/omegaup.js');
+import * as markdown from './markdown';
 
-describe('omegaup.Markdown', function() {
-  describe('markdownConverter', function() {
-    let converter = omegaup.Markdown.markdownConverter();
+describe('markdown', () => {
+  describe('markdownConverter', () => {
+    let converter = markdown.markdownConverter();
 
-    it('Should handle trivial inputs', function() {
+    it('Should handle trivial inputs', () => {
       expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');
     });
 
-    it('Should handle sample I/O tables', function() {
+    it('Should handle sample I/O tables', () => {
       expect(
         converter.makeHtml(`# Ejemplo
 
@@ -37,7 +36,7 @@ Case #2: 15
 </table>`);
     });
 
-    it('Should handle sample I/O tables with markdown', function() {
+    it('Should handle sample I/O tables with markdown', () => {
       expect(
         converter.makeHtml(`# Ejemplo
 
@@ -115,7 +114,7 @@ Tags &lt;b&gt;hello&lt;/b&gt;
 </table>`);
     });
 
-    it('Should handle GitHub-flavored Markdown tables', function() {
+    it('Should handle GitHub-flavored Markdown tables', () => {
       expect(
         converter.makeHtml(`| foo | bar |
 | --- | --- |
@@ -246,7 +245,7 @@ Tags &lt;b&gt;hello&lt;/b&gt;
 </table>`);
     });
 
-    it('Should handle GitHub-flavored fenced code blocks', function() {
+    it('Should handle GitHub-flavored fenced code blocks', () => {
       // Simple example with backticks.
       expect(converter.makeHtml('```\n<\n >\n```')).toEqual(
         '<pre><code>&lt;\n &gt;\n</code></pre>',

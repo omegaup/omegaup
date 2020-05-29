@@ -752,7 +752,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'user_id' => $user->user_id,
                 'contents' =>  json_encode(
                     [
-                        'type' => 'demotion',
+                        'type' => \OmegaUp\DAO\Notifications::DEMOTION,
                         'message' => $notificationContents,
                         'status' => $status
                     ]
@@ -1133,7 +1133,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -1163,7 +1163,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'myView' => false,
                 ],
             ],
-            'template' => 'quality.nomination.list.tpl',
+            'entrypoint' => 'qualitynomination_list',
         ];
     }
 
@@ -1171,7 +1171,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination for a certain user
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -1200,7 +1200,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'myView' => true,
                 ],
             ],
-            'template' => 'quality.nomination.list.tpl',
+            'entrypoint' => 'qualitynomination_list',
         ];
     }
 }

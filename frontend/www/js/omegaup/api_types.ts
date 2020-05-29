@@ -1025,6 +1025,12 @@ export namespace types {
     message?: string;
     status?: string;
     url?: string;
+    body?: {
+      localizationString: string;
+      localizationParams: string[];
+      url: string;
+      iconUrl: string;
+    };
   }
 
   export interface PageItem {
