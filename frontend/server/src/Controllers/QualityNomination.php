@@ -744,7 +744,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'user_id' => $user->user_id,
                 'contents' =>  json_encode(
                     [
-                        'type' => 'demotion',
+                        'type' => \OmegaUp\DAO\Notifications::DEMOTION,
                         'message' => $notificationContents,
                         'status' => $status
                     ]
