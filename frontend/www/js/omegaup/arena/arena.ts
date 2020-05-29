@@ -2399,8 +2399,8 @@ export class Arena {
   }
 }
 
-export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
-  const options: ArenaOptions = {
+export function GetDefaultOptions(): ArenaOptions {
+  return {
     isLockdownMode: false,
     isInterview: false,
     isPractice: false,
@@ -2435,6 +2435,12 @@ export function GetOptionsFromLocation(arenaLocation: Location): ArenaOptions {
     },
     preferredLanguage: null,
   };
+}
+
+export function GetOptionsFromLocation(
+  arenaLocation: Location | URL,
+): ArenaOptions {
+  const options = GetDefaultOptions();
 
   if (
     document.getElementsByTagName('body')[0].className.indexOf('lockdown') !==

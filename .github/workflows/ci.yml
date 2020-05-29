@@ -110,11 +110,10 @@ jobs:
         run: yarn build
 
       - name: Run JavaScript tests
-        run: yarn test
+        run: yarn test:coverage
 
       - name: Upload code coverage
         run: |
-          yarn coverage
           bash <(curl -s https://codecov.io/bash) -cF javascript
 
   lint:

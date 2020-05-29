@@ -14,6 +14,9 @@ namespace OmegaUp\DAO;
  * @package docs
  */
 class Notifications extends \OmegaUp\DAO\Base\Notifications {
+    const COURSE_REGISTRATION_REQUEST = 'course-registration-request';
+    const DEMOTION = 'demotion';
+
     /**
      * @return list<array{contents: string, notification_id: int, timestamp: \OmegaUp\Timestamp}>
      */
