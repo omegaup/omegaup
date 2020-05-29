@@ -3,7 +3,12 @@
     <div class="page-header">
       <h1>
         <span>{{ T.problemEditEditProblem }} {{ data.title }}</span>
-        <small v-html="goToProblem"></small>
+        <small>
+          &ndash;
+          <a v-bind:href="`/arena/problem/${alias}/`">
+            {{ T.problemEditGoToProblem }}
+          </a>
+        </small>
       </h1>
       <p>
         <a
@@ -11,14 +16,6 @@
           >{{ T.navHelp }}</a
         >
       </p>
-    </div>
-    <div class="d-flex justify-content-between">
-      <a href="#" v-on:click="scrollLeft">
-        <font-awesome-icon v-bind:icon="['fas', 'angle-double-left']" />
-      </a>
-      <a href="#" v-on:click="scrollRight">
-        <font-awesome-icon v-bind:icon="['fas', 'angle-double-right']" />
-      </a>
     </div>
     <ul class="nav nav-tabs">
       <li class="nav-item" v-on:click="showTab = 'edit'">
@@ -186,24 +183,6 @@
   </div>
 </template>
 
-<style>
-.tab-panel {
-  flex-wrap: nowrap;
-}
-
-.wrap {
-  overflow: hidden;
-  width: 100%;
-  flex-direction: row;
-}
-
-.nav-tabs {
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  overflow: hidden;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Form from './Form.vue';
@@ -217,18 +196,8 @@ import * as ui from '../../ui';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faAngleDoubleLeft,
-  faAngleDoubleRight,
-} from '@fortawesome/free-solid-svg-icons';
-library.add(faAngleDoubleLeft);
-library.add(faAngleDoubleRight);
-
 @Component({
   components: {
-    FontAwesomeIcon,
     'omegaup-problem-form': problem_Form,
     'omegaup-problem-tags': problem_Tags,
     'omegaup-problem-versions': problem_Versions,
@@ -250,25 +219,5 @@ export default class ProblemEdit extends Vue {
   T = T;
   alias = this.data.alias;
   showTab = 'edit';
-
-  get goToProblem(): string {
-    return `&ndash; <a href="/arena/problem/${this.alias}/">${T.problemEditGoToProblem}</a>`;
-  }
-
-  scrollLeft(): void {
-    let content = document.querySelector('.nav-tabs');
-    if (!content) {
-      return;
-    }
-    content.scrollLeft -= 50;
-  }
-
-  scrollRight(): void {
-    let content = document.querySelector('.nav-tabs');
-    if (!content) {
-      return;
-    }
-    content.scrollLeft += 50;
-  }
 }
 </script>
