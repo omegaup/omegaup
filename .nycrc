@@ -5,10 +5,9 @@
     "frontend/www/js/**/*.vue"
   ],
   "exclude": [
-    "frontend/www/js/**/*.test.js",
+    "frontend/www/js/**/*.test.ts",
     "frontend/www/js/omegaup/lang*.ts",
-    "frontend/www/js/**/*.test_helper.js",
-    "frontend/www/js/omegaup/api.fake.js",
+    "frontend/www/js/omegaup/test.setup.js",
     "frontend/www/third_party/**"
   ]
 }

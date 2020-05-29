@@ -128,12 +128,6 @@ let config = [
           },
         },
       ]),
-      new HtmlWebpackPlugin({
-        inject: false,
-        chunks: ['omegaup', 'arena'],
-        filename: 'tests/index.html',
-        template: path.resolve(__dirname, './stuff/webpack/tests.ejs'),
-      }),
       new VueLoaderPlugin(),
     ],
     optimization: {
@@ -192,12 +186,9 @@ let config = [
         {
           test: /\.vue$/,
           loader: 'vue-loader',
-          options: {
-            loaders: {},
-          },
         },
         {
-          test: /\.tsx?$/,
+          test: /\.ts$/,
           loader: 'ts-loader',
           exclude: /node_modules/,
           options: {
@@ -287,9 +278,6 @@ let config = [
         {
           test: /\.vue$/,
           loader: 'vue-loader',
-          options: {
-            loaders: {},
-          },
         },
         {
           test: /\.js$/,
