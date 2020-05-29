@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
@@ -9,6 +10,7 @@ const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
 
 module.exports = {
   name: 'frontend',
+
   entry: {
     omegaup: [
       '@babel/polyfill',
@@ -97,13 +99,19 @@ module.exports = {
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
   },
+
   output: {
     path: path.resolve(__dirname, './frontend/www/'),
     publicPath: '/',
     filename: 'js/dist/[name].js',
     library: '[name]',
     libraryTarget: 'umd',
+
+    // use absolute paths in sourcemaps (important for debugging via IDE)
+    devtoolModuleFilenameTemplate: '[absolute-resource-path]',
+    devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
   },
+
   plugins: [
     new CopyWebpackPlugin([
       {
@@ -123,7 +131,13 @@ module.exports = {
       },
     ]),
     new VueLoaderPlugin(),
+    new ForkTsCheckerWebpackPlugin({
+      vue: true,
+      formatter: 'codeframe',
+      async: false,
+    }),
   ],
+
   optimization: {
     runtimeChunk: {
       name: 'commons',
@@ -175,11 +189,18 @@ module.exports = {
       },
     },
   },
+
   module: {
+    noParse: /^(vue|vue-router|vuex|vuex-router-sync)$/,
     rules: [
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+        options: {
+          compilerOptions: {
+            whitespace: 'condense',
+          },
+        },
       },
       {
         test: /\.ts$/,
@@ -187,6 +208,8 @@ module.exports = {
         exclude: /node_modules/,
         options: {
           appendTsSuffixTo: [/\.vue$/],
+          transpileOnly: true,
+          happyPackMode: false,
         },
       },
       {
@@ -210,6 +233,7 @@ module.exports = {
       },
     ],
   },
+
   resolve: {
     extensions: ['.ts', '.js', '.vue', '.json'],
     alias: {
