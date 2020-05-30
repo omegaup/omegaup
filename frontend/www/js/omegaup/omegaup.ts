@@ -256,7 +256,7 @@ export namespace omegaup {
     penalty: number;
     score: number;
     source: string;
-    time: string;
+    time: Date;
     verdict: string;
   }
 
