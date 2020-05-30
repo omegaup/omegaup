@@ -15,7 +15,7 @@
     <div
       class="w-100 d-flex align-items-center pt-1"
       v-bind:class="{ 'notification-link': url }"
-      v-on:click="$emit('remove', notification, url)"
+      v-on:click="handleClick"
     >
       <img class="d-block" width="80" v-bind:src="iconUrl" />
       <div v-if="htmlText" v-html="htmlText"></div>
@@ -137,9 +137,9 @@ export default class Notification extends Vue {
     return time.formatDate(this.notification.timestamp);
   }
 
-  redirectToUrl(): void {
+  handleClick(): void {
     if (this.url) {
-      ui.navigateTo(this.url);
+      this.$emit('remove', this.notification, this.url);
     }
   }
 }

@@ -558,6 +558,8 @@
 	"noCoders": "No hay coders",
 	"nominationsRangeHeader": "Nominaciones de calidad (del %(lowCount) al %(highCount))",
 	"notRegisteredInContest": "No est\u00e1s registrado en este concurso.",
+	"notificationCourseRegistrationAccepted": "Tu solicitud de registro en el curso %(courseName) ha sido **aceptada**.",
+	"notificationCourseRegistrationRejected": "Tu solicitud de registro en el curso %(courseName) ha sido **rechazada**.",
 	"notificationCourseRegistrationRequest": "El usuario **%(username)** ha solicitado acceso al curso %(courseName).",
 	"notificationNewBadge": "Has recibido una nueva insignia: **%(badgeName)**.",
 	"notificationsMarkAllAsRead": "Marcar todo como le\u00eddo",
