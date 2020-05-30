@@ -19,40 +19,44 @@
     </div>
     <ul class="nav nav-tabs">
       <li class="nav-item" v-on:click="showTab = 'edit'">
-        <a href="#" data-toggle="tab" class="nav-link active">{{
+        <a href="#" data-toggle="tab" data-tab-edit class="nav-link active">{{
           T.problemEditEditProblem
         }}</a>
       </li>
       <li class="nav-item" v-on:click="showTab = 'markdown'">
-        <a href="#" data-toggle="tab" class="nav-link">{{
+        <a href="#" data-toggle="tab" data-tab-markdown class="nav-link">{{
           T.problemEditEditMarkdown
         }}</a>
       </li>
       <li class="nav-item" v-on:click="showTab = 'version'">
-        <a href="#" data-toggle="tab" class="nav-link">{{
+        <a href="#" data-toggle="tab" data-tab-version class="nav-link">{{
           T.problemEditChooseVersion
         }}</a>
       </li>
       <li class="nav-item" v-on:click="showTab = 'solution'">
-        <a href="#" data-toggle="tab" class="nav-link">{{
+        <a href="#" data-toggle="tab" data-tab-solution class="nav-link">{{
           T.problemEditSolution
         }}</a>
       </li>
       <li class="nav-item" v-on:click="showTab = 'admins'">
-        <a href="#" data-toggle="tab" class="nav-link">{{
+        <a href="#" data-toggle="tab" data-tab-admins class="nav-link">{{
           T.problemEditAddAdmin
         }}</a>
       </li>
       <li class="nav-item" v-on:click="showTab = 'tags'">
-        <a href="#" data-toggle="tab" class="nav-link">{{
+        <a href="#" data-toggle="tab" data-tab-tags class="nav-link">{{
           T.problemEditAddTags
         }}</a>
       </li>
       <li class="nav-item" v-on:click="showTab = 'download'">
-        <a href="#" data-toggle="tab" class="nav-link">{{ T.wordsDownload }}</a>
+        <a href="#" data-toggle="tab" data-tab-download class="nav-link">{{
+          T.wordsDownload
+        }}</a>
       </li>
       <li class="nav-item" v-on:click="showTab = 'delete'">
-        <a href="#" data-toggle="tab" class="nav-link">{{ T.wordsDelete }}</a>
+        <a href="#" data-toggle="tab" data-tab-delete class="nav-link">{{
+          T.wordsDelete
+        }}</a>
       </li>
     </ul>
 
@@ -212,6 +216,8 @@ export default class ProblemEdit extends Vue {
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop() markdownContents!: string;
   @Prop() markdownPreview!: string;
+  @Prop() markdownSolutionContents!: string;
+  @Prop() markdownSolutionPreview!: string;
   @Prop() initialLanguage!: string;
   @Prop() username!: string;
   @Prop() name!: string;

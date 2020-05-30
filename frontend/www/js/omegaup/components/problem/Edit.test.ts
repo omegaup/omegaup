@@ -1,0 +1,54 @@
+import { shallowMount } from '@vue/test-utils';
+import expect from 'expect';
+import Vue from 'vue';
+
+import T from '../../lang';
+import { omegaup } from '../../omegaup';
+
+import course_Edit from './Edit.vue';
+
+describe('Edit.vue', () => {
+  it('Should handle an existing problem', async () => {
+    const wrapper = shallowMount(course_Edit, {
+      propsData: {
+        data: {
+          title: 'problem',
+          alias: 'problem-alias',
+          timeLimit: 1000,
+          extraWallTime: 0,
+          memoryLimit: 32768,
+          outputLimit: 10240,
+          inputLimit: 10240,
+          overallWallTimeLimit: 1000,
+          validatorTimeLimit: 0,
+          emailClarifications: 1,
+          visibility: 2,
+          allowUserAddTags: false,
+          source: 'omegaUp classic',
+          validator: 'token-numeric',
+          languages: 'py2,py3',
+          selectedTags: [],
+          statement: {
+            language: 'es',
+          },
+          solution: {
+            language: 'es',
+          },
+        },
+        initialLanguage: 'es',
+      },
+    });
+
+    expect(wrapper.text()).toContain(T.problemEditEditProblem);
+
+    // All the links are available
+    await wrapper.find('a[data-tab-markdown]').trigger('click');
+    await wrapper.find('a[data-tab-version]').trigger('click');
+    await wrapper.find('a[data-tab-solution]').trigger('click');
+    await wrapper.find('a[data-tab-admins]').trigger('click');
+    await wrapper.find('a[data-tab-tags]').trigger('click');
+    await wrapper.find('a[data-tab-download]').trigger('click');
+    await wrapper.find('a[data-tab-delete]').trigger('click');
+    await wrapper.find('a[data-tab-edit]').trigger('click');
+  });
+});
