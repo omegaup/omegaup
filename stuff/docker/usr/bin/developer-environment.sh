@@ -2,6 +2,13 @@
 
 set -e
 
+if [[ "${CI}" == "true" ]]; then
+	# When running in a CI environment, the database/composer setup is done
+	# outside.
+	echo "CI=true was passed, not running database/composer setup."
+	exit 0
+fi
+
 if [[ ! -f /opt/omegaup/frontend/server/config.php ]]; then
   cat > /opt/omegaup/frontend/server/config.php <<EOF
 <?php
