@@ -478,6 +478,14 @@ export namespace types {
       );
     }
 
+    export function ProblemDetailsv2Payload(
+      elementId: string = 'payload',
+    ): types.ProblemDetailsv2Payload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemEditPayload(
       elementId: string = 'payload',
     ): types.ProblemEditPayload {
@@ -1085,6 +1093,10 @@ export namespace types {
     visits: number;
   }
 
+  export interface ProblemDetailsv2Payload {
+    problem: types.ProblemInfo;
+  }
+
   export interface ProblemEditPayload {
     alias: string;
     allowUserAddTags: boolean;
@@ -1137,6 +1149,25 @@ export namespace types {
     alias: string;
     name: string;
     role: string;
+  }
+
+  export interface ProblemInfo {
+    alias: string;
+    karel_problem: boolean;
+    limits: {
+      input_limit: string;
+      memory_limit: string;
+      overall_wall_time_limit: string;
+      time_limit: string;
+    };
+    points: number;
+    quality_seal: boolean;
+    sample_input: string;
+    settings: types.ProblemSettings;
+    source?: string;
+    statement: types.ProblemStatement;
+    title: string;
+    visibility: number;
   }
 
   export interface ProblemListItem {
