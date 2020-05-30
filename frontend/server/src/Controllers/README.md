@@ -3283,6 +3283,8 @@ nominator or a member of the reviewer group.
 | `offset`   | `int`   |             |
 | `rowcount` | `int`   |             |
 | `status`   | `mixed` |             |
+| `query`    | `mixed` |             |
+| `column`   | `mixed` |             |
 
 ### Returns
 
