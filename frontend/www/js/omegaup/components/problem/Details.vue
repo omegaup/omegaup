@@ -94,6 +94,10 @@
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
+table td {
+  padding: .5rem;
+}
+
 .karel-js-link {
   border: 1px solid #eee;
   border-left: 0;

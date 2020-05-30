@@ -4136,61 +4136,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $memoryLimit = intval(
-            $details['settings']['limits']['MemoryLimit']
-        ) / 1024 / 1024;
-        $result = [
-            'problem_alias' => $details['alias'],
-            'visibility' => $details['visibility'],
-            'quality_seal' => $details['quality_seal'],
-            'source' => (
-                isset($details['source']) ?
-                strval($details['source']) :
-                null
-            ),
-            'problemsetter' => $details['problemsetter'] ?? null,
-            'title' => $details['title'],
-            'points' => $details['points'],
-            'time_limit' => $details['settings']['limits']['TimeLimit'],
-            'overall_wall_time_limit' => $details['settings']['limits']['OverallWallTimeLimit'],
-            'memory_limit' => "{$memoryLimit} MiB",
-            'input_limit' => ($details['input_limit'] / 1024) . ' KiB',
-            'solvers' => isset($details['solvers']) ? $details['solvers'] : [],
-            'quality_payload' => [
-                'solved' => false,
-                'tried' => false,
-                'nominated' => false,
-                'dismissed' => false,
-            ],
-            'nomination_payload' => [
-                'problem_alias' => $details['alias'],
-                'reviewer' => false,
-                'already_reviewed' => false,
-            ],
-            'karel_problem' => count(array_intersect(
-                $details['languages'],
-                ['kp', 'kj']
-            )) == 2,
-            'problem_admin' => false,
-        ];
-        if (
-            isset($details['settings']['cases']) &&
-            isset($details['settings']['cases']['sample']) &&
-            isset($details['settings']['cases']['sample']['in'])
-        ) {
-            $result['sample_input'] = strval(
-                $details['settings']['cases']['sample']['in']
-            );
-        }
-        $details['histogram'] = [
-            'difficulty_histogram' => $problem->difficulty_histogram,
-            'quality_histogram' => $problem->quality_histogram,
-            'quality' => floatval($problem->quality),
-            'difficulty' => floatval($problem->difficulty),
-        ];
-        $details['user'] = ['logged_in' => false, 'admin' => false, 'reviewer' => false];
-        $result['payload'] = $details;
-
         $sampleInput = '';
         if (
             isset($details['settings']['cases']) &&
@@ -4242,72 +4187,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => 'omegaupTitleProblem',
             ],
             'entrypoint' => 'problem_details',
-        ];
-
-        if (
-            is_null($r->identity)
-            || is_null($r->identity->user_id)
-            || is_null($problem->problem_id)
-        ) {
-            return [
-                'smartyProperties' => $result,
-                'template' => 'arena.problem.tpl',
-            ];
-        }
-        $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
-            $problem->problem_id,
-            $r->identity->user_id
-        );
-        $isProblemAdmin = \OmegaUp\Authorization::isProblemAdmin(
-            $r->identity,
-            $problem
-        );
-        $isQualityReviewer = \OmegaUp\Authorization::isQualityReviewer(
-            $r->identity
-        );
-
-        $result['nomination_payload']['reviewer'] = $isQualityReviewer;
-        $result['nomination_payload']['already_reviewed'] = \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
-            $r->identity,
-            $problem
-        );
-
-        $nominationStatus['tried'] = false;
-        $nominationStatus['solved'] = false;
-
-        foreach ($details['runs'] ?? [] as $run) {
-            if ($run['verdict'] === 'AC') {
-                $nominationStatus['solved'] = true;
-                break;
-            } elseif ($run['verdict'] !== 'JE' && $run['verdict'] !== 'VE' && $run['verdict'] !== 'CE') {
-                $nominationStatus['tried'] = true;
-            }
-        }
-        $nominationStatus['problem_alias'] = $details['alias'];
-        $nominationStatus['language'] = $details['statement']['language'];
-        $nominationStatus['can_nominate_problem'] = !is_null($r->user);
-        $user = [
-            'logged_in' => true,
-            'admin' => $isProblemAdmin,
-            'reviewer' => $isQualityReviewer,
-        ];
-        $result['quality_payload'] = $nominationStatus;
-        $result['problem_admin'] = $isProblemAdmin;
-        $result['payload']['user'] = $user;
-        $result['payload']['shouldShowFirstAssociatedIdentityRunWarning'] =
-            !is_null($r->user) && !\OmegaUp\Controllers\User::isMainIdentity(
-                $r->user,
-                $r->identity
-            ) && \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
-                $r->user
-            );
-        $result['payload']['solution_status'] = self::getProblemSolutionStatus(
-            $problem,
-            $r->identity
-        );
-        return [
-            'smartyProperties' => $result,
-            'template' => 'arena.problem.tpl',
         ];
     }
 
