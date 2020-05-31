@@ -83,6 +83,7 @@
       <div class="tab-pane active problems" v-if="showTab === 'problems'">
         <omegaup-contest-add-problem
           v-bind:contest-alias="contest.alias"
+          v-bind:initialPoints="contest.partial_score ? 100 : 1"
           v-bind:data="problems"
           v-on:emit-add-problem="
             addProblemComponent => $emit('add-problem', addProblemComponent)

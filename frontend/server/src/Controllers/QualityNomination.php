@@ -744,7 +744,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'user_id' => $user->user_id,
                 'contents' =>  json_encode(
                     [
-                        'type' => 'demotion',
+                        'type' => \OmegaUp\DAO\Notifications::DEMOTION,
                         'message' => $notificationContents,
                         'status' => $status
                     ]
@@ -831,6 +831,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $column
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -863,13 +865,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ['promotion', 'demotion']
         );
 
+        if (!is_null($r['query']) && !is_null($r['column'])) {
+            \OmegaUp\Validators::validateOptionalInEnum(
+                $r['column'],
+                'column',
+                ['alias','nominator_username','author_username']
+            );
+            $query = strval($r['query']);
+            $column = strval($r['column']);
+            $params = [
+                'query' => $query,
+                'column' => $column,
+            ];
+        } else {
+            $query = null;
+            $column = null;
+            $params = [];
+        }
+
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
             /* nominator */ null,
             /* assignee */ null,
             $offset,
             $rowCount,
             $types,
-            $status
+            $status,
+            $query,
+            $column
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(
@@ -877,7 +899,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $rowCount,
             $offset,
             /*$adjacent=*/5,
-            /*$params=*/[]
+            /*$params=*/ $params
         );
 
         return [

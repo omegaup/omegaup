@@ -201,6 +201,7 @@ export namespace omegaup {
     acceptsSubmissions: boolean;
     bestScore: number;
     maxScore: number;
+    hasRuns?: boolean;
   }
 
   export interface ContestResult {
@@ -255,7 +256,7 @@ export namespace omegaup {
     penalty: number;
     score: number;
     source: string;
-    time: string;
+    time: Date;
     verdict: string;
   }
 

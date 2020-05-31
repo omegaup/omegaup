@@ -2318,20 +2318,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+        $usersProblems = \OmegaUp\DAO\Problems::getProblemsByUsersInACourse(
             $r['course']
         );
         $userSolvedProblems = [];
-        foreach ($solvedProblems as $problem) {
-            $userSolvedProblems[$problem['username']][] = $problem;
-        }
-
-        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
-            $r['course']
-        );
         $userUnsolvedProblems = [];
-        foreach ($unsolvedProblems as $problem) {
-            $userUnsolvedProblems[$problem['username']][] = $problem;
+        foreach ($usersProblems as $userProblem) {
+            if ($userProblem['solved']) {
+                $userSolvedProblems[$userProblem['username']][] = $userProblem;
+            } else {
+                $userUnsolvedProblems[$userProblem['username']][] = $userProblem;
+            }
         }
 
         return [
@@ -2717,6 +2714,36 @@ class Course extends \OmegaUp\Controllers\Controller {
             ])
         );
 
+        /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
+        foreach (
+            \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                $course
+            ) as $admin
+        ) {
+            if (empty($admin['user_id']) || $admin['role'] === 'site-admin') {
+                continue;
+            }
+
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $admin['user_id'],
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
+                            'body' => [
+                                'localizationString' => 'notificationCourseRegistrationRequest',
+                                'localizationParams' => [
+                                    'username' => $r->identity->username,
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/edit/#students",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
         return ['status' => 'ok'];
     }
 
@@ -3543,12 +3570,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        $solvedProblems = \OmegaUp\DAO\Problems::getSolvedProblemsByUsersOfCourse(
+        $usersProblems = \OmegaUp\DAO\Problems::getProblemsByUsersInACourse(
             $r['course_alias']
         );
         $userProblems = [];
-        foreach ($solvedProblems as $problem) {
-            $userProblems[$problem['username']][] = $problem;
+        foreach ($usersProblems as $userProblem) {
+            if (!$userProblem['solved']) {
+                continue;
+            }
+            $userProblems[$userProblem['username']][] = $userProblem;
         }
         return ['user_problems' => $userProblems];
     }
@@ -3573,13 +3603,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-
-        $unsolvedProblems = \OmegaUp\DAO\Problems::getUnsolvedProblemsByUsersOfCourse(
+        $usersProblems = \OmegaUp\DAO\Problems::getProblemsByUsersInACourse(
             $r['course_alias']
         );
         $userProblems = [];
-        foreach ($unsolvedProblems as $problem) {
-            $userProblems[$problem['username']][] = $problem;
+        foreach ($usersProblems as $userProblem) {
+            if ($userProblem['solved']) {
+                continue;
+            }
+            $userProblems[$userProblem['username']][] = $userProblem;
         }
         return ['user_problems' => $userProblems];
     }
