@@ -559,6 +559,8 @@ const translations: { [key: string]: string; } = {
   noCoders: "Nenhum programador.",
   nominationsRangeHeader: "Nomea\u00e7\u00f5es de qualidade (de %(lowCount) a %(highCount))",
   notRegisteredInContest: "Voc\u00ea n\u00e3o est\u00e1 registrado para este concurso.",
+  notificationCourseRegistrationAccepted: "Seu pedido de registro no curso %(courseName), tem sido **aceitado**.",
+  notificationCourseRegistrationRejected: "Seu pedido de registro no curso %(courseName), tem sido **rejeitado**.",
   notificationCourseRegistrationRequest: "O usu\u00e1rio **%(username)** tem solicitado acceso ao curso %(courseName).",
   notificationNewBadge: "Voc\u00ea tem recebido um novo distintivo: **%(badgeName)**",
   notificationsMarkAllAsRead: "Marcar tudo como lido",
