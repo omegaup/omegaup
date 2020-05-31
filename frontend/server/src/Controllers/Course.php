@@ -1644,10 +1644,16 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'contents' =>  json_encode(
                         [
                             'type' => (
-                                $request->accepted ? \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED : \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED
+                                $request->accepted ?
+                                \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED :
+                                \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED
                             ),
                             'body' => [
-                                'localizationString' => $request->accepted ? 'notificationCourseRegistrationAccepted' : 'notificationCourseRegistrationRejected',
+                                'localizationString' => (
+                                    $request->accepted ?
+                                    'notificationCourseRegistrationAccepted' :
+                                    'notificationCourseRegistrationRejected'
+                                ),
                                 'localizationParams' => [
                                     'courseName' => $course->name,
                                 ],
