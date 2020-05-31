@@ -10,6 +10,7 @@ import notification_Notification from './Notification.vue';
 
 describe('Notification.vue', () => {
   it('Should handle empty url in contents body', () => {
+    const courseName = 'Curso de prueba';
     const wrapper = shallowMount(notification_Notification, {
       propsData: {
         notification: {
@@ -18,7 +19,7 @@ describe('Notification.vue', () => {
             body: {
               localizationString: 'notificationCourseRegistrationRejected',
               localizationParams: {
-                courseName: 'Curso de prueba',
+                courseName,
               },
               url: '',
               iconUrl: '/media/info.png',
@@ -30,6 +31,6 @@ describe('Notification.vue', () => {
     });
 
     expect(wrapper.find('button.close').text()).toBe('❌');
-    expect(wrapper.text()).toContain('Curso de prueba');
+    expect(wrapper.text()).toContain(courseName);
   });
 });

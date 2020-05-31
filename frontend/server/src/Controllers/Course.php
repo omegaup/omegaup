@@ -1643,13 +1643,15 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'user_id' => $targetIdentity->user_id,
                     'contents' =>  json_encode(
                         [
-                            'type' => $request->accepted ? \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED : \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED,
+                            'type' => (
+                                $request->accepted ? \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED : \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED
+                            ),
                             'body' => [
                                 'localizationString' => $request->accepted ? 'notificationCourseRegistrationAccepted' : 'notificationCourseRegistrationRejected',
                                 'localizationParams' => [
                                     'courseName' => $course->name,
                                 ],
-                                'url' => $request->accepted ? "/course/{$course->alias}/" : '',
+                                'url' => "/course/{$course->alias}/",
                                 'iconUrl' => '/media/info.png',
                             ],
                         ]
