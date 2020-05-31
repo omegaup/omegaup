@@ -2714,6 +2714,36 @@ class Course extends \OmegaUp\Controllers\Controller {
             ])
         );
 
+        /** @var array{user_id: int|null, role: 'admin'|'owner'|'site-admin', username: string} */
+        foreach (
+            \OmegaUp\DAO\UserRoles::getCourseAdmins(
+                $course
+            ) as $admin
+        ) {
+            if (empty($admin['user_id']) || $admin['role'] === 'site-admin') {
+                continue;
+            }
+
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $admin['user_id'],
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
+                            'body' => [
+                                'localizationString' => 'notificationCourseRegistrationRequest',
+                                'localizationParams' => [
+                                    'username' => $r->identity->username,
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/edit/#students",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
         return ['status' => 'ok'];
     }
 
