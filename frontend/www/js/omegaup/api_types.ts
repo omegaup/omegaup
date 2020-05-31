@@ -575,24 +575,6 @@ export namespace types {
       );
     }
 
-    export function ProblemsEditPayload(
-      elementId: string = 'payload',
-    ): types.ProblemsEditPayload {
-      return (x => {
-        if (x.problemsetter)
-          x.problemsetter = (x => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function SchoolOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
@@ -1287,29 +1269,6 @@ export namespace types {
     parents?: string[];
     tree?: { [key: string]: string };
     version?: string;
-  }
-
-  export interface ProblemsEditPayload {
-    alias: string;
-    allowUserAddTags: boolean;
-    emailClarifications: boolean;
-    extraWallTime: number;
-    inputLimit: number;
-    languages: string;
-    memoryLimit: number;
-    outputLimit: number;
-    overallWallTimeLimit: number;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
-    source: string;
-    statement: types.ProblemStatement;
-    timeLimit: number;
-    title: string;
-    validLanguages: { [key: string]: string };
-    validator: string;
-    validatorTimeLimit: number | number;
-    validatorTypes: { [key: string]: null | string };
-    visibility: number;
-    visibilityStatuses: { [key: string]: number };
   }
 
   export interface Problemset {
