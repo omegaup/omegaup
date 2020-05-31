@@ -4561,6 +4561,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             // HACK to prevent fails in validateCreateOrUpdate
             $r['problem_alias'] = strval($r['alias']);
+            $problemParams = null;
             try {
                 $problemParams = self::convertRequestToProblemParams($r);
                 self::createProblem($r->user, $r->identity, $problemParams);
@@ -4575,7 +4576,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $statusError = $response['error'];
                 }
                 if (
-                    isset($problemParams)
+                    !is_null($problemParams)
                     && !is_null($problemParams->selectedTagsAsJSON)
                 ) {
                     /** @var list<array{tagname: string, public: bool}> */
