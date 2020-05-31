@@ -323,6 +323,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/update_ranks.py' .
              ' --verbose ' .
+             ' --update-coder-of-the-month ' .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
