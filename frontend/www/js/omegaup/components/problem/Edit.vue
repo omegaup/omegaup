@@ -188,7 +188,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
@@ -196,8 +196,6 @@ import problem_StatementEdit from './StatementEdit.vue';
 import problem_Admins from '../common/Admins.vue';
 import problem_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
-import * as ui from '../../ui';
-import latinize from 'latinize';
 import { types } from '../../api_types';
 
 @Component({
