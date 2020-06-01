@@ -10,7 +10,12 @@
       v-bind:initialColumn="column"
       v-bind:tags="tags"
     ></omegaup-problem-search-bar>
-    <a href="#" class="d-inline-block mb-3" role="button" v-on:click="showFinderWizard = true">
+    <a
+      href="#"
+      class="d-inline-block mb-3"
+      role="button"
+      v-on:click="showFinderWizard = true"
+    >
       {{ T.wizardLinkText }}
     </a>
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
@@ -31,14 +36,24 @@
               <th scope="col" class="align-middle">
                 {{ T.wordsTitle }}
                 <div>
-                  <span class="badge badge-quality mr-1">{{ T.tagSourceQuality }}</span>
-                  <span class="badge badge-owner mr-1">{{ T.tagSourceOwner }}</span>
+                  <span class="badge badge-quality mr-1">{{
+                    T.tagSourceQuality
+                  }}</span>
+                  <span class="badge badge-owner mr-1">{{
+                    T.tagSourceOwner
+                  }}</span>
                   <span class="badge badge-voted">{{ T.tagSourceVoted }}</span>
                 </div>
               </th>
-              <th scope="col" class="text-center align-middle">{{ T.wordsQuality }}</th>
-              <th scope="col" class="text-center align-middle">{{ T.wordsDifficulty }}</th>
-              <th scope="col" class="text-right align-middle">{{ T.wordsRatio }}</th>
+              <th scope="col" class="text-center align-middle">
+                {{ T.wordsQuality }}
+              </th>
+              <th scope="col" class="text-center align-middle">
+                {{ T.wordsDifficulty }}
+              </th>
+              <th scope="col" class="text-right align-middle">
+                {{ T.wordsRatio }}
+              </th>
               <th scope="col" class="text-right align-middle">
                 {{ T.wordsPointsForRank }}
                 <a
@@ -50,7 +65,9 @@
                   ><img src="/media/question.png"
                 /></a>
               </th>
-              <th scope="col" class="text-right align-middle" v-if="loggedIn">{{ T.wordsMyScore }}</th>
+              <th scope="col" class="text-right align-middle" v-if="loggedIn">
+                {{ T.wordsMyScore }}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -59,57 +76,65 @@
                 <a v-bind:href="`/arena/problem/${problem.alias}/`">
                   {{ problem.title }}
                 </a>
-                <!--TODO: manejar esto-->
-                <span
-                  v-bind:class="
-                    `glyphicon ${iconClassForProblem(
-                      problem.quality_seal,
-                      problem.visibility,
-                    )}`
+                <font-awesome-icon
+                  v-bind:title="T.wordsHighQualityProblem"
+                  v-if="problem.qualitySeal || problem.visibility === 3"
+                  v-bind:icon="['fas', 'medal']"
+                  color="gold"
+                />
+                <font-awesome-icon
+                  v-bind:title="T.wordsWarningProblem"
+                  v-else-if="
+                    problem.visibility === 1 || problem.visibility === -1
                   "
-                  v-bind:title="
-                    iconTitleForProblem(problem.quality_seal, problem.visibility)
-                  "
-                ></span>
-                <span
-                  v-if="problem.visibility === -1"
-                  v-bind:class="`glyphicon glyphicon-eye-close`"
+                  v-bind:icon="['fas', 'exclamation-triangle']"
+                />
+                <font-awesome-icon
+                  v-bind:title="T.wordsBannedProblem"
+                  v-else-if="problem.visibility <= -3"
+                  v-bind:icon="['fas', 'ban']"
+                />
+                <font-awesome-icon
                   v-bind:title="T.wordsPrivate"
-                ></span>
-                <!-- hasta aqui -->
+                  v-else-if="problem.visibility === 0"
+                  v-bind:icon="['fas', 'eye-slash']"
+                />
                 <div v-if="problem.tags.length">
                   <a
                     v-bind:class="`badge badge-${tag.source} mr-1`"
                     v-bind:href="hrefForProblemTag(currentTags, tag.name)"
                     v-for="tag in problem.tags"
-                    >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a
+                    >{{
+                      T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name
+                    }}</a
                   >
                 </div>
               </td>
-              <td class="text-center tooltip_column" v-if="problem.quality !== null">
+              <td
+                class="text-center tooltip_column"
+                v-if="problem.quality !== null"
+              >
                 <span
-                  data-wenk-pos="right"
-                  v-bind:data-wenk="
+                  v-tooltip="
+                    `${UI.formatString(T.wordsOutOf4, {
+                      Score: problem.quality.toFixed(1),
+                    })}`
+                  "
+                >
+                  {{ QUALITY_TAGS[Math.round(problem.quality)] }}
+                </span>
+              </td>
+              <td class="text-right" v-else="">—</td>
+              <td class="text-center" v-if="problem.difficulty !== null">
+                <span
+                  v-tooltip="
                     `${UI.formatString(T.wordsOutOf4, {
                       Score: problem.difficulty.toFixed(1),
                     })}`
                   "
-                  >{{ QUALITY_TAGS[Math.round(problem.quality)] }}</span
                 >
-              </td>
-              <td class="text-right" v-else="">—</td>
-              <td
-                class="text-center"
-                v-if="true || problem.difficulty !== null"
-                v-tooltip="`${
-                  UI.formatString(T.wordsOutOf4, {
-                    Score: 2.3,
-                  })
-                }`"
-              >
-                <span
-                  >{{ DIFFICULTY_TAGS[Math.round(2.3)] }}</span
-                >
+                  {{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}
+                </span>
               </td>
               <td class="text-center" v-else="">—</td>
               <td class="text-right">
@@ -137,7 +162,7 @@
   color: black;
 
   &:hover {
-    background-color: rgba(black, .35);
+    background-color: rgba(black, 0.35);
   }
 
   &-owner {
@@ -152,12 +177,6 @@
     background-color: #99c2ff;
   }
 }
-
-.omegaup-quality-badge {
-  width: 18px;
-  height: 18px;
-  background: url('/media/quality-badge-sm.png') center/contain no-repeat;
-}
 </style>
 
 <script lang="ts">
@@ -166,13 +185,27 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as UI from '../../ui';
-import { VTooltip } from 'v-tooltip';
+
 import common_Paginator from '../common/Paginatorv2.vue';
 import problem_FinderWizard from './FinderWizard.vue';
 import problem_SearchBar from './SearchBar.vue';
 
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faEyeSlash,
+  faMedal,
+  faExclamationTriangle,
+  faBan,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
+
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-problem-finder': problem_FinderWizard,
     'omegaup-common-paginator': common_Paginator,
     'omegaup-problem-search-bar': problem_SearchBar,
@@ -213,23 +246,6 @@ export default class ProblemList extends Vue {
     T.qualityFormDifficultyHard,
     T.qualityFormDifficultyVeryHard,
   ];
-
-  iconClassForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility == 3) return 'omegaup-quality-badge';
-    else if (visibility == 1 || visibility == -1)
-      return 'glyphicon-warning-sign';
-    else if (visibility <= -2) return 'glyphicon-ban-circle';
-    else if (visibility == 0) return 'glyphicon-eye-close';
-    return '';
-  }
-
-  iconTitleForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility == 3) return T.wordsHighQualityProblem;
-    else if (visibility == 1 || visibility == -1) return T.wordsWarningProblem;
-    else if (visibility <= -3) return T.wordsBannedProblem;
-    else if (visibility == 0) return T.wordsPrivate;
-    return '';
-  }
 
   hrefForProblemTag(currentTags: string[], problemTag: string): string {
     if (!currentTags) return `/problem/?tag[]=${problemTag}`;
