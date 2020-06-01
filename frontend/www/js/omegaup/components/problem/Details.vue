@@ -81,7 +81,6 @@
         </div>
         <div class="mt-4 markdown">
           <vue-mathjax
-            v-on:change="hasChanged"
             v-bind:formula="problemStatement"
             v-bind:safe="false"
           ></vue-mathjax>
