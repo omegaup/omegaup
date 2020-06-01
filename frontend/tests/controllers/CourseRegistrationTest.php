@@ -280,6 +280,30 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Course::apiArbitrateRequest($request);
         }
 
+        for ($i = 0; $i < 2; $i++) {
+            $login = self::login($students[$i]);
+            $notifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token
+            ]))['notifications'];
+
+            $this->assertEquals(
+                \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED,
+                $notifications[0]['contents']['type']
+            );
+        }
+
+        for ($i = 2; $i < $numberOfStudents - 1; $i++) {
+            $login = self::login($students[$i]);
+            $notifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token
+            ]))['notifications'];
+
+            $this->assertEquals(
+                \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED,
+                $notifications[0]['contents']['type']
+            );
+        }
+
         $result = \OmegaUp\Controllers\Course::apiRequests(
             $courseRequestMainAdmin
         )['users'];
