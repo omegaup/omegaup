@@ -1162,7 +1162,7 @@ export namespace types {
     };
     points: number;
     quality_seal: boolean;
-    sample_input: string;
+    sample_input?: string;
     settings: types.ProblemSettings;
     source?: string;
     statement: types.ProblemStatement;

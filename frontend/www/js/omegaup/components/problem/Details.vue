@@ -95,7 +95,7 @@
 @import '../../../../sass/main.scss';
 
 table td {
-  padding: .5rem;
+  padding: 0.5rem;
 }
 
 .karel-js-link {
