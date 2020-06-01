@@ -506,19 +506,36 @@ export namespace types {
               );
             return x;
           })(x.problemsetter);
-        x.publishedRevision = (x => {
-          if (x.author)
+        if (x.publishedRevision)
+          x.publishedRevision = (x => {
             x.author = (x => {
               if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.author);
-          if (x.committer)
             x.committer = (x => {
               if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.committer);
-          return x;
-        })(x.publishedRevision);
+            return x;
+          })(x.publishedRevision);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function ProblemEditTransitionalPayload(
+      elementId: string = 'payload',
+    ): types.ProblemEditTransitionalPayload {
+      return (x => {
+        if (x.problemsetter)
+          x.problemsetter = (x => {
+            if (x.creation_date)
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1126,14 +1143,13 @@ export namespace types {
     loadMathjax: boolean;
     log: types.ProblemVersion[];
     memoryLimit: number;
-    message?: string;
     outputLimit: number;
     overallWallTimeLimit: number;
     problemsetter?: { creation_date?: Date; name: string; username: string };
-    publishedRevision: {
-      author?: { email?: string; name?: string; time?: Date };
-      commit?: string;
-      committer?: { email?: string; name?: string; time?: Date };
+    publishedRevision?: {
+      author: { email?: string; name?: string; time?: Date };
+      commit: string;
+      committer: { email?: string; name?: string; time?: Date };
       message?: string;
       parents?: string[];
       tree?: { [key: string]: string };
@@ -1144,8 +1160,35 @@ export namespace types {
     source: string;
     statement: types.ProblemStatement;
     statusError?: string;
-    statusSuccess?: string;
+    statusSuccess: boolean;
     tags: { name?: string }[];
+    timeLimit: number;
+    title: string;
+    validLanguages: { [key: string]: string };
+    validator: string;
+    validatorTimeLimit: number | number;
+    validatorTypes: { [key: string]: null | string };
+    visibility: number;
+    visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemEditTransitionalPayload {
+    alias: string;
+    allowUserAddTags: boolean;
+    emailClarifications: boolean;
+    extraWallTime: number;
+    inputLimit: number;
+    languages: string;
+    memoryLimit: number;
+    outputLimit: number;
+    overallWallTimeLimit: number;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
+    source: string;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };
