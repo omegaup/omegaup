@@ -29,6 +29,7 @@
  * @psalm-type ProblemDetailsv2Payload=array{problem: ProblemInfo}
  * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: ProblemStatement, title: null|string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool}
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
@@ -3885,7 +3886,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{isSysadmin: bool, privateProblemsAlert: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: ProblemsMineInfoPayload, title: string}, entrypoint: string}
      */
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -3909,8 +3910,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ),
                     'privateProblemsAlert' => $privateProblemsAlert,
                 ],
+                'title' => 'omegaupTitleMyProblemsList',
             ],
-            'template' => 'problem.mine.tpl',
+            'entrypoint' => 'problem_mine',
         ];
     }
 

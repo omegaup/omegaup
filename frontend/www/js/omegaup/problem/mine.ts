@@ -1,31 +1,35 @@
 import Vue from 'vue';
 import problem_Mine from '../components/problem/Mine.vue';
 import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
 import T from '../lang';
 import * as api from '../api';
 import * as UI from '../ui';
 
 OmegaUp.on('ready', () => {
-  const payload = JSON.parse(document.getElementById('payload').innerText);
+  const payload = types.payloadParsers.ProblemsMineInfoPayload();
   let showAllProblems = false;
   const problemsMine = new Vue({
-    el: '#problem-mine',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-problem-mine', {
         props: {
           problems: this.problems,
-          privateProblemsAlert: this.privateProblemsAlert,
-          isSysadmin: this.isSysadmin,
+          privateProblemsAlert: payload.privateProblemsAlert,
+          isSysadmin: payload.isSysadmin,
           pagerItems: this.pagerItems,
         },
         on: {
-          'change-show-all-problems': ev => {
-            showAllProblems = ev.selected;
-            showProblems(showAllProblems);
+          'change-show-all-problems': (shouldShowAll: boolean) => {
+            showAllProblems = shouldShowAll;
+            showProblems(shouldShowAll);
           },
-          'change-visibility': (ev, selectedProblems, visibility) => {
+          'change-visibility': (
+            selectedProblems: string[],
+            visibility: number,
+          ) => {
             Promise.all(
-              selectedProblems.map(problemAlias =>
+              selectedProblems.map((problemAlias: string) =>
                 api.Problem.update({
                   problem_alias: problemAlias,
                   visibility: visibility,
@@ -46,7 +50,7 @@ OmegaUp.on('ready', () => {
                 showProblems(showAllProblems);
               });
           },
-          'go-to-page': pageNumber => {
+          'go-to-page': (pageNumber: number) => {
             if (pageNumber > 0) {
               showProblems(showAllProblems, pageNumber);
             }
@@ -55,17 +59,15 @@ OmegaUp.on('ready', () => {
       });
     },
     data: {
-      problems: null,
-      privateProblemsAlert: payload.privateProblemsAlert,
-      isSysadmin: payload.isSysadmin,
-      pagerItems: [],
+      problems: {},
+      pagerItems: {},
     },
     components: {
       'omegaup-problem-mine': problem_Mine,
     },
   });
 
-  function showProblems(showAllProblems, pageNumber) {
+  function showProblems(showAllProblems: boolean, pageNumber?: number): void {
     (showAllProblems
       ? api.Problem.adminList({
           page: pageNumber,

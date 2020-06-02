@@ -600,6 +600,14 @@ export namespace types {
       );
     }
 
+    export function ProblemsMineInfoPayload(
+      elementId: string = 'payload',
+    ): types.ProblemsMineInfoPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function SchoolOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
@@ -1349,6 +1357,11 @@ export namespace types {
     parents?: string[];
     tree?: { [key: string]: string };
     version?: string;
+  }
+
+  export interface ProblemsMineInfoPayload {
+    isSysadmin: boolean;
+    privateProblemsAlert: boolean;
   }
 
   export interface Problemset {
