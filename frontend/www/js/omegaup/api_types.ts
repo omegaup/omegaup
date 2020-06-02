@@ -955,41 +955,7 @@ export namespace types {
     TimeLimit: string;
   }
 
-  export interface NominationList {
-    nominations: null | types.NominationListItem[];
-    pagerItems: types.PageItem[];
-  }
-
   export interface NominationListItem {
-    author: { name?: string; username: string };
-    contents?: {
-      before_ac?: boolean;
-      difficulty?: number;
-      quality?: number;
-      rationale?: string;
-      reason?: string;
-      statements?: { [key: string]: string };
-      tags?: string[];
-    };
-    nomination: string;
-    nominator: { name?: string; username: string };
-    problem: { alias: string; title: string };
-    qualitynomination_id: number;
-    status: string;
-    time: Date;
-    votes: {
-      time?: Date;
-      user: { name?: string; username: string };
-      vote: number;
-    }[];
-  }
-
-  export interface NominationMyList {
-    nominations: null | types.NominationMyListItem[];
-    pagerItems: types.PageItem[];
-  }
-
-  export interface NominationMyListItem {
     author: { name?: string; username: string };
     contents?: {
       before_ac?: boolean;
@@ -2661,7 +2627,10 @@ export namespace messages {
   };
   export type QualityNominationListRequest = { [key: string]: any };
   export type _QualityNominationListServerResponse = any;
-  export type QualityNominationListResponse = types.NominationList;
+  export type QualityNominationListResponse = {
+    nominations: null | types.NominationListItem[];
+    pagerItems: types.PageItem[];
+  };
   export type QualityNominationMyAssignedListRequest = { [key: string]: any };
   export type _QualityNominationMyAssignedListServerResponse = any;
   export type QualityNominationMyAssignedListResponse = {
@@ -2693,7 +2662,10 @@ export namespace messages {
   };
   export type QualityNominationMyListRequest = { [key: string]: any };
   export type _QualityNominationMyListServerResponse = any;
-  export type QualityNominationMyListResponse = types.NominationMyList;
+  export type QualityNominationMyListResponse = {
+    nominations: null | types.NominationListItem[];
+    pagerItems: types.PageItem[];
+  };
   export type QualityNominationResolveRequest = { [key: string]: any };
   export type QualityNominationResolveResponse = {};
 

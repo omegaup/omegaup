@@ -21,6 +21,7 @@ OmegaUp.on('ready', function() {
         props: {
           pages: this.pages,
           nominations: this.nominations,
+          pagerItems: this.pagerItems,
           length: payload.length,
           myView: payload.myView,
           isAdmin: headerPayload.isAdmin,
@@ -40,7 +41,8 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      nominations: <types.NominationList>{},
+      nominations: <types.NominationListItem[]>[],
+      pagerItems: <types.PageItem[]>[],
       pages: 1,
     },
     components: {
@@ -64,7 +66,8 @@ OmegaUp.on('ready', function() {
           column: column,
         })
           .then(data => {
-            nominationsList.nominations = data;
+            nominationsList.nominations = data.nominations ?? [];
+            nominationsList.pagerItems = data.pagerItems;
             nominationsList.pages = pageNumber;
           })
           .catch(UI.apiError);
@@ -75,7 +78,8 @@ OmegaUp.on('ready', function() {
           status: status,
         })
           .then(data => {
-            nominationsList.nominations = data;
+            nominationsList.nominations = data.nominations ?? [];
+            nominationsList.pagerItems = data.pagerItems;
             nominationsList.pages = pageNumber;
           })
           .catch(UI.apiError);
@@ -86,7 +90,8 @@ OmegaUp.on('ready', function() {
         rowcount: payload.length,
       })
         .then(data => {
-          nominationsList.nominations = data;
+          nominationsList.nominations = data.nominations ?? [];
+          nominationsList.pagerItems = data.pagerItems;
           nominationsList.pages = pageNumber;
         })
         .catch(UI.apiError);

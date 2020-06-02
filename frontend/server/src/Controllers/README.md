@@ -3290,9 +3290,10 @@ nominator or a member of the reviewer group.
 
 ### Returns
 
-```typescript
-types.NominationList;
-```
+| Name          | Type                              |
+| ------------- | --------------------------------- |
+| `nominations` | `null|types.NominationListItem[]` |
+| `pagerItems`  | `types.PageItem[]`                |
 
 ## `/api/qualityNomination/myAssignedList/`
 
@@ -3326,9 +3327,10 @@ Displays the nominations that this user has been assigned.
 
 ### Returns
 
-```typescript
-types.NominationMyList;
-```
+| Name          | Type                              |
+| ------------- | --------------------------------- |
+| `nominations` | `null|types.NominationListItem[]` |
+| `pagerItems`  | `types.PageItem[]`                |
 
 ## `/api/qualityNomination/resolve/`
 

@@ -1,13 +1,6 @@
 <template>
   <div>
     <div class="form-inline" v-if="!myView">
-      <omegaup-autocomplete
-        v-bind:init="el => typeahead.nominationTypeahead(el)"
-        v-model="query"
-        v-bind:placeholder="T.wordsKeyword"
-        name="query"
-        class="form-control"
-      ></omegaup-autocomplete>
       <select name="column" class="form-control" v-model="selectColumn">
         <option
           v-for="(columnText, columnIndex) in columns"
@@ -16,10 +9,37 @@
           {{ columnText }}</option
         >
       </select>
+      <omegaup-autocomplete
+        v-bind:init="el => typeahead.problemTypeahead(el)"
+        v-model="query"
+        v-bind:placeholder="T.wordsKeyword"
+        class="form-control"
+        v-show="selectColumn == 'alias'"
+      ></omegaup-autocomplete>
+
+      <omegaup-autocomplete
+        v-bind:init="el => typeahead.userTypeahead(el)"
+        v-model="queryUsername"
+        v-bind:placeholder="T.wordsKeyword"
+        class="form-control"
+        v-show="
+          selectColumn == 'nominator_username' ||
+            selectColumn == 'author_username'
+        "
+      ></omegaup-autocomplete>
       <button
         class="btn btn-primary"
         v-on:click.prevent="
-          $emit('goToPage', 1, showAll ? 'all' : 'open', query, selectColumn)
+          $emit(
+            'goToPage',
+            1,
+            showAll ? 'all' : 'open',
+            selectColumn == 'nominator_username' ||
+              selectColumn == 'author_username'
+              ? queryUsername
+              : query,
+            selectColumn,
+          )
         "
       >
         {{ T.wordsSearch }}
@@ -49,7 +69,10 @@
                   'goToPage',
                   1,
                   showAll ? 'all' : 'open',
-                  query,
+                  selectColumn == 'nominator_username' ||
+                    selectColumn == 'author_username'
+                    ? queryUsername
+                    : query,
                   selectColumn,
                 )
               "
@@ -71,7 +94,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="nomination in nominations.nominations">
+          <tr v-for="nomination in nominations">
             <td>
               <a v-bind:href="problemUrl(nomination.problem.alias)">{{
                 nomination.problem.title
@@ -102,9 +125,22 @@
         </tbody>
       </table>
       <omegaup-common-paginator
-        v-bind:pager-items="nominations.pagerItems"
+        v-bind:pager-items="pagerItems"
         v-on:page-changed="
-          page => $emit('goToPage', page, this.showAll ? 'all' : 'open')
+          page =>
+            $emit(
+              'goToPage',
+              page,
+              this.showAll
+                ? 'all'
+                : 'open'(
+                    selectColumn == 'nominator_username' ||
+                      selectColumn == 'author_username',
+                  )
+                ? queryUsername
+                : query,
+              selectColumn,
+            )
         "
       ></omegaup-common-paginator>
     </div>
@@ -112,7 +148,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as UI from '../../ui';
@@ -131,7 +167,8 @@ export default class QualityNominationList extends Vue {
   @Prop() pages!: number;
   @Prop() length!: number;
   @Prop() myView!: boolean;
-  @Prop() nominations!: types.NominationList;
+  @Prop() nominations!: types.NominationListItem[];
+  @Prop() pagerItems!: types.PageItem[];
   @Prop() isAdmin!: boolean;
 
   showAll = true;
@@ -140,12 +177,19 @@ export default class QualityNominationList extends Vue {
   typeahead = typeahead;
 
   query = '';
+  queryUsername = '';
   selectColumn = '';
   columns = {
     alias: T.wordsAlias,
     nominator_username: T.wordsNominator,
     author_username: T.wordsAuthor,
   };
+
+  @Watch('selectColumn')
+  onPropertyChanged() {
+    this.query = '';
+    this.queryUsername = '';
+  }
 
   problemUrl(problemAlias: string): string {
     return `/arena/problem/${problemAlias}/`;
