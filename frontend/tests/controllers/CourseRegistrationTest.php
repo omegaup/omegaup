@@ -143,7 +143,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Uers only can register into a course with registration mode
+     * Users only can register into a course with registration mode
      */
     public function testRegisterForCourse() {
         $course = self::createCourseWithRegistrationMode()['course'];
@@ -163,6 +163,34 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertNotEmpty($registration);
+    }
+
+    public function testGetNotificationForRegistrationRequest() {
+        $course = self::createCourseWithRegistrationMode()['course'];
+        ['identity' => $student] = \OmegaUp\Test\Factories\User::createUser();
+        $studentLogin = self::login($student);
+
+        \OmegaUp\Controllers\Course::apiRegisterForCourse(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $course->alias,
+            ])
+        );
+
+        $adminLogin = self::login(self::$curator);
+        $response = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+        ]));
+
+        $this->assertCount(1, $response['notifications']);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
+            $response['notifications'][0]['contents']['type']
+        );
+        $this->assertEquals(
+            $course->name,
+            $response['notifications'][0]['contents']['body']['localizationParams']['courseName']
+        );
     }
 
     /**
@@ -250,6 +278,30 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
             $request['resolution'] = $expectedRequest['accepted'];
 
             \OmegaUp\Controllers\Course::apiArbitrateRequest($request);
+        }
+
+        for ($i = 0; $i < 2; $i++) {
+            $login = self::login($students[$i]);
+            $notifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token
+            ]))['notifications'];
+
+            $this->assertEquals(
+                \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_ACCEPTED,
+                $notifications[0]['contents']['type']
+            );
+        }
+
+        for ($i = 2; $i < $numberOfStudents - 1; $i++) {
+            $login = self::login($students[$i]);
+            $notifications = \OmegaUp\Controllers\Notification::apiMyList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token
+            ]))['notifications'];
+
+            $this->assertEquals(
+                \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REJECTED,
+                $notifications[0]['contents']['type']
+            );
         }
 
         $result = \OmegaUp\Controllers\Course::apiRequests(
