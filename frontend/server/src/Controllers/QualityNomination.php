@@ -838,7 +838,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $query
      * @omegaup-request-param mixed $column
      *
-     * @return array{nominations: list<NominationListItem>, pagerItems: list<PageItem>}
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -905,7 +905,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         return [
             'nominations' => $response['nominations'],
-            'pagerItems' => $pagerItems,
+            'pager_items' => $pagerItems,
         ];
     }
 
@@ -938,7 +938,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
      *
-     * @return array{nominations: list<NominationListItem>, pagerItems: list<PageItem>}
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -981,7 +981,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         return [
             'nominations' => $response['nominations'],
-            'pagerItems' => $pagerItems,
+            'pager_items' => $pagerItems,
         ];
     }
 

@@ -11,12 +11,11 @@
       </select>
       <omegaup-autocomplete
         v-bind:init="el => typeahead.problemTypeahead(el)"
-        v-model="query"
+        v-model="queryProblem"
         v-bind:placeholder="T.wordsKeyword"
         class="form-control"
         v-show="selectColumn == 'alias'"
       ></omegaup-autocomplete>
-
       <omegaup-autocomplete
         v-bind:init="el => typeahead.userTypeahead(el)"
         v-model="queryUsername"
@@ -34,10 +33,7 @@
             'goToPage',
             1,
             showAll ? 'all' : 'open',
-            selectColumn == 'nominator_username' ||
-              selectColumn == 'author_username'
-              ? queryUsername
-              : query,
+            getQuery(),
             selectColumn,
           )
         "
@@ -69,10 +65,7 @@
                   'goToPage',
                   1,
                   showAll ? 'all' : 'open',
-                  selectColumn == 'nominator_username' ||
-                    selectColumn == 'author_username'
-                    ? queryUsername
-                    : query,
+                  getQuery(),
                   selectColumn,
                 )
               "
@@ -110,7 +103,7 @@
                 nomination.author.username
               }}</a>
             </td>
-            <td>{{ nomination.time.format('long') }}</td>
+            <td>{{ nomination.time.toLocaleDateString(T.locale) }}</td>
             <td v-if="!myView">{{ nomination.contents.reason }}</td>
             <td class="text-center">{{ nomination.status }}</td>
             <td>
@@ -131,14 +124,8 @@
             $emit(
               'goToPage',
               page,
-              this.showAll
-                ? 'all'
-                : 'open'(
-                    selectColumn == 'nominator_username' ||
-                      selectColumn == 'author_username',
-                  )
-                ? queryUsername
-                : query,
+              this.showAll ? 'all' : 'open',
+              getQuery(),
               selectColumn,
             )
         "
@@ -176,19 +163,30 @@ export default class QualityNominationList extends Vue {
   UI = UI;
   typeahead = typeahead;
 
-  query = '';
+  queryProblem = '';
   queryUsername = '';
   selectColumn = '';
   columns = {
-    alias: T.wordsAlias,
+    alias: T.wordsProblem,
     nominator_username: T.wordsNominator,
     author_username: T.wordsAuthor,
   };
 
   @Watch('selectColumn')
   onPropertyChanged() {
-    this.query = '';
+    this.queryProblem = '';
     this.queryUsername = '';
+  }
+
+  getQuery(): string {
+    if (
+      this.selectColumn == 'nominator_username' ||
+      this.selectColumn == 'author_username'
+    ) {
+      return this.queryUsername;
+    } else {
+      return this.queryProblem;
+    }
   }
 
   problemUrl(problemAlias: string): string {

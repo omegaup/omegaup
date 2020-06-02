@@ -2753,7 +2753,7 @@ export namespace messages {
   export type _QualityNominationListServerResponse = any;
   export type QualityNominationListResponse = {
     nominations: types.NominationListItem[];
-    pagerItems: types.PageItem[];
+    pager_items: types.PageItem[];
   };
   export type QualityNominationMyAssignedListRequest = { [key: string]: any };
   export type _QualityNominationMyAssignedListServerResponse = any;
@@ -2786,7 +2786,7 @@ export namespace messages {
   export type _QualityNominationMyListServerResponse = any;
   export type QualityNominationMyListResponse = {
     nominations: types.NominationListItem[];
-    pagerItems: types.PageItem[];
+    pager_items: types.PageItem[];
   };
   export type QualityNominationResolveRequest = { [key: string]: any };
   export type QualityNominationResolveResponse = {};

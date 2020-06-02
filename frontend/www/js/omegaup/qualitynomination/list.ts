@@ -3,8 +3,7 @@ import qualitynomination_List from '../components/qualitynomination/List.vue';
 import { OmegaUp, omegaup } from '../omegaup';
 import * as api from '../api';
 import * as UI from '../ui';
-import { types } from '../api_types';
-import T from '../lang';
+import { types, messages } from '../api_types';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(
@@ -56,42 +55,30 @@ OmegaUp.on('ready', function() {
     query: string,
     column: string,
   ) {
+    const request: messages.QualityNominationListRequest = {
+      offset: pageNumber,
+      rowcount: payload.length,
+    };
     if (!payload.myView) {
-      if (query != '' && column != '') {
-        api.QualityNomination.list({
-          offset: pageNumber,
-          rowcount: payload.length,
-          status: status,
-          query: query,
-          column: column,
-        })
-          .then(data => {
-            nominationsList.nominations = data.nominations ?? [];
-            nominationsList.pagerItems = data.pagerItems;
-            nominationsList.pages = pageNumber;
-          })
-          .catch(UI.apiError);
-      } else {
-        api.QualityNomination.list({
-          offset: pageNumber,
-          rowcount: payload.length,
-          status: status,
-        })
-          .then(data => {
-            nominationsList.nominations = data.nominations ?? [];
-            nominationsList.pagerItems = data.pagerItems;
-            nominationsList.pages = pageNumber;
-          })
-          .catch(UI.apiError);
+      request.status = status;
+      if (query && column) {
+        // se puede mejor pasar `null` en vez de cadena vacía para estos?
+        request.query = query;
+        request.column = column;
       }
-    } else {
-      api.QualityNomination.myList({
-        offset: pageNumber,
-        rowcount: payload.length,
-      })
+
+      api.QualityNomination.list(request)
         .then(data => {
-          nominationsList.nominations = data.nominations ?? [];
-          nominationsList.pagerItems = data.pagerItems;
+          nominationsList.nominations = data.nominations;
+          nominationsList.pagerItems = data.pager_items;
+          nominationsList.pages = pageNumber;
+        })
+        .catch(UI.apiError);
+    } else {
+      api.QualityNomination.myList(request)
+        .then(data => {
+          nominationsList.nominations = data.nominations;
+          nominationsList.pagerItems = data.pager_items;
           nominationsList.pages = pageNumber;
         })
         .catch(UI.apiError);

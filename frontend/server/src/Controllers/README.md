@@ -3293,7 +3293,7 @@ nominator or a member of the reviewer group.
 | Name          | Type                         |
 | ------------- | ---------------------------- |
 | `nominations` | `types.NominationListItem[]` |
-| `pagerItems`  | `types.PageItem[]`           |
+| `pager_items` | `types.PageItem[]`           |
 
 ## `/api/qualityNomination/myAssignedList/`
 
@@ -3330,7 +3330,7 @@ Displays the nominations that this user has been assigned.
 | Name          | Type                         |
 | ------------- | ---------------------------- |
 | `nominations` | `types.NominationListItem[]` |
-| `pagerItems`  | `types.PageItem[]`           |
+| `pager_items` | `types.PageItem[]`           |
 
 ## `/api/qualityNomination/resolve/`
 
