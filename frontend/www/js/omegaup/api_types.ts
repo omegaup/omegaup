@@ -2741,90 +2741,84 @@ export namespace messages {
   export type QualityNominationListRequest = { [key: string]: any };
   export type _QualityNominationListServerResponse = any;
   export type QualityNominationListResponse = {
-    nominations:
-      | {
-          author: { name?: string; username: string };
-          contents?: {
-            before_ac?: boolean;
-            difficulty?: number;
-            quality?: number;
-            rationale?: string;
-            reason?: string;
-            statements?: { [key: string]: string };
-            tags?: string[];
-          };
-          nomination: string;
-          nominator: { name?: string; username: string };
-          problem: { alias: string; title: string };
-          qualitynomination_id: number;
-          status: string;
-          time: Date;
-          votes: {
-            time?: Date;
-            user: { name?: string; username: string };
-            vote: number;
-          }[];
-        }
-      | null[];
+    nominations: {
+      author: { name?: string; username: string };
+      contents?: {
+        before_ac?: boolean;
+        difficulty?: number;
+        quality?: number;
+        rationale?: string;
+        reason?: string;
+        statements?: { [key: string]: string };
+        tags?: string[];
+      };
+      nomination: string;
+      nominator: { name?: string; username: string };
+      problem: { alias: string; title: string };
+      qualitynomination_id: number;
+      status: string;
+      time: Date;
+      votes: {
+        time?: Date;
+        user: { name?: string; username: string };
+        vote: number;
+      }[];
+    }[];
     pager_items: { class: string; label: string; page: number }[];
   };
   export type QualityNominationMyAssignedListRequest = { [key: string]: any };
   export type _QualityNominationMyAssignedListServerResponse = any;
   export type QualityNominationMyAssignedListResponse = {
-    nominations:
-      | {
-          author: { name?: string; username: string };
-          contents?: {
-            before_ac?: boolean;
-            difficulty?: number;
-            quality?: number;
-            rationale?: string;
-            reason?: string;
-            statements?: { [key: string]: string };
-            tags?: string[];
-          };
-          nomination: string;
-          nominator: { name?: string; username: string };
-          problem: { alias: string; title: string };
-          qualitynomination_id: number;
-          status: string;
-          time: Date;
-          votes: {
-            time?: Date;
-            user: { name?: string; username: string };
-            vote: number;
-          }[];
-        }
-      | null[];
+    nominations: {
+      author: { name?: string; username: string };
+      contents?: {
+        before_ac?: boolean;
+        difficulty?: number;
+        quality?: number;
+        rationale?: string;
+        reason?: string;
+        statements?: { [key: string]: string };
+        tags?: string[];
+      };
+      nomination: string;
+      nominator: { name?: string; username: string };
+      problem: { alias: string; title: string };
+      qualitynomination_id: number;
+      status: string;
+      time: Date;
+      votes: {
+        time?: Date;
+        user: { name?: string; username: string };
+        vote: number;
+      }[];
+    }[];
   };
   export type QualityNominationMyListRequest = { [key: string]: any };
   export type _QualityNominationMyListServerResponse = any;
   export type QualityNominationMyListResponse = {
-    nominations:
-      | {
-          author: { name?: string; username: string };
-          contents?: {
-            before_ac?: boolean;
-            difficulty?: number;
-            quality?: number;
-            rationale?: string;
-            reason?: string;
-            statements?: { [key: string]: string };
-            tags?: string[];
-          };
-          nomination: string;
-          nominator: { name?: string; username: string };
-          problem: { alias: string; title: string };
-          qualitynomination_id: number;
-          status: string;
-          time: Date;
-          votes: {
-            time?: Date;
-            user: { name?: string; username: string };
-            vote: number;
-          }[];
-        }
-      | null[];
+    nominations: {
+      author: { name?: string; username: string };
+      contents?: {
+        before_ac?: boolean;
+        difficulty?: number;
+        quality?: number;
+        rationale?: string;
+        reason?: string;
+        statements?: { [key: string]: string };
+        tags?: string[];
+      };
+      nomination: string;
+      nominator: { name?: string; username: string };
+      problem: { alias: string; title: string };
+      qualitynomination_id: number;
+      status: string;
+      time: Date;
+      votes: {
+        time?: Date;
+        user: { name?: string; username: string };
+        vote: number;
+      }[];
+    }[];
     pager_items: { class: string; label: string; page: number }[];
   };
   export type QualityNominationResolveRequest = { [key: string]: any };
