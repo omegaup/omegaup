@@ -73,9 +73,9 @@
           <tbody>
             <tr v-for="problem in problems">
               <td>
-                <a v-bind:href="`/arena/problem/${problem.alias}/`">
-                  {{ problem.title }}
-                </a>
+                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+                  problem.title
+                }}</a>
                 <font-awesome-icon
                   v-bind:title="T.wordsHighQualityProblem"
                   v-if="problem.qualitySeal || problem.visibility === 3"
