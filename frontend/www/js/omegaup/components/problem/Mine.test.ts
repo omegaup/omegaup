@@ -15,8 +15,8 @@ describe('Mine.vue', () => {
         problems: [],
         pagerItems: [
           {
-            class: "disabled",
-            label: "1",
+            class: 'disabled',
+            label: '1',
             page: 1,
           },
         ],
@@ -24,6 +24,6 @@ describe('Mine.vue', () => {
       },
     });
 
-    expect (wrapper.text()).toContain( T.myproblemsListMyProblems);
+    expect(wrapper.text()).toContain(T.myproblemsListMyProblems);
   });
 });
