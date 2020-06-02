@@ -769,7 +769,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @param int     $nominator The user id of the person that made the nomination.  May be null.
      * @param int     $assignee  The user id of the person assigned to review nominations.  May be null.
      *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>} The response.
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>} The response.
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -831,13 +831,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     *
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
      * @omegaup-request-param mixed $query
      * @omegaup-request-param mixed $column
      *
-     * @return array{nominations: list<NominationListItem|null>, pagerItems: list<PageItem>}
+     * @return array{nominations: list<NominationListItem>, pagerItems: list<PageItem>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -915,7 +916,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>} The response.
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>} The response.
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -933,10 +934,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{nominations: list<NominationListItem|null>, pagerItems: list<PageItem>}
      *
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
+     *
+     * @return array{nominations: list<NominationListItem>, pagerItems: list<PageItem>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
