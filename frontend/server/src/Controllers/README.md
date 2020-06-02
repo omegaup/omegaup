@@ -2857,9 +2857,9 @@ Return a report of which runs would change due to a version change.
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                   |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `diff` | `{ username: string; guid: string; problemset_id: number; old_status: string; old_verdict: string; old_score: number; new_status: string; new_verdict: string; new_score: number; }[]` |
+| Name   | Type               |
+| ------ | ------------------ |
+| `diff` | `types.RunsDiff[]` |
 
 ## `/api/problem/selectVersion/`
 
@@ -3066,10 +3066,10 @@ Entry point for Problem Versions API
 
 ### Returns
 
-| Name        | Type                                                                                                                                                                                                                                |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `published` | `string`                                                                                                                                                                                                                            |
-| `log`       | `{ commit: string; tree: { [key: string]: string; }; parents?: string[]; author: { name?: string; email?: string; time: Date; }; committer: { name?: string; email?: string; time: Date; }; message?: string; version: string; }[]` |
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `published` | `string`                 |
+| `log`       | `types.ProblemVersion[]` |
 
 # ProblemForfeited
 

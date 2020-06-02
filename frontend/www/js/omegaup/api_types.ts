@@ -490,6 +490,52 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemEditPayload {
       return (x => {
+        x.log = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            x.author = (x => {
+              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.author);
+            x.committer = (x => {
+              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.committer);
+            return x;
+          });
+        })(x.log);
+        if (x.problemsetter)
+          x.problemsetter = (x => {
+            if (x.creation_date)
+              x.creation_date = ((x: number) => new Date(x * 1000))(
+                x.creation_date,
+              );
+            return x;
+          })(x.problemsetter);
+        if (x.publishedRevision)
+          x.publishedRevision = (x => {
+            x.author = (x => {
+              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.author);
+            x.committer = (x => {
+              if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            })(x.committer);
+            return x;
+          })(x.publishedRevision);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function ProblemEditTransitionalPayload(
+      elementId: string = 'payload',
+    ): types.ProblemEditTransitionalPayload {
+      return (x => {
         if (x.problemsetter)
           x.problemsetter = (x => {
             if (x.creation_date)
@@ -1098,6 +1144,47 @@ export namespace types {
   }
 
   export interface ProblemEditPayload {
+    admins: types.ProblemAdmin[];
+    alias: string;
+    allowUserAddTags: boolean;
+    emailClarifications: boolean;
+    extraWallTime: number;
+    groupAdmins: types.ProblemGroupAdmin[];
+    inputLimit: number;
+    languages: string;
+    loadMathjax: boolean;
+    log: types.ProblemVersion[];
+    memoryLimit: number;
+    outputLimit: number;
+    overallWallTimeLimit: number;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
+    publishedRevision?: {
+      author: { email?: string; name?: string; time?: Date };
+      commit: string;
+      committer: { email?: string; name?: string; time?: Date };
+      message?: string;
+      parents?: string[];
+      tree?: { [key: string]: string };
+      version?: string;
+    };
+    selectedTags: { public: boolean; tagname: string }[];
+    solution: types.ProblemStatement;
+    source: string;
+    statement: types.ProblemStatement;
+    statusError?: string;
+    statusSuccess: boolean;
+    tags: { name?: string }[];
+    timeLimit: number;
+    title: string;
+    validLanguages: { [key: string]: string };
+    validator: string;
+    validatorTimeLimit: number | number;
+    validatorTypes: { [key: string]: null | string };
+    visibility: number;
+    visibilityStatuses: { [key: string]: number };
+  }
+
+  export interface ProblemEditTransitionalPayload {
     alias: string;
     allowUserAddTags: boolean;
     emailClarifications: boolean;
@@ -1109,7 +1196,11 @@ export namespace types {
     overallWallTimeLimit: number;
     problemsetter?: { creation_date?: Date; name: string; username: string };
     source: string;
-    statement: types.ProblemStatement;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };
@@ -1250,6 +1341,16 @@ export namespace types {
     title?: string;
   }
 
+  export interface ProblemVersion {
+    author: { email?: string; name?: string; time?: Date };
+    commit: string;
+    committer: { name?: string; email?: string; time?: Date };
+    message?: string;
+    parents?: string[];
+    tree?: { [key: string]: string };
+    version?: string;
+  }
+
   export interface Problemset {
     admin?: boolean;
     admission_mode?: string;
@@ -1355,6 +1456,18 @@ export namespace types {
     sys_time: number;
     wall_time: number;
     memory: number;
+  }
+
+  export interface RunsDiff {
+    guid: string;
+    new_score?: number;
+    new_status?: string;
+    new_verdict?: string;
+    old_score?: number;
+    old_status?: string;
+    old_verdict?: string;
+    problemset_id?: number;
+    username: string;
   }
 
   export interface School {
@@ -2525,19 +2638,7 @@ export namespace messages {
   export type _ProblemRunsServerResponse = any;
   export type ProblemRunsResponse = { runs: types.Run[] };
   export type ProblemRunsDiffRequest = { [key: string]: any };
-  export type ProblemRunsDiffResponse = {
-    diff: {
-      username: string;
-      guid: string;
-      problemset_id?: number;
-      old_status?: string;
-      old_verdict?: string;
-      old_score?: number;
-      new_status?: string;
-      new_verdict?: string;
-      new_score?: number;
-    }[];
-  };
+  export type ProblemRunsDiffResponse = { diff: types.RunsDiff[] };
   export type ProblemSelectVersionRequest = { [key: string]: any };
   export type ProblemSelectVersionResponse = {};
   export type ProblemSolutionRequest = { [key: string]: any };
@@ -2566,15 +2667,7 @@ export namespace messages {
   export type _ProblemVersionsServerResponse = any;
   export type ProblemVersionsResponse = {
     published?: string;
-    log: {
-      commit: string;
-      tree?: { [key: string]: string };
-      parents?: string[];
-      author: { name?: string; email?: string; time?: Date };
-      committer: { name?: string; email?: string; time?: Date };
-      message?: string;
-      version?: string;
-    }[];
+    log: types.ProblemVersion[];
   };
 
   // ProblemForfeited
