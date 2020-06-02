@@ -988,21 +988,21 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getProblemCasesContents(
         string $directory,
         string $problemAlias,
-        string $version
+        string $revision
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_CASES_CONTENTS,
-            "{$problemAlias}-{$version}-{$directory}",
+            "{$problemAlias}-{$revision}-{$directory}",
             /** @return ProblemCasesContents */
             function () use (
                 $directory,
                 $problemAlias,
-                $version
+                $revision
             ) {
                 return self::getProblemCasesContentsImpl(
                     $directory,
                     $problemAlias,
-                    $version
+                    $revision
                 );
             },
             24 * 60 * 60 // expire in 1 day
@@ -1015,17 +1015,17 @@ class Run extends \OmegaUp\Controllers\Controller {
     private static function getProblemCasesContentsImpl(
         string $directory,
         string $problemAlias,
-        string $version
+        string $revision
     ): array {
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
             $problemAlias,
-            $version
+            $revision
         );
 
         $existingCases = self::getProblemCasesMetadata(
             $directory,
             $problemAlias,
-            $version
+            $revision
         );
         $response = [];
         foreach ($existingCases as $file) {
@@ -1220,7 +1220,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $r['run_alias'],
                 $r->identity,
                 /*$passthru=*/true,
-                $showDiff
+                /*$skipAuthorization=*/$showDiff
             )
         ) {
             http_response_code(404);
