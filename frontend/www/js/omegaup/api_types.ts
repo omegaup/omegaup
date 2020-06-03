@@ -431,14 +431,6 @@ export namespace types {
       );
     }
 
-    export function ProblemAdminsPayload(
-      elementId: string = 'payload',
-    ): types.ProblemAdminsPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
-      );
-    }
-
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
@@ -532,24 +524,6 @@ export namespace types {
       );
     }
 
-    export function ProblemEditTransitionalPayload(
-      elementId: string = 'payload',
-    ): types.ProblemEditTransitionalPayload {
-      return (x => {
-        if (x.problemsetter)
-          x.problemsetter = (x => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function ProblemFormPayload(
       elementId: string = 'payload',
     ): types.ProblemFormPayload {
@@ -566,35 +540,9 @@ export namespace types {
       );
     }
 
-    export function ProblemMarkdownPayload(
-      elementId: string = 'payload',
-    ): types.ProblemMarkdownPayload {
-      return (x => {
-        if (x.problemsetter)
-          x.problemsetter = (x => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function ProblemQualityPayload(
       elementId: string = 'payload',
     ): types.ProblemQualityPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
-      );
-    }
-
-    export function ProblemTagsPayload(
-      elementId: string = 'payload',
-    ): types.ProblemTagsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -761,6 +709,10 @@ export namespace types {
     isMentor: boolean;
     category: string;
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
+  }
+
+  export interface CommitRunsDiff {
+    [key: string]: types.RunsDiff[];
   }
 
   export interface CommonPayload {
@@ -1055,12 +1007,6 @@ export namespace types {
     username: string;
   }
 
-  export interface ProblemAdminsPayload {
-    admins: types.ProblemAdmin[];
-    alias: string;
-    group_admins: types.ProblemGroupAdmin[];
-  }
-
   export interface ProblemDetails {
     accepted: number;
     admin?: boolean;
@@ -1184,33 +1130,6 @@ export namespace types {
     visibilityStatuses: { [key: string]: number };
   }
 
-  export interface ProblemEditTransitionalPayload {
-    alias: string;
-    allowUserAddTags: boolean;
-    emailClarifications: boolean;
-    extraWallTime: number;
-    inputLimit: number;
-    languages: string;
-    memoryLimit: number;
-    outputLimit: number;
-    overallWallTimeLimit: number;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
-    source: string;
-    statement: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
-    timeLimit: number;
-    title: string;
-    validLanguages: { [key: string]: string };
-    validator: string;
-    validatorTimeLimit: number | number;
-    validatorTypes: { [key: string]: null | string };
-    visibility: number;
-    visibilityStatuses: { [key: string]: number };
-  }
-
   export interface ProblemFormPayload {
     alias: string;
     allowUserAddTags: boolean;
@@ -1292,14 +1211,6 @@ export namespace types {
     tags: string[];
   }
 
-  export interface ProblemMarkdownPayload {
-    alias: string;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
-    source?: string;
-    statement: types.ProblemStatement;
-    title?: string;
-  }
-
   export interface ProblemQualityPayload {
     canNominateProblem: boolean;
     dismissed: boolean;
@@ -1331,14 +1242,6 @@ export namespace types {
     images: { [key: string]: string };
     language: string;
     markdown: string;
-  }
-
-  export interface ProblemTagsPayload {
-    alias: string;
-    allowTags: boolean;
-    selectedTags: types.SelectedTag[];
-    tags: { name?: string }[];
-    title?: string;
   }
 
   export interface ProblemVersion {

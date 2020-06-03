@@ -65,16 +65,13 @@ module.exports = {
     group_list: './frontend/www/js/omegaup/group/list.js',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
-    problem_admins: './frontend/www/js/omegaup/problem/admins.ts',
-    problem_edit: './frontend/www/js/omegaup/problem/edit.js',
-    problem_edit_form: './frontend/www/js/omegaup/problem/edit.ts',
+    problem_edit: './frontend/www/js/omegaup/problem/edit.ts',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
     problem_list: './frontend/www/js/omegaup/problem/list.ts',
     problem_mine: './frontend/www/js/omegaup/problem/mine.js',
     problem_new: './frontend/www/js/omegaup/problem/new.ts',
     problem_print: './frontend/www/js/omegaup/problem/print.ts',
     problem_solution: './frontend/www/js/omegaup/problem/solution.js',
-    problem_tags: './frontend/www/js/omegaup/problem/tags.ts',
     qualitynomination_popup:
       './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list:

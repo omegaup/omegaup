@@ -1,8 +1,8 @@
 <template>
-  <div class="panel panel-primary">
-    <form class="panel-body form" enctype="multipart/form-data" method="post">
+  <div class="card">
+    <form class="card-body form" enctype="multipart/form-data" method="post">
       <div class="row">
-        <label
+        <label class="font-weight-bold"
           >{{ T.statementLanguage }}
           <select name="statement-language" v-model="currentLanguage">
             <option
@@ -16,7 +16,7 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div class="panel">
+          <div>
             <ul class="nav nav-tabs">
               <li
                 v-bind:class="{ active: showTab === 'source' }"
@@ -196,7 +196,7 @@ export default class ProblemStatementEdit extends Vue {
     if (!!oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
 
     this.$emit(
-      'update-markdown-contents',
+      'emit-update-markdown-contents',
       this.statements,
       newLanguage,
       this.currentMarkdown,

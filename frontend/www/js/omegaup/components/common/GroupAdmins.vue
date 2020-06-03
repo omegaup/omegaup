@@ -1,9 +1,9 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
+  <div class="card panel panel-primary">
+    <div class="card-body panel-body">
       <form class="form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label
+          <label class="font-weight-bold"
             >{{ T.wordsGroupAdmin }}
             <span
               aria-hidden="true"
