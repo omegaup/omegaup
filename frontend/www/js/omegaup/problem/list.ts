@@ -9,7 +9,7 @@ import * as UI from '../ui';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
   const problemsList = new Vue({
-    el: '#problem-list',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-problem-list', {
         props: {
