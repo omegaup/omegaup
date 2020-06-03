@@ -2574,7 +2574,7 @@ export namespace messages {
   export type ProblemAdminListRequest = { [key: string]: any };
   export type ProblemAdminListResponse = {
     pagerItems: types.PageItem[];
-    problems: { tags: { name: string; source: string }[] }[];
+    problems: types.ProblemListItem[];
   };
   export type ProblemAdminsRequest = { [key: string]: any };
   export type ProblemAdminsResponse = {
@@ -2637,7 +2637,7 @@ export namespace messages {
   export type ProblemMyListRequest = { [key: string]: any };
   export type ProblemMyListResponse = {
     pagerItems: types.PageItem[];
-    problems: { tags: { name: string; source: string }[] }[];
+    problems: types.ProblemListItem[];
   };
   export type ProblemRejudgeRequest = { [key: string]: any };
   export type ProblemRejudgeResponse = {};

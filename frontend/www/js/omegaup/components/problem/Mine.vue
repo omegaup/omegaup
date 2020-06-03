@@ -116,7 +116,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginatorv2.vue';
@@ -138,7 +137,7 @@ library.add(faEyeSlash, faTrash, faEdit, faChartBar);
   },
 })
 export default class ProblemMine extends Vue {
-  @Prop() problems!: omegaup.Problem[];
+  @Prop() problems!: types.ProblemListItem[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;

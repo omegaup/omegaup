@@ -3546,7 +3546,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -3589,6 +3589,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity->identity_id
         );
         foreach ($problems as $problem) {
+            /** @var ProblemListItem */
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? []  : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
@@ -3615,7 +3616,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param int $page
@@ -3656,6 +3657,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity->identity_id
         );
         foreach ($problems as $problem) {
+            /** @var ProblemListItem */
             $problemArray = $problem->asArray();
             $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
