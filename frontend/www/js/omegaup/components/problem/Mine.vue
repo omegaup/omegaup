@@ -17,29 +17,31 @@
     </div>
     <div class="card">
       <h5 class="card-header">{{ T.myproblemsListMyProblems }}</h5>
-      <div class="card-body d-flex justify-content-between align-items-center">
-        <div class="form-check mr-3">
-          <label class="form-check-label">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              v-model="shouldShowAllProblems"
-              v-on:change.prevent="
-                $emit('change-show-all-problems', shouldShowAllProblems)
-              "
-            />
-            <span>{{ statementShowAllProblems }}</span>
-          </label>
+      <div class="card-body">
+        <div class="row align-items-center justify-content-between">
+          <div class="form-check col-7">
+            <label class="form-check-label">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                v-model="shouldShowAllProblems"
+                v-on:change.prevent="
+                  $emit('change-show-all-problems', shouldShowAllProblems)
+                "
+              />
+              <span>{{ statementShowAllProblems }}</span>
+            </label>
+          </div>
+          <select
+            class="custom-select col-5"
+            v-model="allProblemsVisibilityOption"
+            v-on:change="onChangeVisibility"
+          >
+            <option selected v-bind:value="-1">{{ T.forSelectedItems }}</option>
+            <option v-bind:value="1">{{ T.makePublic }}</option>
+            <option v-bind:value="0">{{ T.makePrivate }}</option>
+          </select>
         </div>
-        <select
-          class="custom-select"
-          v-model="allProblemsVisibilityOption"
-          v-on:change="onChangeVisibility"
-        >
-          <option selected v-bind:value="-1">{{ T.forSelectedItems }}</option>
-          <option v-bind:value="1">{{ T.makePublic }}</option>
-          <option v-bind:value="0">{{ T.makePrivate }}</option>
-        </select>
       </div>
       <div class="table-responsive">
         <table class="table">
@@ -111,14 +113,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-.custom-select {
-  max-width: 15.5rem;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';

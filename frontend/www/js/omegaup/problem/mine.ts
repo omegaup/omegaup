@@ -2,6 +2,7 @@ import Vue from 'vue';
 import problem_Mine from '../components/problem/Mine.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import { omegaup } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
 import * as UI from '../ui';
@@ -60,7 +61,7 @@ OmegaUp.on('ready', () => {
     },
     data: {
       problems: {},
-      pagerItems: {},
+      pagerItems: <types.PageItem[]>[],
     },
     components: {
       'omegaup-problem-mine': problem_Mine,
