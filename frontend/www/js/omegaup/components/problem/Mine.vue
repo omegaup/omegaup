@@ -37,9 +37,9 @@
             v-model="allProblemsVisibilityOption"
             v-on:change="onChangeVisibility"
           >
-            <option selected v-bind:value="-1">{{ T.forSelectedItems }}</option>
-            <option v-bind:value="1">{{ T.makePublic }}</option>
-            <option v-bind:value="0">{{ T.makePrivate }}</option>
+            <option selected value="-1">{{ T.forSelectedItems }}</option>
+            <option value="1">{{ T.makePublic }}</option>
+            <option value="0">{{ T.makePrivate }}</option>
           </select>
         </div>
       </div>
