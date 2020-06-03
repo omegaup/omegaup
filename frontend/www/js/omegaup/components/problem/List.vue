@@ -84,9 +84,7 @@
                 />
                 <font-awesome-icon
                   v-bind:title="T.wordsWarningProblem"
-                  v-else-if="
-                    problem.visibility === 1 || problem.visibility === -1
-                  "
+                  v-else-if="problem.visibility === -1"
                   v-bind:icon="['fas', 'exclamation-triangle']"
                 />
                 <font-awesome-icon
