@@ -582,6 +582,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleContestEdit: "(C0n7357Edi7)",
   omegaupTitleContestNew: "(C0n7357N3w)",
   omegaupTitleContestStats: "(C0n7357S7a75)",
+  omegaupTitleCourseDetails: "(C0ur53 d37ai15)",
   omegaupTitleCourseEdit: "(Edi7 c0ur53)",
   omegaupTitleCourseNew: "(N3w c0ur53)",
   omegaupTitleGroups: "(Gr0up5)",
