@@ -232,6 +232,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'visibility'
                 );
             }
+            if (
+                ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING ||
+                  $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING) &&
+                    !is_null($params->visibility) &&
+                    $problem->visibility !== $params->visibility &&
+                    !\OmegaUp\Authorization::isQualityReviewer($identity)
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'qualityNominationProblemHasBeenWarning',
+                    'visibility'
+                );
+            }
 
             if ($problem->deprecated) {
                 throw new \OmegaUp\Exceptions\PreconditionFailedException(
