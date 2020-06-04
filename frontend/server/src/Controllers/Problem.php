@@ -3143,7 +3143,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $problem_alias
      *
-     * @return array{smartyProperties: array{statsPayload: StatsPayload}, template: string}
+     * @return array{smartyProperties: array{payload: StatsPayload, title: string}, entrypoint: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3160,15 +3160,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'statsPayload' => array_merge(
+                'payload' => array_merge(
                     [
                         'alias' => $r['problem_alias'],
                         'entity_type' => 'problem',
                     ],
                     self::getStats($problem, $r->identity)
                 ),
+                'title' => 'omegaupTitleProblemStats',
             ],
-            'template' => 'problem.stats.tpl',
+            'entrypoint' => 'common_stats',
         ];
     }
 
@@ -4116,7 +4117,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ProblemDetailsv2Payload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{LOAD_MATHJAX: bool, payload: ProblemDetailsv2Payload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $lang
@@ -4186,6 +4187,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
+                'LOAD_MATHJAX' => true,
                 'payload' => [
                     'problem' => [
                         'alias' => $details['alias'],
@@ -4244,7 +4246,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $rowcount
      * @omegaup-request-param mixed $some_tags
      *
-     * @return array{smartyProperties: array{payload: ProblemListPayload}, template: string}
+     * @return array{smartyProperties: array{payload: ProblemListPayload, title: string}, entrypoint: string}
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -4342,8 +4344,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'tags' => $tags,
                     'tagData' => $tagData,
                 ],
+                'title' => 'omegaupTitleProblems',
             ],
-            'template' => 'problems.tpl',
+            'entrypoint' => 'problem_list',
         ];
     }
 
