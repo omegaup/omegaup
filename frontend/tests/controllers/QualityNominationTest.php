@@ -2413,7 +2413,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the script to canonize tags send throught the
+     * Test for the script to canonicalize tags send throught the
      * feedback form (quality nominations).
      */
     public function testCanonicalizeTags() {
@@ -2450,5 +2450,37 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $tags,
             ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
         );
+    }
+
+    /**
+     * Test for the script to standardize tags send throught the
+     * reviewers feedback form.
+     */
+    public function testStandardizeTags() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+
+        $nomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemCategoryKarelEducation',
+            ]),
+        ]));
+
+        // Run standardize tags
+        \OmegaUp\Test\Utils::runStandardizeTags();
+
+        $updatedNomination = \OmegaUp\DAO\QualityNominations::getByPK(
+            $nomination['qualitynomination_id']
+        );
+        $contents = json_decode($updatedNomination->contents, true);
+        $this->assertEquals('problemLevelBasicKarel', $contents['tag']);
     }
 }
