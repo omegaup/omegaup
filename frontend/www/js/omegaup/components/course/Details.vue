@@ -80,17 +80,19 @@
                     `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url}`
                   "
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'link']" />
-                  {{ T.wordsPublic }}
-                </a>
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsPublic
+                  }}</a
+                >
                 <a
                   v-bind:href="
                     `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url_admin}`
                   "
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'link']" />
-                  {{ T.wordsAdmin }}
-                </a>
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsAdmin
+                  }}</a
+                >
                 <a
                   v-bind:href="
                     `/course/${course.alias}/assignment/${homework.alias}/admin/#runs`
@@ -163,17 +165,19 @@
                     `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url}`
                   "
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'link']" />
-                  {{ T.wordsPublic }}
-                </a>
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsPublic
+                  }}</a
+                >
                 <a
                   v-bind:href="
                     `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url_admin}`
                   "
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'link']" />
-                  {{ T.wordsAdmin }}
-                </a>
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsAdmin
+                  }}</a
+                >
                 <a
                   v-bind:href="
                     `/course/${course.alias}/assignment/${exam.alias}/admin/#runs`
