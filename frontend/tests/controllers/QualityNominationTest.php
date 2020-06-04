@@ -2453,9 +2453,55 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a non-reviewer user cannot change the visibility that is not PRIVATE_WARNING or PUBLIC_WARNING of his problems with a demotion qualitynomination.
+     * A PHPUnit data provider for all the tests that can accept a status.
+     *
+     * @return list<array{0: string, 1: int, 2: int, 3: string, 4:array<int:boolean>, 5: boolean }>
      */
-    public function testUserCannotUpdateProblemWithDemotionResolvedWarning() {
+    public function qualityNominationsDemotionStatusApiUpdateCaseProvider(): array {
+        return [
+            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+            'qualityNominationProblemHasWarning',
+            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => false,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
+            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false], true
+            ],
+            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+            'qualityNominationProblemHasWarning',
+            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true], false
+            ],
+            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            'qualityNominationProblemHasBeenBanned',
+            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => false,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => false,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
+            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false], true,
+            ],
+            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            'qualityNominationProblemHasBeenBanned',
+            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
+            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true], false,
+            ]
+        ];
+    }
+
+    /**
+     * Check that a non-reviewer user cannot change the visibility that is not PRIVATE_WARNING or PUBLIC_WARNING
+     * of his problems with a demotion qualitynomination but only reviewer can change any visibility.
+     * @dataProvider qualityNominationsDemotionStatusApiUpdateCaseProvider
+     */
+    public function testUserCannotUpdateProblemWithDemotionResolved(
+        string $status,
+        int $visibility,
+        string $errorMessage,
+        array $invalidVisibilities,
+        bool $loginAsAuthor
+    ) {
         ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
             [
                 'username' => 'user_test_author'
@@ -2491,111 +2537,6 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
             new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
-                'status' => 'warning',
-                'problem_alias' => $problemData['request']['problem_alias'],
-                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-                'rationale' => 'ew plus something else',
-            ])
-        );
-
-        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-        ]));
-        $this->assertEquals(
-            'warning',
-            $details['nomination_status'],
-            'qualitynomination should have been marked as warning'
-        );
-
-        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
-            'auth_token' => $reviewerLogin->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-        ]));
-        $this->assertEquals(
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
-            $problem['visibility'],
-            'Problem should have been public warning'
-        );
-
-        $login = self::login($author);
-        try {
-            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['problem_alias'],
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-                'message' => 'public -> warning',
-            ]));
-            $this->fail(
-                "Normal user shouldn't be able to update to problem with with visibility warning to public"
-            );
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
-                $e->getMessage(),
-                'qualityNominationProblemHasWarning'
-            );
-        }
-        try {
-            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['problem_alias'],
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
-                'message' => 'public -> warning',
-            ]));
-            $this->fail(
-                "Normal user shouldn't be able to update to problem with with visibility warning to private"
-            );
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
-                $e->getMessage(),
-                'qualityNominationProblemHasWarning'
-            );
-        }
-
-        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
-            'message' => 'public -> warning',
-        ]));
-    }
-
-    /**
-     * Check that a reviewer can change the visibility of his problems with a demotion qualitynomination.
-     * @dataProvider qualityNominationsDemotionStatusProvider
-     */
-    public function testReviewerCanUpdateProblemWithDemotionResolved(
-        string $status,
-        int $visibility
-    ) {
-        $author = \OmegaUp\Test\Factories\QualityNomination::$reviewers[0];
-        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
-            [
-                'author' => $author,
-            ]
-        ));
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-
-        $login = self::login($identity);
-        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'nomination' => 'demotion',
-            'contents' => json_encode([
-                 'statements' => [
-                    'es' => [
-                        'markdown' => 'a + b',
-                    ],
-                 ],
-                 'rationale' => 'ew',
-                 'reason' => 'offensive',
-            ]),
-        ]));
-        // Login as a reviewer and approve ban.
-        $login = self::login($author);
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
                 'status' => $status,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
@@ -2604,7 +2545,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
         $this->assertEquals(
@@ -2614,7 +2555,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
+            'auth_token' => $reviewerLogin->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
         $this->assertEquals(
@@ -2624,11 +2565,30 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $login = self::login($author);
-        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'problem_alias' => $problemData['request']['problem_alias'],
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
-            'message' => 'public -> ' . $status,
-        ]));
+        foreach ($invalidVisibilities as $visibility => $shouldFail) {
+            try {
+                $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                    'auth_token' => ($loginAsAuthor ? $login->auth_token : $reviewerLogin->auth_token),
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                    'visibility' => $visibility,
+                    'message' => "public {$status} -> {$visibility}",
+                ]));
+                if (!$shouldFail) {
+                    $this->fail(
+                        "Normal user shouldn't be able to update to problem {$status} to other visibility that is not {$status}"
+                    );
+                }
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                if ($shouldFail) {
+                    $this->fail(
+                        "Normal user should be able to update to problem warning to other visibility {$status}"
+                    );
+                }
+                $this->assertEquals(
+                    $e->getMessage(),
+                    $errorMessage
+                );
+            }
+        }
     }
 }

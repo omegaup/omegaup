@@ -245,8 +245,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ) !== \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING &&
                     intval(
                         $params->visibility
-                    ) !== \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING &&
-                    \OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+                    ) !== \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING
                 ) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'qualityNominationProblemHasWarning',
