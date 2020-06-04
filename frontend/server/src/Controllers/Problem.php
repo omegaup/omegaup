@@ -239,10 +239,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problem->visibility !== $params->visibility &&
                     !\OmegaUp\Authorization::isQualityReviewer($identity)
             ) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'qualityNominationProblemHasBeenWarning',
-                    'visibility'
-                );
+                if (
+                    intval(
+                        $params->visibility
+                    ) !== \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING &&
+                    intval(
+                        $params->visibility
+                    ) !== \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING &&
+                    \OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'qualityNominationProblemHasWarning',
+                        'visibility'
+                    );
+                }
             }
 
             if ($problem->deprecated) {

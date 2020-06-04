@@ -879,7 +879,7 @@ const translations: { [key: string]: string; } = {
   qualityNominationNotFound: "Nomea\u00e7\u00e3o n\u00e3o foi encontrada",
   qualityNominationProblemHasBeenBanned: "Este problema foi banido. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
   qualityNominationProblemHasBeenPromoted: "Este problema foi promovido. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
-  qualityNominationProblemHasBeenWarning: "Este problema tem um aviso. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
+  qualityNominationProblemHasWarning: "Este problema tem um aviso. Voc\u00ea n\u00e3o pode atualizar sua visibilidade.",
   qualityNominationRateProblem: "Avaliar o problema",
   qualityNominationRateProblemDesc: "Se voc\u00ea quiser avaliar o problema mais tarde, clique no link \"Avaliar o problema\"",
   qualityNominationResolutionSuccess: "Nomea\u00e7\u00e3o resolvido com sucesso.",

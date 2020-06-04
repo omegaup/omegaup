@@ -879,7 +879,7 @@ const translations: { [key: string]: string; } = {
   qualityNominationNotFound: "Nominaci\u00f3n no encontrada",
   qualityNominationProblemHasBeenBanned: "Este problema ha sido suspendido. No puedes cambiar su visibilidad.",
   qualityNominationProblemHasBeenPromoted: "Este problema ha sido promovido. No puedes cambiar su visibilidad.",
-  qualityNominationProblemHasBeenWarning: "Este problema ha tenido una advertencia. No puedes cambiar su visibilidad.",
+  qualityNominationProblemHasWarning: "Este problema tiene una advertencia. No puedes cambiar su visibilidad.",
   qualityNominationRateProblem: "Calificar el problema",
   qualityNominationRateProblemDesc: "Si quieres calificar el problema m\u00e1s tarde, haz clic en el enlace: \"Calificar el problema\"",
   qualityNominationResolutionSuccess: "Nominaci\u00f3n resuelta exitosamente.",

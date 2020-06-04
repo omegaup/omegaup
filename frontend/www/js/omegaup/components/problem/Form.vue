@@ -289,9 +289,8 @@ export default class ProblemForm extends Vue {
 
   get isEditable(): boolean {
     return (
-      this.data.visibilityStatuses.privateWarning < this.visibility &&
-      this.visibility < this.data.visibilityStatuses.promoted &&
-      this.visibility != this.data.visibilityStatuses.publicWarning
+      this.data.visibilityStatuses.publicBanned < this.visibility &&
+      this.visibility < this.data.visibilityStatuses.promoted
     );
   }
 

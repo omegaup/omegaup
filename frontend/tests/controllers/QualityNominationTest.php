@@ -11,12 +11,12 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all the tests that can accept a status.
      *
-     * @return list<array{0: string, 1: int, 2: string}>
+     * @return list<array{0: string, 1: int}>
      */
     public function qualityNominationsDemotionStatusProvider(): array {
         return [
-            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED, 'qualityNominationProblemHasBeenBanned'],
-            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING, 'qualityNominationProblemHasBeenWarning'],
+            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED],
+            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING],
         ];
     }
 
@@ -2453,14 +2453,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a non-reviewer user cannot change the visibility of its problems with a demotion qualitynomination.
-     * @dataProvider qualityNominationsDemotionStatusProvider
+     * Check that a non-reviewer user cannot change the visibility that is not PRIVATE_WARNING or PUBLIC_WARNING of his problems with a demotion qualitynomination.
      */
-    public function testUserNormalCannotUpdateProblemWithDemotionResolved(
-        string $status,
-        int $visibility,
-        $exception
-    ) {
+    public function testUserCannotUpdateProblemWithDemotionResolvedWarning() {
         ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
             [
                 'username' => 'user_test_author'
@@ -2496,7 +2491,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
             new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
-                'status' => $status,
+                'status' => 'warning',
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
                 'rationale' => 'ew plus something else',
@@ -2508,9 +2503,9 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
         $this->assertEquals(
-            $status,
+            'warning',
             $details['nomination_status'],
-            "qualitynomination should have been marked as {$status}"
+            'qualitynomination should have been marked as warning'
         );
 
         $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
@@ -2518,13 +2513,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
         $this->assertEquals(
-            $visibility,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
             $problem['visibility'],
-            "Problem should have been public {$status}"
+            'Problem should have been public warning'
         );
 
+        $login = self::login($author);
         try {
-            $login = self::login($author);
             $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
@@ -2532,21 +2527,44 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'message' => 'public -> warning',
             ]));
             $this->fail(
-                "Normal user shouldn't be able to update to problem with with visivility {$status}"
+                "Normal user shouldn't be able to update to problem with with visibility warning to public"
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals(
                 $e->getMessage(),
-                $exception
+                'qualityNominationProblemHasWarning'
             );
         }
+        try {
+            $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+                'message' => 'public -> warning',
+            ]));
+            $this->fail(
+                "Normal user shouldn't be able to update to problem with with visibility warning to private"
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                $e->getMessage(),
+                'qualityNominationProblemHasWarning'
+            );
+        }
+
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING,
+            'message' => 'public -> warning',
+        ]));
     }
 
     /**
-     * Check that a non-reviewer user can change the visibility of his problems with a demotion qualitynomination.
+     * Check that a reviewer can change the visibility of his problems with a demotion qualitynomination.
      * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testUserReviewerCanUpdateProblemWithDemotionResolved(
+    public function testReviewerCanUpdateProblemWithDemotionResolved(
         string $status,
         int $visibility
     ) {
@@ -2612,7 +2630,5 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
             'message' => 'public -> ' . $status,
         ]));
-
-        $this->assertFalse($response['rejudged']);
     }
 }
