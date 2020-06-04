@@ -249,8 +249,8 @@ export default class CourseDetails extends Vue {
     return progress.max_score === 0 ? percentText : `${percentText}%`;
   }
 
-  getFormattedTime(timestamp: number): string {
-    return time.formatDateTime(time.remoteTime(timestamp * 1000));
+  getFormattedTime(date: Date): string {
+    return time.formatDateTime(date);
   }
 
   get descriptionHtml(): string {
