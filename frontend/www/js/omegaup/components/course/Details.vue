@@ -77,7 +77,7 @@
               <td class="text-center" v-if="course.is_admin">
                 <a
                   v-bind:href="
-                    `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url}`
+                    `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url}/`
                   "
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
@@ -86,7 +86,7 @@
                 >
                 <a
                   v-bind:href="
-                    `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url_admin}`
+                    `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url_admin}/`
                   "
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
@@ -162,7 +162,7 @@
               <td class="text-center" v-if="course.is_admin">
                 <a
                   v-bind:href="
-                    `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url}`
+                    `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url}/`
                   "
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
@@ -171,7 +171,7 @@
                 >
                 <a
                   v-bind:href="
-                    `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url_admin}`
+                    `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url_admin}/`
                   "
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
