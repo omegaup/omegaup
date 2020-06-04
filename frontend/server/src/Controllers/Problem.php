@@ -3590,7 +3590,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         foreach ($problems as $problem) {
             /** @var ProblemListItem */
-            $problemArray = $problem->asArray();
+            $problemArray = $problem->asFilteredArray([
+                'alias',
+                'difficulty',
+                'difficulty_histogram',
+                'points',
+                'quality',
+                'quality_histogram',
+                'ratio',
+                'score',
+                'tags',
+                'title',
+                'visibility',
+                'quality_seal',
+            ]);
             $problemArray['tags'] = $hiddenTags ? []  : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
                 /*$public=*/false,
@@ -3658,7 +3671,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         foreach ($problems as $problem) {
             /** @var ProblemListItem */
-            $problemArray = $problem->asArray();
+            $problemArray = $problem->asFilteredArray([
+                'alias',
+                'difficulty',
+                'difficulty_histogram',
+                'points',
+                'quality',
+                'quality_histogram',
+                'ratio',
+                'score',
+                'tags',
+                'title',
+                'visibility',
+                'quality_seal',
+            ]);
             $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
                 /*$public=*/false,
