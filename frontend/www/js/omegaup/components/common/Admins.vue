@@ -1,9 +1,9 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
+  <div class="card mb-3 panel panel-primary">
+    <div class="card-body panel-body">
       <form class="form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label
+          <label class="font-weight-bold"
             >{{ T.wordsAdmin }}
             <span
               aria-hidden="true"
@@ -26,7 +26,7 @@
             </button>
           </div>
           <div class="toggle-container col-md-6">
-            <label>
+            <label class="font-weight-bold">
               <input
                 type="checkbox"
                 name="toggle-site-admins"
@@ -78,6 +78,15 @@
     </table>
   </div>
 </template>
+
+<style>
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: #aaa;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';

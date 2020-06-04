@@ -32,6 +32,7 @@
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
+ * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -4397,7 +4398,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{IS_UPDATE: true, LOAD_MATHJAX: true, STATUS_ERROR?: string, STATUS_SUCCESS: null|string, payload: ProblemEditPayload, problemAdminsPayload: ProblemAdminsPayload, problemEditPayload: ProblemEditTransitionalPayload, problemMarkdownPayload: ProblemMarkdownPayload, problemTagsPayload: ProblemTagsPayload}, template: string}
+     * @return array{smartyProperties: array{IS_UPDATE: true, LOAD_MATHJAX: true, STATUS_ERROR?: string, STATUS_SUCCESS: null|string, payload: ProblemEditPayload, problemAdminsPayload: ProblemAdminsPayload, problemEditPayload: ProblemEditTransitionalPayload, problemMarkdownPayload: ProblemMarkdownPayload, problemTagsPayload: ProblemTagsPayload, title: string}, template: string}
      *
      * @omegaup-request-param string $contents
      * @omegaup-request-param string $directory
@@ -4523,6 +4524,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $details,
                     self::getCommonPayloadForSmarty()
                 ),
+                'title' => 'problemEditEditProblem',
             ],
             'template' => 'problem.edit.tpl',
         ];
