@@ -93,6 +93,7 @@
     "vue": "^2.5.22",
     "vue-async-computed": "^3.8.1",
     "vue-async-computed-decorator": "^0.0.4",
+    "vue-mathjax": "^0.0.11",
     "vue-multiselect": "^2.1.6",
     "vue-slider-component": "^3.0.25"
   }

@@ -594,6 +594,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleMyProblemsList: "Meus problemas",
   omegaupTitleOmegaUpForSchools: "Bem-vindo a omegaUp para escolas",
   omegaupTitlePrivacyPolicy: "Pol\u00edtica de privacidade",
+  omegaupTitleProblem: "Problema",
   omegaupTitleProblemEdit: "Editar problema",
   omegaupTitleProblemNew: "Novo problema",
   omegaupTitleProblemStats: "Estat\u00edsticas do problema",
