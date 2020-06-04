@@ -3122,7 +3122,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $problem_alias
      *
-     * @return array{smartyProperties: array{statsPayload: StatsPayload}, template: string}
+     * @return array{smartyProperties: array{payload: StatsPayload, title: string}, entrypoint: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3139,15 +3139,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'statsPayload' => array_merge(
+                'payload' => array_merge(
                     [
                         'alias' => $r['problem_alias'],
                         'entity_type' => 'problem',
                     ],
                     self::getStats($problem, $r->identity)
                 ),
+                'title' => 'omegaupTitleProblemStats',
             ],
-            'template' => 'problem.stats.tpl',
+            'entrypoint' => 'common_stats',
         ];
     }
 
