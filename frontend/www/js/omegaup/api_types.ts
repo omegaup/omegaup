@@ -600,6 +600,14 @@ export namespace types {
       );
     }
 
+    export function ProblemsMineInfoPayload(
+      elementId: string = 'payload',
+    ): types.ProblemsMineInfoPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function SchoolOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
@@ -1353,6 +1361,11 @@ export namespace types {
     parents?: string[];
     tree?: { [key: string]: string };
     version?: string;
+  }
+
+  export interface ProblemsMineInfoPayload {
+    isSysadmin: boolean;
+    privateProblemsAlert: boolean;
   }
 
   export interface Problemset {
@@ -2604,7 +2617,7 @@ export namespace messages {
   export type ProblemAdminListRequest = { [key: string]: any };
   export type ProblemAdminListResponse = {
     pagerItems: types.PageItem[];
-    problems: { tags: { name: string; source: string }[] }[];
+    problems: types.ProblemListItem[];
   };
   export type ProblemAdminsRequest = { [key: string]: any };
   export type ProblemAdminsResponse = {
@@ -2681,7 +2694,7 @@ export namespace messages {
   export type ProblemMyListRequest = { [key: string]: any };
   export type ProblemMyListResponse = {
     pagerItems: types.PageItem[];
-    problems: { tags: { name: string; source: string }[] }[];
+    problems: types.ProblemListItem[];
   };
   export type ProblemRejudgeRequest = { [key: string]: any };
   export type ProblemRejudgeResponse = {};
