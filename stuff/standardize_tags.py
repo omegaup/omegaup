@@ -33,39 +33,6 @@ MAPPINGS = {
         'problemLevelAdvancedSpecializedTopics',
 }
 
-DELETABLE_TAG = 'problemCategoryOpenResponse'
-
-
-def setup_levels_tags(dbconn: MySQLdb.connections.Connection) -> None:
-    '''Inserts new level tags, updates and deletes old category tags'''
-    logging.info('Setting up level tags on database')
-    with dbconn.cursor() as cur:
-        cur.execute(
-            '''
-                DELETE FROM `Problems_Tags` WHERE `source` = 'quality'
-            '''
-        )
-
-        cur.execute(
-            '''
-                DELETE FROM
-                    `Tags`
-                WHERE
-                    `name` = %s;
-            ''', (DELETABLE_TAG,)
-        )
-
-        for key, value in MAPPINGS.items():
-            cur.execute(
-                '''
-                    UPDATE
-                        `Tags`
-                    SET
-                        `name` = %s
-                    WHERE
-                        `name` = %s;
-                ''', (value, key))
-
 
 def standardize_tags(dbconn: MySQLdb.connections.Connection) -> None:
     '''Reads quality_tag suggestions and updates or deletes them'''
@@ -118,7 +85,6 @@ def main() -> None:
     dbconn = db.connect(args)
     warnings.filterwarnings('ignore', category=dbconn.Warning)
     try:
-        setup_levels_tags(dbconn)
         standardize_tags(dbconn)
         dbconn.commit()
     except:  # noqa: bare-except

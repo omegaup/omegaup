@@ -362,34 +362,4 @@ class Utils {
              ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
         );
     }
-
-    public static function runCanonicalizeTags(): void {
-        // Ensure everything is commited before invoking external script
-        self::commit();
-        self::shellExec(
-            ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/canonicalize_tags.py' .
-             ' --quiet ' .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
-        );
-    }
-
-    public static function runStandardizeTags(): void {
-        // Ensure everything is commited before invoking external script
-        self::commit();
-        self::shellExec(
-            ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/standardize_tags.py' .
-             ' --quiet ' .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
-        );
-    }
 }
