@@ -2299,6 +2299,29 @@ export class Arena {
       }
       groups = detailsGroups;
     }
+
+    // Setup run details view, if available.
+    if (
+      document.getElementById('run-details') !== null &&
+      !this.runDetailsView
+    ) {
+      this.runDetailsView = new Vue({
+        el: '#run-details',
+        render: function(createElement) {
+          return createElement('omegaup-arena-rundetails', {
+            props: {
+              data: this.data,
+            },
+          });
+        },
+        data: { data: null },
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+      });
+      this.bindGlobalHandlers();
+    }
+
     if (this.runDetailsView) {
       this.runDetailsView.data = {
         compile_error: data.compile_error,
@@ -2320,7 +2343,6 @@ export class Arena {
         ),
       };
     }
-    console.log(document.querySelector('.run-details-view'));
     (<HTMLElement>document.querySelector('.run-details-view')).style.display =
       'block';
   }
