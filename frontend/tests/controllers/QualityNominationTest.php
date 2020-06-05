@@ -2460,7 +2460,8 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     public function qualityNominationsDemotionStatusApiUpdateCaseProvider(): array {
         return [
             [
-                'warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                'warning',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
                 'qualityNominationProblemHasWarning',
                 [
                     \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,
