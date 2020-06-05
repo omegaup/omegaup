@@ -7,6 +7,16 @@ import { OmegaUp } from '../omegaup';
 describe('arena', () => {
   describe('ArenaAdmin', () => {
     before(() => {
+      // Create the mountpoint for the arena.Runs component.
+      const runsDiv = document.createElement('div');
+      runsDiv.id = 'runs';
+
+      const runsTable = document.createElement('table');
+      runsTable.className = 'runs';
+
+      runsDiv.appendChild(runsTable);
+      document.body.appendChild(runsDiv);
+
       OmegaUp.ready = true;
     });
 
