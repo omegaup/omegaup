@@ -2530,10 +2530,10 @@ the owner).
 
 ### Returns
 
-| Name         | Type                                               |
-| ------------ | -------------------------------------------------- |
-| `pagerItems` | `types.PageItem[]`                                 |
-| `problems`   | `{ tags: { name: string; source: string; }[]; }[]` |
+| Name         | Type                      |
+| ------------ | ------------------------- |
+| `pagerItems` | `types.PageItem[]`        |
+| `problems`   | `types.ProblemListItem[]` |
 
 ## `/api/problem/admins/`
 
@@ -2745,10 +2745,10 @@ Gets a list of problems where current user is the owner
 
 ### Returns
 
-| Name         | Type                                               |
-| ------------ | -------------------------------------------------- |
-| `pagerItems` | `types.PageItem[]`                                 |
-| `problems`   | `{ tags: { name: string; source: string; }[]; }[]` |
+| Name         | Type                      |
+| ------------ | ------------------------- |
+| `pagerItems` | `types.PageItem[]`        |
+| `problems`   | `types.ProblemListItem[]` |
 
 ## `/api/problem/rejudge/`
 
