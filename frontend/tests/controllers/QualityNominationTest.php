@@ -2413,46 +2413,6 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the script to canonize tags send throught the
-     * feedback form (quality nominations).
-     */
-    public function testCanonicalizeTags() {
-        $problemData[0] = \OmegaUp\Test\Factories\Problem::createProblem();
-        $problemData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
-        self::setUpSyntheticSuggestions($problemData);
-
-        // Run canonicalize tags
-        \OmegaUp\Test\Utils::runCanonicalizeTags();
-        \OmegaUp\Test\Utils::runAggregateFeedback();
-
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
-        sort($tags);
-        $this->assertEquals(
-            $tags,
-            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
-        );
-
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[1]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
-        sort($tags);
-        $this->assertEquals(
-            $tags,
-            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
-        );
-    }
-
-    /**
      * A PHPUnit data provider for all the tests that can accept a status.
      *
      * @return list<array{0: string, 1: int, 2: int, 3: string, 4:array<int:boolean>, 5: boolean }>
