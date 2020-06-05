@@ -8,7 +8,7 @@ import * as ui from '../ui';
 import * as Highcharts from 'highcharts';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.StatsPayload('stats-payload');
+  const payload = types.payloadParsers.StatsPayload();
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
@@ -72,7 +72,7 @@ OmegaUp.on('ready', () => {
   };
 
   let statsChart = new Vue({
-    el: '#common-stats',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-common-stats', {
         props: {
