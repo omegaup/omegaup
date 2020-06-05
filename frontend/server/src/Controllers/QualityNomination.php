@@ -58,15 +58,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTopicTwoPointers',
     ];
 
-    const CATEGORY_TAGS = [
-        'problemCategoryOpenResponse',
-        'problemCategoryKarelEducation',
-        'problemCategoryIntroductionToProgramming',
-        'problemCategoryMathematicalProblems',
-        'problemCategoryElementaryDataStructures',
-        'problemCategoryAlgorithmAndNetworkOptimization',
-        'problemCategoryCompetitiveProgramming',
-        'problemCategorySpecializedTopics',
+    const LEVEL_TAGS = [
+        'problemLevelAdvancedCompetitiveProgramming',
+        'problemLevelAdvancedSpecializedTopics',
+        'problemLevelBasicIntroductionToProgramming',
+        'problemLevelBasicKarel',
+        'problemLevelIntermediateAnalysisAndDesignOfAlgorithms',
+        'problemLevelIntermediateDataStructuresAndAlgorithms',
+        'problemLevelIntermediateMathsInProgramming',
     ];
 
     /**
@@ -337,7 +336,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
             if (
                 isset($contents['tag']) &&
-                !in_array($contents['tag'], self::CATEGORY_TAGS)
+                !in_array($contents['tag'], self::LEVEL_TAGS)
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',

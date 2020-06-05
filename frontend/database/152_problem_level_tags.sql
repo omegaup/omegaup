@@ -1,5 +1,5 @@
 DELETE FROM
-    `Problem_Tags`
+    `Problems_Tags`
 WHERE
     `source` = 'quality';
 
