@@ -40,6 +40,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     const SOLUTION_UNLOCKED = 'unlocked';
     const SOLUTION_LOCKED = 'locked';
 
+    // TODO: No olvidar de editar estos por los nuevos nombres localizados
     const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
     const VALID_SORTING_MODES = ['asc', 'desc'];

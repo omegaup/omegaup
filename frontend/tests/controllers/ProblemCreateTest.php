@@ -487,6 +487,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $r['selected_tags'] = json_encode(
             $expectedTags + [
                 // The following tags will be ignored:
+                // TODO: también acomodar los nombres acá
                 ['tagname' => 'karel', 'public' => true],
                 ['tagname' => 'solo-salida', 'public' => false],
             ]
