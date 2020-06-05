@@ -1211,6 +1211,7 @@ const translations: { [key: string]: string; } = {
   wordsGenderMale: "Masculino",
   wordsGenderOther: "Outros",
   wordsGetVersions: "Obter vers\u00f5es",
+  wordsGlobalSubmissions: "Envios globais",
   wordsGood: "Boa",
   wordsGroup: "Grupo",
   wordsGroupAdmin: "Grupo de administradores",

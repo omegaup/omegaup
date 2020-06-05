@@ -2320,6 +2320,7 @@ export class Arena {
         ),
       };
     }
+    console.log(document.querySelector('.run-details-view'));
     (<HTMLElement>document.querySelector('.run-details-view')).style.display =
       'block';
   }

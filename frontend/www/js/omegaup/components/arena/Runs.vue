@@ -1,234 +1,256 @@
 <template>
-  <table class="runs">
-    <caption>
-      {{
-        T.wordsSubmissions
-      }}
-      <div v-if="showPager">
-        <button v-bind:disabled="filterOffset <= 0" v-on:click="filterOffset--">
-          &lt;
-        </button>
-        {{ filterOffset + 1 }}
-        <button
-          v-bind:disabled="runs.length < rowCount"
-          v-on:click="filterOffset++"
-        >
-          &gt;
-        </button>
-
-        <label
-          >{{ T.wordsVerdict }}:
-          <select v-model="filterVerdict">
-            <option value="">{{ T.wordsAll }}</option>
-            <option value="AC">AC</option>
-            <option value="PA">PA</option>
-            <option value="WA">WA</option>
-            <option value="TLE">TLE</option>
-            <option value="MLE">MLE</option>
-            <option value="OLE">OLE</option>
-            <option value="RTE">RTE</option>
-            <option value="RFE">RFE</option>
-            <option value="CE">CE</option>
-            <option value="JE">JE</option>
-            <option value="VE">VE</option>
-            <option value="NO-AC">No AC</option>
-          </select>
-        </label>
-
-        <label
-          >{{ T.wordsStatus }}:
-          <select v-model="filterStatus">
-            <option value="">{{ T.wordsAll }}</option>
-            <option value="new">new</option>
-            <option value="waiting">waiting</option>
-            <option value="compiling">compiling</option>
-            <option value="running">running</option>
-            <option value="ready">ready</option>
-          </select>
-        </label>
-
-        <label
-          >{{ T.wordsLanguage }}:
-          <select v-model="filterLanguage">
-            <option value="">{{ T.wordsAll }}</option>
-            <option value="cpp17-gcc">C++17 (g++ 7.4)</option>
-            <option value="cpp17-clang">C++17 (clang++ 6.0)</option>
-            <option value="cpp11-gcc">C++11 (g++ 7.4)</option>
-            <option value="cpp11-clang">C++11 (clang++ 6.0)</option>
-            <option value="c11-gcc">C (gcc 7.4)</option>
-            <option value="c11-clang">C (clang 6.0)</option>
-            <option value="cs">C# (dotnet 2.2)</option>
-            <option value="hs">Haskell (ghc 8.0)</option>
-            <option value="java">Java (openjdk 11.0)</option>
-            <option value="pas">Pascal (fpc 3.0)</option>
-            <option value="py3">Python 3.6</option>
-            <option value="py2">Python 2.7</option>
-            <option value="rb">Ruby (2.5)</option>
-            <option value="lua">Lua (5.2)</option>
-            <option value="kp">Karel (Pascal)</option>
-            <option value="kj">Karel (Java)</option>
-            <option value="cat">{{ T.wordsJustOutput }}</option>
-          </select>
-        </label>
-
-        <template v-if="showProblem">
-          <label
-            >{{ T.wordsProblem }}:
-            <omegaup-autocomplete
-              v-bind:init="initProblemAutocomplete"
-              v-model="filterProblem"
-            ></omegaup-autocomplete>
-          </label>
+  <div class="card mt-5">
+    <div class="card-header" v-if="globalRuns">
+      <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+    </div>
+    <table class="runs table table-striped">
+      <caption>
+        {{
+          T.wordsSubmissions
+        }}
+        <div v-if="showPager">
           <button
-            type="button"
-            class="close"
-            style="float: none;"
-            v-on:click="filterProblem = ''"
+            v-bind:disabled="filterOffset <= 0"
+            v-on:click="filterOffset--"
           >
-            &times;
+            &lt;
           </button>
-        </template>
+          {{ filterOffset + 1 }}
+          <button
+            v-bind:disabled="runs.length < rowCount"
+            v-on:click="filterOffset++"
+          >
+            &gt;
+          </button>
 
-        <template v-if="showUser">
           <label
-            >{{ T.wordsUser }}:
-            <omegaup-autocomplete
-              v-bind:init="
-                el => typeahead.userContestTypeahead(el, this.contestAlias)
+            >{{ T.wordsVerdict }}:
+            <select v-model="filterVerdict">
+              <option value="">{{ T.wordsAll }}</option>
+              <option value="AC">AC</option>
+              <option value="PA">PA</option>
+              <option value="WA">WA</option>
+              <option value="TLE">TLE</option>
+              <option value="MLE">MLE</option>
+              <option value="OLE">OLE</option>
+              <option value="RTE">RTE</option>
+              <option value="RFE">RFE</option>
+              <option value="CE">CE</option>
+              <option value="JE">JE</option>
+              <option value="VE">VE</option>
+              <option value="NO-AC">No AC</option>
+            </select>
+          </label>
+
+          <label
+            >{{ T.wordsStatus }}:
+            <select v-model="filterStatus">
+              <option value="">{{ T.wordsAll }}</option>
+              <option value="new">new</option>
+              <option value="waiting">waiting</option>
+              <option value="compiling">compiling</option>
+              <option value="running">running</option>
+              <option value="ready">ready</option>
+            </select>
+          </label>
+
+          <label
+            >{{ T.wordsLanguage }}:
+            <select v-model="filterLanguage">
+              <option value="">{{ T.wordsAll }}</option>
+              <option value="cpp17-gcc">C++17 (g++ 7.4)</option>
+              <option value="cpp17-clang">C++17 (clang++ 6.0)</option>
+              <option value="cpp11-gcc">C++11 (g++ 7.4)</option>
+              <option value="cpp11-clang">C++11 (clang++ 6.0)</option>
+              <option value="c11-gcc">C (gcc 7.4)</option>
+              <option value="c11-clang">C (clang 6.0)</option>
+              <option value="cs">C# (dotnet 2.2)</option>
+              <option value="hs">Haskell (ghc 8.0)</option>
+              <option value="java">Java (openjdk 11.0)</option>
+              <option value="pas">Pascal (fpc 3.0)</option>
+              <option value="py3">Python 3.6</option>
+              <option value="py2">Python 2.7</option>
+              <option value="rb">Ruby (2.5)</option>
+              <option value="lua">Lua (5.2)</option>
+              <option value="kp">Karel (Pascal)</option>
+              <option value="kj">Karel (Java)</option>
+              <option value="cat">{{ T.wordsJustOutput }}</option>
+            </select>
+          </label>
+
+          <template v-if="showProblem">
+            <label
+              >{{ T.wordsProblem }}:
+              <omegaup-autocomplete
+                v-bind:init="initProblemAutocomplete"
+                v-model="filterProblem"
+              ></omegaup-autocomplete>
+            </label>
+            <button
+              type="button"
+              class="close"
+              style="float: none;"
+              v-on:click="filterProblem = ''"
+            >
+              &times;
+            </button>
+          </template>
+
+          <template v-if="showUser">
+            <label
+              >{{ T.wordsUser }}:
+              <omegaup-autocomplete
+                v-bind:init="
+                  el => typeahead.userContestTypeahead(el, this.contestAlias)
+                "
+                v-model="filterUsername"
+              ></omegaup-autocomplete>
+            </label>
+            <button
+              type="button"
+              class="close"
+              style="float: none;"
+              v-on:click="filterUsername = ''"
+            >
+              &times;
+            </button>
+          </template>
+        </div>
+      </caption>
+      <thead>
+        <tr>
+          <th>{{ T.wordsTime }}</th>
+          <th>GUID</th>
+          <th v-if="showUser">{{ T.wordsUser }}</th>
+          <th v-if="showContest">{{ T.wordsContest }}</th>
+          <th v-if="showProblem">{{ T.wordsProblem }}</th>
+          <th>{{ T.wordsStatus }}</th>
+          <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
+          <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
+          <th v-if="!showPoints" class="numeric">{{ T.wordsPercentage }}</th>
+          <th>{{ T.wordsLanguage }}</th>
+          <th class="numeric">{{ T.wordsMemory }}</th>
+          <th class="numeric">{{ T.wordsRuntime }}</th>
+          <th colspan="3">{{ T.wordsActions }}</th>
+        </tr>
+      </thead>
+      <tfoot v-if="problemAlias != null">
+        <tr>
+          <td colspan="9">
+            <a
+              v-bind:href="`/arena/${contestAlias}/practice/`"
+              v-if="isContestFinished"
+              >{{ T.arenaContestEndedUsePractice }}</a
+            >
+            <a
+              v-bind:href="
+                isProblemsetOpened
+                  ? `#problems/${problemAlias}/new-run`
+                  : `/arena/${contestAlias}/`
               "
-              v-model="filterUsername"
-            ></omegaup-autocomplete>
-          </label>
-          <button
-            type="button"
-            class="close"
-            style="float: none;"
-            v-on:click="filterUsername = ''"
+              v-else=""
+              >{{
+                isProblemsetOpened
+                  ? T.wordsNewSubmissions
+                  : T.arenaContestNotOpened
+              }}</a
+            >
+          </td>
+        </tr>
+      </tfoot>
+      <tbody>
+        <tr v-for="run in filteredRuns">
+          <td>{{ time.formatTimestamp(run.time) }}</td>
+          <td>
+            <acronym v-bind:title="run.guid">
+              <tt>{{ run.guid.substring(0, 8) }}</tt>
+            </acronym>
+          </td>
+          <td v-if="showUser">
+            <omegaup-user-username
+              v-bind:classname="run.classname"
+              v-bind:username="run.username"
+              v-bind:country="run.country_id"
+              v-bind:linkify="true"
+            ></omegaup-user-username>
+          </td>
+          <td v-if="showContest">
+            <a
+              v-bind:href="
+                run.contest_alias ? `/arena/${run.contest_alias}/` : ''
+              "
+              >{{ run.contest_alias }}</a
+            >
+          </td>
+          <td v-if="showProblem">
+            <a v-bind:href="`/arena/problem/${run.alias}/`">{{ run.alias }}</a>
+          </td>
+          <td
+            v-bind:style="{ backgroundColor: statusColor(run) }"
+            data-run-status
+            class="text-center"
           >
-            &times;
-          </button>
-        </template>
-      </div>
-    </caption>
-    <thead>
-      <tr>
-        <th>{{ T.wordsTime }}</th>
-        <th>GUID</th>
-        <th v-if="showUser">{{ T.wordsUser }}</th>
-        <th v-if="showContest">{{ T.wordsContest }}</th>
-        <th v-if="showProblem">{{ T.wordsProblem }}</th>
-        <th>{{ T.wordsStatus }}</th>
-        <th v-if="showPoints" class="numeric">{{ T.wordsPoints }}</th>
-        <th v-if="showPoints" class="numeric">{{ T.wordsPenalty }}</th>
-        <th v-if="!showPoints" class="numeric">{{ T.wordsPercentage }}</th>
-        <th>{{ T.wordsLanguage }}</th>
-        <th class="numeric">{{ T.wordsMemory }}</th>
-        <th class="numeric">{{ T.wordsRuntime }}</th>
-        <th v-if="showRejudge">{{ T.wordsRejudge }}</th>
-        <th v-if="showDisqualify">{{ T.wordsDisqualify }}</th>
-        <th v-if="showDetails">{{ T.wordsDetails }}</th>
-      </tr>
-    </thead>
-    <tfoot v-if="problemAlias != null">
-      <tr>
-        <td colspan="9">
-          <a
-            v-bind:href="`/arena/${contestAlias}/practice/`"
-            v-if="isContestFinished"
-            >{{ T.arenaContestEndedUsePractice }}</a
-          >
-          <a
-            v-bind:href="
-              isProblemsetOpened
-                ? `#problems/${problemAlias}/new-run`
-                : `/arena/${contestAlias}/`
-            "
-            v-else=""
-            >{{
-              isProblemsetOpened
-                ? T.wordsNewSubmissions
-                : T.arenaContestNotOpened
-            }}</a
-          >
-        </td>
-      </tr>
-    </tfoot>
-    <tbody v-for="run in filteredRuns">
-      <tr>
-        <td>{{ time.formatTimestamp(run.time) }}</td>
-        <td>
-          <acronym v-bind:title="run.guid">
-            <tt>{{ run.guid.substring(0, 8) }}</tt>
-          </acronym>
-        </td>
-        <td v-if="showUser">
-          <omegaup-user-username
-            v-bind:classname="run.classname"
-            v-bind:username="run.username"
-            v-bind:country="run.country_id"
-            v-bind:linkify="true"
-          ></omegaup-user-username>
-        </td>
-        <td v-if="showContest">
-          <a
-            v-bind:href="
-              run.contest_alias ? `/arena/${run.contest_alias}/` : ''
-            "
-            >{{ run.contest_alias }}</a
-          >
-        </td>
-        <td v-if="showProblem">
-          <a v-bind:href="`/arena/problem/${run.alias}/`">{{ run.alias }}</a>
-        </td>
-        <td
-          v-bind:style="{ backgroundColor: statusColor(run) }"
-          data-run-status
-        >
-          <span>{{ status(run) }}</span>
-          <button
-            type="button"
-            v-show="!!statusHelp(run)"
-            v-bind:data-content="statusHelp(run)"
-            v-on:click="showVerdictHelp"
-            data-toggle="popover"
-            data-trigger="focus"
-            class="glyphicon glyphicon-question-sign"
-          ></button>
-        </td>
-        <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
-        <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
-        <td v-if="!showPoints" class="numeric">{{ percentage(run) }}</td>
-        <td>{{ run.language }}</td>
-        <td class="numeric">{{ memory(run) }}</td>
-        <td class="numeric">{{ runtime(run) }}</td>
-        <td v-if="showRejudge">
-          <button
-            type="button"
-            class="glyphicon glyphicon-repeat"
-            title="rejudge"
-            v-on:click="$emit('rejudge', run)"
-          ></button>
-        </td>
-        <td v-if="showDisqualify">
-          <button
-            type="button"
-            class="glyphicon glyphicon-ban-circle"
-            title="disqualify"
-            v-on:click="$emit('disqualify', run)"
-          ></button>
-        </td>
-        <td v-if="showDetails">
-          <button
-            type="button"
-            data-run-details
-            class="details glyphicon glyphicon-zoom-in"
-            v-on:click="$emit('details', run)"
-          ></button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+            <span>{{ status(run) }}</span>
+
+            <button
+              type="button"
+              v-if="!!statusHelp(run)"
+              v-bind:data-content="statusHelp(run)"
+              v-on:click="showVerdictHelp"
+              data-toggle="popover"
+              data-trigger="focus"
+              class="btn btn-outline-dark btn-sm"
+            >
+              <font-awesome-icon v-bind:icon="['fas', 'question-circle']" />
+            </button>
+          </td>
+          <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
+          <td v-if="showPoints" class="numeric">{{ penalty(run) }}</td>
+          <td v-if="!showPoints" class="numeric">{{ percentage(run) }}</td>
+          <td>{{ run.language }}</td>
+          <td class="numeric">{{ memory(run) }}</td>
+          <td class="numeric">{{ runtime(run) }}</td>
+          <td v-if="showRejudge">
+            <button
+              type="button"
+              v-bind:title="T.wordsRejudge"
+              v-on:click="$emit('rejudge', run)"
+              class="btn btn-outline-dark btn-sm"
+            >
+              <font-awesome-icon v-bind:icon="['fas', 'redo-alt']" />
+            </button>
+          </td>
+          <td v-if="showDisqualify">
+            <button
+              type="button"
+              v-bind:title="T.wordsDisqualify"
+              v-on:click="$emit('disqualify', run)"
+              class="btn btn-outline-dark btn-sm"
+            >
+              <font-awesome-icon v-bind:icon="['fas', 'ban']" />
+            </button>
+          </td>
+          <td v-if="showDetails">
+            <button
+              type="button"
+              data-run-details
+              v-on:click="$emit('details', run)"
+              class="details btn btn-outline-dark btn-sm"
+            >
+              <font-awesome-icon v-bind:icon="['fas', 'search-plus']" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
+
+<style>
+caption {
+  caption-side: top;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
@@ -237,8 +259,22 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
+import arena_RunDetails from './RunDetails.vue';
 
 import Autocomplete from '../Autocomplete.vue';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faQuestionCircle,
+  faRedoAlt,
+  faBan,
+  faSearchPlus,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faQuestionCircle);
+library.add(faRedoAlt);
+library.add(faBan);
+library.add(faSearchPlus);
 
 declare global {
   interface JQuery {
@@ -248,8 +284,10 @@ declare global {
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-autocomplete': Autocomplete,
     'omegaup-user-username': user_Username,
+    'omegaup-arena-rundetails': arena_RunDetails,
   },
 })
 export default class Runs extends Vue {
@@ -269,6 +307,7 @@ export default class Runs extends Vue {
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
+  @Prop({ default: false }) globalRuns!: boolean;
 
   T = T;
   time = time;
@@ -424,7 +463,7 @@ export default class Runs extends Vue {
   status(run: types.Run): string {
     if (run.type == 'disqualified') return T.wordsDisqualified;
 
-    return run.status == 'ready' ? T[`verdict${run.verdict}`] : run.status;
+    return run.status == 'ready' ? run.verdict : run.status;
   }
 
   statusHelp(run: types.Run): string {
@@ -440,8 +479,10 @@ export default class Runs extends Vue {
       }
     }
     if (run.type == 'disqualified') return T.verdictHelpDisqualified;
+    const verdict = T[`verdict${run.verdict}`];
+    const verdictHelp = T[`verdictHelp${run.verdict}`];
 
-    return T[`verdictHelp${run.verdict}`];
+    return `${verdict}: ${verdictHelp}`;
   }
 
   @Watch('username')
