@@ -2459,40 +2459,72 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function qualityNominationsDemotionStatusApiUpdateCaseProvider(): array {
         return [
-            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
-            'qualityNominationProblemHasWarning',
-            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => false,
-            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
-            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false], true
+            [
+                'warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                'qualityNominationProblemHasWarning',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false
+                ],
+                true
             ],
-            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
-            'qualityNominationProblemHasWarning',
-            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true], false
+            [
+                'warning',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                'qualityNominationProblemHasWarning',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true
+                ],
+                false
             ],
-            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
-            'qualityNominationProblemHasBeenBanned',
-            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => false,
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => false,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
-            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false], true,
+            [
+                'banned',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                'qualityNominationProblemHasBeenBanned',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false
+                ],
+                true,
             ],
-            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
-            'qualityNominationProblemHasBeenBanned',
-            [\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,\OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
-            \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true], false,
+            [
+                'banned',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                'qualityNominationProblemHasBeenBanned',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true
+                ],
+                false,
             ]
         ];
     }
 
     /**
-     * Check that a non-reviewer user cannot change the visibility that is not PRIVATE_WARNING or PUBLIC_WARNING
-     * of his problems with a demotion qualitynomination but only reviewer can change any visibility.
+     * Check that a non-reviewer user cannot change the visibility that is not PRIVATE_WARNING
+     * or PUBLIC_WARNING of his problems with a demotion qualitynomination but only reviewer
+     * can change any visibility.
      * @dataProvider qualityNominationsDemotionStatusApiUpdateCaseProvider
      */
     public function testUserCannotUpdateProblemWithDemotionResolved(
@@ -2534,7 +2566,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
         );
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
             new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
                 'status' => $status,
@@ -2565,21 +2597,21 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $login = self::login($author);
-        foreach ($invalidVisibilities as $visibility => $shouldFail) {
+        foreach ($invalidVisibilities as $visibility => $shouldPass) {
             try {
-                $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
                     'auth_token' => ($loginAsAuthor ? $login->auth_token : $reviewerLogin->auth_token),
                     'problem_alias' => $problemData['request']['problem_alias'],
                     'visibility' => $visibility,
                     'message' => "public {$status} -> {$visibility}",
                 ]));
-                if (!$shouldFail) {
+                if (!$shouldPass) {
                     $this->fail(
                         "Normal user shouldn't be able to update to problem {$status} to other visibility that is not {$status}"
                     );
                 }
             } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-                if ($shouldFail) {
+                if ($shouldPass) {
                     $this->fail(
                         "Normal user should be able to update to problem warning to other visibility {$status}"
                     );
