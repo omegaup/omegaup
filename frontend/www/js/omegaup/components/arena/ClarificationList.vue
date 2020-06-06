@@ -98,7 +98,7 @@
 </template>
 
 <style scoped>
-/* Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors) */
+// Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
 /deep/ pre {
   display: block;
   padding: 0.5rem;
