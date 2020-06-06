@@ -14,7 +14,7 @@
         v-model="queryProblem"
         v-bind:placeholder="T.wordsKeyword"
         class="form-control"
-        v-show="selectColumn == 'alias'"
+        v-show="selectColumn == 'problem_alias'"
       ></omegaup-autocomplete>
       <omegaup-autocomplete
         v-bind:init="el => typeahead.userTypeahead(el)"
@@ -29,13 +29,7 @@
       <button
         class="btn btn-primary"
         v-on:click.prevent="
-          $emit(
-            'goToPage',
-            1,
-            showAll ? 'all' : 'open',
-            getQuery(),
-            selectColumn,
-          )
+          $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
         "
       >
         {{ T.wordsSearch }}
@@ -61,13 +55,7 @@
               type="checkbox"
               v-model="showAll"
               v-on:change="
-                $emit(
-                  'goToPage',
-                  1,
-                  showAll ? 'all' : 'open',
-                  getQuery(),
-                  selectColumn,
-                )
+                $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
               "
             />
             {{ T.qualityNominationShowAll }}
@@ -120,14 +108,7 @@
       <omegaup-common-paginator
         v-bind:pager-items="pagerItems"
         v-on:page-changed="
-          page =>
-            $emit(
-              'goToPage',
-              page,
-              this.showAll ? 'all' : 'open',
-              getQuery(),
-              selectColumn,
-            )
+          page => $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
         "
       ></omegaup-common-paginator>
     </div>
@@ -167,7 +148,7 @@ export default class QualityNominationList extends Vue {
   queryUsername = '';
   selectColumn = '';
   columns = {
-    alias: T.wordsProblem,
+    problem_alias: T.wordsProblem,
     nominator_username: T.wordsNominator,
     author_username: T.wordsAuthor,
   };
@@ -186,6 +167,14 @@ export default class QualityNominationList extends Vue {
       return this.queryUsername;
     } else {
       return this.queryProblem;
+    }
+  }
+
+  getStatus(): string {
+    if (this.showAll) {
+      return 'all';
+    } else {
+      return 'open';
     }
   }
 

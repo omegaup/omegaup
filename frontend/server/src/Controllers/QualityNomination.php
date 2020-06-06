@@ -875,7 +875,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateOptionalInEnum(
                 $r['column'],
                 'column',
-                ['alias','nominator_username','author_username']
+                ['problem_alias','nominator_username','author_username']
             );
             $query = strval($r['query']);
             $column = strval($r['column']);

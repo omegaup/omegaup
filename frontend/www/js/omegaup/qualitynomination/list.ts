@@ -62,7 +62,6 @@ OmegaUp.on('ready', function() {
     if (!payload.myView) {
       request.status = status;
       if (query && column) {
-        // se puede mejor pasar `null` en vez de cadena vacía para estos?
         request.query = query;
         request.column = column;
       }
