@@ -41,7 +41,6 @@ describe('ClarificationList.vue', () => {
       },
     });
     expect(wrapper.find('th').text()).toBe(T.wordsProblem);
-    expect(wrapper.find('th').text()).not.toBe(T.wordsContest);
   });
 
   it('Should handle contest clarifications', async () => {
@@ -52,6 +51,5 @@ describe('ClarificationList.vue', () => {
       },
     });
     expect(wrapper.find('th').text()).toBe(T.wordsContest);
-    expect(wrapper.find('th').text()).not.toBe(T.wordsProblem);
   });
 });
