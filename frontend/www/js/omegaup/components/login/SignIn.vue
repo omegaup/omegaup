@@ -87,6 +87,7 @@
               <div class="form-group">
                 <button
                   class="btn btn-primary form-control"
+                  name="sign"
                   v-on:click.prevent="
                     $emit(
                       'register-and-login',
@@ -147,7 +148,6 @@ export default class SignIn extends Vue {
   }
 
   login(url: string) {
-    //this.$gAuth.getAuthCode()
     this.$emit('loginGoogle');
   }
 }

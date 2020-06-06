@@ -229,10 +229,14 @@ class Driver:  # pylint: disable=too-many-instance-attributes
 
         self.wait.until(
             EC.visibility_of_element_located(
-                (By.ID, 'user'))).send_keys(username)
-        self.browser.find_element_by_id('pass').send_keys(password)
+                (By.CSS, 'input[name="login_username"]'))).send_keys(username)
+        self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS, 'input[name="login_password"]'))).send_keys(password)
         with self.page_transition():
-            self.browser.find_element_by_id('login_form').submit()
+            self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS, 'input[name="login"]'))).click()
 
         try:
             yield
@@ -267,13 +271,24 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                      '//a[contains(@href, "/login/")]'))).click()
 
         # Login screen
-        self.browser.find_element_by_id('reg_username').send_keys(user)
-        self.browser.find_element_by_id('reg_email').send_keys(
-            'email_%s@localhost.localdomain' % user)
-        self.browser.find_element_by_id('reg_pass').send_keys(passw)
-        self.browser.find_element_by_id('reg_pass2').send_keys(passw)
+        self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS, 'input[name="reg_username"]'))).send_keys(user)
+        self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS, 'input[name="reg_email"]'))).send_keys(
+                    'email_%s@localhost.localdomain' % user)
+        self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS, 'input[name="reg_password]'))).send_keys(passw)
+        self.wait.until(
+            EC.visibility_of_element_located(
+                (By.CSS,
+                 'input[name="reg_password_confirmation]'))).send_keys(passw)
         with self.page_transition():
-            self.browser.find_element_by_id('register-form').submit()
+            self.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS, 'input[name="sign"]'))).click()
 
         # Enable experiment
         user_id = util.database_utils.mysql(

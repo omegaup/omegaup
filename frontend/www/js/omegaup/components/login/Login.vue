@@ -36,7 +36,7 @@
           <div class="form-group">
             <label for="user">{{ T.loginEmailUsername }}</label>
             <input
-              name="user"
+              name="login_username"
               v-model="usernameOrEmail"
               type="text"
               class="form-control"
@@ -53,7 +53,7 @@
               >)</label
             >
             <input
-              name="pass"
+              name="login_password"
               v-model="password"
               type="password"
               class="form-control"
@@ -65,6 +65,7 @@
           <div class="form-group">
             <button
               class="btn btn-primary form-control"
+              name="login"
               v-on:click.prevent="$emit('login', usernameOrEmail, password)"
             >
               {{ T.loginLogIn }}
