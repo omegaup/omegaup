@@ -18,29 +18,21 @@ OmegaUp.on('ready', () => {
     return;
   }
 
-  interface Reason {
-    error: string;
-    details: string;
-  }
-
   // All possible paths need to end with redirect().
-  gapi.load('auth2', function() {
+  gapi.load('auth2', () => {
     // ['then'] is used instead of .then(), since these are not real ES6
     // Promise objects, therefore they don't have an .else() or .finally().
     // That trips up the linter.
-
     gapi.auth2.init({})['then'](
       (auth: gapi.auth2.GoogleAuth) => {
         auth.signOut()['then'](
-          () => {
-            redirect();
-          },
+          () => redirect(),
           (error: Promise<String>) => {
             redirect();
           },
         );
       },
-      (error: Reason) => {
+      (error: { error: string; details: string }) => {
         redirect();
       },
     );

@@ -10,7 +10,7 @@
     {if isset($inArena) && $inArena}
       {assign var='LOAD_MATHJAX' value='true'}
       {assign var='navbarSection' value='arena'}
-    {else}
+    {elseif isset($GOOGLECLIENTID)}
       <meta name="google-signin-client_id" content="{$GOOGLECLIENTID}" />
       <script src="https://apis.google.com/js/api.js"></script>
     {/if}
