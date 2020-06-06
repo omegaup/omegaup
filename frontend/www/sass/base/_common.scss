@@ -71,3 +71,19 @@ a.card-header-help {
     text-decoration: none;
   }
 }
+
+.tags-badges .badge {
+  color: black;
+  &:hover {
+    background-color: rgba(black, 0.35);
+  }
+  &-owner {
+    background-color: #ccc;
+  }
+  &-quality {
+    background-color: #ffeb3b;
+  }
+  &-voted {
+    background-color: #99c2ff;
+  }
+}

@@ -11,7 +11,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all the tests that can accept a status.
      *
-     * @return list<list<mixed>>
+     * @return list<array{0: string, 1: int}>
      */
     public function qualityNominationsDemotionStatusProvider(): array {
         return [
@@ -19,6 +19,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ['warning', \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING],
         ];
     }
+
     public function testGetNominationsHasAuthorAndNominatorSet() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login(
@@ -806,6 +807,83 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             $problem['visibility'],
             'Problem should have remained public'
         );
+    }
+
+    /**
+     * A PHPUnit data provider for all the tests that can accept a column for search nominations.
+     *
+     * @return list<array{0: string, 1:string, 2: int}>
+     */
+    public function qualityNominationsDemotionSearchColumnsProvider(): array {
+        return [
+            ['alias', 'problem_1', 1],
+            ['author_username', 'user_test_author', 1],
+            ['nominator_username', 'user_test_nominator',1],
+            ['nominator_username', 'invalid_user_test_nominator', 0],
+        ];
+    }
+
+    /**
+     * Check that can search nominations.
+     * @dataProvider qualityNominationsDemotionSearchColumnsProvider
+     */
+    public function testSearchNominations(
+        string $column,
+        string $query,
+        int $valueExpected
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
+        ));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_nominator'
+            ]
+        ));
+        $login = self::login($identity);
+
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'rationale' => 'qwert',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+            ])
+        );
+
+        $this->assertCount(1, $response['nominations']);
+        // Search for $column
+        $response = \OmegaUp\Controllers\QualityNomination::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'query' => $query,
+                'column' => $column
+            ])
+        );
+        $this->assertCount($valueExpected, $response['nominations']);
     }
 
     /**
@@ -2335,42 +2413,175 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the script to canonize tags send throught the
-     * feedback form (quality nominations).
+     * A PHPUnit data provider for all the tests that can accept a status.
+     *
+     * @return list<array{0: string, 1: int, 2: int, 3: string, 4:array<int:boolean>, 5: boolean }>
      */
-    public function testCanonicalizeTags() {
-        $problemData[0] = \OmegaUp\Test\Factories\Problem::createProblem();
-        $problemData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
-        self::setUpSyntheticSuggestions($problemData);
+    public function qualityNominationsDemotionStatusApiUpdateCaseProvider(): array {
+        return [
+            [
+                'warning',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                'qualityNominationProblemHasWarning',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false
+                ],
+                true
+            ],
+            [
+                'warning',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+                'qualityNominationProblemHasWarning',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true
+                ],
+                false
+            ],
+            [
+                'banned',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                'qualityNominationProblemHasBeenBanned',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false
+                ],
+                true,
+            ],
+            [
+                'banned',
+                \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+                'qualityNominationProblemHasBeenBanned',
+                [
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
+                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true
+                ],
+                false,
+            ]
+        ];
+    }
 
-        // Run canonicalize tags
-        \OmegaUp\Test\Utils::runCanonicalizeTags();
-        \OmegaUp\Test\Utils::runAggregateFeedback();
-
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
+    /**
+     * Check that a non-reviewer user cannot change the visibility that is not PRIVATE_WARNING
+     * or PUBLIC_WARNING of his problems with a demotion qualitynomination but only reviewer
+     * can change any visibility.
+     * @dataProvider qualityNominationsDemotionStatusApiUpdateCaseProvider
+     */
+    public function testUserCannotUpdateProblemWithDemotionResolved(
+        string $status,
+        int $visibility,
+        string $errorMessage,
+        array $invalidVisibilities,
+        bool $loginAsAuthor
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
         ));
-        sort($tags);
-        $this->assertEquals(
-            $tags,
-            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew plus something else',
+            ])
         );
 
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[1]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
-        sort($tags);
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
         $this->assertEquals(
-            $tags,
-            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
+            $status,
+            $details['nomination_status'],
+            "qualitynomination should have been marked as {$status}"
         );
+
+        $problem = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertEquals(
+            $visibility,
+            $problem['visibility'],
+            "Problem should have been public {$status}"
+        );
+
+        $login = self::login($author);
+        foreach ($invalidVisibilities as $visibility => $shouldPass) {
+            try {
+                \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+                    'auth_token' => ($loginAsAuthor ? $login->auth_token : $reviewerLogin->auth_token),
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                    'visibility' => $visibility,
+                    'message' => "public {$status} -> {$visibility}",
+                ]));
+                if (!$shouldPass) {
+                    $this->fail(
+                        "Normal user shouldn't be able to update to problem {$status} to other visibility that is not {$status}"
+                    );
+                }
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                if ($shouldPass) {
+                    $this->fail(
+                        "Normal user should be able to update to problem warning to other visibility {$status}"
+                    );
+                }
+                $this->assertEquals(
+                    $e->getMessage(),
+                    $errorMessage
+                );
+            }
+        }
     }
 }

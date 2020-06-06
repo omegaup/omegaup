@@ -15,8 +15,13 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     public static function setUpBeforeClass(): void {
         parent::setUpBeforeClass();
 
+        /**
+         * @psalm-suppress UndefinedConstant OMEGAUP_TEST_SHARD is only
+         * defined in the test bootstrap.php file
+         */
         $scriptFilename = __DIR__ . '/controllers/gitserver-start.sh ' .
-            OMEGAUP_GITSERVER_PORT . ' /tmp/omegaup/problems.git';
+            OMEGAUP_GITSERVER_PORT . ' ' . OMEGAUP_TEST_ROOT .
+            ' /tmp/omegaup/problems-' . OMEGAUP_TEST_SHARD . '.git';
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
             throw new \Exception(
@@ -28,7 +33,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
 
     public static function tearDownAfterClass(): void {
         parent::tearDownAfterClass();
-        $scriptFilename = __DIR__ . '/controllers/gitserver-stop.sh';
+        $scriptFilename = __DIR__ . '/controllers/gitserver-stop.sh ' . OMEGAUP_TEST_ROOT;
         exec($scriptFilename, $output, $returnVar);
         if ($returnVar != 0) {
             throw new \Exception(
@@ -43,6 +48,8 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
      */
     public function setUp(): void {
         parent::setUp();
+
+        self::log("===== Start {$this->toString()}");
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
         \OmegaUp\Controllers\Session::setCookieOnRegisterSessionForTesting(
             false
@@ -60,6 +67,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         //Clean $_REQUEST before each test
         unset($_REQUEST);
 
+        \OmegaUp\Test\Utils::cleanupProblemFiles();
         \OmegaUp\MySQLConnection::getInstance()->StartTrans();
     }
 
@@ -73,6 +81,8 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
         \OmegaUp\MySQLConnection::getInstance()->FailTrans();
         \OmegaUp\MySQLConnection::getInstance()->CompleteTrans();
         \OmegaUp\Test\Utils::cleanupDBForTearDown();
+
+        self::log("===== Stop {$this->toString()}");
     }
 
     public static function logout(): void {

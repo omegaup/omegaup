@@ -1,5 +1,14 @@
 import { OmegaUp } from '../omegaup';
 
+function redirect() {
+  const params = new URL(document.location.toString()).searchParams;
+  let pathname = params.get('redirect');
+  if (!pathname || pathname.indexOf('/') !== 0) {
+    pathname = '/';
+  }
+  window.location.href = pathname;
+}
+
 OmegaUp.on('ready', () => {
   const clientId = document.querySelector(
     'meta[name="google-signin-client_id"]',
@@ -37,12 +46,3 @@ OmegaUp.on('ready', () => {
     );
   });
 });
-
-function redirect() {
-  const params = new URL(document.location.toString()).searchParams;
-  let pathname = params.get('redirect');
-  if (!pathname || pathname.indexOf('/') !== 0) {
-    pathname = '/';
-  }
-  window.location.href = pathname;
-}

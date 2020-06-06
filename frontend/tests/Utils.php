@@ -22,11 +22,6 @@ class Utils {
         return md5(uniqid(strval(rand()), true));
     }
 
-    private static function cleanPath(string $path): void {
-        \OmegaUp\FileHandler::deleteDirRecursively($path);
-        mkdir($path, 0755, true);
-    }
-
     /**
      * Given a run guid, set a score for its run
      *
@@ -114,7 +109,7 @@ class Utils {
     private static function setUpDefaultDataConfig(): void {
         // Create a test default user for manual UI operations
         \OmegaUp\Controllers\User::$sendEmailOnVerify = false;
-        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(
+        ['user' => $admin] = \OmegaUp\Test\Factories\User::createUser(
             new \OmegaUp\Test\Factories\UserParams([
                 'username' => 'admintest',
                 'password' => 'testtesttest',
@@ -139,28 +134,36 @@ class Utils {
         \OmegaUp\Controllers\Run::$defaultSubmissionGap = 0;
     }
 
-    public static function cleanupLogs(): void {
-        file_put_contents(OMEGAUP_LOG_FILE, '');
-        file_put_contents(OMEGAUP_MYSQL_TYPES_LOG_FILE, '');
-        file_put_contents(__DIR__ . '/controllers/gitserver.log', '');
-    }
-
-    public static function cleanupFilesAndDB(): void {
-        // Clean problems and runs path
-        $runsPath = OMEGAUP_TEST_ROOT . 'submissions';
+    public static function cleanupProblemFiles(): void {
         // We need to have this directory be NOT within the /opt/omegaup directory
         // since we intend to share it through VirtualBox, and that does not support
         // mmapping files, which is needed for libgit2.
-        $problemsGitPath = '/tmp/omegaup/problems.git';
-        self::cleanPath(IMAGES_PATH);
-        self::cleanPath($runsPath);
-        self::cleanPath(TEMPLATES_PATH);
-        self::cleanPath($problemsGitPath);
+        /**
+         * @psalm-suppress UndefinedConstant OMEGAUP_TEST_SHARD is only
+         * defined in the test bootstrap.php file
+         */
+        $problemsGitPath = '/tmp/omegaup/problems-' . OMEGAUP_TEST_SHARD . '.git';
+        \OmegaUp\FileHandler::deleteDirRecursively($problemsGitPath);
+        mkdir($problemsGitPath, 0755, true);
+    }
+
+    public static function cleanupFilesAndDB(): void {
+        // Clean the test root.
+        \OmegaUp\FileHandler::deleteDirRecursively(OMEGAUP_TEST_ROOT);
+        mkdir(IMAGES_PATH, 0755, true);
+        mkdir(TEMPLATES_PATH, 0755, true);
         for ($i = 0; $i < 256; $i++) {
-            mkdir(sprintf('%s/%02x', $runsPath, $i), 0775, true);
+            mkdir(
+                sprintf(
+                    '%ssubmissions/%02x',
+                    OMEGAUP_TEST_ROOT,
+                    $i
+                ),
+                0775,
+                true
+            );
         }
-        // Clean DB
-        self::CleanupDB();
+        self::cleanupDB();
     }
 
     private static function cleanupDB(): void {
@@ -248,9 +251,7 @@ class Utils {
             );
             self::setUpDefaultDataConfig();
         } catch (\Exception $e) {
-            echo 'Cleanup DB error. Tests will continue anyways:';
-            /** @psalm-suppress ForbiddenCode It's important to expose this error during tests. */
-            var_dump($e->getMessage());
+            echo "Cleanup DB error. Tests will continue anyways: $e";
         } finally {
             // Enabling them again
             \OmegaUp\MySQLConnection::getInstance()->Execute(
@@ -322,6 +323,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/update_ranks.py' .
              ' --verbose ' .
+             ' --update-coder-of-the-month ' .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
@@ -354,21 +356,6 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/assign_badges.py' .
              ' --verbose ' .
-             ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
-             ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
-             ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
-             ' --password ' . escapeshellarg(OMEGAUP_DB_PASS))
-        );
-    }
-
-    public static function runCanonicalizeTags(): void {
-        // Ensure everything is commited before invoking external script
-        self::commit();
-        self::shellExec(
-            ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/canonicalize_tags.py' .
-             ' --quiet ' .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .

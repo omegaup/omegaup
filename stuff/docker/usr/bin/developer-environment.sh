@@ -2,6 +2,13 @@
 
 set -e
 
+if [[ "${CI}" == "true" ]]; then
+	# When running in a CI environment, the database/composer setup is done
+	# outside.
+	echo "CI=true was passed, not running database/composer setup."
+	exit 0
+fi
+
 if [[ ! -f /opt/omegaup/frontend/server/config.php ]]; then
   cat > /opt/omegaup/frontend/server/config.php <<EOF
 <?php
@@ -26,7 +33,7 @@ if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file=/home/ubuntu/.my.cnf e
   mysql --defaults-file=/home/ubuntu/.my.cnf \
     -e "CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
   mysql --defaults-file=/home/ubuntu/.my.cnf \
-    -e 'GRANT ALL PRIVILEGES ON `omegaup-test`.* TO "omegaup"@"%";'
+    -e 'GRANT ALL PRIVILEGES ON `omegaup-test%`.* TO "omegaup"@"%";'
   /opt/omegaup/stuff/bootstrap-environment.py \
     --mysql-config-file=/home/ubuntu/.my.cnf \
     --purge --verbose --root-url=http://localhost:8000/

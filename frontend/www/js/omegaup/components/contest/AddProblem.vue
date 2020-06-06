@@ -152,15 +152,21 @@ const emptyCommit = {
 })
 export default class AddProblem extends Vue {
   @Prop() contestAlias!: string;
+  @Prop() initialPoints!: number;
   @Prop() data!: omegaup.Problem[];
 
   T = T;
   typeahead = typeahead;
   alias = '';
-  points = 100;
+  points = this.initialPoints;
   order = this.data.length + 1;
   problems = this.data;
-  selected: omegaup.Problem = { alias: '', order: 1, points: 100, title: '' };
+  selected: omegaup.Problem = {
+    alias: '',
+    order: 1,
+    points: this.points,
+    title: '',
+  };
   versionLog: omegaup.Commit[] = [];
   useLatestVersion = true;
   publishedRevision = emptyCommit;
@@ -223,7 +229,7 @@ export default class AddProblem extends Vue {
   @Watch('problems')
   onProblemsChange(newValue: omegaup.Problem[]): void {
     this.alias = '';
-    this.points = 100;
+    this.points = this.points;
     this.order = newValue.length + 1;
   }
 

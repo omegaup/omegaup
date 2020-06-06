@@ -10,11 +10,11 @@
               >{{ T.wordsEditCourse }}</a
             >
           </div>
-          <div class="">
+          <div>
             <a class="no-decoration">
               <h1>{{ course.name }}</h1>
             </a>
-            <p class="container-fluid">{{ course.description }}</p>
+            <div class="container-fluid" v-html="descriptionHtml"></div>
           </div>
         </div>
         <div class="panel-body table-responsive">
@@ -200,6 +200,7 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import * as markdown from '../../markdown';
 import { types } from '../../api_types';
 
 @Component
@@ -209,6 +210,7 @@ export default class CourseDetails extends Vue {
 
   T = T;
   ui = ui;
+  markdownConverter = markdown.markdownConverter();
 
   get filteredHomeworks(): omegaup.Assignment[] {
     return this.course.assignments.filter(
@@ -230,6 +232,10 @@ export default class CourseDetails extends Vue {
 
   getFormattedTime(timestamp: number): string {
     return time.formatDateTime(time.remoteTime(timestamp * 1000));
+  }
+
+  get descriptionHtml(): string {
+    return this.markdownConverter.makeHtml(this.course.description);
   }
 }
 </script>

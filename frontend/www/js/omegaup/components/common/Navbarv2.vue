@@ -352,8 +352,8 @@ export default class Navbar extends Vue {
     return this.isAdmin && !this.omegaUpLockDown && !this.inContest;
   }
 
-  readNotifications(notifications: types.Notification[]): void {
-    this.$emit('read-notifications', notifications);
+  readNotifications(notifications: types.Notification[], url?: string): void {
+    this.$emit('read-notifications', notifications, url);
   }
 }
 </script>
