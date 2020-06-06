@@ -29,6 +29,7 @@
  * @psalm-type ProblemDetailsv2Payload=array{problem: ProblemInfo}
  * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: ProblemStatement, title: null|string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool}
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
@@ -232,6 +233,27 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'qualityNominationProblemHasBeenBanned',
                     'visibility'
                 );
+            }
+            if (
+                ($problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING ||
+                  $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING) &&
+                    !is_null($params->visibility) &&
+                    $problem->visibility !== $params->visibility &&
+                    !\OmegaUp\Authorization::isQualityReviewer($identity)
+            ) {
+                if (
+                    intval(
+                        $params->visibility
+                    ) !== \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING &&
+                    intval(
+                        $params->visibility
+                    ) !== \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'qualityNominationProblemHasWarning',
+                        'visibility'
+                    );
+                }
             }
 
             if ($problem->deprecated) {
@@ -3123,7 +3145,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $problem_alias
      *
-     * @return array{smartyProperties: array{statsPayload: StatsPayload}, template: string}
+     * @return array{smartyProperties: array{payload: StatsPayload, title: string}, entrypoint: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -3140,15 +3162,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         return [
             'smartyProperties' => [
-                'statsPayload' => array_merge(
+                'payload' => array_merge(
                     [
                         'alias' => $r['problem_alias'],
                         'entity_type' => 'problem',
                     ],
                     self::getStats($problem, $r->identity)
                 ),
+                'title' => 'omegaupTitleProblemStats',
             ],
-            'template' => 'problem.stats.tpl',
+            'entrypoint' => 'common_stats',
         ];
     }
 
@@ -3546,7 +3569,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Returns a list of problems where current user has admin rights (or is
      * the owner).
      *
-     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -3589,7 +3612,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity->identity_id
         );
         foreach ($problems as $problem) {
-            $problemArray = $problem->asArray();
+            /** @var ProblemListItem */
+            $problemArray = $problem->asFilteredArray([
+                'alias',
+                'difficulty',
+                'difficulty_histogram',
+                'points',
+                'quality',
+                'quality_histogram',
+                'ratio',
+                'score',
+                'tags',
+                'title',
+                'visibility',
+                'quality_seal',
+            ]);
             $problemArray['tags'] = $hiddenTags ? []  : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
                 /*$public=*/false,
@@ -3615,7 +3652,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a list of problems where current user is the owner
      *
-     * @return array{pagerItems: list<PageItem>, problems: list<array{tags: list<array{name: string, source: string}>}>}
+     * @return array{pagerItems: list<PageItem>, problems: list<ProblemListItem>}
      *
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param int $page
@@ -3656,7 +3693,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity->identity_id
         );
         foreach ($problems as $problem) {
-            $problemArray = $problem->asArray();
+            /** @var ProblemListItem */
+            $problemArray = $problem->asFilteredArray([
+                'alias',
+                'difficulty',
+                'difficulty_histogram',
+                'points',
+                'quality',
+                'quality_histogram',
+                'ratio',
+                'score',
+                'tags',
+                'title',
+                'visibility',
+                'quality_seal',
+            ]);
             $problemArray['tags'] = $hiddenTags ? [] : \OmegaUp\DAO\Problems::getTagsForProblem(
                 $problem,
                 /*$public=*/false,
@@ -3886,7 +3937,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{isSysadmin: bool, privateProblemsAlert: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: ProblemsMineInfoPayload, title: string}, entrypoint: string}
      */
     public static function getProblemsMineInfoForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -3910,8 +3961,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ),
                     'privateProblemsAlert' => $privateProblemsAlert,
                 ],
+                'title' => 'omegaupTitleMyProblemsList',
             ],
-            'template' => 'problem.mine.tpl',
+            'entrypoint' => 'problem_mine',
         ];
     }
 

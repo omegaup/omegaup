@@ -22,7 +22,7 @@ describe('ViewStudent.vue', () => {
   });
 
   it('Should handle runs', async () => {
-    const expectedDate = '1/1/2020, 12:00:00 AM';
+    const expectedDate = new Date('1/1/2020, 12:00:00 AM');
     const wrapper = shallowMount(course_ViewStudent, {
       propsData: {
         course: {
@@ -53,7 +53,7 @@ describe('ViewStudent.vue', () => {
                 penalty: 0,
                 score: 1,
                 source: 'print(3)',
-                time: new Date(expectedDate),
+                time: expectedDate,
                 verdict: 'AC',
               } as omegaup.CourseProblemRun,
             ],
@@ -81,6 +81,8 @@ describe('ViewStudent.vue', () => {
     });
     await wrapper.find('a[data-problem-alias="problem"]').trigger('click');
 
-    expect(wrapper.find('table tbody td').text()).toBe(expectedDate);
+    expect(wrapper.find('table tbody td').text()).toBe(
+      expectedDate.toLocaleString(T.locale),
+    );
   });
 });
