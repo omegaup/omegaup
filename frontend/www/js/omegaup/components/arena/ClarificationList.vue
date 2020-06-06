@@ -85,67 +85,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(clarification, idx) in clarifications">
-            <td class="text-center align-middle">
-              {{
-                inContest
-                  ? clarification.contest_alias
-                  : clarification.problem_alias
-              }}
-            </td>
-            <td class="text-center align-middle">{{ clarification.author }}</td>
-            <td class="text-center align-middle">
-              {{ time.formatDateTime(clarification.time) }}
-            </td>
-            <td class="align-middle">
-              <pre>{{ clarification.message }}</pre>
-            </td>
-            <td class="align-middle">
-              <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
-              <form class="form-inline justify-content-between">
-                <div class="form-group">
-                  <select
-                    class="form-control"
-                    v-model="clarificationsResponses[idx].selectedOption"
-                  >
-                    <option
-                      v-for="response in responses"
-                      v-bind:value="response.value"
-                    >
-                      {{ response.text }}</option
-                    >
-                  </select>
-                </div>
-                <div
-                  class="form-group mt-2 mt-xl-0"
-                  v-if="clarificationsResponses[idx].selectedOption === 'other'"
-                >
-                  <textarea
-                    v-model="clarificationsResponses[idx].customResponse"
-                    v-bind:placeholder="T.wordsAnswer"
-                  >
-                  </textarea>
-                </div>
-                <div class="form-check mt-2 mt-xl-0">
-                  <label class="form-check-label">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      v-bind:value="clarificationsResponses[idx].public"
-                    />
-                    {{ T.wordsPublic }}
-                  </label>
-                </div>
-                <button
-                  class="btn btn-primary btn-sm mt-2 mt-lg-2"
-                  type="submit"
-                  v-on:click.prevent="sendClarificationResponse(idx)"
-                >
-                  {{ T.wordsSend }}
-                </button>
-              </form>
-            </td>
-          </tr>
+          <omegaup-clarification
+            v-for="clarification in clarifications"
+            v-bind:in-contest="inContest"
+            v-bind:key="clarification.clarification_id"
+            v-bind:clarification="clarification"
+          ></omegaup-clarification>
         </tbody>
       </table>
     </div>
@@ -153,7 +98,8 @@
 </template>
 
 <style scoped>
-pre {
+/* Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors) */
+/deep/ pre {
   display: block;
   padding: 0.5rem;
   font-size: 0.8rem;
@@ -170,21 +116,24 @@ pre {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as UI from '../../ui';
-import * as time from '../../time';
 
-@Component
+import arena_Clarification from './Clarification.vue';
+
+@Component({
+  components: {
+    'omegaup-clarification': arena_Clarification,
+  },
+})
 export default class ArenaClarificationList extends Vue {
   @Prop() inContest!: boolean;
   @Prop() clarifications!: types.Clarification[];
   @Prop() contestProblems!: any[]; //TODO: decide how to pass problems for new clarification
 
   T = T;
-  time = time;
-
   newClarification = {
     problem:
       this.inContest && this.contestProblems
@@ -193,56 +142,12 @@ export default class ArenaClarificationList extends Vue {
     message: '',
   };
 
-  responses = [
-    {
-      value: 'yes',
-      text: T.wordsYes,
-    },
-    {
-      value: 'no',
-      text: T.wordsNo,
-    },
-    {
-      value: 'nocomment',
-      text: T.wordsNoComment,
-    },
-    {
-      value: 'readAgain',
-      text: T.wordsReadAgain,
-    },
-    {
-      value: 'other',
-      text: T.wordsOther,
-    },
-  ];
-
-  clarificationsResponses = this.clarifications.map(clarification => {
-    return {
-      clarification_id: clarification.clarification_id,
-      public: clarification.public,
-      selectedOption: 'yes',
-      customResponse: null,
-    };
-  });
-
-  sendClarificationResponse(index: number): void {
-    //TODO: Emit an event to parent with the response to clarification
-  }
-
   sendClarification(): void {
     //TODO: Emit an event to parent with the new clarification
   }
 
-  @Watch('clarifications')
-  onClarificationsChange() {
-    this.clarificationsResponses = this.clarifications.map(clarification => {
-      return {
-        clarification_id: clarification.clarification_id,
-        public: clarification.public,
-        selectedOption: 'yes',
-        customResponse: null,
-      };
-    });
+  sendClarificationResponse(): void {
+    //TODO: Emit an event to parent with the response to clarification
   }
 }
 </script>

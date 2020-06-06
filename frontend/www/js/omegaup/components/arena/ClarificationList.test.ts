@@ -32,22 +32,26 @@ describe('ClarificationList.vue', () => {
       time: new Date(),
     },
   ];
-  it('Should differentiate between problem and contest clarifications', async () => {
+
+  it('Should handle problem clarifications', async () => {
     const wrapper = shallowMount(arena_ClarificationList, {
       propsData: {
         inContest: false,
         clarifications,
       },
     });
-    expect(wrapper.text()).toContain(T.wordsProblem);
-    expect(wrapper.text()).not.toContain(T.wordsContest);
+    expect(wrapper.find('th').text()).toBe(T.wordsProblem);
+    expect(wrapper.find('th').text()).not.toBe(T.wordsContest);
+  });
 
-    const wrapperTwo = shallowMount(arena_ClarificationList, {
+  it('Should handle contest clarifications', async () => {
+    const wrapper = shallowMount(arena_ClarificationList, {
       propsData: {
         inContest: true,
         clarifications,
       },
     });
-    expect(wrapperTwo.text()).toContain(T.wordsContest);
+    expect(wrapper.find('th').text()).toBe(T.wordsContest);
+    expect(wrapper.find('th').text()).not.toBe(T.wordsProblem);
   });
 });
