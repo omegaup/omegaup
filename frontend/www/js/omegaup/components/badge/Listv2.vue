@@ -1,12 +1,14 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="badges-container">
-        <omegaup-badge
-          v-bind:badge="badge"
-          v-bind:key="badge.badge_alias"
-          v-for="badge in badges"
-        ></omegaup-badge>
+      <div class="container">
+        <div class="row">
+          <omegaup-badge
+            v-bind:badge="badge"
+            v-bind:key="badge.badge_alias"
+            v-for="badge in badges"
+          ></omegaup-badge>
+        </div>
       </div>
     </div>
     <div class="card-footer">
@@ -22,13 +24,6 @@
 </template>
 
 <style>
-.badges-container {
-  display: grid;
-  justify-content: space-between;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  grid-auto-rows: 180px;
-}
-
 a.badges-link {
   color: #337ab7;
   font-size: 1rem;
@@ -39,7 +34,7 @@ a.badges-link {
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import Badge from '../badge/Badge.vue';
+import Badge from '../badge/Badgev2.vue';
 
 @Component({
   components: {
