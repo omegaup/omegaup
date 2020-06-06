@@ -29,7 +29,7 @@
           </select>
         </label>
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-2 mt-1" v-show="false">
         <label>
           {{ T.wordsOrderBy }}
           <select name="order_by" class="ml-1 form-control" v-model="column">
@@ -39,7 +39,7 @@
           </select>
         </label>
       </div>
-      <div class="form-group mr-2 mt-1">
+      <div class="form-group mr-2 mt-1" v-show="false">
         <label>
           {{ T.wordsMode }}
           <select name="mode" class="ml-1 form-control" v-model="mode">

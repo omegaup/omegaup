@@ -34,39 +34,69 @@
           <thead>
             <tr>
               <th scope="col" class="align-middle">
-                {{ T.wordsTitle }}
-                <div>
-                  <span class="badge badge-quality mr-1">{{
+                <span>{{ T.wordsTitle }}</span>
+                <template>
+                  <span class="badge badge-quality mr-1 ml-1 p-2">{{
                     T.tagSourceQuality
                   }}</span>
-                  <span class="badge badge-owner mr-1">{{
+                  <span class="badge badge-owner mr-1 p-2">{{
                     T.tagSourceOwner
                   }}</span>
-                  <span class="badge badge-voted">{{ T.tagSourceVoted }}</span>
-                </div>
+                  <span class="badge badge-voted p-2">{{
+                    T.tagSourceVoted
+                  }}</span>
+                </template>
+                <omegaup-common-sort-controls
+                  column="title"
+                  column-type="string"
+                ></omegaup-common-sort-controls>
               </th>
               <th scope="col" class="text-center align-middle">
-                {{ T.wordsQuality }}
+                <span
+                  >{{ T.wordsQuality }}
+                  <omegaup-common-sort-controls
+                    column="quality"
+                  ></omegaup-common-sort-controls
+                ></span>
               </th>
               <th scope="col" class="text-center align-middle">
-                {{ T.wordsDifficulty }}
+                <span
+                  >{{ T.wordsDifficulty }}
+                  <omegaup-common-sort-controls
+                    column="difficulty"
+                  ></omegaup-common-sort-controls
+                ></span>
               </th>
               <th scope="col" class="text-right align-middle">
-                {{ T.wordsRatio }}
-              </th>
-              <th scope="col" class="text-right align-middle">
-                {{ T.wordsPointsForRank }}
-                <a
-                  data-toggle="tooltip"
-                  href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
-                  rel="tooltip"
-                  title=""
-                  v-bind:data-original-title="T.wordsPointsForRankTooltip"
-                  ><img src="/media/question.png"
-                /></a>
+                <span
+                  >{{ T.wordsRatio }}
+                  <omegaup-common-sort-controls
+                    column="ratio"
+                  ></omegaup-common-sort-controls
+                ></span>
               </th>
               <th scope="col" class="text-right align-middle" v-if="loggedIn">
-                {{ T.wordsMyScore }}
+                <span
+                  >{{ T.wordsMyScore }}
+                  <omegaup-common-sort-controls
+                    column="score"
+                  ></omegaup-common-sort-controls
+                ></span>
+              </th>
+              <th scope="col" class="text-right align-middle">
+                <span>
+                  <a
+                    data-toggle="tooltip"
+                    href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
+                    rel="tooltip"
+                    v-bind:title="T.wordsPointsForRank"
+                    v-bind:data-original-title="T.wordsPointsForRankTooltip"
+                    ><img src="/media/question.png"
+                  /></a>
+                  <omegaup-common-sort-controls
+                    column="points"
+                  ></omegaup-common-sort-controls>
+                </span>
               </th>
             </tr>
           </thead>
@@ -97,16 +127,16 @@
                   v-else-if="problem.visibility === 0"
                   v-bind:icon="['fas', 'eye-slash']"
                 />
-                <div v-if="problem.tags.length">
+                <template v-if="problem.tags.length">
                   <a
-                    v-bind:class="`badge badge-${tag.source} mr-1`"
+                    v-bind:class="`badge badge-${tag.source} m-1 p-2`"
                     v-bind:href="hrefForProblemTag(currentTags, tag.name)"
                     v-for="tag in problem.tags"
                     >{{
                       T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name
                     }}</a
                   >
-                </div>
+                </template>
               </td>
               <td
                 class="text-center tooltip_column"
@@ -138,10 +168,10 @@
               <td class="text-right">
                 {{ (100.0 * problem.ratio).toFixed(2) }}%
               </td>
-              <td class="text-right">{{ problem.points.toFixed(2) }}</td>
               <td class="text-right" v-if="loggedIn">
                 {{ problem.score.toFixed(2) }}
               </td>
+              <td class="text-right">{{ problem.points.toFixed(2) }}</td>
             </tr>
           </tbody>
         </table>
@@ -175,6 +205,10 @@
     background-color: #99c2ff;
   }
 }
+
+thead tr th {
+  white-space: nowrap;
+}
 </style>
 
 <script lang="ts">
@@ -185,6 +219,7 @@ import { types } from '../../api_types';
 import * as UI from '../../ui';
 
 import common_Paginator from '../common/Paginatorv2.vue';
+import common_SortControls from '../common/SortControls.vue';
 import problem_FinderWizard from './FinderWizard.vue';
 import problem_SearchBar from './SearchBar.vue';
 
@@ -206,6 +241,7 @@ library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
     FontAwesomeIcon,
     'omegaup-problem-finder': problem_FinderWizard,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-common-sort-controls': common_SortControls,
     'omegaup-problem-search-bar': problem_SearchBar,
   },
   directives: {
