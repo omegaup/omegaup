@@ -4103,7 +4103,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $contest_alias
      *
-     * @return array{smartyProperties: array{statsPayload: StatsPayload}, template: string}
+     * @return array{smartyProperties: array{payload: StatsPayload, title: string}, entrypoint: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -4115,15 +4115,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
         return [
             'smartyProperties' => [
-                'statsPayload' => array_merge(
+                'payload' => array_merge(
                     [
                         'alias' => $r['contest_alias'],
                         'entity_type' => 'contest',
                     ],
                     self::getStats($contest, $r->identity)
                 ),
+                'title' => 'omegaupTitleContestStats',
             ],
-            'template' => 'contest.stats.tpl',
+            'entrypoint' => 'common_stats',
         ];
     }
 
