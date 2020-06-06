@@ -6,19 +6,11 @@ import T from '../lang';
 import Vue from 'vue';
 import login_SignIn from '../components/login/SignIn.vue';
 import VueRecaptcha from 'vue-recaptcha';
-import VueGAPI from 'vue-google-oauth2';
 
 OmegaUp.on('ready', () => {
   const payload = JSON.parse(
     (<HTMLElement>document.getElementById('payload')).innerText,
   );
-  const gauthOption = {
-    apiKey: '1xL2DQJitrxTVSScVMu_0J-h',
-    clientId:
-      '618996099122-3226og5mc9ftnm22rm0enf1kvuchca7c.apps.googleusercontent.com',
-    scope: 'email',
-  };
-  Vue.use(VueGAPI, gauthOption);
 
   let signIn = new Vue({
     el: '#login-sign-in',
