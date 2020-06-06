@@ -1,43 +1,24 @@
 <template>
   <span class="ml-1">
-    <a href="#" v-on:click="toggleSort">
+    <a href="#" v-on:click="$emit('emit-apply-filter', column, toggleSort)">
       <font-awesome-icon
-        fixed-width
         v-bind:icon="['fas', 'exchange-alt']"
         color="lightgray"
         rotation="90"
         v-if="!selected"
       />
-      <template v-else="">
-        <a href="#">
-          <font-awesome-icon
-            v-bind:icon="['fas', 'sort-amount-down']"
-            color="black"
-            v-if="orderMode === 'asc' && columnType === 'number'"
-          />
-          <font-awesome-icon
-            v-bind:icon="['fas', 'sort-alpha-down']"
-            color="black"
-            v-if="orderMode === 'asc' && columnType === 'string'"
-          />
-          <font-awesome-icon
-            v-bind:icon="['fas', 'sort-amount-up']"
-            color="black"
-            v-if="orderMode === 'desc' && columnType === 'number'"
-          />
-          <font-awesome-icon
-            v-bind:icon="['fas', 'sort-alpha-up']"
-            color="black"
-            v-if="orderMode === 'desc' && columnType === 'string'"
-          />
-        </a>
-      </template>
+      <font-awesome-icon
+        v-bind:icon="['fas', iconDisplayed]"
+        color="black"
+        v-else=""
+      />
     </a>
   </span>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -63,47 +44,31 @@ library.add(
 })
 export default class SortControls extends Vue {
   @Prop() column!: string;
-  @Prop({ default: 'number' }) columnType!: string;
+  @Prop() initialMode!: string;
+  @Prop() initialOrderBy!: string;
+  @Prop({ default: omegaup.ColumnType.Number }) columnType!: omegaup.ColumnType;
+
+  get iconDisplayed(): string {
+    if (this.initialMode === omegaup.OrderMode.Descendant) {
+      if (this.columnType === omegaup.ColumnType.Number) {
+        return 'sort-amount-down';
+      }
+      return 'sort-alpha-down';
+    }
+    if (this.columnType === omegaup.ColumnType.Number) {
+      return 'sort-amount-up';
+    }
+    return 'sort-alpha-up';
+  }
 
   get selected(): boolean {
-    const queryString = window.location.search;
-    if (!queryString) return false;
-    const urlParams = new URLSearchParams(queryString);
-    if (!urlParams.get('order_by')) return false;
-    return this.column === urlParams.get('order_by');
+    return this.column === this.initialOrderBy;
   }
 
-  get orderMode(): string {
-    const queryString = window.location.search;
-    if (!queryString) return 'desc';
-    const urlParams = new URLSearchParams(queryString);
-    if (!urlParams.get('mode')) return 'desc';
-    return urlParams.get('mode') ?? 'desc';
-  }
-
-  toggleSort(): void {
-    const queryString = window.location.search;
-    let mode = 'asc';
-    if (!queryString) {
-      window.location.replace(
-        `/problem/?query=&order_by=${this.column}&mode=${mode}`,
-      );
-      return;
-    }
-    const urlParams = new URLSearchParams(queryString);
-    if (!urlParams.get('mode')) {
-      window.location.replace(`${queryString}&mode=${mode}`);
-      return;
-    }
-    if (!urlParams.get('order_by')) {
-      window.location.replace(`${queryString}&order_by=${this.column}`);
-      return;
-    }
-    urlParams.set('mode', urlParams.get('mode') === 'asc' ? 'desc' : 'asc');
-    urlParams.set('order_by', this.column);
-
-    const newQueryString = urlParams.toString();
-    window.location.replace(`/problem/?${newQueryString}`);
+  get toggleSort(): string {
+    return this.initialMode === omegaup.OrderMode.Ascendant
+      ? omegaup.OrderMode.Descendant
+      : omegaup.OrderMode.Ascendant;
   }
 }
 </script>

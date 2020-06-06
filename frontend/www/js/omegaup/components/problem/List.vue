@@ -33,57 +33,84 @@
         <table class="table mb-0">
           <thead>
             <tr>
-              <th scope="col" class="align-middle">
+              <th scope="col" class="align-middle text-nowrap">
                 <span>{{ T.wordsTitle }}</span>
-                <template>
-                  <span class="badge badge-quality mr-1 ml-1 p-2">{{
-                    T.tagSourceQuality
-                  }}</span>
-                  <span class="badge badge-owner mr-1 p-2">{{
-                    T.tagSourceOwner
-                  }}</span>
-                  <span class="badge badge-voted p-2">{{
-                    T.tagSourceVoted
-                  }}</span>
-                </template>
+                <span class="badge badge-quality mr-1 ml-1 p-2">{{
+                  T.tagSourceQuality
+                }}</span>
+                <span class="badge badge-owner mr-1 p-2">{{
+                  T.tagSourceOwner
+                }}</span>
+                <span class="badge badge-voted p-2">{{
+                  T.tagSourceVoted
+                }}</span>
                 <omegaup-common-sort-controls
                   column="title"
-                  column-type="string"
+                  v-bind:column-type="omegaup.ColumnType.String"
+                  v-bind:initial-mode="initialMode"
+                  v-bind:initial-order-by="initialOrderBy"
+                  v-on:emit-apply-filter="
+                    (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                  "
                 ></omegaup-common-sort-controls>
               </th>
-              <th scope="col" class="text-center align-middle">
+              <th scope="col" class="text-center align-middle text-nowrap">
                 <span
                   >{{ T.wordsQuality }}
                   <omegaup-common-sort-controls
                     column="quality"
+                    v-bind:initial-mode="initialMode"
+                    v-bind:initial-order-by="initialOrderBy"
+                    v-on:emit-apply-filter="
+                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                    "
                   ></omegaup-common-sort-controls
                 ></span>
               </th>
-              <th scope="col" class="text-center align-middle">
+              <th scope="col" class="text-center align-middle text-nowrap">
                 <span
                   >{{ T.wordsDifficulty }}
                   <omegaup-common-sort-controls
                     column="difficulty"
+                    v-bind:initial-mode="initialMode"
+                    v-bind:initial-order-by="initialOrderBy"
+                    v-on:emit-apply-filter="
+                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                    "
                   ></omegaup-common-sort-controls
                 ></span>
               </th>
-              <th scope="col" class="text-right align-middle">
+              <th scope="col" class="text-right align-middle text-nowrap">
                 <span
                   >{{ T.wordsRatio }}
                   <omegaup-common-sort-controls
                     column="ratio"
+                    v-bind:initial-mode="initialMode"
+                    v-bind:initial-order-by="initialOrderBy"
+                    v-on:emit-apply-filter="
+                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                    "
                   ></omegaup-common-sort-controls
                 ></span>
               </th>
-              <th scope="col" class="text-right align-middle" v-if="loggedIn">
+              <th
+                scope="col"
+                class="text-right align-middle text-nowrap"
+                v-if="loggedIn"
+              >
                 <span
                   >{{ T.wordsMyScore }}
                   <omegaup-common-sort-controls
                     column="score"
+                    v-bind:initial-mode="initialMode"
+                    v-bind:initial-order-by="initialOrderBy"
+                    v-on:emit-apply-filter="
+                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                    "
                   ></omegaup-common-sort-controls
                 ></span>
               </th>
-              <th scope="col" class="text-right align-middle">
+              <th scope="col" class="text-right align-middle text-nowrap">
                 <span>
                   <a
                     data-toggle="tooltip"
@@ -95,12 +122,17 @@
                   /></a>
                   <omegaup-common-sort-controls
                     column="points"
+                    v-bind:initial-mode="initialMode"
+                    v-bind:initial-order-by="initialOrderBy"
+                    v-on:emit-apply-filter="
+                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                    "
                   ></omegaup-common-sort-controls>
                 </span>
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody data-problems>
             <tr v-for="problem in problems">
               <td>
                 <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
@@ -205,10 +237,6 @@
     background-color: #99c2ff;
   }
 }
-
-thead tr th {
-  white-space: nowrap;
-}
 </style>
 
 <script lang="ts">
@@ -262,9 +290,12 @@ export default class ProblemList extends Vue {
   @Prop() mode!: string;
   @Prop() column!: string;
   @Prop() tags!: string[];
+  @Prop() initialMode!: string;
+  @Prop() initialOrderBy!: string;
 
   T = T;
   UI = UI;
+  omegaup = omegaup;
   showFinderWizard = false;
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,

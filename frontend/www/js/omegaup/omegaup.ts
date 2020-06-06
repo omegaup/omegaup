@@ -74,6 +74,16 @@ export namespace omegaup {
     Public = 'public',
   }
 
+  export enum ColumnType {
+    Number = 'number',
+    String = 'string',
+  }
+
+  export enum OrderMode {
+    Ascendant = 'asc',
+    Descendant = 'desc',
+  }
+
   export enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',

@@ -26,6 +26,8 @@ OmegaUp.on('ready', () => {
           mode: payload.mode,
           column: payload.column,
           tags: payload.tags,
+          initialMode: this.initialMode,
+          initialOrderBy: this.initialOrderBy,
         },
         on: {
           'wizard-search': (queryParameters: {
@@ -33,11 +35,55 @@ OmegaUp.on('ready', () => {
           }): void => {
             window.location.search = UI.buildURLQuery(queryParameters);
           },
+          'apply-filter': (orderBy: string, mode: omegaup.OrderMode): void => {
+            const queryString = window.location.search;
+            if (!queryString) {
+              window.location.replace(
+                `/problem/?query=&order_by=${orderBy}&mode=${mode}`,
+              );
+              return;
+            }
+            const urlParams = new URLSearchParams(queryString);
+            if (!urlParams.get('mode')) {
+              window.location.replace(`${queryString}&mode=${mode}`);
+              return;
+            }
+            if (!urlParams.get('order_by')) {
+              window.location.replace(`${queryString}&order_by=${orderBy}`);
+              return;
+            }
+            urlParams.set('mode', mode);
+            urlParams.set('order_by', orderBy);
+
+            const newQueryString = urlParams.toString();
+            window.location.replace(`/problem/?${newQueryString}`);
+          },
         },
       });
+    },
+    data: {
+      initialMode: 'desc',
+      initialOrderBy: 'problem_id',
     },
     components: {
       'omegaup-problem-list': problem_List,
     },
   });
+
+  const queryString = window.location.search;
+  if (queryString) {
+    const urlParams = new URLSearchParams(queryString);
+    if (urlParams.get('mode')) {
+      const mode = urlParams.get('mode');
+      if (mode) {
+        problemsList.initialMode = mode;
+      }
+    }
+    if (urlParams.get('order_by')) {
+      const orderBy = urlParams.get('order_by');
+      if (orderBy) {
+        problemsList.initialOrderBy = orderBy;
+      }
+    }
+  }
 });
