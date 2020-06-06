@@ -25,7 +25,7 @@
       </form>
     </div>
     <div v-if="groupAdmins.length === 0">
-      <div class="empty-category">
+      <div class="empty-table-message">
         {{ T.courseEditGroupAdminsEmpty }}
       </div>
     </div>
@@ -60,6 +60,10 @@
     </table>
   </div>
 </template>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';

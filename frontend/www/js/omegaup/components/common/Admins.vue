@@ -39,7 +39,7 @@
       </form>
     </div>
     <div v-if="admins.length === 0">
-      <div class="empty-category">
+      <div class="empty-table-message">
         {{ T.courseEditAdminsEmpty }}
       </div>
     </div>
@@ -79,13 +79,8 @@
   </div>
 </template>
 
-<style>
-.empty-category {
-  text-align: center;
-  font-size: 200%;
-  margin: 1em;
-  color: #aaa;
-}
+<style lang="scss">
+@import '../../../../sass/main.scss';
 </style>
 
 <script lang="ts">
