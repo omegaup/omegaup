@@ -611,7 +611,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{contestListPayload: ContestListPayload}, template: string}
+     * @return array{smartyProperties: array{payload: ContestListPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -702,13 +702,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'contestListPayload' => [
+                'payload' => [
                     'query' => $r['query'],
                     'isLogged' => !is_null($r->identity),
                     'contests' => $contests,
                 ],
+                'title' => 'wordsContests',
             ],
-            'template' => 'arena.index.tpl',
+            'entrypoint' => 'arena_contest_list',
         ];
     }
 
@@ -4042,8 +4043,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         foreach ($runs as $run) {
             unset($run['run_id']);
-            $run['score'] = round(floatval($run['score']), 4);
-            $run['contest_score'] = round(floatval($run['contest_score']), 2);
+            if ($contest->partial_score || $run['score'] == 1) {
+                $run['contest_score'] = round(
+                    floatval(
+                        $run['contest_score']
+                    ),
+                    2
+                );
+                $run['score'] = round(floatval($run['score']), 4);
+            } else {
+                $run['contest_score'] = 0;
+                $run['score'] = 0;
+            }
             $result[] = $run;
         }
 
@@ -4092,7 +4103,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $contest_alias
      *
-     * @return array{smartyProperties: array{statsPayload: StatsPayload}, template: string}
+     * @return array{smartyProperties: array{payload: StatsPayload, title: string}, entrypoint: string}
      */
     public static function getStatsDataForSmarty(\OmegaUp\Request $r) {
         // Get user
@@ -4104,15 +4115,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $contest = self::validateStats($r['contest_alias'], $r->identity);
         return [
             'smartyProperties' => [
-                'statsPayload' => array_merge(
+                'payload' => array_merge(
                     [
                         'alias' => $r['contest_alias'],
                         'entity_type' => 'contest',
                     ],
                     self::getStats($contest, $r->identity)
                 ),
+                'title' => 'omegaupTitleContestStats',
             ],
-            'template' => 'contest.stats.tpl',
+            'entrypoint' => 'common_stats',
         ];
     }
 

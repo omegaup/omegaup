@@ -156,7 +156,10 @@ OmegaUp.on('ready', function() {
     el: '#assignments div.list',
     render: function(createElement) {
       return createElement('omegaup-course-assignmentlist', {
-        props: { assignments: this.assignments, courseAlias: courseAlias },
+        props: {
+          assignments: this.assignments,
+          courseAlias: courseAlias,
+        },
         on: {
           edit: function(assignment) {
             assignmentDetails.show = true;
@@ -195,26 +198,24 @@ OmegaUp.on('ready', function() {
               .catch(UI.apiError);
           },
           new: onNewAssignment,
-          'sort-homeworks': function(courseAlias, homeworks) {
-            let index = 1;
-            for (let homework of homeworks) {
-              homework.order = index++;
-            }
+          'sort-homeworks': function(courseAlias, homeworksAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: homeworks,
-            }).catch(UI.apiError);
-          },
-          'sort-tests': function(courseAlias, tests) {
-            let index = 1;
-            for (let test of tests) {
-              test.order = index++;
-            }
-            api.Course.updateAssignmentsOrder({
-              course_alias: courseAlias,
-              assignments: tests,
+              assignments: JSON.stringify(homeworksAliases),
             })
-              .then(function(response) {})
+              .then(() => {
+                UI.success(T.homeworksOrderUpdated);
+              })
+              .catch(UI.apiError);
+          },
+          'sort-tests': function(courseAlias, testsAliases) {
+            api.Course.updateAssignmentsOrder({
+              course_alias: courseAlias,
+              assignments: JSON.stringify(testsAliases),
+            })
+              .then(() => {
+                UI.success(T.testsOrderUpdated);
+              })
               .catch(UI.apiError);
           },
         },
@@ -432,18 +433,15 @@ OmegaUp.on('ready', function() {
               })
               .catch(UI.apiError);
           },
-          sort: function(assignment, assignmentProblems) {
-            let index = 1;
-            for (let problem of assignmentProblems) {
-              problem.order = index;
-              index++;
-            }
+          sort: function(assignmentAlias, problemsAliases) {
             api.Course.updateProblemsOrder({
               course_alias: courseAlias,
-              assignment_alias: assignment.alias,
-              problems: assignmentProblems,
+              assignment_alias: assignmentAlias,
+              problems: JSON.stringify(problemsAliases),
             })
-              .then(function(response) {})
+              .then(() => {
+                UI.success(T.problemsOrderUpdated);
+              })
               .catch(UI.apiError);
           },
           tags: function(tags) {

@@ -2,7 +2,7 @@
   <div class="post">
     <div class="copy">
       <h1>{{ T.liveStatistics }}</h1>
-      <div>
+      <div class="total-runs">
         {{ totalRuns }}
       </div>
       <highcharts v-bind:options="verdictChartOptions"></highcharts>
