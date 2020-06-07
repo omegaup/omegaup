@@ -11,6 +11,8 @@ OmegaUp.on('ready', () => {
   const queryString = window.location.search;
   let sortOrder = 'desc';
   let columnName = 'problem_id';
+  let language = 'all';
+  let query = '';
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
     if (urlParams.get('sort_order')) {
@@ -23,6 +25,18 @@ OmegaUp.on('ready', () => {
       const columnNameParam = urlParams.get('order_by');
       if (columnNameParam) {
         columnName = columnNameParam;
+      }
+    }
+    if (urlParams.get('language')) {
+      const languageParam = urlParams.get('language');
+      if (languageParam) {
+        language = languageParam;
+      }
+    }
+    if (urlParams.get('query')) {
+      const queryParam = urlParams.get('query');
+      if (queryParam) {
+        query = queryParam;
       }
     }
   }
@@ -53,27 +67,11 @@ OmegaUp.on('ready', () => {
             columnName: string,
             sortOrder: omegaup.SortOrder,
           ): void => {
-            const queryString = window.location.search;
-            if (!queryString) {
-              window.location.replace(
-                `/problem/?query=&order_by=${columnName}&sort_order=${sortOrder}`,
-              );
-              return;
-            }
-            const urlParams = new URLSearchParams(queryString);
-            if (!urlParams.get('sort_order')) {
-              window.location.replace(`${queryString}&sort_order=${sortOrder}`);
-              return;
-            }
-            if (!urlParams.get('order_by')) {
-              window.location.replace(`${queryString}&order_by=${columnName}`);
-              return;
-            }
-            urlParams.set('sort_order', sortOrder);
-            urlParams.set('order_by', columnName);
-
-            const newQueryString = urlParams.toString();
-            window.location.replace(`/problem/?${newQueryString}`);
+            const languageEncoded = encodeURIComponent(language);
+            const queryEncoded = encodeURIComponent(query);
+            window.location.replace(
+              `/problem/?query=${queryEncoded}&language=${languageEncoded}&order_by=${columnName}&sort_order=${sortOrder}`,
+            );
           },
         },
       });
