@@ -30,7 +30,7 @@ describe('GroupAdmins.vue', () => {
         ],
       },
     });
-    expect(wrapper.find('table tbody').isEmpty()).toBe(false);
+    expect(wrapper.find('table tbody').text()).toContain('admin');
 
     expect(wrapper.find('table tbody').text()).toContain('group-admin');
   });

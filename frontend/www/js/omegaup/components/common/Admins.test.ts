@@ -32,7 +32,7 @@ describe('Admins.vue', () => {
         ],
       },
     });
-    expect(wrapper.find('table tbody').isEmpty()).toBe(false);
+    expect(wrapper.find('table tbody').text()).toContain('owner');
     await wrapper.find('input[name="toggle-site-admins"]').trigger('click');
 
     expect(wrapper.find('table tbody').text()).toContain('site-admin');
