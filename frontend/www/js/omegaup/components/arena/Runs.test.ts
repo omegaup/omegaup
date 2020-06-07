@@ -18,7 +18,7 @@ describe('Runs.vue', () => {
     });
 
     expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
-    expect(wrapper.find('table tbody').isEmpty()).toBe(true);
+    expect(wrapper.find('table tbody').text()).toBe('');
   });
 
   it('Should handle runs', async () => {
