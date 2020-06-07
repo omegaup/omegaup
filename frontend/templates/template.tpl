@@ -40,7 +40,6 @@
       <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
     {/if}
 
-    <script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
     <script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
 
     <!-- Bootstrap 4 -->

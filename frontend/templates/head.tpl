@@ -34,7 +34,6 @@
 		<script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}" defer></script>
 		<script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
 {/if}
-		<script type="text/javascript" src="{version_hash src="/js/langtools.js"}" defer></script>
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
 {if isset($headerPayload) && $headerPayload.bootstrap4}
 		<link rel="stylesheet" href="/third_party/bootstrap-4.4.1/css/bootstrap.min.css"/>
