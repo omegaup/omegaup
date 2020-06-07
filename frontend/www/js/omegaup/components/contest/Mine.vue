@@ -104,7 +104,7 @@
               <td>
                 <a
                   v-bind:href="
-                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}`
+                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`
                   "
                   v-if="contest.scoreboard_url"
                 >
@@ -116,7 +116,7 @@
                 <a
                   class="ml-1"
                   v-bind:href="
-                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}`
+                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`
                   "
                   v-if="contest.scoreboard_url_admin"
                 >
@@ -225,7 +225,7 @@ export default class List extends Vue {
   time = time;
   shouldShowAllContests = false;
   allContestsVisibilityOption = 'none';
-  selectedContests = [];
+  selectedContests: string[] = [];
 
   getAdmissionModeText(admissionMode: string): string {
     switch (admissionMode) {
