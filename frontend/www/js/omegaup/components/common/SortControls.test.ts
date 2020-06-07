@@ -24,7 +24,7 @@ describe('SortControls.vue', () => {
 
     wrapper.setProps({ initialOrderBy: 'title' });
 
-    expect(wrapper.vm.selected).toBe(true);
+    expect(wrapper.vm.selected).toBe(false);
     expect(wrapper.vm.iconDisplayed).toBe('sort-alpha-up');
   });
 });
