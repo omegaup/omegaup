@@ -62,8 +62,8 @@
           </label>
         </div>
       </div>
-      <table class="table table-striped">
-        <thead>
+      <table class="table table-striped" name="table">
+        <thead name="table_head">
           <tr>
             <th>{{ T.wordsAlias }}</th>
             <th v-if="!myView">{{ T.wordsNominator }}</th>
@@ -74,7 +74,7 @@
             <th><!-- view button --></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody name="table_body">
           <tr v-for="nomination in nominations">
             <td>
               <a v-bind:href="problemUrl(nomination.problem.alias)">{{
@@ -120,14 +120,14 @@ import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as UI from '../../ui';
-import paginador from '../common/Paginatorv2.vue';
+import paginator from '../common/Paginatorv2.vue';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
 import * as typeahead from '../../typeahead';
 
 @Component({
   components: {
-    'omegaup-common-paginator': paginador,
+    'omegaup-common-paginator': paginator,
     'omegaup-autocomplete': Autocomplete,
   },
 })
