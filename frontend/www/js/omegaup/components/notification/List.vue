@@ -29,7 +29,7 @@
           v-else=""
           class="dropdown-item"
           href="#"
-          v-on:click="$emit('read', notifications)"
+          v-on:click="$emit('read', notifications, null)"
         >
           {{ T.notificationsMarkAllAsRead }} ✔️
         </a>
@@ -38,7 +38,7 @@
             v-bind:key="notification.notification_id"
             v-bind:notification="notification"
             v-for="notification in notifications"
-            v-on:remove="$emit('read', [notification])"
+            v-on:remove="readSingleNotification"
           ></omegaup-notification
         ></transition-group>
       </form>
@@ -98,5 +98,9 @@ library.add(faBell);
 export default class NotificationList extends Vue {
   @Prop() notifications!: types.Notification[];
   T = T;
+
+  readSingleNotification(notification: types.Notification, url?: string): void {
+    this.$emit('read', [notification], url);
+  }
 }
 </script>

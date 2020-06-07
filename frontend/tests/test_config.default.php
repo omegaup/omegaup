@@ -4,6 +4,7 @@ require_once OMEGAUP_ROOT . '/server/try_define.php';
 
 /** @var string */
 $_omegaUpRoot = OMEGAUP_ROOT;
+$_testShard = intval(getenv('TEST_TOKEN') ?: '0');
 
 # ####################################
 # EXPERIMENTS
@@ -13,7 +14,11 @@ try_define('EXPERIMENT_IDENTITIES', true);
 # ####################################
 # DATABASE CONFIG
 # ####################################
-try_define('OMEGAUP_DB_NAME', 'omegaup-test');
+if (!empty($_testShard)) {
+    try_define('OMEGAUP_DB_NAME', "omegaup-test-{$_testShard}");
+} else {
+    try_define('OMEGAUP_DB_NAME', 'omegaup-test');
+}
 try_define('OMEGAUP_DB_USER', 'root');
 try_define('OMEGAUP_DB_PASS', '');
 try_define('OMEGAUP_DB_HOST', '127.0.0.1');
@@ -21,9 +26,13 @@ try_define('OMEGAUP_DB_HOST', '127.0.0.1');
 # ####################################
 # TEST CONFIG
 # ####################################
-try_define('OMEGAUP_TEST_ROOT', "{$_omegaUpRoot}/tests/controllers/");
-try_define('OMEGAUP_TEST_RESOURCES_ROOT', "{$_omegaUpRoot}/tests/resources/");
 try_define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
+try_define('OMEGAUP_TEST_RESOURCES_ROOT', "{$_omegaUpRoot}/tests/resources/");
+try_define(
+    'OMEGAUP_TEST_ROOT',
+    "{$_omegaUpRoot}/tests/runfiles/shard-{$_testShard}/"
+);
+try_define('OMEGAUP_TEST_SHARD', $_testShard);
 
 # ####################################
 # LOG CONFIG
@@ -39,14 +48,13 @@ try_define('DUMP_MYSQL_QUERY_RESULT_TYPES', true);
 # ####################################
 # GRADER CONFIG
 # ####################################
-try_define('BIN_PATH', "{$_omegaUpRoot}/../bin");
 try_define('IMAGES_PATH', OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH', '/img/');
 try_define('OMEGAUP_CACERT_URL', "{$_omegaUpRoot}/omegaup.pem");
-try_define('OMEGAUP_GITSERVER_PORT', '33863');
+try_define('OMEGAUP_GITSERVER_PORT', 33863 + $_testShard);
 try_define(
     'OMEGAUP_GITSERVER_URL',
-    'http://localhost:' . OMEGAUP_GITSERVER_PORT
+    'http://localhost:' . strval(OMEGAUP_GITSERVER_PORT)
 );
 try_define(
     'OMEGAUP_GITSERVER_SECRET_TOKEN',

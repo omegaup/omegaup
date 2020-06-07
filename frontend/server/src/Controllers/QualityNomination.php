@@ -1,7 +1,10 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
+/**
+ * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ */
 class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Number of reviewers to automatically assign each nomination.
@@ -614,8 +617,8 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             'problem_alias' => $r['problem_alias'],
         ], /*$isRequired=*/ false);
 
-        \OmegaUp\DAO\DAO::transBegin();
         try {
+            \OmegaUp\DAO\DAO::transBegin();
             \OmegaUp\Controllers\Problem::updateProblem(
                 $r->identity,
                 $r->user,
@@ -637,7 +640,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     ])
                 );
             }
-            \OmegaUp\DAO\DAO::transEnd();
             if ($r['status'] == 'banned' || $r['status'] == 'warning') {
                 self::sendNotificationEmail(
                     $problem,
@@ -646,6 +648,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     strval($r['status'])
                 );
             }
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to resolve demotion request', $e);
@@ -741,7 +744,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'user_id' => $user->user_id,
                 'contents' =>  json_encode(
                     [
-                        'type' => 'demotion',
+                        'type' => \OmegaUp\DAO\Notifications::DEMOTION,
                         'message' => $notificationContents,
                         'status' => $status
                     ]
@@ -761,7 +764,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @param int     $nominator The user id of the person that made the nomination.  May be null.
      * @param int     $assignee  The user id of the person assigned to review nominations.  May be null.
      *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>} The response.
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>} The response.
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -823,11 +826,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>, pager_items: list<array{class: string, label: string, page: int}>}
      *
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
+     * @omegaup-request-param mixed $query
+     * @omegaup-request-param mixed $column
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -860,13 +865,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ['promotion', 'demotion']
         );
 
+        if (!is_null($r['query']) && !is_null($r['column'])) {
+            \OmegaUp\Validators::validateOptionalInEnum(
+                $r['column'],
+                'column',
+                ['alias','nominator_username','author_username']
+            );
+            $query = strval($r['query']);
+            $column = strval($r['column']);
+            $params = [
+                'query' => $query,
+                'column' => $column,
+            ];
+        } else {
+            $query = null;
+            $column = null;
+            $params = [];
+        }
+
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
             /* nominator */ null,
             /* assignee */ null,
             $offset,
             $rowCount,
             $types,
-            $status
+            $status,
+            $query,
+            $column
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(
@@ -874,7 +899,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $rowCount,
             $offset,
             /*$adjacent=*/5,
-            /*$params=*/[]
+            /*$params=*/ $params
         );
 
         return [
@@ -890,7 +915,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>} The response.
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>} The response.
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -908,7 +933,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>, pager_items: list<array{class: string, label: string, page: int}>}
      *
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
@@ -964,7 +989,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, array{language: string, markdown: string, images: array<string, string>}>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -985,7 +1010,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, array{language: string, markdown: string, images: array<string, string>}>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
      */
     private static function getDetails(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -1024,7 +1049,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $response['reviewer'] = $currentUserReviewer;
 
         if ($response['nomination'] === 'promotion') {
-            /** @var array<string, array{language: string, markdown: string, images: array<string, string>}> */
+            /** @var array<string, ProblemStatement> */
             $originalStatements = [];
             $response['original_contents'] = [
                 'statements' => $originalStatements,

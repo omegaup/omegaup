@@ -1,0 +1,259 @@
+name: CI
+
+on:
+  pull_request: {}
+  push:
+    branches:
+      - master
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: omegaup
+          MYSQL_PASSWORD: omegaup
+          MYSQL_DATABASE: omegaup-test
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Download gitserver
+        run: |
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.9/omegaup-gitserver.tar.xz'
+          curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
+
+          # omegaup-gitserver depends on libinteractive.
+          DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar'
+          TARGET='/usr/share/java/libinteractive.jar'
+          sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user setuptools
+          python3 -m pip install --user wheel
+          python3 -m pip install --user mysqlclient
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Create database users
+        run: |
+          mysql \
+            -uroot --skip-password --protocol=TCP \
+            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
+
+      - name: Validate database migration scripts
+        run: python3 stuff/db-migrate.py validate
+
+      - name: Create test database
+        run: |
+          python3 stuff/db-migrate.py \
+            --username=root --password= --hostname=localhost \
+            migrate --databases=omegaup-test
+
+      - name: Validate database schema
+        run: |
+          python3 stuff/policy-tool.py \
+            --username=root --password= --hostname=localhost --database=omegaup-test \
+            validate
+          python3 stuff/database_schema.py \
+            --username=root --password= --hostname=localhost --database=omegaup-test \
+            validate --all < /dev/null
+
+      - name: Run tests
+        timeout-minutes: 20
+        run: ./stuff/mysql_types.sh
+
+      - name: Run Psalm
+        run: |
+          # Create optional directories to simplify psalm config.
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          touch 'frontend/server/config.php'
+          touch 'frontend/tests/test_config.php'
+          ./vendor/bin/psalm
+
+      - name: Upload code coverage
+        run: bash <(curl -s https://codecov.io/bash) -cF php
+
+      - name: Upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-logs
+          path: frontend/tests/runfiles/*/*.log
+
+  javascript:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install yarn dependencies
+        run: yarn install
+
+      - name: Run JavaScript tests
+        run: yarn test:coverage
+
+      - name: Upload code coverage
+        run: |
+          bash <(curl -s https://codecov.io/bash) -cF javascript
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install yarn dependencies
+        run: yarn install
+
+      - name: Install composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run linters
+        run: |
+          # Create optional directories to simplify psalm config.
+          mkdir -p frontend/www/{phpminiadmin,preguntas}
+          touch 'frontend/server/config.php'
+          touch 'frontend/tests/test_config.php'
+
+          ./stuff/lint.sh validate --all < /dev/null
+
+  selenium:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        ports:
+          - 3306:3306
+        env:
+          MYSQL_ROOT_PASSWORD:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: omegaup
+          MYSQL_PASSWORD: omegaup
+          MYSQL_DATABASE: omegaup
+
+      frontend:
+        image: omegaup/dev-php:20200530
+        ports:
+          - 8001:8000
+        volumes:
+          - ${{ github.workspace }}:/opt/omegaup
+          - omegaupdata:/var/lib/omegaup
+        env:
+          CI: true
+
+      gitserver:
+        image: omegaup/dev-gitserver:20200503
+        volumes:
+          - omegaupdata:/var/lib/omegaup
+
+      broadcaster:
+        image: omegaup/dev-broadcaster:20200530
+
+      grader:
+        image: omegaup/dev-grader:20200530
+        volumes:
+          - omegaupdata:/var/lib/omegaup
+
+      runner:
+        image: omegaup/dev-runner:20200530
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Create default configuration files
+        run: |
+          cat > frontend/server/config.php <<EOF
+          <?php
+          define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
+          define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
+          define('OMEGAUP_DB_HOST', 'mysql');
+          define('OMEGAUP_DB_NAME', 'omegaup');
+          define('OMEGAUP_DB_PASS', 'omegaup');
+          define('OMEGAUP_DB_USER', 'omegaup');
+          define('OMEGAUP_ENVIRONMENT', 'development');
+          define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
+          define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
+          define('SMARTY_CACHE_DIR', '/tmp');
+          define('OMEGAUP_CACERT_URL', '/etc/omegaup/frontend/certificate.pem');
+          define('OMEGAUP_SSLCERT_URL', '/etc/omegaup/frontend/certificate.pem');
+          define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
+          define('OMEGAUP_GRADER_URL', 'https://grader:21680');
+          EOF
+
+          cat > ~/.my.cnf << EOF
+          [client]
+          port=3306
+          host=127.0.0.1
+          protocol=tcp
+          user=root
+          password=
+          EOF
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --user setuptools
+          python3 -m pip install --user wheel
+          python3 -m pip install --user --upgrade urllib3
+          python3 -m pip install --user mysqlclient selenium pytest \
+            pytest-xdist flaky
+
+      - name: Install composer dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Initialize database
+        run: |
+          mysql \
+            -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
+          python3 stuff/bootstrap-environment.py \
+          --purge --verbose --root-url=http://localhost:8001
+
+      - name: Install yarn dependencies
+        run: yarn install
+
+      - name: Build webpack resources
+        run: yarn build
+
+      - name: Run Selenium tests
+        run: |
+          python3 -m pytest ./frontend/tests/ui/ \
+            --verbose --capture=no --log-cli-level=INFO --browser=chrome \
+            --force-flaky --max-runs=2 --min-passes=1 --numprocesses=4 \
+            --url=http://localhost:8001
+
+      - name: Collect container logs
+        if: ${{ always() }}
+        run: |
+          mkdir -p frontend/tests/runfiles/containers
+          for name in $(docker ps --format '{{.Names}}'); do
+            docker logs --timestamps --since 1970-01-01T00:00:00 "${name}" > \
+              "frontend/tests/runfiles/containers/${name}.log" 2>&1
+          done
+
+      - name: Upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-logs
+          path: frontend/tests/ui/results/

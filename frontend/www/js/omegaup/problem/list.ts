@@ -1,16 +1,47 @@
 import Vue from 'vue';
 import problem_List from '../components/problem/List.vue';
-import { OmegaUp } from '../omegaup.js';
 import { types } from '../api_types';
-import { omegaup } from '../omegaup.ts';
+import { omegaup, OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
+  const queryString = window.location.search;
+  let sortOrder = 'desc';
+  let columnName = 'problem_id';
+  let language = 'all';
+  let query = '';
+  if (queryString) {
+    const urlParams = new URLSearchParams(queryString);
+    if (urlParams.get('sort_order')) {
+      const sortOrderParam = urlParams.get('sort_order');
+      if (sortOrderParam) {
+        sortOrder = sortOrderParam;
+      }
+    }
+    if (urlParams.get('order_by')) {
+      const columnNameParam = urlParams.get('order_by');
+      if (columnNameParam) {
+        columnName = columnNameParam;
+      }
+    }
+    if (urlParams.get('language')) {
+      const languageParam = urlParams.get('language');
+      if (languageParam) {
+        language = languageParam;
+      }
+    }
+    if (urlParams.get('query')) {
+      const queryParam = urlParams.get('query');
+      if (queryParam) {
+        query = queryParam;
+      }
+    }
+  }
   const problemsList = new Vue({
-    el: '#problem-list',
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-problem-list', {
         props: {
@@ -22,17 +53,24 @@ OmegaUp.on('ready', () => {
           language: payload.language,
           languages: payload.languages,
           keyword: payload.keyword,
-          modes: payload.modes,
-          columns: payload.columns,
-          mode: payload.mode,
-          column: payload.column,
           tags: payload.tags,
+          sortOrder: sortOrder,
+          columnName: columnName,
         },
         on: {
           'wizard-search': (queryParameters: {
             [key: string]: string;
           }): void => {
-            window.location.search = UI.buildURLQuery(queryParameters);
+            window.location.search = ui.buildURLQuery(queryParameters);
+          },
+          'apply-filter': (
+            columnName: string,
+            sortOrder: omegaup.SortOrder,
+          ): void => {
+            const queryParameters = { language, query, columnName, sortOrder };
+            window.location.replace(
+              `/problem?${ui.buildURLQuery(queryParameters)}`,
+            );
           },
         },
       });

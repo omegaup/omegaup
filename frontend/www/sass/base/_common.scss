@@ -10,22 +10,6 @@ body {
   background-color: #FFFFFF;
 }
 
-.forcebreaks {
-  text-overflow: ellipsis !important;
-  word-wrap: break-word;
-  overflow: hidden;
-  display: table-cell;
-}
-
-// Evita el desborde de la tabla top 5 coders trabajando
-// en conjunto con la clase ".forcebreaks" de common.css
-// de tal manera que se establece overflow: hidden con un ancho máximo
-// de 166px de contenido para mostrar.
-.forcebreaks-top-5 {
-  word-wrap: initial !important;
-  max-width: 155px;
-}
-
 // Clase para quitar el padding de algn contenedor o div tag
 .no-padding {
   padding: 0;
@@ -56,6 +40,17 @@ body {
   height: 51px;
   margin: -51px 0 0;
 }
+
+#status {
+  position: -webkit-sticky; /* Safari */
+  position: sticky;
+  z-index: 1;
+  max-width: 900px;
+  margin-right: auto;
+  margin-left: auto;
+  top: 61px;
+  width: 100%;
+}
 /* FIXME: TODO LO ANTERIOR DEBE IRSE CON BS3 */
 
 a {
@@ -74,5 +69,27 @@ a.card-header-help {
   &:hover {
     color: $omegaup-links--hover;
     text-decoration: none;
+  }
+}
+
+.empty-table-message {
+  text-align: center;
+  font-size: 150%;
+  color: #aaa;
+}
+
+.tags-badges .badge {
+  color: black;
+  &:hover {
+    background-color: rgba(black, 0.35);
+  }
+  &-owner {
+    background-color: #ccc;
+  }
+  &-quality {
+    background-color: #ffeb3b;
+  }
+  &-voted {
+    background-color: #99c2ff;
   }
 }

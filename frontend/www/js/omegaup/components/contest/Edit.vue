@@ -52,7 +52,28 @@
     <div class="tab-content">
       <div class="tab-pane active" v-if="showTab === 'new_form'">
         <omegaup-contest-new-form
-          v-bind:data="contest"
+          v-bind:initial-alias="contest.alias"
+          v-bind:initial-title="contest.title"
+          v-bind:initial-description="contest.description"
+          v-bind:initial-start-time="contest.start_time"
+          v-bind:initial-finish-time="contest.finish_time"
+          v-bind:initial-window-length="contest.window_length"
+          v-bind:initial-points-decay-factor="contest.points_decay_factor"
+          v-bind:initial-submissions-gap="contest.submissions_gap"
+          v-bind:initial-languages="contest.languages"
+          v-bind:initial-feedback="contest.feedback"
+          v-bind:initial-penalty="contest.penalty"
+          v-bind:initial-scoreboard="contest.scoreboard"
+          v-bind:initial-penalty-type="contest.penalty_type"
+          v-bind:initial-show-scoreboard-after="contest.show_scoreboard_after"
+          v-bind:initial-partial-score="contest.partial_score"
+          v-bind:initial-needs-basic-information="
+            contest.needs_basic_information
+          "
+          v-bind:initial-requests-user-information="
+            contest.requests_user_information
+          "
+          v-bind:all-languages="contest.available_languages"
           v-bind:update="true"
           v-on:emit-update-contest="
             newFormComponent => $emit('update-contest', newFormComponent)
@@ -62,6 +83,7 @@
       <div class="tab-pane active problems" v-if="showTab === 'problems'">
         <omegaup-contest-add-problem
           v-bind:contest-alias="contest.alias"
+          v-bind:initialPoints="contest.partial_score ? 100 : 1"
           v-bind:data="problems"
           v-on:emit-add-problem="
             addProblemComponent => $emit('add-problem', addProblemComponent)

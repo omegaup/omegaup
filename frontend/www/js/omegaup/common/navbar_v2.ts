@@ -31,7 +31,10 @@ OmegaUp.on('ready', () => {
           initialClarifications: [],
         },
         on: {
-          'read-notifications': (notifications: types.Notification[]) => {
+          'read-notifications': (
+            notifications: types.Notification[],
+            redirectTo?: string,
+          ) => {
             api.Notification.readNotifications({
               notifications: notifications.map(
                 notification => notification.notification_id,
@@ -40,6 +43,9 @@ OmegaUp.on('ready', () => {
               .then(() => api.Notification.myList())
               .then(data => {
                 commonNavbar.notifications = data.notifications;
+                if (redirectTo) {
+                  UI.navigateTo(redirectTo);
+                }
               })
               .catch(UI.apiError);
           },

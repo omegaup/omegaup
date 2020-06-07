@@ -69,7 +69,6 @@ class CourseRunsTest extends \OmegaUp\Test\ControllerTestCase {
             $participant->username,
             $response['runs'][0]['username']
         );
-        $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Course admin should be able to view run, even if not problem admin.
         $adminIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(

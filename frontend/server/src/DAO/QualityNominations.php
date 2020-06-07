@@ -198,14 +198,10 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      * Gets additional details for $nomination and structures it as an object
      * instead of as a flat array.
      *
-     * @param null|array{qualitynomination_id: int, nomination: string, contents?: string, time: \OmegaUp\Timestamp, status: string, nominator_username: string, nominator_name: null|string, alias: string, title: string, author_username: string, author_name: null|string} $nomination
-     * @return array{qualitynomination_id: int, nomination: string, contents?: array{statements?: array<string, string>, rationale?: string, reason?: string, before_ac?: bool, quality?: int, tags?: list<string>, difficulty?: int}, time: \OmegaUp\Timestamp, status: string, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}, votes: list<array{time: \OmegaUp\Timestamp|null, vote: int, user: array{username: string, name: null|string}}>}|null
+     * @param array{qualitynomination_id: int, nomination: string, contents?: string, time: \OmegaUp\Timestamp, status: string, nominator_username: string, nominator_name: null|string, alias: string, title: string, author_username: string, author_name: null|string} $nomination
+     * @return array{qualitynomination_id: int, nomination: string, contents?: array{statements?: array<string, string>, rationale?: string, reason?: string, before_ac?: bool, quality?: int, tags?: list<string>, difficulty?: int}, time: \OmegaUp\Timestamp, status: string, nominator: array{username: string, name: null|string}, author: array{username: string, name: null|string}, problem: array{alias: string, title: string}, votes: list<array{time: \OmegaUp\Timestamp|null, vote: int, user: array{username: string, name: null|string}}>}
      */
     private static function processNomination($nomination) {
-        if (is_null($nomination) || empty($nomination)) {
-            return null;
-        }
-
         $nomination['nominator'] = [
             'username' => $nomination['nominator_username'],
             'name' => $nomination['nominator_name'],
@@ -254,7 +250,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
      *
      * @param list<string> $types
      *
-     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>}
+     * @return array{totalRows: int, nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>}
      */
     public static function getNominations(
         ?int $nominatorUserId,
@@ -262,7 +258,9 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         int $page,
         int $rowcount,
         array $types = ['demotion', 'promotion'],
-        string $status = 'all'
+        string $status = 'all',
+        ?string $query = null,
+        ?string $column = null
     ): array {
         $offset = ($page - 1) * $rowcount;
         $sqlFrom = '
@@ -336,8 +334,31 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $params[] = $nominatorUserId;
         }
 
+        if (!is_null($query) && !is_null($column)) {
+            // Some columns are renamed in the query.
+            if ($column == 'author_username') {
+                $column = 'authorIdentity.username';
+            } elseif ($column == 'nominator_username') {
+                $column = 'nominatorIdentity.username';
+            }
+            $sqlSearch = \OmegaUp\MySQLConnection::getInstance()->escape(
+                $column
+            ) . " LIKE CONCAT('%', ?, '%')";
+            $params[] = $query;
+        } else {
+            $sqlSearch = '';
+        }
+
         if (!empty($conditions)) {
-            $sqlFrom .= ' WHERE ' . implode(' AND ', $conditions);
+            $sqlFrom .= ' WHERE ' . implode(
+                ' AND ',
+                $conditions
+            );
+            if (!is_null($query)) {
+                $sqlFrom .= " AND {$sqlSearch} ";
+            }
+        } else {
+            $sqlFrom .= " WHERE {$sqlSearch} ";
         }
 
         if ($status != 'all') {
@@ -427,6 +448,9 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sql,
             [$qualitynomination_id]
         );
+        if (is_null($result)) {
+            return null;
+        }
         return self::processNomination($result);
     }
 

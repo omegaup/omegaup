@@ -3,8 +3,8 @@ import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 
-export function navigateTo(url: Location): void {
-  window.location = url;
+export function navigateTo(href: string): void {
+  window.location.href = href;
 }
 
 function escapeString(s: string): string {
@@ -33,11 +33,17 @@ export function buildURLQuery(queryParameters: {
     .join('&');
 }
 
-export function isVirtual(contest: omegaup.Contest): boolean {
+export function isVirtual(contest: {
+  rerun_id?: number;
+  title: string;
+}): boolean {
   return !!contest.rerun_id && contest.rerun_id > 0;
 }
 
-export function contestTitle(contest: omegaup.Contest): string {
+export function contestTitle(contest: {
+  rerun_id?: number;
+  title: string;
+}): string {
   if (isVirtual(contest)) {
     return formatString(T.virtualContestSuffix, {
       title: contest.title,

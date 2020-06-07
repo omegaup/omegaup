@@ -784,11 +784,11 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate results
         foreach ($response['results'] as $responseProblem) {
-            if ($responseProblem['score'] != '0') {
-                $this->fail(
-                    'Expecting score to be not set for non-logged in users'
-                );
-            }
+            $this->assertEquals(
+                '0',
+                $responseProblem['score'],
+                'Expecting score to be not set for non-logged in users'
+            );
         }
     }
 
@@ -796,14 +796,18 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
      * Test List API with query param
      */
     public function testListWithAliasQuery() {
-        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
-        ]));
-        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
-        ]));
+        $problemDataPublic = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
+            ])
+        );
+        $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            ])
+        );
 
-        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $userLogin = self::login($identity);
 
         // Expect public problem only
@@ -822,11 +826,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $userLogin->auth_token,
             'query' => substr($problemDataPrivate['request']['title'], 2, 5),
         ]));
-        $this->assertEquals(0, count($response['results']));
+        $this->assertArrayNotContainsInKey(
+            $response['results'],
+            'alias',
+            $problemDataPublic['request']['problem_alias']
+        );
 
         // Expect 1 problem, admin can see private problem
         {
-            ['user' => $admin, 'identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
+            ['identity' => $identityAdmin] = \OmegaUp\Test\Factories\User::createAdminUser();
             $adminLogin = self::login($identityAdmin);
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -855,7 +863,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test 'page', 'order_by' and 'mode' parametes of the apiList() method, and search by title.
+     * Test 'page', 'order_by' and 'sort_order' parametes of the apiList() method, and search by title.
      */
     public function testProblemListPager() {
         // Create a user and some problems with submissions for the tests.
@@ -917,19 +925,19 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // with the additions of the three features to apiList(), that is, paging,
         // order by column and order mode: Call apiList() with and without
         // pagination, for each allowed ordering and each possible order mode.
-        $modes = ['asc', 'desc'];
+        $sortOrderTypes = ['asc', 'desc'];
         $columns = ['title', 'quality', 'difficulty', 'ratio', 'points', 'score'];
         $counter = 0;
         for ($paging = 0; $paging <= 1; $paging++) {
             foreach ($columns as $col) {
-                foreach ($modes as $mode) {
+                foreach ($sortOrderTypes as $sortOrder) {
                     $first = null;
                     $last = null;
                     if ($paging == 1) {
                         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                             'auth_token' => $login->auth_token,
                             'rowcount' => $pageSize,
-                            'mode' => $mode,
+                            'sort_order' => $sortOrder,
                             'order_by' => $col,
                             'page' => 1,
                         ]));
@@ -937,7 +945,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                             'auth_token' => $login->auth_token,
                             'rowcount' => $pageSize,
-                            'mode' => $mode,
+                            'sort_order' => $sortOrder,
                             'order_by' => $col,
                             'page' => $pages,
                         ]));
@@ -949,7 +957,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                             'auth_token' => $login->auth_token,
                             'rowcount' => $pageSize,
-                            'mode' => $mode,
+                            'sort_order' => $sortOrder,
                             'order_by' => $col,
                         ]));
                         $first = $response['results'];
@@ -960,13 +968,13 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                     $j = count($last) - 1;
                     if ($col === 'title') {
                         $comp = strcmp($first[$i]['title'], $last[$j]['title']);
-                        if ($mode === 'asc') {
+                        if ($sortOrder === 'asc') {
                             $this->assertTrue($comp <= 0);
                         } else {
                             $this->assertTrue($comp >= 0);
                         }
                     } elseif ($col === 'difficulty' || $col === 'quality') {
-                        if ($mode === 'asc') {
+                        if ($sortOrder === 'asc') {
                             $this->assertGreaterThanOrEqual(
                                 $last[$j][$col],
                                 $first[$i][$col]
@@ -987,7 +995,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                             }
                         }
                     } else {
-                        if ($mode === 'asc') {
+                        if ($sortOrder === 'asc') {
                             $this->assertTrue(
                                 $first[$i][$col] <= $last[$j][$col]
                             );

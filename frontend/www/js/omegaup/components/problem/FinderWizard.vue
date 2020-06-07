@@ -249,7 +249,7 @@ export default class ProblemFinderWizard extends Vue {
       min_difficulty: this.difficultyRange[0],
       max_difficulty: this.difficultyRange[1],
       order_by: this.selectedPriority,
-      mode: 'desc',
+      sort_order: 'desc',
     };
     if (this.karel) {
       queryParameters.only_karel = true;

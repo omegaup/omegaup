@@ -1,0 +1,13 @@
+{
+  "include": [
+    "frontend/www/js/**/*.js",
+    "frontend/www/js/**/*.ts",
+    "frontend/www/js/**/*.vue"
+  ],
+  "exclude": [
+    "frontend/www/js/**/*.test.ts",
+    "frontend/www/js/omegaup/lang*.ts",
+    "frontend/www/js/omegaup/test.setup.js",
+    "frontend/www/third_party/**"
+  ]
+}

@@ -5,13 +5,21 @@
       <div class="notification-date">
         {{ date }}
       </div>
-      <button class="close" v-on:click.prevent="$emit('remove', notification)">
+      <button
+        class="close"
+        v-on:click.prevent="$emit('remove', notification, null)"
+      >
         ❌
       </button>
     </div>
-    <div class="d-flex align-items-center pt-1">
+    <div
+      class="w-100 d-flex align-items-center pt-1"
+      v-bind:class="{ 'notification-link': url }"
+      v-on:click="handleClick"
+    >
       <img class="d-block" width="80" v-bind:src="iconUrl" />
-      <div v-if="url">
+      <div v-if="htmlText" v-html="htmlText"></div>
+      <div v-else-if="url">
         <a v-bind:href="url">
           {{ text }}
         </a>
@@ -23,7 +31,7 @@
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .close {
   font-size: inherit;
 }
@@ -31,6 +39,13 @@
 .notification-date {
   font-size: 0.8rem;
   color: #666;
+}
+
+.notification-link {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
 }
 </style>
 
@@ -40,34 +55,36 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
+import * as markdown from '../../markdown';
 
 @Component
 export default class Notification extends Vue {
   @Prop() notification!: types.Notification;
 
+  markdownConverter = markdown.markdownConverter();
+
   get iconUrl(): string {
+    if (this.notification.contents.body) {
+      return this.notification.contents.body.iconUrl;
+    }
+
     switch (this.notification.contents.type) {
       case 'badge':
         return `/media/dist/badges/${this.notification.contents.badge}.svg`;
       case 'demotion':
         if (this.notification.contents.status == 'banned') {
           return '/media/banned.svg';
-        } else {
-          return '/media/warning.svg';
         }
+        return '/media/warning.svg';
       case 'general_notification':
         return '/media/email.svg';
       default:
-        return 'media/info.png';
+        return '/media/info.png';
     }
   }
 
   get text(): string {
     switch (this.notification.contents.type) {
-      case 'badge':
-        return ui.formatString(T.notificationNewBadge, {
-          badgeName: T[`badge_${this.notification.contents.badge}_name`],
-        });
       case 'demotion':
         return this.notification.contents.message || '';
       case 'general_notification':
@@ -77,13 +94,37 @@ export default class Notification extends Vue {
     }
   }
 
+  get htmlText(): string {
+    if (this.notification.contents.body) {
+      return this.markdownConverter.makeHtml(
+        ui.formatString(
+          T[this.notification.contents.body.localizationString],
+          this.notification.contents.body.localizationParams,
+        ),
+      );
+    }
+    switch (this.notification.contents.type) {
+      case 'badge':
+        return this.markdownConverter.makeHtml(
+          ui.formatString(T.notificationNewBadge, {
+            badgeName: T[`badge_${this.notification.contents.badge}_name`],
+          }),
+        );
+      default:
+        return '';
+    }
+  }
+
   get url(): string {
+    if (this.notification.contents.body) {
+      return this.notification.contents.body.url;
+    }
+
     switch (this.notification.contents.type) {
       case 'general_notification':
         return this.notification.contents.url || '';
       case 'badge':
-        // TODO: Add link to badge page.
-        return '';
+        return `/badge/${this.notification.contents.badge}/`;
       case 'demotion':
         // TODO: Add link to problem page.
         return '';
@@ -94,6 +135,12 @@ export default class Notification extends Vue {
 
   get date() {
     return time.formatDate(this.notification.timestamp);
+  }
+
+  handleClick(): void {
+    if (this.url) {
+      this.$emit('remove', this.notification, this.url);
+    }
   }
 }
 </script>

@@ -79,10 +79,6 @@ try_define(
     sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
 );
 try_define(
-    'BIN_PATH',
-    sprintf('%s/../bin', strval(OMEGAUP_ROOT))
-);
-try_define(
     'IMAGES_PATH',
     sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
 );

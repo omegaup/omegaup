@@ -186,12 +186,14 @@ def _run_script(path, args, now):
                 _process_one_request(s, request, now)
 
 
-def _purge_old_problems():
+def _purge_old_problems() -> None:
     logging.info('Purging old problems')
     # Removing directories requires the user to be in the 'www-data' group.
     can_delete = 'www-data' in (grp.getgrgid(grid).gr_name
                                 for grid in os.getgroups())
     problems_root = os.path.join(OMEGAUP_RUNTIME_ROOT, 'problems.git')
+    if not os.path.isdir(problems_root):
+        return
     for alias in os.listdir(problems_root):
         path = os.path.join(problems_root, alias)
         logging.debug('Removing %s', path)

@@ -19,13 +19,20 @@ export function apiCall<
           ? {
               method: 'POST',
               body: Object.keys(params)
-                .filter(key => typeof params[key] !== 'undefined')
-                .map(
+                .filter(
                   key =>
-                    `${encodeURIComponent(key)}=${encodeURIComponent(
-                      params[key],
-                    )}`,
+                    params[key] !== null && typeof params[key] !== 'undefined',
                 )
+                .map(key => {
+                  if (params[key] instanceof Date) {
+                    return `${encodeURIComponent(key)}=${encodeURIComponent(
+                      Math.round(params[key].getTime() / 1000),
+                    )}`;
+                  }
+                  return `${encodeURIComponent(key)}=${encodeURIComponent(
+                    params[key],
+                  )}`;
+                })
                 .join('&'),
               headers: {
                 'Content-Type':
@@ -229,6 +236,11 @@ export const Contest = {
       }
       return x.map(x => {
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+        if (x.original_finish_time)
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
@@ -683,17 +695,6 @@ export const Course = {
         return x;
       });
     })(x.admin);
-    x.public = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.public);
     x.student = (x => {
       if (!Array.isArray(x)) {
         return x;
@@ -705,6 +706,17 @@ export const Course = {
         return x;
       });
     })(x.student);
+    x.public = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.public);
     return x;
   }),
   listSolvedProblems: apiCall<
@@ -1205,9 +1217,8 @@ export const Problemset = {
   >('/api/problemset/scoreboard/', x => {
     if (x.finish_time)
       x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-    if (x.start_time)
-      x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-    if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
+    x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+    x.time = ((x: number) => new Date(x * 1000))(x.time);
     return x;
   }),
   scoreboardEvents: apiCall<
@@ -1395,21 +1406,10 @@ export const School = {
   list: apiCall<messages.SchoolListRequest, messages.SchoolListResponse>(
     '/api/school/list/',
   ),
-  monthlySolvedProblemsCount: apiCall<
-    messages.SchoolMonthlySolvedProblemsCountRequest,
-    messages.SchoolMonthlySolvedProblemsCountResponse
-  >('/api/school/monthlySolvedProblemsCount/'),
-  schoolCodersOfTheMonth: apiCall<
-    messages.SchoolSchoolCodersOfTheMonthRequest,
-    messages.SchoolSchoolCodersOfTheMonthResponse
-  >('/api/school/schoolCodersOfTheMonth/'),
   selectSchoolOfTheMonth: apiCall<
     messages.SchoolSelectSchoolOfTheMonthRequest,
     messages.SchoolSelectSchoolOfTheMonthResponse
   >('/api/school/selectSchoolOfTheMonth/'),
-  users: apiCall<messages.SchoolUsersRequest, messages.SchoolUsersResponse>(
-    '/api/school/users/',
-  ),
 };
 
 export const Scoreboard = {
@@ -1428,25 +1428,6 @@ export const Session = {
     messages.SessionGoogleLoginRequest,
     messages.SessionGoogleLoginResponse
   >('/api/session/googleLogin/'),
-};
-
-export const Submission = {
-  latestSubmissions: apiCall<
-    messages.SubmissionLatestSubmissionsRequest,
-    messages._SubmissionLatestSubmissionsServerResponse,
-    messages.SubmissionLatestSubmissionsResponse
-  >('/api/submission/latestSubmissions/', x => {
-    x.submissions = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        x.time = ((x: number) => new Date(x * 1000))(x.time);
-        return x;
-      });
-    })(x.submissions);
-    return x;
-  }),
 };
 
 export const Tag = {

@@ -4,146 +4,236 @@
       v-bind:initialLanguage="language"
       v-bind:languages="languages"
       v-bind:initialKeyword="keyword"
-      v-bind:modes="modes"
-      v-bind:columns="columns"
-      v-bind:initialMode="mode"
-      v-bind:initialColumn="column"
       v-bind:tags="tags"
     ></omegaup-problem-search-bar>
-    <a class="show-finder-button" v-on:click="showFinderWizard = true">{{
-      T.wizardLinkText
-    }}</a>
+    <a
+      href="#"
+      class="d-inline-block mb-3"
+      role="button"
+      v-on:click="showFinderWizard = true"
+    >
+      {{ T.wizardLinkText }}
+    </a>
+    <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
     <omegaup-problem-finder
       v-bind:possible-tags="wizardTags"
       v-on:close="showFinderWizard = false"
       v-on:search-problems="wizardSearch"
       v-show="showFinderWizard"
     ></omegaup-problem-finder>
-    <div class="wait_for_ajax panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">{{ T.wordsProblems }}</h3>
-      </div>
-      <table class="table problem-list">
-        <thead>
-          <tr>
-            <th class="contains-long-desc">
-              {{ T.wordsTitle }}
-              <div>
-                <span class="tag tag-quality">{{ T.tagSourceQuality }}</span>
-                <span class="tag tag-owner">{{ T.tagSourceOwner }}</span>
-                <span class="tag tag-voted">{{ T.tagSourceVoted }}</span>
-              </div>
-            </th>
-            <th class="numericColumn">{{ T.wordsQuality }}</th>
-            <th class="numericColumn">{{ T.wordsDifficulty }}</th>
-            <th class="numericColumn">{{ T.wordsRatio }}</th>
-            <th class="numericColumn">
-              {{ T.wordsPointsForRank }}
-              <a
-                data-toggle="tooltip"
-                href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
-                rel="tooltip"
-                title=""
-                v-bind:data-original-title="T.wordsPointsForRankTooltip"
-                ><img src="/media/question.png"
-              /></a>
-            </th>
-            <th class="numericColumn" v-if="loggedIn">{{ T.wordsMyScore }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="problem in problems">
-            <td>
-              <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
-                problem.title
-              }}</a
-              ><span
-                v-bind:class="
-                  `glyphicon ${iconClassForProblem(
-                    problem.quality_seal,
-                    problem.visibility,
-                  )}`
-                "
-                v-bind:title="
-                  iconTitleForProblem(problem.quality_seal, problem.visibility)
-                "
-              ></span>
-              <span
-                v-if="problem.visibility == -1"
-                v-bind:class="`glyphicon glyphicon-eye-close`"
-                v-bind:title="T.wordsPrivate"
-              ></span>
-              <div class="tag-list" v-if="problem.tags.length">
+    <div class="card">
+      <h5 class="card-header">
+        {{ T.wordsProblems }}
+      </h5>
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th scope="col" class="align-middle text-nowrap">
+                <span>{{ T.wordsTitle }}</span>
+                <span class="badge badge-quality mr-1 ml-1 p-2">{{
+                  T.tagSourceQuality
+                }}</span>
+                <span class="badge badge-owner mr-1 p-2">{{
+                  T.tagSourceOwner
+                }}</span>
+                <span class="badge badge-voted p-2">{{
+                  T.tagSourceVoted
+                }}</span>
+                <omegaup-common-sort-controls
+                  column="title"
+                  v-bind:column-type="omegaup.ColumnType.String"
+                  v-bind:sort-order="sortOrder"
+                  v-bind:column-name="columnName"
+                  v-on:emit-apply-filter="
+                    (columnName, sortOrder) =>
+                      $emit('apply-filter', columnName, sortOrder)
+                  "
+                ></omegaup-common-sort-controls>
+              </th>
+              <th scope="col" class="text-center align-middle text-nowrap">
+                <span
+                  >{{ T.wordsQuality }}
+                  <omegaup-common-sort-controls
+                    column="quality"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
+                    v-on:emit-apply-filter="
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
+                    "
+                  ></omegaup-common-sort-controls
+                ></span>
+              </th>
+              <th scope="col" class="text-center align-middle text-nowrap">
+                <span
+                  >{{ T.wordsDifficulty }}
+                  <omegaup-common-sort-controls
+                    column="difficulty"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
+                    v-on:emit-apply-filter="
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
+                    "
+                  ></omegaup-common-sort-controls
+                ></span>
+              </th>
+              <th scope="col" class="text-right align-middle text-nowrap">
+                <span
+                  >{{ T.wordsRatio }}
+                  <omegaup-common-sort-controls
+                    column="ratio"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
+                    v-on:emit-apply-filter="
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
+                    "
+                  ></omegaup-common-sort-controls
+                ></span>
+              </th>
+              <th
+                scope="col"
+                class="text-right align-middle text-nowrap"
+                v-if="loggedIn"
+              >
+                <span
+                  >{{ T.wordsMyScore }}
+                  <omegaup-common-sort-controls
+                    column="score"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
+                    v-on:emit-apply-filter="
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
+                    "
+                  ></omegaup-common-sort-controls
+                ></span>
+              </th>
+              <th scope="col" class="text-right align-middle text-nowrap">
+                <span>
+                  <a
+                    data-toggle="tooltip"
+                    href="https://blog.omegaup.com/el-nuevo-ranking-de-omegaup/"
+                    rel="tooltip"
+                    v-bind:title="T.wordsPointsForRank"
+                    v-bind:data-original-title="T.wordsPointsForRankTooltip"
+                    ><img src="/media/question.png"
+                  /></a>
+                  <omegaup-common-sort-controls
+                    column="points"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
+                    v-on:emit-apply-filter="
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
+                    "
+                  ></omegaup-common-sort-controls>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody data-problems>
+            <tr v-for="problem in problems">
+              <td>
+                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+                  problem.title
+                }}</a>
+                <font-awesome-icon
+                  v-bind:title="T.wordsHighQualityProblem"
+                  v-if="problem.qualitySeal || problem.visibility === 3"
+                  v-bind:icon="['fas', 'medal']"
+                  color="gold"
+                />
+                <font-awesome-icon
+                  v-bind:title="T.wordsWarningProblem"
+                  v-else-if="problem.visibility === -1"
+                  v-bind:icon="['fas', 'exclamation-triangle']"
+                />
+                <font-awesome-icon
+                  v-bind:title="T.wordsBannedProblem"
+                  v-else-if="problem.visibility <= -3"
+                  v-bind:icon="['fas', 'ban']"
+                />
+                <font-awesome-icon
+                  v-bind:title="T.wordsPrivate"
+                  v-else-if="problem.visibility === 0"
+                  v-bind:icon="['fas', 'eye-slash']"
+                />
                 <a
-                  v-bind:class="`tag tag-${tag.source}`"
+                  v-bind:class="`badge badge-${tag.source} m-1 p-2`"
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
                   v-for="tag in problem.tags"
                   >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a
                 >
-              </div>
-            </td>
-            <td class="numericColumn" v-if="problem.quality === null">—</td>
-            <td class="tooltip_column" v-else="">
-              <span
-                data-wenk-pos="right"
-                v-bind:data-wenk="
-                  `${UI.formatString(T.wordsOutOf4, {
-                    Score: problem.quality.toFixed(1),
-                  })}`
-                "
-                >{{ QUALITY_TAGS[Math.round(problem.quality)] }}</span
+              </td>
+              <td
+                class="text-center tooltip_column"
+                v-if="problem.quality !== null"
               >
-            </td>
-            <td class="numericColumn" v-if="problem.difficulty === null">—</td>
-            <td class="tooltip_column" v-else="">
-              <span
-                data-wenk-pos="right"
-                v-bind:data-wenk="
-                  `${UI.formatString(T.wordsOutOf4, {
-                    Score: problem.difficulty.toFixed(1),
-                  })}`
-                "
-                >{{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}</span
-              >
-            </td>
-            <td class="numericColumn">
-              {{ (100.0 * problem.ratio).toFixed(2) }}%
-            </td>
-            <td class="numericColumn">{{ problem.points.toFixed(2) }}</td>
-            <td class="numericColumn" v-if="loggedIn">
-              {{ problem.score.toFixed(2) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <span
+                  v-tooltip="
+                    `${UI.formatString(T.wordsOutOf4, {
+                      Score: problem.quality.toFixed(1),
+                    })}`
+                  "
+                >
+                  {{ QUALITY_TAGS[Math.round(problem.quality)] }}
+                </span>
+              </td>
+              <td class="text-right" v-else="">—</td>
+              <td class="text-center" v-if="problem.difficulty !== null">
+                <span
+                  v-tooltip="
+                    `${UI.formatString(T.wordsOutOf4, {
+                      Score: problem.difficulty.toFixed(1),
+                    })}`
+                  "
+                >
+                  {{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}
+                </span>
+              </td>
+              <td class="text-center" v-else="">—</td>
+              <td class="text-right">
+                {{ (100.0 * problem.ratio).toFixed(2) }}%
+              </td>
+              <td class="text-right" v-if="loggedIn">
+                {{ problem.score.toFixed(2) }}
+              </td>
+              <td class="text-right">{{ problem.points.toFixed(2) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <omegaup-common-paginator
+          v-bind:pagerItems="pagerItems"
+        ></omegaup-common-paginator>
+      </div>
     </div>
-    <omegaup-common-paginator
-      v-bind:pagerItems="pagerItems"
-    ></omegaup-common-paginator>
   </div>
 </template>
 
-<style>
-.tag {
-  margin-right: 0.25em;
-  font-weight: normal;
-}
+<style lang="scss" scoped>
+.badge {
+  color: black;
 
-.tag-quality {
-  background: #ffeb3b;
-}
+  &:hover {
+    background-color: rgba(black, 0.35);
+  }
 
-.omegaup-quality-badge {
-  width: 18px;
-  height: 18px;
-  background: url('/media/quality-badge-sm.png') center/contain no-repeat;
-}
+  &-owner {
+    background-color: #ccc;
+  }
 
-.show-finder-button {
-  display: block;
-  color: #337ab7;
-  margin-bottom: 15px;
-  cursor: pointer;
+  &-quality {
+    background-color: #ffeb3b;
+  }
+
+  &-voted {
+    background-color: #99c2ff;
+  }
 }
 </style>
 
@@ -153,15 +243,35 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as UI from '../../ui';
-import common_Paginator from '../common/Paginator.vue';
+
+import common_Paginator from '../common/Paginatorv2.vue';
+import common_SortControls from '../common/SortControls.vue';
 import problem_FinderWizard from './FinderWizard.vue';
 import problem_SearchBar from './SearchBar.vue';
 
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faEyeSlash,
+  faMedal,
+  faExclamationTriangle,
+  faBan,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
+
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-problem-finder': problem_FinderWizard,
     'omegaup-common-paginator': common_Paginator,
+    'omegaup-common-sort-controls': common_SortControls,
     'omegaup-problem-search-bar': problem_SearchBar,
+  },
+  directives: {
+    tooltip: VTooltip,
   },
 })
 export default class ProblemList extends Vue {
@@ -178,9 +288,12 @@ export default class ProblemList extends Vue {
   @Prop() mode!: string;
   @Prop() column!: string;
   @Prop() tags!: string[];
+  @Prop() sortOrder!: string;
+  @Prop() columnName!: string;
 
   T = T;
   UI = UI;
+  omegaup = omegaup;
   showFinderWizard = false;
   QUALITY_TAGS = [
     T.qualityFormQualityVeryBad,
@@ -196,23 +309,6 @@ export default class ProblemList extends Vue {
     T.qualityFormDifficultyHard,
     T.qualityFormDifficultyVeryHard,
   ];
-
-  iconClassForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility == 3) return 'omegaup-quality-badge';
-    else if (visibility == 1 || visibility == -1)
-      return 'glyphicon-warning-sign';
-    else if (visibility <= -2) return 'glyphicon-ban-circle';
-    else if (visibility == 0) return 'glyphicon-eye-close';
-    return '';
-  }
-
-  iconTitleForProblem(qualitySeal: boolean, visibility: number): string {
-    if (qualitySeal || visibility == 3) return T.wordsHighQualityProblem;
-    else if (visibility == 1 || visibility == -1) return T.wordsWarningProblem;
-    else if (visibility <= -3) return T.wordsBannedProblem;
-    else if (visibility == 0) return T.wordsPrivate;
-    return '';
-  }
 
   hrefForProblemTag(currentTags: string[], problemTag: string): string {
     if (!currentTags) return `/problem/?tag[]=${problemTag}`;
