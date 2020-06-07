@@ -18,6 +18,12 @@ describe('Details.vue', () => {
       time_limit: '1s',
     },
     points: 100,
+    problemsetter: {
+      classname: 'user-rank-unranked',
+      creation_date: new Date(),
+      name: 'omegaUp admin',
+      username: 'omegaup',
+    },
     quality_seal: false,
     sample_input: null,
     settings: {
@@ -50,11 +56,20 @@ describe('Details.vue', () => {
     visibility: 2,
   };
 
-  it('Should handle null sample input', async () => {
+  const user = {
+    admin: true,
+    loggedIn: true,
+    reviewer: true,
+  };
+
+  it('Should handle no nomination payload', async () => {
     const wrapper = shallowMount(problem_Details, {
       propsData: {
         problem: sampleProblem,
+        user,
       },
     });
+
+    expect(wrapper.text()).toContain(sampleProblem.points);
   });
 });
