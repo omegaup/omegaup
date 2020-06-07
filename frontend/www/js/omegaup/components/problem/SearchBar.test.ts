@@ -23,7 +23,5 @@ describe('SearchBar.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.wordsFilterByLanguage);
-    expect(wrapper.text()).toContain(T.wordsOrderBy);
-    expect(wrapper.text()).toContain(T.wordsMode);
   });
 });
