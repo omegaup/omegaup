@@ -9,11 +9,11 @@ import list from './List.vue';
 import { Contest } from '../../api';
 
 describe('List.vue', () => {
-  it('Should handle empty list of nominations', async () => {
+  it('Should handle list of one nomination', async () => {
     const wrapper = shallowMount(list, {
       propsData: {
-        data: {
-          nominations: {
+        nominations: [
+          {
             author: {
               name: 'nombre',
               username: 'user',
@@ -34,17 +34,17 @@ describe('List.vue', () => {
             },
             qualitynomination_id: 1,
             status: 'open',
-            time: 'Wed Jun 03 2020 18:46:23 GMT-0500 (hora de verano central)',
+            time: new Date('2020-06-03 23:46:10'),
             votes: [],
           },
-          pagerItems: [
-            {
-              class: 'disabled',
-              label: '1',
-              page: 1,
-            },
-          ],
-        },
+        ],
+        pagerItems: [
+          {
+            class: 'disabled',
+            label: '1',
+            page: 1,
+          },
+        ],
         pages: 1,
         length: 100,
         isAdmin: true,
@@ -52,7 +52,7 @@ describe('List.vue', () => {
       },
     });
 
-    expect(wrapper.find('h3.card-header').text()).toContain(
+    expect(wrapper.findComponent({ name: 'title' }).text()).toContain(
       UI.formatString(T.nominationsRangeHeader, {
         lowCount: 1,
         highCount: 100,

@@ -37,7 +37,7 @@
       <br /><br /><br />
     </div>
     <div class="card">
-      <h3 class="card-header">
+      <h3 class="card-header" name="title">
         {{
           UI.formatString(T.nominationsRangeHeader, {
             lowCount: (pages - 1) * length + 1,
