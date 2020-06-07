@@ -76,7 +76,7 @@ describe('Stats.vue', () => {
       time: { useUTC: true },
       title: { text: ui.formatString(T.wordsVerdictsOf, { alias: 'alias' }) },
     },
-    pendingChartsOptions: {
+    pendingChartOptions: {
       chart: {
         marginRight: 10,
         type: 'spline',

@@ -42,11 +42,11 @@ a.badges-link {
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import Badge from '../badge/Badge.vue';
+import badge_Badge from '../badge/Badge.vue';
 
 @Component({
   components: {
-    'omegaup-badge': Badge,
+    'omegaup-badge': badge_Badge,
   },
 })
 export default class BadgeList extends Vue {

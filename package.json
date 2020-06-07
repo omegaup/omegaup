@@ -65,7 +65,7 @@
   "scripts": {
     "test": "mochapack --webpack-config webpack.config-test.js --require frontend/www/js/omegaup/test.setup.js 'frontend/www/js/**/*.test.ts'",
     "test:watch": "mochapack --watch --webpack-config webpack.config-test.js --require frontend/www/js/omegaup/test.setup.js 'frontend/www/js/**/*.test.ts'",
-    "test:coverage": "cross-env NODE_ENV=coverage NODE_OPTIONS=--max-old-space-size=4096 nyc --reporter=json --reporter=text yarn run test",
+    "test:coverage": "cross-env NODE_ENV=coverage NODE_OPTIONS=--max-old-space-size=6144 nyc --reporter=json --reporter=text yarn run test",
     "dev": "cross-env webpack --config-name=frontend --watch --mode=development --display=minimal --display-chunk=false --color=true",
     "dev-all": "cross-env webpack --watch --mode=development --display=minimal --display-chunk=false --color=true",
     "build": "cross-env webpack --hide-modules --mode=production",
@@ -80,6 +80,8 @@
     "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/vue-fontawesome": "^0.1.9",
+    "@types/gapi": "0.0.39",
+    "@types/gapi.auth2": "0.0.52",
     "@types/latinize": "^0.2.15",
     "codemirror": "^5.38.0",
     "jszip": "^3.1.5",
