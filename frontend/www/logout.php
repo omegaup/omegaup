@@ -8,12 +8,13 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
 
 \OmegaUp\UITools::render(
     function (\OmegaUp\Request $r): array {
-        if (defined(OMEGAUP_GOOGLE_CLIENTID)) {
-            $script = ["<script src='https://apis.google.com/js/api.js' async defer></script>"];
+        $scripts = [];  // por consistencia con el nombre en L16.
+        if (defined('OMEGAUP_GOOGLE_CLIENTID')) {
+            $scripts[] = 'https://apis.google.com/js/api.js';
         }
         return [
             'smartyProperties' => [
-                'scripts' => $script ?? [],
+                'scripts' => $scripts,
             ],
             'entrypoint' => 'logout',
         ];
