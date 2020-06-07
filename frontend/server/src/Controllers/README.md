@@ -2710,7 +2710,7 @@ List of public and user's private problems
 | `max_difficulty`        | `mixed` |             |
 | `min_difficulty`        | `mixed` |             |
 | `min_visibility`        | `mixed` |             |
-| `mode`                  | `mixed` |             |
+| `sort_order`            | `mixed` |             |
 | `offset`                | `mixed` |             |
 | `only_karel`            | `mixed` |             |
 | `order_by`              | `mixed` |             |
