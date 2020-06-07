@@ -44,12 +44,12 @@ library.add(
 })
 export default class SortControls extends Vue {
   @Prop() column!: string;
-  @Prop() initialMode!: string;
-  @Prop() initialOrderBy!: string;
+  @Prop() sortOrder!: omegaup.SortOrder;
   @Prop({ default: omegaup.ColumnType.Number }) columnType!: omegaup.ColumnType;
+  @Prop() columnName!: string;
 
   get iconDisplayed(): string {
-    if (this.initialMode === omegaup.OrderMode.Descendant) {
+    if (this.sortOrder === omegaup.SortOrder.Descending) {
       if (this.columnType === omegaup.ColumnType.Number) {
         return 'sort-amount-down';
       }
@@ -62,13 +62,13 @@ export default class SortControls extends Vue {
   }
 
   get selected(): boolean {
-    return this.column === this.initialOrderBy;
+    return this.column === this.columnName;
   }
 
   get toggleSort(): string {
-    return this.initialMode === omegaup.OrderMode.Ascendant
-      ? omegaup.OrderMode.Descendant
-      : omegaup.OrderMode.Ascendant;
+    return this.sortOrder === omegaup.SortOrder.Ascending
+      ? omegaup.SortOrder.Descending
+      : omegaup.SortOrder.Ascending;
   }
 }
 </script>

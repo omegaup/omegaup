@@ -79,9 +79,9 @@ export namespace omegaup {
     String = 'string',
   }
 
-  export enum OrderMode {
-    Ascendant = 'asc',
-    Descendant = 'desc',
+  export enum SortOrder {
+    Ascending = 'asc',
+    Descending = 'desc',
   }
 
   export enum RequestsUserInformation {
@@ -406,7 +406,7 @@ export namespace omegaup {
     min_difficulty: number;
     max_difficulty: number;
     order_by: string;
-    mode: string;
+    sort_order: string;
     only_karel?: boolean;
     tag?: string[];
   }

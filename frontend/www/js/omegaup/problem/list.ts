@@ -8,6 +8,24 @@ import * as UI from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
+  const queryString = window.location.search;
+  let sortOrder = 'desc';
+  let columnName = 'problem_id';
+  if (queryString) {
+    const urlParams = new URLSearchParams(queryString);
+    if (urlParams.get('sort_order')) {
+      const sortOrderParam = urlParams.get('sort_order');
+      if (sortOrderParam) {
+        sortOrder = sortOrderParam;
+      }
+    }
+    if (urlParams.get('order_by')) {
+      const columnNameParam = urlParams.get('order_by');
+      if (columnNameParam) {
+        columnName = columnNameParam;
+      }
+    }
+  }
   const problemsList = new Vue({
     el: '#main-container',
     render: function(createElement) {
@@ -21,13 +39,9 @@ OmegaUp.on('ready', () => {
           language: payload.language,
           languages: payload.languages,
           keyword: payload.keyword,
-          modes: payload.modes,
-          columns: payload.columns,
-          mode: payload.mode,
-          column: payload.column,
           tags: payload.tags,
-          initialMode: this.initialMode,
-          initialOrderBy: this.initialOrderBy,
+          sortOrder: sortOrder,
+          columnName: columnName,
         },
         on: {
           'wizard-search': (queryParameters: {
@@ -35,25 +49,28 @@ OmegaUp.on('ready', () => {
           }): void => {
             window.location.search = UI.buildURLQuery(queryParameters);
           },
-          'apply-filter': (orderBy: string, mode: omegaup.OrderMode): void => {
+          'apply-filter': (
+            columnName: string,
+            sortOrder: omegaup.SortOrder,
+          ): void => {
             const queryString = window.location.search;
             if (!queryString) {
               window.location.replace(
-                `/problem/?query=&order_by=${orderBy}&mode=${mode}`,
+                `/problem/?query=&order_by=${columnName}&sort_order=${sortOrder}`,
               );
               return;
             }
             const urlParams = new URLSearchParams(queryString);
-            if (!urlParams.get('mode')) {
-              window.location.replace(`${queryString}&mode=${mode}`);
+            if (!urlParams.get('sort_order')) {
+              window.location.replace(`${queryString}&sort_order=${sortOrder}`);
               return;
             }
             if (!urlParams.get('order_by')) {
-              window.location.replace(`${queryString}&order_by=${orderBy}`);
+              window.location.replace(`${queryString}&order_by=${columnName}`);
               return;
             }
-            urlParams.set('mode', mode);
-            urlParams.set('order_by', orderBy);
+            urlParams.set('sort_order', sortOrder);
+            urlParams.set('order_by', columnName);
 
             const newQueryString = urlParams.toString();
             window.location.replace(`/problem/?${newQueryString}`);
@@ -61,29 +78,8 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
-      initialMode: 'desc',
-      initialOrderBy: 'problem_id',
-    },
     components: {
       'omegaup-problem-list': problem_List,
     },
   });
-
-  const queryString = window.location.search;
-  if (queryString) {
-    const urlParams = new URLSearchParams(queryString);
-    if (urlParams.get('mode')) {
-      const mode = urlParams.get('mode');
-      if (mode) {
-        problemsList.initialMode = mode;
-      }
-    }
-    if (urlParams.get('order_by')) {
-      const orderBy = urlParams.get('order_by');
-      if (orderBy) {
-        problemsList.initialOrderBy = orderBy;
-      }
-    }
-  }
 });

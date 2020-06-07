@@ -4,10 +4,6 @@
       v-bind:initialLanguage="language"
       v-bind:languages="languages"
       v-bind:initialKeyword="keyword"
-      v-bind:modes="modes"
-      v-bind:columns="columns"
-      v-bind:initialMode="mode"
-      v-bind:initialColumn="column"
       v-bind:tags="tags"
     ></omegaup-problem-search-bar>
     <a
@@ -47,10 +43,11 @@
                 <omegaup-common-sort-controls
                   column="title"
                   v-bind:column-type="omegaup.ColumnType.String"
-                  v-bind:initial-mode="initialMode"
-                  v-bind:initial-order-by="initialOrderBy"
+                  v-bind:sort-order="sortOrder"
+                  v-bind:column-name="columnName"
                   v-on:emit-apply-filter="
-                    (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                    (columnName, sortOrder) =>
+                      $emit('apply-filter', columnName, sortOrder)
                   "
                 ></omegaup-common-sort-controls>
               </th>
@@ -59,10 +56,11 @@
                   >{{ T.wordsQuality }}
                   <omegaup-common-sort-controls
                     column="quality"
-                    v-bind:initial-mode="initialMode"
-                    v-bind:initial-order-by="initialOrderBy"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
                     v-on:emit-apply-filter="
-                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
                     "
                   ></omegaup-common-sort-controls
                 ></span>
@@ -72,10 +70,11 @@
                   >{{ T.wordsDifficulty }}
                   <omegaup-common-sort-controls
                     column="difficulty"
-                    v-bind:initial-mode="initialMode"
-                    v-bind:initial-order-by="initialOrderBy"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
                     v-on:emit-apply-filter="
-                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
                     "
                   ></omegaup-common-sort-controls
                 ></span>
@@ -85,10 +84,11 @@
                   >{{ T.wordsRatio }}
                   <omegaup-common-sort-controls
                     column="ratio"
-                    v-bind:initial-mode="initialMode"
-                    v-bind:initial-order-by="initialOrderBy"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
                     v-on:emit-apply-filter="
-                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
                     "
                   ></omegaup-common-sort-controls
                 ></span>
@@ -102,10 +102,11 @@
                   >{{ T.wordsMyScore }}
                   <omegaup-common-sort-controls
                     column="score"
-                    v-bind:initial-mode="initialMode"
-                    v-bind:initial-order-by="initialOrderBy"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
                     v-on:emit-apply-filter="
-                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
                     "
                   ></omegaup-common-sort-controls
                 ></span>
@@ -122,10 +123,11 @@
                   /></a>
                   <omegaup-common-sort-controls
                     column="points"
-                    v-bind:initial-mode="initialMode"
-                    v-bind:initial-order-by="initialOrderBy"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
                     v-on:emit-apply-filter="
-                      (orderBy, mode) => $emit('apply-filter', orderBy, mode)
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
                     "
                   ></omegaup-common-sort-controls>
                 </span>
@@ -290,8 +292,8 @@ export default class ProblemList extends Vue {
   @Prop() mode!: string;
   @Prop() column!: string;
   @Prop() tags!: string[];
-  @Prop() initialMode!: string;
-  @Prop() initialOrderBy!: string;
+  @Prop() sortOrder!: string;
+  @Prop() columnName!: string;
 
   T = T;
   UI = UI;
