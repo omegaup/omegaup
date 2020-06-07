@@ -52,7 +52,11 @@
                 {{ T.courseAssignmentEmpty }}
               </td>
             </tr>
-            <tr v-else="" v-for="homework in filteredHomeworks">
+            <tr
+              v-else=""
+              v-for="homework in filteredHomeworks"
+              v-bind:data-homework-alias="homework.alias"
+            >
               <td>
                 <a
                   class="text-center"
@@ -253,7 +257,10 @@ export default class CourseDetails extends Vue {
     return progress.max_score === 0 ? percentText : `${percentText}%`;
   }
 
-  getFormattedTime(date: Date): string {
+  getFormattedTime(date: Date | null): string {
+    if (date === null) {
+      return '—';
+    }
     return time.formatDateTime(date);
   }
 
