@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListPayload();
@@ -61,16 +61,15 @@ OmegaUp.on('ready', () => {
           'wizard-search': (queryParameters: {
             [key: string]: string;
           }): void => {
-            window.location.search = UI.buildURLQuery(queryParameters);
+            window.location.search = ui.buildURLQuery(queryParameters);
           },
           'apply-filter': (
             columnName: string,
             sortOrder: omegaup.SortOrder,
           ): void => {
-            const languageEncoded = encodeURIComponent(language);
-            const queryEncoded = encodeURIComponent(query);
+            const queryParameters = { language, query, columnName, sortOrder };
             window.location.replace(
-              `/problem/?query=${queryEncoded}&language=${languageEncoded}&order_by=${columnName}&sort_order=${sortOrder}`,
+              `/problem?${ui.buildURLQuery(queryParameters)}`,
             );
           },
         },

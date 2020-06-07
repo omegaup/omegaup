@@ -33,14 +33,8 @@ describe('SortControls.vue', () => {
       },
     });
 
-    wrapper.setProps({ sortOrder: 'asc' });
+    await wrapper.find('a').trigger('click');
 
-    expect(wrapper.vm.selected).toBe(true);
-    expect(wrapper.vm.iconDisplayed).toBe('sort-alpha-up');
-
-    wrapper.setProps({ sortOrder: 'desc' });
-
-    expect(wrapper.vm.selected).toBe(true);
-    expect(wrapper.vm.iconDisplayed).toBe('sort-alpha-down');
+    expect(wrapper.emitted('emit-apply-filter')).toEqual([['title', 'asc']]);
   });
 });
