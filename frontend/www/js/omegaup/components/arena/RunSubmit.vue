@@ -3,38 +3,35 @@
     <div class="close-container">
       <button class="close">❌</button>
     </div>
-    <div class="languages">
+    <div>
       {{ T.wordsLanguage }}
-      <select
-        name="language"
-        v-model="selectedLanguage"
-      >
+      <select name="language" v-model="selectedLanguage">
         <option v-bind:value="key" v-for="(language, key) in languages">{{
           language
         }}</option>
       </select>
     </div>
-    <div class="filename-extension">
+    <div>
       {{ T.arenaRunSubmitFilename }}
       <tt>{{ filename }}</tt>
     </div>
-    <div class="run-submit-paste-text">
+    <div>
       <label>{{ T.arenaRunSubmitPaste }}</label>
     </div>
-    <div class="code-view">
+    <div>
       <omegaup-arena-code-view
         v-bind:language="selectedLanguage"
         v-bind:readonly="false"
         v-model="code"
       ></omegaup-arena-code-view>
     </div>
-    <div class="upload-file">
+    <div>
       <label
         >{{ T.arenaRunSubmitUpload }}
         <input type="file" name="file" ref="inputFile" />
       </label>
     </div>
-    <div class="submit-run">
+    <div>
       <input
         type="submit"
         v-bind:disabled="submissionGapSecondsRemaining > 0"

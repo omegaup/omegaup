@@ -29,7 +29,6 @@ describe('RunSubmit.vue', () => {
     );
   });
 
-
   it('Should handle enable button', () => {
     const wrapper = shallowMount(arena_RunSubmit, {
       propsData: {
