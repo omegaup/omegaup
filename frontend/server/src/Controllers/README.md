@@ -2530,10 +2530,10 @@ the owner).
 
 ### Returns
 
-| Name         | Type                                               |
-| ------------ | -------------------------------------------------- |
-| `pagerItems` | `types.PageItem[]`                                 |
-| `problems`   | `{ tags: { name: string; source: string; }[]; }[]` |
+| Name         | Type                      |
+| ------------ | ------------------------- |
+| `pagerItems` | `types.PageItem[]`        |
+| `problems`   | `types.ProblemListItem[]` |
 
 ## `/api/problem/admins/`
 
@@ -2681,7 +2681,7 @@ Entry point for Problem Details API
 | `order`                | `string`                                                                                 |
 | `points`               | `number`                                                                                 |
 | `preferred_language`   | `string`                                                                                 |
-| `problemsetter`        | `{ creation_date: Date; name: string; username: string; }`                               |
+| `problemsetter`        | `{ classname: string; creation_date: Date; name: string; username: string; }`            |
 | `quality_seal`         | `boolean`                                                                                |
 | `runs`                 | `types.Run[]`                                                                            |
 | `score`                | `number`                                                                                 |
@@ -2745,10 +2745,10 @@ Gets a list of problems where current user is the owner
 
 ### Returns
 
-| Name         | Type                                               |
-| ------------ | -------------------------------------------------- |
-| `pagerItems` | `types.PageItem[]`                                 |
-| `problems`   | `{ tags: { name: string; source: string; }[]; }[]` |
+| Name         | Type                      |
+| ------------ | ------------------------- |
+| `pagerItems` | `types.PageItem[]`        |
+| `problems`   | `types.ProblemListItem[]` |
 
 ## `/api/problem/rejudge/`
 
@@ -2857,9 +2857,9 @@ Return a report of which runs would change due to a version change.
 
 ### Returns
 
-| Name   | Type                                                                                                                                                                                   |
-| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `diff` | `{ username: string; guid: string; problemset_id: number; old_status: string; old_verdict: string; old_score: number; new_status: string; new_verdict: string; new_score: number; }[]` |
+| Name   | Type               |
+| ------ | ------------------ |
+| `diff` | `types.RunsDiff[]` |
 
 ## `/api/problem/selectVersion/`
 
@@ -3066,10 +3066,10 @@ Entry point for Problem Versions API
 
 ### Returns
 
-| Name        | Type                                                                                                                                                                                                                                |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `published` | `string`                                                                                                                                                                                                                            |
-| `log`       | `{ commit: string; tree: { [key: string]: string; }; parents?: string[]; author: { name?: string; email?: string; time: Date; }; committer: { name?: string; email?: string; time: Date; }; message?: string; version: string; }[]` |
+| Name        | Type                     |
+| ----------- | ------------------------ |
+| `published` | `string`                 |
+| `log`       | `types.ProblemVersion[]` |
 
 # ProblemForfeited
 
@@ -3288,10 +3288,10 @@ nominator or a member of the reviewer group.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
+| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## `/api/qualityNomination/myAssignedList/`
 
@@ -3308,9 +3308,9 @@ Displays the nominations that this user has been assigned.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
 
 ## `/api/qualityNomination/myList/`
 
@@ -3325,10 +3325,10 @@ Displays the nominations that this user has been assigned.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }|null[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
+| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## `/api/qualityNomination/resolve/`
 
