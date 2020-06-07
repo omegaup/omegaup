@@ -236,6 +236,11 @@ export const Contest = {
       }
       return x.map(x => {
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.last_updated = ((x: number) => new Date(x * 1000))(x.last_updated);
+        if (x.original_finish_time)
+          x.original_finish_time = ((x: number) => new Date(x * 1000))(
+            x.original_finish_time,
+          );
         x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });

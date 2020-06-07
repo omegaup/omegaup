@@ -45,6 +45,7 @@ module.exports = {
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant:
       './frontend/www/js/omegaup/contest/list_participant.js',
+    contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
     contest_report: './frontend/www/js/omegaup/contest/report.js',
