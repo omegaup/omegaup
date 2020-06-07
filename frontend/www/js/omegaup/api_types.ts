@@ -844,6 +844,10 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
+  export interface CommitRunsDiff {
+    [key: string]: types.RunsDiff[];
+  }
+
   export interface CommonPayload {
     omegaUpLockDown: boolean;
     bootstrap4: boolean;
