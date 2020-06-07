@@ -8,7 +8,6 @@
       <select
         name="language"
         v-model="selectedLanguage"
-        v-on:change="onLanguageSelect"
       >
         <option v-bind:value="key" v-for="(language, key) in languages">{{
           language
@@ -17,9 +16,7 @@
     </div>
     <div class="filename-extension">
       {{ T.arenaRunSubmitFilename }}
-      <tt>
-        Main<span class="submit-filename-extension">{{ extension }}</span>
-      </tt>
+      <tt>{{ filename }}</tt>
     </div>
     <div class="run-submit-paste-text">
       <label>{{ T.arenaRunSubmitPaste }}</label>
@@ -55,7 +52,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -86,15 +83,20 @@ export default class ArenaRunSubmit extends Vue {
     });
   }
 
-  onLanguageSelect(e: Event): void {
-    if (this.selectedLanguage.startsWith('cpp')) {
+  get filename(): string {
+    return `Main${this.extension}`;
+  }
+
+  @Watch('selectedLanguage')
+  onPropertyChange(newValue: string): void {
+    if (newValue.startsWith('cpp')) {
       this.extension = '.cpp';
-    } else if (this.selectedLanguage.startsWith('c11-')) {
+    } else if (newValue.startsWith('c11-')) {
       this.extension = '.c';
-    } else if (this.selectedLanguage.startsWith('py')) {
+    } else if (newValue.startsWith('py')) {
       this.extension = '.py';
-    } else if (this.selectedLanguage && this.selectedLanguage !== 'cat') {
-      this.extension = `.${this.selectedLanguage}`;
+    } else if (newValue && newValue !== 'cat') {
+      this.extension = `.${newValue}`;
     } else {
       this.extension = '';
     }
