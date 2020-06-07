@@ -9,7 +9,10 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
 \OmegaUp\UITools::render(
     function (\OmegaUp\Request $r): array {
         $scripts = [];
-        if (defined('OMEGAUP_GOOGLE_CLIENTID')) {
+        if (
+            defined('OMEGAUP_GOOGLE_CLIENTID') &&
+            !empty(OMEGAUP_GOOGLE_CLIENTID)
+        ) {
             $scripts[] = 'https://apis.google.com/js/api.js';
         }
         return [
