@@ -20,6 +20,9 @@
  * @psalm-type CourseListPayload=array{courses: array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, student: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, public: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}}}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
+ * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
+ * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: CourseStudent[], student?: string}
+ * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -1714,7 +1717,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course_alias
      * @omegaup-request-param mixed $usernameOrEmail
      *
-     * @return array{problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}>}
+     * @return array{problems: list<CourseProblem>}
      */
     public static function apiStudentProgress(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2376,7 +2379,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $student
      *
-     * @return array{payload: array{course: CourseDetails, students: array{name: null|string, progress: array<string, float>, username: string}[], student?: string}}
+     * @return array{smartyProperties: array{payload: StudentsProgressPayload, title: string}, entrypoint: string}
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -2399,24 +2402,29 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $result = [
-            'payload' => [
-                'course' => self::getCommonCourseDetails(
-                    $course,
-                    $r->identity,
-                    /*onlyIntroDetails=*/false
-                ),
-                'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-                    $course->course_id,
-                    $course->group_id
-                ),
-            ],
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity,
+                        /*onlyIntroDetails=*/false
+                    ),
+                    'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                        $course->course_id,
+                        $course->group_id
+                    ),
+                ],
+                'title' => 'omegaupTitleStudentsProgress',
+            ]
         ];
 
         if (empty($r['student'])) {
+            $result['entrypoint'] = 'course_students';
             return $result;
         }
 
-        $result['payload']['student'] = $r['student'];
+        $result['entrypoint'] = 'course_student';
+        $result['smartyProperties']['payload']['student'] = $r['student'];
         return $result;
     }
 

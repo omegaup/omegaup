@@ -646,6 +646,39 @@ export namespace types {
       );
     }
 
+    export function StudentsProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentsProgressPayload {
+      return (x => {
+        x.course = (x => {
+          if (x.assignments)
+            x.assignments = (x => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map(x => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          if (x.start_time)
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function SubmissionsListPayload(
       elementId: string = 'payload',
     ): types.SubmissionsListPayload {
@@ -941,9 +974,45 @@ export namespace types {
     };
   }
 
+  export interface CourseProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+    runs: {
+      guid: string;
+      language: string;
+      source?: string;
+      status: string;
+      verdict: string;
+      runtime: number;
+      penalty: number;
+      memory: number;
+      score: number;
+      contest_score?: number;
+      time: Date;
+      submit_delay: number;
+    }[];
+  }
+
   export interface CourseProblemTried {
     alias: string;
     title: string;
+    username: string;
+  }
+
+  export interface CourseStudent {
+    name?: string;
+    progress: { [key: string]: number };
     username: string;
   }
 
@@ -1630,6 +1699,12 @@ export namespace types {
     distribution?: { [key: number]: number };
     size_of_bucket?: number;
     total_points?: number;
+  }
+
+  export interface StudentsProgressPayload {
+    course: types.CourseDetails;
+    students: { [key: number]: types.CourseStudent };
+    student?: string;
   }
 
   export interface Submission {
@@ -2354,35 +2429,7 @@ export namespace messages {
   export type CourseStudentProgressRequest = { [key: string]: any };
   export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-      runs: {
-        guid: string;
-        language: string;
-        source?: string;
-        status: string;
-        verdict: string;
-        runtime: number;
-        penalty: number;
-        memory: number;
-        score: number;
-        contest_score?: number;
-        time: Date;
-        submit_delay: number;
-      }[];
-    }[];
+    problems: types.CourseProblem[];
   };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};

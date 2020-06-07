@@ -1939,9 +1939,9 @@ Returns all runs for a course
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `problems` | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; letter: string; order: number; points: number; submissions: number; title: string; version: string; visibility: number; visits: number; runs: { guid: string; language: string; source?: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; time: Date; submit_delay: number; }[]; }[]` |
+| Name       | Type                    |
+| ---------- | ----------------------- |
+| `problems` | `types.CourseProblem[]` |
 
 ## `/api/course/update/`
 

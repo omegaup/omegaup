@@ -56,8 +56,8 @@ module.exports = {
     course_list: './frontend/www/js/omegaup/course/list.ts',
     course_new: './frontend/www/js/omegaup/course/new.js',
     course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
-    course_student: './frontend/www/js/omegaup/course/student.js',
-    course_students: './frontend/www/js/omegaup/course/students.js',
+    course_student: './frontend/www/js/omegaup/course/student.ts',
+    course_students: './frontend/www/js/omegaup/course/students.ts',
     group_identities: './frontend/www/js/omegaup/group/identities.js',
     group_members: './frontend/www/js/omegaup/group/members.js',
     course_submissions_list:

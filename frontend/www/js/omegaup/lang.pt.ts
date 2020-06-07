@@ -606,6 +606,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleSchoolProfile: "Perfil de Escola",
   omegaupTitleSchoolsRank: "Ranking de escolas",
   omegaupTitleScoreboardmerge: "Uni\u00e3o de paineis de avalia\u00e7\u00e3o",
+  omegaupTitleStudentsProgress: "Progresso dos alunos",
   omegaupTitleSupportDashboard: "Painel de Suporte",
   omegaupTitleUpdatePrivileges: "Atualizar privil\u00e9gios",
   omegaupTitleUsersRank: "Ranking de usu\u00e1rios",
