@@ -2681,7 +2681,7 @@ Entry point for Problem Details API
 | `order`                | `string`                                                                                 |
 | `points`               | `number`                                                                                 |
 | `preferred_language`   | `string`                                                                                 |
-| `problemsetter`        | `{ creation_date: Date; name: string; username: string; }`                               |
+| `problemsetter`        | `{ classname: string; creation_date: Date; name: string; username: string; }`            |
 | `quality_seal`         | `boolean`                                                                                |
 | `runs`                 | `types.Run[]`                                                                            |
 | `score`                | `number`                                                                                 |

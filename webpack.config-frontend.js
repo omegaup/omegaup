@@ -50,7 +50,7 @@ module.exports = {
     contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
-    course_details: './frontend/www/js/omegaup/course/details.js',
+    course_details: './frontend/www/js/omegaup/course/details.ts',
     course_edit: './frontend/www/js/omegaup/course/edit.js',
     course_intro: './frontend/www/js/omegaup/course/intro.js',
     course_list: './frontend/www/js/omegaup/course/list.ts',
@@ -65,6 +65,7 @@ module.exports = {
     group_list: './frontend/www/js/omegaup/group/list.js',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
+    logout: './frontend/www/js/omegaup/login/logout.ts',
     problem_admins: './frontend/www/js/omegaup/problem/admins.ts',
     problem_details: './frontend/www/js/omegaup/problem/details.ts',
     problem_edit: './frontend/www/js/omegaup/problem/edit.js',
