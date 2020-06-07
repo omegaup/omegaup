@@ -44,24 +44,28 @@
             v-bind:title="T.wordsBannedProblem"
             color="darkred"
           />
-          <!-- TODO: Add link to EditProblem if user is problem admin -->
+          <a v-if="user.admin" v-bind:href="`/problem/${problem.alias}/edit/`">
+            <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+          </a>
         </h3>
         <table class="table table-bordered mx-auto w-75 mb-0">
           <tr>
-            <td>{{ T.wordsPoints }}</td>
-            <td>{{ problem.points }}</td>
-            <td>{{ T.wordsMemoryLimit }}</td>
-            <td>{{ problem.limits.memory_limit }}</td>
+            <td class="align-middle">{{ T.wordsPoints }}</td>
+            <td class="align-middle">{{ problem.points }}</td>
+            <td class="align-middle">{{ T.wordsMemoryLimit }}</td>
+            <td class="align-middle">{{ problem.limits.memory_limit }}</td>
           </tr>
           <tr>
-            <td>{{ T.wordsTimeLimit }}</td>
-            <td>{{ problem.limits.time_limit }}</td>
-            <td>{{ T.wordsOverallWallTimeLimit }}</td>
-            <td>{{ problem.limits.overall_wall_time_limit }}</td>
+            <td class="align-middle">{{ T.wordsTimeLimit }}</td>
+            <td class="align-middle">{{ problem.limits.time_limit }}</td>
+            <td class="align-middle">{{ T.wordsOverallWallTimeLimit }}</td>
+            <td class="align-middle">
+              {{ problem.limits.overall_wall_time_limit }}
+            </td>
           </tr>
           <tr>
-            <td>{{ T.problemEditFormInputLimit }}</td>
-            <td>{{ problem.limits.input_limit }}</td>
+            <td class="align-middle">{{ T.problemEditFormInputLimit }}</td>
+            <td class="align-middle">{{ problem.limits.input_limit }}</td>
           </tr>
         </table>
 
@@ -79,12 +83,34 @@
             <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
           </a>
         </div>
+
         <div class="mt-4 markdown">
           <vue-mathjax
             v-bind:formula="problemStatement"
             v-bind:safe="false"
           ></vue-mathjax>
         </div>
+        <hr class="my-3" />
+        <div class="font-italic">
+          {{ `${T.wordsSource}: ${problem.source}` }}
+        </div>
+        <template v-if="problem.problemsetter">
+          <div>
+            {{ T.wordsProblemsetter }}:
+            <omegaup-username
+              v-bind:classname="problem.problemsetter.classname"
+              v-bind:username="problem.problemsetter.username"
+              v-bind:linkify="true"
+            ></omegaup-username>
+          </div>
+          <div>
+            {{
+              UI.formatString(T.wordsUploadedOn, {
+                date: time.formatDate(problem.problemsetter.creation_date),
+              })
+            }}
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -114,17 +140,27 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as markdown from '../../markdown';
+import * as time from '../../time';
+import * as UI from '../../ui';
+import user_Username from '../user/Username.vue';
 
 import { VueMathjax } from 'vue-mathjax';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
+  faEdit,
   faExclamationTriangle,
   faEyeSlash,
   faBan,
   faExternalLinkAlt,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faExclamationTriangle, faEyeSlash, faBan, faExternalLinkAlt);
+library.add(
+  faExclamationTriangle,
+  faEdit,
+  faEyeSlash,
+  faBan,
+  faExternalLinkAlt,
+);
 
 interface Tab {
   name: string;
@@ -135,12 +171,17 @@ interface Tab {
   components: {
     FontAwesomeIcon,
     'vue-mathjax': VueMathjax,
+    'omegaup-username': user_Username,
   },
 })
 export default class ProblemDetails extends Vue {
   @Prop() problem!: types.ProblemInfo;
+  @Prop() user!: types.UserInfoForProblem;
+  @Prop() nominationStatus!: types.NominationStatus;
 
   T = T;
+  UI = UI;
+  time = time;
   selectedTab = 'problems';
   markdownConverter = markdown.markdownConverter();
 

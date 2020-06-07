@@ -247,6 +247,39 @@ export namespace types {
       );
     }
 
+    export function CourseDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CourseDetailsPayload {
+      return (x => {
+        x.details = (x => {
+          if (x.assignments)
+            x.assignments = (x => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map(x => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          if (x.start_time)
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseListPayload(
       elementId: string = 'payload',
     ): types.CourseListPayload {
@@ -481,8 +514,21 @@ export namespace types {
     export function ProblemDetailsv2Payload(
       elementId: string = 'payload',
     ): types.ProblemDetailsv2Payload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+      return (x => {
+        x.problem = (x => {
+          if (x.problemsetter)
+            x.problemsetter = (x => {
+              if (x.creation_date)
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
+              return x;
+            })(x.problemsetter);
+          return x;
+        })(x.problem);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
       );
     }
 
@@ -912,6 +958,11 @@ export namespace types {
     student_count?: number;
   }
 
+  export interface CourseDetailsPayload {
+    details: types.CourseDetails;
+    progress: types.AssignmentProgress;
+  }
+
   export interface CourseListPayload {
     courses: {
       admin: {
@@ -1017,6 +1068,16 @@ export namespace types {
     TimeLimit: string;
   }
 
+  export interface NominationStatus {
+    alreadyReviewed: boolean;
+    dismissed: boolean;
+    dismissedBeforeAC: boolean;
+    nominated: boolean;
+    nominatedBeforeAC: boolean;
+    solved: boolean;
+    tried: boolean;
+  }
+
   export interface Notification {
     contents: types.NotificationContents;
     notification_id: number;
@@ -1087,7 +1148,12 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
+    problemsetter?: {
+      classname: string;
+      creation_date?: Date;
+      name: string;
+      username: string;
+    };
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1128,7 +1194,12 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
+    problemsetter?: {
+      classname: string;
+      creation_date?: Date;
+      name: string;
+      username: string;
+    };
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1154,6 +1225,8 @@ export namespace types {
 
   export interface ProblemDetailsv2Payload {
     problem: types.ProblemInfo;
+    user: types.UserInfoForProblem;
+    nominationStatus?: types.NominationStatus;
   }
 
   export interface ProblemEditPayload {
@@ -1170,7 +1243,12 @@ export namespace types {
     memoryLimit: number;
     outputLimit: number;
     overallWallTimeLimit: number;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
+    problemsetter?: {
+      classname: string;
+      creation_date?: Date;
+      name: string;
+      username: string;
+    };
     publishedRevision?: {
       author: { email?: string; name?: string; time?: Date };
       commit: string;
@@ -1208,10 +1286,19 @@ export namespace types {
     memoryLimit: number;
     outputLimit: number;
     overallWallTimeLimit: number;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
+    problemsetter?: {
+      classname: string;
+      creation_date?: Date;
+      name: string;
+      username: string;
+    };
     showDiff: string;
     source: string;
-    statement: types.ProblemStatement;
+    statement: {
+      images: { [key: string]: string };
+      language: string;
+      markdown: string;
+    };
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };
@@ -1264,6 +1351,12 @@ export namespace types {
       time_limit: string;
     };
     points: number;
+    problemsetter?: {
+      classname: string;
+      creation_date?: Date;
+      name: string;
+      username: string;
+    };
     quality_seal: boolean;
     sample_input?: string;
     settings: types.ProblemSettings;
@@ -1306,7 +1399,12 @@ export namespace types {
 
   export interface ProblemMarkdownPayload {
     alias: string;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
+    problemsetter?: {
+      classname: string;
+      creation_date?: Date;
+      name: string;
+      username: string;
+    };
     source?: string;
     statement: types.ProblemStatement;
     title?: string;
@@ -1695,6 +1793,12 @@ export namespace types {
     pagerItems: types.PageItem[];
     submissions: types.Submission[];
     totalRows: number;
+  }
+
+  export interface UserInfoForProblem {
+    loggedIn: boolean;
+    admin: boolean;
+    reviewer: boolean;
   }
 
   export interface UserListItem {
@@ -2652,12 +2756,16 @@ export namespace messages {
     order?: string;
     points?: number;
     preferred_language?: string;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
+    problemsetter?: {
+      classname: string;
+      creation_date?: Date;
+      name: string;
+      username: string;
+    };
     quality_seal?: boolean;
     runs?: types.Run[];
     score?: number;
     settings?: types.ProblemSettings;
-    slow?: boolean;
     show_diff?: string;
     solvers?: {
       language: string;
@@ -2670,18 +2778,6 @@ export namespace messages {
     statement?: types.ProblemStatement;
     submissions?: number;
     title?: string;
-    validator?: {
-      custom_validator: { limits: { TimeLimit: number } };
-      limits?: {
-        ExtraWallTime: string;
-        MemoryLimit: number | string;
-        OutputLimit: number | string;
-        OverallWallTimeLimit: string;
-        TimeLimit: string;
-      };
-      name: string;
-      tolerance: number;
-    };
     version?: string;
     visibility?: number;
     visits?: number;
