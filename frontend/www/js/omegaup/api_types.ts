@@ -1090,6 +1090,7 @@ export namespace types {
       user: { name?: string; username: string };
       vote: number;
     }[];
+  }
 
   export interface NominationStatus {
     alreadyReviewed: boolean;
