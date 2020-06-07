@@ -1,43 +1,50 @@
 <template>
   <div>
-    <div class="form-inline" v-if="!myView">
-      <select name="column" class="form-control" v-model="selectColumn">
-        <option
-          v-for="(columnText, columnIndex) in columns"
-          v-bind:value="columnIndex"
+    <div class="mb-3">
+      <form>
+        <div class="form-row">
+          <div class="col-md-4 mb-3">
+            <select name="column" class="form-control" v-model="selectColumn">
+              <option
+                v-for="(columnText, columnIndex) in columns"
+                v-bind:value="columnIndex"
+              >
+                {{ columnText }}</option
+              >
+            </select>
+          </div>
+          <div class="col-md-4 mb-3">
+            <omegaup-autocomplete
+              v-bind:init="el => typeahead.problemTypeahead(el)"
+              v-model="queryProblem"
+              v-bind:placeholder="T.wordsKeyword"
+              class="form-control"
+              v-show="selectColumn == 'problem_alias'"
+            ></omegaup-autocomplete>
+            <omegaup-autocomplete
+              v-bind:init="el => typeahead.userTypeahead(el)"
+              v-model="queryUsername"
+              v-bind:placeholder="T.wordsKeyword"
+              class="form-control"
+              v-show="
+                selectColumn == 'nominator_username' ||
+                  selectColumn == 'author_username'
+              "
+            ></omegaup-autocomplete>
+          </div>
+        </div>
+        <button
+          class="btn btn-primary"
+          v-on:click.prevent="
+            $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
+          "
         >
-          {{ columnText }}</option
-        >
-      </select>
-      <omegaup-autocomplete
-        v-bind:init="el => typeahead.problemTypeahead(el)"
-        v-model="queryProblem"
-        v-bind:placeholder="T.wordsKeyword"
-        class="form-control"
-        v-show="selectColumn == 'problem_alias'"
-      ></omegaup-autocomplete>
-      <omegaup-autocomplete
-        v-bind:init="el => typeahead.userTypeahead(el)"
-        v-model="queryUsername"
-        v-bind:placeholder="T.wordsKeyword"
-        class="form-control"
-        v-show="
-          selectColumn == 'nominator_username' ||
-            selectColumn == 'author_username'
-        "
-      ></omegaup-autocomplete>
-      <button
-        class="btn btn-primary"
-        v-on:click.prevent="
-          $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
-        "
-      >
-        {{ T.wordsSearch }}
-      </button>
-      <br /><br /><br />
+          {{ T.wordsSearch }}
+        </button>
+      </form>
     </div>
     <div class="card">
-      <h3 class="card-header" name="title">
+      <h3 class="card-header">
         {{
           UI.formatString(T.nominationsRangeHeader, {
             lowCount: (pages - 1) * length + 1,
@@ -62,19 +69,19 @@
           </label>
         </div>
       </div>
-      <table class="table table-striped" name="table">
-        <thead name="table_head">
+      <table class="table table-striped">
+        <thead>
           <tr>
             <th>{{ T.wordsAlias }}</th>
             <th v-if="!myView">{{ T.wordsNominator }}</th>
             <th>{{ T.wordsAuthor }}</th>
             <th>{{ T.wordsSubmissionDate }}</th>
-            <th v-if="!myView">{{ T.wordsReason }}</th>
+            <th v-if="!myView" data-name="reason">{{ T.wordsReason }}</th>
             <th class="text-center">{{ T.wordsStatus }}</th>
             <th><!-- view button --></th>
           </tr>
         </thead>
-        <tbody name="table_body">
+        <tbody>
           <tr v-for="nomination in nominations">
             <td>
               <a v-bind:href="problemUrl(nomination.problem.alias)">{{
@@ -120,14 +127,14 @@ import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as UI from '../../ui';
-import paginator from '../common/Paginatorv2.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
 import * as typeahead from '../../typeahead';
 
 @Component({
   components: {
-    'omegaup-common-paginator': paginator,
+    'omegaup-common-paginator': common_Paginator,
     'omegaup-autocomplete': Autocomplete,
   },
 })

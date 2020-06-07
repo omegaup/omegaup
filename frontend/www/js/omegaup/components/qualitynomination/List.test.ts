@@ -49,24 +49,8 @@ describe('List.vue', () => {
       },
     });
 
-    expect(wrapper.find('[name="title"]').text()).toContain(
-      ui.formatString(T.nominationsRangeHeader, {
-        lowCount: 1,
-        highCount: 100,
-      }),
-    );
-
-    expect(wrapper.find('[name="table_head"]').text()).toContain(
-      T.wordsAlias +
-        T.wordsNominator +
-        T.wordsAuthor +
-        T.wordsSubmissionDate +
-        T.wordsReason +
-        T.wordsStatus,
-    );
-
-    expect(wrapper.find('[name="table_body"]').text()).toContain(
-      'problemuser_nominatoruser3/6/2020poorly-describedopen' + T.wordsDetails,
+    expect(wrapper.find('[data-name="reason"]').text()).toContain(
+      T.wordsReason,
     );
   });
 
@@ -113,19 +97,6 @@ describe('List.vue', () => {
       },
     });
 
-    expect(wrapper.find('[name="title"]').text()).toContain(
-      ui.formatString(T.nominationsRangeHeader, {
-        lowCount: 1,
-        highCount: 100,
-      }),
-    );
-
-    expect(wrapper.find('[name="table_head"]').text()).toContain(
-      T.wordsAlias + T.wordsAuthor + T.wordsSubmissionDate + T.wordsStatus,
-    );
-
-    expect(wrapper.find('[name="table_body"]').text()).toContain(
-      'problemuser3/6/2020open' + T.wordsDetails,
-    );
+    expect(wrapper.find('[data-name="reason"]').exists()).toBe(false);
   });
 });
