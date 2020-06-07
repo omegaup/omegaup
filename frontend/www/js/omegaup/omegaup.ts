@@ -94,7 +94,7 @@ export namespace omegaup {
     alias: string;
     assignment_type: string;
     description: string;
-    finish_time: Date;
+    finish_time: Date | null;
     has_runs?: boolean;
     max_points?: number;
     name: string;
@@ -220,7 +220,7 @@ export namespace omegaup {
     assignments: Assignment[];
     basic_information_required: boolean;
     description: string;
-    finish_time: Date;
+    finish_time: Date | null;
     is_admin: boolean;
     name: string;
     public: boolean;
@@ -229,7 +229,7 @@ export namespace omegaup {
     school_name: string;
     show_scoreboard: boolean;
     start_time: Date;
-    student_count: boolean;
+    student_count: number;
   }
 
   export interface CourseAdmin {
