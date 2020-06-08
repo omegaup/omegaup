@@ -816,7 +816,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function qualityNominationsDemotionSearchColumnsProvider(): array {
         return [
-            ['alias', 'problem_1', 1],
+            ['problem_alias', 'problem_1', 1],
             ['author_username', 'user_test_author', 1],
             ['nominator_username', 'user_test_nominator',1],
             ['nominator_username', 'invalid_user_test_nominator', 0],
