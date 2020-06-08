@@ -29,26 +29,6 @@
           </select>
         </label>
       </div>
-      <div class="form-group mr-2 mt-1">
-        <label>
-          {{ T.wordsOrderBy }}
-          <select name="order_by" class="ml-1 form-control" v-model="column">
-            <option v-for="column in columns" v-bind:value="column">
-              {{ getColumnText(column) }}</option
-            >
-          </select>
-        </label>
-      </div>
-      <div class="form-group mr-2 mt-1">
-        <label>
-          {{ T.wordsMode }}
-          <select name="mode" class="ml-1 form-control" v-model="mode">
-            <option v-for="mode in modes" v-bind:value="mode">
-              {{ getModeText(mode) }}</option
-            >
-          </select>
-        </label>
-      </div>
       <input
         class="btn btn-primary mt-1"
         type="submit"
@@ -87,42 +67,19 @@ export default class ProblemSearchBar extends Vue {
   @Prop() tags!: string[];
   @Prop() initialKeyword!: string;
   @Prop() initialLanguage!: string;
-  @Prop() initialColumn!: string;
-  @Prop() initialMode!: string;
   @Prop() languages!: string[];
-  @Prop() modes!: string[];
-  @Prop() columns!: string[];
 
   T = T;
   typeahead = typeahead;
 
   keyword = this.initialKeyword;
   language = this.initialLanguage;
-  column = this.initialColumn;
-  mode = this.initialMode;
 
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;
     if (language === 'en') return T.wordsEnglish;
     if (language === 'es') return T.wordsSpanish;
     return T.wordsPortuguese;
-  }
-
-  getColumnText(column: string): string {
-    if (column === 'title') return T.wordsTitle;
-    if (column === 'quality') return T.wordsQuality;
-    if (column === 'difficulty') return T.wordsDifficulty;
-    if (column === 'submissions') return T.wordsRuns;
-    if (column === 'accepted') return T.wordsAccepted;
-    if (column === 'ratio') return T.wordsRatio;
-    if (column === 'points') return T.wordsPointsForRank;
-    if (column === 'score') return T.wordsMyScore;
-    return T.codersOfTheMonthDate;
-  }
-
-  getModeText(mode: string): string {
-    if (mode === 'asc') return T.wordsModeAsc;
-    return T.wordsModeDesc;
   }
 }
 </script>

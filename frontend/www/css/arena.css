@@ -296,46 +296,6 @@ body#only-problem #problems .main {
 	background: #fff;
 }
 
-#run-details .compile_error {
-	display: none;
-}
-.guid {
-	font-family: monospace;
-	padding: 0 0.3em;
-}
-#run-details .logs {
-	margin-top: 1em;
-	border-top: 1px dotted black;
-	padding-top: 1em;
-	display: none;
-}
-.cases table {
-	width: 100%;
-}
-.cases table tr.group {
-	border-top: 1px solid #ccc;
-}
-.cases table tr.group td, .cases table tr.group th {
-	padding: 0.2em inherit 0.2em inherit;
-}
-.cases span.collapse {
-	padding: 0.2em;
-}
-.cases table thead th {
-	text-align: center;
-}
-.cases table td.center,
-.cases table th.center {
-	text-align: center;
-}
-.cases table td.score,
-.cases table th.score {
-	text-align: right;
-}
-.cases table pre.stderr {
-	color: #400;
-}
-
 table.clarifications {
 	width: 100%;
 	margin: 0 auto;

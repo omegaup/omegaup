@@ -3,7 +3,12 @@
 namespace OmegaUp\Controllers;
 
 /**
+ * QualityNominationController
+ *
  * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type NominationListItem=array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+ *
  */
 class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
@@ -826,13 +831,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>, pager_items: list<array{class: string, label: string, page: int}>}
      *
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
      * @omegaup-request-param mixed $query
      * @omegaup-request-param mixed $column
+     *
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -869,18 +875,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Validators::validateOptionalInEnum(
                 $r['column'],
                 'column',
-                ['alias','nominator_username','author_username']
+                ['problem_alias','nominator_username','author_username']
             );
             $query = strval($r['query']);
             $column = strval($r['column']);
-            $params = [
-                'query' => $query,
-                'column' => $column,
-            ];
         } else {
             $query = null;
             $column = null;
-            $params = [];
         }
 
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
@@ -899,7 +900,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $rowCount,
             $offset,
             /*$adjacent=*/5,
-            /*$params=*/ $params
+            /*$params=*/ []
         );
 
         return [
@@ -933,10 +934,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>, pager_items: list<array{class: string, label: string, page: int}>}
      *
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
+     *
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
         if (OMEGAUP_LOCKDOWN) {
@@ -1124,7 +1126,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -1154,7 +1156,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'myView' => false,
                 ],
             ],
-            'template' => 'quality.nomination.list.tpl',
+            'entrypoint' => 'qualitynomination_list',
         ];
     }
 
@@ -1162,7 +1164,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination for a certain user
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -1191,7 +1193,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'myView' => true,
                 ],
             ],
-            'template' => 'quality.nomination.list.tpl',
+            'entrypoint' => 'qualitynomination_list',
         ];
     }
 }

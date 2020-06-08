@@ -170,24 +170,9 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
-
-interface RunsDiff {
-  guid: string;
-  new_score: number;
-  new_status: string;
-  new_verdict: string;
-  old_score: number;
-  old_status: string;
-  old_verdict: string;
-  problemset_id: number;
-  username: string;
-}
-
-interface CommitRunsDiff {
-  [commit: string]: RunsDiff[];
-}
 
 @Component
 export default class ProblemVersions extends Vue {
@@ -200,7 +185,7 @@ export default class ProblemVersions extends Vue {
   time = time;
   diffMode = 'files';
   selectedRevision: omegaup.Commit = this.value;
-  runsDiff: CommitRunsDiff = {};
+  runsDiff: types.CommitRunsDiff = {};
   showOnlyChanges = false;
   updatePublished = 'owned-problemsets';
 
@@ -239,7 +224,7 @@ export default class ProblemVersions extends Vue {
     return diff;
   }
 
-  get diffSubmissions(): [RunsDiff, string][] {
+  get diffSubmissions(): [types.RunsDiff, string][] {
     if (!this.selectedRevision) {
       return [];
     }
@@ -247,12 +232,16 @@ export default class ProblemVersions extends Vue {
     if (!this.runsDiff.hasOwnProperty(version)) {
       return [];
     }
-    const result: [RunsDiff, string][] = [];
+    const result: [types.RunsDiff, string][] = [];
     for (const row of this.runsDiff[version]) {
       let className = '';
-      if (row.new_score > row.old_score) {
+      if (row.new_score && row.old_score && row.new_score > row.old_score) {
         className = 'success';
-      } else if (row.new_score < row.old_score) {
+      } else if (
+        row.new_score &&
+        row.old_score &&
+        row.new_score < row.old_score
+      ) {
         className = 'danger';
       } else if (row.old_verdict != row.new_verdict) {
         className = 'warning';

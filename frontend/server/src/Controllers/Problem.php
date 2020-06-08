@@ -35,6 +35,7 @@
  * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
+ * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3315,7 +3316,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $max_difficulty
      * @omegaup-request-param mixed $min_difficulty
      * @omegaup-request-param mixed $min_visibility
-     * @omegaup-request-param mixed $mode
+     * @omegaup-request-param mixed $sort_order
      * @omegaup-request-param mixed $only_karel
      * @omegaup-request-param mixed $order_by
      * @omegaup-request-param mixed $page
@@ -3324,12 +3325,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param mixed $some_tags
      *
-     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, mode: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>}
+     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, sortOrder: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>}
      */
     private static function validateListParams(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateOptionalInEnum(
-            $r['mode'],
-            'mode',
+            $r['sort_order'],
+            'sort_order',
             array_merge(
                 [''],
                 \OmegaUp\Controllers\Problem::VALID_SORTING_MODES
@@ -3403,7 +3404,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'mode' => strval($r['mode']),
+            'sortOrder' => strval($r['sort_order']),
             'page' => intval($r['page']),
             'orderBy' => strval($r['order_by']),
             'language' => strval($r['language']),
@@ -3428,7 +3429,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $max_difficulty
      * @omegaup-request-param mixed $min_difficulty
      * @omegaup-request-param mixed $min_visibility
-     * @omegaup-request-param mixed $mode
+     * @omegaup-request-param mixed $sort_order
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param mixed $only_karel
      * @omegaup-request-param mixed $order_by
@@ -3461,7 +3462,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         [
-            'mode' => $mode,
+            'sortOrder' => $sortOrder,
             'page' => $page,
             'orderBy' => $orderBy,
             'language' => $language,
@@ -3477,7 +3478,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $page ?: 1,
             $language ?: 'all',
             $orderBy ?: 'problem_id',
-            $mode ?: 'desc',
+            $sortOrder ?: 'desc',
             $offset,
             $rowcount,
             $tags,
@@ -3501,7 +3502,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         int $page,
         string $language,
         string $orderBy,
-        string $mode,
+        string $sortOrder,
         ?int $offset,
         int $rowcount,
         array $tags,
@@ -3551,7 +3552,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identityType,
             $language,
             $orderBy,
-            $mode,
+            $sortOrder,
             $offset,
             $rowcount,
             $keyword,
@@ -4330,7 +4331,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $max_difficulty
      * @omegaup-request-param mixed $min_difficulty
      * @omegaup-request-param mixed $min_visibility
-     * @omegaup-request-param mixed $mode
+     * @omegaup-request-param mixed $sort_order
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param mixed $only_karel
      * @omegaup-request-param mixed $order_by
@@ -4366,7 +4367,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         [
-            'mode' => $mode,
+            'sortOrder' => $sortOrder,
             'page' => $page,
             'orderBy' => $orderBy,
             'language' => $language,
@@ -4382,7 +4383,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $page ?: 1,
             $language ?: 'all',
             $orderBy ?: 'problem_id',
-            $mode ?: 'desc',
+            $sortOrder ?: 'desc',
             $offset,
             $pageSize,
             $tags,
@@ -4399,7 +4400,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'query' => $keyword,
             'language' => $language,
             'order_by' => $orderBy,
-            'mode' => $mode,
+            'sort_order' => $sortOrder,
             'tag' => $tags
         ];
 
@@ -4427,7 +4428,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'currentTags' => $tags,
                     'pagerItems' => $pagerItems,
                     'keyword' => $keyword,
-                    'mode' => $mode,
+                    'mode' => $sortOrder,
                     'column' => $orderBy,
                     'language' => $language,
                     'languages' => array_merge(
@@ -4514,7 +4515,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{IS_UPDATE: true, LOAD_MATHJAX: true, STATUS_ERROR?: string, STATUS_SUCCESS: null|string, payload: ProblemEditPayload, problemAdminsPayload: ProblemAdminsPayload, problemEditPayload: ProblemEditTransitionalPayload, problemMarkdownPayload: ProblemMarkdownPayload, problemTagsPayload: ProblemTagsPayload}, template: string}
+     * @return array{smartyProperties: array{IS_UPDATE: true, LOAD_MATHJAX: true, STATUS_ERROR?: string, STATUS_SUCCESS: null|string, payload: ProblemEditPayload, problemAdminsPayload: ProblemAdminsPayload, problemEditPayload: ProblemEditTransitionalPayload, problemMarkdownPayload: ProblemMarkdownPayload, problemTagsPayload: ProblemTagsPayload, title: string}, template: string}
      *
      * @omegaup-request-param string $contents
      * @omegaup-request-param string $directory
@@ -4640,6 +4641,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $details,
                     self::getCommonPayloadForSmarty()
                 ),
+                'title' => 'problemEditEditProblem',
             ],
             'template' => 'problem.edit.tpl',
         ];
