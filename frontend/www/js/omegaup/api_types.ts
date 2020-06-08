@@ -1014,8 +1014,9 @@ export namespace types {
     description: string;
     finish_time?: Date;
     isCurator?: boolean;
-    is_admin?: boolean;
+    is_admin: boolean;
     name: string;
+    public?: boolean;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
