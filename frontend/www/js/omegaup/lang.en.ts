@@ -1331,6 +1331,7 @@ const translations: { [key: string]: string; } = {
   wordsScore: "Score",
   wordsScoreboard: "Scoreboard",
   wordsSearch: "Search",
+  wordsSearchBy: "Search by",
   wordsSeeGeneralRanking: "See the general ranking",
   wordsSeeLatestSubmissions: "See latest submissions sent by this user",
   wordsSeeSolution: "See Solution",
