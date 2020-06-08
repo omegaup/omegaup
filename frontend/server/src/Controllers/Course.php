@@ -2585,6 +2585,14 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         if ($showAssignment) {
+            \OmegaUp\Validators::validateStringNonEmpty(
+                $r['assignment_alias'],
+                'assignment_alias'
+            );
+            $assignment = self::validateCourseAssignmentAlias(
+                $course,
+                $r['assignment_alias']
+            );
             return [
                 'smartyProperties' => [
                     'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
@@ -2604,7 +2612,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
                 'template' => 'arena.contest.course.tpl',
-                'inContest' => true,
+                // It only considers hide navbar inside a test/exam
+                'inContest' => $assignment->assignment_type === 'test',
             ];
         }
 
