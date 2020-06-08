@@ -45,6 +45,7 @@ module.exports = {
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant:
       './frontend/www/js/omegaup/contest/list_participant.js',
+    contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
     contest_report: './frontend/www/js/omegaup/contest/report.js',
@@ -65,6 +66,7 @@ module.exports = {
     group_list: './frontend/www/js/omegaup/group/list.js',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
+    logout: './frontend/www/js/omegaup/login/logout.ts',
     problem_admins: './frontend/www/js/omegaup/problem/admins.ts',
     problem_details: './frontend/www/js/omegaup/problem/details.ts',
     problem_edit: './frontend/www/js/omegaup/problem/edit.js',

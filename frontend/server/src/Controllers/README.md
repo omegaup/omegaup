@@ -598,9 +598,9 @@ the director).
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                       |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ admission_mode: string; alias: string; finish_time: Date; rerun_id: number; scoreboard_url: string; scoreboard_url_admin: string; start_time: Date; title: string; }[]` |
+| Name       | Type              |
+| ---------- | ----------------- |
+| `contests` | `types.Contest[]` |
 
 ## `/api/contest/admins/`
 
@@ -842,9 +842,9 @@ Returns a list of contests where current user is participating in
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score: boolean; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
+| Name       | Type              |
+| ---------- | ----------------- |
+| `contests` | `types.Contest[]` |
 
 ## `/api/contest/myList/`
 
@@ -862,9 +862,9 @@ Returns a list of contests where current user is the director
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score: boolean; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
+| Name       | Type              |
+| ---------- | ----------------- |
+| `contests` | `types.Contest[]` |
 
 ## `/api/contest/open/`
 
@@ -2710,7 +2710,7 @@ List of public and user's private problems
 | `max_difficulty`        | `mixed` |             |
 | `min_difficulty`        | `mixed` |             |
 | `min_visibility`        | `mixed` |             |
-| `mode`                  | `mixed` |             |
+| `sort_order`            | `mixed` |             |
 | `offset`                | `mixed` |             |
 | `only_karel`            | `mixed` |             |
 | `order_by`              | `mixed` |             |

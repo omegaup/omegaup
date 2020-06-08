@@ -97,6 +97,33 @@ export namespace types {
       );
     }
 
+    export function ContestListMinePayload(
+      elementId: string = 'payload',
+    ): types.ContestListMinePayload {
+      return (x => {
+        x.contests = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            if (x.original_finish_time)
+              x.original_finish_time = ((x: number) => new Date(x * 1000))(
+                x.original_finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ContestListPayload(
       elementId: string = 'payload',
     ): types.ContestListPayload {
@@ -817,6 +844,10 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
+  export interface CommitRunsDiff {
+    [key: string]: types.RunsDiff[];
+  }
+
   export interface CommonPayload {
     omegaUpLockDown: boolean;
     bootstrap4: boolean;
@@ -841,6 +872,36 @@ export namespace types {
     statement_type?: string;
   }
 
+  export interface Contest {
+    acl_id?: number;
+    admission_mode: string;
+    alias: string;
+    contest_id: number;
+    description: string;
+    feedback?: string;
+    finish_time: Date;
+    languages?: string;
+    last_updated: Date;
+    original_finish_time?: Date;
+    partial_score: boolean;
+    penalty?: number;
+    penalty_calc_policy?: string;
+    penalty_type?: string;
+    points_decay_factor?: number;
+    problemset_id: number;
+    recommended: boolean;
+    rerun_id: number;
+    scoreboard?: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    show_scoreboard_after?: number;
+    start_time: Date;
+    submissions_gap?: number;
+    title: string;
+    urgent?: number;
+    window_length?: number;
+  }
+
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
     needsBasicInformation?: boolean;
@@ -863,6 +924,11 @@ export namespace types {
     start_time: Date;
     title: string;
     window_length?: number;
+  }
+
+  export interface ContestListMinePayload {
+    contests: types.Contest[];
+    privateContestsAlert: boolean;
   }
 
   export interface ContestListPayload {
@@ -1955,18 +2021,7 @@ export namespace messages {
   };
   export type ContestAdminListRequest = { [key: string]: any };
   export type _ContestAdminListServerResponse = any;
-  export type ContestAdminListResponse = {
-    contests: {
-      admission_mode: string;
-      alias: string;
-      finish_time: Date;
-      rerun_id: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-      start_time: Date;
-      title: string;
-    }[];
-  };
+  export type ContestAdminListResponse = { contests: types.Contest[] };
   export type ContestAdminsRequest = { [key: string]: any };
   export type ContestAdminsResponse = {
     admins: { role: string; username: string }[];
@@ -2065,70 +2120,10 @@ export namespace messages {
   };
   export type ContestListParticipatingRequest = { [key: string]: any };
   export type _ContestListParticipatingServerResponse = any;
-  export type ContestListParticipatingResponse = {
-    contests: {
-      acl_id?: number;
-      admission_mode: string;
-      alias: string;
-      contest_id: number;
-      description: string;
-      feedback?: string;
-      finish_time: Date;
-      languages?: string;
-      last_updated: Date;
-      original_finish_time?: Date;
-      partial_score: boolean;
-      penalty?: number;
-      penalty_calc_policy?: string;
-      penalty_type?: string;
-      points_decay_factor?: number;
-      problemset_id: number;
-      recommended: boolean;
-      rerun_id: number;
-      scoreboard?: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-      show_scoreboard_after?: number;
-      start_time: Date;
-      submissions_gap?: number;
-      title: string;
-      urgent?: number;
-      window_length?: number;
-    }[];
-  };
+  export type ContestListParticipatingResponse = { contests: types.Contest[] };
   export type ContestMyListRequest = { [key: string]: any };
   export type _ContestMyListServerResponse = any;
-  export type ContestMyListResponse = {
-    contests: {
-      acl_id?: number;
-      admission_mode: string;
-      alias: string;
-      contest_id: number;
-      description: string;
-      feedback?: string;
-      finish_time: Date;
-      languages?: string;
-      last_updated: Date;
-      original_finish_time?: Date;
-      partial_score: boolean;
-      penalty?: number;
-      penalty_calc_policy?: string;
-      penalty_type?: string;
-      points_decay_factor?: number;
-      problemset_id: number;
-      recommended: boolean;
-      rerun_id: number;
-      scoreboard?: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-      show_scoreboard_after?: number;
-      start_time: Date;
-      submissions_gap?: number;
-      title: string;
-      urgent?: number;
-      window_length?: number;
-    }[];
-  };
+  export type ContestMyListResponse = { contests: types.Contest[] };
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemsRequest = { [key: string]: any };
