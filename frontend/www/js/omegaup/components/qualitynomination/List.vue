@@ -1,48 +1,47 @@
 <template>
   <div>
-    <div class="mb-3">
-      <form>
-        <div class="form-row">
-          <div class="col-md-4 mb-3">
-            <select name="column" class="form-control" v-model="selectColumn">
-              <option
-                v-for="(columnText, columnIndex) in columns"
-                v-bind:value="columnIndex"
-              >
-                {{ columnText }}</option
-              >
-            </select>
-          </div>
-          <div class="col-md-4 mb-3">
-            <omegaup-autocomplete
-              v-bind:init="el => typeahead.problemTypeahead(el)"
-              v-model="queryProblem"
-              v-bind:placeholder="T.wordsKeyword"
-              class="form-control"
-              v-show="selectColumn == 'problem_alias'"
-            ></omegaup-autocomplete>
-            <omegaup-autocomplete
-              v-bind:init="el => typeahead.userTypeahead(el)"
-              v-model="queryUsername"
-              v-bind:placeholder="T.wordsKeyword"
-              class="form-control"
-              v-show="
-                selectColumn == 'nominator_username' ||
-                  selectColumn == 'author_username'
-              "
-            ></omegaup-autocomplete>
-          </div>
+    <form class="form-group">
+      <div class="form-row mb-3">
+        <label class="col-form-label">{{ T.wordsSearchBy }}</label>
+        <div class="col-md-4">
+          <select name="column" class="form-control" v-model="selectColumn">
+            <option
+              v-for="(columnText, columnIndex) in columns"
+              v-bind:value="columnIndex"
+            >
+              {{ columnText }}</option
+            >
+          </select>
         </div>
-        <button
-          class="btn btn-primary"
-          v-on:click.prevent="
-            $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
-          "
-        >
-          {{ T.wordsSearch }}
-        </button>
-      </form>
-    </div>
+        <div class="col-md-4">
+          <omegaup-autocomplete
+            v-bind:init="el => typeahead.problemTypeahead(el)"
+            v-model="queryProblem"
+            v-bind:placeholder="T.wordsKeyword"
+            class="form-control"
+            v-show="selectColumn == 'problem_alias'"
+          ></omegaup-autocomplete>
+          <omegaup-autocomplete
+            v-bind:init="el => typeahead.userTypeahead(el)"
+            v-model="queryUsername"
+            v-bind:placeholder="T.wordsKeyword"
+            class="form-control"
+            v-show="
+              selectColumn == 'nominator_username' ||
+                selectColumn == 'author_username'
+            "
+          ></omegaup-autocomplete>
+        </div>
+      </div>
+      <button
+        class="btn btn-primary"
+        v-on:click.prevent="
+          $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
+        "
+      >
+        {{ T.wordsSearch }}
+      </button>
+    </form>
     <div class="card">
       <h3 class="card-header">
         {{

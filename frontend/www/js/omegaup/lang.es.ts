@@ -1328,6 +1328,7 @@ const translations: { [key: string]: string; } = {
   wordsScore: "Puntaje",
   wordsScoreboard: "Lista de estudiantes",
   wordsSearch: "Buscar",
+  wordsSearchBy: "Buscar por",
   wordsSeeGeneralRanking: "Ver el ranking general",
   wordsSeeLatestSubmissions: "Ver los \u00faltimos env\u00edos realizados por este usuario",
   wordsSeeSolution: "Ver Soluci\u00f3n",

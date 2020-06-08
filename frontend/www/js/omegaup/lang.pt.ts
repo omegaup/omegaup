@@ -1328,6 +1328,7 @@ const translations: { [key: string]: string; } = {
   wordsScore: "Pontua\u00e7\u00e3o",
   wordsScoreboard: "Scoreboard",
   wordsSearch: "Pesquisar",
+  wordsSearchBy: "Procura por",
   wordsSeeGeneralRanking: "Ver o ranking geral",
   wordsSeeLatestSubmissions: "Ver as \u00faltimas submiss\u00f5es realizadas pelo usu\u00e1rio",
   wordsSeeSolution: "Ver Solu\u00e7\u00e3o",
