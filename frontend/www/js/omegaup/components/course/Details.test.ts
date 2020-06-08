@@ -9,7 +9,7 @@ import { types } from '../../api_types';
 import course_Details from './Details.vue';
 
 describe('Details.vue', () => {
-  it('Should handle empty assignments and progress', () => {
+  it('Should handle empty assignments and progress as admin', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Details, {
       propsData: {
@@ -35,6 +35,39 @@ describe('Details.vue', () => {
     });
 
     expect(wrapper.text()).toContain(courseName);
+    expect(wrapper.find('a[data-button-homework]').text()).toBe(
+      T.wordsNewHomework,
+    );
+    expect(wrapper.find('a[data-button-exam]').text()).toBe(T.wordsNewExam);
+  });
+
+  it('Should handle empty assignments and progress as student', () => {
+    const courseName = 'Test course';
+    const wrapper = shallowMount(course_Details, {
+      propsData: {
+        course: <omegaup.Course>{
+          admission_mode: 'registration',
+          alias: 'test-course',
+          assignments: <omegaup.Assignment[]>[],
+          basic_information_required: false,
+          description: '# Test',
+          finish_time: null,
+          isCurator: false,
+          is_admin: false,
+          name: courseName,
+          public: true,
+          requests_user_information: 'no',
+          school_name: '',
+          show_scoreboard: false,
+          start_time: new Date(),
+          student_count: 1,
+        },
+        progress: <types.AssignmentProgress>{},
+      },
+    });
+
+    expect(wrapper.find('a[data-button-homework]').exists()).toBe(false);
+    expect(wrapper.find('a[data-button-exam]').exists()).toBe(false);
   });
 
   it('Should handle assignments without finish_time', () => {
