@@ -3,40 +3,51 @@
     <div class="close-container">
       <button class="close">❌</button>
     </div>
-    <div>
-      {{ T.wordsLanguage }}
-      <select name="language" v-model="selectedLanguage">
-        <option v-bind:value="key" v-for="(language, key) in languages">{{
-          language
-        }}</option>
-      </select>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">
+        {{ T.wordsLanguage }}
+      </label>
+      <div class="col-sm-4">
+        <select name="language" class="form-control" v-model="selectedLanguage">
+          <option v-bind:value="key" v-for="(language, key) in languages">{{
+            language
+          }}</option>
+        </select>
+      </div>
     </div>
-    <div>
-      {{ T.arenaRunSubmitFilename }}
-      <tt>{{ filename }}</tt>
+    <div class="form-group row">
+      <label class="col-sm-7 col-form-label">
+        {{ T.arenaRunSubmitFilename }}
+        <tt>{{ filename }}</tt>
+      </label>
     </div>
-    <div>
-      <label>{{ T.arenaRunSubmitPaste }}</label>
+    <div class="form-group row">
+      <label class="col-sm-7 col-form-label">{{ T.arenaRunSubmitPaste }}</label>
     </div>
-    <div>
+    <div class="code-view form-group">
       <omegaup-arena-code-view
         v-bind:language="selectedLanguage"
         v-bind:readonly="false"
         v-model="code"
       ></omegaup-arena-code-view>
     </div>
-    <div>
-      <label
-        >{{ T.arenaRunSubmitUpload }}
-        <input type="file" name="file" ref="inputFile" />
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">
+        {{ T.arenaRunSubmitUpload }}
       </label>
+      <div class="col-sm-6">
+        <input type="file" name="file" ref="inputFile" />
+      </div>
     </div>
-    <div>
-      <input
-        type="submit"
-        v-bind:disabled="submissionGapSecondsRemaining > 0"
-        v-bind:value="buttonDescription"
-      />
+    <div class="form-group row">
+      <div class="col-sm-10">
+        <input
+          type="submit"
+          class="btn btn-primary"
+          v-bind:disabled="submissionGapSecondsRemaining > 0"
+          v-bind:value="buttonDescription"
+        />
+      </div>
     </div>
   </form>
 </template>
@@ -49,7 +60,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -69,7 +80,6 @@ export default class ArenaRunSubmit extends Vue {
   T = T;
   selectedLanguage = '';
   code = '';
-  extension = '';
 
   get buttonDescription(): string {
     if (this.submissionGapSecondsRemaining < 1) {
@@ -84,19 +94,20 @@ export default class ArenaRunSubmit extends Vue {
     return `Main${this.extension}`;
   }
 
-  @Watch('selectedLanguage')
-  onPropertyChange(newValue: string): void {
-    if (newValue.startsWith('cpp')) {
-      this.extension = '.cpp';
-    } else if (newValue.startsWith('c11-')) {
-      this.extension = '.c';
-    } else if (newValue.startsWith('py')) {
-      this.extension = '.py';
-    } else if (newValue && newValue !== 'cat') {
-      this.extension = `.${newValue}`;
-    } else {
-      this.extension = '';
+  get extension(): string {
+    if (this.selectedLanguage.startsWith('cpp')) {
+      return '.cpp';
     }
+    if (this.selectedLanguage.startsWith('c11-')) {
+      return '.c';
+    }
+    if (this.selectedLanguage.startsWith('py')) {
+      return '.py';
+    }
+    if (this.selectedLanguage && this.selectedLanguage !== 'cat') {
+      return `.${this.selectedLanguage}`;
+    }
+    return '';
   }
 
   onSubmit(ev: Event): void {
