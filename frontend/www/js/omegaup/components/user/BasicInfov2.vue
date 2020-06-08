@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div class="render-if-email" v-if="profile.email">
+      <div v-if="profile.email">
         <div class="form-group row padding-field">
           <div class="col-sm-3 field-name">
             <strong>{{ T.profileEmail }}</strong>
@@ -119,6 +119,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import user_Username from './Username.vue';
@@ -129,7 +130,7 @@ import user_Username from './Username.vue';
   },
 })
 export default class UserBasicInfo extends Vue {
-  @Prop() profile!: omegaup.Profile;
+  @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
 }
