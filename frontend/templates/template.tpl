@@ -10,7 +10,7 @@
     {if isset($inArena) && $inArena}
       {assign var='LOAD_MATHJAX' value='true'}
       {assign var='navbarSection' value='arena'}
-    {else}
+    {elseif isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
       <meta name="google-signin-client_id" content="{$GOOGLECLIENTID}" />
     {/if}
 
@@ -31,6 +31,11 @@
       <script type="text/javascript" src="{$jsfile}" defer></script>
     {/if}
 
+    {if isset($scripts)}
+      {foreach from=$scripts item=$script}
+        <script type="text/javascript" src="{$script}" defer async></script>
+      {/foreach}
+    {/if}
     {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
       <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}" defer></script>
       <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
