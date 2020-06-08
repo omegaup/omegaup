@@ -19,10 +19,11 @@ export default class ArenaAdmin {
 
     this.arena = arena;
     this.arena.problemsetAdmin = true;
+    const globalRuns = this.arena.options.contestAlias === 'admin';
 
     this.setUpPagers();
     this.runsList = new Vue({
-      el: '#runs table.runs',
+      el: globalRuns ? '#main-container' : '#runs table.runs',
       render: function(createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -36,6 +37,7 @@ export default class ArenaAdmin {
             showRejudge: true,
             showUser: true,
             problemsetProblems: Object.values(self.arena.problems),
+            globalRuns: globalRuns,
           },
           on: {
             details: (run: types.Run) => {

@@ -222,7 +222,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'nomination' => 'quality_tag',
                 'contents' => json_encode([
                     'quality_seal' => false,
-                    'tag' => 'problemCategoryOpenResponse',
+                    'tag' => 'problemLevelAdvancedCompetitiveProgramming',
                 ]),
             ]));
             $this->fail('The user must be a reviewer.');
@@ -240,10 +240,10 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'nomination' => 'quality_tag',
                 'contents' => json_encode([
                     'quality_seal' => false,
-                    'tag' => 'problemCategory',
+                    'tag' => 'problemLevel',
                 ]),
             ]));
-            $this->fail('The tag should be one of the category tags group.');
+            $this->fail('The tag should be one of the level tags group.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterInvalid', $e->getMessage());
         }
@@ -254,7 +254,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => false,
-                'tag' => 'problemCategoryOpenResponse',
+                'tag' => 'problemLevelAdvancedCompetitiveProgramming',
             ]),
         ]));
 
@@ -265,7 +265,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'nomination' => 'quality_tag',
                 'contents' => json_encode([
                     'quality_seal' => false,
-                    'tag' => 'problemCategoryOpenResponse',
+                    'tag' => 'problemLevelAdvancedCompetitiveProgramming',
                 ]),
             ]));
             $this->fail(
@@ -816,7 +816,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function qualityNominationsDemotionSearchColumnsProvider(): array {
         return [
-            ['alias', 'problem_1', 1],
+            ['problem_alias', 'problem_1', 1],
             ['author_username', 'user_test_author', 1],
             ['nominator_username', 'user_test_nominator',1],
             ['nominator_username', 'invalid_user_test_nominator', 0],
@@ -1809,7 +1809,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => true,
-                'tag' => 'problemCategoryKarelEducation',
+                'tag' => 'problemLevelBasicKarel',
             ]),
         ]));
 
@@ -1822,7 +1822,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => true,
-                'tag' => 'problemCategoryKarelEducation',
+                'tag' => 'problemLevelBasicKarel',
             ]),
         ]));
 
@@ -1835,7 +1835,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => false,
-                'tag' => 'problemCategoryOpenResponse',
+                'tag' => 'problemLevelAdvancedSpecializedTopics',
             ]),
         ]));
 
@@ -1863,7 +1863,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => false,
-                'tag' => 'problemCategoryOpenResponse',
+                'tag' => 'problemLevelAdvancedSpecializedTopics',
             ]),
         ]));
 
@@ -1876,7 +1876,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => false,
-                'tag' => 'problemCategoryIntroductionToProgramming',
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
             ]),
         ]));
 
@@ -1889,7 +1889,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'nomination' => 'quality_tag',
             'contents' => json_encode([
                 'quality_seal' => true,
-                'tag' => 'problemCategoryIntroductionToProgramming',
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
             ]),
         ]));
 
@@ -2409,46 +2409,6 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             ),
             [],
             'There must be a maximum number of tags to be assigned.'
-        );
-    }
-
-    /**
-     * Test for the script to canonize tags send throught the
-     * feedback form (quality nominations).
-     */
-    public function testCanonicalizeTags() {
-        $problemData[0] = \OmegaUp\Test\Factories\Problem::createProblem();
-        $problemData[1] = \OmegaUp\Test\Factories\Problem::createProblem();
-        self::setUpSyntheticSuggestions($problemData);
-
-        // Run canonicalize tags
-        \OmegaUp\Test\Utils::runCanonicalizeTags();
-        \OmegaUp\Test\Utils::runAggregateFeedback();
-
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
-        sort($tags);
-        $this->assertEquals(
-            $tags,
-            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath']
-        );
-
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[1]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
-        sort($tags);
-        $this->assertEquals(
-            $tags,
-            ['lenguaje', 'problemTopicDynamicProgramming', 'problemTopicGeometry', 'problemTopicMath', 'problemTopicSorting']
         );
     }
 

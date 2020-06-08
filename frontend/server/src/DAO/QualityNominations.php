@@ -340,6 +340,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 $column = 'authorIdentity.username';
             } elseif ($column == 'nominator_username') {
                 $column = 'nominatorIdentity.username';
+            } elseif ($column == 'problem_alias') {
+                $column = 'alias';
             }
             $sqlSearch = \OmegaUp\MySQLConnection::getInstance()->escape(
                 $column
