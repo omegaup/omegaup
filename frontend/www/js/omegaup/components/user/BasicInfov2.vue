@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div v-if="profile.email">
+      <div class="render-if-email" v-if="profile.email">
         <div class="form-group row padding-field">
           <div class="col-sm-3 field-name">
             <strong>{{ T.profileEmail }}</strong>
