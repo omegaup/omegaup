@@ -33,8 +33,8 @@
 {/if}
 		<script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>
 {if isset($headerPayload) && $headerPayload.bootstrap4}
-		<link rel="stylesheet" href="/third_party/bootstrap-4.4.1/css/bootstrap.min.css"/>
-		<script src="/third_party/bootstrap-4.4.1/js/bootstrap.bundle.min.js"></script>
+		<link rel="stylesheet" href="/third_party/bootstrap-4.5.0/css/bootstrap.min.css"/>
+		<script src="/third_party/bootstrap-4.5.0/js/bootstrap.bundle.min.js"></script>
 {else}
 		<!-- Bootstrap -->
 		<!-- Latest compiled and minified CSS -->
