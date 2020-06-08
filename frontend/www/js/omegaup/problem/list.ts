@@ -67,7 +67,12 @@ OmegaUp.on('ready', () => {
             columnName: string,
             sortOrder: omegaup.SortOrder,
           ): void => {
-            const queryParameters = { language, query, columnName, sortOrder };
+            const queryParameters = {
+              language,
+              query,
+              order_by: columnName,
+              sort_order: sortOrder,
+            };
             window.location.replace(
               `/problem?${ui.buildURLQuery(queryParameters)}`,
             );
