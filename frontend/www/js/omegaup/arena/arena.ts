@@ -474,7 +474,10 @@ export class Arena {
       navbarPayload = JSON.parse(navbar.innerText);
     }
 
-    if (document.getElementById('arena-navbar-miniranking') !== null) {
+    if (
+      document.getElementById('arena-navbar-miniranking') !== null &&
+      this.options.contestAlias !== null
+    ) {
       this.navbarMiniRanking = new Vue({
         el: '#arena-navbar-miniranking',
         render: function(createElement) {
