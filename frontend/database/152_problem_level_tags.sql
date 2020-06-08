@@ -16,48 +16,21 @@ WHERE
 UPDATE
     `Tags`
 SET
-    `name` = 'problemLevelIntermediateAnalysisAndDesignOfAlgorithms'
-WHERE
-    `name` = 'problemCategoryAlgorithmAndNetworkOptimization';
-
-UPDATE
-    `Tags`
-SET
-    `name` = 'problemLevelAdvancedCompetitiveProgramming'
-WHERE
-    `name` = 'problemCategoryCompetitiveProgramming';
-
-UPDATE
-    `Tags`
-SET
-    `name` = 'problemLevelIntermediateDataStructuresAndAlgorithms'
-WHERE
-    `name` = 'problemCategoryElementaryDataStructures';
-
-UPDATE
-    `Tags`
-SET
-    `name` = 'problemLevelBasicIntroductionToProgramming'
-WHERE
-    `name` = 'problemCategoryIntroductionToProgramming';
-
-UPDATE
-    `Tags`
-SET
-    `name` = 'problemLevelBasicKarel'
-WHERE
-    `name` = 'problemCategoryKarelEducation';
-
-UPDATE
-    `Tags`
-SET
-    `name` = 'problemLevelIntermediateMathsInProgramming'
-WHERE
-    `name` = 'problemCategoryMathematicalProblems';
-
-UPDATE
-    `Tags`
-SET
-    `name` = 'problemLevelAdvancedSpecializedTopics'
-WHERE
-    `name` = 'problemCategorySpecializedTopics';
+    `name` = CASE `name`
+        WHEN 'problemCategoryAlgorithmAndNetworkOptimization'
+            THEN 'problemLevelIntermediateAnalysisAndDesignOfAlgorithms'
+        WHEN 'problemCategoryCompetitiveProgramming'
+            THEN 'problemLevelAdvancedCompetitiveProgramming'
+        WHEN 'problemCategoryElementaryDataStructures'
+            THEN 'problemLevelIntermediateDataStructuresAndAlgorithms'
+        WHEN 'problemCategoryIntroductionToProgramming'
+            THEN 'problemLevelBasicIntroductionToProgramming'
+        WHEN 'problemCategoryKarelEducation'
+            THEN 'problemLevelBasicKarel'
+        WHEN 'problemCategoryMathematicalProblems'
+            THEN 'problemLevelIntermediateMathsInProgramming'
+        WHEN 'problemCategorySpecializedTopics'
+            THEN 'problemLevelAdvancedSpecializedTopics'
+        ELSE
+            `name`
+        END;
