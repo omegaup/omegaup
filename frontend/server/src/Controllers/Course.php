@@ -2612,7 +2612,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ],
                 ],
                 'template' => 'arena.contest.course.tpl',
-                // It only considers hide navbar inside a test/exam
+                // Navbar is only hidden during exams.
                 'inContest' => $assignment->assignment_type === 'test',
             ];
         }
