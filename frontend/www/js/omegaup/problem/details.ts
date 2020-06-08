@@ -11,6 +11,8 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-details', {
         props: {
           problem: payload.problem,
+          user: payload.user,
+          nominationStatus: payload.nominationStatus,
         },
       });
     },
