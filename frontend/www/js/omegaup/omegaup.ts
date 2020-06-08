@@ -74,6 +74,16 @@ export namespace omegaup {
     Public = 'public',
   }
 
+  export enum ColumnType {
+    Number = 'number',
+    String = 'string',
+  }
+
+  export enum SortOrder {
+    Ascending = 'asc',
+    Descending = 'desc',
+  }
+
   export enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',
@@ -396,7 +406,7 @@ export namespace omegaup {
     min_difficulty: number;
     max_difficulty: number;
     order_by: string;
-    mode: string;
+    sort_order: string;
     only_karel?: boolean;
     tag?: string[];
   }
