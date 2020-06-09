@@ -1,8 +1,8 @@
 <template>
   <div class="card-body">
-    <div class="profile-fields fields-border">
+    <div class="fields-border">
       <div class="form-group row padding-field">
-        <div class="col-sm-3 field-name">
+        <div class="col-sm-3">
           <strong>{{ T.profileUsername }}</strong>
         </div>
         <div class="col-sm-9 field-data">
@@ -15,7 +15,7 @@
         </div>
       </div>
       <div class="form-group row padding-field">
-        <div class="col-sm-3 field-name">
+        <div class="col-sm-3">
           <strong>{{ T.profile }}</strong>
         </div>
         <div class="col-sm-9 field-data">
@@ -25,7 +25,7 @@
 
       <div class="render-if-email" v-if="profile.email">
         <div class="form-group row padding-field">
-          <div class="col-sm-3 field-name">
+          <div class="col-sm-3">
             <strong>{{ T.profileEmail }}</strong>
           </div>
           <div class="col-sm-9 field-data">
@@ -35,7 +35,7 @@
         </div>
 
         <div class="form-group row padding-field">
-          <div class="col-sm-3 field-name">
+          <div class="col-sm-3">
             <strong>{{ T.profileCountry }}</strong>
           </div>
           <div class="col-sm-9 field-data">
@@ -44,7 +44,7 @@
         </div>
 
         <div class="form-group row padding-field">
-          <div class="col-sm-3 field-name">
+          <div class="col-sm-3">
             <strong>{{ T.profileState }}</strong>
           </div>
           <div class="col-sm-9 field-data">
@@ -53,7 +53,7 @@
         </div>
 
         <div class="form-group row padding-field">
-          <div class="col-sm-3 field-name">
+          <div class="col-sm-3">
             <strong>{{ T.profileSchool }}</strong>
           </div>
           <div class="col-sm-9 field-data">
@@ -64,7 +64,7 @@
         </div>
 
         <div class="form-group row padding-field">
-          <div class="col-sm-3 field-name">
+          <div class="col-sm-3">
             <strong>{{ T.profileGraduationDate }}</strong>
           </div>
           <div class="col-sm-9 field-data">
@@ -73,7 +73,7 @@
         </div>
 
         <div class="form-group row padding-field">
-          <div class="col-sm-3 field-name">
+          <div class="col-sm-3">
             <strong>{{ T.profileRank }}</strong
             ><a href="https://blog.omegaup.com/categorias/" target="_blank"
               ><em class="glyphicon glyphicon-question-sign"></em
