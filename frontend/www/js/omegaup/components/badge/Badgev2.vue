@@ -34,7 +34,7 @@ figure {
   max-height: 100%;
 }
 .badge-name {
-  padding-top: 5px;
+  padding-top: 0.5rem;
 }
 .badge-gray {
   filter: grayscale(100%);
