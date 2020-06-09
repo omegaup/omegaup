@@ -22,7 +22,7 @@
 }
 
 figure {
-  max-height: 15rem !important;
+  max-height: 10rem !important;
 }
 
 .badge-icon {
