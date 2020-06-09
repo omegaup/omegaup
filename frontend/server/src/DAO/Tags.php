@@ -17,7 +17,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     final public static function getByName(string $name): ?\OmegaUp\DAO\VO\Tags {
         $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
 
-        /** @var array{name: string, tag_id: int}|null */
+        /** @var array{name: string, public: bool, tag_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;

@@ -146,3 +146,18 @@ VALUES
     ('problemTagCodingRush', 1),
     ('problemTagCOCI', 1),
     ('problemTagBOI', 1);
+
+UPDATE
+    `Tags`
+SET
+    `public` = 1
+WHERE
+    `name` IN (
+        'problemLevelIntermediateAnalysisAndDesignOfAlgorithms',
+        'problemLevelAdvancedCompetitiveProgramming',
+        'problemLevelIntermediateDataStructuresAndAlgorithms',
+        'problemLevelBasicIntroductionToProgramming',
+        'problemLevelBasicKarel',
+        'problemLevelIntermediateMathsInProgramming',
+        'problemLevelAdvancedSpecializedTopics'
+    );
