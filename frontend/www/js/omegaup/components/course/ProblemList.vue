@@ -104,16 +104,16 @@
                 >{{ T.wordsLevels }}
                 <select class="form-control" v-model="level">
                   <option value="intro">
-                    {{ T.problemLevelIntro }}
+                    {{ T.problemDifficultyIntro }}
                   </option>
                   <option value="easy">
-                    {{ T.problemLevelEasy }}
+                    {{ T.problemDifficultyEasy }}
                   </option>
                   <option value="medium">
-                    {{ T.problemLevelMedium }}
+                    {{ T.problemDifficultyMedium }}
                   </option>
                   <option value="hard">
-                    {{ T.problemLevelHard }}
+                    {{ T.problemDifficultyHard }}
                   </option>
                 </select></label
               >
