@@ -22,7 +22,6 @@ describe('arena', () => {
 
     it('can be instantiated', () => {
       const options = arena.GetDefaultOptions();
-      options.contestAlias = 'test';
 
       const arenaInstance = new arena.Arena(options);
       const adminInstance = new ArenaAdmin(arenaInstance);
