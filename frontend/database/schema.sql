@@ -926,6 +926,7 @@ CREATE TABLE `Submissions` (
 CREATE TABLE `Tags` (
   `tag_id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(75) NOT NULL,
+  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el tag es público o no. Los usuarios solo pueden agregar tags privados',
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tags privados para los problemas.';
