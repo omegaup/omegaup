@@ -101,7 +101,7 @@
             </div>
             <div class="form-group">
               <label
-                >{{ T.wordsLevels }}
+                >{{ T.wordsDifficulty }}
                 <select class="form-control" v-model="level">
                   <option value="intro">
                     {{ T.problemDifficultyIntro }}
