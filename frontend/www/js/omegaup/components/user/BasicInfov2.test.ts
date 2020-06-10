@@ -9,7 +9,7 @@ describe('BasicInfov2.vue', () => {
     const email = 'test@omegaup.com';
     const wrapper = shallowMount(user_BasicInfo, {
       propsData: {
-        profile:  <types.UserProfile>{ email: email },
+        profile: <types.UserProfile>{ email: email },
         rank: 'Ω',
       },
     });
