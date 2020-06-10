@@ -646,7 +646,7 @@ OmegaUp.on('ready', function() {
         .attr('href', '/course/' + courseAlias + '/');
       details.course = course;
       editAdmissionMode.admissionMode = course.admission_mode;
-      editAdmissionMode.shouldShowPublicOption = course.isCurator;
+      editAdmissionMode.shouldShowPublicOption = course.is_curator;
       clone.initialName = course.name;
     })
     .catch(UI.apiError);

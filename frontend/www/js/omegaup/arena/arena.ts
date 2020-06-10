@@ -474,7 +474,10 @@ export class Arena {
       navbarPayload = JSON.parse(navbar.innerText);
     }
 
-    if (document.getElementById('arena-navbar-miniranking') !== null) {
+    if (
+      document.getElementById('arena-navbar-miniranking') !== null &&
+      this.options.contestAlias !== null
+    ) {
       this.navbarMiniRanking = new Vue({
         el: '#arena-navbar-miniranking',
         render: function(createElement) {
@@ -2299,6 +2302,29 @@ export class Arena {
       }
       groups = detailsGroups;
     }
+
+    // Setup run details view, if available.
+    if (
+      document.getElementById('run-details') !== null &&
+      !this.runDetailsView
+    ) {
+      this.runDetailsView = new Vue({
+        el: '#run-details',
+        render: function(createElement) {
+          return createElement('omegaup-arena-rundetails', {
+            props: {
+              data: this.data,
+            },
+          });
+        },
+        data: { data: null },
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+      });
+      this.bindGlobalHandlers();
+    }
+
     if (this.runDetailsView) {
       this.runDetailsView.data = {
         compile_error: data.compile_error,

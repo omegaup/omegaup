@@ -3164,6 +3164,8 @@ Returns the Scoreboard events
 
 # QualityNomination
 
+QualityNominationController
+
 ## `/api/qualityNomination/create/`
 
 ### Description
@@ -3288,10 +3290,10 @@ nominator or a member of the reviewer group.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Name          | Type                         |
+| ------------- | ---------------------------- |
+| `nominations` | `types.NominationListItem[]` |
+| `pager_items` | `types.PageItem[]`           |
 
 ## `/api/qualityNomination/myAssignedList/`
 
@@ -3325,10 +3327,10 @@ Displays the nominations that this user has been assigned.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Name          | Type                         |
+| ------------- | ---------------------------- |
+| `nominations` | `types.NominationListItem[]` |
+| `pager_items` | `types.PageItem[]`           |
 
 ## `/api/qualityNomination/resolve/`
 
