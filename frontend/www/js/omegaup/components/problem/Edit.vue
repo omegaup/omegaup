@@ -261,7 +261,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
@@ -270,6 +270,8 @@ import problem_Admins from '../common/Admins.vue';
 import problem_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
+import * as markdown from '../../markdown';
 
 @Component({
   components: {
@@ -286,9 +288,7 @@ export default class ProblemEdit extends Vue {
   @Prop() initialAdmins!: types.ProblemAdmin[];
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop() markdownContents!: string;
-  @Prop() markdownPreview!: string;
   @Prop() markdownSolutionContents!: string;
-  @Prop() markdownSolutionPreview!: string;
   @Prop() initialLanguage!: string;
   @Prop() username!: string;
   @Prop() name!: string;
@@ -296,6 +296,16 @@ export default class ProblemEdit extends Vue {
   T = T;
   alias = this.data.alias;
   showTab = 'edit';
+  markdownConverter = markdown.markdownConverter({
+    preview: true,
+    imageMapping: {},
+  });
+  markdownEditor: Markdown.Editor = new Markdown.Editor(
+    this.markdownConverter,
+    '-statements',
+  );
+  markdownPreview: string = '';
+  markdownSolutionPreview: string = '';
 
   get activeTab(): string {
     switch (this.showTab) {
@@ -320,8 +330,31 @@ export default class ProblemEdit extends Vue {
     }
   }
 
+  mounted(): void {
+    const markdownConverter = markdown.markdownConverter({
+      preview: true,
+      imageMapping: {},
+    });
+    this.markdownEditor = new Markdown.Editor(markdownConverter, '-statements');
+    this.markdownEditor.run();
+  }
+
   onDownload(): void {
     window.location.href = `/api/problem/download/problem_alias/${this.alias}/`;
+  }
+
+  @Watch('markdownContents')
+  onMarkdownStatementChanged(newValue: string): void {
+    this.markdownPreview = this.markdownEditor
+      .getConverter()
+      .makeHtml(newValue);
+  }
+
+  @Watch('markdownSolutionsContents')
+  onValueMarkdownSolutionChanged(newValue: string): void {
+    this.markdownSolutionPreview = this.markdownEditor
+      .getConverter()
+      .makeHtml(newValue);
   }
 }
 </script>

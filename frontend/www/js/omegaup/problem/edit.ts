@@ -5,8 +5,7 @@ import Vue from 'vue';
 import problem_Edit from '../components/problem/Edit.vue';
 import * as ui from '../ui';
 import * as api from '../api';
-import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
-import * as markdown from '../markdown';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemEditPayload();
@@ -16,6 +15,11 @@ OmegaUp.on('ready', () => {
   if (payload.statusSuccess) {
     ui.success(T.problemEditUpdatedSuccessfully);
   }
+  const lang = payload.statement.language;
+  const statements: types.Statements = {};
+  const solutions: types.Statements = {};
+  statements[lang] = payload.statement.markdown;
+  solutions[lang] = payload.solution.markdown;
   const problemEdit = new Vue({
     el: '#main-container',
     render: function(createElement) {
@@ -25,20 +29,18 @@ OmegaUp.on('ready', () => {
           originalVisibility: payload.visibility,
           initialAdmins: this.initialAdmins,
           initialGroups: this.initialGroups,
-          initialLanguage: this.initialLanguage,
+          initialLanguage: lang,
           log: this.log,
           publishedRevision: this.publishedRevision,
           value: this.publishedRevision,
           markdownContents: this.markdownContents,
-          markdownPreview: this.markdownPreview,
           markdownSolutionContents: this.markdownSolutionContents,
-          markdownSolutionPreview: this.markdownSolutionPreview,
         },
         on: {
           'update-markdown-contents': (
             statements: types.Statements,
             language: string,
-            currentMarkdown: any,
+            currentMarkdown: string,
             markdownType: string,
           ) => {
             // First update markdown contents to current markdown, otherwise
@@ -47,10 +49,7 @@ OmegaUp.on('ready', () => {
             if (markdownType === 'statements') {
               problemEdit.markdownContents = currentMarkdown;
               if (statements.hasOwnProperty(language)) {
-                problemEdit.updateAndRefresh(
-                  statements[language],
-                  markdownType,
-                );
+                problemEdit.markdownContents = statements[language];
                 return;
               }
               api.Problem.details({
@@ -66,21 +65,14 @@ OmegaUp.on('ready', () => {
                   if (response.statement.language !== language) {
                     response.statement.markdown = '';
                   }
-                  problemEdit.statements[language] =
-                    response.statement.markdown;
-                  problemEdit.updateAndRefresh(
-                    response.statement.markdown,
-                    markdownType,
-                  );
+                  statements[language] = response.statement.markdown;
+                  problemEdit.markdownContents = response.statement.markdown;
                 })
                 .catch(ui.apiError);
             } else {
               problemEdit.markdownSolutionContents = currentMarkdown;
               if (statements.hasOwnProperty(language)) {
-                problemEdit.updateAndRefresh(
-                  statements[language],
-                  markdownType,
-                );
+                problemEdit.markdownSolutionContents = statements[language];
                 return;
               }
               api.Problem.solution({
@@ -94,11 +86,9 @@ OmegaUp.on('ready', () => {
                   if (response.solution.language !== language) {
                     response.solution.markdown = '';
                   }
-                  problemEdit.solutions[language] = response.solution.markdown;
-                  problemEdit.updateAndRefresh(
-                    response.solution.markdown,
-                    markdownType,
-                  );
+                  solutions[language] = response.solution.markdown;
+                  problemEdit.markdownSolutionContents =
+                    response.solution.markdown;
                 })
                 .catch(ui.apiError);
             }
@@ -226,17 +216,6 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    mounted() {
-      const markdownConverter = markdown.markdownConverter({
-        preview: true,
-        imageMapping: {},
-      });
-      this.markdownEditor = new Markdown.Editor(
-        markdownConverter,
-        '-statements',
-      );
-      this.markdownEditor.run();
-    },
     methods: {
       refreshProblemAdmins: (): void => {
         api.Problem.admins({ problem_alias: payload.alias })
@@ -246,55 +225,17 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
-      updateAndRefresh: (markdown: string, markdownType: string): void => {
-        if (markdown === null) {
-          return;
-        }
-        if (markdownType === 'statements') {
-          problemEdit.markdownContents = markdown;
-          problemEdit.markdownPreview = problemEdit.markdownEditor
-            .getConverter()
-            .makeHtml(markdown);
-        }
-        if (markdownType === 'solutions') {
-          problemEdit.markdownSolutionContents = markdown;
-          problemEdit.markdownSolutionPreview = problemEdit.markdownEditor
-            .getConverter()
-            .makeHtml(markdown);
-        }
-      },
-      getInitialContents: (): void => {
-        const lang = payload.statement.language;
-        problemEdit.initialLanguage = lang;
-        problemEdit.statements[lang] = payload.statement.markdown;
-        problemEdit.solutions[lang] = payload.solution.markdown;
-        problemEdit.updateAndRefresh(payload.statement.markdown, 'statements');
-        problemEdit.updateAndRefresh(payload.solution.markdown, 'solutions');
-      },
     },
     data: {
       initialAdmins: payload.admins,
       initialGroups: payload.groupAdmins,
-      initialLanguage: '',
       log: [],
       publishedRevision: {},
-      markdownContents: '',
-      markdownPreview: '',
-      markdownSolutionContents: '',
-      markdownSolutionPreview: '',
-      markdownEditor: <Markdown.Editor>{},
-      solutions: <types.Statements>{},
-      statements: <types.Statements>{},
+      markdownContents: payload.statement.markdown,
+      markdownSolutionContents: payload.solution.markdown,
     },
     components: {
       'omegaup-problem-edit': problem_Edit,
     },
   });
-
-  const imageMapping = {};
-  const markdownConverter = markdown.markdownConverter({
-    preview: true,
-    imageMapping: imageMapping,
-  });
-  problemEdit.getInitialContents();
 });
