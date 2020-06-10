@@ -4511,7 +4511,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ProblemEditPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{LOAD_MATHJAX: bool, payload: ProblemEditPayload, title: string}, entrypoint: string}
      *
      * @omegaup-request-param string $contents
      * @omegaup-request-param string $directory
@@ -4608,6 +4608,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $details = self::getProblemEditDetails($problem, $r->identity);
         $result = [
             'smartyProperties' => [
+                'LOAD_MATHJAX' => true,
                 'payload' => array_merge(
                     $details,
                     self::getCommonPayloadForSmarty()

@@ -9,7 +9,7 @@ declare module '@/third_party/js/pagedown/Markdown.Editor.js' {
   export class Editor {
     hooks: Hooks;
 
-    constructor(markdownConverter: Markdown.Converter, idPostfix: string);
+    constructor(markdownConverter: Markdown.Converter, idPostfix?: string);
 
     getPostfix: () => string;
     getConverter: () => Markdown.Converter;

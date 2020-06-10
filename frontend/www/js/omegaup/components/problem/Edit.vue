@@ -117,14 +117,13 @@
       <div class="tab-pane active" v-if="showTab === 'markdown'">
         <omegaup-problem-markdown
           v-bind:markdown-contents="markdownContents"
-          v-bind:markdown-preview="markdownPreview"
           v-bind:initial-language="data.statement.language"
           v-bind:markdown-type="'statements'"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:source="data.source"
-          v-bind:username="username"
-          v-bind:name="name"
+          v-bind:username="data.problemsetter.username"
+          v-bind:name="data.problemsetter.name"
           v-on:emit-update-markdown-contents="
             (statements, newLanguage, currentMarkdown) =>
               $emit(
@@ -158,7 +157,6 @@
       <div class="tab-pane active" v-if="showTab === 'solution'">
         <omegaup-problem-markdown
           v-bind:markdown-contents="markdownSolutionContents"
-          v-bind:markdown-preview="markdownSolutionPreview"
           v-bind:initial-language="data.solution.language"
           v-bind:markdown-type="'solutions'"
           v-bind:title="data.title"
@@ -270,8 +268,6 @@ import problem_Admins from '../common/Admins.vue';
 import problem_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
-import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
-import * as markdown from '../../markdown';
 
 @Component({
   components: {
@@ -290,22 +286,10 @@ export default class ProblemEdit extends Vue {
   @Prop() markdownContents!: string;
   @Prop() markdownSolutionContents!: string;
   @Prop() initialLanguage!: string;
-  @Prop() username!: string;
-  @Prop() name!: string;
 
   T = T;
   alias = this.data.alias;
   showTab = 'edit';
-  markdownConverter = markdown.markdownConverter({
-    preview: true,
-    imageMapping: {},
-  });
-  markdownEditor: Markdown.Editor = new Markdown.Editor(
-    this.markdownConverter,
-    '-statements',
-  );
-  markdownPreview: string = '';
-  markdownSolutionPreview: string = '';
 
   get activeTab(): string {
     switch (this.showTab) {
@@ -330,31 +314,8 @@ export default class ProblemEdit extends Vue {
     }
   }
 
-  mounted(): void {
-    const markdownConverter = markdown.markdownConverter({
-      preview: true,
-      imageMapping: {},
-    });
-    this.markdownEditor = new Markdown.Editor(markdownConverter, '-statements');
-    this.markdownEditor.run();
-  }
-
   onDownload(): void {
     window.location.href = `/api/problem/download/problem_alias/${this.alias}/`;
-  }
-
-  @Watch('markdownContents')
-  onMarkdownStatementChanged(newValue: string): void {
-    this.markdownPreview = this.markdownEditor
-      .getConverter()
-      .makeHtml(newValue);
-  }
-
-  @Watch('markdownSolutionsContents')
-  onValueMarkdownSolutionChanged(newValue: string): void {
-    this.markdownSolutionPreview = this.markdownEditor
-      .getConverter()
-      .makeHtml(newValue);
   }
 }
 </script>

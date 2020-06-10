@@ -35,10 +35,10 @@
             <div class="tab-content">
               <div class="tab-pane active" v-show="showTab === 'source'">
                 <!-- id-lint off -->
-                <div v-bind:id="`wmd-button-bar-${markdownType}`"></div>
+                <div id="wmd-button-bar-statements"></div>
                 <textarea
                   class="wmd-input"
-                  v-bind:id="`wmd-input-${markdownType}`"
+                  id="wmd-input-statements"
                   v-model="currentMarkdown"
                 ></textarea>
               </div>
@@ -47,7 +47,7 @@
                 <div
                   ref="preview"
                   class="no-bottom-margin statement"
-                  v-bind:id="`wmd-preview-${markdownType}`"
+                  id="wmd-preview-statements"
                   v-html="markdownPreview"
                 ></div>
                 <!-- id-lint on -->
@@ -126,6 +126,8 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import user_Username from '../user/Username.vue';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
+import * as markdown from '../../markdown';
 
 @Component({
   components: {
@@ -141,7 +143,6 @@ export default class ProblemStatementEdit extends Vue {
   @Prop() name!: string;
   @Prop() classname!: string;
   @Prop() markdownContents!: string;
-  @Prop() markdownPreview!: string;
   @Prop() initialLanguage!: string;
   @Prop() markdownType!: string;
 
@@ -153,9 +154,31 @@ export default class ProblemStatementEdit extends Vue {
   errors: string[] = [];
   languages = ['es', 'en', 'pt'];
   statements: types.Statements = {};
+  markdownConverter = markdown.markdownConverter({
+    preview: true,
+    imageMapping: {},
+  });
+  markdownEditor: Markdown.Editor = new Markdown.Editor(
+    this.markdownConverter,
+    '-statements',
+  );
+  markdownPreview: string = '';
 
   mounted(): void {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
+    const markdownConverter = markdown.markdownConverter({
+      preview: true,
+      imageMapping: {},
+    });
+    const preview = this.preview;
+    this.markdownEditor = new Markdown.Editor(
+      this.markdownConverter,
+      '-statements',
+    );
+
+    this.markdownEditor.hooks.chain('onPreviewRefresh', () => {
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, preview]);
+    });
+    this.markdownEditor.run();
   }
 
   getLanguageNameText(language: string): string {
