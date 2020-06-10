@@ -665,7 +665,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
                 if (strpos($tagName, 'problemTag') === 0) {
-                    //Starts with 'problemTag'
+                    // Starts with 'problemTag'
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'tagPrefixRestricted',
                         'name'
