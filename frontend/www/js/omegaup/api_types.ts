@@ -279,26 +279,22 @@ export namespace types {
     ): types.CourseDetailsPayload {
       return (x => {
         x.details = (x => {
-          if (x.assignments)
-            x.assignments = (x => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map(x => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
                 );
-                return x;
-              });
-            })(x.assignments);
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          if (x.start_time)
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.details);
         return x;
@@ -1007,20 +1003,20 @@ export namespace types {
   }
 
   export interface CourseDetails {
-    admission_mode?: string;
+    admission_mode: string;
     alias: string;
-    assignments?: types.CourseAssignment[];
+    assignments: types.CourseAssignment[];
     basic_information_required: boolean;
     description: string;
     finish_time?: Date;
-    isCurator?: boolean;
-    is_admin?: boolean;
+    is_admin: boolean;
+    is_curator: boolean;
     name: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
-    show_scoreboard?: boolean;
-    start_time?: Date;
+    show_scoreboard: boolean;
+    start_time: Date;
     student_count?: number;
   }
 
