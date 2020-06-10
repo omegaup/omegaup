@@ -278,4 +278,27 @@ class Problem {
         // Call api
         \OmegaUp\Controllers\Problem::apiAddTag($r);
     }
+
+    public static function initPublicTags(): void {
+        $tags = [
+            'problemTagArrays',
+            'problemTagBigData',
+            'problemTopicGreedy',
+            'problemTopicHashing',
+            'problemTopicMath',
+            'problemTopicMatrices',
+            'problemTopicMaxFlow',
+            'problemTopicNumberTheory',
+        ];
+        foreach ($tags as $tag) {
+            \OmegaUp\DAO\Tags::create(
+                new \OmegaUp\DAO\VO\Tags(
+                    [
+                        'name' => $tag,
+                        'public' => true,
+                    ]
+                )
+            );
+        }
+    }
 }
