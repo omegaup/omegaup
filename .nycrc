@@ -1,8 +1,13 @@
 {
+  "extension": [
+    ".js",
+    ".ts",
+    ".vue"
+  ],
   "include": [
     "frontend/www/js/**/*.js",
     "frontend/www/js/**/*.ts",
-    "frontend/www/js/**/*.vue"
+    "frontend/www/js/omegaup/components/**/*.vue"
   ],
   "exclude": [
     "frontend/www/js/**/*.test.ts",
