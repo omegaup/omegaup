@@ -25,16 +25,14 @@
               </th>
               <th colspan="2" v-else="">
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
-                  <span
-                    v-bind:class="{
-                      'glyphicon glyphicon-collapse-up':
-                        groupVisible[element.group],
-                      'glyphicon glyphicon-collapse-down': !groupVisible[
-                        element.group
-                      ],
-                    }"
-                  >
-                  </span>
+                  <font-awesome-icon
+                    v-if="groupVisible[element.group]"
+                    v-bind:icon="['fas', 'chevron-circle-up']"
+                  />
+                  <font-awesome-icon
+                    v-else=""
+                    v-bind:icon="['fas', 'chevron-circle-down']"
+                  />
                 </div>
               </th>
               <th class="score">
@@ -207,9 +205,61 @@
   border-radius: 5px;
 }
 .vue-codemirror-wrap {
-  height: 85%;
+  height: 100%;
   .CodeMirror {
     height: 100%;
+  }
+}
+
+#run-details .compile_error {
+  display: none;
+}
+
+.guid {
+  font-family: monospace;
+  padding: 0 0.3em;
+}
+
+#run-details .logs {
+  margin-top: 1em;
+  border-top: 1px dotted black;
+  padding-top: 1em;
+  display: none;
+}
+
+.cases {
+  table {
+    width: 100%;
+
+    tr.group {
+      border-top: 1px solid #ccc;
+
+      td,
+      th {
+        padding: 0.2em inherit 0.2em inherit;
+      }
+    }
+  }
+
+  span.collapse {
+    padding: 0.2em;
+  }
+
+  table {
+    thead th,
+    td.center,
+    th.center {
+      text-align: center;
+    }
+
+    td.score,
+    th.score {
+      text-align: right;
+    }
+
+    pre.stderr {
+      color: #400;
+    }
   }
 }
 </style>
@@ -220,12 +270,22 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faChevronCircleUp,
+  faChevronCircleDown,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faChevronCircleUp);
+library.add(faChevronCircleDown);
+
 interface GroupVisibility {
   [name: string]: boolean;
 }
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-arena-code-view': arena_CodeView,
   },
 })

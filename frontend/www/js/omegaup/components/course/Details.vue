@@ -112,7 +112,9 @@
       </div>
       <div class="card-footer">
         <a
+          data-button-homework
           class="btn btn-primary float-right"
+          v-if="course.is_admin"
           v-bind:href="
             `/course/${course.alias}/edit/#assignments/new/homework/`
           "
@@ -197,7 +199,9 @@
       </div>
       <div class="card-footer">
         <a
+          data-button-exam
           class="btn btn-primary float-right"
+          v-if="course.is_admin"
           v-bind:href="`/course/${course.alias}/edit/#assignments/new/test/`"
           >{{ T.wordsNewExam }}</a
         >

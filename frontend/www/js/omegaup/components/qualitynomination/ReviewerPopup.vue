@@ -84,14 +84,13 @@ export default class ReviewerPopup extends Vue {
   tag = '';
 
   PROBLEM_CATEGORIES = [
-    'problemCategoryOpenResponse',
-    'problemCategoryKarelEducation',
-    'problemCategoryIntroductionToProgramming',
-    'problemCategoryMathematicalProblems',
-    'problemCategoryElementaryDataStructures',
-    'problemCategoryAlgorithmAndNetworkOptimization',
-    'problemCategoryCompetitiveProgramming',
-    'problemCategorySpecializedTopics',
+    'problemLevelAdvancedCompetitiveProgramming',
+    'problemLevelAdvancedSpecializedTopics',
+    'problemLevelBasicIntroductionToProgramming',
+    'problemLevelBasicKarel',
+    'problemLevelIntermediateAnalysisAndDesignOfAlgorithms',
+    'problemLevelIntermediateDataStructuresAndAlgorithms',
+    'problemLevelIntermediateMathsInProgramming',
   ];
 }
 </script>
