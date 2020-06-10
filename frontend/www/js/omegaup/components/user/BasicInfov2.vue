@@ -23,13 +23,13 @@
         </div>
       </div>
 
-      <div class="render-if-email" v-if="profile.email">
+      <div v-if="profile.email">
         <div class="form-group row padding-field">
           <div class="col-sm-3">
             <strong>{{ T.profileEmail }}</strong>
           </div>
           <div class="col-sm-9 field-data">
-            Primary: <strong>{{ profile.email }}</strong
+            Primary: <strong data-email> {{ profile.email }}</strong
             >&nbsp;
           </div>
         </div>
@@ -120,6 +120,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import user_Username from './Username.vue';
 

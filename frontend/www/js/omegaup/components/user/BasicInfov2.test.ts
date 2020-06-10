@@ -1,16 +1,18 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
+import { types } from '../../api_types';
 
 import user_BasicInfo from './BasicInfov2.vue';
 
 describe('BasicInfov2.vue', () => {
   it('Should display user email', () => {
+    const email = 'test@omegaup.com';
     const wrapper = shallowMount(user_BasicInfo, {
       propsData: {
-        profile: { email: 'test@omegaup.com' },
-        rank: null,
+        profile:  <types.UserProfile>{ email: email },
+        rank: 'Ω',
       },
     });
-    expect(wrapper.find('.render-if-email').exists()).toBe(true);
+    expect(wrapper.find('[data-email]').text()).toBe(email);
   });
 });
