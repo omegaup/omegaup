@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-    <h5 class="card-header">
+    <h5 class="card-header" v-if="title">
       {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
     </h5>
     <div class="card-body text-center" v-if="sortOptions.length > 0">
