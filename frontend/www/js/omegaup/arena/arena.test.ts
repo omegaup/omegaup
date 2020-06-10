@@ -52,10 +52,8 @@ describe('arena', () => {
 
     it('can be instantiated', () => {
       const options = arena.GetDefaultOptions();
-      options.contestAlias = 'test';
 
       const arenaInstance = new arena.Arena(options);
-      expect(arenaInstance.options.contestAlias).toEqual('test');
       expect(arenaInstance.problemsetAdmin).toEqual(false);
     });
   });
