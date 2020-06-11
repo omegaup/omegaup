@@ -659,9 +659,30 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $tag = \OmegaUp\DAO\Tags::getByName($tagName);
         if (is_null($tag)) {
-            $tag = new \OmegaUp\DAO\VO\Tags([
-                'name' => $tagName,
-            ]);
+            if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
+                $tag = new \OmegaUp\DAO\VO\Tags([
+                    'name' => $tagName,
+                    'public' => false,
+                ]);
+            } else {
+                if ($isPublic) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'newPublicTagsNotAllowed',
+                        'public'
+                    );
+                }
+                if (strpos($tagName, 'problemTag') === 0) {
+                    // Starts with 'problemTag'
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'tagPrefixRestricted',
+                        'name'
+                    );
+                }
+                $tag = new \OmegaUp\DAO\VO\Tags([
+                    'name' => $tagName,
+                    'public' => false,
+                ]);
+            }
             \OmegaUp\DAO\Tags::create($tag);
         }
 

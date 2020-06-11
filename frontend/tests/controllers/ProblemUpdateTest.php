@@ -649,6 +649,28 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
     }
 
+    public function testAddOnlyPrivateTags() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
+            'visibility' => 0
+        ]));
+        $login = self::login($problemData['author']);
+        \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'name' => 'test-tag',
+            'public' => false,
+        ]));
+
+        $response = \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'name' => 'test-tag',
+        ]));
+        $this->assertTrue($response['tags'][0]['public']);
+        $this->assertFalse($response['tags'][1]['public']);
+    }
+
     /**
      * Tests that problems cannot change their visibility under some scenarios.
      */
@@ -847,7 +869,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['problem']->alias,
             'name' => 'foo',
-            'public' => 'true',
+            'public' => false,
         ]));
         $this->assertEquals(
             [
@@ -857,7 +879,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 ],
                 [
                     'name' => 'foo',
-                    'public' => '1',
+                    'public' => false,
                 ],
             ],
             \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
@@ -884,6 +906,17 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemData['problem']->alias,
             ]))['tags']
         );
+
+        try {
+            \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+                'name' => 'problemTagTestTag',
+                'public' => false,
+            ]));
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('tagRestricted', $e->getMessage());
+        }
 
         try {
             \OmegaUp\Controllers\Problem::apiRemoveTag(new \OmegaUp\Request([

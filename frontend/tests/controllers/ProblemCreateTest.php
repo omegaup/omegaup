@@ -14,6 +14,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
+        \OmegaUp\Test\Factories\Problem::initPublicTags();
     }
 
     /**
@@ -480,7 +481,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
         $expectedTags = [
-            ['tagname' => 'math', 'public' => true],
+            ['tagname' => 'problemTopicMath', 'public' => true],
             ['tagname' => 'geometry', 'public' => false],
         ];
 
