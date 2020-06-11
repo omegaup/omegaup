@@ -4459,6 +4459,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'modes' => \OmegaUp\Controllers\Problem::VALID_SORTING_MODES,
                     'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
                     'tags' => $tags,
+                    'publicTags' => $publicTags,
                     'tagData' => $tagData,
                 ],
                 'title' => 'omegaupTitleProblems',
