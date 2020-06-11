@@ -8,7 +8,7 @@
         {{ T.wordsLanguage }}
       </label>
       <div class="col-sm-4">
-        <select class="form-control" v-model="selectedLanguage">
+        <select class="form-control" name="language" v-model="selectedLanguage">
           <option v-bind:value="key" v-for="(language, key) in languages">{{
             language
           }}</option>
