@@ -8,7 +8,7 @@
         {{ T.wordsLanguage }}
       </label>
       <div class="col-sm-4">
-        <select name="language" class="form-control" v-model="selectedLanguage">
+        <select class="form-control" v-model="selectedLanguage">
           <option v-bind:value="key" v-for="(language, key) in languages">{{
             language
           }}</option>
@@ -76,10 +76,15 @@ export default class ArenaRunSubmit extends Vue {
   @Prop() languages!: omegaup.Languages;
   @Prop({ default: 0 }) submissionGapSecondsRemaining!: number;
   @Prop() inputLimit!: number;
+  @Prop() preferredLanguage!: string;
 
   T = T;
   selectedLanguage = '';
   code = '';
+
+  mounted(): void {
+    this.selectedLanguage = this.preferredLanguage;
+  }
 
   get buttonDescription(): string {
     if (this.submissionGapSecondsRemaining < 1) {
@@ -181,6 +186,12 @@ export default class ArenaRunSubmit extends Vue {
       return;
     }
     this.$emit('submit-run', this.code, this.selectedLanguage);
+  }
+
+  clearInput(): void {
+    const input = this.inputFile;
+    input.type = 'text';
+    input.type = 'file';
   }
 }
 </script>

@@ -132,62 +132,6 @@ OmegaUp.on('ready', () => {
         }
       });
   }
-
-  $('#submit select[name="language"]').on('change', () => {
-    var lang = String($('#submit select[name="language"]').val());
-    if (lang.startsWith('cpp')) {
-      $('#submit-filename-extension').text('.cpp');
-    } else if (lang.startsWith('c-')) {
-      $('#submit-filename-extension').text('.c');
-    } else if (lang.startsWith('py')) {
-      $('#submit-filename-extension').text('.py');
-    } else if (lang && lang != 'cat') {
-      $('#submit-filename-extension').text('.' + lang);
-    } else {
-      $('#submit-filename-extension').text();
-    }
-  });
-
-  $('#submit').on('submit', () => {
-    if (!$('#submit textarea[name="code"]').val()) return false;
-
-    $('#submit input').attr('disabled', 'disabled');
-    api.Run.create({
-      contest_alias: arenaInstance.options.contestAlias,
-      problem_alias: arenaInstance.currentProblem.alias,
-      language: $('#submit select[name="language"]').val(),
-      source: $('#submit textarea[name="code"]').val(),
-    })
-      .then(run => {
-        arenaInstance.trackRun({
-          status: 'new',
-          guid: run.guid,
-          alias: arenaInstance.currentProblem.alias,
-          time: new Date(),
-          score: 0,
-          submit_delay: 0,
-          penalty: 0,
-          runtime: 0,
-          memory: 0,
-          username: arenaInstance.options.payload.currentUsername,
-          classname: arenaInstance.options.payload.userClassname,
-          country: arenaInstance.options.payload.userCountry,
-          language: String($('#submit select[name="language"]').val()),
-          verdict: 'JE',
-        });
-        arenaInstance.updateRunFallback(run.guid);
-
-        $('#submit input').prop('disabled', false);
-        arenaInstance.hideOverlay();
-      })
-      .catch(run => {
-        alert(run.error);
-        $('#submit input').prop('disabled', false);
-      });
-
-    return false;
-  });
-
   $('#rejudge-problem').on('click', () => {
     if (
       confirm(

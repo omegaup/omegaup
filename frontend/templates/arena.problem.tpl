@@ -119,7 +119,7 @@
   </div>
 </div>
 <div id="overlay">
-  {include file='arena.runsubmit.tpl' inline}
+  <div id="run-submit"></div>
   <div id="run-details"></div>
 </div>
 <div id="footer"></div>

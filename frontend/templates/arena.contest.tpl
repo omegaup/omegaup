@@ -112,7 +112,7 @@
 {include file='arena.clarification_list.tpl' contest=true inline}
 		</div>
 		<div id="overlay">
-{include file='arena.runsubmit.tpl' inline}
+			<div id="run-submit"></div>
 {include file='arena.clarification.tpl' admin=$admin inline}
 			<div id="run-details"></div>
 		</div>
