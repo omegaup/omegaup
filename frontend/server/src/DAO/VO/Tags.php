@@ -18,6 +18,7 @@ class Tags extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'tag_id' => true,
         'name' => true,
+        'public' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -40,6 +41,11 @@ class Tags extends \OmegaUp\DAO\VO\VO {
                 $data['name']
             );
         }
+        if (isset($data['public'])) {
+            $this->public = boolval(
+                $data['public']
+            );
+        }
     }
 
     /**
@@ -57,4 +63,11 @@ class Tags extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $name = null;
+
+    /**
+     * Indica si el tag es público o no. Los usuarios solo pueden agregar tags privados
+     *
+     * @var bool
+     */
+    public $public = false;
 }

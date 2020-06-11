@@ -5,6 +5,11 @@
  * @author joemmanuel
  */
 class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
+        \OmegaUp\Test\Factories\Problem::initPublicTags();
+    }
+
     /**
      * Gets the list of problems
      */
@@ -82,6 +87,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemListWithTags() {
         // Get 3 problems
         $n = 3;
+        $tags = [
+            'problemTopicGreedy',
+            'problemTopicHashing',
+            'problemTopicMath',
+            'problemTopicMatrices',
+            'problemTopicMaxFlow',
+            'problemTopicNumberTheory',
+        ];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
@@ -89,7 +102,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             for ($j = 0; $j <= $i; $j++) {
                 \OmegaUp\Test\Factories\Problem::addTag(
                     $problemData[$i],
-                    "tag-$j",
+                    $tags[$j],
                     1 /* public */
                 );
             }
@@ -102,7 +115,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         for ($j = 0; $j < $n; $j++) {
             \OmegaUp\Test\Factories\Problem::addTag(
                 $privateProblemData,
-                "tag-$j",
+                $tags[$j],
                 1 /* public */
             );
         }
@@ -114,7 +127,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         for ($j = 0; $j < $n; $j++) {
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => "tag-$j",
+                'tag' => $tags[$j],
             ]));
             // $n public problems but not the private problem that has all tags.
             // But only problems $j or later have tag $j.
@@ -122,17 +135,17 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // Test multiple tags at a time
-        $tags = [];
+        $expectedTags = [];
         for ($j = 0; $j < $n; $j++) {
-            $tags[] = "tag-$j";
-            $plainTags = implode(',', $tags);
+            $expectedTags[] = $tags[$j];
+            $plainTags = implode(',', $expectedTags);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'tag' => $plainTags,
             ]));
             // $n public problems but not the private problem that has all tags.
-            // But only problems $j or later have tags 0 through $j.
+            // But only problems $j or later have tags[0] through tags[$j].
             $this->assertCount($n - $j, $response['results']);
         }
     }
@@ -150,6 +163,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // - Each one will have i tags, where i equals the number of the problem
         $n = 5;
         $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
+        $tags = [
+            'problemTopicGreedy',
+            'problemTopicHashing',
+            'problemTopicMath',
+            'problemTopicMatrices',
+            'problemTopicMaxFlow',
+            'problemTopicNumberTheory',
+        ];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
                 'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PROMOTED,
@@ -158,7 +179,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             for ($j = 0; $j <= $i; $j++) {
                 \OmegaUp\Test\Factories\Problem::addTag(
                     $problemData[$i],
-                    "test-tag-$j",
+                    $tags[$j],
                     1 /* public */
                 );
             }
@@ -234,7 +255,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         //                         tag and languages
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => 'test-tag-0',
+            'tag' => $tags[0],
             'programming_languages' => 'kp,kj',
         ]));
         $this->assertCount(3, $response['results']);
@@ -246,7 +267,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // - Sorted by popularity
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => 'test-tag-0',
+            'tag' => $tags[0],
             'programming_languages' => 'kp,kj',
             'difficulty_range' => '0,3',
             'order_by' => 'submissions',
@@ -267,7 +288,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // - Sorted by quality
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => 'test-tag-0,test-tag-3',
+            'tag' => "$tags[0],$tags[3]",
             'require_all_tags' => false,
             'difficulty_range' => '0,4',
             'order_by' => 'quality',
@@ -285,7 +306,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // - Sorted by quality
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login[0]->auth_token,
-            'tag' => ['test-tag-2', 'test-tag-3'],
+            'tag' => [$tags[2], $tags[3]],
             'require_all_tags' => false,
             'difficulty_range' => '1,4',
             'order_by' => 'quality',
@@ -348,16 +369,16 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $all_problems = [$problem, $private_problem,
                          $problem_a, $private_problem_a, $problem_b, $private_problem_b];
-        // Tag each problem with 3 tags, 2 public and 1 private.
+        // Tag each problem with 3 private tags.
         foreach ($all_problems as $problem) {
             \OmegaUp\Test\Factories\Problem::addTag(
                 $problem,
-                'a',
+                'problemTagArrays',
                 1 /* public */
             );
             \OmegaUp\Test\Factories\Problem::addTag(
                 $problem,
-                'b',
+                'problemTagBigData',
                 1 /* public */
             );
             \OmegaUp\Test\Factories\Problem::addTag(
@@ -374,9 +395,9 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             4,      // User B sees 3 public problems and private_problem_b
             3,      // Random user sees only 3 public problems
         ];
-        // Same thing when searching for tags "a" and "b", since tags a and b are public
+        // Same thing when searching for tags "problemTagArrays" and "problemTagBigData", since tags problemTagArrays and problemTagBigData are public
         $tag_ab_results = $tag_a_results;
-        // But searching for tags "a" and "c" won't give other users' problems
+        // But searching for tags "problemTagArrays" and "c" won't give other users' problems
         // because tag "c" is private.
         $tag_ac_results = [
             6,      // admin can still see all problems
@@ -389,19 +410,19 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => 'a',
+                'tag' => 'problemTagArrays',
             ]));
             $this->assertCount($tag_a_results[$i], $response['results']);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => 'a,b',
+                'tag' => 'problemTagArrays,problemTagBigData',
             ]));
             $this->assertCount($tag_ab_results[$i], $response['results']);
 
             $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'tag' => 'a,c',
+                'tag' => 'problemTagArrays,c',
             ]));
             $this->assertCount($tag_ac_results[$i], $response['results']);
         }

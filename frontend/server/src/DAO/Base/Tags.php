@@ -32,13 +32,15 @@ abstract class Tags {
             UPDATE
                 `Tags`
             SET
-                `name` = ?
+                `name` = ?,
+                `public` = ?
             WHERE
                 (
                     `tag_id` = ?
                 );';
         $params = [
             $Tags->name,
+            intval($Tags->public),
             intval($Tags->tag_id),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -61,7 +63,8 @@ abstract class Tags {
         $sql = '
             SELECT
                 `Tags`.`tag_id`,
-                `Tags`.`name`
+                `Tags`.`name`,
+                `Tags`.`public`
             FROM
                 `Tags`
             WHERE
@@ -144,7 +147,8 @@ abstract class Tags {
         $sql = '
             SELECT
                 `Tags`.`tag_id`,
-                `Tags`.`name`
+                `Tags`.`name`,
+                `Tags`.`public`
             FROM
                 `Tags`
         ';
@@ -195,12 +199,15 @@ abstract class Tags {
         $sql = '
             INSERT INTO
                 `Tags` (
-                    `name`
+                    `name`,
+                    `public`
                 ) VALUES (
+                    ?,
                     ?
                 );';
         $params = [
             $Tags->name,
+            intval($Tags->public),
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
