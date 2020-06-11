@@ -32,10 +32,10 @@
       ></omegaup-arena-code-view>
     </div>
     <div class="form-group row">
-      <label class="col-sm-4 col-form-label">
+      <label class="col-sm-3 col-form-label">
         {{ T.arenaRunSubmitUpload }}
       </label>
-      <div class="col-sm-6">
+      <div class="col-sm-7">
         <input type="file" name="file" ref="inputFile" />
       </div>
     </div>
@@ -44,7 +44,7 @@
         <input
           type="submit"
           class="btn btn-primary"
-          v-bind:disabled="submissionGapSecondsRemaining > 0"
+          v-bind:disabled="secondsRemaining > 0"
           v-bind:value="buttonDescription"
         />
       </div>
@@ -60,7 +60,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
@@ -81,17 +81,16 @@ export default class ArenaRunSubmit extends Vue {
   T = T;
   selectedLanguage = '';
   code = '';
-
-  mounted(): void {
-    this.selectedLanguage = this.preferredLanguage;
-  }
+  secondsRemaining = this.submissionGapSecondsRemaining;
+  submissionGapInterval: number = 0;
 
   get buttonDescription(): string {
-    if (this.submissionGapSecondsRemaining < 1) {
+    if (this.secondsRemaining < 1) {
       return T.wordsSend;
     }
+
     return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-      submissionGap: this.submissionGapSecondsRemaining,
+      submissionGap: this.secondsRemaining,
     });
   }
 
@@ -100,6 +99,9 @@ export default class ArenaRunSubmit extends Vue {
   }
 
   get extension(): string {
+    if (!this.selectedLanguage) {
+      return '';
+    }
     if (this.selectedLanguage.startsWith('cpp')) {
       return '.cpp';
     }
@@ -109,17 +111,37 @@ export default class ArenaRunSubmit extends Vue {
     if (this.selectedLanguage.startsWith('py')) {
       return '.py';
     }
-    if (this.selectedLanguage && this.selectedLanguage !== 'cat') {
+    if (this.selectedLanguage !== 'cat') {
       return `.${this.selectedLanguage}`;
     }
     return '';
   }
 
+  @Watch('preferredLanguage')
+  onPreferredLanguageChanged(newValue: string): void {
+    this.selectedLanguage = newValue;
+  }
+
+  @Watch('submissionGapSecondsRemaining')
+  onSubmissionGapChanged(newValue: number): void {
+    this.secondsRemaining = this.submissionGapSecondsRemaining;
+    if (this.secondsRemaining < 1) return;
+    if (this.submissionGapInterval) {
+      window.clearInterval(this.submissionGapInterval);
+    }
+    this.submissionGapInterval = window.setInterval(() => {
+      if (this.secondsRemaining < 1) {
+        window.clearInterval(this.submissionGapInterval);
+      }
+      this.secondsRemaining--;
+    }, 1000);
+  }
+
   onSubmit(ev: Event): void {
-    if (this.submissionGapSecondsRemaining > 0) {
+    if (this.secondsRemaining > 0) {
       alert(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-          submissionGap: this.submissionGapSecondsRemaining,
+          submissionGap: this.secondsRemaining,
         }),
       );
       return;
@@ -186,12 +208,13 @@ export default class ArenaRunSubmit extends Vue {
       return;
     }
     this.$emit('submit-run', this.code, this.selectedLanguage);
+    this.clearInput();
+    this.code = '';
   }
 
   clearInput(): void {
-    const input = this.inputFile;
-    input.type = 'text';
-    input.type = 'file';
+    this.inputFile.type = 'text';
+    this.inputFile.type = 'file';
   }
 }
 </script>

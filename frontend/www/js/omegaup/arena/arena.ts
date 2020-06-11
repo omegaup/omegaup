@@ -546,7 +546,7 @@ export class Arena {
           return createElement('omegaup-arena-runsubmit', {
             props: {
               languages: this.languages,
-              submissionGapSecondsRemaining: 0,
+              submissionGapSecondsRemaining: this.submissionGapSecondsRemaining,
               preferredLanguage: this.preferredLanguage,
             },
             on: {
@@ -617,6 +617,7 @@ export class Arena {
         data: {
           languages: [],
           preferredLanguage: '',
+          submissionGapSecondsRemaining: 0,
         },
         components: {
           'omegaup-arena-runsubmit': arena_RunSubmit,
@@ -2028,23 +2029,11 @@ export class Arena {
         );
       }
     }
-    if (this.submissionGapInterval) {
-      clearInterval(this.submissionGapInterval);
-      this.submissionGapInterval = null;
-    }
-    this.submissionGapInterval = setInterval(() => {
-      const submissionGapSecondsRemaining = Math.ceil(
+    if (this.runSubmitView) {
+      this.runSubmitView.submissionGapSecondsRemaining = Math.ceil(
         (nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
       );
-      if (this.runSubmitView) {
-        this.runSubmitView.submissionGapSecondsRemaining = submissionGapSecondsRemaining;
-      }
-      if (submissionGapSecondsRemaining < 1) {
-        clearInterval(
-          <ReturnType<typeof setTimeout>>this.submissionGapInterval,
-        );
-      }
-    }, 1000);
+    }
   }
 
   computeProblemsetArg(): { contest_alias?: string; problemset_id?: number } {
