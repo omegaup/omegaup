@@ -16,6 +16,8 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-tags', {
         props: {
           initialTags: payload.tags,
+          publicTags: payload.publicTags,
+          levelTags: payload.levelTags,
           initialSelectedTags: payload.selectedTags,
           alias: payload.alias,
           title: payload.title,
@@ -23,6 +25,21 @@ OmegaUp.on('ready', () => {
           canAddNewTags: true,
         },
         on: {
+          'update-problem-level': (levelTag?: string) => {
+            const params = levelTag
+              ? {
+                  problemAlias: payload.alias,
+                  levelTag,
+                }
+              : {
+                  problemAlias: payload.alias,
+                };
+            api.Problem.updateProblemLevel(params)
+              .then(response => {
+                ui.success(T.problemLevelUpdated);
+              })
+              .catch(ui.apiError);
+          },
           'add-tag': (alias: string, tagname: string, isPublic: boolean) => {
             api.Problem.addTag({
               problem_alias: alias,

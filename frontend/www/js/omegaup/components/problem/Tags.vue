@@ -42,6 +42,22 @@
           </button>
         </div>
         <div class="form-group">
+          <label>{{ T.wordsLevel }}</label>
+          <select class="form-control" v-model="problemLevelTag">
+            <option v-for="levelTag in levelTags" v-bind:value="levelTag">
+              {{ T[levelTag] }}
+            </option>
+          </select>
+          <span class="help-block">{{ T.levelTagHelp }}</span>
+          <button
+            type="button"
+            class="btn btn-primary m-1"
+            v-on:click.prevent="onUpdateProblemLevel"
+          >
+            {{ T.updateProblemLevel }}
+          </button>
+        </div>
+        <div class="form-group">
           <label class="switch-container">
             <div class="switch">
               <input type="checkbox" v-model="allowTags" />
@@ -195,6 +211,8 @@ import { types } from '../../api_types';
 @Component
 export default class ProblemTags extends Vue {
   @Prop() initialTags!: omegaup.Tag[];
+  @Prop() publicTags!: string[];
+  @Prop() levelTags!: string[];
   @Prop({ default: [] }) initialSelectedTags!: types.SelectedTag[];
   @Prop() alias!: string;
   @Prop({ default: '' }) title!: string;
@@ -207,6 +225,7 @@ export default class ProblemTags extends Vue {
   allowTags = this.initialAllowTags;
   public = false;
   tagname = '';
+  problemLevelTag = '';
 
   get selectedTagsList(): string {
     return JSON.stringify(this.selectedTags);
@@ -217,6 +236,12 @@ export default class ProblemTags extends Vue {
     this.tags = this.tags.filter(val => val.name !== tagname);
     if (this.canAddNewTags) {
       this.$emit('add-tag', this.alias, tagname, isPublic);
+    }
+  }
+
+  onUpdateProblemLevel(): void {
+    if (this.problemLevelTag !== '') {
+      this.$emit('update-problem-level', this.problemLevelTag);
     }
   }
 

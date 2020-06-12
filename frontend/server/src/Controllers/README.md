@@ -144,6 +144,7 @@
   - [`/api/problem/stats/`](#apiproblemstats)
   - [`/api/problem/tags/`](#apiproblemtags)
   - [`/api/problem/update/`](#apiproblemupdate)
+  - [`/api/problem/updateProblemLevel/`](#apiproblemupdateproblemlevel)
   - [`/api/problem/updateSolution/`](#apiproblemupdatesolution)
   - [`/api/problem/updateStatement/`](#apiproblemupdatestatement)
   - [`/api/problem/versions/`](#apiproblemversions)
@@ -2979,6 +2980,23 @@ Update problem contents
 | Name       | Type      |
 | ---------- | --------- |
 | `rejudged` | `boolean` |
+
+## `/api/problem/updateProblemLevel/`
+
+### Description
+
+Updates the problem level of a problem
+
+### Parameters
+
+| Name           | Type    | Description |
+| -------------- | ------- | ----------- |
+| `problemAlias` | `mixed` |             |
+| `levelTag`     | `mixed` |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/problem/updateSolution/`
 

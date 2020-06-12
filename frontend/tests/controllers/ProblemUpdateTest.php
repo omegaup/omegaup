@@ -14,6 +14,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
+        \OmegaUp\Test\Factories\Problem::initPublicTags();
     }
 
     /**
@@ -58,6 +59,42 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['problem']->problem_id
         );
         $this->assertEquals(2, count($problemLanguages));
+    }
+
+    /**
+     * Test for updating the level of a problem
+     */
+    public function testUpdateProblemLevel() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAuthor = $problemData['author'];
+        $login = self::login($problemAuthor);
+
+        $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+            $problemData['problem']
+        );
+        $this->assertNull($problemLevel);
+
+        $selectedLevel = 'problemLevelBasicKarel';
+        \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problemAlias' => $problemData['problem']->alias,
+            'levelTag' => $selectedLevel,
+        ]));
+        $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+            $problemData['problem']
+        );
+        $this->assertEquals($selectedLevel, $problemLevel);
+
+        $selectedLevel = 'problemLevelBasicIntroductionToProgramming';
+        \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problemAlias' => $problemData['problem']->alias,
+            'levelTag' => $selectedLevel,
+        ]));
+        $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+            $problemData['problem']
+        );
+        $this->assertEquals($selectedLevel, $problemLevel);
     }
 
     public function testUpdateProblemTitleAndContents() {
