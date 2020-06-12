@@ -47,6 +47,8 @@
         <table class="table mb-0">
           <thead>
             <tr>
+              <th scope="col" class="text-center"></th>
+              <th scope="col" class="text-center">{{ T.wordsID }}</th>
               <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
               <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
               <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
@@ -54,13 +56,18 @@
           </thead>
           <tbody>
             <tr v-for="problem in problems">
-              <td class="d-flex align-items-center">
+              <td class="align-middle">
                 <input
                   type="checkbox"
                   v-model="selectedProblems"
                   v-bind:disabled="problem.visibility === -10"
                   v-bind:value="problem.alias"
                 />
+              </td>
+              <td class="text-center align-middle">
+                {{ problem.problem_id }}
+              </td>
+              <td class="d-flex align-items-center">
                 <div class="d-inline-block ml-2">
                   <a
                     class="mr-1"
