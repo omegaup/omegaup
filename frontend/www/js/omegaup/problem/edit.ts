@@ -5,7 +5,6 @@ import Vue from 'vue';
 import problem_Edit from '../components/problem/Edit.vue';
 import * as ui from '../ui';
 import * as api from '../api';
-import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemEditPayload();
@@ -15,11 +14,12 @@ OmegaUp.on('ready', () => {
   if (payload.statusSuccess) {
     ui.success(T.problemEditUpdatedSuccessfully);
   }
-  const lang = payload.statement.language;
-  const statements: types.Statements = {};
-  const solutions: types.Statements = {};
-  statements[lang] = payload.statement.markdown;
-  solutions[lang] = payload.solution.markdown;
+  const statements: types.Statements = {
+    [payload.statement.language]: payload.statement.markdown,
+  };
+  const solutions: types.Statements = {
+    [payload.statement.language]: payload.solution.markdown,
+  };
   const problemEdit = new Vue({
     el: '#main-container',
     render: function(createElement) {
@@ -29,7 +29,7 @@ OmegaUp.on('ready', () => {
           originalVisibility: payload.visibility,
           initialAdmins: this.initialAdmins,
           initialGroups: this.initialGroups,
-          initialLanguage: lang,
+          initialLanguage: payload.statement.language,
           log: this.log,
           publishedRevision: this.publishedRevision,
           value: this.publishedRevision,
@@ -229,8 +229,8 @@ OmegaUp.on('ready', () => {
     data: {
       initialAdmins: payload.admins,
       initialGroups: payload.groupAdmins,
-      log: [],
-      publishedRevision: {},
+      log: <types.ProblemVersion[]>payload.log,
+      publishedRevision: <types.ProblemVersion>payload.publishedRevision,
       markdownContents: payload.statement.markdown,
       markdownSolutionContents: payload.solution.markdown,
     },

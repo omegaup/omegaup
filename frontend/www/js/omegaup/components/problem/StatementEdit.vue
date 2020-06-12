@@ -16,63 +16,61 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div>
-            <ul class="nav nav-tabs">
-              <li
-                v-bind:class="{ active: showTab === 'source' }"
-                v-on:click="showTab = 'source'"
-              >
-                <a data-toggle="tab">{{ T.wordsSource }}</a>
-              </li>
-              <li
-                v-bind:class="{ active: showTab === 'preview' }"
-                v-on:click="showTab = 'preview'"
-              >
-                <a data-toggle="tab">{{ T.wordsPreview }}</a>
-              </li>
-            </ul>
+          <ul class="nav nav-tabs">
+            <li
+              v-bind:class="{ active: showTab === 'source' }"
+              v-on:click="showTab = 'source'"
+            >
+              <a data-toggle="tab">{{ T.wordsSource }}</a>
+            </li>
+            <li
+              v-bind:class="{ active: showTab === 'preview' }"
+              v-on:click="showTab = 'preview'"
+            >
+              <a data-toggle="tab">{{ T.wordsPreview }}</a>
+            </li>
+          </ul>
 
-            <div class="tab-content">
-              <div class="tab-pane active" v-show="showTab === 'source'">
-                <!-- id-lint off -->
-                <div id="wmd-button-bar-statements"></div>
-                <textarea
-                  class="wmd-input"
-                  id="wmd-input-statements"
-                  v-model="currentMarkdown"
-                ></textarea>
-              </div>
-              <div class="tab-pane active" v-show="showTab === 'preview'">
-                <h1 class="title text-center">{{ title }}</h1>
-                <div
-                  ref="preview"
-                  class="no-bottom-margin statement"
-                  id="wmd-preview-statements"
-                  v-html="markdownPreview"
-                ></div>
-                <!-- id-lint on -->
-                <template v-if="markdownType === 'statements'">
-                  <hr />
-                  <div>
-                    <em
-                      >{{ T.wordsSource }}:
-                      <span class="source">{{ source }}</span>
-                    </em>
-                  </div>
-                  <div>
-                    <em
-                      >{{ T.wordsProblemsetter }}:
-                      <a class="problemsetter">
-                        <omegaup-user-username
-                          v-bind:classname="classname"
-                          v-bind:linkify="true"
-                          v-bind:username="username"
-                        ></omegaup-user-username>
-                      </a>
-                    </em>
-                  </div>
-                </template>
-              </div>
+          <div class="tab-content">
+            <div class="tab-pane active" v-show="showTab === 'source'">
+              <!-- id-lint off -->
+              <div id="wmd-button-bar-statements"></div>
+              <textarea
+                class="wmd-input"
+                id="wmd-input-statements"
+                v-model="currentMarkdown"
+              ></textarea>
+            </div>
+            <div class="tab-pane active" v-show="showTab === 'preview'">
+              <h1 class="title text-center">{{ title }}</h1>
+              <div
+                ref="preview"
+                class="no-bottom-margin statement"
+                id="wmd-preview-statements"
+                v-html="markdownPreview"
+              ></div>
+              <!-- id-lint on -->
+              <template v-if="markdownType === 'statements'">
+                <hr />
+                <div>
+                  <em
+                    >{{ T.wordsSource }}:
+                    <span class="source">{{ source }}</span>
+                  </em>
+                </div>
+                <div>
+                  <em
+                    >{{ T.wordsProblemsetter }}:
+                    <a class="problemsetter">
+                      <omegaup-user-username
+                        v-bind:classname="classname"
+                        v-bind:linkify="true"
+                        v-bind:username="username"
+                      ></omegaup-user-username>
+                    </a>
+                  </em>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -129,6 +127,15 @@ import user_Username from '../user/Username.vue';
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
 import * as markdown from '../../markdown';
 
+const markdownConverter = markdown.markdownConverter({
+  preview: true,
+  imageMapping: {},
+});
+const markdownEditor: Markdown.Editor = new Markdown.Editor(
+  markdownConverter,
+  '-statements',
+);
+
 @Component({
   components: {
     'omegaup-user-username': user_Username,
@@ -154,31 +161,13 @@ export default class ProblemStatementEdit extends Vue {
   errors: string[] = [];
   languages = ['es', 'en', 'pt'];
   statements: types.Statements = {};
-  markdownConverter = markdown.markdownConverter({
-    preview: true,
-    imageMapping: {},
-  });
-  markdownEditor: Markdown.Editor = new Markdown.Editor(
-    this.markdownConverter,
-    '-statements',
-  );
   markdownPreview: string = '';
 
   mounted(): void {
-    const markdownConverter = markdown.markdownConverter({
-      preview: true,
-      imageMapping: {},
+    markdownEditor.hooks.chain('onPreviewRefresh', () => {
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
     });
-    const preview = this.preview;
-    this.markdownEditor = new Markdown.Editor(
-      this.markdownConverter,
-      '-statements',
-    );
-
-    this.markdownEditor.hooks.chain('onPreviewRefresh', () => {
-      MathJax.Hub.Queue(['Typeset', MathJax.Hub, preview]);
-    });
-    this.markdownEditor.run();
+    markdownEditor.run();
   }
 
   getLanguageNameText(language: string): string {

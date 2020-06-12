@@ -1272,15 +1272,7 @@ export namespace types {
       name: string;
       username: string;
     };
-    publishedRevision?: {
-      author: { email?: string; name?: string; time?: Date };
-      commit: string;
-      committer: { email?: string; name?: string; time?: Date };
-      message?: string;
-      parents?: string[];
-      tree?: { [key: string]: string };
-      version?: string;
-    };
+    publishedRevision?: types.ProblemVersion;
     selectedTags: { public: boolean; tagname: string }[];
     solution: types.ProblemStatement;
     source: string;
