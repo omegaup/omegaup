@@ -1230,6 +1230,7 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
+    problem_id?: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1260,6 +1261,7 @@ export namespace types {
     accepted: number;
     admin?: boolean;
     alias: string;
+    allow_user_add_tags: boolean;
     commit: string;
     creation_date: Date;
     difficulty?: number;
@@ -1275,6 +1277,7 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
+    problem_id?: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1305,9 +1308,9 @@ export namespace types {
   }
 
   export interface ProblemDetailsv2Payload {
+    nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
     user: types.UserInfoForProblem;
-    nominationStatus?: types.NominationStatus;
   }
 
   export interface ProblemEditPayload {
@@ -1429,6 +1432,7 @@ export namespace types {
       time_limit: string;
     };
     points: number;
+    problem_id?: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1449,14 +1453,15 @@ export namespace types {
     difficulty?: number;
     difficulty_histogram: number[];
     points: number;
+    problem_id: number;
     quality?: number;
     quality_histogram: number[];
+    quality_seal: boolean;
     ratio: number;
     score: number;
-    tags: { source: string; name: string }[];
+    tags: { name: string; source: string }[];
     title: string;
     visibility: number;
-    quality_seal: boolean;
   }
 
   export interface ProblemListPayload {
@@ -1502,16 +1507,16 @@ export namespace types {
 
   export interface ProblemSettings {
     cases: { [key: string]: { in: string; out: string; weight?: number } };
-    limits: types.LimitsSettings;
     interactive?: types.InteractiveSettings;
+    limits: types.LimitsSettings;
     validator: {
-      name: string;
-      tolerance?: number;
       custom_validator?: {
-        source: string;
         language: string;
         limits?: types.LimitsSettings;
+        source: string;
       };
+      name: string;
+      tolerance?: number;
     };
   }
 
