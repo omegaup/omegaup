@@ -481,7 +481,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
         $expectedTags = [
-            ['tagname' => 'problemTopicMath', 'public' => true],
+            ['tagname' => 'problemTagMatrices', 'public' => true],
             ['tagname' => 'geometry', 'public' => false],
         ];
 

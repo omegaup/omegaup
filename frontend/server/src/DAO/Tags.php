@@ -44,4 +44,35 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
         }
         return $result;
     }
+
+    /**
+     * Finds all public tags beginning with a certain parameter
+     *
+     * @return list<string>
+     */
+    public static function findPublicTagsByPrefix(
+        string $prefix
+    ) {
+        $sql = "
+            SELECT
+                name
+            FROM
+                Tags
+            WHERE
+                name LIKE CONCAT(?, '%') AND
+                public = true;";
+
+        $results = [];
+        /** @var array{name: string} row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [ $prefix ]
+            ) as $row
+        ) {
+            $results[] = $row['name'];
+        }
+
+        return $results;
+    }
 }

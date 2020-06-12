@@ -79,7 +79,9 @@
                   />
                   <div class="tags-badges" v-if="problem.tags.length">
                     <a
-                      v-bind:class="`badge badge-${tag.source} mr-1`"
+                      v-bind:class="
+                        `badge custom-badge custom-badge-${tag.source} m-1 p-2`
+                      "
                       v-bind:href="`/problem/?tag[]=${tag.name}`"
                       v-for="tag in problem.tags"
                       >{{
