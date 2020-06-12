@@ -43,7 +43,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
     const SOLUTION_UNLOCKED = 'unlocked';
     const SOLUTION_LOCKED = 'locked';
 
-    const RESTRICTED_TAG_NAMES = ['karel', 'lenguaje', 'solo-salida', 'interactive'];
+    const RESTRICTED_TAG_NAMES = [
+        'problemRestrictedTagKarel',
+        'problemRestrictedTagLanguage',
+        'problemRestrictedTagOnlyOutput',
+        'problemRestrictedTagInteractive'
+    ];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
     const VALID_SORTING_MODES = ['asc', 'desc'];
     const VALID_SORTING_COLUMNS = [
@@ -638,7 +643,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $allowRestricted = false
     ): void {
         // Normalize name.
-        $tagName = \OmegaUp\Controllers\Tag::normalize($tagName);
+        if (!$isPublic) {
+            $tagName = \OmegaUp\Controllers\Tag::normalize($tagName);
+        }
 
         if (
             !$allowRestricted &&
@@ -1464,16 +1471,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $languages = explode(',', $problem->languages);
         if (in_array('cat', $languages)) {
             \OmegaUp\Controllers\Problem::addTag(
-                'solo-salida',
+                'problemRestrictedTagOnlyOutput',
                 true,
                 $problem,
                 true
             );
         } elseif (!empty(array_intersect(['kp', 'kj'], $languages))) {
-            \OmegaUp\Controllers\Problem::addTag('karel', true, $problem, true);
+            \OmegaUp\Controllers\Problem::addTag(
+                'problemRestrictedTagKarel',
+                true,
+                $problem,
+                true
+            );
         } else {
             \OmegaUp\Controllers\Problem::addTag(
-                'lenguaje',
+                'problemRestrictedTagLanguage',
                 true,
                 $problem,
                 true
@@ -1490,7 +1502,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         if (!empty($distribSettings['interactive'])) {
             \OmegaUp\Controllers\Problem::addTag(
-                'interactive',
+                'problemRestrictedTagInteractive',
                 true,
                 $problem,
                 true

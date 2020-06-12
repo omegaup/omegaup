@@ -489,7 +489,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedTags + [
                 // The following tags will be ignored:
                 ['tagname' => 'karel', 'public' => true],
-                ['tagname' => 'solo-salida', 'public' => false],
+                ['tagname' => 'problemRestrictedTagOnlyOutput', 'public' => false],
             ]
         );
 
@@ -507,10 +507,10 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             });
         }
         $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-            return $tag['name'] == 'lenguaje';
+            return $tag['name'] == 'problemRestrictedTagLanguage';
         });
         $this->assertArrayNotContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-            return ($tag['name'] == 'karel' || $tag['name'] == 'solo-salida');
+            return ($tag['name'] == 'problemRestrictedTagKarel' || $tag['name'] == 'problemRestrictedTagOnlyOutput');
         });
     }
 
