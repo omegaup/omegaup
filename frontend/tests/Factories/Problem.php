@@ -283,12 +283,12 @@ class Problem {
         $tags = [
             'problemTagArrays',
             'problemTagBigData',
-            'problemTopicGreedy',
-            'problemTopicHashing',
-            'problemTopicMath',
-            'problemTopicMatrices',
-            'problemTopicMaxFlow',
-            'problemTopicNumberTheory',
+            'problemTagGreedyAlgorithms',
+            'problemTagHashing',
+            'problemTagMatrices',
+            'problemTagMaxFlow',
+            'problemTagMeetInTheMiddle',
+            'problemTagNumberTheory',
         ];
         foreach ($tags as $tag) {
             \OmegaUp\DAO\Tags::create(
