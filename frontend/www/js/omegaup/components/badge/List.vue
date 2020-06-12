@@ -15,8 +15,8 @@
       <div class="badges-container">
         <omegaup-badge
           v-bind:badge="badge"
-          v-bind:key="badge.badge_alias"
-          v-for="badge in badges"
+          v-bind:key="idx"
+          v-for="(badge, idx) in badges"
         ></omegaup-badge>
       </div>
     </div>
