@@ -2,8 +2,8 @@ declare module '@/third_party/js/pagedown/Markdown.Editor.js' {
   import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
 
   interface Hooks {
-    set: (eventName: string, callback: (text?: string, ...args: any[]) => string | () ) => void;
-    chain: (eventName: string, callback: (text?: string, ...args: any[]) => string | () ) => void;
+    set: (eventName: string, callback: () => void) => void;
+    chain: (eventName: string, callback: () => void) => void;
   }
 
   export class Editor {
