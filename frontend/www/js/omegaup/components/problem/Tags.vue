@@ -56,6 +56,7 @@
           >
             {{ T.updateProblemLevel }}
           </button>
+          <!-- TODO: Add a button to remove current problem level -->
         </div>
         <div class="form-group">
           <label class="switch-container">
