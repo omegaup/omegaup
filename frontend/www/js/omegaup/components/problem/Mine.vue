@@ -44,7 +44,7 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table">
+        <table class="table mb-0">
           <thead>
             <tr>
               <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
@@ -60,7 +60,6 @@
                   v-model="selectedProblems"
                   v-bind:disabled="problem.visibility === -10"
                   v-bind:value="problem.alias"
-                  v-bind:id="problem.alias"
                 />
                 <div class="d-inline-block ml-2">
                   <a
@@ -80,7 +79,9 @@
                   />
                   <div class="tags-badges" v-if="problem.tags.length">
                     <a
-                      v-bind:class="`badge badge-${tag.source} mr-1`"
+                      v-bind:class="
+                        `badge custom-badge custom-badge-${tag.source} m-1 p-2`
+                      "
                       v-bind:href="`/problem/?tag[]=${tag.name}`"
                       v-for="tag in problem.tags"
                       >{{

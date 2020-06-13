@@ -130,6 +130,6 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['template'], 'course.details.tpl');
+        $this->assertEquals($response['entrypoint'], 'course_details');
     }
 }
