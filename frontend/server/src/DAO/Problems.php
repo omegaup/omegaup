@@ -142,13 +142,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
-            $clauses[] = [
-                "(p.title LIKE CONCAT('%', ?, '%')
-                  OR p.alias LIKE CONCAT('%', ?, '%')
-                  OR p.problem_id = ?
-                 )",
-                [$query, $query, $query],
-            ];
+            if (is_numeric($query)) {
+                $clauses[] = [
+                    'p.problem_id = ?',
+                    [intval($query)],
+                ];
+            } else {
+                $clauses[] = [
+                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
+                    [$query, $query],
+                ];
+            }
         }
 
         if ($identityType === IDENTITY_ADMIN) {

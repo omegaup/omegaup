@@ -1230,7 +1230,7 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
-    problem_id?: number;
+    problem_id: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1277,7 +1277,7 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
-    problem_id?: number;
+    problem_id: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1432,7 +1432,7 @@ export namespace types {
       time_limit: string;
     };
     points: number;
-    problem_id?: number;
+    problem_id: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
