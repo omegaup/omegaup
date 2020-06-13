@@ -31,13 +31,14 @@
             <tr>
               <th scope="col" class="align-middle text-nowrap">
                 <span>{{ T.wordsTitle }}</span>
-                <span class="badge badge-quality mr-1 ml-1 p-2">{{
-                  T.tagSourceQuality
-                }}</span>
-                <span class="badge badge-owner mr-1 p-2">{{
+                <span
+                  class="badge custom-badge custom-badge-quality mr-1 ml-1 p-2"
+                  >{{ T.tagSourceQuality }}</span
+                >
+                <span class="badge custom-badge custom-badge-owner mr-1 p-2">{{
                   T.tagSourceOwner
                 }}</span>
-                <span class="badge badge-voted p-2">{{
+                <span class="badge custom-badge custom-badge-voted p-2">{{
                   T.tagSourceVoted
                 }}</span>
                 <omegaup-common-sort-controls
@@ -162,7 +163,9 @@
                   v-bind:icon="['fas', 'eye-slash']"
                 />
                 <a
-                  v-bind:class="`badge badge-${tag.source} m-1 p-2`"
+                  v-bind:class="
+                    `badge custom-badge custom-badge-${tag.source} m-1 p-2`
+                  "
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
                   v-for="tag in problem.tags"
                   >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a
@@ -214,28 +217,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.badge {
-  color: black;
-
-  &:hover {
-    background-color: rgba(black, 0.35);
-  }
-
-  &-owner {
-    background-color: #ccc;
-  }
-
-  &-quality {
-    background-color: #ffeb3b;
-  }
-
-  &-voted {
-    background-color: #99c2ff;
-  }
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';

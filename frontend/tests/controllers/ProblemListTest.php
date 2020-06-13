@@ -98,12 +98,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // Get 3 problems
         $n = 3;
         $tags = [
-            'problemTopicGreedy',
-            'problemTopicHashing',
-            'problemTopicMath',
-            'problemTopicMatrices',
-            'problemTopicMaxFlow',
-            'problemTopicNumberTheory',
+            'problemTagArrays',
+            'problemTagBigData',
+            'problemTagGreedyAlgorithms',
+            'problemTagHashing',
+            'problemTagMatrices',
+            'problemTagMaxFlow',
+            'problemTagMeetInTheMiddle',
+            'problemTagNumberTheory',
         ];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
@@ -174,12 +176,14 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $n = 5;
         $karel_problem = 'kj,kp,cpp11-gcc,c11-gcc'; // Karel problems should allow kj AND kp extensions
         $tags = [
-            'problemTopicGreedy',
-            'problemTopicHashing',
-            'problemTopicMath',
-            'problemTopicMatrices',
-            'problemTopicMaxFlow',
-            'problemTopicNumberTheory',
+            'problemTagArrays',
+            'problemTagBigData',
+            'problemTagGreedyAlgorithms',
+            'problemTagHashing',
+            'problemTagMatrices',
+            'problemTagMaxFlow',
+            'problemTagMeetInTheMiddle',
+            'problemTagNumberTheory',
         ];
         for ($i = 0; $i < $n; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([

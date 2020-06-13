@@ -7,8 +7,11 @@ require('jsdom-global')(undefined, {
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 
+// Any write to console.error() will cause a test failure.
+const originalConsoleError = console.error;
 console.error = function() {
-  throw new Error(util.inspect(...arguments));
+  originalConsoleError(...arguments);
+  throw new Error('Unexpected call to console.error(). Failing test.');
 };
 
 // https://github.com/vuejs/vue-test-utils/issues/936
