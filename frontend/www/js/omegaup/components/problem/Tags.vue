@@ -52,7 +52,9 @@
           <button
             type="button"
             class="btn btn-primary m-1"
-            v-bind:disabled="!problemLevelTag || problemLevel === problemLevelTag"
+            v-bind:disabled="
+              !problemLevelTag || problemLevel === problemLevelTag
+            "
             v-on:click.prevent="onUpdateProblemLevel"
           >
             {{ T.updateProblemLevel }}
