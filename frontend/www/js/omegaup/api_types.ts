@@ -1703,7 +1703,7 @@ export namespace types {
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
-    students: { [key: number]: types.CourseStudent };
+    students: types.CourseStudent[];
     student?: string;
   }
 

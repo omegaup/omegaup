@@ -21,7 +21,7 @@
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
- * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: CourseStudent[], student?: string}
+* @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>, student?: string}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  */
 class Course extends \OmegaUp\Controllers\Controller {
