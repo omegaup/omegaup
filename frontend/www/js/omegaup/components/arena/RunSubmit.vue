@@ -1,5 +1,5 @@
 <template>
-  <form class="run-submit-view" v-on:submit.prevent="onSubmit">
+  <form data-run-submit v-on:submit.prevent="onSubmit">
     <div class="close-container">
       <button class="close">❌</button>
     </div>
@@ -9,9 +9,11 @@
       </label>
       <div class="col-sm-4">
         <select class="form-control" name="language" v-model="selectedLanguage">
-          <option v-bind:value="key" v-for="(language, key) in languages">{{
-            language
-          }}</option>
+          <option
+            v-bind:value="key"
+            v-for="(language, key) in allowedLanguages"
+            >{{ language }}</option
+          >
         </select>
       </div>
     </div>
@@ -41,12 +43,19 @@
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <input
+        <button
           type="submit"
           class="btn btn-primary"
           v-bind:disabled="secondsRemaining > 0"
-          v-bind:value="buttonDescription"
-        />
+        >
+          <omegaup-countdown
+            v-if="secondsRemaining > 0"
+            v-bind:target-time="nextSubmissionTimestamp"
+            v-bind:countdown-to-next-submission="true"
+            v-on:emit-finish="now = Date.now()"
+          ></omegaup-countdown>
+          <span v-else="">{{ T.wordsSend }}</span>
+        </button>
       </div>
     </div>
   </form>
@@ -65,37 +74,72 @@ import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
+import omegaup_Countdown from '../Countdown.vue';
 
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class ArenaRunSubmit extends Vue {
   @Ref() inputFile!: HTMLInputElement;
-  @Prop() languages!: omegaup.Languages;
-  @Prop({ default: 0 }) submissionGapSecondsRemaining!: number;
+  @Prop() languages!: string[];
+  @Prop({ default: Date.now() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop() preferredLanguage!: string;
 
   T = T;
   selectedLanguage = '';
   code = '';
-  secondsRemaining = this.submissionGapSecondsRemaining;
-  submissionGapInterval: number = 0;
+  now: number = Date.now();
 
-  get buttonDescription(): string {
-    if (this.secondsRemaining < 1) {
-      return T.wordsSend;
-    }
-
-    return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-      submissionGap: this.secondsRemaining,
-    });
+  get secondsRemaining(): number {
+    return (this.nextSubmissionTimestamp.getTime() - this.now) / 1000;
   }
 
   get filename(): string {
     return `Main${this.extension}`;
+  }
+
+  get allowedLanguages(): omegaup.Languages {
+    let allowedLanguages: omegaup.Languages = {};
+    const allLanguages = [
+      { language: '', name: '' },
+      { language: 'kp', name: 'Karel (Pascal)' },
+      { language: 'kj', name: 'Karel (Java)' },
+      { language: 'c', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-gcc', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-clang', name: 'C11 (clang 6.0)' },
+      { language: 'cpp', name: 'C++03 (g++ 7.4)' },
+      { language: 'cpp11', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-gcc', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-clang', name: 'C++11 (clang++ 6.0)' },
+      { language: 'cpp17-gcc', name: 'C++17 (g++ 7.4)' },
+      { language: 'cpp17-clang', name: 'C++17 (clang++ 6.0)' },
+      { language: 'java', name: 'Java (openjdk 11.0)' },
+      { language: 'py', name: 'Python 2.7' },
+      { language: 'py2', name: 'Python 2.7' },
+      { language: 'py3', name: 'Python 3.6' },
+      { language: 'rb', name: 'Ruby (2.5)' },
+      { language: 'pl', name: 'Perl (5.26)' },
+      { language: 'cs', name: 'C# (dotnet 2.2)' },
+      { language: 'pas', name: 'Pascal (fpc 3.0)' },
+      { language: 'cat', name: 'Output Only' },
+      { language: 'hs', name: 'Haskell (ghc 8.0)' },
+      { language: 'lua', name: 'Lua (5.2)' },
+    ];
+
+    this.languages.push('');
+
+    allLanguages
+      .filter(item => {
+        return this.languages.includes(item.language);
+      })
+      .forEach(optionItem => {
+        allowedLanguages[optionItem.language] = optionItem.name;
+      });
+    return allowedLanguages;
   }
 
   get extension(): string {
@@ -120,21 +164,6 @@ export default class ArenaRunSubmit extends Vue {
   @Watch('preferredLanguage')
   onPreferredLanguageChanged(newValue: string): void {
     this.selectedLanguage = newValue;
-  }
-
-  @Watch('submissionGapSecondsRemaining')
-  onSubmissionGapChanged(newValue: number): void {
-    this.secondsRemaining = this.submissionGapSecondsRemaining;
-    if (this.secondsRemaining < 1) return;
-    if (this.submissionGapInterval) {
-      window.clearInterval(this.submissionGapInterval);
-    }
-    this.submissionGapInterval = window.setInterval(() => {
-      if (this.secondsRemaining < 1) {
-        window.clearInterval(this.submissionGapInterval);
-      }
-      this.secondsRemaining--;
-    }, 1000);
   }
 
   onSubmit(ev: Event): void {

@@ -303,9 +303,9 @@ export class Arena {
 
   runSubmitView:
     | (Vue & {
-        languages: omegaup.Languages;
+        languages: string[];
         code: string;
-        submissionGapSecondsRemaining: number;
+        nextSubmissionTimestamp: Date;
         preferredLanguage: string | null;
       })
     | null = null;
@@ -540,84 +540,27 @@ export class Arena {
 
     // Setup run submit view, if it is available.
     if (document.getElementById('run-submit') !== null) {
-      this.runSubmitView = new Vue({
+      const self = this;
+      self.runSubmitView = new Vue({
         el: '#run-submit',
         render: function(createElement) {
           return createElement('omegaup-arena-runsubmit', {
             props: {
               languages: this.languages,
-              submissionGapSecondsRemaining: this.submissionGapSecondsRemaining,
+              nextSubmissionTimestamp: this.nextSubmissionTimestamp,
               preferredLanguage: this.preferredLanguage,
             },
             on: {
               'submit-run': (code: string, language: string) => {
-                this.submitRun(code, language);
+                self.submitRun(code, language);
               },
             },
           });
         },
-        methods: {
-          submitRun: (code: string, language: string): void => {
-            const problemset = this.computeProblemsetArg();
-
-            api.Run.create(
-              $.extend(problemset, {
-                problem_alias: this.currentProblem.alias,
-                language: language,
-                source: code,
-              }),
-            )
-              .then(response => {
-                ui.reportEvent('submission', 'submit');
-                if (this.options.isLockdownMode && sessionStorage) {
-                  sessionStorage.setItem(`run:${response.guid}`, code);
-                }
-
-                const currentProblem = this.problems[this.currentProblem.alias];
-                if (!this.options.isOnlyProblem) {
-                  this.problems[
-                    this.currentProblem.alias
-                  ].lastSubmission = new Date();
-                  this.problems[
-                    this.currentProblem.alias
-                  ].nextSubmissionTimestamp = response.nextSubmissionTimestamp;
-                }
-                const run = {
-                  guid: response.guid,
-                  submit_delay: response.submit_delay,
-                  username: this.options.payload.currentUsername,
-                  classname: this.options.payload.userClassname,
-                  country: 'xx',
-                  status: 'new',
-                  alias: this.currentProblem.alias,
-                  time: new Date(),
-                  penalty: 0,
-                  runtime: 0,
-                  memory: 0,
-                  verdict: 'JE',
-                  score: 0,
-                  language: language,
-                };
-                this.updateRun(run);
-
-                this.hideOverlay();
-                this.clearInputFile();
-                if (!this.options.courseAlias) {
-                  this.initSubmissionCountdown();
-                }
-              })
-              .catch(run => {
-                alert(run.error ?? run);
-                if (run.errorname) {
-                  ui.reportEvent('submission', 'submit-fail', run.errorname);
-                }
-              });
-          },
-        },
         data: {
           languages: [],
           preferredLanguage: '',
-          submissionGapSecondsRemaining: 0,
+          nextSubmissionTimestamp: new Date(0),
         },
         components: {
           'omegaup-arena-runsubmit': arena_RunSubmit,
@@ -1574,51 +1517,14 @@ export class Arena {
   }
 
   updateAllowedLanguages(languages: string[]): void {
-    const allLanguages = [
-      { language: '', name: '' },
-      { language: 'kp', name: 'Karel (Pascal)' },
-      { language: 'kj', name: 'Karel (Java)' },
-      { language: 'c', name: 'C11 (gcc 7.4)' },
-      { language: 'c11-gcc', name: 'C11 (gcc 7.4)' },
-      { language: 'c11-clang', name: 'C11 (clang 6.0)' },
-      { language: 'cpp', name: 'C++03 (g++ 7.4)' },
-      { language: 'cpp11', name: 'C++11 (g++ 7.4)' },
-      { language: 'cpp11-gcc', name: 'C++11 (g++ 7.4)' },
-      { language: 'cpp11-clang', name: 'C++11 (clang++ 6.0)' },
-      { language: 'cpp17-gcc', name: 'C++17 (g++ 7.4)' },
-      { language: 'cpp17-clang', name: 'C++17 (clang++ 6.0)' },
-      { language: 'java', name: 'Java (openjdk 11.0)' },
-      { language: 'py', name: 'Python 2.7' },
-      { language: 'py2', name: 'Python 2.7' },
-      { language: 'py3', name: 'Python 3.6' },
-      { language: 'rb', name: 'Ruby (2.5)' },
-      { language: 'pl', name: 'Perl (5.26)' },
-      { language: 'cs', name: 'C# (dotnet 2.2)' },
-      { language: 'pas', name: 'Pascal (fpc 3.0)' },
-      { language: 'cat', name: 'Output Only' },
-      { language: 'hs', name: 'Haskell (ghc 8.0)' },
-      { language: 'lua', name: 'Lua (5.2)' },
-    ];
-
     const canSubmit = languages.length !== 0;
 
     $('.runs').toggle(canSubmit);
     $('.data').toggle(canSubmit);
     $('.best-solvers').toggle(canSubmit);
 
-    languages.push('');
-
-    let allowedLanguages: omegaup.Languages = {};
-
-    allLanguages
-      .filter(item => {
-        return languages.includes(item.language);
-      })
-      .forEach(optionItem => {
-        allowedLanguages[optionItem.language] = optionItem.name;
-      });
     if (this.runSubmitView) {
-      this.runSubmitView.languages = allowedLanguages;
+      this.runSubmitView.languages = languages;
       this.runSubmitView.preferredLanguage = this.preferredLanguage;
     }
   }
@@ -1790,11 +1696,8 @@ export class Arena {
       }
 
       if (newRun) {
-        $('#overlay form').hide();
+        $('#overlay form:not([data-run-submit])').hide();
         $('#overlay').show();
-        (<HTMLElement>(
-          document.querySelector('.run-submit-view')
-        )).style.display = 'flex';
         if (this.options.shouldShowFirstAssociatedIdentityRunWarning) {
           this.options.shouldShowFirstAssociatedIdentityRunWarning = false;
           ui.warning(T.firstSumbissionWithIdentity);
@@ -1959,7 +1862,7 @@ export class Arena {
     if (!showRunMatch) {
       return;
     }
-    $('#overlay form').hide();
+    $('#overlay form:not([data-run-submit])').hide();
     $('#overlay').show();
     api.Run.details({ run_alias: showRunMatch[1] })
       .then(time.remoteTimeAdapter)
@@ -1992,32 +1895,15 @@ export class Arena {
       return;
     }
     this.hideOverlay();
-    this.clearInputFile();
     e.preventDefault();
   }
 
-  clearInputFile(): void {
-    // This worked, nay, was required, on older browsers.
-    // It stopped working sometime in 2017, and now .val(null)
-    // is enough to clear the input field.
-    // Leaving this here for now in case some older browsers
-    // still require it.
-    // this.elements.submitForm.file.replaceWith(
-    //   (this.elements.submitForm.file = this.elements.submitForm.file.clone(
-    //     true,
-    //   )),
-    // );
-    // @ts-ignore Apparently TypeScript does not like the new way of doing
-    // things.
-    //this.elements.submitForm.file.val(null);
-  }
-
   initSubmissionCountdown(): void {
-    let nextSubmissionTimestamp = new Date(0);
+    let nextSubmissionTimestamp: Date = new Date(0);
     const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
-        nextSubmissionTimestamp = problem.nextSubmissionTimestamp;
+        nextSubmissionTimestamp = new Date(problem.nextSubmissionTimestamp);
       } else if (
         typeof problem.runs !== 'undefined' &&
         typeof this.currentProblemset?.submissions_gap !== 'undefined' &&
@@ -2030,9 +1916,7 @@ export class Arena {
       }
     }
     if (this.runSubmitView) {
-      this.runSubmitView.submissionGapSecondsRemaining = Math.ceil(
-        (nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
-      );
+      this.runSubmitView.nextSubmissionTimestamp = nextSubmissionTimestamp;
     }
   }
 
@@ -2047,6 +1931,59 @@ export class Arena {
       return { problemset_id: this.options.problemsetId };
     }
     return {};
+  }
+
+  submitRun(code: string, language: string): void {
+    const problemset = this.computeProblemsetArg();
+
+    api.Run.create(
+      Object.assign(problemset, {
+        problem_alias: this.currentProblem.alias,
+        language: language,
+        source: code,
+      }),
+    )
+      .then(response => {
+        ui.reportEvent('submission', 'submit');
+        if (this.options.isLockdownMode && sessionStorage) {
+          sessionStorage.setItem(`run:${response.guid}`, code);
+        }
+
+        const currentProblem = this.problems[this.currentProblem.alias];
+        if (!this.options.isOnlyProblem) {
+          this.problems[this.currentProblem.alias].lastSubmission = new Date();
+          this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
+            response.nextSubmissionTimestamp;
+        }
+        const run = {
+          guid: response.guid,
+          submit_delay: response.submit_delay,
+          username: this.options.payload.currentUsername,
+          classname: this.options.payload.userClassname,
+          country: 'xx',
+          status: 'new',
+          alias: this.currentProblem.alias,
+          time: new Date(),
+          penalty: 0,
+          runtime: 0,
+          memory: 0,
+          verdict: 'JE',
+          score: 0,
+          language: language,
+        };
+        this.updateRun(run);
+
+        this.hideOverlay();
+        if (!this.options.courseAlias) {
+          this.initSubmissionCountdown();
+        }
+      })
+      .catch(run => {
+        alert(run.error ?? run);
+        if (run.errorname) {
+          ui.reportEvent('submission', 'submit-fail', run.errorname);
+        }
+      });
   }
 
   updateSummary(contest: omegaup.Contest): void {

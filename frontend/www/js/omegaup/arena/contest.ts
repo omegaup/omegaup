@@ -85,9 +85,7 @@ OmegaUp.on('ready', () => {
           )}`;
           return;
         }
-        $('#overlay form').hide();
-        $('.run-submit-view input').show();
-        $('.run-submit-view').show();
+        $('#overlay form:not([data-run-submit])').hide();
         $('#overlay').show();
       }
     }

@@ -136,12 +136,12 @@ def create_run(driver, problem_alias, filename):
                                  'frontend/tests/resources/%s' % filename)
     with open(resource_path, 'r') as f:
         driver.browser.execute_script(
-            'document.querySelector(".run-submit-view .CodeMirror")'
+            'document.querySelector("form[data-run-submit] .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
     original_url = driver.browser.current_url
     driver.browser.find_element_by_css_selector(
-        '.run-submit-view input[type="submit"]').submit()
+        'form[data-run-submit] button[type="submit"]').submit()
     driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')

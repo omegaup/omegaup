@@ -7,20 +7,31 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import * as time from '../time';
+import * as ui from '../ui';
+import T from '../lang';
 
 @Component
 export default class Countdown extends Vue {
   @Prop() targetTime!: Date;
+  @Prop({ default: false }) countdownToNextSubmission!: boolean;
 
   timerInterval = 0;
   currentTime = Date.now();
 
   get timeLeft(): number {
-    return this.targetTime.getTime() - this.currentTime;
+    if (!this.countdownToNextSubmission) {
+      return this.targetTime.getTime() - this.currentTime;
+    }
+    return Math.ceil((this.targetTime.getTime() - this.currentTime) / 1000);
   }
 
   get formattedTimeLeft(): string {
-    return time.formatDelta(this.timeLeft);
+    if (!this.countdownToNextSubmission) {
+      return time.formatDelta(this.timeLeft);
+    }
+    return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+      submissionGap: this.timeLeft,
+    });
   }
 
   @Watch('timeLeft')
