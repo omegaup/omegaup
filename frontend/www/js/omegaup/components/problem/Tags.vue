@@ -52,11 +52,19 @@
           <button
             type="button"
             class="btn btn-primary m-1"
+            v-bind:disabled="!problemLevelTag || problemLevel === problemLevelTag"
             v-on:click.prevent="onUpdateProblemLevel"
           >
             {{ T.updateProblemLevel }}
           </button>
-          <!-- TODO: Add a button to remove current problem level -->
+          <button
+            type="button"
+            class="btn btn-danger m-1"
+            v-bind:disabled="!problemLevel"
+            v-on:click.prevent="onDeleteProblemLevel"
+          >
+            {{ T.deleteProblemLevel }}
+          </button>
         </div>
         <div class="form-group">
           <label class="switch-container">
@@ -212,6 +220,7 @@ import { types } from '../../api_types';
 @Component
 export default class ProblemTags extends Vue {
   @Prop() initialTags!: omegaup.Tag[];
+  @Prop() problemLevel!: string;
   @Prop() publicTags!: string[];
   @Prop() levelTags!: string[];
   @Prop({ default: [] }) initialSelectedTags!: types.SelectedTag[];
@@ -226,7 +235,7 @@ export default class ProblemTags extends Vue {
   allowTags = this.initialAllowTags;
   public = false;
   tagname = '';
-  problemLevelTag = '';
+  problemLevelTag: string | null = this.problemLevel;
 
   get selectedTagsList(): string {
     return JSON.stringify(this.selectedTags);
@@ -241,9 +250,14 @@ export default class ProblemTags extends Vue {
   }
 
   onUpdateProblemLevel(): void {
-    if (this.problemLevelTag !== '') {
+    if (this.problemLevelTag) {
       this.$emit('update-problem-level', this.problemLevelTag);
     }
+  }
+
+  onDeleteProblemLevel(): void {
+    this.$emit('update-problem-level');
+    this.problemLevelTag = null;
   }
 
   onRemoveTag(tagname: string): void {

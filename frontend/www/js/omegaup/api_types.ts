@@ -1531,6 +1531,7 @@ export namespace types {
     allowTags: boolean;
     selectedTags: types.SelectedTag[];
     tags: { name?: string }[];
+    problemLevel?: string;
     publicTags: string[];
     levelTags: string[];
     title?: string;

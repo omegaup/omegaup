@@ -77,8 +77,8 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $selectedLevel = 'problemLevelBasicKarel';
         \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'problemAlias' => $problemData['problem']->alias,
-            'levelTag' => $selectedLevel,
+            'problem_alias' => $problemData['problem']->alias,
+            'level_tag' => $selectedLevel,
         ]));
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']
@@ -88,8 +88,8 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $selectedLevel = 'problemLevelBasicIntroductionToProgramming';
         \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'problemAlias' => $problemData['problem']->alias,
-            'levelTag' => $selectedLevel,
+            'problem_alias' => $problemData['problem']->alias,
+            'level_tag' => $selectedLevel,
         ]));
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']

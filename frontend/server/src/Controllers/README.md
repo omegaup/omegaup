@@ -2989,10 +2989,10 @@ Updates the problem level of a problem
 
 ### Parameters
 
-| Name           | Type    | Description |
-| -------------- | ------- | ----------- |
-| `problemAlias` | `mixed` |             |
-| `levelTag`     | `mixed` |             |
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| `problem_alias` | `mixed` |             |
+| `level_tag`     | `mixed` |             |
 
 ### Returns
 
