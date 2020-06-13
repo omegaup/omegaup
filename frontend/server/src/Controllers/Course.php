@@ -2405,7 +2405,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         $result = [
             'smartyProperties' => [
                 'payload' => [
-                    'course' => self::getCommonCourseDetails($course, $r->identity),
+                    'course' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
                     'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
                         $course->course_id,
                         $course->group_id
