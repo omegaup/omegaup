@@ -33,23 +33,19 @@
 
           <div class="tab-content">
             <div class="tab-pane active" v-show="showTab === 'source'">
-              <!-- id-lint off -->
-              <div id="wmd-button-bar-statements"></div>
+              <div ref="markdownButtonBar" class="wmd-button-bar"></div>
               <textarea
                 class="wmd-input"
-                id="wmd-input-statements"
+                ref="markdownInput"
                 v-model="currentMarkdown"
               ></textarea>
             </div>
             <div class="tab-pane active" v-show="showTab === 'preview'">
               <h1 class="title text-center">{{ title }}</h1>
               <div
-                ref="preview"
-                class="no-bottom-margin statement"
-                id="wmd-preview-statements"
-                v-html="markdownPreview"
+                ref="markdownPreview"
+                class="no-bottom-margin statement wmd-preview"
               ></div>
-              <!-- id-lint on -->
               <template v-if="markdownType === 'statements'">
                 <hr />
                 <div>
@@ -117,6 +113,10 @@
   </div>
 </template>
 
+<style lang="scss">
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -131,10 +131,6 @@ const markdownConverter = markdown.markdownConverter({
   preview: true,
   imageMapping: {},
 });
-const markdownEditor: Markdown.Editor = new Markdown.Editor(
-  markdownConverter,
-  '-statements',
-);
 
 @Component({
   components: {
@@ -142,7 +138,9 @@ const markdownEditor: Markdown.Editor = new Markdown.Editor(
   },
 })
 export default class ProblemStatementEdit extends Vue {
-  @Ref() readonly preview!: HTMLDivElement;
+  @Ref() readonly markdownButtonBar!: HTMLDivElement;
+  @Ref() readonly markdownInput!: HTMLDivElement;
+  @Ref() readonly markdownPreview!: HTMLDivElement;
   @Prop() alias!: string;
   @Prop() title!: string;
   @Prop() source!: string;
@@ -161,13 +159,20 @@ export default class ProblemStatementEdit extends Vue {
   errors: string[] = [];
   languages = ['es', 'en', 'pt'];
   statements: types.Statements = {};
-  markdownPreview: string = '';
+  markdownEditor: Markdown.Editor | null = null;
 
   mounted(): void {
-    markdownEditor.hooks.chain('onPreviewRefresh', () => {
-      MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
+    this.markdownEditor = new Markdown.Editor(markdownConverter, '', {
+      panels: {
+        buttonBar: this.markdownButtonBar,
+        preview: this.markdownPreview,
+        input: this.markdownInput,
+      },
     });
-    markdownEditor.run();
+    this.markdownEditor.hooks.chain('onPreviewRefresh', () => {
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.markdownPreview]);
+    });
+    this.markdownEditor.run();
   }
 
   getLanguageNameText(language: string): string {
@@ -192,6 +197,9 @@ export default class ProblemStatementEdit extends Vue {
   onMarkdownContentsChange(newMarkdown: string): void {
     this.currentMarkdown = newMarkdown;
     this.statements[this.currentLanguage] = newMarkdown;
+    if (this.markdownEditor) {
+      this.markdownEditor.refreshPreview();
+    }
   }
 
   @Watch('showTab')
@@ -199,13 +207,19 @@ export default class ProblemStatementEdit extends Vue {
     if (this.showTab !== 'preview') {
       return;
     }
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.markdownPreview]);
+    if (this.markdownEditor) {
+      this.markdownEditor.refreshPreview();
+    }
   }
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.markdownPreview]);
     if (!!oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
+    if (this.markdownEditor) {
+      this.markdownEditor.refreshPreview();
+    }
 
     this.$emit(
       'emit-update-markdown-contents',
