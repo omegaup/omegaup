@@ -43,4 +43,26 @@ class Tag extends \OmegaUp\Controllers\Controller {
         }
         return $response;
     }
+
+    /**
+     * Returns the list of all tags beginning with 'problemLevel'
+     *
+     * @return list<string>
+     */
+    public static function getLevelTags() {
+        return \OmegaUp\DAO\Tags::findPublicTagsByPrefix(
+            'problemLevel'
+        );
+    }
+
+    /**
+     * Returns the list of all tags beginning with 'problemTag'
+     *
+     * @return list<string>
+     */
+    public static function getPublicTags() {
+        return \OmegaUp\DAO\Tags::findPublicTagsByPrefix(
+            'problemTag'
+        );
+    }
 }

@@ -855,7 +855,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             [
                 [
-                    'name' => 'lenguaje',
+                    'name' => 'problemRestrictedTagLanguage',
                     'public' => '1',
                 ],
             ],
@@ -874,7 +874,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             [
                 [
-                    'name' => 'lenguaje',
+                    'name' => 'problemRestrictedTagLanguage',
                     'public' => '1',
                 ],
                 [
@@ -897,7 +897,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             [
                 [
-                    'name' => 'lenguaje',
+                    'name' => 'problemRestrictedTagLanguage',
                     'public' => '1',
                 ],
             ],
@@ -922,7 +922,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Problem::apiRemoveTag(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
-                'name' => 'lenguaje',
+                'name' => 'problemRestrictedTagLanguage',
                 'public' => 'true',
             ]));
             $this->fail('Should not have been able to remove restricted tag');
