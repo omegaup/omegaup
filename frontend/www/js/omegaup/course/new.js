@@ -6,17 +6,28 @@ import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function() {
-  var defaultDate = Date.create(Date.now());
-  defaultDate.set({ seconds: 0 });
-  var defaultStartTime = Date.create(defaultDate);
-  defaultDate.setDate(defaultDate.getDate() + 30);
-  var defaultFinishTime = Date.create(defaultDate);
+  var defaultStartTime = new Date();
+  defaultStartTime.setSeconds(0);
+  var defaultFinishTime = new Date(defaultStartTime);
+  defaultFinishTime.setDate(defaultFinishTime.getDate() + 30);
 
   var details = new Vue({
     el: '#course-details',
     render: function(createElement) {
-      return createElement('omegaup-course-details', {
-        props: { T: T, update: false, course: this.course },
+      return createElement('omegaup-course-form', {
+        props: {
+          course: {
+            alias: '',
+            description: '',
+            start_time: defaultStartTime,
+            finish_time: defaultFinishTime,
+            show_scoreboard: false,
+            name: '',
+            school_name: '',
+            basic_information_required: false,
+            requests_user_information: 'no',
+          },
+        },
         on: {
           submit: function(ev) {
             new Promise((accept, reject) => {
@@ -66,14 +77,8 @@ OmegaUp.on('ready', function() {
         },
       });
     },
-    data: {
-      course: {
-        start_time: defaultStartTime,
-        finish_time: defaultFinishTime,
-      },
-    },
     components: {
-      'omegaup-course-details': course_Form,
+      'omegaup-course-form': course_Form,
     },
   });
 });
