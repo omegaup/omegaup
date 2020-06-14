@@ -32,7 +32,7 @@
  * @psalm-type ProblemMarkdownPayload=array{alias: string, problemsetter?: array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, source: null|string, statement: ProblemStatement, title: null|string}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool}
- * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, title: null|string}
+ * @psalm-type ProblemTagsPayload=array{alias: string, allowTags: bool, selectedTags: list<SelectedTag>, tags: list<array{name: null|string}>, problemLevel: string|null, publicTags: list<string>, levelTags: list<string>, title: null|string}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
@@ -593,6 +593,66 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\Controllers\ACL::addGroup($problem->acl_id, $group->group_id);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Updates the problem level of a problem
+     *
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $level_tag
+     *
+     * @return array{status: string}
+     */
+    public static function apiUpdateProblemLevel(\OmegaUp\Request $r): array {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['level_tag'],
+            'level_tag'
+        );
+
+        $r->ensureIdentity();
+
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $tag = null;
+        if (!empty($r['level_tag'])) {
+            $tag = \OmegaUp\DAO\Tags::getByName($r['level_tag']);
+
+            if (is_null($tag)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('tag');
+            }
+
+            if (
+                !in_array(
+                    $tag->name,
+                    \OmegaUp\Controllers\Tag::getLevelTags()
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'notProblemLevelTag',
+                    'level_tag'
+                );
+            }
+        }
+
+        \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+            $problem,
+            $tag
+        );
 
         return [
             'status' => 'ok',
@@ -4667,6 +4727,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'title' => $problem->title,
                     'allowTags' => $problem->allow_user_add_tags,
                     'tags' => $tags,
+                    'problemLevel' => \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+                        $problem
+                    ),
+                    'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
+                    'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     'selectedTags' => $selectedTags,
                 ],
                 'problemMarkdownPayload' =>  [

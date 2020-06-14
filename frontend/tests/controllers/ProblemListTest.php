@@ -861,7 +861,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // Expect public problem only
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
-            'query' => substr($problemDataPublic['request']['title'], 2, 5),
+            'query' => substr($problemDataPublic['request']['title'], 2, 8),
         ]));
         $this->assertArrayContainsInKey(
             $response['results'],
@@ -872,7 +872,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         // Expect 0 problems, matches are private for $user
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $userLogin->auth_token,
-            'query' => substr($problemDataPrivate['request']['title'], 2, 5),
+            'query' => substr($problemDataPrivate['request']['title'], 2, 8),
         ]));
         $this->assertArrayNotContainsInKey(
             $response['results'],
