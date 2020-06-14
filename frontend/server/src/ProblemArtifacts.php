@@ -23,14 +23,20 @@ class ProblemArtifacts {
         $this->revision = $revision;
     }
 
-    public function get(string $path, bool $quiet = false): string {
+    public function get(string $path): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->revision, $path)
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        /** @var string */
-        return $browser->exec();
+        $result = $browser->exec();
+        if (!is_string($result)) {
+            $this->log->error(
+                "Failed to get contents for {$this->alias}:{$this->revision}/{$path}"
+            );
+            throw new \OmegaUp\Exceptions\InternalServerErrorException();
+        }
+        return $result;
     }
 
     public function exists(string $path): bool {
@@ -46,7 +52,7 @@ class ProblemArtifacts {
         );
     }
 
-    public function getByRevision(bool $quiet = false): string {
+    public function getByRevision(): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowRevisionURL(
@@ -55,15 +61,21 @@ class ProblemArtifacts {
             )
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        /** @var string */
-        return $browser->exec();
+        $result = $browser->exec();
+        if (!is_string($result)) {
+            $this->log->error(
+                "Failed to get contents for {$this->alias}:{$this->revision}"
+            );
+            throw new \OmegaUp\Exceptions\InternalServerErrorException();
+        }
+        return $result;
     }
 
     /**
      * Returns a list of tree entries.
      *
      * @param string $path The path to display.
-     * @return list<array{mode: int, type: string, id: string, name: string}> The list of
+     * @return list<array{mode: int, type: string, id: string, name: string, size: int}> The list of
      * direct entries in $path.
      */
     public function lsTree(string $path): array {
@@ -83,7 +95,7 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|array{id: string, entries?: null|list<array{mode: int, type: string, id: string, name: string}>} */
+        /** @var null|array{id: string, entries?: null|list<array{mode: int, type: string, id: string, name: string, size: int}>} */
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response) || !array_key_exists('entries', $response)) {
             $this->log->error(
@@ -91,7 +103,7 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|list<array{mode: int, type: string, id: string, name: string}> */
+        /** @var null|list<array{mode: int, type: string, id: string, name: string, size: int}> */
         $entries = $response['entries'];
         if (!is_iterable($entries)) {
             $this->log->error(
@@ -106,11 +118,11 @@ class ProblemArtifacts {
      * Returns the list of files that are transitively reachable from $path.
      *
      * @param string $path The path to display.
-     * @return list<array{path: string, mode: int, id: string, type: string}> The list of files
+     * @return list<array{id: string, mode: int, path: string, size: int, type: string}> The list of files
      * that are transitively reachable from $path.
      */
     public function lsTreeRecursive(string $path = '.'): array {
-        /** @var list<array{path: string, mode: int, id: string, type: string}> */
+        /** @var list<array{id: string, mode: int, path: string, size: int, type: string}> */
         $entries = [];
         /** @var list<string> */
         $queue = [$path];
