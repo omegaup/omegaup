@@ -115,7 +115,7 @@
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'markdown'">
-        <omegaup-problem-markdown
+        <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownContents"
           v-bind:markdown-preview="markdownPreview"
           v-bind:initial-language="data.statement.language"
@@ -135,7 +135,7 @@
                 'statements',
               )
           "
-        ></omegaup-problem-markdown>
+        ></omegaup-problem-statementedit>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'version'">
@@ -156,7 +156,7 @@
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'solution'">
-        <omegaup-problem-markdown
+        <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownSolutionContents"
           v-bind:markdown-preview="markdownSolutionPreview"
           v-bind:initial-language="data.solution.language"
@@ -172,7 +172,7 @@
                 'solutions',
               )
           "
-        ></omegaup-problem-markdown>
+        ></omegaup-problem-statementedit>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'admins'">
@@ -187,7 +187,7 @@
               $emit('remove-admin', addAdminComponent.selected.username)
           "
         ></omegaup-problem-admins>
-        <omegaup-problem-group-admins
+        <omegaup-problem-groupadmins
           v-bind:initial-groups="initialGroups"
           v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
@@ -198,7 +198,7 @@
             groupAdminsComponent =>
               $emit('remove-group-admin', groupAdminsComponent.groupAlias)
           "
-        ></omegaup-problem-group-admins>
+        ></omegaup-problem-groupadmins>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'tags'">
@@ -276,9 +276,9 @@ import { types } from '../../api_types';
     'omegaup-problem-form': problem_Form,
     'omegaup-problem-tags': problem_Tags,
     'omegaup-problem-versions': problem_Versions,
-    'omegaup-problem-markdown': problem_StatementEdit,
+    'omegaup-problem-statementedit': problem_StatementEdit,
     'omegaup-problem-admins': problem_Admins,
-    'omegaup-problem-group-admins': problem_GroupAdmins,
+    'omegaup-problem-groupadmins': problem_GroupAdmins,
   },
 })
 export default class ProblemEdit extends Vue {
