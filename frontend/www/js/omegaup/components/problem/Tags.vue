@@ -222,7 +222,7 @@ import { types } from '../../api_types';
 @Component
 export default class ProblemTags extends Vue {
   @Prop() initialTags!: omegaup.Tag[];
-  @Prop() problemLevel!: string;
+  @Prop({ default: null }) problemLevel!: string | null;
   @Prop() publicTags!: string[];
   @Prop() levelTags!: string[];
   @Prop({ default: [] }) initialSelectedTags!: types.SelectedTag[];
