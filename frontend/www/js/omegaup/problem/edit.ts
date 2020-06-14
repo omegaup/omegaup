@@ -40,8 +40,8 @@ OmegaUp.on('ready', () => {
         on: {
           'update-problem-level': (levelTag?: string) => {
             api.Problem.updateProblemLevel({
-                problem_alias: payload.alias,
-                level_tag: levelTag,
+              problem_alias: payload.alias,
+              level_tag: levelTag,
             })
               .then(response => {
                 ui.success(T.problemLevelUpdated);

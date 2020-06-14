@@ -202,7 +202,7 @@ export default class ProblemStatementEdit extends Vue {
   @Watch('markdownType')
   onInitialMarkdownTypeChange(
     newMarkdownType: string,
-    oldMarkdownType: string
+    oldMarkdownType: string,
   ): void {
     this.showTab = 'source';
     this.currentLanguage = this.initialLanguage;
