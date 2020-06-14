@@ -612,6 +612,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleSchoolProfile: "School Profile",
   omegaupTitleSchoolsRank: "School ranking",
   omegaupTitleScoreboardmerge: "Scoreboardmerge",
+  omegaupTitleStudentsProgress: "Progreso de los estudiantes",
   omegaupTitleSupportDashboard: "Support dashboard",
   omegaupTitleUpdatePrivileges: "Update privileges",
   omegaupTitleUsersRank: "User ranking",
