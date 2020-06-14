@@ -1173,12 +1173,7 @@ export namespace types {
     points: number;
     preferred_language?: string;
     problem_id: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1220,12 +1215,7 @@ export namespace types {
     points: number;
     preferred_language?: string;
     problem_id: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1271,12 +1261,7 @@ export namespace types {
     outputLimit: number;
     overallWallTimeLimit: number;
     problemLevel?: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     publicTags?: string[];
     publishedRevision?: types.ProblemVersion;
     selectedTags: { public: boolean; tagname: string }[];
@@ -1338,12 +1323,7 @@ export namespace types {
     };
     points: number;
     problem_id: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     sample_input?: string;
     settings: types.ProblemSettings;
@@ -1505,6 +1485,13 @@ export namespace types {
     version: string;
     visibility: number;
     visits: number;
+  }
+
+  export interface ProblemsetterInfo {
+    classname: string;
+    creation_date?: Date;
+    name: string;
+    username: string;
   }
 
   export interface Progress {
@@ -2613,12 +2600,7 @@ export namespace messages {
     order?: string;
     points?: number;
     preferred_language?: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal?: boolean;
     runs?: types.Run[];
     score?: number;

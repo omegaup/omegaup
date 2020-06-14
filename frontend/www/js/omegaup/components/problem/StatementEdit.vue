@@ -63,9 +63,9 @@
                     >{{ T.wordsProblemsetter }}:
                     <a class="problemsetter">
                       <omegaup-user-username
-                        v-bind:classname="classname"
+                        v-bind:classname="problemsetter.classname"
                         v-bind:linkify="true"
-                        v-bind:username="username"
+                        v-bind:username="problemsetter.username"
                       ></omegaup-user-username>
                     </a>
                   </em>
@@ -152,9 +152,7 @@ export default class ProblemStatementEdit extends Vue {
   @Prop() alias!: string;
   @Prop() title!: string;
   @Prop() source!: string;
-  @Prop() username!: string;
-  @Prop() name!: string;
-  @Prop() classname!: string;
+  @Prop({ default: null }) problemsetter!: types.ProblemsetterInfo;
   @Prop() markdownContents!: string;
   @Prop() initialLanguage!: string;
   @Prop() markdownType!: string;

@@ -122,6 +122,7 @@
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:source="data.source"
+          v-bind:problemsetter="data.problemsetter"
           v-bind:username="data.problemsetter.username"
           v-bind:name="data.problemsetter.name"
           v-on:emit-update-markdown-contents="
