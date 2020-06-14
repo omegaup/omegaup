@@ -1531,6 +1531,9 @@ export namespace types {
     allowTags: boolean;
     selectedTags: types.SelectedTag[];
     tags: { name?: string }[];
+    problemLevel?: string;
+    publicTags: string[];
+    levelTags: string[];
     title?: string;
   }
 
@@ -2797,6 +2800,8 @@ export namespace messages {
   };
   export type ProblemUpdateRequest = { [key: string]: any };
   export type ProblemUpdateResponse = { rejudged: boolean };
+  export type ProblemUpdateProblemLevelRequest = { [key: string]: any };
+  export type ProblemUpdateProblemLevelResponse = {};
   export type ProblemUpdateSolutionRequest = { [key: string]: any };
   export type ProblemUpdateSolutionResponse = {};
   export type ProblemUpdateStatementRequest = { [key: string]: any };
@@ -3622,6 +3627,9 @@ export namespace controllers {
     update: (
       params?: messages.ProblemUpdateRequest,
     ) => Promise<messages.ProblemUpdateResponse>;
+    updateProblemLevel: (
+      params?: messages.ProblemUpdateProblemLevelRequest,
+    ) => Promise<messages.ProblemUpdateProblemLevelResponse>;
     updateSolution: (
       params?: messages.ProblemUpdateSolutionRequest,
     ) => Promise<messages.ProblemUpdateSolutionResponse>;

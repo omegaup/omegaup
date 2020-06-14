@@ -42,6 +42,33 @@
           </button>
         </div>
         <div class="form-group">
+          <label>{{ T.wordsLevel }}</label>
+          <select class="form-control" v-model="problemLevelTag">
+            <option v-for="levelTag in levelTags" v-bind:value="levelTag">
+              {{ T[levelTag] }}
+            </option>
+          </select>
+          <span class="help-block">{{ T.levelTagHelp }}</span>
+          <button
+            type="button"
+            class="btn btn-primary m-1"
+            v-bind:disabled="
+              !problemLevelTag || problemLevel === problemLevelTag
+            "
+            v-on:click.prevent="onUpdateProblemLevel"
+          >
+            {{ T.updateProblemLevel }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger m-1"
+            v-bind:disabled="!problemLevel"
+            v-on:click.prevent="onDeleteProblemLevel"
+          >
+            {{ T.deleteProblemLevel }}
+          </button>
+        </div>
+        <div class="form-group">
           <label class="switch-container">
             <div class="switch">
               <input type="checkbox" v-model="allowTags" />
@@ -195,6 +222,9 @@ import { types } from '../../api_types';
 @Component
 export default class ProblemTags extends Vue {
   @Prop() initialTags!: omegaup.Tag[];
+  @Prop({ default: null }) problemLevel!: string | null;
+  @Prop() publicTags!: string[];
+  @Prop() levelTags!: string[];
   @Prop({ default: [] }) initialSelectedTags!: types.SelectedTag[];
   @Prop() alias!: string;
   @Prop({ default: '' }) title!: string;
@@ -207,6 +237,7 @@ export default class ProblemTags extends Vue {
   allowTags = this.initialAllowTags;
   public = false;
   tagname = '';
+  problemLevelTag: string | null = this.problemLevel;
 
   get selectedTagsList(): string {
     return JSON.stringify(this.selectedTags);
@@ -218,6 +249,17 @@ export default class ProblemTags extends Vue {
     if (this.canAddNewTags) {
       this.$emit('add-tag', this.alias, tagname, isPublic);
     }
+  }
+
+  onUpdateProblemLevel(): void {
+    if (this.problemLevelTag) {
+      this.$emit('update-problem-level', this.problemLevelTag);
+    }
+  }
+
+  onDeleteProblemLevel(): void {
+    this.$emit('update-problem-level');
+    this.problemLevelTag = null;
   }
 
   onRemoveTag(tagname: string): void {

@@ -281,6 +281,10 @@ class Problem {
 
     public static function initPublicTags(): void {
         $tags = [
+            'problemLevelAdvancedCompetitiveProgramming',
+            'problemLevelAdvancedSpecializedTopics',
+            'problemLevelBasicIntroductionToProgramming',
+            'problemLevelBasicKarel',
             'problemTagArrays',
             'problemTagBigData',
             'problemTagGreedyAlgorithms',
