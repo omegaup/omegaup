@@ -64,7 +64,7 @@
                   v-bind:value="problem.alias"
                 />
               </td>
-              <td class="text-center align-middle">
+              <td class="text-right align-middle">
                 {{ problem.problem_id }}
               </td>
               <td class="d-flex align-items-center">
