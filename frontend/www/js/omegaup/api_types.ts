@@ -715,6 +715,35 @@ export namespace types {
       );
     }
 
+    export function StudentProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentProgressPayload {
+      return (x => {
+        x.course = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function StudentsProgressPayload(
       elementId: string = 'payload',
     ): types.StudentsProgressPayload {
@@ -1882,10 +1911,15 @@ export namespace types {
     total_points?: number;
   }
 
+  export interface StudentProgressPayload {
+    course: types.CourseDetails;
+    students: types.CourseStudent[];
+    student: string;
+  }
+
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
     students: types.CourseStudent[];
-    student?: string;
   }
 
   export interface Submission {
