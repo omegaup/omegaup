@@ -280,7 +280,7 @@ import { types } from '../../api_types';
   },
 })
 export default class ProblemEdit extends Vue {
-  @Prop() data!: types.ProblemFormPayload;
+  @Prop() data!: types.ProblemEditPayload;
   @Prop() initialAdmins!: types.ProblemAdmin[];
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop() markdownContents!: string;

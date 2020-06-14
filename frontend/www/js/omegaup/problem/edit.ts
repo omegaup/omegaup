@@ -30,7 +30,7 @@ OmegaUp.on('ready', () => {
           initialAdmins: this.initialAdmins,
           initialGroups: this.initialGroups,
           initialLanguage: payload.statement.language,
-          log: this.log,
+          log: payload.log,
           publishedRevision: this.publishedRevision,
           value: this.publishedRevision,
           markdownContents: this.markdownContents,
@@ -229,8 +229,7 @@ OmegaUp.on('ready', () => {
     data: {
       initialAdmins: payload.admins,
       initialGroups: payload.groupAdmins,
-      log: <types.ProblemVersion[]>payload.log,
-      publishedRevision: <types.ProblemVersion>payload.publishedRevision,
+      publishedRevision: payload.publishedRevision,
       markdownContents: payload.statement.markdown,
       markdownSolutionContents: payload.solution.markdown,
     },
