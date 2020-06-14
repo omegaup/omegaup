@@ -7,7 +7,7 @@ import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.StudentsProgressPayload();
+  const payload = types.payloadParsers.StudentProgressPayload();
 
   let initialStudent: types.CourseStudent | null = null;
   if (payload.students && payload.students.length > 0) {
