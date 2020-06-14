@@ -612,6 +612,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleSchoolProfile: "(Sch001 Pr0fi13)",
   omegaupTitleSchoolsRank: "(Sch001 ranking)",
   omegaupTitleScoreboardmerge: "(Sc0r3b0ardm3rg3)",
+  omegaupTitleStudentsProgress: "(Pr0gr350 d3 105 357udian735)",
   omegaupTitleSupportDashboard: "(Supp0r7 da5hb0ard)",
   omegaupTitleUpdatePrivileges: "(Upda73 privi13g35)",
   omegaupTitleUsersRank: "(U53r ranking)",
