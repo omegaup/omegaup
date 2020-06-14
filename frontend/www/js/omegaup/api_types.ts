@@ -274,35 +274,6 @@ export namespace types {
       );
     }
 
-    export function CourseDetailsPayload(
-      elementId: string = 'payload',
-    ): types.CourseDetailsPayload {
-      return (x => {
-        x.details = (x => {
-          x.assignments = (x => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map(x => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
-                );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.details);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function CourseListPayload(
       elementId: string = 'payload',
     ): types.CourseListPayload {
@@ -715,27 +686,64 @@ export namespace types {
       );
     }
 
+    export function StudentProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentProgressPayload {
+      return (x => {
+        x.course = (x => {
+          if (x.assignments)
+            x.assignments = (x => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map(x => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          if (x.start_time)
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function StudentsProgressPayload(
       elementId: string = 'payload',
     ): types.StudentsProgressPayload {
       return (x => {
         x.course = (x => {
-          x.assignments = (x => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map(x => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
+          if (x.assignments)
+            x.assignments = (x => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map(x => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
+                return x;
+              });
+            })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          if (x.start_time)
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
         return x;
@@ -1032,26 +1040,21 @@ export namespace types {
   }
 
   export interface CourseDetails {
-    admission_mode: string;
+    admission_mode?: string;
     alias: string;
-    assignments: types.CourseAssignment[];
+    assignments?: types.CourseAssignment[];
     basic_information_required: boolean;
     description: string;
     finish_time?: Date;
-    is_admin: boolean;
-    is_curator: boolean;
+    isCurator?: boolean;
+    is_admin?: boolean;
     name: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
-    show_scoreboard: boolean;
-    start_time: Date;
+    show_scoreboard?: boolean;
+    start_time?: Date;
     student_count?: number;
-  }
-
-  export interface CourseDetailsPayload {
-    details: types.CourseDetails;
-    progress: types.AssignmentProgress;
   }
 
   export interface CourseListPayload {
@@ -1882,10 +1885,15 @@ export namespace types {
     total_points?: number;
   }
 
+  export interface StudentProgressPayload {
+    course: types.CourseDetails;
+    students: types.CourseStudent[];
+    student: string;
+  }
+
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
     students: types.CourseStudent[];
-    student?: string;
   }
 
   export interface Submission {
