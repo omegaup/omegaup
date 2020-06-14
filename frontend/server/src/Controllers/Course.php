@@ -2446,6 +2446,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course,
                         $r->identity
                     ),
+                    // TODO: Get progress only for the given student, rather than every student.
                     'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
                         $course->course_id,
                         $course->group_id
