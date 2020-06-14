@@ -1385,6 +1385,7 @@ const translations: { [key: string]: string; } = {
   wordsKarel: "Karel",
   wordsKeepProblem: "Conservar problema",
   wordsKeyword: "Palabra clave",
+  wordsKeywordSearch: "Buscar por alias, t\u00edtulo o id de problema",
   wordsLanguage: "Lenguaje",
   wordsLanguages: "Lenguajes",
   wordsLatestSubmissions: "\u00daltimos env\u00edos",

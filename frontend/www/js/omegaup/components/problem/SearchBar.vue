@@ -15,7 +15,7 @@
           class="form-control"
           v-bind:init="el => typeahead.problemTypeahead(el)"
           v-model="keyword"
-          v-bind:placeholder="T.wordsKeyword"
+          v-bind:placeholder="T.wordsKeywordSearch"
           name="query"
         ></omegaup-autocomplete>
       </div>
