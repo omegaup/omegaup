@@ -1888,7 +1888,7 @@ export namespace types {
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     students: types.CourseStudent[];
-    student: string;
+    student?: string;
   }
 
   export interface StudentsProgressPayload {
