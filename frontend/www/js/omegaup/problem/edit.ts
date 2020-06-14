@@ -83,8 +83,8 @@ OmegaUp.on('ready', () => {
                 .catch(ui.apiError);
             } else {
               problemEdit.markdownSolutionContents = currentMarkdown;
-              if (statements.hasOwnProperty(language)) {
-                problemEdit.markdownSolutionContents = statements[language];
+              if (solutions.hasOwnProperty(language)) {
+                problemEdit.markdownSolutionContents = solutions[language];
                 return;
               }
               api.Problem.solution({

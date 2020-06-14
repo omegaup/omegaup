@@ -162,10 +162,10 @@
           v-bind:markdown-type="'solutions'"
           v-bind:title="data.title"
           v-on:emit-update-markdown-contents="
-            (statements, newLanguage, currentMarkdown) =>
+            (solutions, newLanguage, currentMarkdown) =>
               $emit(
                 'update-markdown-contents',
-                statements,
+                solutions,
                 newLanguage,
                 currentMarkdown,
                 'solutions',
@@ -266,7 +266,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import problem_Form from './Form.vue';
 import problem_Tags from './Tags.vue';
 import problem_Versions from './Versions.vue';
@@ -292,7 +292,6 @@ export default class ProblemEdit extends Vue {
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop() markdownContents!: string;
   @Prop() markdownSolutionContents!: string;
-  @Prop() initialLanguage!: string;
 
   T = T;
   alias = this.data.alias;

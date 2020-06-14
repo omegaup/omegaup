@@ -199,6 +199,16 @@ export default class ProblemStatementEdit extends Vue {
     this.currentLanguage = newInitial;
   }
 
+  @Watch('markdownType')
+  onInitialMarkdownTypeChange(
+    newMarkdownType: string,
+    oldMarkdownType: string
+  ): void {
+    this.showTab = 'source';
+    this.currentLanguage = this.initialLanguage;
+    this.currentMarkdown = this.markdownContents;
+  }
+
   @Watch('markdownContents')
   onMarkdownContentsChange(newMarkdown: string): void {
     this.currentMarkdown = newMarkdown;
@@ -221,6 +231,7 @@ export default class ProblemStatementEdit extends Vue {
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
+    this.showTab = 'source';
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.markdownPreview]);
     if (!!oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
     if (this.markdownEditor) {
