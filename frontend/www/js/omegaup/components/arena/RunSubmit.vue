@@ -46,12 +46,14 @@
         <button
           type="submit"
           class="btn btn-primary"
-          v-bind:disabled="secondsRemaining > 0"
+          v-bind:disabled="!canSubmit"
         >
           <omegaup-countdown
-            v-if="secondsRemaining > 0"
+            v-if="!canSubmit"
             v-bind:target-time="nextSubmissionTimestamp"
-            v-bind:countdown-to-next-submission="true"
+            v-bind:countdown-format="
+              omegaup.CountdownFormat.WAIT_BETWEEN_UPLOADS_SECONDS
+            "
             v-on:emit-finish="now = Date.now()"
           ></omegaup-countdown>
           <span v-else="">{{ T.wordsSend }}</span>
@@ -85,17 +87,18 @@ import omegaup_Countdown from '../Countdown.vue';
 export default class ArenaRunSubmit extends Vue {
   @Ref() inputFile!: HTMLInputElement;
   @Prop() languages!: string[];
-  @Prop({ default: Date.now() }) nextSubmissionTimestamp!: Date;
+  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop() preferredLanguage!: string;
 
   T = T;
+  omegaup = omegaup;
   selectedLanguage = '';
   code = '';
   now: number = Date.now();
 
-  get secondsRemaining(): number {
-    return (this.nextSubmissionTimestamp.getTime() - this.now) / 1000;
+  get canSubmit(): boolean {
+    return this.nextSubmissionTimestamp.getTime() < this.now;
   }
 
   get filename(): string {
@@ -130,12 +133,10 @@ export default class ArenaRunSubmit extends Vue {
       { language: 'lua', name: 'Lua (5.2)' },
     ];
 
-    this.languages.push('');
-
     allLanguages
-      .filter(item => {
-        return this.languages.includes(item.language);
-      })
+      .filter(
+        item => this.languages.includes(item.language) || item.language === '',
+      )
       .forEach(optionItem => {
         allowedLanguages[optionItem.language] = optionItem.name;
       });
@@ -143,7 +144,7 @@ export default class ArenaRunSubmit extends Vue {
   }
 
   get extension(): string {
-    if (!this.selectedLanguage) {
+    if (!this.selectedLanguage || this.selectedLanguage === 'cat') {
       return '';
     }
     if (this.selectedLanguage.startsWith('cpp')) {
@@ -155,10 +156,7 @@ export default class ArenaRunSubmit extends Vue {
     if (this.selectedLanguage.startsWith('py')) {
       return '.py';
     }
-    if (this.selectedLanguage !== 'cat') {
-      return `.${this.selectedLanguage}`;
-    }
-    return '';
+    return `.${this.selectedLanguage}`;
   }
 
   @Watch('preferredLanguage')
@@ -167,10 +165,12 @@ export default class ArenaRunSubmit extends Vue {
   }
 
   onSubmit(ev: Event): void {
-    if (this.secondsRemaining > 0) {
+    if (!this.canSubmit) {
       alert(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-          submissionGap: this.secondsRemaining,
+          submissionGap: Math.ceil(
+            (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
+          ),
         }),
       );
       return;

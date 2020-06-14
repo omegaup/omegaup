@@ -79,6 +79,11 @@ export namespace omegaup {
     String = 'string',
   }
 
+  export enum CountdownFormat {
+    EVENT_COUNTDOWN,
+    WAIT_BETWEEN_UPLOADS_SECONDS,
+  }
+
   export enum SortOrder {
     Ascending = 'asc',
     Descending = 'desc',

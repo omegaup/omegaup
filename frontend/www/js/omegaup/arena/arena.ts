@@ -1876,6 +1876,7 @@ export class Arena {
   }
 
   hideOverlay(): void {
+    if ($('#overlay').css('display') === 'none') return;
     $('#overlay').hide();
     window.location.hash = window.location.hash.substring(
       0,
@@ -1899,7 +1900,7 @@ export class Arena {
   }
 
   initSubmissionCountdown(): void {
-    let nextSubmissionTimestamp: Date = new Date(0);
+    let nextSubmissionTimestamp = new Date(0);
     const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
