@@ -144,8 +144,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if (!is_null($query)) {
             if (is_numeric($query)) {
                 $clauses[] = [
-                    'p.problem_id = ?',
-                    [intval($query)],
+                    "(
+                      p.title LIKE CONCAT('%', ?, '%') OR
+                      p.alias LIKE CONCAT('%', ?, '%') OR
+                      p.problem_id = ?
+                    )",
+                    [$query, $query, intval($query)],
                 ];
             } else {
                 $clauses[] = [

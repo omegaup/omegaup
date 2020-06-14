@@ -1264,17 +1264,20 @@ export namespace types {
     groupAdmins: types.ProblemGroupAdmin[];
     inputLimit: number;
     languages: string;
+    levelTags?: string[];
     loadMathjax: boolean;
     log: types.ProblemVersion[];
     memoryLimit: number;
     outputLimit: number;
     overallWallTimeLimit: number;
+    problemLevel?: string;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
       name: string;
       username: string;
     };
+    publicTags?: string[];
     publishedRevision?: types.ProblemVersion;
     selectedTags: { public: boolean; tagname: string }[];
     solution: types.ProblemStatement;
@@ -1418,7 +1421,7 @@ export namespace types {
   export interface ProblemVersion {
     author: { email?: string; name?: string; time?: Date };
     commit: string;
-    committer: { name?: string; email?: string; time?: Date };
+    committer: { email?: string; name?: string; time?: Date };
     message?: string;
     parents?: string[];
     tree?: { [key: string]: string };
@@ -2678,6 +2681,8 @@ export namespace messages {
   };
   export type ProblemUpdateRequest = { [key: string]: any };
   export type ProblemUpdateResponse = { rejudged: boolean };
+  export type ProblemUpdateProblemLevelRequest = { [key: string]: any };
+  export type ProblemUpdateProblemLevelResponse = {};
   export type ProblemUpdateSolutionRequest = { [key: string]: any };
   export type ProblemUpdateSolutionResponse = {};
   export type ProblemUpdateStatementRequest = { [key: string]: any };
@@ -3503,6 +3508,9 @@ export namespace controllers {
     update: (
       params?: messages.ProblemUpdateRequest,
     ) => Promise<messages.ProblemUpdateResponse>;
+    updateProblemLevel: (
+      params?: messages.ProblemUpdateProblemLevelRequest,
+    ) => Promise<messages.ProblemUpdateProblemLevelResponse>;
     updateSolution: (
       params?: messages.ProblemUpdateSolutionRequest,
     ) => Promise<messages.ProblemUpdateSolutionResponse>;

@@ -23,8 +23,8 @@
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
- * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{name?: string, email?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
- * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, loadMathjax: true, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemsetter?: array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, publishedRevision: ProblemVersion|null, selectedTags: list<array{public: bool, tagname: string}>, solution: ProblemStatement, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, tags: list<array{name: null|string}>, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
+ * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags?: list<string>, loadMathjax: true, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel?: null|string, problemsetter?: array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, publicTags?: list<string>, publishedRevision: ProblemVersion|null, selectedTags: list<array{public: bool, tagname: string}>, solution: ProblemStatement, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, tags: list<array{name: null|string}>, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
  * @psalm-type ProblemDetailsv2Payload=array{nominationStatus?: NominationStatus, problem: ProblemInfo, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
@@ -589,6 +589,66 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\Controllers\ACL::addGroup($problem->acl_id, $group->group_id);
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
+     * Updates the problem level of a problem
+     *
+     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $level_tag
+     *
+     * @return array{status: string}
+     */
+    public static function apiUpdateProblemLevel(\OmegaUp\Request $r): array {
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['problem_alias'],
+            'problem_alias'
+        );
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['level_tag'],
+            'level_tag'
+        );
+
+        $r->ensureIdentity();
+
+        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $tag = null;
+        if (!empty($r['level_tag'])) {
+            $tag = \OmegaUp\DAO\Tags::getByName($r['level_tag']);
+
+            if (is_null($tag)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('tag');
+            }
+
+            if (
+                !in_array(
+                    $tag->name,
+                    \OmegaUp\Controllers\Tag::getLevelTags()
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'notProblemLevelTag',
+                    'level_tag'
+                );
+            }
+        }
+
+        \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+            $problem,
+            $tag
+        );
 
         return [
             'status' => 'ok',
@@ -4549,7 +4609,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{LOAD_MATHJAX: bool, payload: ProblemEditPayload, title: string}, entrypoint: string}
+     * @return array{entrypoint: string, smartyProperties: array{LOAD_MATHJAX: bool, payload: ProblemEditPayload, title: string}}
      *
      * @omegaup-request-param string $contents
      * @omegaup-request-param string $directory
@@ -4662,6 +4722,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'admins' => $admins,
                 'groupAdmins' => $groupAdmins,
                 'tags' => $tags,
+                'problemLevel' => \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+                    $problem
+                ),
+                'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
+                'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                 'selectedTags' => $selectedTags,
                 'log' => $versions['log'],
                 'publishedRevision' => $publishedRevision,

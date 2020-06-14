@@ -207,6 +207,12 @@
           v-bind:title="data.title"
           v-bind:initial-allow-tags="data.allowUserAddTags"
           v-bind:can-add-new-tags="true"
+          v-bind:public-tags="data.publicTags"
+          v-bind:level-tags="data.levelTags"
+          v-bind:problem-level="data.problemLevel"
+          v-on:emit-update-problem-level="
+            levelTag => $emit('update-problem-level', levelTag)
+          "
           v-on:emit-add-tag="
             (alias, tagname, isPublic) =>
               $emit('add-tag', alias, tagname, isPublic)

@@ -35,8 +35,25 @@ OmegaUp.on('ready', () => {
           value: this.publishedRevision,
           markdownContents: this.markdownContents,
           markdownSolutionContents: this.markdownSolutionContents,
+          problemLevel: this.problemLevel,
         },
         on: {
+          'update-problem-level': (levelTag?: string) => {
+            const params = levelTag
+              ? {
+                  problem_alias: payload.alias,
+                  level_tag: levelTag,
+                }
+              : {
+                  problem_alias: payload.alias,
+                };
+            api.Problem.updateProblemLevel(params)
+              .then(response => {
+                ui.success(T.problemLevelUpdated);
+                this.problemLevel = levelTag;
+              })
+              .catch(ui.apiError);
+          },
           'update-markdown-contents': (
             statements: types.Statements,
             language: string,
@@ -232,6 +249,7 @@ OmegaUp.on('ready', () => {
       publishedRevision: payload.publishedRevision,
       markdownContents: payload.statement.markdown,
       markdownSolutionContents: payload.solution.markdown,
+      problemLevel: payload.problemLevel,
     },
     components: {
       'omegaup-problem-edit': problem_Edit,
