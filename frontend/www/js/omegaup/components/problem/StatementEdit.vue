@@ -17,17 +17,21 @@
       <div class="row">
         <div class="col-md-12">
           <ul class="nav nav-tabs">
-            <li
-              v-bind:class="{ active: showTab === 'source' }"
-              v-on:click="showTab = 'source'"
-            >
-              <a data-toggle="tab">{{ T.wordsSource }}</a>
+            <li class="nav-item" v-on:click="showTab = 'source'">
+              <a
+                class="nav-link"
+                v-bind:class="{ active: showTab === 'source' }"
+                data-toggle="tab"
+                >{{ T.wordsSource }}</a
+              >
             </li>
-            <li
-              v-bind:class="{ active: showTab === 'preview' }"
-              v-on:click="showTab = 'preview'"
-            >
-              <a data-toggle="tab">{{ T.wordsPreview }}</a>
+            <li class="nav-item" v-on:click="showTab = 'preview'">
+              <a
+                class="nav-link"
+                v-bind:class="{ active: showTab === 'preview' }"
+                data-toggle="tab"
+                >{{ T.wordsPreview }}</a
+              >
             </li>
           </ul>
 
@@ -115,6 +119,10 @@
 
 <style lang="scss">
 @import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+.wmd-preview,
+.wmd-button-bar {
+  background-color: #fff;
+}
 </style>
 
 <script lang="ts">
