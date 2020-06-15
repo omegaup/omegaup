@@ -7,7 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp|null, badge_alias: string, unlocked?: boolean, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
  * @psalm-type BadgeDetailsPayload=array{badge: Badge}
- * @psalm-type BadgeListPayload=array{badges: list<string>, owned_badges: list<Badge>}
+ * @psalm-type BadgeListPayload=array{badges: list<string>, ownedBadges: list<Badge>}
  */
 class Badge extends \OmegaUp\Controllers\Controller {
     /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
@@ -152,13 +152,12 @@ class Badge extends \OmegaUp\Controllers\Controller {
     public static function getBadgeListForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
         $badges = self::apiList($r);
-        $owned_badges = self::apiMyList($r);
-        print_r($owned_badges);
+        $ownedBadges = self::apiMyList($r);
         return [
             'smartyProperties' => [
                 'payload' => [
                     'badges' => $badges,
-                    'owned_badges' => $owned_badges['badges']
+                    'ownedBadges' => $ownedBadges['badges']
                 ],
                 'title' => 'omegaupTitleBadges'
             ],

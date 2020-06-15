@@ -12,8 +12,10 @@ OmegaUp.on('ready', function() {
     render: function(createElement) {
       return createElement('omegaup-badge-list', {
         props: {
-          allBadges: <Set<string[]>>new Set([payload.badges]),
-          visitorBadges: <Set<types.Badge[]>>new Set([payload.owned_badges]),
+          allBadges: <Set<string>>new Set(payload.badges),
+          visitorBadges: <Set<string>>(
+            new Set(payload.ownedBadges.map(badge => badge.badge_alias))
+          ),
           showAllBadgesLink: false,
         },
       });

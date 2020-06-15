@@ -70,7 +70,7 @@ export namespace types {
       elementId: string = 'payload',
     ): types.BadgeListPayload {
       return (x => {
-        x.owned_badges = (x => {
+        x.ownedBadges = (x => {
           if (!Array.isArray(x)) {
             return x;
           }
@@ -85,7 +85,7 @@ export namespace types {
               );
             return x;
           });
-        })(x.owned_badges);
+        })(x.ownedBadges);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -813,7 +813,7 @@ export namespace types {
 
   export interface BadgeListPayload {
     badges: string[];
-    owned_badges: types.Badge[];
+    ownedBadges: types.Badge[];
   }
 
   export interface Clarification {
