@@ -314,76 +314,87 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  var details = new Vue({
-    el: '#edit div',
-    render: function(createElement) {
-      return createElement('omegaup-course-details', {
-        props: { update: true, course: this.course },
-        on: {
-          submit: function(ev) {
-            new Promise((accept, reject) => {
-              if (ev.school_id !== undefined) {
-                accept(ev.school_id);
-              } else if (ev.school_name) {
-                api.School.create({ name: ev.school_name })
-                  .then(function(data) {
-                    accept(data.school_id);
+  api.Course.adminDetails({ alias: courseAlias })
+    .then(function(course) {
+      $('.course-header')
+        .text(course.name)
+        .attr('href', '/course/' + courseAlias + '/');
+      var details = new Vue({
+        el: '#edit div',
+        render: function(createElement) {
+          return createElement('omegaup-course-form', {
+            props: { update: true, course: course },
+            on: {
+              submit: function(ev) {
+                new Promise((accept, reject) => {
+                  if (ev.school_id !== undefined) {
+                    accept(ev.school_id);
+                  } else if (ev.school_name) {
+                    api.School.create({ name: ev.school_name })
+                      .then(function(data) {
+                        accept(data.school_id);
+                      })
+                      .catch(UI.apiError);
+                  } else {
+                    accept(null);
+                  }
+                })
+                  .then(function(school_id) {
+                    const params = {
+                      course_alias: courseAlias,
+                      name: ev.name,
+                      description: ev.description,
+                      start_time: ev.startTime.getTime() / 1000,
+                      alias: ev.alias,
+                      show_scoreboard: ev.showScoreboard,
+                      needs_basic_information: ev.basic_information_required,
+                      requests_user_information: ev.requests_user_information,
+                      school_id: school_id,
+                    };
+
+                    if (ev.unlimitedDuration) {
+                      params.unlimited_duration = true;
+                    } else {
+                      params.finish_time =
+                        new Date(ev.finishTime).setHours(23, 59, 59, 999) /
+                        1000;
+                    }
+
+                    api.Course.update(params)
+                      .then(function() {
+                        UI.success(
+                          UI.formatString(
+                            T.courseEditCourseEditedAndGoToCourse,
+                            {
+                              alias: ev.alias,
+                            },
+                          ),
+                        );
+                        $('.course-header')
+                          .text(ev.alias)
+                          .attr('href', '/course/' + ev.alias + '/');
+                        $('div.post.footer').show();
+                        window.scrollTo(0, 0);
+                      })
+                      .catch(UI.apiError);
                   })
                   .catch(UI.apiError);
-              } else {
-                accept(null);
-              }
-            })
-              .then(function(school_id) {
-                const params = {
-                  course_alias: courseAlias,
-                  name: ev.name,
-                  description: ev.description,
-                  start_time: ev.startTime.getTime() / 1000,
-                  alias: ev.alias,
-                  show_scoreboard: ev.showScoreboard,
-                  needs_basic_information: ev.basic_information_required,
-                  requests_user_information: ev.requests_user_information,
-                  school_id: school_id,
-                };
-
-                if (ev.unlimitedDuration) {
-                  params.unlimited_duration = true;
-                } else {
-                  params.finish_time =
-                    new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000;
-                }
-
-                api.Course.update(params)
-                  .then(function() {
-                    UI.success(
-                      UI.formatString(T.courseEditCourseEditedAndGoToCourse, {
-                        alias: ev.alias,
-                      }),
-                    );
-                    $('.course-header')
-                      .text(ev.alias)
-                      .attr('href', '/course/' + ev.alias + '/');
-                    $('div.post.footer').show();
-                    window.scrollTo(0, 0);
-                  })
-                  .catch(UI.apiError);
-              })
-              .catch(UI.apiError);
-          },
-          cancel: function(ev) {
-            window.location = '/course/' + courseAlias + '/';
-          },
+              },
+              cancel: function(ev) {
+                window.location = '/course/' + courseAlias + '/';
+              },
+            },
+          });
+        },
+        components: {
+          'omegaup-course-form': course_Form,
         },
       });
-    },
-    data: {
-      course: {},
-    },
-    components: {
-      'omegaup-course-details': course_Form,
-    },
-  });
+      editAdmissionMode.admissionMode = course.admission_mode;
+      editAdmissionMode.shouldShowPublicOption = course.is_curator;
+      clone.initialName = course.name;
+    })
+    .catch(UI.apiError);
 
   var problemList = new Vue({
     el: '#problems div',
@@ -638,18 +649,6 @@ OmegaUp.on('ready', function() {
       }
     }
   }
-
-  api.Course.adminDetails({ alias: courseAlias })
-    .then(function(course) {
-      $('.course-header')
-        .text(course.name)
-        .attr('href', '/course/' + courseAlias + '/');
-      details.course = course;
-      editAdmissionMode.admissionMode = course.admission_mode;
-      editAdmissionMode.shouldShowPublicOption = course.is_curator;
-      clone.initialName = course.name;
-    })
-    .catch(UI.apiError);
 
   function refreshStudentList() {
     api.Course.listStudents({ course_alias: courseAlias })

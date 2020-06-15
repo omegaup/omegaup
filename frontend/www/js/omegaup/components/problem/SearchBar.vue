@@ -4,7 +4,7 @@
       <div class="form-group mr-2" v-if="tags.length !== 0">
         <div class="mr-1" v-for="tag in tags">
           <input type="hidden" name="tag[]" v-bind:value="tag" />
-          <span class="badge badge-secondary">{{ tag }}</span>
+          <span class="badge badge-secondary m-1 p-2">{{ tag }}</span>
         </div>
         <a class="remove-all-tags" href="/problem/">
           <font-awesome-icon v-bind:icon="['fas', 'times']" />
@@ -15,7 +15,7 @@
           class="form-control"
           v-bind:init="el => typeahead.problemTypeahead(el)"
           v-model="keyword"
-          v-bind:placeholder="T.wordsKeyword"
+          v-bind:placeholder="T.wordsKeywordSearch"
           name="query"
         ></omegaup-autocomplete>
       </div>

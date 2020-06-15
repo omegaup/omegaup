@@ -144,6 +144,7 @@
   - [`/api/problem/stats/`](#apiproblemstats)
   - [`/api/problem/tags/`](#apiproblemtags)
   - [`/api/problem/update/`](#apiproblemupdate)
+  - [`/api/problem/updateProblemLevel/`](#apiproblemupdateproblemlevel)
   - [`/api/problem/updateSolution/`](#apiproblemupdatesolution)
   - [`/api/problem/updateStatement/`](#apiproblemupdatestatement)
   - [`/api/problem/versions/`](#apiproblemversions)
@@ -1939,9 +1940,9 @@ Returns all runs for a course
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `problems` | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; letter: string; order: number; points: number; submissions: number; title: string; version: string; visibility: number; visits: number; runs: { guid: string; language: string; source?: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; time: Date; submit_delay: number; }[]; }[]` |
+| Name       | Type                    |
+| ---------- | ----------------------- |
+| `problems` | `types.CourseProblem[]` |
 
 ## `/api/course/update/`
 
@@ -2681,7 +2682,7 @@ Entry point for Problem Details API
 | `order`                | `string`                                                                                 |
 | `points`               | `number`                                                                                 |
 | `preferred_language`   | `string`                                                                                 |
-| `problemsetter`        | `{ classname: string; creation_date: Date; name: string; username: string; }`            |
+| `problemsetter`        | `types.ProblemsetterInfo`                                                                |
 | `quality_seal`         | `boolean`                                                                                |
 | `runs`                 | `types.Run[]`                                                                            |
 | `score`                | `number`                                                                                 |
@@ -2979,6 +2980,23 @@ Update problem contents
 | Name       | Type      |
 | ---------- | --------- |
 | `rejudged` | `boolean` |
+
+## `/api/problem/updateProblemLevel/`
+
+### Description
+
+Updates the problem level of a problem
+
+### Parameters
+
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| `problem_alias` | `mixed` |             |
+| `level_tag`     | `mixed` |             |
+
+### Returns
+
+_Nothing_
 
 ## `/api/problem/updateSolution/`
 

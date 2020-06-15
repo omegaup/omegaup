@@ -78,17 +78,21 @@ a.card-header-help {
   color: #aaa;
 }
 
-.tags-badges .badge {
+.custom-badge {
   color: black;
+
   &:hover {
     background-color: rgba(black, 0.35);
   }
+
   &-owner {
     background-color: #ccc;
   }
+
   &-quality {
     background-color: #ffeb3b;
   }
+
   &-voted {
     background-color: #99c2ff;
   }

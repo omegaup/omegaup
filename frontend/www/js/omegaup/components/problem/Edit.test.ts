@@ -34,6 +34,10 @@ describe('Edit.vue', () => {
           solution: {
             language: 'es',
           },
+          problemsetter: {
+            username: 'username',
+            name: 'name',
+          },
         },
         initialLanguage: 'es',
       },

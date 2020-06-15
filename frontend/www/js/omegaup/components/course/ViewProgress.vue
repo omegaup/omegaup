@@ -1,11 +1,11 @@
 <template>
-  <div class="omegaup-course-viewprogress panel">
-    <div class="page-header">
+  <div class="omegaup-course-viewprogress card">
+    <div class="card-header">
       <h2>
         <a v-bind:href="courseUrl">{{ course.name }}</a>
       </h2>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <table class="table table-striped">
         <thead>
           <tr>
@@ -30,7 +30,7 @@
       </table>
     </div>
     <!-- panel-body -->
-    <div class="panel-footer">
+    <div class="card-footer">
       {{ T.courseStudentsProgressExportToSpreadsheet }}:
       <a v-bind:download="csvFilename" v-bind:href="csvDataUrl">.csv</a>
       <a v-bind:download="odsFilename" v-bind:href="odsDataUrl">.ods</a>

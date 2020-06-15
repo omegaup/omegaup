@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="panel-body controls">
+  <div class="card">
+    <div class="card-body controls">
       <label
         >{{ T.problemVersionDiffMode }}
         <select v-model="diffMode">
@@ -17,7 +17,7 @@
         <input type="checkbox" v-model="showOnlyChanges"
       /></label>
     </div>
-    <div class="panel-body no-padding">
+    <div class="card-body no-padding">
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-6 scrollable">
@@ -131,10 +131,10 @@
         </div>
       </div>
     </div>
-    <div class="panel-footer" v-if="showFooter">
+    <div class="card-footer" v-if="showFooter">
       <form
         v-on:submit.prevent="
-          $emit('select-version', selectedRevision, updatePublished)
+          $emit('emit-select-version', selectedRevision, updatePublished)
         "
       >
         <button class="btn btn-primary" type="submit">
@@ -264,7 +264,11 @@ export default class ProblemVersions extends Vue {
     if (!newValue || this.runsDiff.hasOwnProperty(newValue.version)) {
       return;
     }
-    this.$emit('runs-diff', this, this.selectedRevision);
+    if (!this.showFooter) {
+      this.$emit('runs-diff', this, this.selectedRevision);
+    } else {
+      this.$emit('emit-runs-diff', this, this.selectedRevision);
+    }
   }
 }
 </script>

@@ -513,14 +513,6 @@ export namespace types {
       );
     }
 
-    export function ProblemAdminsPayload(
-      elementId: string = 'payload',
-    ): types.ProblemAdminsPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
-      );
-    }
-
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
@@ -627,24 +619,6 @@ export namespace types {
       );
     }
 
-    export function ProblemEditTransitionalPayload(
-      elementId: string = 'payload',
-    ): types.ProblemEditTransitionalPayload {
-      return (x => {
-        if (x.problemsetter)
-          x.problemsetter = (x => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function ProblemFormPayload(
       elementId: string = 'payload',
     ): types.ProblemFormPayload {
@@ -661,35 +635,9 @@ export namespace types {
       );
     }
 
-    export function ProblemMarkdownPayload(
-      elementId: string = 'payload',
-    ): types.ProblemMarkdownPayload {
-      return (x => {
-        if (x.problemsetter)
-          x.problemsetter = (x => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function ProblemQualityPayload(
       elementId: string = 'payload',
     ): types.ProblemQualityPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
-      );
-    }
-
-    export function ProblemTagsPayload(
-      elementId: string = 'payload',
-    ): types.ProblemTagsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -735,6 +683,64 @@ export namespace types {
           x.max_wait_time = ((x: number) => new Date(x * 1000))(
             x.max_wait_time,
           );
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function StudentProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentProgressPayload {
+      return (x => {
+        x.course = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function StudentsProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentsProgressPayload {
+      return (x => {
+        x.course = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1085,9 +1091,45 @@ export namespace types {
     };
   }
 
+  export interface CourseProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+    runs: {
+      guid: string;
+      language: string;
+      source?: string;
+      status: string;
+      verdict: string;
+      runtime: number;
+      penalty: number;
+      memory: number;
+      score: number;
+      contest_score?: number;
+      time: Date;
+      submit_delay: number;
+    }[];
+  }
+
   export interface CourseProblemTried {
     alias: string;
     title: string;
+    username: string;
+  }
+
+  export interface CourseStudent {
+    name?: string;
+    progress: { [key: string]: number };
     username: string;
   }
 
@@ -1241,12 +1283,6 @@ export namespace types {
     username: string;
   }
 
-  export interface ProblemAdminsPayload {
-    admins: types.ProblemAdmin[];
-    alias: string;
-    group_admins: types.ProblemGroupAdmin[];
-  }
-
   export interface ProblemDetails {
     accepted: number;
     admin?: boolean;
@@ -1261,12 +1297,8 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problem_id: number;
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1291,6 +1323,7 @@ export namespace types {
     accepted: number;
     admin?: boolean;
     alias: string;
+    allow_user_add_tags: boolean;
     commit: string;
     creation_date: Date;
     difficulty?: number;
@@ -1306,12 +1339,8 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problem_id: number;
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1336,9 +1365,9 @@ export namespace types {
   }
 
   export interface ProblemDetailsv2Payload {
+    nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
     user: types.UserInfoForProblem;
-    nominationStatus?: types.NominationStatus;
   }
 
   export interface ProblemEditPayload {
@@ -1350,26 +1379,16 @@ export namespace types {
     groupAdmins: types.ProblemGroupAdmin[];
     inputLimit: number;
     languages: string;
+    levelTags?: string[];
     loadMathjax: boolean;
     log: types.ProblemVersion[];
     memoryLimit: number;
     outputLimit: number;
     overallWallTimeLimit: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
-    publishedRevision?: {
-      author: { email?: string; name?: string; time?: Date };
-      commit: string;
-      committer: { email?: string; name?: string; time?: Date };
-      message?: string;
-      parents?: string[];
-      tree?: { [key: string]: string };
-      version?: string;
-    };
+    problemLevel?: string;
+    problemsetter?: types.ProblemsetterInfo;
+    publicTags?: string[];
+    publishedRevision?: types.ProblemVersion;
     selectedTags: { public: boolean; tagname: string }[];
     solution: types.ProblemStatement;
     source: string;
@@ -1377,38 +1396,6 @@ export namespace types {
     statusError?: string;
     statusSuccess: boolean;
     tags: { name?: string }[];
-    timeLimit: number;
-    title: string;
-    validLanguages: { [key: string]: string };
-    validator: string;
-    validatorTimeLimit: number | number;
-    validatorTypes: { [key: string]: null | string };
-    visibility: number;
-    visibilityStatuses: { [key: string]: number };
-  }
-
-  export interface ProblemEditTransitionalPayload {
-    alias: string;
-    allowUserAddTags: boolean;
-    emailClarifications: boolean;
-    extraWallTime: number;
-    inputLimit: number;
-    languages: string;
-    memoryLimit: number;
-    outputLimit: number;
-    overallWallTimeLimit: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
-    source: string;
-    statement: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };
@@ -1460,12 +1447,8 @@ export namespace types {
       time_limit: string;
     };
     points: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problem_id: number;
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     sample_input?: string;
     settings: types.ProblemSettings;
@@ -1480,14 +1463,15 @@ export namespace types {
     difficulty?: number;
     difficulty_histogram: number[];
     points: number;
+    problem_id: number;
     quality?: number;
     quality_histogram: number[];
+    quality_seal: boolean;
     ratio: number;
     score: number;
-    tags: { source: string; name: string }[];
+    tags: { name: string; source: string }[];
     title: string;
     visibility: number;
-    quality_seal: boolean;
   }
 
   export interface ProblemListPayload {
@@ -1506,19 +1490,6 @@ export namespace types {
     tags: string[];
   }
 
-  export interface ProblemMarkdownPayload {
-    alias: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
-    source?: string;
-    statement: types.ProblemStatement;
-    title?: string;
-  }
-
   export interface ProblemQualityPayload {
     canNominateProblem: boolean;
     dismissed: boolean;
@@ -1533,16 +1504,16 @@ export namespace types {
 
   export interface ProblemSettings {
     cases: { [key: string]: { in: string; out: string; weight?: number } };
-    limits: types.LimitsSettings;
     interactive?: types.InteractiveSettings;
+    limits: types.LimitsSettings;
     validator: {
-      name: string;
-      tolerance?: number;
       custom_validator?: {
-        source: string;
         language: string;
         limits?: types.LimitsSettings;
+        source: string;
       };
+      name: string;
+      tolerance?: number;
     };
   }
 
@@ -1552,18 +1523,10 @@ export namespace types {
     markdown: string;
   }
 
-  export interface ProblemTagsPayload {
-    alias: string;
-    allowTags: boolean;
-    selectedTags: types.SelectedTag[];
-    tags: { name?: string }[];
-    title?: string;
-  }
-
   export interface ProblemVersion {
     author: { email?: string; name?: string; time?: Date };
     commit: string;
-    committer: { name?: string; email?: string; time?: Date };
+    committer: { email?: string; name?: string; time?: Date };
     message?: string;
     parents?: string[];
     tree?: { [key: string]: string };
@@ -1647,6 +1610,13 @@ export namespace types {
     version: string;
     visibility: number;
     visits: number;
+  }
+
+  export interface ProblemsetterInfo {
+    classname: string;
+    creation_date?: Date;
+    name: string;
+    username: string;
   }
 
   export interface Progress {
@@ -1841,6 +1811,17 @@ export namespace types {
     distribution?: { [key: number]: number };
     size_of_bucket?: number;
     total_points?: number;
+  }
+
+  export interface StudentProgressPayload {
+    course: types.CourseDetails;
+    students: types.CourseStudent[];
+    student: string;
+  }
+
+  export interface StudentsProgressPayload {
+    course: types.CourseDetails;
+    students: types.CourseStudent[];
   }
 
   export interface Submission {
@@ -2500,35 +2481,7 @@ export namespace messages {
   export type CourseStudentProgressRequest = { [key: string]: any };
   export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-      runs: {
-        guid: string;
-        language: string;
-        source?: string;
-        status: string;
-        verdict: string;
-        runtime: number;
-        penalty: number;
-        memory: number;
-        score: number;
-        contest_score?: number;
-        time: Date;
-        submit_delay: number;
-      }[];
-    }[];
+    problems: types.CourseProblem[];
   };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
@@ -2755,12 +2708,7 @@ export namespace messages {
     order?: string;
     points?: number;
     preferred_language?: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal?: boolean;
     runs?: types.Run[];
     score?: number;
@@ -2823,6 +2771,8 @@ export namespace messages {
   };
   export type ProblemUpdateRequest = { [key: string]: any };
   export type ProblemUpdateResponse = { rejudged: boolean };
+  export type ProblemUpdateProblemLevelRequest = { [key: string]: any };
+  export type ProblemUpdateProblemLevelResponse = {};
   export type ProblemUpdateSolutionRequest = { [key: string]: any };
   export type ProblemUpdateSolutionResponse = {};
   export type ProblemUpdateStatementRequest = { [key: string]: any };
@@ -3648,6 +3598,9 @@ export namespace controllers {
     update: (
       params?: messages.ProblemUpdateRequest,
     ) => Promise<messages.ProblemUpdateResponse>;
+    updateProblemLevel: (
+      params?: messages.ProblemUpdateProblemLevelRequest,
+    ) => Promise<messages.ProblemUpdateProblemLevelResponse>;
     updateSolution: (
       params?: messages.ProblemUpdateSolutionRequest,
     ) => Promise<messages.ProblemUpdateSolutionResponse>;
