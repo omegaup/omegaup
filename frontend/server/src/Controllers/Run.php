@@ -5,7 +5,6 @@
 /**
  * RunController
  *
- * @author joemmanuel
  * @psalm-type ProblemCasesContents=array<string, array{in: string, out: string}>
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type RunDetails=array{admin: bool, alias: string, cases?: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string}
@@ -1029,11 +1028,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
         $response = [];
         foreach ($existingCases as $file) {
-            /** @var array{contents: string, id: string, size: int} */
-            $problemContent = json_decode(
-                $problemArtifacts->get($file['path']),
-                /*$assoc=*/true
-            );
             [$_, $filename] = explode("{$directory}/", $file['path']);
             $extension = pathinfo($filename, PATHINFO_EXTENSION);
             \OmegaUp\Validators::validateInEnum(
@@ -1048,21 +1042,11 @@ class Run extends \OmegaUp\Controllers\Controller {
                     'out' => '',
                 ];
             }
-            /* @var string|bool(false) */
-            $contents = base64_decode(
-                $problemContent['contents'],
-                /*strict=*/ true
-            );
-            if (!$contents) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'invalidContents',
-                    'contents'
-                );
-            }
+            $caseContents = $problemArtifacts->get($file['path']);
             if ($extension === 'in') {
-                $response[$caseName]['in'] = $contents;
+                $response[$caseName]['in'] = $caseContents;
             } else {
-                $response[$caseName]['out'] = $contents;
+                $response[$caseName]['out'] = $caseContents;
             }
         }
         return $response;
@@ -1214,7 +1198,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             $r['run_alias'],
             'run_alias'
         );
-
         if (
             !self::downloadSubmission(
                 $r['run_alias'],
