@@ -9,7 +9,11 @@
           <div class="form-group col-md-4">
             <label
               >{{ T.wordsName }}
-              <input class="form-control name" type="text" v-model="name"
+              <input
+                class="form-control"
+                data-course-new-name
+                type="text"
+                v-model="name"
             /></label>
           </div>
           <div class="form-group col-md-4">
@@ -23,8 +27,9 @@
                 v-bind:title="T.courseNewFormShortTitle_alias_Desc"
               ></span>
               <input
-                class="form-control alias"
+                class="form-control"
                 type="text"
+                data-course-new-alias
                 v-bind:disabled="update"
                 v-model="alias"
             /></label>
@@ -232,7 +237,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
@@ -243,21 +248,21 @@ import DatePicker from '../DatePicker.vue';
   },
 })
 export default class CourseDetails extends Vue {
-  @Prop() update!: boolean;
-  @Prop() course!: omegaup.Course;
+  @Prop({ default: false }) update!: boolean;
+  @Prop() course!: types.CourseDetails;
 
   T = T;
-  alias = this.course.alias || '';
-  description = this.course.description || '';
+  alias = this.course.alias;
+  description = this.course.description;
   finishTime = this.course.finish_time || new Date();
-  showScoreboard = !!this.course.show_scoreboard;
-  startTime = this.course.start_time || new Date();
-  name = this.course.name || '';
-  school_name = this.course.school_name || '';
+  showScoreboard = this.course.show_scoreboard;
+  startTime = this.course.start_time;
+  name = this.course.name;
+  school_name = this.course.school_name;
   school_id = this.course.school_id;
-  basic_information_required = !!this.course.basic_information_required;
-  requests_user_information = this.course.requests_user_information || 'no';
-  unlimitedDuration = !this.course.finish_time;
+  basic_information_required = this.course.basic_information_required;
+  requests_user_information = this.course.requests_user_information;
+  unlimitedDuration = this.course.finish_time === null;
 
   data(): { [name: string]: any } {
     return {
@@ -275,24 +280,18 @@ export default class CourseDetails extends Vue {
     );
   }
 
-  @Watch('course')
-  onCourseChange() {
-    this.reset();
-  }
-
   reset(): void {
-    this.alias = this.course.alias || '';
-    this.description = this.course.description || '';
+    this.alias = this.course.alias;
+    this.description = this.course.description;
     this.finishTime = this.course.finish_time || new Date();
-    this.showScoreboard = !!this.course.show_scoreboard;
-    this.startTime = this.course.start_time || new Date();
-    this.name = this.course.name || '';
-    this.school_id = this.course.school_id || undefined;
-    this.school_name = this.course.school_name || '';
-    this.basic_information_required = !!this.course.basic_information_required;
-    this.requests_user_information =
-      this.course.requests_user_information || 'no';
-    this.unlimitedDuration = !this.course.finish_time;
+    this.showScoreboard = this.course.show_scoreboard;
+    this.startTime = this.course.start_time;
+    this.name = this.course.name;
+    this.school_name = this.course.school_name;
+    this.school_id = this.course.school_id;
+    this.basic_information_required = this.course.basic_information_required;
+    this.requests_user_information = this.course.requests_user_information;
+    this.unlimitedDuration = this.course.finish_time === null;
   }
 
   onSubmit(): void {
