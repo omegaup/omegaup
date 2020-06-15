@@ -1,8 +1,8 @@
 <template>
-  <div class="panel panel-primary">
-    <form class="panel-body form" enctype="multipart/form-data" method="post">
+  <div class="card">
+    <form class="card-body form" enctype="multipart/form-data" method="post">
       <div class="row">
-        <label
+        <label class="font-weight-bold"
           >{{ T.statementLanguage }}
           <select name="statement-language" v-model="currentLanguage">
             <option
@@ -16,63 +16,62 @@
       </div>
       <div class="row">
         <div class="col-md-12">
-          <div class="panel">
-            <ul class="nav nav-tabs">
-              <li
+          <ul class="nav nav-tabs">
+            <li class="nav-item" v-on:click="showTab = 'source'">
+              <a
+                class="nav-link"
                 v-bind:class="{ active: showTab === 'source' }"
-                v-on:click="showTab = 'source'"
+                data-toggle="tab"
+                >{{ T.wordsSource }}</a
               >
-                <a data-toggle="tab">{{ T.wordsSource }}</a>
-              </li>
-              <li
+            </li>
+            <li class="nav-item" v-on:click="showTab = 'preview'">
+              <a
+                class="nav-link"
                 v-bind:class="{ active: showTab === 'preview' }"
-                v-on:click="showTab = 'preview'"
+                data-toggle="tab"
+                >{{ T.wordsPreview }}</a
               >
-                <a data-toggle="tab">{{ T.wordsPreview }}</a>
-              </li>
-            </ul>
+            </li>
+          </ul>
 
-            <div class="tab-content">
-              <div class="tab-pane active" v-show="showTab === 'source'">
-                <!-- id-lint off -->
-                <div v-bind:id="`wmd-button-bar-${markdownType}`"></div>
-                <textarea
-                  class="wmd-input"
-                  v-bind:id="`wmd-input-${markdownType}`"
-                  v-model="currentMarkdown"
-                ></textarea>
-              </div>
-              <div class="tab-pane active" v-show="showTab === 'preview'">
-                <h1 class="title text-center">{{ title }}</h1>
-                <div
-                  ref="preview"
-                  class="no-bottom-margin statement"
-                  v-bind:id="`wmd-preview-${markdownType}`"
-                  v-html="markdownPreview"
-                ></div>
-                <!-- id-lint on -->
-                <template v-if="markdownType === 'statements'">
-                  <hr />
-                  <div>
-                    <em
-                      >{{ T.wordsSource }}:
-                      <span class="source">{{ source }}</span>
-                    </em>
-                  </div>
-                  <div>
-                    <em
-                      >{{ T.wordsProblemsetter }}:
-                      <a class="problemsetter">
-                        <omegaup-user-username
-                          v-bind:classname="classname"
-                          v-bind:linkify="true"
-                          v-bind:username="username"
-                        ></omegaup-user-username>
-                      </a>
-                    </em>
-                  </div>
-                </template>
-              </div>
+          <div class="tab-content">
+            <div class="tab-pane active" v-show="showTab === 'source'">
+              <div ref="markdownButtonBar" class="wmd-button-bar"></div>
+              <textarea
+                class="wmd-input"
+                ref="markdownInput"
+                v-model="currentMarkdown"
+              ></textarea>
+            </div>
+            <div class="tab-pane active" v-show="showTab === 'preview'">
+              <h1 class="title text-center">{{ title }}</h1>
+              <div
+                ref="markdownPreview"
+                class="no-bottom-margin statement wmd-preview"
+              ></div>
+              <template v-if="markdownType === 'statements'">
+                <hr />
+                <div>
+                  <em
+                    >{{ T.wordsSource }}:
+                    <span class="source">{{ source }}</span>
+                  </em>
+                </div>
+                <div>
+                  <em
+                    >{{ T.wordsProblemsetter }}:
+                    <a class="problemsetter">
+                      <omegaup-user-username
+                        v-if="problemsetter"
+                        v-bind:classname="problemsetter.classname"
+                        v-bind:linkify="true"
+                        v-bind:username="problemsetter.username"
+                      ></omegaup-user-username>
+                    </a>
+                  </em>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -119,6 +118,14 @@
   </div>
 </template>
 
+<style lang="scss">
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+.wmd-preview,
+.wmd-button-bar {
+  background-color: #fff;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -126,6 +133,13 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import user_Username from '../user/Username.vue';
+import * as Markdown from '@/third_party/js/pagedown/Markdown.Editor.js';
+import * as markdown from '../../markdown';
+
+const markdownConverter = markdown.markdownConverter({
+  preview: true,
+  imageMapping: {},
+});
 
 @Component({
   components: {
@@ -133,15 +147,14 @@ import user_Username from '../user/Username.vue';
   },
 })
 export default class ProblemStatementEdit extends Vue {
-  @Ref() readonly preview!: HTMLDivElement;
+  @Ref() readonly markdownButtonBar!: HTMLDivElement;
+  @Ref() readonly markdownInput!: HTMLDivElement;
+  @Ref() readonly markdownPreview!: HTMLDivElement;
   @Prop() alias!: string;
   @Prop() title!: string;
   @Prop() source!: string;
-  @Prop() username!: string;
-  @Prop() name!: string;
-  @Prop() classname!: string;
+  @Prop({ default: null }) problemsetter!: types.ProblemsetterInfo;
   @Prop() markdownContents!: string;
-  @Prop() markdownPreview!: string;
   @Prop() initialLanguage!: string;
   @Prop() markdownType!: string;
 
@@ -153,9 +166,20 @@ export default class ProblemStatementEdit extends Vue {
   errors: string[] = [];
   languages = ['es', 'en', 'pt'];
   statements: types.Statements = {};
+  markdownEditor: Markdown.Editor | null = null;
 
   mounted(): void {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
+    this.markdownEditor = new Markdown.Editor(markdownConverter, '', {
+      panels: {
+        buttonBar: this.markdownButtonBar,
+        preview: this.markdownPreview,
+        input: this.markdownInput,
+      },
+    });
+    this.markdownEditor.hooks.chain('onPreviewRefresh', () => {
+      MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.markdownPreview]);
+    });
+    this.markdownEditor.run();
   }
 
   getLanguageNameText(language: string): string {
@@ -176,10 +200,23 @@ export default class ProblemStatementEdit extends Vue {
     this.currentLanguage = newInitial;
   }
 
+  @Watch('markdownType')
+  onInitialMarkdownTypeChange(
+    newMarkdownType: string,
+    oldMarkdownType: string,
+  ): void {
+    this.showTab = 'source';
+    this.currentLanguage = this.initialLanguage;
+    this.currentMarkdown = this.markdownContents;
+  }
+
   @Watch('markdownContents')
   onMarkdownContentsChange(newMarkdown: string): void {
     this.currentMarkdown = newMarkdown;
     this.statements[this.currentLanguage] = newMarkdown;
+    if (this.markdownEditor) {
+      this.markdownEditor.refreshPreview();
+    }
   }
 
   @Watch('showTab')
@@ -187,16 +224,23 @@ export default class ProblemStatementEdit extends Vue {
     if (this.showTab !== 'preview') {
       return;
     }
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.markdownPreview]);
+    if (this.markdownEditor) {
+      this.markdownEditor.refreshPreview();
+    }
   }
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.preview]);
+    this.showTab = 'source';
+    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.markdownPreview]);
     if (!!oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
+    if (this.markdownEditor) {
+      this.markdownEditor.refreshPreview();
+    }
 
     this.$emit(
-      'update-markdown-contents',
+      'emit-update-markdown-contents',
       this.statements,
       newLanguage,
       this.currentMarkdown,
