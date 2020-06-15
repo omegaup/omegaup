@@ -17,7 +17,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     final public static function getByName(string $name): ?\OmegaUp\DAO\VO\Tags {
         $sql = 'SELECT * FROM Tags WHERE name = ? LIMIT 1;';
 
-        /** @var array{name: string, tag_id: int}|null */
+        /** @var array{name: string, public: bool, tag_id: int}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$name]);
         if (empty($row)) {
             return null;
@@ -43,5 +43,36 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             $result[] = new \OmegaUp\DAO\VO\Tags($row);
         }
         return $result;
+    }
+
+    /**
+     * Finds all public tags beginning with a certain parameter
+     *
+     * @return list<string>
+     */
+    public static function findPublicTagsByPrefix(
+        string $prefix
+    ) {
+        $sql = "
+            SELECT
+                name
+            FROM
+                Tags
+            WHERE
+                name LIKE CONCAT(?, '%') AND
+                public = true;";
+
+        $results = [];
+        /** @var array{name: string} row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [ $prefix ]
+            ) as $row
+        ) {
+            $results[] = $row['name'];
+        }
+
+        return $results;
     }
 }

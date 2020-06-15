@@ -1,17 +1,18 @@
 import course_ViewStudent from '../components/course/ViewStudent.vue';
-import { OmegaUp } from '../omegaup';
+import { omegaup, OmegaUp } from '../omegaup';
+import { types } from '../api_types';
 import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
-  var payload = JSON.parse(document.getElementById('payload').innerText);
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.StudentProgressPayload();
 
-  var initialStudent = null;
+  let initialStudent: types.CourseStudent | null = null;
   if (payload.students && payload.students.length > 0) {
     initialStudent = payload.students[0];
-    for (var student of payload.students) {
+    for (const student of payload.students) {
       if (student.username == payload.student) {
         initialStudent = student;
         break;
@@ -19,8 +20,8 @@ OmegaUp.on('ready', function() {
     }
   }
 
-  var viewStudent = new Vue({
-    el: '#view-student',
+  const viewStudent = new Vue({
+    el: '#main-container',
     render: function(createElement) {
       return createElement('omegaup-course-viewstudent', {
         props: {
@@ -31,14 +32,17 @@ OmegaUp.on('ready', function() {
           students: payload.students,
         },
         on: {
-          update: function(student, assignment) {
+          update: (
+            student: types.CourseStudent,
+            assignment: types.CourseAssignment,
+          ) => {
             if (assignment == null) return;
             api.Course.studentProgress({
               course_alias: payload.course.alias,
               assignment_alias: assignment.alias,
               usernameOrEmail: student.username,
             })
-              .then(function(data) {
+              .then(data => {
                 viewStudent.problems = data.problems;
               })
               .catch(UI.apiError);
@@ -47,7 +51,7 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      problems: [],
+      problems: <types.CourseProblem[]>[],
     },
     components: {
       'omegaup-course-viewstudent': course_ViewStudent,

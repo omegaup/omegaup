@@ -279,26 +279,22 @@ export namespace types {
     ): types.CourseDetailsPayload {
       return (x => {
         x.details = (x => {
-          if (x.assignments)
-            x.assignments = (x => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map(x => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
                 );
-                return x;
-              });
-            })(x.assignments);
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          if (x.start_time)
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.details);
         return x;
@@ -719,6 +715,64 @@ export namespace types {
       );
     }
 
+    export function StudentProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentProgressPayload {
+      return (x => {
+        x.course = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function StudentsProgressPayload(
+      elementId: string = 'payload',
+    ): types.StudentsProgressPayload {
+      return (x => {
+        x.course = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function SubmissionsListPayload(
       elementId: string = 'payload',
     ): types.SubmissionsListPayload {
@@ -1007,20 +1061,20 @@ export namespace types {
   }
 
   export interface CourseDetails {
-    admission_mode?: string;
+    admission_mode: string;
     alias: string;
-    assignments?: types.CourseAssignment[];
+    assignments: types.CourseAssignment[];
     basic_information_required: boolean;
     description: string;
     finish_time?: Date;
-    isCurator?: boolean;
-    is_admin?: boolean;
+    is_admin: boolean;
+    is_curator: boolean;
     name: string;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
-    show_scoreboard?: boolean;
-    start_time?: Date;
+    show_scoreboard: boolean;
+    start_time: Date;
     student_count?: number;
   }
 
@@ -1058,9 +1112,45 @@ export namespace types {
     };
   }
 
+  export interface CourseProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+    runs: {
+      guid: string;
+      language: string;
+      source?: string;
+      status: string;
+      verdict: string;
+      runtime: number;
+      penalty: number;
+      memory: number;
+      score: number;
+      contest_score?: number;
+      time: Date;
+      submit_delay: number;
+    }[];
+  }
+
   export interface CourseProblemTried {
     alias: string;
     title: string;
+    username: string;
+  }
+
+  export interface CourseStudent {
+    name?: string;
+    progress: { [key: string]: number };
     username: string;
   }
 
@@ -1234,6 +1324,7 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
+    problem_id: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1264,6 +1355,7 @@ export namespace types {
     accepted: number;
     admin?: boolean;
     alias: string;
+    allow_user_add_tags: boolean;
     commit: string;
     creation_date: Date;
     difficulty?: number;
@@ -1279,6 +1371,7 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
+    problem_id: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1309,9 +1402,9 @@ export namespace types {
   }
 
   export interface ProblemDetailsv2Payload {
+    nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
     user: types.UserInfoForProblem;
-    nominationStatus?: types.NominationStatus;
   }
 
   export interface ProblemEditPayload {
@@ -1433,6 +1526,7 @@ export namespace types {
       time_limit: string;
     };
     points: number;
+    problem_id: number;
     problemsetter?: {
       classname: string;
       creation_date?: Date;
@@ -1453,14 +1547,15 @@ export namespace types {
     difficulty?: number;
     difficulty_histogram: number[];
     points: number;
+    problem_id: number;
     quality?: number;
     quality_histogram: number[];
+    quality_seal: boolean;
     ratio: number;
     score: number;
-    tags: { source: string; name: string }[];
+    tags: { name: string; source: string }[];
     title: string;
     visibility: number;
-    quality_seal: boolean;
   }
 
   export interface ProblemListPayload {
@@ -1506,16 +1601,16 @@ export namespace types {
 
   export interface ProblemSettings {
     cases: { [key: string]: { in: string; out: string; weight?: number } };
-    limits: types.LimitsSettings;
     interactive?: types.InteractiveSettings;
+    limits: types.LimitsSettings;
     validator: {
-      name: string;
-      tolerance?: number;
       custom_validator?: {
-        source: string;
         language: string;
         limits?: types.LimitsSettings;
+        source: string;
       };
+      name: string;
+      tolerance?: number;
     };
   }
 
@@ -1530,6 +1625,9 @@ export namespace types {
     allowTags: boolean;
     selectedTags: types.SelectedTag[];
     tags: { name?: string }[];
+    problemLevel?: string;
+    publicTags: string[];
+    levelTags: string[];
     title?: string;
   }
 
@@ -1814,6 +1912,17 @@ export namespace types {
     distribution?: { [key: number]: number };
     size_of_bucket?: number;
     total_points?: number;
+  }
+
+  export interface StudentProgressPayload {
+    course: types.CourseDetails;
+    students: types.CourseStudent[];
+    student: string;
+  }
+
+  export interface StudentsProgressPayload {
+    course: types.CourseDetails;
+    students: types.CourseStudent[];
   }
 
   export interface Submission {
@@ -2473,35 +2582,7 @@ export namespace messages {
   export type CourseStudentProgressRequest = { [key: string]: any };
   export type _CourseStudentProgressServerResponse = any;
   export type CourseStudentProgressResponse = {
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-      runs: {
-        guid: string;
-        language: string;
-        source?: string;
-        status: string;
-        verdict: string;
-        runtime: number;
-        penalty: number;
-        memory: number;
-        score: number;
-        contest_score?: number;
-        time: Date;
-        submit_delay: number;
-      }[];
-    }[];
+    problems: types.CourseProblem[];
   };
   export type CourseUpdateRequest = { [key: string]: any };
   export type CourseUpdateResponse = {};
@@ -2796,6 +2877,8 @@ export namespace messages {
   };
   export type ProblemUpdateRequest = { [key: string]: any };
   export type ProblemUpdateResponse = { rejudged: boolean };
+  export type ProblemUpdateProblemLevelRequest = { [key: string]: any };
+  export type ProblemUpdateProblemLevelResponse = {};
   export type ProblemUpdateSolutionRequest = { [key: string]: any };
   export type ProblemUpdateSolutionResponse = {};
   export type ProblemUpdateStatementRequest = { [key: string]: any };
@@ -3621,6 +3704,9 @@ export namespace controllers {
     update: (
       params?: messages.ProblemUpdateRequest,
     ) => Promise<messages.ProblemUpdateResponse>;
+    updateProblemLevel: (
+      params?: messages.ProblemUpdateProblemLevelRequest,
+    ) => Promise<messages.ProblemUpdateProblemLevelResponse>;
     updateSolution: (
       params?: messages.ProblemUpdateSolutionRequest,
     ) => Promise<messages.ProblemUpdateSolutionResponse>;
