@@ -6,7 +6,6 @@ import badge_List from '../components/badge/List.vue';
 
 OmegaUp.on('ready', function() {
   const payload = types.payloadParsers.BadgeListPayload();
-  console.log(payload);
   let badgeList = new Vue({
     el: '#main-container',
     render: function(createElement) {
