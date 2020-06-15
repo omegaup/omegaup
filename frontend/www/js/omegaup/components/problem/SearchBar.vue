@@ -4,7 +4,7 @@
       <div class="form-group mr-2" v-if="tags.length !== 0">
         <div class="mr-1" v-for="tag in tags">
           <input type="hidden" name="tag[]" v-bind:value="tag" />
-          <span class="badge badge-secondary">{{ tag }}</span>
+          <span class="badge badge-secondary m-1 p-2">{{ tag }}</span>
         </div>
         <a class="remove-all-tags" href="/problem/">
           <font-awesome-icon v-bind:icon="['fas', 'times']" />
@@ -15,7 +15,7 @@
           class="form-control"
           v-bind:init="el => typeahead.problemTypeahead(el)"
           v-model="keyword"
-          v-bind:placeholder="T.wordsKeyword"
+          v-bind:placeholder="T.wordsKeywordSearch"
           name="query"
         ></omegaup-autocomplete>
       </div>
@@ -25,26 +25,6 @@
           <select name="language" class="ml-1 form-control" v-model="language">
             <option v-for="language in languages" v-bind:value="language">
               {{ getLanguageText(language) }}</option
-            >
-          </select>
-        </label>
-      </div>
-      <div class="form-group mr-2 mt-1">
-        <label>
-          {{ T.wordsOrderBy }}
-          <select name="order_by" class="ml-1 form-control" v-model="column">
-            <option v-for="column in columns" v-bind:value="column">
-              {{ getColumnText(column) }}</option
-            >
-          </select>
-        </label>
-      </div>
-      <div class="form-group mr-2 mt-1">
-        <label>
-          {{ T.wordsMode }}
-          <select name="mode" class="ml-1 form-control" v-model="mode">
-            <option v-for="mode in modes" v-bind:value="mode">
-              {{ getModeText(mode) }}</option
             >
           </select>
         </label>
@@ -87,42 +67,19 @@ export default class ProblemSearchBar extends Vue {
   @Prop() tags!: string[];
   @Prop() initialKeyword!: string;
   @Prop() initialLanguage!: string;
-  @Prop() initialColumn!: string;
-  @Prop() initialMode!: string;
   @Prop() languages!: string[];
-  @Prop() modes!: string[];
-  @Prop() columns!: string[];
 
   T = T;
   typeahead = typeahead;
 
   keyword = this.initialKeyword;
   language = this.initialLanguage;
-  column = this.initialColumn;
-  mode = this.initialMode;
 
   getLanguageText(language: string): string {
     if (language === 'all') return T.wordsAll;
     if (language === 'en') return T.wordsEnglish;
     if (language === 'es') return T.wordsSpanish;
     return T.wordsPortuguese;
-  }
-
-  getColumnText(column: string): string {
-    if (column === 'title') return T.wordsTitle;
-    if (column === 'quality') return T.wordsQuality;
-    if (column === 'difficulty') return T.wordsDifficulty;
-    if (column === 'submissions') return T.wordsRuns;
-    if (column === 'accepted') return T.wordsAccepted;
-    if (column === 'ratio') return T.wordsRatio;
-    if (column === 'points') return T.wordsPointsForRank;
-    if (column === 'score') return T.wordsMyScore;
-    return T.codersOfTheMonthDate;
-  }
-
-  getModeText(mode: string): string {
-    if (mode === 'asc') return T.wordsModeAsc;
-    return T.wordsModeDesc;
   }
 }
 </script>

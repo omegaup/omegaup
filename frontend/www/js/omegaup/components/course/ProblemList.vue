@@ -81,7 +81,7 @@
     <div class="panel-footer" v-show="showForm">
       <form>
         <div class="row">
-          <div class="col-md-4" v-show="showTopicsAndLevel">
+          <div class="col-md-4" v-show="showTopicsAndDifficulty">
             <div class="form-group">
               <label
                 >{{ T.wordsTopics }}
@@ -101,26 +101,26 @@
             </div>
             <div class="form-group">
               <label
-                >{{ T.wordsLevels }}
-                <select class="form-control" v-model="level">
+                >{{ T.wordsDifficulty }}
+                <select class="form-control" v-model="difficulty">
                   <option value="intro">
-                    {{ T.problemLevelIntro }}
+                    {{ T.problemDifficultyIntro }}
                   </option>
                   <option value="easy">
-                    {{ T.problemLevelEasy }}
+                    {{ T.problemDifficultyEasy }}
                   </option>
                   <option value="medium">
-                    {{ T.problemLevelMedium }}
+                    {{ T.problemDifficultyMedium }}
                   </option>
                   <option value="hard">
-                    {{ T.problemLevelHard }}
+                    {{ T.problemDifficultyHard }}
                   </option>
                 </select></label
               >
             </div>
           </div>
           <div class="col-md-8">
-            <div class="row" v-show="showTopicsAndLevel">
+            <div class="row" v-show="showTopicsAndDifficulty">
               <div class="form-group col-md-12">
                 <label
                   >{{ T.wordsProblems }}
@@ -210,23 +210,23 @@ export default class CourseProblemList extends Vue {
   T = T;
   assignment: Partial<omegaup.Assignment> = {};
   showForm = false;
-  level = 'intro';
+  difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
   problemAlias = '';
-  showTopicsAndLevel = false;
+  showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
 
   get tags(): string[] {
     let t = this.topics.slice();
-    t.push(this.level);
+    t.push(this.difficulty);
     return t;
   }
 
   onShowForm(): void {
     this.showForm = true;
     this.problemAlias = '';
-    this.level = 'intro';
+    this.difficulty = 'intro';
     this.topics = [];
   }
 

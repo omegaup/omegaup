@@ -52,7 +52,11 @@
                 {{ T.courseAssignmentEmpty }}
               </td>
             </tr>
-            <tr v-else="" v-for="homework in filteredHomeworks">
+            <tr
+              v-else=""
+              v-for="homework in filteredHomeworks"
+              v-bind:data-homework-alias="homework.alias"
+            >
               <td>
                 <a
                   class="text-center"
@@ -108,7 +112,9 @@
       </div>
       <div class="card-footer">
         <a
+          data-button-homework
           class="btn btn-primary float-right"
+          v-if="course.is_admin"
           v-bind:href="
             `/course/${course.alias}/edit/#assignments/new/homework/`
           "
@@ -193,7 +199,9 @@
       </div>
       <div class="card-footer">
         <a
+          data-button-exam
           class="btn btn-primary float-right"
+          v-if="course.is_admin"
           v-bind:href="`/course/${course.alias}/edit/#assignments/new/test/`"
           >{{ T.wordsNewExam }}</a
         >
@@ -253,7 +261,10 @@ export default class CourseDetails extends Vue {
     return progress.max_score === 0 ? percentText : `${percentText}%`;
   }
 
-  getFormattedTime(date: Date): string {
+  getFormattedTime(date: Date | null): string {
+    if (date === null) {
+      return '—';
+    }
     return time.formatDateTime(date);
   }
 

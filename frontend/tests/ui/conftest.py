@@ -16,6 +16,7 @@ import pytest
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -194,6 +195,27 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                 (By.XPATH,
                  '//%s//div[@data-value = "%s"]' %
                  (parent_xpath, value)))).click()
+
+    def send_keys(self,  # pylint: disable=no-self-use
+                  element: WebElement,
+                  value: str,
+                  retries: int = 10) -> None:
+        '''Helper to _really_ send keys to an element.
+
+        For some yet unexplained reason when running in non-headless mode, the
+        interactions with text elements do not always register by the browser.
+        This causes input elements to remain empty even after sending the keys.
+
+        This method sends the keys and then ensures that the value of the
+        element is the expected string, retrying if necessary.
+        '''
+
+        for _ in range(retries):
+            element.clear()
+            element.send_keys(value)
+            if element.get_attribute('value') == value:
+                return
+        logging.error('Failed to send keys to the element')
 
     @contextlib.contextmanager
     def login_user(self):

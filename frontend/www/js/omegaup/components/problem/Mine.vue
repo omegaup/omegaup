@@ -44,9 +44,11 @@
         </div>
       </div>
       <div class="table-responsive">
-        <table class="table">
+        <table class="table mb-0">
           <thead>
             <tr>
+              <th scope="col" class="text-center"></th>
+              <th scope="col" class="text-center">{{ T.wordsID }}</th>
               <th scope="col" class="text-center">{{ T.wordsTitle }}</th>
               <th scope="col" class="text-center">{{ T.wordsEdit }}</th>
               <th scope="col" class="text-center">{{ T.wordsStatistics }}</th>
@@ -54,14 +56,18 @@
           </thead>
           <tbody>
             <tr v-for="problem in problems">
-              <td class="d-flex align-items-center">
+              <td class="align-middle">
                 <input
                   type="checkbox"
                   v-model="selectedProblems"
                   v-bind:disabled="problem.visibility === -10"
                   v-bind:value="problem.alias"
-                  v-bind:id="problem.alias"
                 />
+              </td>
+              <td class="text-right align-middle">
+                {{ problem.problem_id }}
+              </td>
+              <td class="d-flex align-items-center">
                 <div class="d-inline-block ml-2">
                   <a
                     class="mr-1"
@@ -80,7 +86,9 @@
                   />
                   <div class="tags-badges" v-if="problem.tags.length">
                     <a
-                      v-bind:class="`badge badge-${tag.source} mr-1`"
+                      v-bind:class="
+                        `badge custom-badge custom-badge-${tag.source} m-1 p-2`
+                      "
                       v-bind:href="`/problem/?tag[]=${tag.name}`"
                       v-for="tag in problem.tags"
                       >{{

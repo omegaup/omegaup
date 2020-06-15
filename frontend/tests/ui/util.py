@@ -325,7 +325,7 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//tr/td/a[contains(@href, "%s")][text()="%s"]' %
+                 '//tr/td/a[contains(@href, "%s")][contains(text(), "%s")]' %
                  (alias, scoreboard)))).click()
     assert (url in driver.browser.current_url), driver.browser.current_url
 

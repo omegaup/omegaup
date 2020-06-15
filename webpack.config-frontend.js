@@ -45,6 +45,7 @@ module.exports = {
     contest_list: './frontend/www/js/omegaup/contest/list.js',
     contest_list_participant:
       './frontend/www/js/omegaup/contest/list_participant.js',
+    contest_mine: './frontend/www/js/omegaup/contest/mine.ts',
     contest_new: './frontend/www/js/omegaup/contest/new.ts',
     contest_print: './frontend/www/js/omegaup/contest/print.ts',
     contest_report: './frontend/www/js/omegaup/contest/report.js',
@@ -56,8 +57,8 @@ module.exports = {
     course_list: './frontend/www/js/omegaup/course/list.ts',
     course_new: './frontend/www/js/omegaup/course/new.js',
     course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
-    course_student: './frontend/www/js/omegaup/course/student.js',
-    course_students: './frontend/www/js/omegaup/course/students.js',
+    course_student: './frontend/www/js/omegaup/course/student.ts',
+    course_students: './frontend/www/js/omegaup/course/students.ts',
     group_identities: './frontend/www/js/omegaup/group/identities.js',
     group_members: './frontend/www/js/omegaup/group/members.js',
     course_submissions_list:
@@ -65,21 +66,19 @@ module.exports = {
     group_list: './frontend/www/js/omegaup/group/list.js',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
-    problem_admins: './frontend/www/js/omegaup/problem/admins.ts',
+    logout: './frontend/www/js/omegaup/login/logout.ts',
+    problem_edit: './frontend/www/js/omegaup/problem/edit.ts',
     problem_details: './frontend/www/js/omegaup/problem/details.ts',
-    problem_edit: './frontend/www/js/omegaup/problem/edit.js',
-    problem_edit_form: './frontend/www/js/omegaup/problem/edit.ts',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
     problem_list: './frontend/www/js/omegaup/problem/list.ts',
     problem_mine: './frontend/www/js/omegaup/problem/mine.ts',
     problem_new: './frontend/www/js/omegaup/problem/new.ts',
     problem_print: './frontend/www/js/omegaup/problem/print.ts',
     problem_solution: './frontend/www/js/omegaup/problem/solution.js',
-    problem_tags: './frontend/www/js/omegaup/problem/tags.ts',
     qualitynomination_popup:
       './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list:
-      './frontend/www/js/omegaup/qualitynomination/list.js',
+      './frontend/www/js/omegaup/qualitynomination/list.ts',
     qualitynomination_demotionpopup:
       './frontend/www/js/omegaup/arena/qualitynomination_demotionpopup.js',
     qualitynomination_details:

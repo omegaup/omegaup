@@ -144,6 +144,7 @@
   - [`/api/problem/stats/`](#apiproblemstats)
   - [`/api/problem/tags/`](#apiproblemtags)
   - [`/api/problem/update/`](#apiproblemupdate)
+  - [`/api/problem/updateProblemLevel/`](#apiproblemupdateproblemlevel)
   - [`/api/problem/updateSolution/`](#apiproblemupdatesolution)
   - [`/api/problem/updateStatement/`](#apiproblemupdatestatement)
   - [`/api/problem/versions/`](#apiproblemversions)
@@ -598,9 +599,9 @@ the director).
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                       |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ admission_mode: string; alias: string; finish_time: Date; rerun_id: number; scoreboard_url: string; scoreboard_url_admin: string; start_time: Date; title: string; }[]` |
+| Name       | Type              |
+| ---------- | ----------------- |
+| `contests` | `types.Contest[]` |
 
 ## `/api/contest/admins/`
 
@@ -842,9 +843,9 @@ Returns a list of contests where current user is participating in
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score: boolean; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
+| Name       | Type              |
+| ---------- | ----------------- |
+| `contests` | `types.Contest[]` |
 
 ## `/api/contest/myList/`
 
@@ -862,9 +863,9 @@ Returns a list of contests where current user is the director
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `contests` | `{ acl_id?: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback?: string; finish_time: Date; languages?: string; last_updated: Date; original_finish_time?: Date; partial_score: boolean; penalty?: number; penalty_calc_policy?: string; penalty_type?: string; points_decay_factor?: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard?: number; scoreboard_url: string; scoreboard_url_admin: string; show_scoreboard_after?: number; start_time: Date; submissions_gap?: number; title: string; urgent?: number; window_length: number; }[]` |
+| Name       | Type              |
+| ---------- | ----------------- |
+| `contests` | `types.Contest[]` |
 
 ## `/api/contest/open/`
 
@@ -1939,9 +1940,9 @@ Returns all runs for a course
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `problems` | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; letter: string; order: number; points: number; submissions: number; title: string; version: string; visibility: number; visits: number; runs: { guid: string; language: string; source?: string; status: string; verdict: string; runtime: number; penalty: number; memory: number; score: number; contest_score: number; time: Date; submit_delay: number; }[]; }[]` |
+| Name       | Type                    |
+| ---------- | ----------------------- |
+| `problems` | `types.CourseProblem[]` |
 
 ## `/api/course/update/`
 
@@ -2681,7 +2682,7 @@ Entry point for Problem Details API
 | `order`                | `string`                                                                                 |
 | `points`               | `number`                                                                                 |
 | `preferred_language`   | `string`                                                                                 |
-| `problemsetter`        | `{ classname: string; creation_date: Date; name: string; username: string; }`            |
+| `problemsetter`        | `types.ProblemsetterInfo`                                                                |
 | `quality_seal`         | `boolean`                                                                                |
 | `runs`                 | `types.Run[]`                                                                            |
 | `score`                | `number`                                                                                 |
@@ -2711,7 +2712,7 @@ List of public and user's private problems
 | `max_difficulty`        | `mixed` |             |
 | `min_difficulty`        | `mixed` |             |
 | `min_visibility`        | `mixed` |             |
-| `mode`                  | `mixed` |             |
+| `sort_order`            | `mixed` |             |
 | `offset`                | `mixed` |             |
 | `only_karel`            | `mixed` |             |
 | `order_by`              | `mixed` |             |
@@ -2981,6 +2982,23 @@ Update problem contents
 | ---------- | --------- |
 | `rejudged` | `boolean` |
 
+## `/api/problem/updateProblemLevel/`
+
+### Description
+
+Updates the problem level of a problem
+
+### Parameters
+
+| Name            | Type    | Description |
+| --------------- | ------- | ----------- |
+| `problem_alias` | `mixed` |             |
+| `level_tag`     | `mixed` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/problem/updateSolution/`
 
 ### Description
@@ -3165,6 +3183,8 @@ Returns the Scoreboard events
 
 # QualityNomination
 
+QualityNominationController
+
 ## `/api/qualityNomination/create/`
 
 ### Description
@@ -3289,10 +3309,10 @@ nominator or a member of the reviewer group.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Name          | Type                         |
+| ------------- | ---------------------------- |
+| `nominations` | `types.NominationListItem[]` |
+| `pager_items` | `types.PageItem[]`           |
 
 ## `/api/qualityNomination/myAssignedList/`
 
@@ -3326,10 +3346,10 @@ Displays the nominations that this user has been assigned.
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nominations` | `{ author: { name: string; username: string; }; contents?: { before_ac?: boolean; difficulty?: number; quality?: number; rationale?: string; reason?: string; statements?: { [key: string]: string; }; tags?: string[]; }; nomination: string; nominator: { name: string; username: string; }; problem: { alias: string; title: string; }; qualitynomination_id: number; status: string; time: Date; votes: { time: Date; user: { name: string; username: string; }; vote: number; }[]; }[]` |
-| `pager_items` | `{ class: string; label: string; page: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Name          | Type                         |
+| ------------- | ---------------------------- |
+| `nominations` | `types.NominationListItem[]` |
+| `pager_items` | `types.PageItem[]`           |
 
 ## `/api/qualityNomination/resolve/`
 

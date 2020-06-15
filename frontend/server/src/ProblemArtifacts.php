@@ -23,14 +23,20 @@ class ProblemArtifacts {
         $this->revision = $revision;
     }
 
-    public function get(string $path, bool $quiet = false): string {
+    public function get(string $path): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->revision, $path)
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        /** @var string */
-        return $browser->exec();
+        $result = $browser->exec();
+        if (!is_string($result)) {
+            $this->log->error(
+                "Failed to get contents for {$this->alias}:{$this->revision}/{$path}"
+            );
+            throw new \OmegaUp\Exceptions\InternalServerErrorException();
+        }
+        return $result;
     }
 
     public function exists(string $path): bool {
@@ -46,7 +52,7 @@ class ProblemArtifacts {
         );
     }
 
-    public function getByRevision(bool $quiet = false): string {
+    public function getByRevision(): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowRevisionURL(
@@ -55,8 +61,14 @@ class ProblemArtifacts {
             )
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        /** @var string */
-        return $browser->exec();
+        $result = $browser->exec();
+        if (!is_string($result)) {
+            $this->log->error(
+                "Failed to get contents for {$this->alias}:{$this->revision}"
+            );
+            throw new \OmegaUp\Exceptions\InternalServerErrorException();
+        }
+        return $result;
     }
 
     /**

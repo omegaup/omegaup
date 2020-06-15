@@ -17,46 +17,91 @@
         >
       </p>
     </div>
-    <ul class="nav nav-tabs">
-      <li class="nav-item" v-on:click="showTab = 'edit'">
-        <a href="#" data-toggle="tab" data-tab-edit class="nav-link active">{{
-          T.problemEditEditProblem
-        }}</a>
-      </li>
-      <li class="nav-item" v-on:click="showTab = 'markdown'">
-        <a href="#" data-toggle="tab" data-tab-markdown class="nav-link">{{
-          T.problemEditEditMarkdown
-        }}</a>
-      </li>
-      <li class="nav-item" v-on:click="showTab = 'version'">
-        <a href="#" data-toggle="tab" data-tab-version class="nav-link">{{
-          T.problemEditChooseVersion
-        }}</a>
-      </li>
-      <li class="nav-item" v-on:click="showTab = 'solution'">
-        <a href="#" data-toggle="tab" data-tab-solution class="nav-link">{{
-          T.problemEditSolution
-        }}</a>
-      </li>
-      <li class="nav-item" v-on:click="showTab = 'admins'">
-        <a href="#" data-toggle="tab" data-tab-admins class="nav-link">{{
-          T.problemEditAddAdmin
-        }}</a>
-      </li>
-      <li class="nav-item" v-on:click="showTab = 'tags'">
-        <a href="#" data-toggle="tab" data-tab-tags class="nav-link">{{
-          T.problemEditAddTags
-        }}</a>
-      </li>
-      <li class="nav-item" v-on:click="showTab = 'download'">
-        <a href="#" data-toggle="tab" data-tab-download class="nav-link">{{
-          T.wordsDownload
-        }}</a>
-      </li>
-      <li class="nav-item" v-on:click="showTab = 'delete'">
-        <a href="#" data-toggle="tab" data-tab-delete class="nav-link">{{
-          T.wordsDelete
-        }}</a>
+    <ul class="nav nav-pills edit-problem-tabs mb-3">
+      <li class="nav-item dropdown">
+        <a
+          href="#"
+          data-toggle="dropdown"
+          role="button"
+          class="nav-link active dropdown-toggle"
+          aria-haspopup="true"
+          aria-expanded="false"
+          >{{ activeTab }}</a
+        >
+        <div class="dropdown-menu">
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-edit
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'edit' }"
+            v-on:click="showTab = 'edit'"
+            >{{ T.problemEditEditProblem }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-markdown
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'markdown' }"
+            v-on:click="showTab = 'markdown'"
+            >{{ T.problemEditEditMarkdown }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-version
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'version' }"
+            v-on:click="showTab = 'version'"
+            >{{ T.problemEditChooseVersion }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-solution
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'solution' }"
+            v-on:click="showTab = 'solution'"
+            >{{ T.problemEditSolution }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-admins
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'admins' }"
+            v-on:click="showTab = 'admins'"
+            >{{ T.problemEditAddAdmin }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-tags
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'tags' }"
+            v-on:click="showTab = 'tags'"
+            >{{ T.problemEditAddTags }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-download
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'download' }"
+            v-on:click="showTab = 'download'"
+            >{{ T.wordsDownload }}</a
+          >
+          <a
+            href="#"
+            data-toggle="tab"
+            data-tab-delete
+            class="dropdown-item"
+            v-bind:class="{ active: showTab === 'delete' }"
+            v-on:click="showTab = 'delete'"
+            >{{ T.wordsDelete }}</a
+          >
+        </div>
       </li>
     </ul>
 
@@ -70,17 +115,25 @@
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'markdown'">
-        <omegaup-problem-markdown
+        <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownContents"
-          v-bind:markdown-preview="markdownPreview"
           v-bind:initial-language="data.statement.language"
           v-bind:markdown-type="'statements'"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:source="data.source"
-          v-bind:username="username"
-          v-bind:name="name"
-        ></omegaup-problem-markdown>
+          v-bind:problemsetter="data.problemsetter"
+          v-on:emit-update-markdown-contents="
+            (statements, newLanguage, currentMarkdown) =>
+              $emit(
+                'update-markdown-contents',
+                statements,
+                newLanguage,
+                currentMarkdown,
+                'statements',
+              )
+          "
+        ></omegaup-problem-statementedit>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'version'">
@@ -89,17 +142,34 @@
           v-bind:published-revision="data.publishedRevision"
           v-bind:value="data.publishedRevision"
           v-bind:show-footer="true"
+          v-on:emit-select-version="
+            (selectedRevision, updatePublished) =>
+              $emit('select-version', selectedRevision, updatePublished)
+          "
+          v-on:emit-runs-diff="
+            (addProblemComponent, selectedCommit) =>
+              $emit('runs-diff', addProblemComponent, selectedCommit)
+          "
         ></omegaup-problem-versions>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'solution'">
-        <omegaup-problem-markdown
+        <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownSolutionContents"
-          v-bind:markdown-preview="markdownSolutionPreview"
           v-bind:initial-language="data.solution.language"
           v-bind:markdown-type="'solutions'"
           v-bind:title="data.title"
-        ></omegaup-problem-markdown>
+          v-on:emit-update-markdown-contents="
+            (solutions, newLanguage, currentMarkdown) =>
+              $emit(
+                'update-markdown-contents',
+                solutions,
+                newLanguage,
+                currentMarkdown,
+                'solutions',
+              )
+          "
+        ></omegaup-problem-statementedit>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'admins'">
@@ -114,7 +184,7 @@
               $emit('remove-admin', addAdminComponent.selected.username)
           "
         ></omegaup-problem-admins>
-        <omegaup-problem-group-admins
+        <omegaup-problem-groupadmins
           v-bind:initial-groups="initialGroups"
           v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
@@ -125,7 +195,7 @@
             groupAdminsComponent =>
               $emit('remove-group-admin', groupAdminsComponent.groupAlias)
           "
-        ></omegaup-problem-group-admins>
+        ></omegaup-problem-groupadmins>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'tags'">
@@ -136,6 +206,12 @@
           v-bind:title="data.title"
           v-bind:initial-allow-tags="data.allowUserAddTags"
           v-bind:can-add-new-tags="true"
+          v-bind:public-tags="data.publicTags"
+          v-bind:level-tags="data.levelTags"
+          v-bind:problem-level="data.problemLevel"
+          v-on:emit-update-problem-level="
+            levelTag => $emit('update-problem-level', levelTag)
+          "
           v-on:emit-add-tag="
             (alias, tagname, isPublic) =>
               $emit('add-tag', alias, tagname, isPublic)
@@ -153,7 +229,7 @@
       <div class="tab-pane active" v-if="showTab === 'download'">
         <div class="card">
           <div class="card-body">
-            <form class="form">
+            <form class="form" v-on:submit.prevent="onDownload">
               <div class="form-group">
                 <button class="btn btn-primary" type="submit">
                   {{ T.wordsDownload }}
@@ -167,7 +243,7 @@
       <div class="tab-pane active" v-if="showTab === 'delete'">
         <div class="card">
           <div class="card-body">
-            <form class="form">
+            <form class="form" v-on:submit.prevent="$emit('remove', alias)">
               <div class="form-group">
                 <div class="alert alert-danger">
                   <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
@@ -203,25 +279,47 @@ import { types } from '../../api_types';
     'omegaup-problem-form': problem_Form,
     'omegaup-problem-tags': problem_Tags,
     'omegaup-problem-versions': problem_Versions,
-    'omegaup-problem-markdown': problem_StatementEdit,
+    'omegaup-problem-statementedit': problem_StatementEdit,
     'omegaup-problem-admins': problem_Admins,
-    'omegaup-problem-group-admins': problem_GroupAdmins,
+    'omegaup-problem-groupadmins': problem_GroupAdmins,
   },
 })
 export default class ProblemEdit extends Vue {
-  @Prop() data!: types.ProblemFormPayload;
+  @Prop() data!: types.ProblemEditPayload;
   @Prop() initialAdmins!: types.ProblemAdmin[];
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop() markdownContents!: string;
-  @Prop() markdownPreview!: string;
   @Prop() markdownSolutionContents!: string;
-  @Prop() markdownSolutionPreview!: string;
-  @Prop() initialLanguage!: string;
-  @Prop() username!: string;
-  @Prop() name!: string;
 
   T = T;
   alias = this.data.alias;
   showTab = 'edit';
+
+  get activeTab(): string {
+    switch (this.showTab) {
+      case 'edit':
+        return T.problemEditEditProblem;
+      case 'markdown':
+        return T.problemEditEditMarkdown;
+      case 'version':
+        return T.problemEditChooseVersion;
+      case 'solution':
+        return T.problemEditSolution;
+      case 'admins':
+        return T.problemEditAddAdmin;
+      case 'tags':
+        return T.problemEditAddTags;
+      case 'download':
+        return T.wordsDownload;
+      case 'delete':
+        return T.wordsDelete;
+      default:
+        return T.problemEditEditProblem;
+    }
+  }
+
+  onDownload(): void {
+    window.location.href = `/api/problem/download/problem_alias/${this.alias}/`;
+  }
 }
 </script>
