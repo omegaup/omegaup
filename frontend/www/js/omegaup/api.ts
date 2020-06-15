@@ -1127,6 +1127,10 @@ export const Problem = {
     messages.ProblemUpdateRequest,
     messages.ProblemUpdateResponse
   >('/api/problem/update/'),
+  updateProblemLevel: apiCall<
+    messages.ProblemUpdateProblemLevelRequest,
+    messages.ProblemUpdateProblemLevelResponse
+  >('/api/problem/updateProblemLevel/'),
   updateSolution: apiCall<
     messages.ProblemUpdateSolutionRequest,
     messages.ProblemUpdateSolutionResponse

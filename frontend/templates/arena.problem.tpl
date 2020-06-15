@@ -16,7 +16,7 @@
   <div id="problems" class="tab">
     <div id="problem" class="main">
       <h1 class="title">
-        {$title|escape}
+        {$payload['problem_id']}. {$title|escape}
         {if $quality_seal || $visibility == 3}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
         {if $visibility == 1 || $visibility == -1}<span class="glyphicon glyphicon-warning-sign" title="{#wordsWarningProblem#}"></span>{/if}
         {if $visibility == 0 || $visibility == -1}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}

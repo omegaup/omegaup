@@ -30,6 +30,20 @@
           <thead>
             <tr>
               <th scope="col" class="align-middle text-nowrap">
+                <span
+                  >{{ T.wordsID }}
+                  <omegaup-common-sort-controls
+                    column="problem_id"
+                    v-bind:sort-order="sortOrder"
+                    v-bind:column-name="columnName"
+                    v-on:emit-apply-filter="
+                      (columnName, sortOrder) =>
+                        $emit('apply-filter', columnName, sortOrder)
+                    "
+                  ></omegaup-common-sort-controls
+                ></span>
+              </th>
+              <th scope="col" class="align-middle text-nowrap">
                 <span>{{ T.wordsTitle }}</span>
                 <span
                   class="badge custom-badge custom-badge-quality mr-1 ml-1 p-2"
@@ -137,6 +151,7 @@
           </thead>
           <tbody data-problems>
             <tr v-for="problem in problems">
+              <td>{{ problem.problem_id }}</td>
               <td>
                 <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
                   problem.title

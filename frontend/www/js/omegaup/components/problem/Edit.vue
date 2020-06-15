@@ -115,16 +115,14 @@
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'markdown'">
-        <omegaup-problem-markdown
+        <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownContents"
-          v-bind:markdown-preview="markdownPreview"
           v-bind:initial-language="data.statement.language"
           v-bind:markdown-type="'statements'"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:source="data.source"
-          v-bind:username="username"
-          v-bind:name="name"
+          v-bind:problemsetter="data.problemsetter"
           v-on:emit-update-markdown-contents="
             (statements, newLanguage, currentMarkdown) =>
               $emit(
@@ -135,7 +133,7 @@
                 'statements',
               )
           "
-        ></omegaup-problem-markdown>
+        ></omegaup-problem-statementedit>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'version'">
@@ -156,23 +154,22 @@
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'solution'">
-        <omegaup-problem-markdown
+        <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownSolutionContents"
-          v-bind:markdown-preview="markdownSolutionPreview"
           v-bind:initial-language="data.solution.language"
           v-bind:markdown-type="'solutions'"
           v-bind:title="data.title"
           v-on:emit-update-markdown-contents="
-            (statements, newLanguage, currentMarkdown) =>
+            (solutions, newLanguage, currentMarkdown) =>
               $emit(
                 'update-markdown-contents',
-                statements,
+                solutions,
                 newLanguage,
                 currentMarkdown,
                 'solutions',
               )
           "
-        ></omegaup-problem-markdown>
+        ></omegaup-problem-statementedit>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'admins'">
@@ -187,7 +184,7 @@
               $emit('remove-admin', addAdminComponent.selected.username)
           "
         ></omegaup-problem-admins>
-        <omegaup-problem-group-admins
+        <omegaup-problem-groupadmins
           v-bind:initial-groups="initialGroups"
           v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
@@ -198,7 +195,7 @@
             groupAdminsComponent =>
               $emit('remove-group-admin', groupAdminsComponent.groupAlias)
           "
-        ></omegaup-problem-group-admins>
+        ></omegaup-problem-groupadmins>
       </div>
 
       <div class="tab-pane active" v-if="showTab === 'tags'">
@@ -209,6 +206,12 @@
           v-bind:title="data.title"
           v-bind:initial-allow-tags="data.allowUserAddTags"
           v-bind:can-add-new-tags="true"
+          v-bind:public-tags="data.publicTags"
+          v-bind:level-tags="data.levelTags"
+          v-bind:problem-level="data.problemLevel"
+          v-on:emit-update-problem-level="
+            levelTag => $emit('update-problem-level', levelTag)
+          "
           v-on:emit-add-tag="
             (alias, tagname, isPublic) =>
               $emit('add-tag', alias, tagname, isPublic)
@@ -276,22 +279,17 @@ import { types } from '../../api_types';
     'omegaup-problem-form': problem_Form,
     'omegaup-problem-tags': problem_Tags,
     'omegaup-problem-versions': problem_Versions,
-    'omegaup-problem-markdown': problem_StatementEdit,
+    'omegaup-problem-statementedit': problem_StatementEdit,
     'omegaup-problem-admins': problem_Admins,
-    'omegaup-problem-group-admins': problem_GroupAdmins,
+    'omegaup-problem-groupadmins': problem_GroupAdmins,
   },
 })
 export default class ProblemEdit extends Vue {
-  @Prop() data!: types.ProblemFormPayload;
+  @Prop() data!: types.ProblemEditPayload;
   @Prop() initialAdmins!: types.ProblemAdmin[];
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop() markdownContents!: string;
-  @Prop() markdownPreview!: string;
   @Prop() markdownSolutionContents!: string;
-  @Prop() markdownSolutionPreview!: string;
-  @Prop() initialLanguage!: string;
-  @Prop() username!: string;
-  @Prop() name!: string;
 
   T = T;
   alias = this.data.alias;
