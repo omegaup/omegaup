@@ -15,7 +15,7 @@ import T from '../lang';
 export default class Countdown extends Vue {
   @Prop() targetTime!: Date;
   @Prop({
-    default: omegaup.CountdownFormat.EVENT_COUNTDOWN,
+    default: omegaup.CountdownFormat.EventCountdown,
   })
   countdownFormat!: omegaup.CountdownFormat;
 
@@ -27,23 +27,21 @@ export default class Countdown extends Vue {
   }
 
   get formattedTimeLeft(): string {
-    if (this.countdownFormat === omegaup.CountdownFormat.EVENT_COUNTDOWN) {
-      return time.formatDelta(this.timeLeft);
+    switch (this.countdownFormat) {
+      case omegaup.CountdownFormat.EventCountdown:
+        return time.formatDelta(this.timeLeft);
+      case omegaup.CountdownFormat.WaitBetweenUploadsSeconds:
+        return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+          submissionGap: Math.ceil(this.timeLeft / 1000),
+        });
+      default:
+        return '';
     }
-    if (
-      this.countdownFormat ===
-      omegaup.CountdownFormat.WAIT_BETWEEN_UPLOADS_SECONDS
-    ) {
-      return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-        submissionGap: Math.ceil(this.timeLeft / 1000),
-      });
-    }
-    return '';
   }
 
   @Watch('timeLeft')
   onValueChanged(newValue: number): void {
-    if (newValue / 1000 > 0) return;
+    if (newValue > 0) return;
     if (!this.timerInterval) return;
     clearInterval(this.timerInterval);
     this.timerInterval = 0;

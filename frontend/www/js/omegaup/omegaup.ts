@@ -80,8 +80,8 @@ export namespace omegaup {
   }
 
   export enum CountdownFormat {
-    EVENT_COUNTDOWN,
-    WAIT_BETWEEN_UPLOADS_SECONDS,
+    EventCountdown,
+    WaitBetweenUploadsSeconds,
   }
 
   export enum SortOrder {

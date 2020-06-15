@@ -52,7 +52,7 @@
             v-if="!canSubmit"
             v-bind:target-time="nextSubmissionTimestamp"
             v-bind:countdown-format="
-              omegaup.CountdownFormat.WAIT_BETWEEN_UPLOADS_SECONDS
+              omegaup.CountdownFormat.WaitBetweenUploadsSeconds
             "
             v-on:emit-finish="now = Date.now()"
           ></omegaup-countdown>
