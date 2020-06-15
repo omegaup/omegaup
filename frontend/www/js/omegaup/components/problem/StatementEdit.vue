@@ -63,6 +63,7 @@
                     >{{ T.wordsProblemsetter }}:
                     <a class="problemsetter">
                       <omegaup-user-username
+                        v-if="problemsetter"
                         v-bind:classname="problemsetter.classname"
                         v-bind:linkify="true"
                         v-bind:username="problemsetter.username"
