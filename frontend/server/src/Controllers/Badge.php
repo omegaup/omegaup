@@ -161,7 +161,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
                 ],
                 'title' => 'omegaupTitleBadges'
             ],
-            'entrypoint' => 'badge_list_v2',
+            'entrypoint' => 'badge_list',
         ];
     }
 
