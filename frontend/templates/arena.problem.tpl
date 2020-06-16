@@ -119,6 +119,9 @@
   </div>
 </div>
 <div id="overlay">
+  {if !empty($payload)}
+    <script type="text/json" id="payload">{$payload|json_encode}</script>
+  {/if}
   <div id="run-submit"></div>
   <div id="run-details"></div>
 </div>
