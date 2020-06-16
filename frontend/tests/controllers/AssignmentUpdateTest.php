@@ -4,6 +4,26 @@
  * @author alanboy
  */
 class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
+    private static $login = null;
+    private static $courseAlias = null;
+    private static $courseStartTime = null;
+    private static $assignmentAlias = null;
+
+    public function setUp(): void {
+        parent::setUp();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        self::$login = self::login($identity);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
+            $identity,
+            self::$login
+        );
+        self::$assignmentAlias = $courseData['assignment_alias'];
+        self::$courseAlias = $courseData['course_alias'];
+        self::$courseStartTime = $courseData['request']['start_time']->time;
+    }
+
     public function testAssignmentUpdate() {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
@@ -382,29 +402,19 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    public function testAssignmentUpdateWithInvalidDates() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        $login = self::login($identity);
-
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            $identity,
-            $login
-        );
-        $assignmentAlias = $courseData['assignment_alias'];
-        $courseAlias = $courseData['course_alias'];
-        $courseStartTime = $courseData['request']['start_time']->time;
-
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'assignment' => $assignmentAlias,
-            'course' => $courseAlias,
-            'start_time' => $courseStartTime - 10,
-            'name' => 'some new name',
-            'description' => 'some meaningful description'
-        ]);
-
+    public function testAssignmentStartTimeBeforeCourseStartTime() {
         try {
-            \OmegaUp\Controllers\Course::apiUpdateAssignment($r);
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(
+                new \OmegaUp\Request([
+                    'auth_token' => self::$login->auth_token,
+                    'assignment' => self::$assignmentAlias,
+                    'course' => self::$courseAlias,
+                    'start_time' => self::$courseStartTime - 10,
+                    'finish_time' => self::$courseStartTime + 10,
+                    'name' => 'some new name',
+                    'description' => 'some meaningful description',
+                ])
+            );
             $this->fail('Should have thrown exception due invalid start time.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals(
@@ -412,33 +422,27 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $e->getMessage()
             );
         }
+    }
 
-        $r['start_time'] = $courseStartTime + 10;
-        $r['finish_time'] = $courseStartTime - 10;
-
+    public function testAssignmentFinishTimeBeforeCourseStartTime() {
         try {
-            \OmegaUp\Controllers\Course::apiUpdateAssignment($r);
+            \OmegaUp\Controllers\Course::apiUpdateAssignment(
+                new \OmegaUp\Request([
+                    'auth_token' => self::$login->auth_token,
+                    'assignment' => self::$assignmentAlias,
+                    'course' => self::$courseAlias,
+                    'start_time' => self::$courseStartTime + 10,
+                    'finish_time' => self::$courseStartTime - 10,
+                    'name' => 'some new name',
+                    'description' => 'some meaningful description',
+                ])
+            );
             $this->fail(
                 'Updating assignment should have failed due assignment end date incorrect'
             );
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals(
                 'courseAssignmentEndDateBeforeCourseStartDate',
-                $e->getMessage()
-            );
-        }
-
-        $r['finish_time'] = null;
-        $r['unlimited_duration'] = true;
-
-        try {
-            \OmegaUp\Controllers\Course::apiUpdateAssignment($r);
-            $this->fail(
-                'Updating assignment should have failed due assignment unlimted duration not allowed'
-            );
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals(
-                'courseDoesNotHaveUnlimitedDuration',
                 $e->getMessage()
             );
         }
