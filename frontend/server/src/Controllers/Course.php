@@ -95,20 +95,47 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $r->ensureOptionalBool('unlimited_duration');
-        $startTime = $r->ensureTimestamp(
-            'start_time',
-            $courseStartTime->time,
-            is_null($courseFinishTime) ? null : $courseFinishTime->time
-        );
-        $finishTime = $r->ensureOptionalTimestamp(
-            'finish_time',
-            $courseStartTime->time,
-            is_null($courseFinishTime) ? null : $courseFinishTime->time,
-            /*$isRequired=*/(
-                !is_null($courseFinishTime) ||
-                !$r['unlimited_duration']
-            )
-        );
+        try {
+            $startTime = $r->ensureTimestamp(
+                'start_time',
+                $courseStartTime->time,
+                is_null($courseFinishTime) ? null : $courseFinishTime->time
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            if ($e->getMessage() === 'parameterDateTooSmall') {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'courseAssignmentStartDateBeforeCourseStartDate'
+                );
+            }
+            throw $e;
+        }
+        if (
+            boolval($r['unlimited_duration'])
+            && !is_null($courseFinishTime)
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration'
+            );
+        }
+
+        try {
+            $finishTime = $r->ensureOptionalTimestamp(
+                'finish_time',
+                $courseStartTime->time,
+                is_null($courseFinishTime) ? null : $courseFinishTime->time,
+                /*$isRequired=*/(
+                    !is_null($courseFinishTime) ||
+                    !$r['unlimited_duration']
+                )
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            if ($e->getMessage() === 'parameterDateTooSmall') {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'courseAssignmentEndDateBeforeCourseStartDate'
+                );
+            }
+            throw $e;
+        }
 
         if (
             !is_null($finishTime) &&
@@ -770,20 +797,38 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $assignment->start_time;
         }
-        $startTime = $r->ensureTimestamp(
-            'start_time',
-            $course->start_time->time,
-            is_null($course->finish_time) ? null : $course->finish_time->time
-        );
+        try {
+            $startTime = $r->ensureTimestamp(
+                'start_time',
+                $course->start_time->time,
+                is_null($course->finish_time) ? null : $course->finish_time->time
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            if ($e->getMessage() === 'parameterDateTooSmall') {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'courseAssignmentStartDateBeforeCourseStartDate'
+                );
+            }
+            throw $e;
+        }
 
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = $assignment->finish_time;
         }
-        $finishTime = $r->ensureTimestamp(
-            'finish_time',
-            $course->start_time->time,
-            is_null($course->finish_time) ? null : $course->finish_time->time
-        );
+        try {
+            $finishTime = $r->ensureTimestamp(
+                'finish_time',
+                $course->start_time->time,
+                is_null($course->finish_time) ? null : $course->finish_time->time
+            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            if ($e->getMessage() === 'parameterDateTooSmall') {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'courseAssignmentEndDateBeforeCourseStartDate'
+                );
+            }
+            throw $e;
+        }
 
         $unlimitedDuration = $r->ensureOptionalBool(
             'unlimited_duration'
