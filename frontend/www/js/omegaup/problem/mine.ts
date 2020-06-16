@@ -18,6 +18,7 @@ OmegaUp.on('ready', () => {
           privateProblemsAlert: payload.privateProblemsAlert,
           isSysadmin: payload.isSysadmin,
           pagerItems: this.pagerItems,
+          visibilityStatuses: payload.visibilityStatuses,
         },
         on: {
           'change-show-all-problems': (shouldShowAll: boolean) => {
@@ -25,14 +26,14 @@ OmegaUp.on('ready', () => {
             showProblems(shouldShowAll);
           },
           'change-visibility': (
-            selectedProblems: string[],
+            selectedProblems: types.ProblemListItem[],
             visibility: number,
           ) => {
             Promise.all(
-              selectedProblems.map((problemAlias: string) =>
+              selectedProblems.map((problem: types.ProblemListItem) =>
                 api.Problem.update({
-                  problem_alias: problemAlias,
-                  visibility: visibility,
+                  problem_alias: problem.alias,
+                  visibility: visibilityTrue(visibility, problem.visibility),
                   message:
                     visibility === 1
                       ? 'private -> public'
@@ -81,6 +82,53 @@ OmegaUp.on('ready', () => {
         problemsMine.problems = result.problems;
       })
       .catch(UI.apiError);
+  }
+
+  function visibilityTrue(
+    newVisibility: number,
+    oldVisibility: number,
+  ): number {
+    let visibility: number = 0;
+    if (newVisibility == 1) {
+      switch (oldVisibility) {
+        case payload.visibilityStatuses['privateBanned']: {
+          visibility = payload.visibilityStatuses['publicBanned'];
+          break;
+        }
+        case payload.visibilityStatuses['privateWarning']: {
+          visibility = payload.visibilityStatuses['publicBanned'];
+          break;
+        }
+        case payload.visibilityStatuses['private']: {
+          visibility = payload.visibilityStatuses['public'];
+          break;
+        }
+        default: {
+          visibility = oldVisibility;
+          break;
+        }
+      }
+    } else if (newVisibility == 0) {
+      switch (oldVisibility) {
+        case payload.visibilityStatuses['publicBanned']: {
+          visibility = payload.visibilityStatuses['privateBanned'];
+          break;
+        }
+        case payload.visibilityStatuses['publicWarning']: {
+          visibility = payload.visibilityStatuses['privateWarning'];
+          break;
+        }
+        case payload.visibilityStatuses['public']: {
+          visibility = payload.visibilityStatuses['private'];
+          break;
+        }
+        default: {
+          visibility = oldVisibility;
+          break;
+        }
+      }
+    }
+    return visibility;
   }
 
   showProblems(showAllProblems, /*pageNumber=*/ 1);

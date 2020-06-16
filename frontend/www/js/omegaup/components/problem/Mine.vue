@@ -61,7 +61,7 @@
                   type="checkbox"
                   v-model="selectedProblems"
                   v-bind:disabled="problem.visibility === -10"
-                  v-bind:value="problem.alias"
+                  v-bind:value="problem"
                 />
               </td>
               <td class="text-right align-middle">
@@ -75,13 +75,28 @@
                     >{{ problem.title }}</a
                   >
                   <font-awesome-icon
+                    v-bind:title="T.wordsWarningProblem"
+                    v-if="problem.visibility == 1 || problem.visibility == -1"
+                    v-bind:icon="['fas', 'exclamation-triangle']"
+                  />
+                  <font-awesome-icon
+                    v-bind:title="T.wordsBannedProblem"
+                    v-if="problem.visibility == -3 || problem.visibility == -2"
+                    v-bind:icon="['fas', 'ban']"
+                  />
+                  <font-awesome-icon
                     v-bind:title="T.wordsPrivate"
-                    v-if="problem.visibility <= 0 && problem.visibility > -10"
+                    v-if="
+                      (problem.visibility <= -3 ||
+                        problem.visibility == -1 ||
+                        problem.visibility == 0) &&
+                        problem.visibility > -10
+                    "
                     v-bind:icon="['fas', 'eye-slash']"
                   />
                   <font-awesome-icon
                     v-bind:title="T.wordsDeleted"
-                    v-else-if="problem.visibility === -10"
+                    v-if="problem.visibility === -10"
                     v-bind:icon="['fas', 'trash']"
                   />
                   <div class="tags-badges" v-if="problem.tags.length">
@@ -135,8 +150,17 @@ import {
   faTrash,
   faEdit,
   faChartBar,
+  faExclamationTriangle,
+  faBan,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faEyeSlash, faTrash, faEdit, faChartBar);
+library.add(
+  faEyeSlash,
+  faTrash,
+  faEdit,
+  faChartBar,
+  faExclamationTriangle,
+  faBan,
+);
 
 @Component({
   components: {
@@ -149,10 +173,11 @@ export default class ProblemMine extends Vue {
   @Prop() pagerItems!: types.PageItem[];
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;
+  @Prop() visibilityStatuses!: Array<string>;
 
   T = T;
   shouldShowAllProblems = false;
-  selectedProblems = [];
+  selectedProblems = <types.ProblemListItem[]>[];
   allProblemsVisibilityOption = -1;
 
   get statementShowAllProblems(): string {
