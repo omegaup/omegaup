@@ -1355,16 +1355,16 @@ export namespace types {
     outputLimit: number;
     overallWallTimeLimit: number;
     problemLevel?: string;
+    selectedPublicTags?: string[];
+    selectedPrivateTags?: string[];
     problemsetter?: types.ProblemsetterInfo;
     publicTags?: string[];
     publishedRevision?: types.ProblemVersion;
-    selectedTags: { public: boolean; tagname: string }[];
     solution: types.ProblemStatement;
     source: string;
     statement: types.ProblemStatement;
     statusError?: string;
     statusSuccess: boolean;
-    tags: { name?: string }[];
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };

@@ -558,7 +558,7 @@ const translations: { [key: string]: string; } = {
   navUserRanking: "(U53r ranking)",
   navViewBadges: "(Vi3w badg35)",
   navViewProfile: "(My pr0fi13)",
-  newPublicTagsNotAllowed: "(I7 i5 n07 a110w3d 70 add n3w pub1ic 7ag5.)",
+  newPublicTagsNotAllowed: "(I7 i5 n07 a110w3d 70 add n3w pub1ic 7ag5)",
   noCoders: "(N0 c0d3r5.)",
   nominationsRangeHeader: "(Qua1i7y n0mina7i0n5 (fr0m %(lowCount) 70 %(highCount)))",
   notProblemLevelTag: "(Th3 7ag 53n7 i5 n07 a 13v31 7ag.)",
