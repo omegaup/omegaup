@@ -191,6 +191,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
@@ -202,7 +203,7 @@ import Autocomplete from '../Autocomplete.vue';
 })
 export default class CourseProblemList extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
-  @Prop() assignmentProblems!: omegaup.AssignmentProblem[];
+  @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: omegaup.Assignment;
 

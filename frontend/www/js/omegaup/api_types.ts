@@ -799,33 +799,6 @@ export namespace types {
     }
   }
 
-  export interface AssignmentProblem {
-    accepted: number;
-    alias: string;
-    commit: string;
-    difficulty: number;
-    languages: string;
-    letter: string;
-    order: number;
-    points: number;
-    quality_payload: {
-      canNominateProblem: boolean;
-      dismissed: boolean;
-      dismissedBeforeAC: boolean;
-      language?: string;
-      nominated: boolean;
-      nominatedBeforeAC: boolean;
-      problemAlias: string;
-      solved: boolean;
-      tried: boolean;
-    };
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
-  }
-
   export interface AssignmentProgress {
     [key: string]: types.Progress;
   }
@@ -1028,23 +1001,6 @@ export namespace types {
     languages: { [key: string]: string };
   }
 
-  export interface ContestProblem {
-    accepted: number;
-    alias: string;
-    commit: string;
-    difficulty: number;
-    languages: string;
-    letter: string;
-    order: number;
-    points: number;
-    problem_id: number;
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
-  }
-
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
@@ -1117,7 +1073,7 @@ export namespace types {
 
   export interface CourseEditPayload {
     admins: types.CourseAdmin[];
-    assignmentProblems: types.AssignmentProblem[];
+    assignmentProblems: types.ProblemsetProblem[];
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
@@ -2092,7 +2048,7 @@ export namespace messages {
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
-    problems: types.ContestProblem[];
+    problems: types.ProblemsetProblem[];
     points_decay_factor: number;
     problemset_id: number;
     requests_user_information: string;
@@ -2158,22 +2114,7 @@ export namespace messages {
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.ProblemsetProblem[];
     points_decay_factor: number;
     problemset_id: number;
     requests_user_information: string;
@@ -2406,7 +2347,7 @@ export namespace messages {
     director: string;
     finish_time?: Date;
     name: string;
-    problems: types.AssignmentProblem[];
+    problems: types.ProblemsetProblem[];
     problemset_id: number;
     start_time: Date;
   };
