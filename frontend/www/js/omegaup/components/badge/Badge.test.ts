@@ -4,14 +4,14 @@ import badge_Badge from './Badge.vue';
 
 describe('Badge.vue', () => {
   it('Should display badge name', () => {
-    const badge_alias = 'contestManager';
+    const badgeAlias = 'contestManager';
     const wrapper = shallowMount(badge_Badge, {
       propsData: {
-        badge: { badge_alias: badge_alias },
+        badge: { badge_alias: badgeAlias },
       },
     });
     expect(wrapper.find('img').attributes().src).toBe(
-      `/media/dist/badges/${badge_alias}.svg`,
+      `/media/dist/badges/${badgeAlias}.svg`,
     );
   });
 });
