@@ -37,11 +37,12 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Given a course alias, get all of its assignments. Hides any assignments
      * that have not started, if not an admin.
      *
-     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, max_points: float, order: int, problemset_id?: int, scoreboard_url: string, scoreboard_url_admin: string}>
      */
     public static function getAllAssignments(
         string $alias,
-        bool $isAdmin
+        bool $isAdmin,
+        bool $withProblemsetId = false
     ): array {
         // Non-admins should not be able to see assignments that have not
         // started.
@@ -73,7 +74,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         foreach ($rs as $row) {
             unset($row['acl_id']);
             unset($row['assignment_id']);
-            unset($row['problemset_id']);
+            if (!$withProblemsetId) {
+                unset($row['problemset_id']);
+            }
             unset($row['course_id']);
             $ar[] = $row;
         }

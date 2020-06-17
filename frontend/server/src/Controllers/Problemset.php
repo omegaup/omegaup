@@ -107,11 +107,9 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $interview_alias
-     * @omegaup-request-param mixed $lang
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     * @omegaup-request-param mixed $username
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         [

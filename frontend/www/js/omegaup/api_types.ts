@@ -303,6 +303,56 @@ export namespace types {
       );
     }
 
+    export function CourseEditPayload(
+      elementId: string = 'payload',
+    ): types.CourseEditPayload {
+      return (x => {
+        x.course = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        x.identityRequests = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.last_update)
+              x.last_update = ((x: number) => new Date(x * 1000))(
+                x.last_update,
+              );
+            x.request_time = ((x: number) => new Date(x * 1000))(
+              x.request_time,
+            );
+            return x;
+          });
+        })(x.identityRequests);
+        x.selectedAssignment = (x => {
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.selectedAssignment);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseListPayload(
       elementId: string = 'payload',
     ): types.CourseListPayload {
@@ -749,6 +799,33 @@ export namespace types {
     }
   }
 
+  export interface AssignmentProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    letter: string;
+    order: number;
+    points: number;
+    quality_payload: {
+      canNominateProblem: boolean;
+      dismissed: boolean;
+      dismissedBeforeAC: boolean;
+      language?: string;
+      nominated: boolean;
+      nominatedBeforeAC: boolean;
+      problemAlias: string;
+      solved: boolean;
+      tried: boolean;
+    };
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
   export interface AssignmentProgress {
     [key: string]: types.Progress;
   }
@@ -994,6 +1071,12 @@ export namespace types {
     user_registration_accepted?: boolean;
   }
 
+  export interface CourseAdmin {
+    role: string;
+    user_id?: number;
+    username: string;
+  }
+
   export interface CourseAssignment {
     alias: string;
     assignment_type: string;
@@ -1002,6 +1085,7 @@ export namespace types {
     max_points: number;
     name: string;
     order: number;
+    problemset_id?: number;
     publish_time_delay?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -1029,6 +1113,23 @@ export namespace types {
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
     progress: types.AssignmentProgress;
+  }
+
+  export interface CourseEditPayload {
+    admins: types.CourseAdmin[];
+    assignmentProblems: types.AssignmentProblem[];
+    course: types.CourseDetails;
+    groupsAdmins: types.CourseGroupAdmin[];
+    identityRequests: types.IdentityRequest[];
+    selectedAssignment: types.CourseAssignment;
+    students: types.CourseStudent[];
+    tags: string[];
+  }
+
+  export interface CourseGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface CourseListPayload {
@@ -1131,6 +1232,16 @@ export namespace types {
       runner_queue_length: number;
       runners: string[];
     };
+  }
+
+  export interface IdentityRequest {
+    accepted?: boolean;
+    admin?: { name?: string; username: string };
+    country?: string;
+    country_id?: string;
+    last_update?: Date;
+    request_time: Date;
+    username: string;
   }
 
   export interface IndexPayload {
@@ -2290,49 +2401,12 @@ export namespace messages {
     admin: boolean;
     alias: string;
     assignment_type?: string;
-    courseAssignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: Date;
-      finish_time?: Date;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
+    courseAssignments: types.CourseAssignment[];
     description?: string;
     director: string;
     finish_time?: Date;
     name: string;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      quality_payload: {
-        canNominateProblem: boolean;
-        dismissed: boolean;
-        dismissedBeforeAC: boolean;
-        language?: string;
-        nominated: boolean;
-        nominatedBeforeAC: boolean;
-        problemAlias: string;
-        solved: boolean;
-        tried: boolean;
-      };
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.AssignmentProblem[];
     problemset_id: number;
     start_time: Date;
   };
@@ -2404,13 +2478,7 @@ export namespace messages {
     };
   };
   export type CourseListStudentsRequest = { [key: string]: any };
-  export type CourseListStudentsResponse = {
-    students: {
-      name?: string;
-      progress: { [key: string]: number };
-      username: string;
-    }[];
-  };
+  export type CourseListStudentsResponse = { students: types.CourseStudent[] };
   export type CourseListUnsolvedProblemsRequest = { [key: string]: any };
   export type CourseListUnsolvedProblemsResponse = {
     user_problems: {
@@ -2433,17 +2501,7 @@ export namespace messages {
   export type CourseRemoveStudentResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
-  export type CourseRequestsResponse = {
-    users: {
-      accepted?: boolean;
-      admin?: { name?: string; username: string };
-      country?: string;
-      country_id?: string;
-      last_update?: Date;
-      request_time: Date;
-      username: string;
-    }[];
-  };
+  export type CourseRequestsResponse = { users: types.IdentityRequest[] };
   export type CourseRunsRequest = { [key: string]: any };
   export type _CourseRunsServerResponse = any;
   export type CourseRunsResponse = { runs: types.Run[] };
