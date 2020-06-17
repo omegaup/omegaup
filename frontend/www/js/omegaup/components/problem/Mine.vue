@@ -76,28 +76,40 @@
                   >
                   <font-awesome-icon
                     v-bind:title="T.wordsWarningProblem"
-                    v-if="problem.visibility == 1 || problem.visibility == -1"
+                    v-if="
+                      problem.visibility ==
+                        visibilityStatuses['publicWarning'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateWarning']
+                    "
                     v-bind:icon="['fas', 'exclamation-triangle']"
                   />
                   <font-awesome-icon
                     v-bind:title="T.wordsBannedProblem"
-                    v-if="problem.visibility == -3 || problem.visibility == -2"
+                    v-else-if="
+                      problem.visibility ==
+                        visibilityStatuses['publicBanned'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateBanned']
+                    "
                     v-bind:icon="['fas', 'ban']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsPrivate"
-                    v-if="
-                      (problem.visibility <= -3 ||
-                        problem.visibility == -1 ||
-                        problem.visibility == 0) &&
-                        problem.visibility > -10
-                    "
-                    v-bind:icon="['fas', 'eye-slash']"
+                    v-bind:title="T.wordsDeleted"
+                    v-if="problem.visibility === visibilityStatuses['deleted']"
+                    v-bind:icon="['fas', 'trash']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsDeleted"
-                    v-if="problem.visibility === -10"
-                    v-bind:icon="['fas', 'trash']"
+                    v-bind:title="T.wordsPrivate"
+                    v-else-if="
+                      (problem.visibility <=
+                        visibilityStatuses['privateBanned'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateWarning'] ||
+                        problem.visibility == visibilityStatuses['private']) &&
+                        problem.visibility > visibilityStatuses['deleted']
+                    "
+                    v-bind:icon="['fas', 'eye-slash']"
                   />
                   <div class="tags-badges" v-if="problem.tags.length">
                     <a
