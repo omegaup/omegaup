@@ -10,7 +10,7 @@
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, problem_id?: int, quality_payload?: ProblemQualityPayload, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}
- * @psalm-type CourseAdmin=array{role: string, user_id: int|null, username: string}
+ * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problemset_id?: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, basic_information_required: bool, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, name: string, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int}
@@ -27,7 +27,7 @@
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment, students: list<CourseStudent>, tags: list<string>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<CourseStudent>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
@@ -2348,28 +2348,30 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
         $course = self::validateCourseExists($r['course']);
+        if (is_null($course->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
         self::resolveGroup($course);
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $courseDetails = self::getCommonCourseDetails(
-            $course,
-            $r->identity,
-            /*$withProblemsetId*/true
-        );
-        $selectedAssignment = $courseDetails['assignments'][0];
+        $courseDetails = self::getCommonCourseDetails($course, $r->identity);
+        $selectedAssignment = null;
         $assignmentProblems = [];
-        if (isset($selectedAssignment['problemset_id'])) {
+        if (!empty($courseDetails['assignments'])) {
+            $selectedAssignment = $courseDetails['assignments'][0];
             $assignmentProblems = self::getProblemsByAssignment(
-                $selectedAssignment['problemset_id'],
+                $selectedAssignment['alias'],
+                $course->alias,
                 $r->identity,
                 $r->user
             );
         }
-        foreach ($courseDetails['assignments'] as &$assignment) {
-            unset($assignment['problemset_id']);
+        $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
+        foreach ($admins as &$admin) {
+            unset($admin['user_id']);
         }
         return [
             'smartyProperties' => [
@@ -2385,9 +2387,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
                         intval($course->course_id)
                     ),
-                    'admins' => \OmegaUp\DAO\UserRoles::getCourseAdmins(
-                        $course
-                    ),
+                    'admins' => $admins,
                     'groupsAdmins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins(
                         $course
                     ),
@@ -2883,16 +2883,14 @@ class Course extends \OmegaUp\Controllers\Controller {
      */
     private static function getCommonCourseDetails(
         \OmegaUp\DAO\VO\Courses $course,
-        \OmegaUp\DAO\VO\Identities $identity,
-        bool $withProblemsetId = false
+        \OmegaUp\DAO\VO\Identities $identity
     ): array {
         $isAdmin = \OmegaUp\Authorization::isCourseAdmin($identity, $course);
 
         $result = [
             'assignments' => \OmegaUp\DAO\Courses::getAllAssignments(
                 strval($course->alias),
-                $isAdmin,
-                $withProblemsetId
+                $isAdmin
             ),
             'name' => strval($course->name),
             'description' => strval($course->description),
@@ -3171,12 +3169,18 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['token'],
             $r
         );
-        if (is_null($tokenAuthenticationResult['course']->acl_id)) {
+        if (
+            is_null($tokenAuthenticationResult['course']->acl_id)
+            || is_null($tokenAuthenticationResult['course']->alias)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseNotFound'
             );
         }
-        if (is_null($tokenAuthenticationResult['assignment']->problemset_id)) {
+        if (
+            is_null($tokenAuthenticationResult['assignment']->problemset_id)
+            || is_null($tokenAuthenticationResult['assignment']->alias)
+        ) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'assignmentNotFound'
             );
@@ -3216,7 +3220,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             'start_time' => $tokenAuthenticationResult['assignment']->start_time,
             'finish_time' => $tokenAuthenticationResult['assignment']->finish_time,
             'problems' => self::getProblemsByAssignment(
-                $tokenAuthenticationResult['assignment']->problemset_id,
+                $tokenAuthenticationResult['assignment']->alias,
+                $tokenAuthenticationResult['course']->alias,
                 $r->identity,
                 $r->user
             ),
@@ -3231,15 +3236,17 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return list<ProblemsetProblem>
      */
     private static function getProblemsByAssignment(
-        int $problemsetId,
+        string $assignmentAlias,
+        string $courseAlias,
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user
     ): array {
         $problems = [];
         $problemIndex = 0;
         foreach (
-            \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
-                $problemsetId
+            \OmegaUp\DAO\ProblemsetProblems::getProblemsByAssignmentAlias(
+                $assignmentAlias,
+                $courseAlias
             ) as $problem
         ) {
             $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(

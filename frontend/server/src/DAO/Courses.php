@@ -41,8 +41,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      */
     public static function getAllAssignments(
         string $alias,
-        bool $isAdmin,
-        bool $withProblemsetId = false
+        bool $isAdmin
     ): array {
         // Non-admins should not be able to see assignments that have not
         // started.
@@ -74,9 +73,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         foreach ($rs as $row) {
             unset($row['acl_id']);
             unset($row['assignment_id']);
-            if (!$withProblemsetId) {
-                unset($row['problemset_id']);
-            }
+            unset($row['problemset_id']);
             unset($row['course_id']);
             $ar[] = $row;
         }

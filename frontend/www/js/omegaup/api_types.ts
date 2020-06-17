@@ -341,12 +341,15 @@ export namespace types {
             return x;
           });
         })(x.identityRequests);
-        x.selectedAssignment = (x => {
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.selectedAssignment);
+        if (x.selectedAssignment)
+          x.selectedAssignment = (x => {
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.selectedAssignment);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1029,7 +1032,6 @@ export namespace types {
 
   export interface CourseAdmin {
     role: string;
-    user_id?: number;
     username: string;
   }
 
@@ -1077,7 +1079,7 @@ export namespace types {
     course: types.CourseDetails;
     groupsAdmins: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
-    selectedAssignment: types.CourseAssignment;
+    selectedAssignment?: types.CourseAssignment;
     students: types.CourseStudent[];
     tags: string[];
   }
