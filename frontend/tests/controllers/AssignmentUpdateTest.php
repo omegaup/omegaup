@@ -233,7 +233,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        // Get a course
+        // Create a course with a different courseDuration of 180.
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
             /*$admin=*/ null,
             /*$adminLogin=*/ null,
