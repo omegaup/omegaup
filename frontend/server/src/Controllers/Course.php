@@ -94,20 +94,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             'description'
         );
 
-        $r->ensureOptionalBool('unlimited_duration');
-        $startTime = $r->ensureTimestamp(
-            'start_time',
-            $courseStartTime->time,
-            is_null($courseFinishTime) ? null : $courseFinishTime->time
-        );
-        $finishTime = $r->ensureOptionalTimestamp(
-            'finish_time',
-            $courseStartTime->time,
-            is_null($courseFinishTime) ? null : $courseFinishTime->time,
-            /*$isRequired=*/(
-                !is_null($courseFinishTime) ||
-                !$r['unlimited_duration']
-            )
+        $unlimitedDuration = $r->ensureOptionalBool(
+            'unlimited_duration'
+        ) ?? false;
+        [
+            'startTime' => $startTime,
+            'finishTime' => $finishTime,
+        ] = self::validateAssignmentDates(
+            $r,
+            $unlimitedDuration,
+            $courseStartTime,
+            $courseFinishTime
         );
 
         if (
@@ -129,6 +126,52 @@ class Course extends \OmegaUp\Controllers\Controller {
             'alias',
             /*$isRequired=*/true
         );
+    }
+
+    /**
+     * @return array{finishTime: \OmegaUp\Timestamp|null, startTime: \OmegaUp\Timestamp}
+     *
+     * @omegaup-request-param OmegaUp\Timestamp $start_time
+     * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
+     */
+    private static function validateAssignmentDates(
+        \OmegaUp\Request $r,
+        bool $unlimitedDuration,
+        \OmegaUp\Timestamp $courseStartTime,
+        ?\OmegaUp\Timestamp $courseFinishTime
+    ): array {
+        $startTime = $r->ensureTimestamp(
+            'start_time',
+            /*$startTime=*/null,
+            is_null($courseFinishTime) ? null : $courseFinishTime->time
+        );
+        if ($startTime->time < $courseStartTime->time) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentStartDateBeforeCourseStartDate'
+            );
+        }
+        if ($unlimitedDuration && !is_null($courseFinishTime)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration'
+            );
+        }
+
+        $finishTime = $r->ensureOptionalTimestamp(
+            'finish_time',
+            null,
+            is_null($courseFinishTime) ? null : $courseFinishTime->time,
+            /*$isRequired=*/!is_null($courseFinishTime) || !$unlimitedDuration
+        );
+        if (
+            !is_null($finishTime)
+            && $finishTime->time < $courseStartTime->time
+        ) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentEndDateBeforeCourseStartDate'
+            );
+        }
+
+        return ['startTime' => $startTime, 'finishTime' => $finishTime];
     }
 
     /**
@@ -770,32 +813,24 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $assignment->start_time;
         }
-        $startTime = $r->ensureTimestamp(
-            'start_time',
-            $course->start_time->time,
-            is_null($course->finish_time) ? null : $course->finish_time->time
-        );
-
         if (is_null($r['finish_time'])) {
             $r['finish_time'] = $assignment->finish_time;
         }
-        $finishTime = $r->ensureTimestamp(
-            'finish_time',
-            $course->start_time->time,
-            is_null($course->finish_time) ? null : $course->finish_time->time
-        );
 
         $unlimitedDuration = $r->ensureOptionalBool(
             'unlimited_duration'
         ) ?? false;
+        [
+            'startTime' => $startTime,
+            'finishTime' => $finishTime,
+        ] = self::validateAssignmentDates(
+            $r,
+            $unlimitedDuration,
+            $course->start_time,
+            $course->finish_time
+        );
 
-        if ($unlimitedDuration && !is_null($course->finish_time)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseDoesNotHaveUnlimitedDuration'
-            );
-        }
-
-        if ($startTime->time > $finishTime->time) {
+        if (!is_null($finishTime) && $startTime->time > $finishTime->time) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
