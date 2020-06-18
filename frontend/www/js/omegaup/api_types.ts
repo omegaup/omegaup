@@ -1641,7 +1641,6 @@ export namespace types {
     letter: string;
     order: number;
     points: number;
-    problem_id?: number;
     quality_payload?: types.ProblemQualityPayload;
     submissions: number;
     title: string;
