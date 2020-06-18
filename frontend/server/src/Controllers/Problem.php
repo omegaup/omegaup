@@ -661,7 +661,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $public
+     * @omegaup-request-param bool|null $public
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -4717,11 +4717,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'selectedPublicTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
                     $problem,
-                    true /* public */
+                    !\OmegaUp\Authorization::canEditProblem($r->identity, $problem),
+                    /*public=*/ true
                 ),
                 'selectedPrivateTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
                     $problem,
-                    false /* public */
+                    !\OmegaUp\Authorization::canEditProblem($r->identity, $problem),
+                    /*public=*/ false
                 ),
                 'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                 'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
@@ -4764,8 +4766,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'statusSuccess' => false,
                         'admins' => $admins,
                         'groupAdmins' => $groupAdmins,
-                        'tags' => $tags,
-                        'selectedTags' => $selectedTags,
                         'log' => $versions['log'],
                         'publishedRevision' => $publishedRevision,
                         'solution' => $solution,
