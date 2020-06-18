@@ -111,9 +111,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             !is_null($finishTime) &&
             $startTime->time > $finishTime->time
         ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseInvalidStartTime'
             );
+            $exception->addCustomMessageToArray('errorcolumn', 'finish_time');
+            throw $exception;
         }
 
         \OmegaUp\Validators::validateInEnum(
@@ -146,14 +148,21 @@ class Course extends \OmegaUp\Controllers\Controller {
             is_null($courseFinishTime) ? null : $courseFinishTime->time
         );
         if ($startTime->time < $courseStartTime->time) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseAssignmentStartDateBeforeCourseStartDate'
             );
+            $exception->addCustomMessageToArray('errorcolumn', 'start_time');
+            throw $exception;
         }
         if ($unlimitedDuration && !is_null($courseFinishTime)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseDoesNotHaveUnlimitedDuration'
             );
+            $exception->addCustomMessageToArray(
+                'errorcolumn',
+                'unlimited_duration'
+            );
+            throw $exception;
         }
 
         $finishTime = $r->ensureOptionalTimestamp(
@@ -166,9 +175,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             !is_null($finishTime)
             && $finishTime->time < $courseStartTime->time
         ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'courseAssignmentEndDateBeforeCourseStartDate'
             );
+            $exception->addCustomMessageToArray('errorcolumn', 'finish_time');
+            throw $exception;
         }
 
         return ['startTime' => $startTime, 'finishTime' => $finishTime];
@@ -667,10 +678,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'aliasInUse',
-                    $e
+                $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'aliasInUse'
                 );
+                $exception->addCustomMessageToArray('errorcolumn', 'alias');
+                throw $exception;
             }
             throw $e;
         }

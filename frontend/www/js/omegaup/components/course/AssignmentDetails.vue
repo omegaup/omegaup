@@ -3,7 +3,10 @@
     <div class="panel-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
-          <div class="form-group col-md-4">
+          <div
+            class="form-group col-md-4"
+            v-bind:class="{ 'has-error': columnError === 'name' }"
+          >
             <label
               >{{ T.wordsTitle }}
               <input
@@ -11,9 +14,13 @@
                 size="30"
                 type="text"
                 v-model="name"
+                required
             /></label>
           </div>
-          <div class="form-group col-md-4">
+          <div
+            class="form-group col-md-4"
+            v-bind:class="{ 'has-error': columnError === 'alias' }"
+          >
             <label
               >{{ T.courseNewFormShortTitle_alias_ }}
               <span
@@ -28,9 +35,13 @@
                 type="text"
                 v-bind:disabled="update"
                 v-model="alias"
+                required
             /></label>
           </div>
-          <div class="form-group col-md-4">
+          <div
+            class="form-group col-md-4"
+            v-bind:class="{ 'has-error': columnError === 'assignment_type' }"
+          >
             <label
               >{{ T.courseAssignmentNewFormType }}
               <span
@@ -40,7 +51,7 @@
                 data-toggle="tooltip"
                 v-bind:title="T.courseAssignmentNewFormTypeDesc"
               ></span>
-              <select class="form-control" v-model="assignmentType">
+              <select class="form-control" v-model="assignmentType" required>
                 <option value="homework">
                   {{ T.wordsHomework }}
                 </option>
@@ -52,7 +63,10 @@
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-4">
+          <div
+            class="form-group col-md-4"
+            v-bind:class="{ 'has-error': columnError === 'start_time' }"
+          >
             <label
               >{{ T.courseNewFormStartDate }}
               <span
@@ -65,6 +79,8 @@
               <omegaup-datetimepicker
                 v-bind:enabled="!assignment.has_runs"
                 v-model="startTime"
+                v-bind:finish="finishTimeCourse"
+                v-bind:start="startTimeCourse"
               ></omegaup-datetimepicker
             ></label>
           </div>
@@ -79,12 +95,18 @@
                 v-bind:title="T.courseNewFormUnlimitedDurationDesc"
               ></span
             ></span>
-            <div class="form-control container-fluid">
+            <div
+              class="form-control container-fluid"
+              v-bind:class="{
+                'has-error': columnError === 'unlimited_duration',
+              }"
+            >
               <label class="radio-inline"
                 ><input
                   type="radio"
                   v-bind:value="true"
                   v-model="unlimitedDuration"
+                  v-bind:disabled="!unlimitedDurationCourse"
                 />{{ T.wordsYes }}</label
               >
               <label class="radio-inline"
@@ -92,11 +114,15 @@
                   type="radio"
                   v-bind:value="false"
                   v-model="unlimitedDuration"
+                  v-bind:disabled="!unlimitedDurationCourse"
                 />{{ T.wordsNo }}</label
               >
             </div>
           </div>
-          <div class="form-group col-md-4">
+          <div
+            class="form-group col-md-4"
+            v-bind:class="{ 'has-error': columnError === 'finish_time' }"
+          >
             <label
               >{{ T.courseNewFormEndDate }}
               <span
@@ -110,12 +136,17 @@
                 v-bind:enabled="!unlimitedDuration"
                 v-bind:readonly="false"
                 v-model="finishTime"
+                v-bind:finish="finishTimeCourse"
+                v-bind:start="startTimeCourse"
               ></omegaup-datetimepicker
             ></label>
           </div>
         </div>
         <div class="row">
-          <div class="form-group container-fluid">
+          <div
+            class="form-group container-fluid"
+            v-bind:class="{ 'has-error': columnError === 'description' }"
+          >
             <label
               >{{ T.courseNewFormDescription }}
               <textarea
@@ -123,6 +154,7 @@
                 cols="30"
                 rows="5"
                 v-model="description"
+                required
               ></textarea
             ></label>
           </div>
@@ -170,6 +202,10 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() update!: boolean;
   @Prop() assignment!: omegaup.Assignment;
   @Prop({ default: false }) show!: boolean;
+  @Prop() finishTimeCourse!: Date;
+  @Prop() startTimeCourse!: Date;
+  @Prop({ default: false }) unlimitedDurationCourse!: boolean;
+  @Prop({ default: '' }) columnError!: string;
 
   T = T;
   alias = this.assignment.alias || '';

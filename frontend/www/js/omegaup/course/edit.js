@@ -237,6 +237,10 @@ OmegaUp.on('ready', function() {
           show: this.show,
           update: this.update,
           assignment: this.assignment,
+          unlimitedDurationCourse: this.unlimitedDurationCourse,
+          finishTimeCourse: this.finishTimeCourse,
+          startTimeCourse: this.startTimeCourse,
+          columnError: this.columnError,
         },
         on: {
           submit: function(ev) {
@@ -264,6 +268,7 @@ OmegaUp.on('ready', function() {
                 .catch(function(error) {
                   UI.apiError(error);
                   assignmentDetails.show = true;
+                  assignmentDetails.columnError = error.errorcolumn;
                 });
             } else {
               const params = {
@@ -290,6 +295,7 @@ OmegaUp.on('ready', function() {
                 .catch(function(error) {
                   UI.apiError(error);
                   assignmentDetails.show = true;
+                  assignmentDetails.columnError = error.errorcolumn;
                 });
             }
             assignmentDetails.show = false;
@@ -308,6 +314,10 @@ OmegaUp.on('ready', function() {
         start_time: defaultStartTime,
         finish_time: defaultFinishTime,
       },
+      unlimitedDurationCourse: false,
+      finishTimeCourse: null,
+      startTimeCourse: null,
+      columnError: '',
     },
     components: {
       'omegaup-course-assignmentdetails': course_AssignmentDetails,
@@ -393,6 +403,9 @@ OmegaUp.on('ready', function() {
       editAdmissionMode.admissionMode = course.admission_mode;
       editAdmissionMode.shouldShowPublicOption = course.is_curator;
       clone.initialName = course.name;
+      assignmentDetails.unlimitedDurationCourse = !course.finish_time;
+      assignmentDetails.finishTimeCourse = course.finish_time;
+      assignmentDetails.startTimeCourse = course.start_time;
     })
     .catch(UI.apiError);
 

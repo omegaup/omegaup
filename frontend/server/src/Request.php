@@ -192,10 +192,12 @@ class Request extends \ArrayObject {
         ?int $upperBound = null
     ): \OmegaUp\Timestamp {
         if (!self::offsetExists($key)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
+            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
             );
+            $exception->addCustomMessageToArray('errorcolumn', $key);
+            throw $exception;
         }
         /** @var mixed */
         $val = $this->offsetGet($key);
