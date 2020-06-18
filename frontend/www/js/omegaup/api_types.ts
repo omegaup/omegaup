@@ -66,6 +66,32 @@ export namespace types {
       );
     }
 
+    export function BadgeListPayload(
+      elementId: string = 'payload',
+    ): types.BadgeListPayload {
+      return (x => {
+        x.ownedBadges = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.assignation_time)
+              x.assignation_time = ((x: number) => new Date(x * 1000))(
+                x.assignation_time,
+              );
+            if (x.first_assignation)
+              x.first_assignation = ((x: number) => new Date(x * 1000))(
+                x.first_assignation,
+              );
+            return x;
+          });
+        })(x.ownedBadges);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -838,6 +864,11 @@ export namespace types {
     badge: types.Badge;
   }
 
+  export interface BadgeListPayload {
+    badges: string[];
+    ownedBadges: types.Badge[];
+  }
+
   export interface Clarification {
     answer?: string;
     author?: string;
@@ -1574,6 +1605,7 @@ export namespace types {
   export interface ProblemsMineInfoPayload {
     isSysadmin: boolean;
     privateProblemsAlert: boolean;
+    visibilityStatuses: { [key: string]: number };
   }
 
   export interface Problemset {

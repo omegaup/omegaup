@@ -61,7 +61,7 @@
                   type="checkbox"
                   v-model="selectedProblems"
                   v-bind:disabled="problem.visibility === -10"
-                  v-bind:value="problem.alias"
+                  v-bind:value="problem"
                 />
               </td>
               <td class="text-right align-middle">
@@ -75,14 +75,41 @@
                     >{{ problem.title }}</a
                   >
                   <font-awesome-icon
-                    v-bind:title="T.wordsPrivate"
-                    v-if="problem.visibility <= 0 && problem.visibility > -10"
-                    v-bind:icon="['fas', 'eye-slash']"
+                    v-bind:title="T.wordsWarningProblem"
+                    v-if="
+                      problem.visibility ==
+                        visibilityStatuses['publicWarning'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateWarning']
+                    "
+                    v-bind:icon="['fas', 'exclamation-triangle']"
+                  />
+                  <font-awesome-icon
+                    v-bind:title="T.wordsBannedProblem"
+                    v-else-if="
+                      problem.visibility ==
+                        visibilityStatuses['publicBanned'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateBanned']
+                    "
+                    v-bind:icon="['fas', 'ban']"
                   />
                   <font-awesome-icon
                     v-bind:title="T.wordsDeleted"
-                    v-else-if="problem.visibility === -10"
+                    v-if="problem.visibility === visibilityStatuses['deleted']"
                     v-bind:icon="['fas', 'trash']"
+                  />
+                  <font-awesome-icon
+                    v-bind:title="T.wordsPrivate"
+                    v-else-if="
+                      (problem.visibility <=
+                        visibilityStatuses['privateBanned'] ||
+                        problem.visibility ==
+                          visibilityStatuses['privateWarning'] ||
+                        problem.visibility == visibilityStatuses['private']) &&
+                        problem.visibility > visibilityStatuses['deleted']
+                    "
+                    v-bind:icon="['fas', 'eye-slash']"
                   />
                   <div class="tags-badges" v-if="problem.tags.length">
                     <a
@@ -135,8 +162,17 @@ import {
   faTrash,
   faEdit,
   faChartBar,
+  faExclamationTriangle,
+  faBan,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faEyeSlash, faTrash, faEdit, faChartBar);
+library.add(
+  faEyeSlash,
+  faTrash,
+  faEdit,
+  faChartBar,
+  faExclamationTriangle,
+  faBan,
+);
 
 @Component({
   components: {
@@ -149,10 +185,11 @@ export default class ProblemMine extends Vue {
   @Prop() pagerItems!: types.PageItem[];
   @Prop() privateProblemsAlert!: boolean;
   @Prop() isSysadmin!: boolean;
+  @Prop() visibilityStatuses!: Array<string>;
 
   T = T;
   shouldShowAllProblems = false;
-  selectedProblems = [];
+  selectedProblems = <types.ProblemListItem[]>[];
   allProblemsVisibilityOption = -1;
 
   get statementShowAllProblems(): string {
