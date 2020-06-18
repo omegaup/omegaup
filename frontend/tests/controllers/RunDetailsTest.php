@@ -136,6 +136,27 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testDownload() {
+        $adminLogin = self::login($this->admin);
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 50);
+
+        $response = \OmegaUp\Controllers\Run::apiDownload(
+            new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+                'show_diff' => true,
+            ])
+        );
+        $this->assertTrue(true);
+    }
+
     /**
      * User only can see run details for submissions when gets the verdict AC
      */
