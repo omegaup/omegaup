@@ -188,6 +188,10 @@ export default class ArenaRunSubmit extends Vue {
         const result = e.target?.result ?? null;
         if (result === null) return;
         this.$emit('submit-run', result as string, this.selectedLanguage);
+        this.$nextTick(() => {
+          // will run after $emit is done
+          this.clearForm();
+        });
       };
 
       const validExtensions = [
@@ -237,13 +241,16 @@ export default class ArenaRunSubmit extends Vue {
       return;
     }
     this.$emit('submit-run', this.code, this.selectedLanguage);
-    this.clearInput();
-    this.code = '';
+    this.$nextTick(() => {
+      // will run after $emit is done
+      this.clearForm();
+    });
   }
 
-  clearInput(): void {
+  clearForm(): void {
     this.inputFile.type = 'text';
     this.inputFile.type = 'file';
+    this.code = '';
   }
 }
 </script>
