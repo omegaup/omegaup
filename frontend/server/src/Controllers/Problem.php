@@ -661,7 +661,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $public
+     * @omegaup-request-param boolean|null $public
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -677,6 +677,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Authenticate logged user
         $r->ensureIdentity();
+        $r->ensureOptionalBool('public');
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -729,7 +730,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'public'
                     );
                 }
-                if (strpos($tagName, 'problemTag') === 0) {
+                if (
+                    strpos($tagName, 'problemTag') === 0 ||
+                    strpos($tagName, 'problemtag') === 0
+                ) {
                     // Starts with 'problemTag'
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'tagPrefixRestricted',

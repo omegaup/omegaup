@@ -44,6 +44,47 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
+    /**
+     * Returns the list of tags of a problem. That list will contain
+     * either public or private tags.
+     *
+     * @return list<string>
+     */
+    public static function getTagsForProblem(
+        \OmegaUp\DAO\VO\Problems $problem,
+        bool $publicOnly,
+        bool $public = true
+    ): array {
+        if ($publicOnly && !$public) {
+            return [];
+        }
+
+        $sql = "
+            SELECT
+                `t`.`name`
+            FROM
+                `Problems_Tags` AS `pt`
+            INNER JOIN
+                `Tags` `t` on `t`.`tag_id` = `pt`.`tag_id`
+            WHERE
+                `pt`.`problem_id` = ? AND
+                `t`.`name` NOT LIKE 'problemRestricted%' AND
+                `t`.`name` NOT LIKE 'problemLevel%' AND
+                `t`.`public` = ?;";
+
+        $results = [];
+        /** @var array{name: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [ $problem->problem_id, $public ]
+            ) as $row
+        ) {
+            $results[] = $row['name'];
+        }
+        return $results;
+    }
+
     public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {
         $placeholders = join(
             ',',

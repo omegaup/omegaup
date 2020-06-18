@@ -2503,11 +2503,11 @@ Adds a tag to a problem
 
 ### Parameters
 
-| Name            | Type    | Description |
-| --------------- | ------- | ----------- |
-| `name`          | `mixed` |             |
-| `problem_alias` | `mixed` |             |
-| `public`        | `mixed` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `name`          | `mixed`        |             |
+| `problem_alias` | `mixed`        |             |
+| `public`        | `boolean|null` |             |
 
 ### Returns
 
