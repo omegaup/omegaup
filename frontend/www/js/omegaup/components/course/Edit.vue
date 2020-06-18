@@ -16,6 +16,7 @@
         <a
           href="#"
           class="nav-link"
+          data-tab-course
           v-on:click="showTab = 'course'"
           v-bind:class="{ active: showTab === 'course' }"
           >{{ T.courseEdit }}</a
@@ -25,6 +26,7 @@
         <a
           href="#"
           class="nav-link"
+          data-tab-assignments
           v-on:click="showTab = 'assignments'"
           v-bind:class="{ active: showTab === 'assignments' }"
           >{{ T.wordsAssignments }}</a
@@ -34,6 +36,7 @@
         <a
           href="#"
           class="nav-link"
+          data-tab-problems
           v-on:click="showTab = 'problems'"
           v-bind:class="{ active: showTab === 'problems' }"
           >{{ T.wordsProblems }}</a
@@ -43,6 +46,7 @@
         <a
           href="#"
           class="nav-link"
+          data-tab-admission-mode
           v-on:click="showTab = 'admission-mode'"
           v-bind:class="{ active: showTab === 'admission-mode' }"
           >{{ T.contestNewFormAdmissionMode }}</a
@@ -52,6 +56,7 @@
         <a
           href="#"
           class="nav-link"
+          data-tab-students
           v-on:click="showTab = 'students'"
           v-bind:class="{ active: showTab === 'students' }"
           >{{ T.courseEditStudents }}</a
@@ -61,6 +66,7 @@
         <a
           href="#"
           class="nav-link"
+          data-tab-admins
           v-on:click="showTab = 'admins'"
           v-bind:class="{ active: showTab === 'admins' }"
           >{{ T.courseEditAdmins }}</a
@@ -70,6 +76,7 @@
         <a
           href="#"
           class="nav-link"
+          data-tab-clone
           v-on:click="showTab = 'clone'"
           v-bind:class="{ active: showTab === 'clone' }"
           >{{ T.courseEditClone }}</a
@@ -190,6 +197,7 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import course_Clone from './Clone.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { omegaup } from '../../omegaup';
 
 @Component({
   components: {
@@ -205,11 +213,9 @@ import { types } from '../../api_types';
   },
 })
 export default class CourseEdit extends Vue {
-  @Prop() data!: types.CourseEditPayload;
+  @Prop() data!: omegaup.TransitionalCourseEditPayload;
 
   T = T;
   showTab = 'course';
-  selectedAssignment: types.CourseAssignment | null = this.data.course
-    .assignments[0];
 }
 </script>

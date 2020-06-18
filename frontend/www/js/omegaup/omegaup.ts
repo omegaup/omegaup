@@ -2,6 +2,7 @@ import * as ui from './ui';
 import * as api from './api';
 import * as errors from './errors';
 import * as time from './time';
+import { types } from './api_types';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -63,6 +64,38 @@ export class EventListenerList {
 }
 
 export namespace omegaup {
+  export interface TransitionalCourseEditPayload {
+    admins: TransitionalCourseAdmin[];
+    assignmentProblems: types.ProblemsetProblem[];
+    course: types.CourseDetails;
+    groupsAdmins: TransitionalCourseGroupAdmin[];
+    identityRequests: TransitionalIdentityRequest[];
+    selectedAssignment?: types.CourseAssignment;
+    students: types.CourseStudent[];
+    tags: string[];
+  }
+
+  export interface TransitionalCourseAdmin {
+    role: string;
+    username: string;
+  }
+
+  export interface TransitionalCourseGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
+  }
+
+  export interface TransitionalIdentityRequest {
+    accepted?: boolean;
+    admin?: { name?: string; username: string };
+    country?: string;
+    country_id?: string;
+    last_update?: Date;
+    request_time: Date;
+    username: string;
+  }
+
   export interface Selectable<T> {
     value: T;
     selected: boolean;
