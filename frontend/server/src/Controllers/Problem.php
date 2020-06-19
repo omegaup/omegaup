@@ -25,7 +25,7 @@
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
- * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags?: list<string>, loadMathjax: true, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel?: null|string, problemsetter?: ProblemsetterInfo, publicTags?: list<string>, publishedRevision: ProblemVersion|null, selectedTags: list<array{public: bool, tagname: string}>, solution: ProblemStatement, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, tags: list<array{name: null|string}>, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedTags: list<array{public: bool, tagname: string}>, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, solution: ProblemStatement, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, tags: list<array{name: null|string}>, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning?: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
  * @psalm-type ProblemDetailsv2Payload=array{nominationStatus?: NominationStatus, problem: ProblemInfo, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
@@ -661,7 +661,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $public
+     * @omegaup-request-param boolean|null $public
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -677,6 +677,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Authenticate logged user
         $r->ensureIdentity();
+        $r->ensureOptionalBool('public');
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
@@ -729,8 +730,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'public'
                     );
                 }
-                if (strpos($tagName, 'problemTag') === 0) {
-                    // Starts with 'problemTag'
+
+                // After normalization problemTag becomes problemtag
+                if (strpos($tagName, 'problemtag') === 0) {
+                    // Starts with 'problemtag'
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'tagPrefixRestricted',
                         'name'
@@ -4716,36 +4719,45 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $groupAdmins = \OmegaUp\DAO\GroupRoles::getProblemAdmins($problem);
 
         $details = self::getProblemEditDetails($problem, $r->identity);
+        $extraInfo = [
+            'statusSuccess' => false,
+            'admins' => $admins,
+            'groupAdmins' => $groupAdmins,
+            'tags' => $tags,
+            'problemLevel' => \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+                $problem
+            ),
+            'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
+            'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
+            'selectedTags' => $selectedTags,
+            'selectedPublicTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+                $problem,
+                true
+            ),
+            'selectedPrivateTags' => (
+                \OmegaUp\Authorization::canEditProblem($r->identity, $problem) ?
+                \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+                    $problem,
+                    false
+                ) : []
+            ),
+            'log' => $versions['log'],
+            'publishedRevision' => $publishedRevision,
+            'solution' => $solution,
+        ];
+
         $result = [
             'smartyProperties' => [
                 'LOAD_MATHJAX' => true,
                 'payload' => array_merge(
                     $details,
-                    self::getCommonPayloadForSmarty()
+                    self::getCommonPayloadForSmarty(),
+                    $extraInfo
                 ),
                 'title' => 'problemEditEditProblem',
             ],
             'entrypoint' => 'problem_edit',
         ];
-        $result['smartyProperties']['payload'] = array_merge(
-            [
-                'loadMathjax' => true,
-                'statusSuccess' => false,
-                'admins' => $admins,
-                'groupAdmins' => $groupAdmins,
-                'tags' => $tags,
-                'problemLevel' => \OmegaUp\DAO\ProblemsTags::getProblemLevel(
-                    $problem
-                ),
-                'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
-                'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
-                'selectedTags' => $selectedTags,
-                'log' => $versions['log'],
-                'publishedRevision' => $publishedRevision,
-                'solution' => $solution,
-            ],
-            $result['smartyProperties']['payload']
-        );
         if (isset($details['problemsetter'])) {
             $result['smartyProperties']['payload']['problemsetter'] = $details['problemsetter'];
         }
@@ -4774,17 +4786,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     self::getCommonPayloadForSmarty()
                 );
                 $result['smartyProperties']['payload'] = array_merge(
-                    [
-                        'loadMathjax' => true,
-                        'statusSuccess' => false,
-                        'admins' => $admins,
-                        'groupAdmins' => $groupAdmins,
-                        'tags' => $tags,
-                        'selectedTags' => $selectedTags,
-                        'log' => $versions['log'],
-                        'publishedRevision' => $publishedRevision,
-                        'solution' => $solution,
-                    ],
+                    $extraInfo,
                     $result['smartyProperties']['payload']
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
