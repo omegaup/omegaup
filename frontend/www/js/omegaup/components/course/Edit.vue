@@ -102,9 +102,10 @@
           v-bind:course-alias="data.course.alias"
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
+          v-if="data.selectedAssignment"
           v-bind:show="false"
           v-bind:update="true"
-          v-bind:assignment="selectedAssignment"
+          v-bind:assignment="data.selectedAssignment"
         ></omegaup-course-assignment-details>
       </div>
 
@@ -114,6 +115,7 @@
         v-if="showTab === 'problems'"
       >
         <omegaup-course-problem-list
+          v-if="data.selectedAssignment"
           v-bind:assignments="data.course.assignments"
           v-bind:assignment-problems="data.assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
