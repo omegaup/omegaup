@@ -4732,13 +4732,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'selectedTags' => $selectedTags,
             'selectedPublicTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
                 $problem,
-                !\OmegaUp\Authorization::canEditProblem($r->identity, $problem),
                 true
             ),
-            'selectedPrivateTags' => \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
-                $problem,
-                !\OmegaUp\Authorization::canEditProblem($r->identity, $problem),
-                false
+            'selectedPrivateTags' => (
+                \OmegaUp\Authorization::canEditProblem($r->identity, $problem) ?
+                \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+                    $problem,
+                    false
+                ) : []
             ),
             'log' => $versions['log'],
             'publishedRevision' => $publishedRevision,
