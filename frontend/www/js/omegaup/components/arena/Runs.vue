@@ -92,7 +92,13 @@
               <label
                 >{{ T.wordsProblem }}:
                 <omegaup-autocomplete
+                  v-if="problemsetProblems.length !== 0"
                   v-bind:init="initProblemAutocomplete"
+                  v-model="filterProblem"
+                ></omegaup-autocomplete>
+                <omegaup-autocomplete
+                  v-else=""
+                  v-bind:init="el => typeahead.problemTypeahead(el)"
                   v-model="filterProblem"
                 ></omegaup-autocomplete>
               </label>
@@ -110,9 +116,15 @@
               <label
                 >{{ T.wordsUser }}:
                 <omegaup-autocomplete
+                  v-if="problemsetProblems.length !== 0"
                   v-bind:init="
                     el => typeahead.userContestTypeahead(el, this.contestAlias)
                   "
+                  v-model="filterUsername"
+                ></omegaup-autocomplete>
+                <omegaup-autocomplete
+                  v-else=""
+                  v-bind:init="el => typeahead.userTypeahead(el)"
                   v-model="filterUsername"
                 ></omegaup-autocomplete>
               </label>
@@ -368,17 +380,13 @@ export default class Runs extends Vue {
   }
 
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
-    if (this.problemsetProblems !== null) {
-      typeahead.problemContestTypeahead(
-        el,
-        () => this.problemsetProblems,
-        (event: Event, item: { alias: string; title: string }) => {
-          this.filterProblem = item.alias;
-        },
-      );
-    } else {
-      typeahead.problemTypeahead(el);
-    }
+    typeahead.problemsetProblemTypeahead(
+      el,
+      () => this.problemsetProblems,
+      (event: Event, item: { alias: string; title: string }) => {
+        this.filterProblem = item.alias;
+      },
+    );
   }
 
   memory(run: types.Run): string {
