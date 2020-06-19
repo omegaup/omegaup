@@ -5,7 +5,7 @@
         <div class="row">
           <div
             class="form-group col-md-4"
-            v-bind:class="{ 'has-error': columnError === 'name' }"
+            v-bind:class="{ 'has-error': invalidParameterName === 'name' }"
           >
             <label
               >{{ T.wordsTitle }}
@@ -19,7 +19,7 @@
           </div>
           <div
             class="form-group col-md-4"
-            v-bind:class="{ 'has-error': columnError === 'alias' }"
+            v-bind:class="{ 'has-error': invalidParameterName === 'alias' }"
           >
             <label
               >{{ T.courseNewFormShortTitle_alias_ }}
@@ -40,7 +40,9 @@
           </div>
           <div
             class="form-group col-md-4"
-            v-bind:class="{ 'has-error': columnError === 'assignment_type' }"
+            v-bind:class="{
+              'has-error': invalidParameterName === 'assignment_type',
+            }"
           >
             <label
               >{{ T.courseAssignmentNewFormType }}
@@ -65,7 +67,9 @@
         <div class="row">
           <div
             class="form-group col-md-4"
-            v-bind:class="{ 'has-error': columnError === 'start_time' }"
+            v-bind:class="{
+              'has-error': invalidParameterName === 'start_time',
+            }"
           >
             <label
               >{{ T.courseNewFormStartDate }}
@@ -98,7 +102,7 @@
             <div
               class="form-control container-fluid"
               v-bind:class="{
-                'has-error': columnError === 'unlimited_duration',
+                'has-error': invalidParameterName === 'unlimited_duration',
               }"
             >
               <label class="radio-inline"
@@ -121,7 +125,9 @@
           </div>
           <div
             class="form-group col-md-4"
-            v-bind:class="{ 'has-error': columnError === 'finish_time' }"
+            v-bind:class="{
+              'has-error': invalidParameterName === 'finish_time',
+            }"
           >
             <label
               >{{ T.courseNewFormEndDate }}
@@ -145,7 +151,9 @@
         <div class="row">
           <div
             class="form-group container-fluid"
-            v-bind:class="{ 'has-error': columnError === 'description' }"
+            v-bind:class="{
+              'has-error': invalidParameterName === 'description',
+            }"
           >
             <label
               >{{ T.courseNewFormDescription }}
@@ -205,7 +213,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
-  @Prop({ default: '' }) columnError!: string;
+  @Prop({ default: '' }) invalidParameterName!: string;
 
   T = T;
   alias = this.assignment.alias || '';

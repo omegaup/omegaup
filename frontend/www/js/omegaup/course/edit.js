@@ -240,7 +240,7 @@ OmegaUp.on('ready', function() {
           unlimitedDurationCourse: this.unlimitedDurationCourse,
           finishTimeCourse: this.finishTimeCourse,
           startTimeCourse: this.startTimeCourse,
-          columnError: this.columnError,
+          invalidParameterName: this.invalidParameterName,
         },
         on: {
           submit: function(ev) {
@@ -268,7 +268,8 @@ OmegaUp.on('ready', function() {
                 .catch(function(error) {
                   UI.apiError(error);
                   assignmentDetails.show = true;
-                  assignmentDetails.columnError = error.parameter || '';
+                  assignmentDetails.invalidParameterName =
+                    error.parameter || '';
                 });
             } else {
               const params = {
@@ -295,7 +296,8 @@ OmegaUp.on('ready', function() {
                 .catch(function(error) {
                   UI.apiError(error);
                   assignmentDetails.show = true;
-                  assignmentDetails.columnError = error.parameter || '';
+                  assignmentDetails.invalidParameterName =
+                    error.parameter || '';
                 });
             }
             assignmentDetails.show = false;
@@ -317,7 +319,7 @@ OmegaUp.on('ready', function() {
       unlimitedDurationCourse: false,
       finishTimeCourse: null,
       startTimeCourse: null,
-      columnError: '',
+      invalidParameterName: '',
     },
     components: {
       'omegaup-course-assignmentdetails': course_AssignmentDetails,
