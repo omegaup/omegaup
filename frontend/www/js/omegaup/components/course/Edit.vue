@@ -197,7 +197,6 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import course_Clone from './Clone.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
-import { omegaup } from '../../omegaup';
 
 @Component({
   components: {
@@ -213,7 +212,7 @@ import { omegaup } from '../../omegaup';
   },
 })
 export default class CourseEdit extends Vue {
-  @Prop() data!: omegaup.TransitionalCourseEditPayload;
+  @Prop() data!: types.CourseEditPayload;
 
   T = T;
   showTab = 'course';
