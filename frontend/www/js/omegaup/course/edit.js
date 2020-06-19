@@ -268,7 +268,7 @@ OmegaUp.on('ready', function() {
                 .catch(function(error) {
                   UI.apiError(error);
                   assignmentDetails.show = true;
-                  assignmentDetails.columnError = error.errorcolumn;
+                  assignmentDetails.columnError = error.parameter || '';
                 });
             } else {
               const params = {
@@ -295,7 +295,7 @@ OmegaUp.on('ready', function() {
                 .catch(function(error) {
                   UI.apiError(error);
                   assignmentDetails.show = true;
-                  assignmentDetails.columnError = error.errorcolumn;
+                  assignmentDetails.columnError = error.parameter || '';
                 });
             }
             assignmentDetails.show = false;

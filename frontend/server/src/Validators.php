@@ -47,12 +47,10 @@ class Validators {
 
         // Validate data is string
         if (!is_string($parameter) || empty($parameter)) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $parameterName
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
-            throw $exception;
         }
     }
 
@@ -136,27 +134,23 @@ class Validators {
             empty($parameter) ||
             strlen($parameter) > 32
         ) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidAlias',
                 $parameterName
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
-            throw $exception;
         }
         if (self::isRestrictedAlias($parameter)) {
             $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'aliasInUse'
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
+            $exception->addCustomMessageToArray('parameter', $parameterName);
             throw $exception;
         }
         if (!self::isValidAlias($parameter)) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalidAlias',
                 $parameterName
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
-            throw $exception;
         }
     }
 
@@ -392,19 +386,16 @@ class Validators {
         } elseif ($parameter instanceof \OmegaUp\Timestamp) {
             $parameter = $parameter->time;
         } else {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $parameterName
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
-            throw $exception;
         }
         if (!is_null($lowerBound) && $parameter < $lowerBound) {
             $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterDateTooSmall',
                 $parameterName
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
             $exception->addCustomMessageToArray(
                 'payload',
                 ['lower_bound' => $lowerBound]
@@ -416,7 +407,6 @@ class Validators {
                 'parameterDateTooLarge',
                 $parameterName
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
             $exception->addCustomMessageToArray(
                 'payload',
                 ['upper_bound' => $upperBound]
@@ -562,12 +552,10 @@ class Validators {
             return true;
         }
         if ($required) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $parameterName
             );
-            $exception->addCustomMessageToArray('errorcolumn', $parameterName);
-            throw $exception;
         }
         return false;
     }

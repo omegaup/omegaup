@@ -111,11 +111,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             !is_null($finishTime) &&
             $startTime->time > $finishTime->time
         ) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseInvalidStartTime'
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseInvalidStartTime',
+                'finish_time'
             );
-            $exception->addCustomMessageToArray('errorcolumn', 'finish_time');
-            throw $exception;
         }
 
         \OmegaUp\Validators::validateInEnum(
@@ -148,21 +147,16 @@ class Course extends \OmegaUp\Controllers\Controller {
             is_null($courseFinishTime) ? null : $courseFinishTime->time
         );
         if ($startTime->time < $courseStartTime->time) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentStartDateBeforeCourseStartDate'
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentStartDateBeforeCourseStartDate',
+                'start_time'
             );
-            $exception->addCustomMessageToArray('errorcolumn', 'start_time');
-            throw $exception;
         }
         if ($unlimitedDuration && !is_null($courseFinishTime)) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseDoesNotHaveUnlimitedDuration'
-            );
-            $exception->addCustomMessageToArray(
-                'errorcolumn',
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseDoesNotHaveUnlimitedDuration',
                 'unlimited_duration'
             );
-            throw $exception;
         }
 
         $finishTime = $r->ensureOptionalTimestamp(
@@ -175,11 +169,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             !is_null($finishTime)
             && $finishTime->time < $courseStartTime->time
         ) {
-            $exception = new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentEndDateBeforeCourseStartDate'
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseAssignmentEndDateBeforeCourseStartDate',
+                'finish_time'
             );
-            $exception->addCustomMessageToArray('errorcolumn', 'finish_time');
-            throw $exception;
         }
 
         return ['startTime' => $startTime, 'finishTime' => $finishTime];
@@ -681,7 +674,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                     'aliasInUse'
                 );
-                $exception->addCustomMessageToArray('errorcolumn', 'alias');
+                $exception->addCustomMessageToArray('parameter', 'alias');
                 throw $exception;
             }
             throw $e;
