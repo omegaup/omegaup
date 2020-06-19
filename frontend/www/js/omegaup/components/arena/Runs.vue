@@ -111,7 +111,7 @@
                 >{{ T.wordsUser }}:
                 <omegaup-autocomplete
                   v-bind:init="initUserAutocomplete"
-                  v-model="filterUsername"
+                  v-bind:value.sync="filterUsername"
                 ></omegaup-autocomplete>
               </label>
               <button
