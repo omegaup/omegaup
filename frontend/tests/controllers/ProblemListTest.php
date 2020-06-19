@@ -325,7 +325,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             'difficulty_range' => '1,4',
             'order_by' => 'quality',
         ]));
-        $this->assertCount(0, $response['results']);
+        $this->assertEmpty($response['results']);
     }
 
     /**

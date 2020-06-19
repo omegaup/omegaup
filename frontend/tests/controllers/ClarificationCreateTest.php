@@ -166,7 +166,7 @@ class ClarificationCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemData['request']['problem_alias'],
             ])
         );
-        $this->assertCount(0, $response['clarifications']);
+        $this->assertEmpty($response['clarifications']);
     }
 
     /**

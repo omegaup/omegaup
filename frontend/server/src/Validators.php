@@ -140,9 +140,11 @@ class Validators {
             );
         }
         if (self::isRestrictedAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'aliasInUse'
             );
+            $exception->addCustomMessageToArray('parameter', $parameterName);
+            throw $exception;
         }
         if (!self::isValidAlias($parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
