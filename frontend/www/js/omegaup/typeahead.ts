@@ -140,7 +140,7 @@ export function problemTypeahead(
     .trigger('change');
 }
 
-export function problemContestTypeahead(
+export function problemsetProblemTypeahead(
   elem: JQuery<HTMLElement>,
   problemDataset: () => { alias: string; title: string }[],
   cb?: CallbackType<{ alias: string; title: string }>,
