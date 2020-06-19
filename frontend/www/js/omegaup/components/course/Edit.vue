@@ -119,7 +119,7 @@
           v-bind:assignments="data.course.assignments"
           v-bind:assignment-problems="data.assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
-          v-bind:selected-assignment="data.selectedAssignment"
+          v-bind:selected-assignment="selectedAssignment"
         ></omegaup-course-problem-list>
       </div>
 
@@ -218,5 +218,6 @@ export default class CourseEdit extends Vue {
 
   T = T;
   showTab = 'course';
+  selectedAssignment: types.CourseAssignment | null = null;
 }
 </script>
