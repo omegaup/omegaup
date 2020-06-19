@@ -387,7 +387,7 @@ class Validators {
             $parameter = $parameter->time;
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
+                'parameterNotADate',
                 $parameterName
             );
         }
