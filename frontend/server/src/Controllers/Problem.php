@@ -730,11 +730,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'public'
                     );
                 }
-                if (
-                    strpos($tagName, 'problemTag') === 0 ||
-                    strpos($tagName, 'problemtag') === 0
-                ) {
-                    // Starts with 'problemTag'
+
+                // After normalization problemTag becomes problemtag
+                if (strpos($tagName, 'problemtag') === 0) {
+                    // Starts with 'problemtag'
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
                         'tagPrefixRestricted',
                         'name'
