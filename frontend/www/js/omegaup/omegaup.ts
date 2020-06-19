@@ -148,17 +148,6 @@ export namespace omegaup {
     start_time: Date;
   }
 
-  export interface AssignmentProblem {
-    alias: string;
-    commit: string;
-    languages: string;
-    letter: string;
-    order: number;
-    points: number;
-    title: string;
-    version: string;
-  }
-
   export interface Case {
     contest_score: number;
     max_score: number;
