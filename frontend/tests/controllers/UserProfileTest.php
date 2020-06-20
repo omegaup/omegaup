@@ -495,7 +495,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
         );
-        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
             new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
                 'status' => $status,
@@ -506,11 +506,12 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $login = self::login($author);
-        // As all problems are public, this function should retrieve 10 records
+        // Since the problem is public, this function should retrieve 1 problem.
         $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
         $this->assertCount(1, $response['problems']);
+        $this->assertEquals('problem_1', $response['problems'][0]['alias']);
 
         // Now make one of those problems private, results must change
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
@@ -523,7 +524,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
         ]));
 
-        $this->assertCount(0, $response['problems']);
+        $this->assertEmpty($response['problems']);
 
         // Now, as another user, request the problems created by initial user
         ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
@@ -533,6 +534,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'username' => $identity->username
         ]));
-        $this->assertCount(0, $response['problems']);
+        $this->assertEmpty($response['problems']);
     }
 }
