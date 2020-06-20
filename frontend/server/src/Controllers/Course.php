@@ -118,7 +118,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             $startTime->time > $finishTime->time
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseInvalidStartTime'
+                'courseInvalidStartTime',
+                'finish_time'
             );
         }
 
@@ -153,12 +154,14 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         if ($startTime->time < $courseStartTime->time) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentStartDateBeforeCourseStartDate'
+                'courseAssignmentStartDateBeforeCourseStartDate',
+                'start_time'
             );
         }
         if ($unlimitedDuration && !is_null($courseFinishTime)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseDoesNotHaveUnlimitedDuration'
+                'courseDoesNotHaveUnlimitedDuration',
+                'unlimited_duration'
             );
         }
 
@@ -173,7 +176,8 @@ class Course extends \OmegaUp\Controllers\Controller {
             && $finishTime->time < $courseStartTime->time
         ) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'courseAssignmentEndDateBeforeCourseStartDate'
+                'courseAssignmentEndDateBeforeCourseStartDate',
+                'finish_time'
             );
         }
 
@@ -673,10 +677,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
-                throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'aliasInUse',
-                    $e
+                $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                    'aliasInUse'
                 );
+                $exception->addCustomMessageToArray('parameter', 'alias');
+                throw $exception;
             }
             throw $e;
         }
