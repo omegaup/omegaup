@@ -46,6 +46,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitUpload: "Ou fa\u00e7a upload de um arquivo",
   arenaRunSubmitWaitBetweenUploads: "Voc\u00ea deve esperar %(submissionGap) segundos entre  cada solu\u00e7\u00e3o apresentada",
   assignmentNotFound: "Designa\u00e7\u00e3o n\u00e3o encontrado",
+  assignmentRemoveAlreadyHasRuns: "A tarefa n\u00e3o pode ser removida depois que uma solu\u00e7\u00e3o \u00e9 julgada.",
   authorRankRangeHeader: "Os melhores %(lowCount) a %(highCount) autores com maior score obtido",
   authorRankUnranked: "Autor n\u00e3o classificado",
   badgeAssignationTimeMessage: "Data que voc\u00ea recebeu este crach\u00e1",

@@ -45,6 +45,7 @@
 	"arenaRunSubmitUpload": "O sube un archivo",
 	"arenaRunSubmitWaitBetweenUploads": "Debes esperar %(submissionGap) segundos entre cada env\u00edo del mismo problema",
 	"assignmentNotFound": "Tarea/examen no encontrado",
+	"assignmentRemoveAlreadyHasRuns": "La tarea no se puede eliminar si ya tiene soluciones revisadas.",
 	"authorRankRangeHeader": "Los mejores %(lowCount) a %(highCount) autores con m\u00e1s puntaje",
 	"authorRankUnranked": "Autor no clasificado",
 	"badgeAssignationTimeMessage": "Fecha en que conseguiste esta insignia",
