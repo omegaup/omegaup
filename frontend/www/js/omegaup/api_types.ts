@@ -66,6 +66,32 @@ export namespace types {
       );
     }
 
+    export function BadgeListPayload(
+      elementId: string = 'payload',
+    ): types.BadgeListPayload {
+      return (x => {
+        x.ownedBadges = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.assignation_time)
+              x.assignation_time = ((x: number) => new Date(x * 1000))(
+                x.assignation_time,
+              );
+            if (x.first_assignation)
+              x.first_assignation = ((x: number) => new Date(x * 1000))(
+                x.first_assignation,
+              );
+            return x;
+          });
+        })(x.ownedBadges);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -303,6 +329,59 @@ export namespace types {
       );
     }
 
+    export function CourseEditPayload(
+      elementId: string = 'payload',
+    ): types.CourseEditPayload {
+      return (x => {
+        x.course = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        x.identityRequests = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.last_update)
+              x.last_update = ((x: number) => new Date(x * 1000))(
+                x.last_update,
+              );
+            x.request_time = ((x: number) => new Date(x * 1000))(
+              x.request_time,
+            );
+            return x;
+          });
+        })(x.identityRequests);
+        if (x.selectedAssignment)
+          x.selectedAssignment = (x => {
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.selectedAssignment);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseListPayload(
       elementId: string = 'payload',
     ): types.CourseListPayload {
@@ -487,14 +566,6 @@ export namespace types {
       );
     }
 
-    export function ProblemAdminsPayload(
-      elementId: string = 'payload',
-    ): types.ProblemAdminsPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
-      );
-    }
-
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
@@ -601,24 +672,6 @@ export namespace types {
       );
     }
 
-    export function ProblemEditTransitionalPayload(
-      elementId: string = 'payload',
-    ): types.ProblemEditTransitionalPayload {
-      return (x => {
-        if (x.problemsetter)
-          x.problemsetter = (x => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function ProblemFormPayload(
       elementId: string = 'payload',
     ): types.ProblemFormPayload {
@@ -635,35 +688,9 @@ export namespace types {
       );
     }
 
-    export function ProblemMarkdownPayload(
-      elementId: string = 'payload',
-    ): types.ProblemMarkdownPayload {
-      return (x => {
-        if (x.problemsetter)
-          x.problemsetter = (x => {
-            if (x.creation_date)
-              x.creation_date = ((x: number) => new Date(x * 1000))(
-                x.creation_date,
-              );
-            return x;
-          })(x.problemsetter);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function ProblemQualityPayload(
       elementId: string = 'payload',
     ): types.ProblemQualityPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
-      );
-    }
-
-    export function ProblemTagsPayload(
-      elementId: string = 'payload',
-    ): types.ProblemTagsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -837,6 +864,11 @@ export namespace types {
     badge: types.Badge;
   }
 
+  export interface BadgeListPayload {
+    badges: string[];
+    ownedBadges: types.Badge[];
+  }
+
   export interface Clarification {
     answer?: string;
     author?: string;
@@ -1003,23 +1035,6 @@ export namespace types {
     languages: { [key: string]: string };
   }
 
-  export interface ContestProblem {
-    accepted: number;
-    alias: string;
-    commit: string;
-    difficulty: number;
-    languages: string;
-    letter: string;
-    order: number;
-    points: number;
-    problem_id: number;
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
-  }
-
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
@@ -1046,6 +1061,11 @@ export namespace types {
     user_registration_accepted?: boolean;
   }
 
+  export interface CourseAdmin {
+    role: string;
+    username: string;
+  }
+
   export interface CourseAssignment {
     alias: string;
     assignment_type: string;
@@ -1054,6 +1074,7 @@ export namespace types {
     max_points: number;
     name: string;
     order: number;
+    problemset_id?: number;
     publish_time_delay?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -1081,6 +1102,23 @@ export namespace types {
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
     progress: types.AssignmentProgress;
+  }
+
+  export interface CourseEditPayload {
+    admins: types.CourseAdmin[];
+    assignmentProblems: types.ProblemsetProblem[];
+    course: types.CourseDetails;
+    groupsAdmins: types.CourseGroupAdmin[];
+    identityRequests: types.IdentityRequest[];
+    selectedAssignment?: types.CourseAssignment;
+    students: types.CourseStudent[];
+    tags: string[];
+  }
+
+  export interface CourseGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface CourseListPayload {
@@ -1183,6 +1221,16 @@ export namespace types {
       runner_queue_length: number;
       runners: string[];
     };
+  }
+
+  export interface IdentityRequest {
+    accepted?: boolean;
+    admin?: { name?: string; username: string };
+    country?: string;
+    country_id?: string;
+    last_update?: Date;
+    request_time: Date;
+    username: string;
   }
 
   export interface IndexPayload {
@@ -1304,12 +1352,6 @@ export namespace types {
     username: string;
   }
 
-  export interface ProblemAdminsPayload {
-    admins: types.ProblemAdmin[];
-    alias: string;
-    group_admins: types.ProblemGroupAdmin[];
-  }
-
   export interface ProblemDetails {
     accepted: number;
     admin?: boolean;
@@ -1325,12 +1367,7 @@ export namespace types {
     points: number;
     preferred_language?: string;
     problem_id: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1372,12 +1409,7 @@ export namespace types {
     points: number;
     preferred_language?: string;
     problem_id: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
@@ -1416,65 +1448,24 @@ export namespace types {
     groupAdmins: types.ProblemGroupAdmin[];
     inputLimit: number;
     languages: string;
-    loadMathjax: boolean;
+    levelTags: string[];
     log: types.ProblemVersion[];
     memoryLimit: number;
     outputLimit: number;
     overallWallTimeLimit: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
-    publishedRevision?: {
-      author: { email?: string; name?: string; time?: Date };
-      commit: string;
-      committer: { email?: string; name?: string; time?: Date };
-      message?: string;
-      parents?: string[];
-      tree?: { [key: string]: string };
-      version?: string;
-    };
+    problemLevel?: string;
+    problemsetter?: types.ProblemsetterInfo;
+    publicTags: string[];
+    publishedRevision?: types.ProblemVersion;
     selectedTags: { public: boolean; tagname: string }[];
+    selectedPublicTags: string[];
+    selectedPrivateTags: string[];
     solution: types.ProblemStatement;
     source: string;
     statement: types.ProblemStatement;
     statusError?: string;
     statusSuccess: boolean;
     tags: { name?: string }[];
-    timeLimit: number;
-    title: string;
-    validLanguages: { [key: string]: string };
-    validator: string;
-    validatorTimeLimit: number | number;
-    validatorTypes: { [key: string]: null | string };
-    visibility: number;
-    visibilityStatuses: { [key: string]: number };
-  }
-
-  export interface ProblemEditTransitionalPayload {
-    alias: string;
-    allowUserAddTags: boolean;
-    emailClarifications: boolean;
-    extraWallTime: number;
-    inputLimit: number;
-    languages: string;
-    memoryLimit: number;
-    outputLimit: number;
-    overallWallTimeLimit: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
-    source: string;
-    statement: {
-      images: { [key: string]: string };
-      language: string;
-      markdown: string;
-    };
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };
@@ -1527,12 +1518,7 @@ export namespace types {
     };
     points: number;
     problem_id: number;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     sample_input?: string;
     settings: types.ProblemSettings;
@@ -1574,19 +1560,6 @@ export namespace types {
     tags: string[];
   }
 
-  export interface ProblemMarkdownPayload {
-    alias: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
-    source?: string;
-    statement: types.ProblemStatement;
-    title?: string;
-  }
-
   export interface ProblemQualityPayload {
     canNominateProblem: boolean;
     dismissed: boolean;
@@ -1620,21 +1593,10 @@ export namespace types {
     markdown: string;
   }
 
-  export interface ProblemTagsPayload {
-    alias: string;
-    allowTags: boolean;
-    selectedTags: types.SelectedTag[];
-    tags: { name?: string }[];
-    problemLevel?: string;
-    publicTags: string[];
-    levelTags: string[];
-    title?: string;
-  }
-
   export interface ProblemVersion {
     author: { email?: string; name?: string; time?: Date };
     commit: string;
-    committer: { name?: string; email?: string; time?: Date };
+    committer: { email?: string; name?: string; time?: Date };
     message?: string;
     parents?: string[];
     tree?: { [key: string]: string };
@@ -1644,6 +1606,7 @@ export namespace types {
   export interface ProblemsMineInfoPayload {
     isSysadmin: boolean;
     privateProblemsAlert: boolean;
+    visibilityStatuses: { [key: string]: number };
   }
 
   export interface Problemset {
@@ -1711,13 +1674,19 @@ export namespace types {
     letter: string;
     order: number;
     points: number;
-    problem_id?: number;
     quality_payload?: types.ProblemQualityPayload;
     submissions: number;
     title: string;
     version: string;
     visibility: number;
     visits: number;
+  }
+
+  export interface ProblemsetterInfo {
+    classname: string;
+    creation_date?: Date;
+    name: string;
+    username: string;
   }
 
   export interface Progress {
@@ -2113,7 +2082,7 @@ export namespace messages {
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
-    problems: types.ContestProblem[];
+    problems: types.ProblemsetProblem[];
     points_decay_factor: number;
     problemset_id: number;
     requests_user_information: string;
@@ -2179,22 +2148,7 @@ export namespace messages {
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.ProblemsetProblem[];
     points_decay_factor: number;
     problemset_id: number;
     requests_user_information: string;
@@ -2422,49 +2376,12 @@ export namespace messages {
     admin: boolean;
     alias: string;
     assignment_type?: string;
-    courseAssignments: {
-      name: string;
-      description: string;
-      alias: string;
-      publish_time_delay?: number;
-      assignment_type: string;
-      start_time: Date;
-      finish_time?: Date;
-      max_points: number;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-    }[];
+    courseAssignments: types.CourseAssignment[];
     description?: string;
     director: string;
     finish_time?: Date;
     name: string;
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      quality_payload: {
-        canNominateProblem: boolean;
-        dismissed: boolean;
-        dismissedBeforeAC: boolean;
-        language?: string;
-        nominated: boolean;
-        nominatedBeforeAC: boolean;
-        problemAlias: string;
-        solved: boolean;
-        tried: boolean;
-      };
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
+    problems: types.ProblemsetProblem[];
     problemset_id: number;
     start_time: Date;
   };
@@ -2536,13 +2453,7 @@ export namespace messages {
     };
   };
   export type CourseListStudentsRequest = { [key: string]: any };
-  export type CourseListStudentsResponse = {
-    students: {
-      name?: string;
-      progress: { [key: string]: number };
-      username: string;
-    }[];
-  };
+  export type CourseListStudentsResponse = { students: types.CourseStudent[] };
   export type CourseListUnsolvedProblemsRequest = { [key: string]: any };
   export type CourseListUnsolvedProblemsResponse = {
     user_problems: {
@@ -2565,17 +2476,7 @@ export namespace messages {
   export type CourseRemoveStudentResponse = {};
   export type CourseRequestsRequest = { [key: string]: any };
   export type _CourseRequestsServerResponse = any;
-  export type CourseRequestsResponse = {
-    users: {
-      accepted?: boolean;
-      admin?: { name?: string; username: string };
-      country?: string;
-      country_id?: string;
-      last_update?: Date;
-      request_time: Date;
-      username: string;
-    }[];
-  };
+  export type CourseRequestsResponse = { users: types.IdentityRequest[] };
   export type CourseRunsRequest = { [key: string]: any };
   export type _CourseRunsServerResponse = any;
   export type CourseRunsResponse = { runs: types.Run[] };
@@ -2809,12 +2710,7 @@ export namespace messages {
     order?: string;
     points?: number;
     preferred_language?: string;
-    problemsetter?: {
-      classname: string;
-      creation_date?: Date;
-      name: string;
-      username: string;
-    };
+    problemsetter?: types.ProblemsetterInfo;
     quality_seal?: boolean;
     runs?: types.Run[];
     score?: number;

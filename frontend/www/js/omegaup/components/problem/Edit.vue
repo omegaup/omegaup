@@ -117,14 +117,12 @@
       <div class="tab-pane active" v-if="showTab === 'markdown'">
         <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownContents"
-          v-bind:markdown-preview="markdownPreview"
           v-bind:initial-language="data.statement.language"
           v-bind:markdown-type="'statements'"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:source="data.source"
-          v-bind:username="username"
-          v-bind:name="name"
+          v-bind:problemsetter="data.problemsetter"
           v-on:emit-update-markdown-contents="
             (statements, newLanguage, currentMarkdown) =>
               $emit(
@@ -158,15 +156,14 @@
       <div class="tab-pane active" v-if="showTab === 'solution'">
         <omegaup-problem-statementedit
           v-bind:markdown-contents="markdownSolutionContents"
-          v-bind:markdown-preview="markdownSolutionPreview"
           v-bind:initial-language="data.solution.language"
           v-bind:markdown-type="'solutions'"
           v-bind:title="data.title"
           v-on:emit-update-markdown-contents="
-            (statements, newLanguage, currentMarkdown) =>
+            (solutions, newLanguage, currentMarkdown) =>
               $emit(
                 'update-markdown-contents',
-                statements,
+                solutions,
                 newLanguage,
                 currentMarkdown,
                 'solutions',
@@ -209,6 +206,12 @@
           v-bind:title="data.title"
           v-bind:initial-allow-tags="data.allowUserAddTags"
           v-bind:can-add-new-tags="true"
+          v-bind:public-tags="data.publicTags"
+          v-bind:level-tags="data.levelTags"
+          v-bind:problem-level="data.problemLevel"
+          v-on:emit-update-problem-level="
+            levelTag => $emit('update-problem-level', levelTag)
+          "
           v-on:emit-add-tag="
             (alias, tagname, isPublic) =>
               $emit('add-tag', alias, tagname, isPublic)
@@ -282,16 +285,11 @@ import { types } from '../../api_types';
   },
 })
 export default class ProblemEdit extends Vue {
-  @Prop() data!: types.ProblemFormPayload;
+  @Prop() data!: types.ProblemEditPayload;
   @Prop() initialAdmins!: types.ProblemAdmin[];
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
   @Prop() markdownContents!: string;
-  @Prop() markdownPreview!: string;
   @Prop() markdownSolutionContents!: string;
-  @Prop() markdownSolutionPreview!: string;
-  @Prop() initialLanguage!: string;
-  @Prop() username!: string;
-  @Prop() name!: string;
 
   T = T;
   alias = this.data.alias;

@@ -140,7 +140,7 @@ export function problemTypeahead(
     .trigger('change');
 }
 
-export function problemContestTypeahead(
+export function problemsetProblemTypeahead(
   elem: JQuery<HTMLElement>,
   problemDataset: () => { alias: string; title: string }[],
   cb?: CallbackType<{ alias: string; title: string }>,
@@ -243,7 +243,9 @@ export function userContestTypeahead(
   contestAlias: string,
 ): void {
   const cb = (event: Event, val: { label: string; value: string }) =>
-    $(<EventTarget>event.target).val(val.label);
+    $(<EventTarget>event.target)
+      .attr('data-value', val.value)
+      .val(val.label);
   elem
     .typeahead<{ label: string; value: string }>(
       {

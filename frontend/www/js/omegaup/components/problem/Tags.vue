@@ -1,9 +1,9 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
+  <div class="card">
+    <div class="card-body">
       <form class="form" v-on:submit.prevent="onAddTag(tagname, public)">
         <div class="form-group">
-          <label>{{ T.wordsTags }}</label>
+          <label class="font-weight-bold">{{ T.wordsTags }}</label>
           <input
             name="tag_name"
             v-model="tagname"
@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label>{{ T.problemEditTagPublic }}</label>
+          <label class="font-weight-bold">{{ T.problemEditTagPublic }}</label>
           <select class="form-control" v-model="public">
             <option v-bind:value="false" selected="selected">
               {{ T.wordsNo }}
@@ -69,7 +69,7 @@
           </button>
         </div>
         <div class="form-group">
-          <label class="switch-container">
+          <label class="switch-container font-weight-bold">
             <div class="switch">
               <input type="checkbox" v-model="allowTags" />
               <span class="slider round"></span>
@@ -247,18 +247,18 @@ export default class ProblemTags extends Vue {
     this.selectedTags.push({ tagname: tagname, public: isPublic });
     this.tags = this.tags.filter(val => val.name !== tagname);
     if (this.canAddNewTags) {
-      this.$emit('add-tag', this.alias, tagname, isPublic);
+      this.$emit('emit-add-tag', this.alias, tagname, isPublic);
     }
   }
 
   onUpdateProblemLevel(): void {
     if (this.problemLevelTag) {
-      this.$emit('update-problem-level', this.problemLevelTag);
+      this.$emit('emit-update-problem-level', this.problemLevelTag);
     }
   }
 
   onDeleteProblemLevel(): void {
-    this.$emit('update-problem-level');
+    this.$emit('emit-update-problem-level');
     this.problemLevelTag = null;
   }
 
@@ -268,7 +268,7 @@ export default class ProblemTags extends Vue {
       val => val.tagname !== tagname,
     );
     if (this.canAddNewTags) {
-      this.$emit('remove-tag', this.alias, tagname);
+      this.$emit('emit-remove-tag', this.alias, tagname);
     }
   }
 
@@ -277,7 +277,12 @@ export default class ProblemTags extends Vue {
     if (!this.canAddNewTags) {
       return;
     }
-    this.$emit('change-allow-user-add-tag', this.alias, this.title, newValue);
+    this.$emit(
+      'emit-change-allow-user-add-tag',
+      this.alias,
+      this.title,
+      newValue,
+    );
   }
 }
 </script>
