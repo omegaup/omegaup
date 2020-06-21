@@ -824,7 +824,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (is_null($r['start_time'])) {
             $r['start_time'] = $assignment->start_time;
         }
-        if (is_null($r['finish_time'])) {
+        if (is_null($r['finish_time']) && !is_null($assignment->finish_time)) {
             $r['finish_time'] = $assignment->finish_time;
         }
 
