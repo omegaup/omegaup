@@ -2468,6 +2468,8 @@ export namespace messages {
   export type CourseRegisterForCourseResponse = {};
   export type CourseRemoveAdminRequest = { [key: string]: any };
   export type CourseRemoveAdminResponse = {};
+  export type CourseRemoveAssignmentRequest = { [key: string]: any };
+  export type CourseRemoveAssignmentResponse = {};
   export type CourseRemoveGroupAdminRequest = { [key: string]: any };
   export type CourseRemoveGroupAdminResponse = {};
   export type CourseRemoveProblemRequest = { [key: string]: any };
@@ -3411,6 +3413,9 @@ export namespace controllers {
     removeAdmin: (
       params?: messages.CourseRemoveAdminRequest,
     ) => Promise<messages.CourseRemoveAdminResponse>;
+    removeAssignment: (
+      params?: messages.CourseRemoveAssignmentRequest,
+    ) => Promise<messages.CourseRemoveAssignmentResponse>;
     removeGroupAdmin: (
       params?: messages.CourseRemoveGroupAdminRequest,
     ) => Promise<messages.CourseRemoveGroupAdminResponse>;
