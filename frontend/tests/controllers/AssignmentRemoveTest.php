@@ -37,7 +37,6 @@ class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testAssignmentRemoveWithSubmittedRuns() {
-        // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
 
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -52,32 +51,28 @@ class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
         $courseAlias = $courseData['course_alias'];
         $assignmentAlias = $courseData['assignment_alias'];
 
-        // Add the problem to the assignment
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
             $login,
             $courseAlias,
             $assignmentAlias,
             [$problemData]
         );
-        // Create our participant
+
         [
             'identity' => $participant,
         ] = \OmegaUp\Test\Factories\User::createUser();
 
-        // Add student to course
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $participant
         );
 
-        // Create a run for assignment
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemData,
             $courseData,
             $participant
         );
 
-        // Grade the run
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $login = self::login($admin);
