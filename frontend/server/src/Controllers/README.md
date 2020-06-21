@@ -81,6 +81,7 @@
   - [`/api/course/myProgress/`](#apicoursemyprogress)
   - [`/api/course/registerForCourse/`](#apicourseregisterforcourse)
   - [`/api/course/removeAdmin/`](#apicourseremoveadmin)
+  - [`/api/course/removeAssignment/`](#apicourseremoveassignment)
   - [`/api/course/removeGroupAdmin/`](#apicourseremovegroupadmin)
   - [`/api/course/removeProblem/`](#apicourseremoveproblem)
   - [`/api/course/removeStudent/`](#apicourseremovestudent)
@@ -1822,6 +1823,23 @@ Removes an admin from a course
 | ----------------- | ------- | ----------- |
 | `course_alias`    | `mixed` |             |
 | `usernameOrEmail` | `mixed` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/course/removeAssignment/`
+
+### Description
+
+Remove an assignment from a course
+
+### Parameters
+
+| Name               | Type    | Description |
+| ------------------ | ------- | ----------- |
+| `assignment_alias` | `mixed` |             |
+| `course_alias`     | `mixed` |             |
 
 ### Returns
 

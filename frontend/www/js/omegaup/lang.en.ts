@@ -46,6 +46,7 @@ const translations: { [key: string]: string; } = {
   arenaRunSubmitUpload: "Or upload the file",
   arenaRunSubmitWaitBetweenUploads: "You must wait %(submissionGap) seconds between submissions for a problem",
   assignmentNotFound: "Assignment not found",
+  assignmentRemoveAlreadyHasRuns: "Assignment can't be removed once a solution has been judged.",
   authorRankRangeHeader: "Top %(lowCount) to %(highCount) authors with more score",
   authorRankUnranked: "Unranked author",
   badgeAssignationTimeMessage: "Date you got this badge",
