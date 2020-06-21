@@ -573,4 +573,15 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             $problemsetProblem->problem_id,
         ]);
     }
+
+    /**
+     * It removes all the problems belong to problemset and return the number of
+     * affected rows
+     */
+    public static function removeProblemsFromProblemset(int $problemsetId): int {
+        $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
 }
