@@ -3,7 +3,7 @@
 /**
  * @author juan.pablo
  */
-class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
+class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentRemove() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
             /*$numberOfAssignments=*/5
