@@ -51,7 +51,15 @@
               ></a>
             </td>
             <td class="button-column">
+              <span
+                v-bind:title="T.assignmentRemoveAlreadyHasRuns"
+                aria-hidden="true"
+                class="glyphicon glyphicon-remove disabled"
+                v-if="assignment.has_runs"
+              ></span>
               <a
+                href="#"
+                v-else=""
                 v-bind:title="T.courseAssignmentDelete"
                 v-on:click="$emit('delete', assignment)"
                 ><span
@@ -148,6 +156,12 @@
     </div>
   </div>
 </template>
+
+<style>
+.disabled {
+  color: lightgrey;
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
