@@ -1440,6 +1440,7 @@ const translations: { [key: string]: string; } = {
   wordsPending: "Pending",
   wordsPendingRuns: "Pending runs",
   wordsPercentage: "Percentage",
+  wordsPersonalData: "Personal data",
   wordsPoints: "Points",
   wordsPointsDistribution: "Points distribution for contest: %(alias)",
   wordsPointsDistributionInIntervals: "Points distribution in intervals of 100",

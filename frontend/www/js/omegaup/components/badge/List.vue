@@ -1,6 +1,6 @@
 <template>
   <div class="card panel panel-default">
-    <div class="card-header panel-heading">
+    <div class="card-header panel-heading" v-if="!this.showAllBadgesLink">
       <h4 class="card-title panel-title">
         {{ title }}
         <span class="badge badge-secondary">{{ badges.length }} </span>
@@ -12,7 +12,6 @@
           <omegaup-badge
             v-bind:badge="badge"
             v-bind:key="idx"
-            v-bind:class="{ 'margin-bottom': showAllBadgesLink }"
             v-for="(badge, idx) in badges"
           ></omegaup-badge>
         </div>
@@ -34,10 +33,6 @@
 a.badges-link {
   color: #337ab7;
   font-size: 1rem;
-}
-
-.margin-bottom {
-  margin-bottom: 11rem;
 }
 </style>
 
