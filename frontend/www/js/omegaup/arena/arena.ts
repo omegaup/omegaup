@@ -303,6 +303,11 @@ export class Arena {
 
   runSubmitView:
     | (Vue & {
+        $refs: {
+          clearForm: () => void;
+          code: string;
+          inputFile: HTMLInputElement;
+        };
         languages: string[];
         code: string;
         nextSubmissionTimestamp: Date;
@@ -543,6 +548,7 @@ export class Arena {
       const self = this;
       self.runSubmitView = new Vue({
         el: '#run-submit',
+        ref: 'component',
         render: function(createElement) {
           return createElement('omegaup-arena-runsubmit', {
             props: {
@@ -1973,7 +1979,11 @@ export class Arena {
           language: language,
         };
         this.updateRun(run);
-
+        if (this.runSubmitView) {
+          console.log(
+            (<arena_RunSubmit>this.runSubmitView.$refs.component).code,
+          );
+        }
         this.hideOverlay();
         if (!this.options.courseAlias) {
           this.initSubmissionCountdown();
