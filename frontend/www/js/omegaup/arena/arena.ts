@@ -17,6 +17,7 @@ import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue'
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import arena_RunSubmit from '../components/arena/RunSubmit.vue';
+import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
@@ -303,11 +304,6 @@ export class Arena {
 
   runSubmitView:
     | (Vue & {
-        $refs: {
-          clearForm: () => void;
-          code: string;
-          inputFile: HTMLInputElement;
-        };
         languages: string[];
         code: string;
         nextSubmissionTimestamp: Date;
@@ -548,7 +544,6 @@ export class Arena {
       const self = this;
       self.runSubmitView = new Vue({
         el: '#run-submit',
-        ref: 'component',
         render: function(createElement) {
           return createElement('omegaup-arena-runsubmit', {
             props: {
@@ -561,6 +556,7 @@ export class Arena {
                 self.submitRun(code, language);
               },
             },
+            ref: 'component',
           });
         },
         data: {
@@ -1980,9 +1976,9 @@ export class Arena {
         };
         this.updateRun(run);
         if (this.runSubmitView) {
-          console.log(
-            (<arena_RunSubmit>this.runSubmitView.$refs.component).code,
-          );
+          const component = <arena_RunSubmit>this.runSubmitView.$refs.component;
+          component.clearForm();
+          (<arena_CodeView>component.$children[0]).refresh();
         }
         this.hideOverlay();
         if (!this.options.courseAlias) {
