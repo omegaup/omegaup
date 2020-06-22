@@ -3,7 +3,9 @@
   <div id="summary" class="main">
     <!-- id-lint on -->
     <h1>{{ ui.contestTitle(contest) }}</h1>
-    <div v-html="descriptionHtml"></div>
+    <omegaup-markdown
+      v-bind:markdown="(contest && contest.description) || ''"
+    ></omegaup-markdown>
     <table>
       <tr v-if="showDeadlines">
         <td>
@@ -69,11 +71,15 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
-import * as markdown from '../../markdown';
+import omegaup_Markdown from '../Markdown.vue';
 import * as ui from '../../ui';
 import * as time from '../../time';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class ContestSummary extends Vue {
   @Prop() contest!: omegaup.Contest;
   @Prop({ default: true }) showDeadlines!: boolean;
@@ -82,7 +88,6 @@ export default class ContestSummary extends Vue {
   T = T;
   ui = ui;
   time = time;
-  markdownConverter = markdown.markdownConverter();
 
   get duration(): number {
     if (!this.contest.start_time || !this.contest.finish_time) {
@@ -101,11 +106,6 @@ export default class ContestSummary extends Vue {
       return time.formatDelta(this.contest.window_length);
     }
     return time.formatDelta(this.duration);
-  }
-
-  get descriptionHtml(): string {
-    if (this.contest.description == undefined) return '';
-    return this.markdownConverter.makeHtml(this.contest.description);
   }
 }
 </script>
