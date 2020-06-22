@@ -18,7 +18,11 @@
       v-on:click="handleClick"
     >
       <img class="d-block" width="80" v-bind:src="iconUrl" />
-      <div v-if="htmlText" v-html="htmlText"></div>
+      <template v-if="notificationMarkdown">
+        <omegaup-markdown
+          v-bind:markdown="notificationMarkdown"
+        ></omegaup-markdown>
+      </template>
       <div v-else-if="url">
         <a v-bind:href="url">
           {{ text }}
@@ -55,13 +59,16 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
-import * as markdown from '../../markdown';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class Notification extends Vue {
   @Prop() notification!: types.Notification;
-
-  markdownConverter = markdown.markdownConverter();
 
   get iconUrl(): string {
     if (this.notification.contents.body) {
@@ -94,22 +101,18 @@ export default class Notification extends Vue {
     }
   }
 
-  get htmlText(): string {
+  get notificationMarkdown(): string {
     if (this.notification.contents.body) {
-      return this.markdownConverter.makeHtml(
-        ui.formatString(
-          T[this.notification.contents.body.localizationString],
-          this.notification.contents.body.localizationParams,
-        ),
+      return ui.formatString(
+        T[this.notification.contents.body.localizationString],
+        this.notification.contents.body.localizationParams,
       );
     }
     switch (this.notification.contents.type) {
       case 'badge':
-        return this.markdownConverter.makeHtml(
-          ui.formatString(T.notificationNewBadge, {
-            badgeName: T[`badge_${this.notification.contents.badge}_name`],
-          }),
-        );
+        return ui.formatString(T.notificationNewBadge, {
+          badgeName: T[`badge_${this.notification.contents.badge}_name`],
+        });
       default:
         return '';
     }
