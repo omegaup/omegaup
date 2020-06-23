@@ -7,10 +7,7 @@
       </a>
     </h3>
     <div class="my-4 markdown">
-      <vue-mathjax
-        v-bind:formula="descriptionHtml"
-        v-bind:safe="false"
-      ></vue-mathjax>
+      <omegaup-markdown v-bind:markdown="course.description"></omegaup-markdown>
     </div>
     <div v-if="course.is_admin">
       {{
@@ -216,10 +213,10 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
-import * as markdown from '../../markdown';
 import { types } from '../../api_types';
 
-import { VueMathjax } from 'vue-mathjax';
+import omegaup_Markdown from '../Markdown.vue';
+
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -232,7 +229,7 @@ library.add(faEdit, faLink, faTachometerAlt);
 @Component({
   components: {
     FontAwesomeIcon,
-    'vue-mathjax': VueMathjax,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class CourseDetails extends Vue {
@@ -241,7 +238,6 @@ export default class CourseDetails extends Vue {
 
   T = T;
   ui = ui;
-  markdownConverter = markdown.markdownConverter();
 
   get filteredHomeworks(): omegaup.Assignment[] {
     return this.course.assignments.filter(
@@ -266,10 +262,6 @@ export default class CourseDetails extends Vue {
       return '—';
     }
     return time.formatDateTime(date);
-  }
-
-  get descriptionHtml(): string {
-    return this.markdownConverter.makeHtml(this.course.description);
   }
 }
 </script>

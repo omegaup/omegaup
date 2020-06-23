@@ -6,7 +6,7 @@
           <h3 class="panel-title">{{ T.wordsPrivacyPolicy }}</h3>
         </div>
         <div class="panel">
-          <p v-html="policyHtml"></p>
+          <omegaup-markdown v-bind:markdown="policyMarkdown"></omegaup-markdown>
         </div>
       </div>
       <form v-on:submit.prevent="$emit('submit', this)">
@@ -32,9 +32,14 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as markdown from '../../markdown';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class UserPrivacyPolicy extends Vue {
   @Prop() policyMarkdown!: string;
   @Prop({ default: false }) initialAgreed!: boolean;
@@ -42,10 +47,5 @@ export default class UserPrivacyPolicy extends Vue {
 
   T = T;
   agreed = this.initialAgreed;
-  markdownConverter = markdown.markdownConverter();
-
-  get policyHtml(): string {
-    return this.markdownConverter.makeHtml(this.policyMarkdown);
-  }
 }
 </script>
