@@ -88,7 +88,6 @@ export default class ContestSummary extends Vue {
   T = T;
   ui = ui;
   time = time;
-  markdownConverter = markdown.markdownConverter();
 
   get duration(): number {
     if (!this.contest.start_time || !this.contest.finish_time) {
