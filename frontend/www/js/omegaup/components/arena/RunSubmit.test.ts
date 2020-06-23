@@ -6,7 +6,6 @@ import T from '../../lang';
 import * as ui from '../../ui';
 
 import arena_RunSubmit from './RunSubmit.vue';
-import arena_CodeView from './CodeView.vue';
 
 describe('RunSubmit.vue', () => {
   it('Should handle disabled button', () => {
