@@ -1424,31 +1424,21 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
-            \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
-                $problemset->problemset_id
-            );
-
             \OmegaUp\DAO\Assignments::unlinkProblemset(
                 $assignment,
                 $problemset
             );
 
-            \OmegaUp\DAO\ProblemsetAccessLog::deleteByProblemset(
-                new \OmegaUp\DAO\VO\ProblemsetAccessLog([
-                    'problemset_id' => $problemset->problemset_id,
-                ])
+            \OmegaUp\DAO\ProblemsetAccessLog::removeAccessLogFromProblemset(
+                $problemset->problemset_id
             );
 
-            \OmegaUp\DAO\ProblemsetIdentities::deleteByProblemset(
-                new \OmegaUp\DAO\VO\ProblemsetIdentities([
-                    'problemset_id' => $problemset->problemset_id,
-                ])
+            \OmegaUp\DAO\ProblemsetIdentities::removeIdentitiesFromProblemset(
+                $problemset->problemset_id
             );
 
-            \OmegaUp\DAO\ProblemsetProblemOpened::deleteByProblemset(
-                new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
-                    'problemset_id' => $problemset->problemset_id,
-                ])
+            \OmegaUp\DAO\ProblemsetProblemOpened::removeProblemOpenedFromProblemset(
+                $problemset->problemset_id
             );
 
             \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(

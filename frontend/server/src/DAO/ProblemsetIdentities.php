@@ -278,8 +278,8 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 
-    final public static function deleteByProblemset(
-        \OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentities
+    final public static function removeIdentitiesFromProblemset(
+        int $problemsetId
     ): int {
         $sql = '
             DELETE FROM
@@ -287,10 +287,8 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
             WHERE
                 `problemset_id` = ?;';
 
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            $sql,
-            [$problemsetIdentities->problemset_id]
-        );
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problemsetId]);
+
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }

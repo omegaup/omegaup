@@ -12,8 +12,8 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class ProblemsetProblemOpened extends \OmegaUp\DAO\Base\ProblemsetProblemOpened {
-    final public static function deleteByProblemset(
-        \OmegaUp\DAO\VO\ProblemsetProblemOpened $problemsetProblemOpened
+    final public static function removeProblemOpenedFromProblemset(
+        int $problemsetId
     ): int {
         $sql = '
             DELETE FROM
@@ -21,10 +21,8 @@ class ProblemsetProblemOpened extends \OmegaUp\DAO\Base\ProblemsetProblemOpened 
             WHERE
                 `problemset_id` = ?;';
 
-        \OmegaUp\MySQLConnection::getInstance()->Execute(
-            $sql,
-            [$problemsetProblemOpened->problemset_id]
-        );
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problemsetId]);
+
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }
