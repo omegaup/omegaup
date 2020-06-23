@@ -553,10 +553,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN
                 Problems p ON p.acl_id = a.acl_id
             WHERE
-                p.visibility = ? AND
+                (
+                    p.visibility >= ? OR
+                    p.visibility = ?
+                ) AND
                 i.identity_id = ?;';
 
-        $params = [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $identityId];
+        $params = [
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            $identityId,
+        ];
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -1031,7 +1038,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     final public static function isVisible(\OmegaUp\DAO\VO\Problems $problem): bool {
-        return intval($problem->visibility) >= 1;
+        return (intval(
+            $problem->visibility
+        ) >= \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING  || intval(
+            $problem->visibility
+        ) == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED);
     }
 
     public static function deleteProblem(int $problemId): int {
