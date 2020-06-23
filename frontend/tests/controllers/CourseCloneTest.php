@@ -85,7 +85,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseAlias
         ]));
-        $this->assertCount(0, $students['students']);
+        $this->assertEmpty($students['students']);
     }
 
     /**

@@ -951,8 +951,9 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'name' => 'problemTagTestTag',
                 'public' => false,
             ]));
+            $this->fail('Should have failed.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('tagRestricted', $e->getMessage());
+            $this->assertEquals('tagPrefixRestricted', $e->getMessage());
         }
 
         try {
@@ -966,6 +967,45 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('tagRestricted', $e->getMessage());
         }
+
+        $testTags = [
+            'test-tag-a',
+            'test-tag-b',
+        ];
+        \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'name' => $testTags[0],
+            'public' => false,
+        ]));
+
+        \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'name' => $testTags[1],
+            'public' => false,
+        ]));
+
+        $privateTags = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+            $problemData['problem'],
+            !\OmegaUp\Authorization::canEditProblem(
+                $problemData['author'],
+                $problemData['problem']
+            ),
+            /*public=*/ false
+        );
+        $this->assertEquals($testTags, $privateTags);
+
+        ['user' => $extraUser, 'identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $privateTags = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+            $problemData['problem'],
+            !\OmegaUp\Authorization::canEditProblem(
+                $extraIdentity,
+                $problemData['problem']
+            ),
+            /*public=*/ false
+        );
+        $this->assertEmpty($privateTags);
     }
 
     /**

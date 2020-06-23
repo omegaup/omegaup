@@ -257,3 +257,10 @@ jobs:
         with:
           name: test-logs
           path: frontend/tests/ui/results/
+
+      - name: Upload artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-logs
+          path: frontend/tests/runfiles/*/*.log

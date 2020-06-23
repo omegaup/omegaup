@@ -185,4 +185,31 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             [$courseId]
         );
     }
+
+    /**
+     * Since Problemsets and Assignments tables are related to each other, it
+     * is necessary to unlink the assignment in Problemsets table, and then
+     * delete the row in both tables
+     */
+    public static function deleteWithProblemset(
+        \OmegaUp\DAO\VO\Assignments $assignment,
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ): void {
+        $sql = '
+            UPDATE
+                `Problemsets`
+            SET
+                `assignment_id` = NULL
+            WHERE
+                `problemset_id` = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$problemset->problemset_id]
+        );
+
+        \OmegaUp\DAO\Assignments::delete($assignment);
+
+        \OmegaUp\DAO\Problemsets::delete($problemset);
+    }
 }
