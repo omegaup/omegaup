@@ -739,6 +739,10 @@ export const Course = {
     messages.CourseRemoveAdminRequest,
     messages.CourseRemoveAdminResponse
   >('/api/course/removeAdmin/'),
+  removeAssignment: apiCall<
+    messages.CourseRemoveAssignmentRequest,
+    messages.CourseRemoveAssignmentResponse
+  >('/api/course/removeAssignment/'),
   removeGroupAdmin: apiCall<
     messages.CourseRemoveGroupAdminRequest,
     messages.CourseRemoveGroupAdminResponse

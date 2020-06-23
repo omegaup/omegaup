@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import expect from 'expect';
 import Vue from 'vue';
 
@@ -11,7 +11,7 @@ import notification_Notification from './Notification.vue';
 describe('Notification.vue', () => {
   it('Should handle empty url in contents body', () => {
     const courseName = 'Curso de prueba';
-    const wrapper = shallowMount(notification_Notification, {
+    const wrapper = mount(notification_Notification, {
       propsData: {
         notification: {
           contents: {
@@ -31,6 +31,6 @@ describe('Notification.vue', () => {
     });
 
     expect(wrapper.find('button.close').text()).toBe('❌');
-    expect(wrapper.text()).toContain(courseName);
+    expect(wrapper.text()).toEqual(expect.stringContaining(courseName));
   });
 });

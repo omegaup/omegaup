@@ -1361,15 +1361,16 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Remove an assignment from a course
      *
+     * @return array{status: string}
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
      */
-    public static function apiRemoveAssignment(\OmegaUp\Request $r): void {
+    public static function apiRemoveAssignment(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
 
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
             'course_alias'
@@ -1378,7 +1379,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['assignment_alias'],
             'assignment_alias'
         );
-        $course = self::validateCourseExists($r['course_alias']);
+        [
+            'course' => $course,
+            'assignment' => $assignment,
+        ] = self::validateAssignmentDetails(
+            $r['course_alias'],
+            $r['assignment_alias'],
+            $r->identity
+        );
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'courseNotFound'
@@ -1394,13 +1402,43 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course->course_id,
             $r['assignment_alias']
         );
-        if (is_null($problemSet)) {
+        if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
 
-        throw new \OmegaUp\Exceptions\UnimplementedException();
+        $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
+            intval($problemSet->problemset_id)
+        );
+
+        if ($runCount > 0) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'courseUpdateAlreadyHasRuns'
+            );
+        }
+
+        \OmegaUp\DAO\DAO::transBegin();
+
+        try {
+            \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
+                $problemSet->problemset_id
+            );
+
+            \OmegaUp\DAO\Assignments::deleteWithProblemset(
+                $assignment,
+                $problemSet
+            );
+
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
+
+        return [
+            'status' => 'ok',
+        ];
     }
 
     /**
