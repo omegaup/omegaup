@@ -147,13 +147,17 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 50);
 
-        $response = \OmegaUp\Controllers\Run::apiDownload(
+        ob_start();
+        \OmegaUp\Controllers\Run::apiDownload(
             new \OmegaUp\Request([
                 'run_alias' => $runData['response']['guid'],
                 'auth_token' => $login->auth_token,
                 'show_diff' => true,
             ])
         );
+        $zipContents = ob_get_contents();
+        ob_end_clean();
+
         $this->assertTrue(true);
     }
 

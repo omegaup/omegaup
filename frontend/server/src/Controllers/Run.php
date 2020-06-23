@@ -1248,14 +1248,17 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        return \OmegaUp\Grader::getInstance()->downloadSubmissionFile(
-            $run,
-            $submission,
-            $passthru
-        );
+        if ($passthru) {
+            header('Content-Type: application/zip');
+            header(
+                "Content-Disposition: attachment; filename={$submission->guid}.zip"
+            );
+            return self::getGraderResourcePassthru($run, 'files.zip');
+        }
+        return self::getGraderResource($run, 'files.zip');
     }
 
-    public static function getGraderResource(
+    private static function getGraderResource(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename
     ): ?string {

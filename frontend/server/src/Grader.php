@@ -210,24 +210,6 @@ class Grader {
         throw new \BadMethodCallException();
     }
 
-    public function downloadSubmissionFile(
-        \OmegaUp\DAO\VO\Runs $run,
-        \OmegaUp\DAO\VO\Submissions $submission,
-        bool $passthru
-    ) {
-        if ($passthru) {
-            header('Content-Type: application/zip');
-            header(
-                "Content-Disposition: attachment; filename={$submission->guid}.zip"
-            );
-            return \OmegaUp\Controllers\Run::getGraderResourcePassthru(
-                $run,
-                'files.zip'
-            );
-        }
-        return \OmegaUp\Controllers\Run::getGraderResource($run, 'files.zip');
-    }
-
     /**
      * Sends a request to the grader.
      *

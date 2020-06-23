@@ -616,7 +616,10 @@ class NoOpGrader extends \OmegaUp\Grader {
             return null;
         }
 
-        return $this->_resources[$path];
+        $out = fopen('php://output', 'w');
+        fputs($out, $this->_resources[$path]);
+        fclose($out);
+        return true;
     }
 
     public function setGraderResourceForTesting(
@@ -630,14 +633,6 @@ class NoOpGrader extends \OmegaUp\Grader {
 
     public function getRuns(): array {
         return $this->_runs;
-    }
-
-    public function downloadSubmissionFile(
-        \OmegaUp\DAO\VO\Runs $run,
-        \OmegaUp\DAO\VO\Submissions $submission,
-        bool $passthru
-    ) {
-        return \OmegaUp\Controllers\Run::getGraderResource($run, 'files.zip');
     }
 }
 
