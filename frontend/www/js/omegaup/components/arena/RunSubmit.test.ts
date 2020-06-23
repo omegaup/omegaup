@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 import Vue from 'vue';
 
@@ -6,13 +6,14 @@ import T from '../../lang';
 import * as ui from '../../ui';
 
 import arena_RunSubmit from './RunSubmit.vue';
+import arena_CodeView from './CodeView.vue';
 
 describe('RunSubmit.vue', () => {
   it('Should handle disabled button', () => {
     const now = new Date();
     const future = now.getTime() + 10 * 1000;
     const nextSubmission = new Date(future);
-    const wrapper = shallowMount(arena_RunSubmit, {
+    const wrapper = mount(arena_RunSubmit, {
       propsData: {
         languages: [
           { py2: 'Python 2.7' },
@@ -20,9 +21,15 @@ describe('RunSubmit.vue', () => {
           { java: 'Java' },
         ],
         nextSubmissionTimestamp: nextSubmission,
+        preferredLanguage: 'es',
       },
     });
 
+    const message = ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+      submissionGap: 10,
+    });
+
+    expect(wrapper.find('button[type="submit"]').text()).toBe(message);
     expect(wrapper.find('button[type="submit"]').attributes('disabled')).toBe(
       'disabled',
     );

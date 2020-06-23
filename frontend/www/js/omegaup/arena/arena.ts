@@ -1937,7 +1937,9 @@ export class Arena {
   }
 
   submitRun(code: string, language: string): void {
-    const problemset = this.computeProblemsetArg();
+    const problemset = this.options.isPractice
+      ? {}
+      : this.computeProblemsetArg();
 
     api.Run.create(
       Object.assign(problemset, {
@@ -1978,9 +1980,13 @@ export class Arena {
         if (this.runSubmitView) {
           const component = <arena_RunSubmit>this.runSubmitView.$refs.component;
           component.clearForm();
-          (<arena_CodeView>component.$children[0]).refresh();
+          // Wait until the code view has been cleared before hiding the
+          // overlay. Not doing so will sometimes cause the contents of the
+          // editor to still be visible when the overlay is shown again.
+          component.$nextTick(() => this.hideOverlay());
+        } else {
+          this.hideOverlay();
         }
-        this.hideOverlay();
         if (!this.options.courseAlias) {
           this.initSubmissionCountdown();
         }
