@@ -1401,18 +1401,18 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = \OmegaUp\DAO\Assignments::getProblemset(
+        $problemset = \OmegaUp\DAO\Assignments::getProblemset(
             $course->course_id,
             $r['assignment_alias']
         );
-        if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
+        if (is_null($problemset) || is_null($problemset->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
 
         $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-            intval($problemSet->problemset_id)
+            intval($problemset->problemset_id)
         );
 
         if ($runCount > 0) {
@@ -1425,13 +1425,39 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         try {
             \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
-                $problemSet->problemset_id
+                $problemset->problemset_id
             );
 
-            \OmegaUp\DAO\Assignments::deleteWithProblemset(
+            \OmegaUp\DAO\Assignments::unlinkProblemset(
                 $assignment,
-                $problemSet
+                $problemset
             );
+
+            \OmegaUp\DAO\ProblemsetAccessLog::deleteByProblemset(
+                new \OmegaUp\DAO\VO\ProblemsetAccessLog([
+                    'problemset_id' => $problemset->problemset_id,
+                ])
+            );
+
+            \OmegaUp\DAO\ProblemsetIdentities::deleteByProblemset(
+                new \OmegaUp\DAO\VO\ProblemsetIdentities([
+                    'problemset_id' => $problemset->problemset_id,
+                ])
+            );
+
+            \OmegaUp\DAO\ProblemsetProblemOpened::deleteByProblemset(
+                new \OmegaUp\DAO\VO\ProblemsetProblemOpened([
+                    'problemset_id' => $problemset->problemset_id,
+                ])
+            );
+
+            \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
+                $problemset->problemset_id
+            );
+
+            \OmegaUp\DAO\Assignments::delete($assignment);
+
+            \OmegaUp\DAO\Problemsets::delete($problemset);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {

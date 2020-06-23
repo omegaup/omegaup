@@ -277,4 +277,20 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
+
+    final public static function deleteByProblemset(
+        \OmegaUp\DAO\VO\ProblemsetIdentities $problemsetIdentities
+    ): int {
+        $sql = '
+            DELETE FROM
+                `Problemset_Identities`
+            WHERE
+                `problemset_id` = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$problemsetIdentities->problemset_id]
+        );
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
 }
