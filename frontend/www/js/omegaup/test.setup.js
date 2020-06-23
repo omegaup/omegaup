@@ -7,6 +7,16 @@ require('jsdom-global')(undefined, {
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 
+// This is needed for CodeMirror to work.
+global.document.body.createTextRange = () => {
+  return {
+    setEnd: () => {},
+    setStart: () => {},
+    getBoundingClientRect: () => {},
+    getClientRects: () => [],
+  };
+};
+
 // Any write to console.error() will cause a test failure.
 const originalConsoleError = console.error;
 console.error = function() {
