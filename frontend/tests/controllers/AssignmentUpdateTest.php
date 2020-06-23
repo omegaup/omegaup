@@ -111,6 +111,25 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($updatedStartTime, $response['start_time']->time);
         $this->assertNull($response['finish_time']);
+
+        \OmegaUp\Controllers\Course::apiUpdateAssignment(new \OmegaUp\Request([
+            'auth_token' => self::$login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+            'unlimited_duration' => true,
+            'description' => 'some new meaningful description'
+        ]));
+
+        $response = \OmegaUp\Controllers\Course::apiAssignmentDetails(new \OmegaUp\Request([
+            'auth_token' => self::$login->auth_token,
+            'assignment' => $assignmentAlias,
+            'course' => $courseAlias,
+        ]));
+
+        $this->assertEquals(
+            'some new meaningful description',
+            $response['description']
+        );
     }
 
     /**
