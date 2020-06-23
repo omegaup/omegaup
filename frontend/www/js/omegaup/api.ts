@@ -592,9 +592,9 @@ export const Course = {
         return x;
       }
       return x.map(x => {
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         if (x.finish_time)
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
     })(x.courseAssignments);
@@ -739,6 +739,10 @@ export const Course = {
     messages.CourseRemoveAdminRequest,
     messages.CourseRemoveAdminResponse
   >('/api/course/removeAdmin/'),
+  removeAssignment: apiCall<
+    messages.CourseRemoveAssignmentRequest,
+    messages.CourseRemoveAssignmentResponse
+  >('/api/course/removeAssignment/'),
   removeGroupAdmin: apiCall<
     messages.CourseRemoveGroupAdminRequest,
     messages.CourseRemoveGroupAdminResponse

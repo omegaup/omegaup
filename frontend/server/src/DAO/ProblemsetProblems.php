@@ -141,6 +141,55 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         );
     }
 
+    /**
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     */
+    final public static function getProblemsByAssignmentAlias(
+        string $assignmentAlias,
+        string $courseAlias
+    ): array {
+        // Build SQL statement
+        $sql = 'SELECT
+                    p.title,
+                    p.problem_id,
+                    p.alias,
+                    p.visibility,
+                    p.visits,
+                    p.submissions,
+                    p.accepted,
+                    IFNULL(p.difficulty, 0.0) AS difficulty,
+                    pp.order,
+                    p.languages,
+                    pp.points,
+                    pp.commit,
+                    pp.version
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problemset_Problems pp
+                ON
+                    pp.problem_id = p.problem_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.problemset_id = pp.problemset_id
+                INNER JOIN
+                    Courses c
+                ON
+                    c.course_id = a.course_id
+                WHERE
+                    a.alias = ?
+                    AND c.alias = ?
+                ORDER BY
+                    pp.order, pp.problem_id ASC;';
+
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        return  \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$assignmentAlias, $courseAlias]
+        );
+    }
+
     /*
      * Get problemset problems including problemset alias, points, and order
      *
@@ -523,5 +572,16 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
         ]);
+    }
+
+    /**
+     * It removes all the problems belong to problemset and return the number of
+     * affected rows
+     */
+    public static function removeProblemsFromProblemset(int $problemsetId): int {
+        $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }

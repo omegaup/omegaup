@@ -5,7 +5,7 @@
     </div>
     <div class="panel-body text-center">
       <h2 name="name">{{ name }}</h2>
-      <p name="description">{{ description }}</p>
+      <omegaup-markdown v-bind:markdown="description"></omegaup-markdown>
       <template
         v-if="userRegistrationRequested === null || userRegistrationAccepted"
       >
@@ -14,7 +14,9 @@
           v-if="needsBasicInformation"
         ></p>
         <template v-if="requestsUserInformation != 'no'">
-          <p v-html="consentHtml"></p>
+          <omegaup-markdown
+            v-bind:markdown="statements.privacy.markdown || ''"
+          ></omegaup-markdown>
           <label
             ><input
               type="radio"
@@ -33,7 +35,9 @@
           >
         </template>
         <template v-if="shouldShowAcceptTeacher">
-          <p v-html="acceptTeacherConsentHtml"></p>
+          <omegaup-markdown
+            v-bind:markdown="statements.acceptTeacher.markdown || ''"
+          ></omegaup-markdown>
           <label
             ><input
               name="accept-teacher"
@@ -89,7 +93,8 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as markdown from '../../markdown';
+
+import omegaup_Markdown from '../Markdown.vue';
 
 interface Statement {
   [name: string]: {
@@ -99,7 +104,11 @@ interface Statement {
   };
 }
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class CourseIntro extends Vue {
   @Prop() name!: string;
   @Prop() description!: string;
@@ -113,18 +122,7 @@ export default class CourseIntro extends Vue {
 
   T = T;
   shareUserInformation = false;
-  markdownConverter = markdown.markdownConverter();
   acceptTeacher = false;
-
-  get consentHtml(): string {
-    const markdown = this.statements.privacy.markdown || '';
-    return this.markdownConverter.makeHtml(markdown);
-  }
-
-  get acceptTeacherConsentHtml(): string {
-    const markdown = this.statements.acceptTeacher.markdown || '';
-    return this.markdownConverter.makeHtml(markdown);
-  }
 
   get isButtonDisabled(): boolean {
     return (
