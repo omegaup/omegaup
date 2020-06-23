@@ -314,6 +314,7 @@ export class Arena {
     | (Vue & {
         problems: omegaup.Problem[];
         ranking: types.ScoreboardRankingEntry[];
+        shouldShowInvitedUsersFilter: boolean;
         showPenalty: boolean;
         lastUpdated: Date;
       })
@@ -510,6 +511,7 @@ export class Arena {
               lastUpdated: this.lastUpdated,
               digitsAfterDecimalPoint: digitsAfterDecimalPoint,
               showPenalty: this.showPenalty,
+              shouldShowInvitedUsersFilter: this.shouldShowInvitedUsersFilter,
             },
           });
         },
@@ -518,6 +520,7 @@ export class Arena {
           ranking: [],
           lastUpdated: new Date(0),
           showPenalty: true,
+          shouldShowInvitedUsersFilter: this.options.contestAlias !== null,
         },
         components: {
           'omegaup-arena-scoreboard': arena_Scoreboard,
