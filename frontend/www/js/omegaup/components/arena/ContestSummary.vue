@@ -3,7 +3,9 @@
   <div id="summary" class="main">
     <!-- id-lint on -->
     <h1>{{ ui.contestTitle(contest) }}</h1>
-    <p>{{ contest.description }}</p>
+    <omegaup-markdown
+      v-bind:markdown="(contest && contest.description) || ''"
+    ></omegaup-markdown>
     <table>
       <tr v-if="showDeadlines">
         <td>
@@ -69,10 +71,15 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
+import omegaup_Markdown from '../Markdown.vue';
 import * as ui from '../../ui';
 import * as time from '../../time';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class ContestSummary extends Vue {
   @Prop() contest!: omegaup.Contest;
   @Prop({ default: true }) showDeadlines!: boolean;

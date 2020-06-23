@@ -85,10 +85,11 @@
         </div>
 
         <div class="mt-4 markdown">
-          <vue-mathjax
-            v-bind:formula="problemStatement"
-            v-bind:safe="false"
-          ></vue-mathjax>
+          <omegaup-markdown
+            v-bind:markdown="problem.statement.markdown"
+            v-bind:image-mapping="problem.statement.images"
+            v-bind:problem-settings="problem.settings"
+          ></omegaup-markdown>
         </div>
         <hr class="my-3" />
         <div class="font-italic">
@@ -139,12 +140,12 @@ table td {
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as markdown from '../../markdown';
 import * as time from '../../time';
 import * as UI from '../../ui';
-import user_Username from '../user/Username.vue';
 
-import { VueMathjax } from 'vue-mathjax';
+import user_Username from '../user/Username.vue';
+import omegaup_Markdown from '../Markdown.vue';
+
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -170,7 +171,7 @@ interface Tab {
 @Component({
   components: {
     FontAwesomeIcon,
-    'vue-mathjax': VueMathjax,
+    'omegaup-markdown': omegaup_Markdown,
     'omegaup-username': user_Username,
   },
 })
@@ -183,7 +184,6 @@ export default class ProblemDetails extends Vue {
   UI = UI;
   time = time;
   selectedTab = 'problems';
-  markdownConverter = markdown.markdownConverter();
 
   get availableTabs(): Tab[] {
     let tabs = [
@@ -193,14 +193,6 @@ export default class ProblemDetails extends Vue {
       },
     ];
     return tabs;
-  }
-
-  get problemStatement(): string {
-    return this.markdownConverter.makeHtmlWithImages(
-      this.problem.statement.markdown,
-      this.problem.statement.images,
-      this.problem.settings,
-    );
   }
 }
 </script>

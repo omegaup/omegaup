@@ -36,7 +36,7 @@ export default class ArenaAdmin {
             showPager: true,
             showRejudge: true,
             showUser: true,
-            problemsetProblems: Object.values(self.arena.problems),
+            problemsetProblems: Object.values(arena.problems),
             globalRuns: globalRuns,
           },
           on: {
