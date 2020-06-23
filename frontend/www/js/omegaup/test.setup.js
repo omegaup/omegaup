@@ -8,7 +8,7 @@ global.jQuery = require('jquery');
 global.$ = global.jQuery;
 
 // This is needed for CodeMirror to work.
-global.document.body.createTextRange = () => {
+global.document.createRange = () => {
   return {
     setEnd: () => {},
     setStart: () => {},
