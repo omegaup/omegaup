@@ -511,7 +511,7 @@ export class Arena {
               lastUpdated: this.lastUpdated,
               digitsAfterDecimalPoint: digitsAfterDecimalPoint,
               showPenalty: this.showPenalty,
-              shouldShowInvitedUsersFilter: self.options.contestAlias !== null,
+              showInvitedUsersFilter: self.options.contestAlias !== null,
             },
           });
         },

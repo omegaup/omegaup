@@ -72,7 +72,6 @@ const baseScoreboardProps = {
     '#8144D6',
     '#CD35D3',
   ],
-  shouldShowInvitedUsersFilter: true,
   showPenalty: false,
 };
 
