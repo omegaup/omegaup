@@ -823,50 +823,53 @@ export namespace types {
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
       return (x => {
-        x.profile = (x => {
-          if (x.birth_date)
-            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
-          return x;
-        })(x.profile);
-        x.contests = (x => {
-          if (x instanceof Object) {
-            Object.keys(x).forEach(
-              y =>
-                (x[y] = (x => {
-                  x.data = (x => {
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
-                    x.finish_time = ((x: number) => new Date(x * 1000))(
-                      x.finish_time,
-                    );
-                    x.last_updated = ((x: number) => new Date(x * 1000))(
-                      x.last_updated,
-                    );
+        if (x.contests)
+          x.contests = (x => {
+            if (x instanceof Object) {
+              Object.keys(x).forEach(
+                y =>
+                  (x[y] = (x => {
+                    x.data = (x => {
+                      x.start_time = ((x: number) => new Date(x * 1000))(
+                        x.start_time,
+                      );
+                      x.finish_time = ((x: number) => new Date(x * 1000))(
+                        x.finish_time,
+                      );
+                      x.last_updated = ((x: number) => new Date(x * 1000))(
+                        x.last_updated,
+                      );
+                      return x;
+                    })(x.data);
                     return x;
-                  })(x.data);
-                  return x;
-                })(x[y])),
-            );
-          }
-          return x;
-        })(x.contests);
-        x.ownedBadges = (x => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map(x => {
-            if (x.assignation_time)
-              x.assignation_time = ((x: number) => new Date(x * 1000))(
-                x.assignation_time,
+                  })(x[y])),
               );
-            if (x.first_assignation)
-              x.first_assignation = ((x: number) => new Date(x * 1000))(
-                x.first_assignation,
-              );
+            }
             return x;
-          });
-        })(x.ownedBadges);
+          })(x.contests);
+        if (x.ownedBadges)
+          x.ownedBadges = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.assignation_time)
+                x.assignation_time = ((x: number) => new Date(x * 1000))(
+                  x.assignation_time,
+                );
+              if (x.first_assignation)
+                x.first_assignation = ((x: number) => new Date(x * 1000))(
+                  x.first_assignation,
+                );
+              return x;
+            });
+          })(x.ownedBadges);
+        if (x.profile)
+          x.profile = (x => {
+            if (x.birth_date)
+              x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+            return x;
+          })(x.profile);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -2018,15 +2021,15 @@ export namespace types {
   }
 
   export interface UserProfileDetailsPayload {
+    badges?: string[];
+    contests?: types.UserProfileContests;
+    createdProblems?: types.Problem[];
+    ownedBadges?: types.Badge[];
+    profile?: types.UserProfileInfo;
+    solvedProblems?: types.Problem[];
+    stats?: types.UserProfileStats;
+    unsolvedProblems?: types.Problem[];
     statusError?: string;
-    profile: types.UserProfileInfo;
-    contests: types.UserProfileContests;
-    solvedProblems: types.Problem[];
-    unsolvedProblems: types.Problem[];
-    createdProblems: types.Problem[];
-    stats: types.UserProfileStats;
-    badges: string[];
-    ownedBadges: types.Badge[];
   }
 
   export interface UserProfileInfo {

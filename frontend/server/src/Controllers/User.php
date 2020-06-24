@@ -23,8 +23,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int|null}>
  * @psalm-type UserProfileStats=list<array{date: null|string, runs: int, verdict: string}>
  * @psalm-type UserListItem=array{label: string, value: string}
- * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: UserProfileStats, badges: list<string>, ownedBadges: list<Badge>}
-
+* @psalm-type UserProfileDetailsPayload=array{badges: list<string>, contests: UserProfileContests, createdProblems: list<Problem>, ownedBadges: list<Badge>, profile: UserProfileInfo, solvedProblems: list<Problem>, stats: UserProfileStats, unsolvedProblems: list<Problem>}|array{statusError: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3634,54 +3633,51 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: UserProfileDetailsPayload, title: string }, template: string}
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
-        $payload = [];
-        $profile =  [];
-        $contests = [];
-        $solvedProblems = [];
-        $unsolvedProblems = [];
-        $createdProblems = [];
-        $stats = [];
-        $badges = [];
-        $ownedBadges = [];
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'Identity'
+            );
+        }
         try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
-
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $profile =  self::getProfileDetails($r->identity, $identity);
-            $contests = self::apiContestStats($r);
-            $solvedProblems = self::apiProblemsSolved($r);
-            $unsolvedProblems = self::apiListUnsolvedProblems($r);
-            $createdProblems = self::apiProblemsCreated($r);
-            $stats = self::apiStats($r);
-            $badges = \OmegaUp\Controllers\Badge::apiList($r);
-            $ownedBadges = \OmegaUp\Controllers\Badge::apiMyList($r);
+            return [
+                'smartyProperties' => [
+                    'payload' => [
+                        'profile' => self::getProfileDetails(
+                            $r->identity,
+                            $identity
+                        ),
+                        'contests' => self::apiContestStats($r)['contests'],
+                        'solvedProblems' => self::apiProblemsSolved(
+                            $r
+                        )['problems'],
+                        'unsolvedProblems' => self::apiListUnsolvedProblems(
+                            $r
+                        )['problems'],
+                        'createdProblems' => self::apiProblemsCreated(
+                            $r
+                        )['problems'],
+                        'stats' => self::apiStats($r)['runs'],
+                        'badges' => \OmegaUp\Controllers\Badge::apiList($r),
+                        'ownedBadges' => \OmegaUp\Controllers\Badge::apiMyList(
+                            $r
+                        )['badges'],
+                    ],
+                    'title' => 'omegaupTitleProfile'
+                ],
+                'template' => 'user.profile.tpl',
+            ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $payload = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
+            return [
+                'smartyProperties' => [
+                    'payload' => ['statusError' => $e->getErrorMessage()],
+                    'title' => 'omegaupTitleProfile'
+                ],
+                'template' => 'user.profile.tpl',
             ];
         }
-        return [
-            'smartyProperties' => [
-                'payload' => array_merge($payload, [
-                    'profile' => $profile,
-                    'contests' => $contests['contests'],
-                    'solvedProblems' => $solvedProblems['problems'],
-                    'unsolvedProblems' => $unsolvedProblems['problems'],
-                    'createdProblems' => $createdProblems['problems'],
-                    'stats' => $stats,
-                    'badges' => $badges,
-                    'ownedBadges' => $ownedBadges['badges']
-                ]),
-                'title' => 'omegaupTitleProfile'
-            ],
-            'template' => 'user.profile.tpl',
-        ];
     }
 
     /**
