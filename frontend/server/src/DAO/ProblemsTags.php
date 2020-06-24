@@ -52,13 +52,8 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
      */
     public static function getTagsForProblem(
         \OmegaUp\DAO\VO\Problems $problem,
-        bool $publicOnly,
-        bool $public = true
+        bool $public
     ): array {
-        if ($publicOnly && !$public) {
-            return [];
-        }
-
         $sql = "
             SELECT
                 `t`.`name`

@@ -79,6 +79,11 @@ export namespace omegaup {
     String = 'string',
   }
 
+  export enum CountdownFormat {
+    EventCountdown,
+    WaitBetweenUploadsSeconds,
+  }
+
   export enum SortOrder {
     Ascending = 'asc',
     Descending = 'desc',
@@ -113,17 +118,6 @@ export namespace omegaup {
     scoreboard_url: string;
     scoreboard_url_admin: string;
     start_time: Date;
-  }
-
-  export interface AssignmentProblem {
-    alias: string;
-    commit: string;
-    languages: string;
-    letter: string;
-    order: number;
-    points: number;
-    title: string;
-    version: string;
   }
 
   export interface Case {

@@ -41,7 +41,9 @@
                 v-html="T.contestBasicInformationNeeded"
               ></p>
               <template v-if="requestsUserInformation !== 'no'">
-                <p v-html="consentHtml"></p>
+                <omegaup-markdown
+                  v-bind:markdown="(statement && statement.markdown) || ''"
+                ></omegaup-markdown>
                 <p>
                   <label>
                     <input
@@ -139,7 +141,6 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as markdown from '../../markdown';
 import * as UI from '../../ui';
 import omegaup_Countdown from '../Countdown.vue';
 
@@ -168,21 +169,12 @@ export default class ContestIntro extends Vue {
     none: '',
     summary: T.contestNewFormImmediateSummaryFeedbackDesc,
   };
-  markdownConverter = markdown.markdownConverter();
   shareUserInformation = null;
   now = Date.now();
 
   get redirectURL(): string {
     const url = encodeURIComponent(window.location.pathname);
     return `/login/?redirect=${url}`;
-  }
-
-  get consentHtml(): string {
-    const markdown = this.statement?.markdown;
-    if (!markdown) {
-      return '';
-    }
-    return this.markdownConverter.makeHtml(markdown);
   }
 
   get differentStartsDescription(): string {

@@ -6,11 +6,18 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { omegaup } from '../omegaup';
 import * as time from '../time';
+import * as ui from '../ui';
+import T from '../lang';
 
 @Component
 export default class Countdown extends Vue {
   @Prop() targetTime!: Date;
+  @Prop({
+    default: omegaup.CountdownFormat.EventCountdown,
+  })
+  countdownFormat!: omegaup.CountdownFormat;
 
   timerInterval = 0;
   currentTime = Date.now();
@@ -20,7 +27,16 @@ export default class Countdown extends Vue {
   }
 
   get formattedTimeLeft(): string {
-    return time.formatDelta(this.timeLeft);
+    switch (this.countdownFormat) {
+      case omegaup.CountdownFormat.EventCountdown:
+        return time.formatDelta(this.timeLeft);
+      case omegaup.CountdownFormat.WaitBetweenUploadsSeconds:
+        return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
+          submissionGap: Math.ceil(this.timeLeft / 1000),
+        });
+      default:
+        return '';
+    }
   }
 
   @Watch('timeLeft')
