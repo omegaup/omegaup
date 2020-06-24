@@ -10,6 +10,7 @@
             v-bind:serializer="publicTagsSerializer"
             v-on:hit="addPublicTag"
             v-bind:auto-close="true"
+            v-bind:placeholder="T.publicTagsPlaceholder"
           >
           </vue-typeahead-bootstrap>
         </div>
@@ -46,7 +47,12 @@
         <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
           <div class="input-group">
-            <input type="text" class="form-control" v-model="newPrivateTag" />
+            <input
+              type="text"
+              class="form-control"
+              v-model="newPrivateTag"
+              v-bind:placeholder="T.privateTagsPlaceholder"
+            />
             <div class="input-group-append">
               <button
                 class="btn btn-outline-primary"
