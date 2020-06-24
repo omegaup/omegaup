@@ -11,12 +11,13 @@ import * as time from '../time';
 import * as typeahead from '../typeahead';
 import * as ui from '../ui';
 
-import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
+import arena_RunSubmit from '../components/arena/RunSubmit.vue';
+import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
@@ -257,16 +258,7 @@ export class Arena {
     loadingOverlay: JQuery;
     ranking: JQuery;
     socketStatus: JQuery;
-    submitForm: JQuery & { code: JQuery; file: JQuery; language: JQuery };
   };
-
-  codeEditor:
-    | (Vue & {
-        language: string;
-        code: string;
-        refresh: () => void;
-      })
-    | null = null;
 
   navbarAssignments: Vue | null = null;
 
@@ -307,6 +299,15 @@ export class Arena {
   runDetailsView:
     | (Vue & {
         data: omegaup.RunDetails;
+      })
+    | null = null;
+
+  runSubmitView:
+    | (Vue & {
+        languages: string[];
+        code: string;
+        nextSubmissionTimestamp: Date;
+        preferredLanguage: string | null;
       })
     | null = null;
 
@@ -435,11 +436,6 @@ export class Arena {
       loadingOverlay: $('#loading'),
       ranking: $('#ranking div'),
       socketStatus: $('#title .socket-status'),
-      submitForm: $.extend($('#submit'), {
-        code: $('#submit textarea[name="code"]'),
-        file: $('#submit input[type="file"]'),
-        language: $('#submit select[name="language"]'),
-      }),
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
@@ -540,6 +536,37 @@ export class Arena {
         data: { data: null },
         components: {
           'omegaup-arena-rundetails': arena_RunDetails,
+        },
+      });
+    }
+
+    // Setup run submit view, if it is available.
+    if (document.getElementById('run-submit') !== null) {
+      const self = this;
+      self.runSubmitView = new Vue({
+        el: '#run-submit',
+        render: function(createElement) {
+          return createElement('omegaup-arena-runsubmit', {
+            props: {
+              languages: this.languages,
+              nextSubmissionTimestamp: this.nextSubmissionTimestamp,
+              preferredLanguage: this.preferredLanguage,
+            },
+            on: {
+              'submit-run': (code: string, language: string) => {
+                self.submitRun(code, language);
+              },
+            },
+            ref: 'component',
+          });
+        },
+        data: {
+          languages: [],
+          preferredLanguage: '',
+          nextSubmissionTimestamp: new Date(0),
+        },
+        components: {
+          'omegaup-arena-runsubmit': arena_RunSubmit,
         },
       });
     }
@@ -1493,123 +1520,16 @@ export class Arena {
   }
 
   updateAllowedLanguages(languages: string[]): void {
-    const allowedLanguages = [
-      { language: '', name: '' },
-      { language: 'kp', name: 'Karel (Pascal)' },
-      { language: 'kj', name: 'Karel (Java)' },
-      { language: 'c', name: 'C11 (gcc 7.4)' },
-      { language: 'c11-gcc', name: 'C11 (gcc 7.4)' },
-      { language: 'c11-clang', name: 'C11 (clang 6.0)' },
-      { language: 'cpp', name: 'C++03 (g++ 7.4)' },
-      { language: 'cpp11', name: 'C++11 (g++ 7.4)' },
-      { language: 'cpp11-gcc', name: 'C++11 (g++ 7.4)' },
-      { language: 'cpp11-clang', name: 'C++11 (clang++ 6.0)' },
-      { language: 'cpp17-gcc', name: 'C++17 (g++ 7.4)' },
-      { language: 'cpp17-clang', name: 'C++17 (clang++ 6.0)' },
-      { language: 'java', name: 'Java (openjdk 11.0)' },
-      { language: 'py', name: 'Python 2.7' },
-      { language: 'py2', name: 'Python 2.7' },
-      { language: 'py3', name: 'Python 3.6' },
-      { language: 'rb', name: 'Ruby (2.5)' },
-      { language: 'pl', name: 'Perl (5.26)' },
-      { language: 'cs', name: 'C# (dotnet 2.2)' },
-      { language: 'pas', name: 'Pascal (fpc 3.0)' },
-      { language: 'cat', name: 'Output Only' },
-      { language: 'hs', name: 'Haskell (ghc 8.0)' },
-      { language: 'lua', name: 'Lua (5.2)' },
-    ];
-
-    const canSubmit = languages.length != 0;
+    const canSubmit = languages.length !== 0;
 
     $('.runs').toggle(canSubmit);
     $('.data').toggle(canSubmit);
     $('.best-solvers').toggle(canSubmit);
 
-    // refresh options in select
-    const languageSelect = <HTMLSelectElement>(
-      document.querySelector('select[name="language"]')
-    );
-    while (languageSelect.firstChild)
-      languageSelect.removeChild(languageSelect.firstChild);
-
-    languages.push('');
-
-    allowedLanguages
-      .filter(item => {
-        return languages.includes(item.language);
-      })
-      .forEach(optionItem => {
-        const optionNode = document.createElement('option');
-        optionNode.value = optionItem.language;
-        optionNode.appendChild(document.createTextNode(optionItem.name));
-        languageSelect.appendChild(optionNode);
-      });
-  }
-
-  selectDefaultLanguage(): void {
-    const langElement = this.elements.submitForm.language;
-
-    if (this.preferredLanguage) {
-      $('option', langElement).each((index, value) => {
-        const option = $(value);
-        if (option.val() != this.preferredLanguage) return;
-        option.prop('selected', true);
-        return false;
-      });
+    if (this.runSubmitView) {
+      this.runSubmitView.languages = languages;
+      this.runSubmitView.preferredLanguage = this.preferredLanguage;
     }
-    if (langElement.val()) return;
-
-    $('option', langElement).each((index, value) => {
-      const option = $(value);
-
-      option.prop('selected', true);
-      langElement.trigger('change');
-      return false;
-    });
-  }
-
-  mountEditor(problem: Problem): void {
-    const lang = <string>(this.elements.submitForm.language.val() ?? '');
-    let template = '';
-    if (lang && problem.settings?.interactive?.templates?.[lang]) {
-      template = problem.settings.interactive.templates[lang];
-    }
-    if (this.codeEditor) {
-      this.codeEditor.code = template;
-      return;
-    }
-
-    const codeEditor = (this.codeEditor = new Vue({
-      el: this.elements.submitForm.code[0],
-      render: function(createElement) {
-        return createElement('omegaup-arena-code-view', {
-          props: {
-            language: this.language,
-            value: this.code,
-          },
-          on: {
-            input: (value: string) => {
-              codeEditor.code = value;
-            },
-            change: (value: string) => {
-              codeEditor.code = value;
-            },
-          },
-        });
-      },
-      data: {
-        language: lang,
-        code: template,
-      },
-      methods: {
-        refresh: () => {
-          (<arena_CodeView>codeEditor.$children[0]).refresh();
-        },
-      },
-      components: {
-        'omegaup-arena-code-view': arena_CodeView,
-      },
-    }));
   }
 
   onHashChanged(): void {
@@ -1779,19 +1699,8 @@ export class Arena {
       }
 
       if (newRun) {
-        $('#overlay form').hide();
-        $('input', this.elements.submitForm).show();
-        this.elements.submitForm.show();
+        $('#overlay form:not([data-run-submit])').hide();
         $('#overlay').show();
-        if (this.codeEditor) {
-          // It might not be mounted yet if we refresh directly onto
-          // a /new-run view. This code executes directly, whereas
-          // codeEditor is mounted after update() finishes.
-          //
-          // Luckily in this case we don't require the call to refresh
-          // for the display to update correctly!
-          this.codeEditor.refresh();
-        }
         if (this.options.shouldShowFirstAssociatedIdentityRunWarning) {
           this.options.shouldShowFirstAssociatedIdentityRunWarning = false;
           ui.warning(T.firstSumbissionWithIdentity);
@@ -1945,11 +1854,7 @@ export class Arena {
     this.installLibinteractiveHooks();
     MathJax.Hub.Queue(['Typeset', MathJax.Hub, statementElement]);
 
-    this.mountEditor(problem);
-
-    const languageArray = problem.languages;
-    this.updateAllowedLanguages(languageArray);
-    this.selectDefaultLanguage();
+    this.updateAllowedLanguages(problem.languages);
 
     this.ephemeralGrader.send('setSettings', problem.settings);
   }
@@ -1960,7 +1865,7 @@ export class Arena {
     if (!showRunMatch) {
       return;
     }
-    $('#overlay form').hide();
+    $('#overlay form:not([data-run-submit])').hide();
     $('#overlay').show();
     api.Run.details({ run_alias: showRunMatch[1] })
       .then(time.remoteTimeAdapter)
@@ -1974,6 +1879,7 @@ export class Arena {
   }
 
   hideOverlay(): void {
+    if ($('#overlay').css('display') === 'none') return;
     $('#overlay').hide();
     window.location.hash = window.location.hash.substring(
       0,
@@ -1983,10 +1889,6 @@ export class Arena {
 
   bindGlobalHandlers(): void {
     $('#overlay, .close').on('click', (e: Event) => this.onCloseSubmit(e));
-    this.elements.submitForm.language.on('change', (e: Event) =>
-      this.onLanguageSelect(e),
-    );
-    this.elements.submitForm.on('submit', (e: Event) => this.onSubmit(e));
   }
 
   onCloseSubmit(e: Event): void {
@@ -1996,37 +1898,16 @@ export class Arena {
     ) {
       return;
     }
-    $('#clarification', this.elements.submitForm).hide();
     this.hideOverlay();
-    this.clearInputFile();
     e.preventDefault();
-  }
-
-  clearInputFile(): void {
-    // This worked, nay, was required, on older browsers.
-    // It stopped working sometime in 2017, and now .val(null)
-    // is enough to clear the input field.
-    // Leaving this here for now in case some older browsers
-    // still require it.
-    this.elements.submitForm.file.replaceWith(
-      (this.elements.submitForm.file = this.elements.submitForm.file.clone(
-        true,
-      )),
-    );
-    // @ts-ignore Apparently TypeScript does not like the new way of doing
-    // things.
-    this.elements.submitForm.file.val(null);
   }
 
   initSubmissionCountdown(): void {
     let nextSubmissionTimestamp = new Date(0);
-    $('#submit input[type=submit]')
-      .removeAttr('value')
-      .prop('disabled', false);
     const problem = this.problems[this.currentProblem.alias];
     if (typeof problem !== 'undefined') {
       if (typeof problem.nextSubmissionTimestamp !== 'undefined') {
-        nextSubmissionTimestamp = problem.nextSubmissionTimestamp;
+        nextSubmissionTimestamp = new Date(problem.nextSubmissionTimestamp);
       } else if (
         typeof problem.runs !== 'undefined' &&
         typeof this.currentProblemset?.submissions_gap !== 'undefined' &&
@@ -2038,138 +1919,9 @@ export class Arena {
         );
       }
     }
-    if (this.submissionGapInterval) {
-      clearInterval(this.submissionGapInterval);
-      this.submissionGapInterval = null;
+    if (this.runSubmitView) {
+      this.runSubmitView.nextSubmissionTimestamp = nextSubmissionTimestamp;
     }
-    this.submissionGapInterval = setInterval(() => {
-      const submissionGapSecondsRemaining = Math.ceil(
-        (nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
-      );
-      if (submissionGapSecondsRemaining > 0) {
-        $('#submit input[type=submit]')
-          .attr('disabled', 'disabled')
-          .val(
-            ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-              submissionGap: submissionGapSecondsRemaining,
-            }),
-          );
-      } else {
-        $('#submit input[type=submit]')
-          .removeAttr('value')
-          .prop('disabled', false);
-        clearInterval(
-          <ReturnType<typeof setTimeout>>this.submissionGapInterval,
-        );
-      }
-    }, 1000);
-  }
-
-  onLanguageSelect(e: Event): void {
-    const lang = (<HTMLSelectElement>e.target).value;
-    const ext = $('.submit-filename-extension', this.elements.submitForm);
-    if (lang.startsWith('cpp')) {
-      ext.text('.cpp');
-    } else if (lang.startsWith('c-')) {
-      ext.text('.c');
-    } else if (lang.startsWith('py')) {
-      ext.text('.py');
-    } else if (lang && lang != 'cat') {
-      ext.text(`.${lang}`);
-    } else {
-      ext.text('');
-    }
-    if (this.codeEditor) {
-      this.codeEditor.language = lang;
-    }
-  }
-
-  onSubmit(e: Event): void {
-    e.preventDefault();
-
-    if (
-      !this.options.courseAlias &&
-      !this.options.isOnlyProblem &&
-      (this.problems[this.currentProblem.alias].lastSubmission?.getTime() ??
-        0) +
-        this.submissionGap * 1000 >
-        Date.now()
-    ) {
-      alert(
-        ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-          submissionGap: this.submissionGap,
-        }),
-      );
-      return;
-    }
-
-    const submitForm = this.elements.submitForm;
-    const langSelect = this.elements.submitForm.language;
-    if (!langSelect.val()) {
-      alert(T.arenaRunSubmitMissingLanguage);
-      return;
-    }
-
-    const file = (<HTMLInputElement>this.elements.submitForm.file[0])
-      ?.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = e => {
-        const result = e.target?.result ?? null;
-        if (result === null) return;
-        this.submitRun(result as string);
-      };
-
-      const extensionArray = file.name.split(/\./);
-      const extension = extensionArray[extensionArray.length - 1];
-
-      if (
-        langSelect.val() != 'cat' ||
-        file.type.indexOf('text/') === 0 ||
-        extension == 'cpp' ||
-        extension == 'c' ||
-        extension == 'cs' ||
-        extension == 'java' ||
-        extension == 'txt' ||
-        extension == 'hs' ||
-        extension == 'kp' ||
-        extension == 'kj' ||
-        extension == 'p' ||
-        extension == 'pas' ||
-        extension == 'py' ||
-        extension == 'rb' ||
-        extension == 'lua'
-      ) {
-        if (
-          this.currentProblem.input_limit &&
-          file.size >= this.currentProblem.input_limit
-        ) {
-          alert(
-            ui.formatString(T.arenaRunSubmitFilesize, {
-              limit: `${this.currentProblem.input_limit / 1024} KiB`,
-            }),
-          );
-          return;
-        }
-        reader.readAsText(file, 'UTF-8');
-      } else {
-        // 100kB _must_ be enough for anybody.
-        if (file.size >= 100 * 1024) {
-          alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '100kB' }));
-          return;
-        }
-        reader.readAsDataURL(file);
-      }
-
-      return;
-    }
-
-    if (!this.codeEditor?.code) {
-      alert(T.arenaRunSubmitEmptyCode);
-      return;
-    }
-    this.submitRun(this.codeEditor.code);
   }
 
   computeProblemsetArg(): { contest_alias?: string; problemset_id?: number } {
@@ -2185,17 +1937,15 @@ export class Arena {
     return {};
   }
 
-  submitRun(code: string): void {
+  submitRun(code: string, language: string): void {
     const problemset = this.options.isPractice
       ? {}
       : this.computeProblemsetArg();
-    const lang = this.elements.submitForm.language.val();
 
-    $('input', this.elements.submitForm).attr('disabled', 'disabled');
     api.Run.create(
-      $.extend(problemset, {
+      Object.assign(problemset, {
         problem_alias: this.currentProblem.alias,
-        language: lang,
+        language: language,
         source: code,
       }),
     )
@@ -2225,20 +1975,25 @@ export class Arena {
           memory: 0,
           verdict: 'JE',
           score: 0,
-          language: <string>(this.elements.submitForm.language.val() ?? ''),
+          language: language,
         };
         this.updateRun(run);
-
-        $('input', this.elements.submitForm).prop('disabled', false);
-        this.hideOverlay();
-        this.clearInputFile();
+        if (this.runSubmitView) {
+          const component = <arena_RunSubmit>this.runSubmitView.$refs.component;
+          component.clearForm();
+          // Wait until the code view has been cleared before hiding the
+          // overlay. Not doing so will sometimes cause the contents of the
+          // editor to still be visible when the overlay is shown again.
+          component.$nextTick(() => this.hideOverlay());
+        } else {
+          this.hideOverlay();
+        }
         if (!this.options.courseAlias) {
           this.initSubmissionCountdown();
         }
       })
       .catch(run => {
         alert(run.error ?? run);
-        $('input', this.elements.submitForm).prop('disabled', false);
         if (run.errorname) {
           ui.reportEvent('submission', 'submit-fail', run.errorname);
         }
@@ -2303,29 +2058,6 @@ export class Arena {
       }
       groups = detailsGroups;
     }
-
-    // Setup run details view, if available.
-    if (
-      document.getElementById('run-details') !== null &&
-      !this.runDetailsView
-    ) {
-      this.runDetailsView = new Vue({
-        el: '#run-details',
-        render: function(createElement) {
-          return createElement('omegaup-arena-rundetails', {
-            props: {
-              data: this.data,
-            },
-          });
-        },
-        data: { data: null },
-        components: {
-          'omegaup-arena-rundetails': arena_RunDetails,
-        },
-      });
-      this.bindGlobalHandlers();
-    }
-
     if (this.runDetailsView) {
       this.runDetailsView.data = {
         compile_error: data.compile_error,

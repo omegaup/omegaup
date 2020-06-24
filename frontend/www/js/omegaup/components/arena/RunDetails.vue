@@ -205,7 +205,7 @@
   border-radius: 5px;
 }
 .vue-codemirror-wrap {
-  height: 100%;
+  height: 95%;
   .CodeMirror {
     height: 100%;
   }

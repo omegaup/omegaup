@@ -112,7 +112,10 @@
 {include file='arena.clarification_list.tpl' contest=true inline}
 		</div>
 		<div id="overlay">
-{include file='arena.runsubmit.tpl' inline}
+			{if !empty($payload)}
+				<script type="text/json" id="payload">{$payload|json_encode}</script>
+			{/if}
+			<div id="run-submit"></div>
 {include file='arena.clarification.tpl' admin=$admin inline}
 			<div id="run-details"></div>
 		</div>
