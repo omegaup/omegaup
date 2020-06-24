@@ -606,7 +606,8 @@ class NoOpGrader extends \OmegaUp\Grader {
     public function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $missingOk = false
+        bool $missingOk = false,
+        array $headers = []
     ): ?bool {
         $path = "{$run->run_id}/{$filename}";
         if (!array_key_exists($path, $this->_resources)) {

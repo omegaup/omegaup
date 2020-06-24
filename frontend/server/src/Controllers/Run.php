@@ -1249,11 +1249,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
 
         if ($passthru) {
-            header('Content-Type: application/zip');
-            header(
+            $headers = [
+                'Content-Type: application/zip',
                 "Content-Disposition: attachment; filename={$submission->guid}.zip"
-            );
-            return self::getGraderResourcePassthru($run, 'files.zip');
+            ];
+            return self::getGraderResourcePassthru($run, 'files.zip', $headers);
         }
         return self::getGraderResource($run, 'files.zip');
     }
@@ -1277,21 +1277,25 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param list<string> $headers
      * @return bool|null|string
      */
     private static function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
-        string $filename
+        string $filename,
+        array $headers = []
     ) {
         $result = \OmegaUp\Grader::getInstance()->getGraderResourcePassthru(
             $run,
             $filename,
-            /*missingOk=*/true
+            /*missingOk=*/true,
+            $headers
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/true
+                /*passthru=*/true,
+                $headers
             );
         }
         return $result;
@@ -1300,13 +1304,15 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Given the run resouce path, fetches its contents from S3.
      *
-     * @param  string $resourcePath The run's resource path.
-     * @param  bool   $passthru     Whether to output directly.
-     * @return ?string              The contents of the resource (or an empty string) if successful. null otherwise.
+     * @param  string       $resourcePath The run's resource path.
+     * @param  bool         $passthru     Whether to output directly.
+     * @param  list<string> $fileHeaders
+     * @return ?string                    The contents of the resource (or an empty string) if successful. null otherwise.
      */
     private static function downloadResourceFromS3(
         string $resourcePath,
-        bool $passthru
+        bool $passthru,
+        array $fileHeaders = []
     ): ?string {
         if (
             !defined('AWS_CLI_SECRET_ACCESS_KEY') ||
@@ -1423,6 +1429,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $output = curl_exec($curl);
         if ($passthru) {
+            foreach ($fileHeaders as $header) {
+                header($header);
+            }
             $result = '';
         } else {
             $result = strval($output);
