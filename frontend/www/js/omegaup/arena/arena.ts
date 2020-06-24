@@ -499,7 +499,6 @@ export class Arena {
     }
 
     if (this.elements.ranking.length) {
-      const self = this;
       this.scoreboard = new Vue({
         el: this.elements.ranking[0],
         render: function(createElement) {
@@ -511,7 +510,7 @@ export class Arena {
               lastUpdated: this.lastUpdated,
               digitsAfterDecimalPoint: digitsAfterDecimalPoint,
               showPenalty: this.showPenalty,
-              showInvitedUsersFilter: self.options.contestAlias !== null,
+              showInvitedUsersFilter: options.contestAlias !== null,
             },
           });
         },
