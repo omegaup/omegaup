@@ -8,7 +8,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
- * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp|null, badge_alias: string, unlocked?: boolean, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
+ * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp|null, badge_alias: string, unlocked?: bool, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
@@ -23,7 +23,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int|null}>
  * @psalm-type UserProfileStats=list<array{date: null|string, runs: int, verdict: string}>
  * @psalm-type UserListItem=array{label: string, value: string}
-* @psalm-type UserProfileDetailsPayload=array{badges: list<string>, contests: UserProfileContests, createdProblems: list<Problem>, ownedBadges: list<Badge>, profile: UserProfileInfo, solvedProblems: list<Problem>, stats: UserProfileStats, unsolvedProblems: list<Problem>}|array{statusError: string}
+ * @psalm-type UserProfileDetailsPayload=array{badges: list<string>, contests: UserProfileContests, createdProblems: list<Problem>, ownedBadges: list<Badge>, profile: UserProfileInfo, solvedProblems: list<Problem>, stats: UserProfileStats, unsolvedProblems: list<Problem>}|array{statusError: string}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */

@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * BadgesController
  *
- * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp|null, badge_alias: string, unlocked?: boolean, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
+ * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp|null, badge_alias: string, unlocked?: bool, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
  * @psalm-type BadgeDetailsPayload=array{badge: Badge}
  * @psalm-type BadgeListPayload=array{badges: list<string>, ownedBadges: list<Badge>}
  */
