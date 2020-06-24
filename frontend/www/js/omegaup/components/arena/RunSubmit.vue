@@ -1,5 +1,5 @@
 <template>
-  <form class="run-submit-view" v-on:submit.prevent="onSubmit">
+  <form data-run-submit v-on:submit.prevent="onSubmit">
     <div class="close-container">
       <button class="close">❌</button>
     </div>
@@ -8,10 +8,12 @@
         {{ T.wordsLanguage }}
       </label>
       <div class="col-sm-4">
-        <select name="language" class="form-control" v-model="selectedLanguage">
-          <option v-bind:value="key" v-for="(language, key) in languages">{{
-            language
-          }}</option>
+        <select class="form-control" name="language" v-model="selectedLanguage">
+          <option
+            v-bind:value="key"
+            v-for="(language, key) in allowedLanguages"
+            >{{ language }}</option
+          >
         </select>
       </div>
     </div>
@@ -32,21 +34,30 @@
       ></omegaup-arena-code-view>
     </div>
     <div class="form-group row">
-      <label class="col-sm-4 col-form-label">
+      <label class="col-sm-3 col-form-label">
         {{ T.arenaRunSubmitUpload }}
       </label>
-      <div class="col-sm-6">
+      <div class="col-sm-7">
         <input type="file" name="file" ref="inputFile" />
       </div>
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <input
+        <button
           type="submit"
           class="btn btn-primary"
-          v-bind:disabled="submissionGapSecondsRemaining > 0"
-          v-bind:value="buttonDescription"
-        />
+          v-bind:disabled="!canSubmit"
+        >
+          <omegaup-countdown
+            v-if="!canSubmit"
+            v-bind:target-time="nextSubmissionTimestamp"
+            v-bind:countdown-format="
+              omegaup.CountdownFormat.WaitBetweenUploadsSeconds
+            "
+            v-on:emit-finish="now = Date.now()"
+          ></omegaup-countdown>
+          <span v-else="">{{ T.wordsSend }}</span>
+        </button>
       </div>
     </div>
   </form>
@@ -60,41 +71,82 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
+import omegaup_Countdown from '../Countdown.vue';
 
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
+    'omegaup-countdown': omegaup_Countdown,
   },
 })
 export default class ArenaRunSubmit extends Vue {
   @Ref() inputFile!: HTMLInputElement;
-  @Prop() languages!: omegaup.Languages;
-  @Prop({ default: 0 }) submissionGapSecondsRemaining!: number;
+  @Prop() languages!: string[];
+  @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
+  @Prop() preferredLanguage!: string;
 
   T = T;
+  omegaup = omegaup;
   selectedLanguage = '';
   code = '';
+  now: number = Date.now();
 
-  get buttonDescription(): string {
-    if (this.submissionGapSecondsRemaining < 1) {
-      return T.wordsSend;
-    }
-    return ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-      submissionGap: this.submissionGapSecondsRemaining,
-    });
+  get canSubmit(): boolean {
+    return this.nextSubmissionTimestamp.getTime() < this.now;
   }
 
   get filename(): string {
     return `Main${this.extension}`;
   }
 
+  get allowedLanguages(): omegaup.Languages {
+    let allowedLanguages: omegaup.Languages = {};
+    const allLanguages = [
+      { language: '', name: '' },
+      { language: 'kp', name: 'Karel (Pascal)' },
+      { language: 'kj', name: 'Karel (Java)' },
+      { language: 'c', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-gcc', name: 'C11 (gcc 7.4)' },
+      { language: 'c11-clang', name: 'C11 (clang 6.0)' },
+      { language: 'cpp', name: 'C++03 (g++ 7.4)' },
+      { language: 'cpp11', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-gcc', name: 'C++11 (g++ 7.4)' },
+      { language: 'cpp11-clang', name: 'C++11 (clang++ 6.0)' },
+      { language: 'cpp17-gcc', name: 'C++17 (g++ 7.4)' },
+      { language: 'cpp17-clang', name: 'C++17 (clang++ 6.0)' },
+      { language: 'java', name: 'Java (openjdk 11.0)' },
+      { language: 'py', name: 'Python 2.7' },
+      { language: 'py2', name: 'Python 2.7' },
+      { language: 'py3', name: 'Python 3.6' },
+      { language: 'rb', name: 'Ruby (2.5)' },
+      { language: 'pl', name: 'Perl (5.26)' },
+      { language: 'cs', name: 'C# (dotnet 2.2)' },
+      { language: 'pas', name: 'Pascal (fpc 3.0)' },
+      { language: 'cat', name: 'Output Only' },
+      { language: 'hs', name: 'Haskell (ghc 8.0)' },
+      { language: 'lua', name: 'Lua (5.2)' },
+    ];
+
+    allLanguages
+      .filter(
+        item => this.languages.includes(item.language) || item.language === '',
+      )
+      .forEach(optionItem => {
+        allowedLanguages[optionItem.language] = optionItem.name;
+      });
+    return allowedLanguages;
+  }
+
   get extension(): string {
+    if (!this.selectedLanguage || this.selectedLanguage === 'cat') {
+      return '';
+    }
     if (this.selectedLanguage.startsWith('cpp')) {
       return '.cpp';
     }
@@ -104,17 +156,21 @@ export default class ArenaRunSubmit extends Vue {
     if (this.selectedLanguage.startsWith('py')) {
       return '.py';
     }
-    if (this.selectedLanguage && this.selectedLanguage !== 'cat') {
-      return `.${this.selectedLanguage}`;
-    }
-    return '';
+    return `.${this.selectedLanguage}`;
+  }
+
+  @Watch('preferredLanguage')
+  onPreferredLanguageChanged(newValue: string): void {
+    this.selectedLanguage = newValue;
   }
 
   onSubmit(ev: Event): void {
-    if (this.submissionGapSecondsRemaining > 0) {
+    if (!this.canSubmit) {
       alert(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {
-          submissionGap: this.submissionGapSecondsRemaining,
+          submissionGap: Math.ceil(
+            (this.nextSubmissionTimestamp.getTime() - Date.now()) / 1000,
+          ),
         }),
       );
       return;
@@ -181,6 +237,12 @@ export default class ArenaRunSubmit extends Vue {
       return;
     }
     this.$emit('submit-run', this.code, this.selectedLanguage);
+  }
+
+  clearForm(): void {
+    this.code = '';
+    this.inputFile.type = 'text';
+    this.inputFile.type = 'file';
   }
 }
 </script>
