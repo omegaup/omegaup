@@ -116,9 +116,9 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 ui.success(T.tagAdded);
                 if (isPublic) {
-                  this.selectedPublicTags?.push(tagname);
+                  this.selectedPublicTags.push(tagname);
                 } else {
-                  this.selectedPrivateTags?.push(tagname);
+                  this.selectedPrivateTags.push(tagname);
                 }
               })
               .catch(ui.apiError);
@@ -131,11 +131,11 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 ui.success(T.tagRemoved);
                 // FIXME: For some reason this is not being reactive
-                if (isPublic && this.selectedPublicTags) {
+                if (isPublic) {
                   this.selectedPublicTags = this.selectedPublicTags.filter(
                     tag => tag !== tagname,
                   );
-                } else if (this.selectedPrivateTags) {
+                } else {
                   this.selectedPrivateTags = this.selectedPrivateTags.filter(
                     tag => tag !== tagname,
                   );
