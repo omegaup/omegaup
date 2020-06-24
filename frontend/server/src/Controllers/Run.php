@@ -1306,13 +1306,13 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @param  string       $resourcePath The run's resource path.
      * @param  bool         $passthru     Whether to output directly.
-     * @param  list<string> $fileHeaders
+     * @param  list<string> $httpHeaders
      * @return ?string                    The contents of the resource (or an empty string) if successful. null otherwise.
      */
     private static function downloadResourceFromS3(
         string $resourcePath,
         bool $passthru,
-        array $fileHeaders = []
+        array $httpHeaders = []
     ): ?string {
         if (
             !defined('AWS_CLI_SECRET_ACCESS_KEY') ||
@@ -1429,7 +1429,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $output = curl_exec($curl);
         if ($passthru) {
-            foreach ($fileHeaders as $header) {
+            foreach ($httpHeaders as $header) {
                 header($header);
             }
             $result = '';
