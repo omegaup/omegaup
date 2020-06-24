@@ -314,7 +314,6 @@ export class Arena {
     | (Vue & {
         problems: omegaup.Problem[];
         ranking: types.ScoreboardRankingEntry[];
-        shouldShowInvitedUsersFilter: boolean;
         showPenalty: boolean;
         lastUpdated: Date;
       })
@@ -500,6 +499,7 @@ export class Arena {
     }
 
     if (this.elements.ranking.length) {
+      const self = this;
       this.scoreboard = new Vue({
         el: this.elements.ranking[0],
         render: function(createElement) {
@@ -511,7 +511,7 @@ export class Arena {
               lastUpdated: this.lastUpdated,
               digitsAfterDecimalPoint: digitsAfterDecimalPoint,
               showPenalty: this.showPenalty,
-              shouldShowInvitedUsersFilter: this.shouldShowInvitedUsersFilter,
+              shouldShowInvitedUsersFilter: self.options.contestAlias !== null,
             },
           });
         },
@@ -520,7 +520,6 @@ export class Arena {
           ranking: [],
           lastUpdated: new Date(0),
           showPenalty: true,
-          shouldShowInvitedUsersFilter: this.options.contestAlias !== null,
         },
         components: {
           'omegaup-arena-scoreboard': arena_Scoreboard,
