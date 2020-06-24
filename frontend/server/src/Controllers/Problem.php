@@ -2179,7 +2179,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
         $problemArtifacts->download();
 
-        die();
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     /**
@@ -4954,7 +4956,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problemParams = self::convertRequestToProblemParams($r);
                 self::createProblem($r->user, $r->identity, $problemParams);
                 header("Location: /problem/{$r['problem_alias']}/edit/");
-                die();
+
+                // Since all the headers and response have been sent, make the API
+                // caller to exit quietly.
+                throw new \OmegaUp\Exceptions\ExitException();
+            } catch (\OmegaUp\Exceptions\ExitException $e) {
+                throw $e;
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 /** @var array{error?: string} */
                 $response = $e->asResponseArray();
@@ -5190,7 +5197,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'Location: ' . TEMPLATES_URL_PATH . "{$r['problem_alias']}/{$r['commit']}/{$r['filename']}?noredirect=1"
         );
         header('HTTP/1.1 303 See Other');
-        die();
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     public static function regenerateTemplates(
@@ -5253,7 +5263,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'Location: ' . IMAGES_URL_PATH . "{$r['problem_alias']}/{$r['object_id']}.{$r['extension']}?noredirect=1"
         );
         header('HTTP/1.1 303 See Other');
-        die();
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     public static function regenerateImage(
@@ -5417,7 +5430,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             readfile("{$dirname}/interactive.zip");
             \OmegaUp\FileHandler::deleteDirRecursively($dirname);
-            die();
+
+            // Since all the headers and response have been sent, make the API
+            // caller to exit quietly.
+            throw new \OmegaUp\Exceptions\ExitException();
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            throw $e;
         } catch (\Exception $e) {
             return [
                 'smartyProperties' => [

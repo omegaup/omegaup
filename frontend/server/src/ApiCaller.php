@@ -35,6 +35,9 @@ class ApiCaller {
                 200
             );
             return $response;
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // The controller has explicitly requested to exit.
+            exit;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             $apiException = $e;
         } catch (\Exception $e) {

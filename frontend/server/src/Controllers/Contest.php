@@ -4433,8 +4433,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
         fclose($out);
 
-        // X_X
-        die();
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     /**
@@ -4478,7 +4479,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         $zip->finish();
 
-        die();
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     /**
