@@ -85,11 +85,8 @@ OmegaUp.on('ready', () => {
           )}`;
           return;
         }
-        $('#overlay form').hide();
-        $('#submit input').show();
-        $('#submit').show();
+        $('#overlay form:not([data-run-submit])').hide();
         $('#overlay').show();
-        arenaInstance.mountEditor(arenaInstance.currentProblem);
       }
     }
     arenaInstance.detectShowRun();
