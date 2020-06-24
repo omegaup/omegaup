@@ -3635,14 +3635,14 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
         $payload = [];
-        $profile =  self::getProfileDetails($r->identity, $identity);
-        $contests = self::apiContestStats($r);
-        $solvedProblems = self::apiProblemsSolved($r);
-        $unsolvedProblems = self::apiListUnsolvedProblems($r);
-        $createdProblems = self::apiProblemsCreated($r);
-        $stats = self::apiStats($r);
-        $badges = \OmegaUp\Controllers\Badge::apiList($r);
-        $ownedBadges = \OmegaUp\Controllers\Badge::apiMyList($r);
+        $profile =  [];
+        $contests = [];
+        $solvedProblems = [];
+        $unsolvedProblems = [];
+        $createdProblems = [];
+        $stats = [];
+        $badges = [];
+        $ownedBadges = [];
         try {
             self::authenticateOrAllowUnauthenticatedRequest($r);
 
@@ -3653,6 +3653,14 @@ class User extends \OmegaUp\Controllers\Controller {
                     'Identity'
                 );
             }
+            $profile =  self::getProfileDetails($r->identity, $identity);
+            $contests = self::apiContestStats($r);
+            $solvedProblems = self::apiProblemsSolved($r);
+            $unsolvedProblems = self::apiListUnsolvedProblems($r);
+            $createdProblems = self::apiProblemsCreated($r);
+            $stats = self::apiStats($r);
+            $badges = \OmegaUp\Controllers\Badge::apiList($r);
+            $ownedBadges = \OmegaUp\Controllers\Badge::apiMyList($r);
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             $payload = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
