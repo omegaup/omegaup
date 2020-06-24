@@ -3631,6 +3631,11 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{smartyProperties: array{payload: UserProfileDetailsPayload, title: string }, template: string}
+     *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $username
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
         self::authenticateOrAllowUnauthenticatedRequest($r);
