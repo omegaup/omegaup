@@ -506,6 +506,7 @@ export class Arena {
               lastUpdated: this.lastUpdated,
               digitsAfterDecimalPoint: digitsAfterDecimalPoint,
               showPenalty: this.showPenalty,
+              showInvitedUsersFilter: options.contestAlias !== null,
             },
           });
         },
