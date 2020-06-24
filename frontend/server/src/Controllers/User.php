@@ -3631,7 +3631,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: UserProfileDetailsPayload, title: string }, entrypoint: string}
+     * @return array{smartyProperties: array{payload: UserProfileDetailsPayload, title: string }, template: string}
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
         $payload = [];
