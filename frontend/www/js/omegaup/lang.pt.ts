@@ -1154,6 +1154,7 @@ const translations: { [key: string]: string; } = {
   updateItemsError: "Ocorreu um erro ao atualizar itens",
   updateItemsSuccess: "Todos os itens selecionados foram atualizados",
   updateProblemLevel: "Atualizar o n\u00edvel do problema",
+  updateStatementsCommitMessage: "Atualizando elabora\u00e7\u00e3oes",
   userDoesNotHaveAnyPasswordChangeRequest: "O usu\u00e1rio n\u00e3o possui nenhuma solicita\u00e7\u00e3o de mudan\u00e7a de senha nas \u00faltimas 24 horas.",
   userEditAddPassword: "Adicionar senha",
   userEditBachelors: "Grau",
