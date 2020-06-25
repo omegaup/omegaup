@@ -1457,7 +1457,6 @@ export namespace types {
     problemsetter?: types.ProblemsetterInfo;
     publicTags: string[];
     publishedRevision?: types.ProblemVersion;
-    selectedTags: { public: boolean; tagname: string }[];
     selectedPublicTags: string[];
     selectedPrivateTags: string[];
     solution: types.ProblemStatement;
@@ -1465,7 +1464,6 @@ export namespace types {
     statement: types.ProblemStatement;
     statusError?: string;
     statusSuccess: boolean;
-    tags: { name?: string }[];
     timeLimit: number;
     title: string;
     validLanguages: { [key: string]: string };

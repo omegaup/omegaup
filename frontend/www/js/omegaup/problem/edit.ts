@@ -36,6 +36,8 @@ OmegaUp.on('ready', () => {
           markdownContents: this.markdownContents,
           markdownSolutionContents: this.markdownSolutionContents,
           problemLevel: this.problemLevel,
+          selectedPublicTags: this.selectedPublicTags,
+          selectedPrivateTags: this.selectedPrivateTags,
         },
         on: {
           'update-problem-level': (levelTag?: string) => {
@@ -111,18 +113,33 @@ OmegaUp.on('ready', () => {
               name: tagname,
               public: isPublic,
             })
-              .then(response => {
+              .then(() => {
                 ui.success(T.tagAdded);
+                if (isPublic) {
+                  this.selectedPublicTags.push(tagname);
+                } else {
+                  this.selectedPrivateTags.push(tagname);
+                }
               })
               .catch(ui.apiError);
           },
-          'remove-tag': (alias: string, tagname: string) => {
+          'remove-tag': (alias: string, tagname: string, isPublic: boolean) => {
             api.Problem.removeTag({
               problem_alias: alias,
               name: tagname,
             })
-              .then(response => {
+              .then(() => {
                 ui.success(T.tagRemoved);
+                // FIXME: For some reason this is not being reactive
+                if (isPublic) {
+                  this.selectedPublicTags = this.selectedPublicTags.filter(
+                    tag => tag !== tagname,
+                  );
+                } else {
+                  this.selectedPrivateTags = this.selectedPrivateTags.filter(
+                    tag => tag !== tagname,
+                  );
+                }
               })
               .catch(ui.apiError);
           },
@@ -245,6 +262,8 @@ OmegaUp.on('ready', () => {
       markdownContents: payload.statement.markdown,
       markdownSolutionContents: payload.solution.markdown,
       problemLevel: payload.problemLevel,
+      selectedPublicTags: payload.selectedPublicTags,
+      selectedPrivateTags: payload.selectedPrivateTags,
     },
     components: {
       'omegaup-problem-edit': problem_Edit,

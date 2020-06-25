@@ -97,6 +97,7 @@
     "vue-async-computed-decorator": "^0.0.4",
     "vue-mathjax": "^0.0.11",
     "vue-multiselect": "^2.1.6",
-    "vue-slider-component": "^3.0.25"
+    "vue-slider-component": "^3.0.25",
+    "vue-typeahead-bootstrap": "^2.1.2"
   }
 }
