@@ -274,6 +274,9 @@ class UITools {
             $navbarSection = $response['navbarSection'] ?? '';
             /** @var array<string, mixed> */
             $payload = $smartyProperties['payload'] ?? [];
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // The callback explicitly requested to exit.
+            exit;
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }

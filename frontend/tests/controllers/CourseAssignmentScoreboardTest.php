@@ -54,19 +54,25 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment' => $courseData['assignment_alias']
         ]));
 
-        // Validation. Courses should be sorted by names instead of ranking.
+        $userScore = [];
+        foreach ($expectedScores as $index => $score) {
+            $key = array_keys($score);
+            $userScore[$index] = $score[$key[0]];
+        }
+
+        // Validation. Now, courses should be sorted by ranking.
         array_multisort(
+            array_values($userScore),
+            SORT_DESC,
             array_keys($expectedScores),
             SORT_ASC,
-            array_values($expectedScores),
-            SORT_DESC,
             $expectedScores
         );
         $expectedPlace = 0;
         $lastScore = 0;
         $i = 0;
         foreach ($expectedScores as $username => $score) {
-            if ($lastScore != $score) {
+            if ($lastScore !== $score) {
                 $expectedPlace = $i + 1;
                 $lastScore = $score;
             }
@@ -76,9 +82,10 @@ class CourseAssignmentScoreboardTest extends \OmegaUp\Test\ControllerTestCase {
                 $response['ranking'][$i]['username'],
                 'Scoreboard is not properly sorted by username.'
             );
-            $this->assertFalse(
-                array_key_exists('place', $response['ranking'][$i]),
-                'Course scoreboard contains place information and should not.'
+            $this->assertEquals(
+                $expectedPlace,
+                $response['ranking'][$i]['place'],
+                'Course scoreboard place information is wrong.'
             );
             $i++;
         }
