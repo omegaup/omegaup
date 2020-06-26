@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="course-edit">
     <div class="page-header">
       <h1>
         <span>{{ T.wordsEditCourse }} {{ data.course.name }}</span>
         <small>
           &ndash;
-          <a v-bind:href="`/course/${data.course.alias}/`">
+          <a v-bind:href="courseURL">
             {{ T.courseEditGoToCourse }}
           </a>
         </small>
@@ -14,7 +14,7 @@
     <ul class="nav nav-pills">
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          href="#course"
           class="nav-link"
           data-tab-course
           v-on:click="showTab = 'course'"
@@ -24,17 +24,17 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          href="#assignments"
           class="nav-link"
           data-tab-assignments
-          v-on:click="showTab = 'assignments'"
+          v-on:click="onSelectAssignmentTab"
           v-bind:class="{ active: showTab === 'assignments' }"
           >{{ T.wordsAssignments }}</a
         >
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          href="#problems"
           class="nav-link"
           data-tab-problems
           v-on:click="showTab = 'problems'"
@@ -44,7 +44,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          href="#admission-mode"
           class="nav-link"
           data-tab-admission-mode
           v-on:click="showTab = 'admission-mode'"
@@ -54,7 +54,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          href="#students"
           class="nav-link"
           data-tab-students
           v-on:click="showTab = 'students'"
@@ -64,7 +64,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          href="#admins"
           class="nav-link"
           data-tab-admins
           v-on:click="showTab = 'admins'"
@@ -74,7 +74,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          href="#clone"
           class="nav-link"
           data-tab-clone
           v-on:click="showTab = 'clone'"
@@ -89,6 +89,10 @@
         <omegaup-course-form
           v-bind:update="true"
           v-bind:course="data.course"
+          v-on:emit-cancel="onCancel"
+          v-on:emit-submit="
+            formComponent => $emit('submit-edit-course', formComponent)
+          "
         ></omegaup-course-form>
       </div>
 
@@ -100,12 +104,35 @@
         <omegaup-course-assignment-list
           v-bind:assignments="data.course.assignments"
           v-bind:course-alias="data.course.alias"
+          v-bind:show-new-assignment-button="showNewAssignmentButton"
+          v-on:emit-new="onNewAssignment"
+          v-on:emit-edit="assignment => onEditAssignment(assignment)"
+          v-on:emit-add-problems="assignment => onAddProblems(assignment)"
+          v-on:emit-delete="
+            assignment => $emit('delete-assignment', assignment)
+          "
+          v-on:emit-sort-homeworks="
+            (courseAlias, homeworksAliases) =>
+              $emit('sort-homeworks', courseAlias, homeworksAliases)
+          "
+          v-on:emit-sort-tests="
+            (courseAlias, testsAliases) =>
+              $emit('sort-tests', courseAlias, testsAliases)
+          "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
-          v-if="data.selectedAssignment"
-          v-bind:show="false"
-          v-bind:update="true"
-          v-bind:assignment="data.selectedAssignment"
+          v-bind:show="showAssignmentDetails"
+          v-bind:update="updateAssignment"
+          v-bind:unlimited-duration-course="!data.course.finish_time"
+          v-bind:finish-time-course="data.course.finish_time"
+          v-bind:start-time-course="data.course.start_time"
+          v-bind:assignment="assignment"
+          v-bind:invalid-parameter-name="invalidParameterName"
+          v-on:emit-cancel="onResetAssignmentForm"
+          v-on:emit-submit="
+            assignmentFormComponent =>
+              $emit('submit-new-assignment', assignmentFormComponent)
+          "
         ></omegaup-course-assignment-details>
       </div>
 
@@ -115,11 +142,27 @@
         v-if="showTab === 'problems'"
       >
         <omegaup-course-problem-list
-          v-if="data.selectedAssignment"
           v-bind:assignments="data.course.assignments"
           v-bind:assignment-problems="data.assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
-          v-bind:selected-assignment="data.selectedAssignment"
+          v-bind:selected-assignment="selectedAssignment"
+          v-bind:initial-show-form="showFormProblem"
+          v-on:emit-add-problem="
+            (assignment, problemAlias) =>
+              $emit('add-problem', assignment, problemAlias)
+          "
+          v-on:emit-select-assignment="
+            assignment => $emit('select-assignment', assignment)
+          "
+          v-on:emit-remove="
+            (assignment, problem) =>
+              $emit('remove-problem', assignment, problem)
+          "
+          v-on:emit-sort="
+            (assignmentAlias, problemsAlias) =>
+              $emit('sort-problems', assignmentAlias, problemsAlias)
+          "
+          v-on:emit-tags="tags => $emit('tags-problems', tags)"
         ></omegaup-course-problem-list>
       </div>
 
@@ -135,6 +178,9 @@
             T.courseEditAdmissionModeDescription
           "
           v-bind:course-alias="data.course.alias"
+          v-on:emit-update-admission-mode="
+            admisionMode => $emit('update-admission-mode', admisionMode)
+          "
         ></omegaup-course-admision-mode>
       </div>
 
@@ -147,47 +193,73 @@
           v-bind:students="data.students"
           v-bind:course-alias="data.course.alias"
           v-bind:identity-requests="data.identityRequests"
+          v-on:emit-add-student="
+            participants => $emit('add-student', participants)
+          "
+          v-on:emit-remove-student="student => $emit('remove-student', student)"
+          v-on:emit-accept-request="
+            username => $emit('accept-request', username)
+          "
+          v-on:emit-deny-request="username => $emit('deny-request', username)"
         ></omegaup-course-add-students>
       </div>
 
-      <div class="tab-pane active" role="tabpanel" v-if="showTab === 'admins'">
-        <omegaup-common-admins
-          v-bind:initial-admins="data.admins"
-          v-bind:has-parent-component="true"
-          v-on:emit-add-admin="
-            addAdminComponent => $emit('add-admin', addAdminComponent.username)
-          "
-          v-on:emit-remove-admin="
-            addAdminComponent =>
-              $emit('remove-admin', addAdminComponent.selected.username)
-          "
-        ></omegaup-common-admins>
-        <omegaup-common-groupadmins
-          v-bind:initial-groups="data.groupsAdmins"
-          v-bind:has-parent-component="true"
-          v-on:emit-add-group-admin="
-            groupAdminsComponent =>
-              $emit('add-group-admin', groupAdminsComponent.groupAlias)
-          "
-          v-on:emit-remove-group-admin="
-            groupAdminsComponent =>
-              $emit('remove-group-admin', groupAdminsComponent.groupAlias)
-          "
-        ></omegaup-common-groupadmins>
+      <div
+        class="tab-pane active pane-admins row"
+        role="tabpanel"
+        v-if="showTab === 'admins'"
+      >
+        <div class="col-md-6">
+          <omegaup-common-admins
+            v-bind:initial-admins="data.admins"
+            v-bind:has-parent-component="true"
+            v-on:emit-add-admin="
+              addAdminComponent =>
+                $emit('add-admin', addAdminComponent.username)
+            "
+            v-on:emit-remove-admin="
+              addAdminComponent =>
+                $emit('remove-admin', addAdminComponent.selected.username)
+            "
+          ></omegaup-common-admins>
+        </div>
+        <div class="col-md-6">
+          <omegaup-common-groupadmins
+            v-bind:initial-groups="data.groupsAdmins"
+            v-bind:has-parent-component="true"
+            v-on:emit-add-group-admin="
+              groupAdminsComponent =>
+                $emit('add-group-admin', groupAdminsComponent.groupAlias)
+            "
+            v-on:emit-remove-group-admin="
+              groupAdminsComponent =>
+                $emit('remove-group-admin', groupAdminsComponent.groupAlias)
+            "
+          ></omegaup-common-groupadmins>
+        </div>
       </div>
 
       <div class="tab-pane active" role="tabpanel" v-if="showTab === 'clone'">
         <omegaup-course-clone
           v-bind:initial-alias="data.course.alias"
           v-bind:initial-name="data.course.name"
+          v-on:emit-clone="
+            (alias, name, startTime) => $emit('clone', alias, name, startTime)
+          "
         ></omegaup-course-clone>
       </div>
     </div>
   </div>
 </template>
 
+<style>
+.course-edit .pane-admins {
+  display: flex;
+}
+</style>
+
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import course_AssignmentDetails from './AssignmentDetails.vue';
@@ -199,6 +271,34 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import course_Clone from './Clone.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
+
+const now = new Date();
+const finishTime = new Date();
+finishTime.setHours(finishTime.getHours() + 5);
+const defaultStartTime = now;
+const defaultFinishTime = finishTime;
+const availableTabs = [
+  'course',
+  'assignments',
+  'problems',
+  'admission-mode',
+  'students',
+  'admins',
+  'clone',
+];
+const emptyAssignment: types.CourseAssignment = {
+  alias: '',
+  description: '',
+  name: '',
+  has_runs: false,
+  max_points: 0,
+  start_time: defaultStartTime,
+  finish_time: defaultFinishTime,
+  order: 1,
+  scoreboard_url: '',
+  scoreboard_url_admin: '',
+  assignment_type: 'homework',
+};
 
 @Component({
   components: {
@@ -215,8 +315,80 @@ import { types } from '../../api_types';
 })
 export default class CourseEdit extends Vue {
   @Prop() data!: types.CourseEditPayload;
+  @Prop() invalidParameterName!: string;
+  @Prop() initialTab!: string;
 
   T = T;
   showTab = 'course';
+  showAssignmentDetails = false;
+  showFormProblem = false;
+  updateAssignment = true;
+  showNewAssignmentButton = true;
+  assignment = emptyAssignment;
+  selectedAssignment = this.data.selectedAssignment;
+
+  get courseURL(): string {
+    return `/course/${this.data.course.alias}/`;
+  }
+
+  onNewAssignment(): void {
+    this.showAssignmentDetails = true;
+    this.updateAssignment = false;
+    this.showNewAssignmentButton = false;
+
+    // Vue lazily updates the DOM, so any interactions with `$el` need to
+    // wait until the update is done.
+    Vue.nextTick(() => {
+      document
+        .querySelector('.omegaup-course-assignmentdetails')
+        ?.scrollIntoView();
+    });
+  }
+
+  onEditAssignment(assignment: types.CourseAssignment): void {
+    this.showAssignmentDetails = true;
+    this.updateAssignment = true;
+    this.showNewAssignmentButton = false;
+    this.assignment = assignment;
+
+    // Vue lazily updates the DOM, so any interactions with `$el` need to
+    // wait until the update is done.
+    Vue.nextTick(() => {
+      document
+        .querySelector('.omegaup-course-assignmentdetails')
+        ?.scrollIntoView();
+    });
+  }
+
+  onAddProblems(assignment: types.CourseAssignment): void {
+    window.location.hash = 'problems';
+    this.showAssignmentDetails = false;
+    this.showNewAssignmentButton = false;
+    this.selectedAssignment = assignment;
+    this.showTab = 'problems';
+  }
+
+  onCancel(): void {
+    window.location.href = this.courseURL;
+  }
+
+  onResetAssignmentForm(): void {
+    this.showAssignmentDetails = false;
+    this.showNewAssignmentButton = true;
+  }
+
+  onSelectAssignmentTab(): void {
+    this.showTab = 'assignments';
+    this.onResetAssignmentForm();
+  }
+
+  @Watch('initialTab')
+  onInitialTabChanged(newValue: string): void {
+    if (availableTabs.includes(this.initialTab)) {
+      this.showTab = newValue;
+      return;
+    }
+    this.showTab = 'course';
+  }
 }
 </script>
