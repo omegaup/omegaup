@@ -140,6 +140,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
             $badgeAlias
         );
         return [
+            'assignation_time' => null,
             'badge_alias' => $badgeAlias,
             'first_assignation' => $firstAssignation,
             'total_users' => $totalUsers,
