@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  */
 class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
     /**
-     * @return list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string}>
+     * @return list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string, first_assignation: null, owners_count: int, total_users: int}>
      */
     public static function getUserOwnedBadges(\OmegaUp\DAO\VO\Users $user): array {
         $sql = 'SELECT
@@ -28,7 +28,18 @@ class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
                     ub.assignation_time ASC;';
         $args = [$user->user_id];
         /** @var list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
+        $result = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
+        $badges = [];
+        foreach ($result as $badge) {
+            $badges[] = [
+                'assignation_time' => $badge['assignation_time'],
+                'badge_alias' => $badge['badge_alias'],
+                'first_assignation' => null,
+                'owners_count' => 0,
+                'total_users' => 0,
+            ];
+        }
+        return $badges;
     }
 
     public static function getUserBadgeAssignationTime(

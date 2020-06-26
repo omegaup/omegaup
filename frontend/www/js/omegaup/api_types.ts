@@ -911,10 +911,9 @@ export namespace types {
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;
-    unlocked?: boolean;
     first_assignation?: Date;
-    total_users?: number;
-    owners_count?: number;
+    owners_count: number;
+    total_users: number;
   }
 
   export interface BadgeDetailsPayload {
