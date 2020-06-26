@@ -1072,6 +1072,7 @@ export namespace types {
     description: string;
     finish_time?: Date;
     max_points: number;
+    has_runs: boolean;
     name: string;
     order: number;
     problemset_id?: number;
@@ -2428,18 +2429,7 @@ export namespace messages {
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;
   export type CourseListAssignmentsResponse = {
-    assignments: {
-      alias: string;
-      assignment_type: string;
-      description: string;
-      finish_time?: Date;
-      has_runs: boolean;
-      name: string;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-      start_time: Date;
-    }[];
+    assignments: types.CourseAssignment[];
   };
   export type CourseListCoursesRequest = { [key: string]: any };
   export type _CourseListCoursesServerResponse = any;
