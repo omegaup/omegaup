@@ -49,7 +49,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = "
             SELECT
                 a.*,
-                COUNT(s.submission_id) > 1 AS has_runs,
+                COUNT(s.submission_id) AS has_runs,
                 p.scoreboard_url,
                 p.scoreboard_url_admin
             FROM
@@ -73,7 +73,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             ORDER BY
                 `order`, start_time;";
 
-        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$alias]);
 
         $ar = [];
@@ -82,6 +82,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             unset($row['assignment_id']);
             unset($row['problemset_id']);
             unset($row['course_id']);
+            $row['has_runs'] = $row['has_runs'] > 0;
             $ar[] = $row;
         }
         return $ar;
