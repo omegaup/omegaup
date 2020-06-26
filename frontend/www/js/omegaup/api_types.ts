@@ -1934,11 +1934,40 @@ export namespace types {
     gender?: string;
     graduation_date?: Date;
     gravatar_92: string;
-    hide_problem_tags?: boolean;
+    hide_problem_tags: boolean;
     is_private: boolean;
     locale: string;
     name?: string;
     preferred_language?: string;
+    scholar_degree?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username?: string;
+    verified: boolean;
+  }
+
+  export interface UserProfileInfo {
+    birth_date?: Date;
+    classname: string;
+    country?: string;
+    country_id?: string;
+    email?: string;
+    gender?: string;
+    graduation_date?: string | Date;
+    gravatar_92?: string;
+    hide_problem_tags?: boolean;
+    is_private: boolean;
+    locale?: string;
+    name?: string;
+    preferred_language?: string;
+    rankinfo: {
+      name?: string;
+      problems_solved?: number;
+      rank?: number;
+      author_ranking?: number;
+    };
     scholar_degree?: string;
     school?: string;
     school_id?: number;
@@ -3104,29 +3133,7 @@ export namespace messages {
   export type UserProblemsSolvedResponse = { problems: types.Problem[] };
   export type UserProfileRequest = { [key: string]: any };
   export type _UserProfileServerResponse = any;
-  export type UserProfileResponse = {
-    birth_date?: Date;
-    classname: string;
-    country?: string;
-    country_id?: string;
-    email?: string;
-    gender?: string;
-    graduation_date?: Date;
-    gravatar_92?: string;
-    hide_problem_tags?: boolean;
-    is_private: boolean;
-    locale?: string;
-    name?: string;
-    preferred_language?: string;
-    rankinfo: { name?: string; problems_solved?: number; rank?: number };
-    scholar_degree?: string;
-    school?: string;
-    school_id?: number;
-    state?: string;
-    state_id?: string;
-    username?: string;
-    verified?: boolean;
-  };
+  export type UserProfileResponse = types.UserProfileInfo;
   export type UserRemoveExperimentRequest = { [key: string]: any };
   export type UserRemoveExperimentResponse = {};
   export type UserRemoveGroupRequest = { [key: string]: any };
