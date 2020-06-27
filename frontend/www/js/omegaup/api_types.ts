@@ -1949,7 +1949,7 @@ export namespace types {
   }
 
   export interface UserProfileInfo {
-    birth_date?: Date;
+    birth_date?: string | Date;
     classname: string;
     country?: string;
     country_id?: string;
@@ -1963,10 +1963,10 @@ export namespace types {
     name?: string;
     preferred_language?: string;
     rankinfo: {
+      author_ranking?: number;
       name?: string;
       problems_solved?: number;
       rank?: number;
-      author_ranking?: number;
     };
     scholar_degree?: string;
     school?: string;
@@ -1974,7 +1974,7 @@ export namespace types {
     state?: string;
     state_id?: string;
     username?: string;
-    verified: boolean;
+    verified?: boolean;
   }
 
   export interface UserRank {

@@ -656,7 +656,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Get identity profile from cache
      *
-     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: string|null, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
+     * @return array{birth_date: \OmegaUp\Timestamp|null|string, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: string|null, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
      */
     public static function getProfile(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -674,7 +674,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $response = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::USER_PROFILE,
             $identity->username,
-            /** @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool} */
+            /** @return array{birth_date: \OmegaUp\Timestamp|null|string, classname: null|string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool|null, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null} */
             function () use ($identity, $user) {
                 if (!is_null($user)) {
                     return \OmegaUp\Controllers\User::getProfileImpl(
@@ -699,7 +699,6 @@ class Identity extends \OmegaUp\Controllers\Controller {
                     $identity
                 );
         }
-        $response['classname'] = '';
 
         // Do not leak plain emails in case the request is for a profile other than
         // the logged identity's one. Admins can see emails
@@ -729,7 +728,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the profile of the identity given
      *
-     * @return array{birth_date: null, classname: string, gender: null, graduation_date: null, gravatar_92: null, hide_problem_tags: bool, scholar_degree: null, verified: bool, country: null|string, country_id: null|string, is_private: true, locale: string, name: null|string, preferred_language: null, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string}
+     * @return array{birth_date: null|string, classname: null|string, country: null|string, country_id: null|string, gender: null|string, graduation_date: null|string, gravatar_92: null, hide_problem_tags: bool|null, is_private: true, locale: string, name: null|string, preferred_language: null, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
      */
     private static function getProfileImpl(\OmegaUp\DAO\VO\Identities $identity) {
         $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk(
@@ -747,14 +746,28 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'birth_date' => null,
-            'classname' => '',
-            'gender' => null,
-            'graduation_date' => null,
+            'birth_date' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['birth_date'] : null,
+            'classname' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['classname'] : null,
+            'gender' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['gender'] : null,
+            'graduation_date' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['graduation_date'] : null,
             'gravatar_92' => null,
-            'hide_problem_tags' => false,
-            'scholar_degree' => null,
-            'verified' => false,
+            'hide_problem_tags' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['hide_problem_tags'] : false,
+            'scholar_degree' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['scholar_degree'] : null,
+            'verified' => !is_null(
+                $extendedProfile
+            ) ? $extendedProfile['verified'] : null,
             'username' => $identity->username,
             'name' => $identity->name,
             'preferred_language' => null,

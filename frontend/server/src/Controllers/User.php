@@ -19,7 +19,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CoderOfTheMonthList=list<array{username: string, country_id: string, gravatar_32: string, date: string, classname: string}>
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, username: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
- * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|string|null, gravatar_92: null|string, hide_problem_tags: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{name: null|string, problems_solved: int|null, rank: int|null, author_ranking: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
+ * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null|string, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool|null, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -1461,7 +1461,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'school_id' => null,
                 'state' => null,
                 'state_id' => null,
-                'verified' => false,
+                'verified' => null,
             ];
         } else {
             $response = \OmegaUp\Controllers\Identity::getProfile(
