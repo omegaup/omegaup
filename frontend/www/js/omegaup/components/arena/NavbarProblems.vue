@@ -1,5 +1,12 @@
 <template>
   <div class="problem-list">
+    <div class="breadcurums active" v-if="inAssignment">
+      <span>
+        <a class="name" href="/course/">{{ T.navCourses }}</a> >
+        <a class="name" v-bind:href="urlAssignment">{{ courseName }}</a> >
+        <span>{{ currentAssignment ? currentAssignment.name : '' }}</span>
+      </span>
+    </div>
     <div class="summary" v-bind:class="{ active: !activeProblem }">
       <a class="name" href="#problems">{{ T.wordsSummary }}</a>
     </div>
@@ -37,11 +44,9 @@
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <a
-            class="name"
-            v-on:click="$emit('navigate-to-problem', problem.alias)"
-            >{{ problem.text }}</a
-          >
+          <a class="name" v-on:click="onNavigateToProblem(problem)">{{
+            problem.text
+          }}</a>
         </div>
       </div>
     </div>
@@ -52,6 +57,7 @@
 .problem-list > div {
   width: 19em;
   margin-bottom: 0.5em;
+  padding-top: 0.2em;
   background: #ddd;
   border: solid 1px #ccc;
   border-width: 1px 0 1px 1px;
@@ -60,7 +66,7 @@
 
 .problem-list > div a {
   color: #5588dd;
-  display: block;
+  display: inherit;
   padding: 0.5em;
   width: 100%;
 }
@@ -109,13 +115,24 @@ library.add(fas);
 export default class ArenaNavbarProblems extends Vue {
   @Prop() problems!: omegaup.ContestProblem[];
   @Prop() activeProblem!: string | null;
+  @Prop() courseAlias!: string | null;
+  @Prop() courseName!: string | null;
   @Prop() inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+  @Prop() currentAssignment!: omegaup.Assignment;
 
   T = T;
 
   getProblemTypeTitle(acceptsSubmissions: boolean): string {
     return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
+  }
+
+  get urlAssignment(): string {
+    return `/course/${this.courseAlias}/`;
+  }
+
+  onNavigateToProblem(problem: omegaup.ContestProblem) {
+    this.$emit('navigate-to-problem', problem.alias);
   }
 }
 </script>

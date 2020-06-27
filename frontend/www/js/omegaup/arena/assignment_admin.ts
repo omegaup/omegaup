@@ -3,13 +3,16 @@ import { Arena, GetOptionsFromLocation } from './arena';
 import ArenaAdmin from './admin_arena';
 import { OmegaUp } from '../omegaup';
 import * as ui from '../ui';
+import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.IntroDetailsPayload();
   const options = GetOptionsFromLocation(window.location);
   const assignmentMatch = /\/course\/([^\/]+)(?:\/assignment\/([^\/]+)\/?)?/.exec(
     window.location.pathname,
   );
   if (assignmentMatch) {
+    options.courseName = payload.details.name;
     options.courseAlias = assignmentMatch[1];
     options.assignmentAlias = assignmentMatch[2];
   }
