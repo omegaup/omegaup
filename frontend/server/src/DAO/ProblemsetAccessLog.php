@@ -114,4 +114,18 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
         }
         return $problemsetAccessLog;
     }
+
+    final public static function removeAccessLogFromProblemset(
+        int $problemsetId
+    ): int {
+        $sql = '
+            DELETE FROM
+                `Problemset_Access_Log`
+            WHERE
+                `problemset_id` = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problemsetId]);
+
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
 }
