@@ -1,15 +1,15 @@
+import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
-import * as markdown from '../markdown';
 import * as ui from '../ui';
-import problem_Solution from '../components/problem/Solution.vue';
-import Vue from 'vue';
+import { types } from '../api_types';
 
-OmegaUp.on('ready', function() {
-  const mdConverter = markdown.markdownConverter();
-  const payload = JSON.parse(document.getElementById('payload').innerText);
-  let problemSolution = new Vue({
+import problem_Solution from '../components/problem/Solution.vue';
+
+OmegaUp.on('ready', () => {
+  const payload = types.payloadParsers.ProblemDetailsPayload();
+  const problemSolution = new Vue({
     el: '#problem-solution',
     render: function(createElement) {
       return createElement('omegaup-problem-solution', {
@@ -20,21 +20,18 @@ OmegaUp.on('ready', function() {
           availableTokens: this.availableTokens,
         },
         on: {
-          'unlock-solution': function() {
+          'unlock-solution': () => {
             api.Problem.solution({
-              problem_alias: payload['alias'],
+              problem_alias: payload.alias,
               forfeit_problem: true,
             })
-              .then(function(data) {
+              .then(data => {
                 if (!data.exists || !data.solution) {
                   ui.error(T.wordsProblemOrSolutionNotExist);
                   return;
                 }
-                problemSolution.solution = mdConverter.makeHtmlWithImages(
-                  data.solution.markdown,
-                  data.solution.images,
-                );
                 problemSolution.status = 'unlocked';
+                problemSolution.solution = data.solution;
                 ui.info(
                   ui.formatString(T.solutionTokens, {
                     available: problemSolution.availableTokens - 1,
@@ -44,9 +41,9 @@ OmegaUp.on('ready', function() {
               })
               .catch(ui.apiError);
           },
-          'get-tokens': function() {
+          'get-tokens': () => {
             api.ProblemForfeited.getCounts()
-              .then(function(data) {
+              .then(data => {
                 problemSolution.allTokens = data.allowed;
                 problemSolution.availableTokens = data.allowed - data.seen;
                 if (problemSolution.availableTokens <= 0) {
@@ -55,17 +52,14 @@ OmegaUp.on('ready', function() {
               })
               .catch(ui.apiError);
           },
-          'get-solution': function() {
-            if (payload['solution_status'] === 'unlocked') {
-              api.Problem.solution({ problem_alias: payload['alias'] })
-                .then(function(data) {
+          'get-solution': () => {
+            if (payload.solution_status === 'unlocked') {
+              api.Problem.solution({ problem_alias: payload.alias })
+                .then(data => {
                   if (!data.exists || !data.solution) {
                     return;
                   }
-                  problemSolution.solution = mdConverter.makeHtmlWithImages(
-                    data.solution.markdown,
-                    data.solution.images,
-                  );
+                  problemSolution.solution = data.solution;
                 })
                 .catch(ui.apiError);
             }
@@ -74,10 +68,10 @@ OmegaUp.on('ready', function() {
       });
     },
     data: {
-      status: payload['solution_status'] || 'not_logged_in',
-      solution: null,
-      allTokens: null,
-      availableTokens: null,
+      status: payload.solution_status || 'not_logged_in',
+      solution: <types.ProblemStatement | null>null,
+      allTokens: 0,
+      availableTokens: 0,
     },
     components: {
       'omegaup-problem-solution': problem_Solution,
