@@ -5,11 +5,11 @@ import Vue from 'vue';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
 
-import course_Edit from './Edit.vue';
+import problem_Edit from './Edit.vue';
 
 describe('Edit.vue', () => {
   it('Should handle an existing problem', async () => {
-    const wrapper = shallowMount(course_Edit, {
+    const wrapper = shallowMount(problem_Edit, {
       propsData: {
         data: {
           title: 'problem',
