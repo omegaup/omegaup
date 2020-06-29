@@ -104,7 +104,7 @@
         <omegaup-course-assignment-list
           v-bind:assignments="data.course.assignments"
           v-bind:course-alias="data.course.alias"
-          v-bind:show-new-assignment-button="showNewAssignmentButton"
+          v-bind:visibility-mode="visibilityMode"
           v-on:emit-new="onNewAssignment"
           v-on:emit-edit="assignment => onEditAssignment(assignment)"
           v-on:emit-add-problems="assignment => onAddProblems(assignment)"
@@ -121,8 +121,8 @@
           "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
-          v-bind:show="showAssignmentDetails"
-          v-bind:update="updateAssignment"
+          ref="assignment_details_list"
+          v-bind:visibility-mode="visibilityMode"
           v-bind:unlimited-duration-course="!data.course.finish_time"
           v-bind:finish-time-course="data.course.finish_time"
           v-bind:start-time-course="data.course.start_time"
@@ -145,8 +145,8 @@
           v-bind:assignments="data.course.assignments"
           v-bind:assignment-problems="data.assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
+          v-bind:visibility-mode="visibilityMode"
           v-bind:selected-assignment="selectedAssignment"
-          v-bind:initial-show-form="showFormProblem"
           v-on:emit-add-problem="
             (assignment, problemAlias) =>
               $emit('add-problem', assignment, problemAlias)
@@ -205,7 +205,7 @@
       </div>
 
       <div
-        class="tab-pane active pane-admins row"
+        class="tab-pane active pane-admins d-flex row"
         role="tabpanel"
         v-if="showTab === 'admins'"
       >
@@ -252,12 +252,6 @@
   </div>
 </template>
 
-<style>
-.course-edit .pane-admins {
-  display: flex;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import course_Form from './Form.vue';
@@ -271,6 +265,7 @@ import common_GroupAdmins from '../common/GroupAdmins.vue';
 import course_Clone from './Clone.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
+import { omegaup } from '../../omegaup';
 
 const now = new Date();
 const finishTime = new Date();
@@ -320,10 +315,9 @@ export default class CourseEdit extends Vue {
 
   T = T;
   showTab = 'course';
-  showAssignmentDetails = false;
-  showFormProblem = false;
-  updateAssignment = true;
-  showNewAssignmentButton = true;
+
+  visibilityMode: omegaup.VisibilityMode = omegaup.VisibilityMode.Default;
+
   assignment = emptyAssignment;
   selectedAssignment = this.data.selectedAssignment;
 
@@ -332,49 +326,33 @@ export default class CourseEdit extends Vue {
   }
 
   onNewAssignment(): void {
-    this.showAssignmentDetails = true;
-    this.updateAssignment = false;
-    this.showNewAssignmentButton = false;
+    this.visibilityMode = omegaup.VisibilityMode.New;
 
-    // Vue lazily updates the DOM, so any interactions with `$el` need to
-    // wait until the update is done.
-    Vue.nextTick(() => {
-      document
-        .querySelector('.omegaup-course-assignmentdetails')
-        ?.scrollIntoView();
-    });
+    (this.$refs.assignment_details_list as HTMLElement).scrollIntoView();
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
-    this.showAssignmentDetails = true;
-    this.updateAssignment = true;
-    this.showNewAssignmentButton = false;
+    this.visibilityMode = omegaup.VisibilityMode.Edit;
+
     this.assignment = assignment;
 
-    // Vue lazily updates the DOM, so any interactions with `$el` need to
-    // wait until the update is done.
-    Vue.nextTick(() => {
-      document
-        .querySelector('.omegaup-course-assignmentdetails')
-        ?.scrollIntoView();
-    });
+    (this.$refs.assignment_details_list as HTMLElement).scrollIntoView();
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {
-    window.location.hash = 'problems';
-    this.showAssignmentDetails = false;
-    this.showNewAssignmentButton = false;
+    this.visibilityMode = omegaup.VisibilityMode.AddProblem;
+
     this.selectedAssignment = assignment;
     this.showTab = 'problems';
+    this.$emit('add-problems');
   }
 
   onCancel(): void {
-    window.location.href = this.courseURL;
+    this.$emit('cancel', this.courseURL);
   }
 
   onResetAssignmentForm(): void {
-    this.showAssignmentDetails = false;
-    this.showNewAssignmentButton = true;
+    this.visibilityMode = omegaup.VisibilityMode.Default;
   }
 
   onSelectAssignmentTab(): void {
