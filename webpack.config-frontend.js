@@ -74,7 +74,7 @@ module.exports = {
     problem_mine: './frontend/www/js/omegaup/problem/mine.ts',
     problem_new: './frontend/www/js/omegaup/problem/new.ts',
     problem_print: './frontend/www/js/omegaup/problem/print.ts',
-    problem_solution: './frontend/www/js/omegaup/problem/solution.js',
+    problem_solution: './frontend/www/js/omegaup/problem/solution.ts',
     qualitynomination_popup:
       './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list:
