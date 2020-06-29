@@ -68,6 +68,13 @@ export namespace omegaup {
     selected: boolean;
   }
 
+  export enum VisibilityMode {
+    Default,
+    New,
+    Edit,
+    AddProblem,
+  }
+
   export enum AdmissionMode {
     Private = 'private',
     Registration = 'registration',

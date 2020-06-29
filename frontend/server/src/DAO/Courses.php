@@ -9,6 +9,9 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Courses}.
  * @access public
+ * @package docs
+ *
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id?: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -37,7 +40,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      * Given a course alias, get all of its assignments. Hides any assignments
      * that have not started, if not an admin.
      *
-     * @return list<array{name: string, description: string, alias: string, publish_time_delay: ?int, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<CourseAssignment>
      */
     public static function getAllAssignments(
         string $alias,
@@ -69,7 +72,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 c.alias = ? $timeCondition
             GROUP BY
-                assignment_id
+                a.assignment_id
             ORDER BY
                 `order`, start_time;";
 

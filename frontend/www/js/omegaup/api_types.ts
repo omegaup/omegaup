@@ -1071,8 +1071,8 @@ export namespace types {
     assignment_type: string;
     description: string;
     finish_time?: Date;
-    max_points: number;
     has_runs: boolean;
+    max_points: number;
     name: string;
     order: number;
     problemset_id?: number;
