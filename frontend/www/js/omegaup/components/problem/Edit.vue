@@ -200,8 +200,6 @@
 
       <div class="tab-pane active" v-if="showTab === 'tags'">
         <omegaup-problem-tags
-          v-bind:initial-tags="data.tags"
-          v-bind:initial-selected-tags="data.selectedTags"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:initial-allow-tags="data.allowUserAddTags"
@@ -209,6 +207,8 @@
           v-bind:public-tags="data.publicTags"
           v-bind:level-tags="data.levelTags"
           v-bind:problem-level="data.problemLevel"
+          v-bind:selected-public-tags="data.selectedPublicTags"
+          v-bind:selected-private-tags="data.selectedPrivateTags"
           v-on:emit-update-problem-level="
             levelTag => $emit('update-problem-level', levelTag)
           "
@@ -217,7 +217,8 @@
               $emit('add-tag', alias, tagname, isPublic)
           "
           v-on:emit-remove-tag="
-            (alias, tagname) => $emit('remove-tag', alias, tagname)
+            (alias, tagname, isPublic) =>
+              $emit('remove-tag', alias, tagname, isPublic)
           "
           v-on:emit-change-allow-user-add-tag="
             (alias, title, allowTags) =>

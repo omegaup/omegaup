@@ -1398,18 +1398,18 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = \OmegaUp\DAO\Assignments::getProblemset(
+        $problemset = \OmegaUp\DAO\Assignments::getProblemset(
             $course->course_id,
             $r['assignment_alias']
         );
-        if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
+        if (is_null($problemset) || is_null($problemset->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
 
         $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-            intval($problemSet->problemset_id)
+            intval($problemset->problemset_id)
         );
 
         if ($runCount > 0) {
@@ -1421,14 +1421,30 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
-            \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
-                $problemSet->problemset_id
+            \OmegaUp\DAO\Assignments::unlinkProblemset(
+                $assignment,
+                $problemset
             );
 
-            \OmegaUp\DAO\Assignments::deleteWithProblemset(
-                $assignment,
-                $problemSet
+            \OmegaUp\DAO\ProblemsetAccessLog::removeAccessLogFromProblemset(
+                $problemset->problemset_id
             );
+
+            \OmegaUp\DAO\ProblemsetIdentities::removeIdentitiesFromProblemset(
+                $problemset->problemset_id
+            );
+
+            \OmegaUp\DAO\ProblemsetProblemOpened::removeProblemOpenedFromProblemset(
+                $problemset->problemset_id
+            );
+
+            \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
+                $problemset->problemset_id
+            );
+
+            \OmegaUp\DAO\Assignments::delete($assignment);
+
+            \OmegaUp\DAO\Problemsets::delete($problemset);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
@@ -3700,8 +3716,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         return $scoreboard->generate(
-            false /*withRunDetails*/,
-            true /*sortByName*/
+            /*$withRunDetails=*/false,
+            /*$sortByName=*/false
         );
     }
 

@@ -1208,7 +1208,10 @@ class Run extends \OmegaUp\Controllers\Controller {
         ) {
             http_response_code(404);
         }
-        exit;
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     /**
