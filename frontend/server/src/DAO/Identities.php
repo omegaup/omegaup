@@ -198,7 +198,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{birth_date: null|string, classname: string, country: string, state: null|string, school: null|string, scholar_degree: null|string, email: null|string, gender: null|string, graduation_date: null|string, locale: null|string, hide_problem_tags: bool|null, verified: bool|null}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -215,7 +215,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     u.`scholar_degree`,
                     u.`hide_problem_tags`,
                     u.`verified`,
-                    i.`gender `,
+                    i.`gender`,
                     IFNULL(
                         (
                             SELECT urc.classname FROM
@@ -256,11 +256,20 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{birth_date: null|string, classname: string, country: string, state: null|string, school: null|string, scholar_degree: null|string, email: null|string, gender: null|string, graduation_date: null|string, locale: null|string, hide_problem_tags: bool|null, verified: bool|null}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, state: null|string, school: null|string, scholar_degree: null|string, email: null|string, gender: null|string, graduation_date: null|string, locale: null|string, hide_problem_tags: bool|null, verified: bool|null}|null */
+        $identity = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
         );
+        if (is_null($identity)) {
+            return null;
+        }
+
+        $identity['hide_problem_tags'] = boolval(
+            $identity['hide_problem_tags']
+        );
+
+        return $identity;
     }
 
     public static function isUserAssociatedWithIdentityOfGroup(

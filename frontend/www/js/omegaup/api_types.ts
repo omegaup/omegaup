@@ -1949,7 +1949,7 @@ export namespace types {
   }
 
   export interface UserProfileInfo {
-    birth_date?: string | Date;
+    birth_date?: Date;
     classname: string;
     country?: string;
     country_id?: string;
@@ -1957,7 +1957,7 @@ export namespace types {
     gender?: string;
     graduation_date?: string | Date;
     gravatar_92?: string;
-    hide_problem_tags?: boolean;
+    hide_problem_tags: boolean;
     is_private: boolean;
     locale?: string;
     name?: string;
