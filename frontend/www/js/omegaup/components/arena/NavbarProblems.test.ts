@@ -37,7 +37,7 @@ describe('NavbarProblems.vue', () => {
       },
     });
 
-    expect(wrapper.find('.breadcrumbs').text()).toBe(
+    expect(wrapper.find('div[data-breadcrumbs]').text()).toBe(
       `${T.navCourses} > Curso de prueba > Tarea de prueba`,
     );
   });
@@ -54,6 +54,6 @@ describe('NavbarProblems.vue', () => {
       },
     });
 
-    expect(wrapper.find('.breadcrumbs').exists()).toBeFalsy();
+    expect(wrapper.find('div[data-breadcrumbs]').exists()).toBeFalsy();
   });
 });

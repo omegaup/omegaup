@@ -1,6 +1,6 @@
 <template>
   <div class="problem-list">
-    <div class="breadcrumbs active" v-if="inAssignment">
+    <div class="active" data-breadcrumbs v-if="inAssignment">
       <span>
         <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
         <a class="breadcrumbs-link" v-bind:href="urlAssignment">{{
@@ -58,7 +58,7 @@
 </template>
 
 <style>
-.problem-list .breadcrumbs .breadcrumbs-link {
+.problem-list .breadcrumbs-link {
   display: inherit;
 }
 
