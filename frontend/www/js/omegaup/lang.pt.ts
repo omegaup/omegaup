@@ -1444,6 +1444,7 @@ const translations: { [key: string]: string; } = {
   wordsPending: "Pendente",
   wordsPendingRuns: "Envios pendentes",
   wordsPercentage: "Porcentagem",
+  wordsPersonalData: "Dados pessoais",
   wordsPoints: "Pontos",
   wordsPointsDistribution: "Distribui\u00e7\u00e3o da pontua\u00e7\u00e3o do concurso: %(alias)",
   wordsPointsDistributionInIntervals: "Distribui\u00e7\u00e3o da pontos em intervalos do 100",
