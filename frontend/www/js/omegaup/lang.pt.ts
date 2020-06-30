@@ -1357,6 +1357,7 @@ const translations: { [key: string]: string; } = {
   wordsExams: "Provas",
   wordsExcellent: "Excelente",
   wordsExperiments: "Experimentos",
+  wordsExport: "Exportar",
   wordsExtraWallTime: "Tempo extra para libinteractive",
   wordsExtraWallTimeMs: "Tempo extra para libinteractive (ms)",
   wordsFair: "M\u00e9dia",

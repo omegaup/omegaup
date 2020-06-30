@@ -1,39 +1,62 @@
 <template>
-  <div class="omegaup-course-viewprogress card">
-    <div class="card-header">
-      <h2>
-        <a v-bind:href="courseUrl">{{ course.name }}</a>
-      </h2>
-    </div>
-    <div class="card-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>{{ T.wordsName }}</th>
-            <th class="score" v-for="assignment in assignments">
-              {{ assignment.name }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="student in students">
-            <td>
-              <a v-bind:href="studentProgressUrl(student)">{{
-                student.name || student.username
-              }}</a>
-            </td>
-            <td class="score" v-for="assignment in assignments">
-              {{ Math.round(score(student, assignment)) }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <!-- panel-body -->
-    <div class="card-footer">
-      {{ T.courseStudentsProgressExportToSpreadsheet }}:
-      <a v-bind:download="csvFilename" v-bind:href="csvDataUrl">.csv</a>
-      <a v-bind:download="odsFilename" v-bind:href="odsDataUrl">.ods</a>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-10">
+        <div class="omegaup-course-viewprogress card">
+          <div class="card-header">
+            <h2>
+              <a v-bind:href="courseUrl">{{ course.name }}</a>
+            </h2>
+          </div>
+          <div class="card-body table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>{{ T.wordsName }}</th>
+                  <th class="score" v-for="assignment in assignments">
+                    {{ assignment.name }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="student in students">
+                  <td>
+                    <a v-bind:href="studentProgressUrl(student)">{{
+                      student.name || student.username
+                    }}</a>
+                  </td>
+                  <td class="score" v-for="assignment in assignments">
+                    {{ Math.round(score(student, assignment)) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="card sticky-top sticky-offset">
+          <div class="card-header p-1">
+            <p class="card-title text-sm-center mb-1">
+              {{ T.courseStudentsProgressExportToSpreadsheet }}
+            </p>
+          </div>
+          <div class="card-body">
+            <a
+              class="btn btn-primary btn-sm mb-1"
+              v-bind:download="csvFilename"
+              v-bind:href="csvDataUrl"
+              >{{ T.wordsExport }}.csv</a
+            >
+            <a
+              class="btn btn-primary btn-sm"
+              v-bind:download="odsFilename"
+              v-bind:href="odsDataUrl"
+              >{{ T.wordsExport }}.ods</a
+            >
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <!-- panel -->
@@ -43,6 +66,9 @@
 .panel-body {
   overflow: auto;
   white-space: nowrap;
+}
+.sticky-offset {
+  top: 4rem;
 }
 </style>
 
