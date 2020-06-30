@@ -256,7 +256,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, state: null|string, school: null|string, scholar_degree: null|string, email: null|string, gender: null|string, graduation_date: null|string, locale: null|string, hide_problem_tags: bool|null, verified: bool|null}|null */
+        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
         $identity = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
@@ -267,6 +267,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
 
         $identity['hide_problem_tags'] = boolval(
             $identity['hide_problem_tags']
+        );
+        $identity['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $identity['birth_date']
         );
 
         return $identity;

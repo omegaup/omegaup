@@ -734,7 +734,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
         $extendedProfile = \OmegaUp\DAO\Identities::getExtendedProfileDataByPk(
             $identity->identity_id
         );
-
+        if (is_null($extendedProfile)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        }
         $schoolId = null;
         if (!is_null($identity->current_identity_school_id)) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
@@ -746,42 +748,22 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'birth_date' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['birth_date'] : null,
-            'classname' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['classname'] : null,
-            'gender' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['gender'] : null,
-            'graduation_date' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['graduation_date'] : null,
+            'birth_date' => $extendedProfile['birth_date'],
+            'classname' => $extendedProfile['classname'],
+            'gender' => $extendedProfile['gender'],
+            'graduation_date' => $extendedProfile['graduation_date'],
             'gravatar_92' => null,
-            'hide_problem_tags' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['hide_problem_tags'] : false,
-            'scholar_degree' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['scholar_degree'] : null,
-            'verified' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['verified'] : null,
+            'hide_problem_tags' => $extendedProfile['hide_problem_tags'],
+            'scholar_degree' => $extendedProfile['scholar_degree'],
+            'verified' => $extendedProfile['verified'],
             'username' => $identity->username,
             'name' => $identity->name,
             'preferred_language' => null,
-            'country' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['country'] : null,
+            'country' => $extendedProfile['country'],
             'country_id' => $identity->country_id,
-            'state' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['state'] : null,
+            'state' => $extendedProfile['state'],
             'state_id' => $identity->state_id,
-            'school' => !is_null(
-                $extendedProfile
-            ) ? $extendedProfile['school'] : null,
+            'school' => $extendedProfile['school'],
             'school_id' => $schoolId,
             'is_private' => true,
             'locale' => \OmegaUp\Controllers\Identity::convertToSupportedLanguage(

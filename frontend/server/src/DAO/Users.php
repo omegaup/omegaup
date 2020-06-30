@@ -15,7 +15,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
     public static function findByEmail(string $email): ?\OmegaUp\DAO\VO\Users {
         $sql = 'select u.* from Users u, Emails e where e.email = ? and e.user_id = u.user_id';
         $params = [ $email ];
-        /** @var array{birth_date: \OmegaUp\Timestamp|null, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($rs)) {
             return null;
@@ -37,7 +37,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 WHERE
                     i.username = ?
                 LIMIT 1;';
-        /** @var array{birth_date: \OmegaUp\Timestamp|null, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$username]
@@ -137,7 +137,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     u.`user_id` = ?
                 LIMIT
                     1;';
-        /** @var array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, scholar_degree: null|string, state: null|string, state_id: null|string, hide_problem_tags: bool|null, verified: bool|null}|null */
+        /** @var array{birth_date: null|string, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, verified: bool|null}|null */
         $user = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$userId]
@@ -148,6 +148,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
         }
 
         $user['hide_problem_tags'] = boolval($user['hide_problem_tags']);
+        $user['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $user['birth_date']
+        );
 
         return $user;
     }
@@ -220,7 +223,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
             LIMIT 1;
         ';
 
-        /** @var array{birth_date: \OmegaUp\Timestamp|null, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
+        /** @var array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$verificationId]
@@ -272,7 +275,7 @@ class Users extends \OmegaUp\DAO\Base\Users {
                 AND
                     in_mailing_list = ?';
 
-        /** @var list<array{birth_date: \OmegaUp\Timestamp|null, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
+        /** @var list<array{birth_date: null|string, facebook_user_id: null|string, git_token: null|string, hide_problem_tags: bool|null, in_mailing_list: bool, is_private: bool, main_email_id: int|null, main_identity_id: int|null, preferred_language: null|string, reset_digest: null|string, reset_sent_at: \OmegaUp\Timestamp|null, scholar_degree: null|string, user_id: int, verification_id: null|string, verified: bool}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$verified, $inMailingList]
