@@ -1022,7 +1022,7 @@ export namespace types {
     needsBasicInformation?: boolean;
     privacyStatement?: types.PrivacyStatement;
     requestsUserInformation?: string;
-    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface ContestListItem {
@@ -1296,7 +1296,7 @@ export namespace types {
   export interface IntroDetailsPayload {
     details: types.CourseDetails;
     progress?: types.AssignmentProgress;
-    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface LimitsSettings {
@@ -1449,7 +1449,7 @@ export namespace types {
     runs?: types.Run[];
     score: number;
     settings: types.ProblemSettings;
-    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     solution_status?: string;
     solvers?: {
       language: string;

@@ -1,10 +1,14 @@
 <template>
   <div class="problem-list">
-    <div class="breadcurums active" v-if="inAssignment">
+    <div class="breadcrumbs active" v-if="inAssignment">
       <span>
-        <a class="name" href="/course/">{{ T.navCourses }}</a> >
-        <a class="name" v-bind:href="urlAssignment">{{ courseName }}</a> >
-        <span>{{ currentAssignment ? currentAssignment.name : '' }}</span>
+        <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
+        <a class="breadcrumbs-link" v-bind:href="urlAssignment">{{
+          courseName
+        }}</a>
+        <template v-if="currentAssignment">
+          > <span class="breadcrumbs-link">{{ currentAssignment.name }}</span>
+        </template>
       </span>
     </div>
     <div class="summary" v-bind:class="{ active: !activeProblem }">
@@ -54,6 +58,10 @@
 </template>
 
 <style>
+.problem-list .breadcrumbs .breadcrumbs-link {
+  display: inherit;
+}
+
 .problem-list > div {
   width: 19em;
   margin-bottom: 0.5em;
@@ -66,7 +74,7 @@
 
 .problem-list > div a {
   color: #5588dd;
-  display: inherit;
+  display: block;
   padding: 0.5em;
   width: 100%;
 }
@@ -119,7 +127,7 @@ export default class ArenaNavbarProblems extends Vue {
   @Prop() courseName!: string | null;
   @Prop() inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
-  @Prop() currentAssignment!: omegaup.Assignment;
+  @Prop({ default: null }) currentAssignment!: omegaup.Assignment | null;
 
   T = T;
 

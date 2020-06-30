@@ -31,7 +31,7 @@
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<CourseStudent>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
- * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning?: bool}
+ * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -2467,6 +2467,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [
+                    'shouldShowFirstAssociatedIdentityRunWarning' => false,
                     'details' => self::getCommonCourseDetails(
                         $course,
                         $r->identity
@@ -2802,6 +2803,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'LOAD_MATHJAX' => true,
                 'payload' => [
+                    'shouldShowFirstAssociatedIdentityRunWarning' => false,
                     'details' => $commonDetails,
                     'progress' => \OmegaUp\DAO\Courses::getAssignmentsProgress(
                         $course->course_id,

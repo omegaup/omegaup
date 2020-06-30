@@ -8,7 +8,7 @@ import { omegaup } from '../../omegaup';
 import arena_NavbarProblems from './NavbarProblems.vue';
 
 describe('NavbarProblems.vue', () => {
-  it('Should handle empty problems in course', () => {
+  it('Should handle breadcrumbs in course', () => {
     const wrapper = shallowMount(arena_NavbarProblems, {
       propsData: {
         activeProblem: null,
@@ -25,19 +25,24 @@ describe('NavbarProblems.vue', () => {
           problems: [],
           problemset_id: 2,
           status: 'ok',
-        },
+          finish_time: new Date(),
+          order: 1,
+          start_time: new Date(),
+          scoreboard_url: '',
+          scoreboard_url_admin: '',
+        } as omegaup.Assignment,
         digitsAfterDecimalPoint: 2,
         inAssignment: true,
         problems: [],
       },
     });
 
-    expect(wrapper.find('.breadcurums').text()).toBe(
+    expect(wrapper.find('.breadcrumbs').text()).toBe(
       `${T.navCourses} > Curso de prueba > Tarea de prueba`,
     );
   });
 
-  it('Should handle empty problems in contest', async () => {
+  it('Should handle empty breadcrumbs in contest', async () => {
     const wrapper = shallowMount(arena_NavbarProblems, {
       propsData: {
         activeProblem: null,
@@ -49,6 +54,6 @@ describe('NavbarProblems.vue', () => {
       },
     });
 
-    expect(wrapper.find('.breadcurums').exists()).toBeFalsy();
+    expect(wrapper.find('.breadcrumbs').exists()).toBeFalsy();
   });
 });
