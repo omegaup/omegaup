@@ -56,6 +56,24 @@ export interface ArenaOptions {
   partialScore: boolean;
 }
 
+export interface Problem {
+  title: string;
+  alias: string;
+  commit: string;
+  languages: string[];
+  letter?: string;
+  points: number;
+  input_limit?: number;
+  quality_payload?: types.ProblemQualityPayload;
+  runs?: types.Run[];
+  source?: string;
+  settings?: types.ProblemSettings;
+  statement?: types.ProblemStatement;
+  problemsetter?: { creation_date?: Date; name: string; username: string };
+  lastSubmission?: Date;
+  nextSubmissionTimestamp?: Date;
+}
+
 export interface RunsState {
   // The list of runs.
   runs: types.Run[];
@@ -152,7 +170,7 @@ export class Arena {
   options: ArenaOptions;
 
   // Currently opened problem.
-  currentProblem: omegaup.ArenaProblem = {
+  currentProblem: Problem = {
     title: '',
     alias: '',
     commit: '',
@@ -181,7 +199,7 @@ export class Arena {
 
   // The set of problems in this contest.
   problems: {
-    [alias: string]: omegaup.ArenaProblem;
+    [alias: string]: Problem;
   } = {};
 
   // WebSocket for real-time updates.
@@ -266,9 +284,7 @@ export class Arena {
     problemAlias: string;
   };
 
-  problemSettingsSummary:
-    | (Vue & { problem: omegaup.ArenaProblem })
-    | null = null;
+  problemSettingsSummary: (Vue & { problem: Problem }) | null = null;
 
   qualityNominationForm:
     | (Vue & { qualityPayload: types.ProblemQualityPayload })
@@ -1566,7 +1582,7 @@ export class Arena {
         this.navbarProblems.activeProblem = this.currentProblem.alias;
       }
 
-      const update = (problem: omegaup.ArenaProblem) => {
+      const update = (problem: Problem) => {
         // TODO: Make #problem a component
         $('#summary').hide();
         $('#problem').show();
@@ -1577,7 +1593,7 @@ export class Arena {
             el: '#problem-settings-summary',
             render: function(createElement) {
               return createElement('omegaup-problem-settings-summary', {
-                props: { problem: this.problem, inArena: true },
+                props: { problem: this.problem },
               });
             },
             components: {
@@ -1805,7 +1821,7 @@ export class Arena {
     });
   }
 
-  renderProblem(problem: omegaup.ArenaProblem): void {
+  renderProblem(problem: Problem): void {
     this.currentProblem = problem;
     const statementElement = <HTMLElement>(
       document.querySelector('#problem div.statement')

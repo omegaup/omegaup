@@ -2,7 +2,7 @@
   <div class="panel">
     <h1 class="title">
       {{ title }}
-      <template v-if="!inArena">
+      <template v-if="showVisibilityIndicators">
         <img
           src="/media/quality-badge-sm.png"
           v-bind:title="T.wordsHighQualityProblem"
@@ -23,13 +23,13 @@
           v-bind:title="T.wordsBannedProblem"
           v-if="problem.visibility <= -2"
         ></span>
-        <template v-if="isAdmin">
+        <template v-if="showEditLink">
           (<a href="/problem/{$problem_alias}/edit/">{{ T.wordsEdit }}</a
           >)
         </template>
       </template>
     </h1>
-    <table class="data">
+    <table>
       <tr>
         <td>{{ T.wordsPoints }}</td>
         <td>{{ problem.points }}</td>
@@ -43,7 +43,7 @@
         <td>{{ overallWallTimeLimit }}</td>
       </tr>
       <tr>
-        <template v-if="inArena">
+        <template v-if="!showVisibilityIndicators">
           <td>{{ T.wordsInOut }}</td>
           <td>{{ T.wordsConsole }}</td>
         </template>
@@ -54,14 +54,14 @@
   </div>
 </template>
 
-<style lang="scss">
-#problem {
+<style lang="scss" scoped>
+.panel {
   .title {
     text-align: center;
     font-size: 1.5em;
     margin: 1em;
   }
-  .data {
+  table {
     width: 30em;
     margin: 10px auto;
     td {
@@ -77,24 +77,17 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import { types } from '../../api_types';
-import { omegaup } from '../../omegaup';
 
-import omegaup_Markdown from '../Markdown.vue';
-
-@Component({
-  components: {
-    'omegaup-markdown': omegaup_Markdown,
-  },
-})
+@Component
 export default class ProblemSettingsSummary extends Vue {
-  @Prop() problem!: omegaup.ArenaProblem;
-  @Prop({ default: false }) inArena!: boolean;
-  @Prop({ default: false }) isAdmin!: boolean;
+  @Prop() problem!: types.ProblemDetails;
+  @Prop({ default: false }) showVisibilityIndicators!: boolean;
+  @Prop({ default: false }) showEditLink!: boolean;
 
   T = T;
 
   get title(): string {
-    if (!this.inArena) {
+    if (this.showVisibilityIndicators) {
       return `${this.problem.problem_id}. ${this.problem.title}`;
     }
     if (!this.problem.letter) {

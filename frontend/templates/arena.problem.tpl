@@ -16,8 +16,8 @@
   <div id="problems" class="tab">
     <div id="problem" class="main">
       <div id="problem-settings-summary"></div>
+      <script type="text/json" id="settings-summary-payload">{$settings_summary_payload|json_encode}</script>
       {js_include entrypoint="problem_settings_summary"}
-      <h1 class="title">
       {if $karel_problem}
         <div class="karel-js-link">
           <a href="/karel.js/{if !empty($sample_input)}#mundo:{$sample_input|escape:url}{/if}" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>

@@ -4,14 +4,27 @@ import Vue from 'vue';
 
 import { types } from '../../api_types';
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 
 import problem_SettingsSummary from './SettingsSummary.vue';
 
 const baseSettingsSummaryProps = {
-  inArena: true,
-  isAdmin: true,
+  showVisibilityIndicators: false,
+  showEditLink: true,
   problem: {
+    accepted: 0,
+    allow_user_add_tags: true,
+    creation_date: new Date(),
+    email_clarifications: true,
+    order: 'normal',
+    score: 100,
+    statement: {
+      images: {},
+      language: 'es',
+      markdown: '',
+    },
+    submissions: 0,
+    version: '587cb50672aa364c75e16b638ec7ca7289e24b08',
+    visits: 0,
     alias: 'sumas',
     commit: '587cb50672aa364c75e16b638ec7ca7289e24b08',
     input_limit: 10240,
@@ -41,7 +54,15 @@ const baseSettingsSummaryProps = {
     },
     title: 'Sumas',
     visibility: 2,
-  } as omegaup.ArenaProblem,
+  } as types.ProblemDetails,
+};
+
+const limits = {
+  ExtraWallTime: '0s',
+  MemoryLimit: '32 MiB',
+  OutputLimit: 10240,
+  OverallWallTimeLimit: '1s',
+  TimeLimit: '1s',
 };
 
 describe('SettingsSummary.vue', () => {
@@ -54,7 +75,7 @@ describe('SettingsSummary.vue', () => {
   });
 
   it('Should handle problem settings summary out of contest', () => {
-    baseSettingsSummaryProps.inArena = false;
+    Object.assign(baseSettingsSummaryProps, { showVisibilityIndicators: true });
     const wrapper = mount(problem_SettingsSummary, {
       propsData: baseSettingsSummaryProps,
     });
@@ -64,9 +85,9 @@ describe('SettingsSummary.vue', () => {
   });
 
   it('Should handle problem settings summary with memory limit as string', () => {
-    if (baseSettingsSummaryProps.problem.settings) {
-      baseSettingsSummaryProps.problem.settings.limits.MemoryLimit = '32 MiB';
-    }
+    Object.assign(baseSettingsSummaryProps.problem.settings, {
+      limits: limits,
+    });
     const wrapper = mount(problem_SettingsSummary, {
       propsData: baseSettingsSummaryProps,
     });

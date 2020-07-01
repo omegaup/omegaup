@@ -725,6 +725,50 @@ export namespace types {
       );
     }
 
+    export function ProblemSettingsSumaryPayload(
+      elementId: string = 'payload',
+    ): types.ProblemSettingsSumaryPayload {
+      return (x => {
+        x.problem = (x => {
+          x.creation_date = ((x: number) => new Date(x * 1000))(
+            x.creation_date,
+          );
+          if (x.problemsetter)
+            x.problemsetter = (x => {
+              if (x.creation_date)
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
+              return x;
+            })(x.problemsetter);
+          if (x.runs)
+            x.runs = (x => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map(x => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
+          if (x.solvers)
+            x.solvers = (x => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map(x => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.solvers);
+          return x;
+        })(x.problem);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ProblemsMineInfoPayload(
       elementId: string = 'payload',
     ): types.ProblemsMineInfoPayload {
@@ -1398,6 +1442,7 @@ export namespace types {
     email_clarifications: boolean;
     input_limit: number;
     languages: string[];
+    letter?: string;
     order: string;
     points: number;
     preferred_language?: string;
@@ -1443,7 +1488,6 @@ export namespace types {
     order: string;
     points: number;
     preferred_language?: string;
-    problem_admin: boolean;
     problem_id: number;
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
@@ -1619,6 +1663,11 @@ export namespace types {
       name: string;
       tolerance?: number;
     };
+  }
+
+  export interface ProblemSettingsSumaryPayload {
+    problem: types.ProblemDetails;
+    problem_admin: boolean;
   }
 
   export interface ProblemStatement {

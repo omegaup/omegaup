@@ -106,27 +106,6 @@ export namespace omegaup {
     [timeType: string]: omegaup.Contest[];
   }
 
-  export interface ArenaProblem {
-    problem_id?: number;
-    title: string;
-    alias: string;
-    commit: string;
-    languages: string[];
-    letter?: string;
-    points: number;
-    input_limit?: number;
-    quality_payload?: types.ProblemQualityPayload;
-    quality_seal?: boolean;
-    runs?: types.Run[];
-    source?: string;
-    settings?: types.ProblemSettings;
-    statement?: types.ProblemStatement;
-    problemsetter?: { creation_date?: Date; name: string; username: string };
-    lastSubmission?: Date;
-    nextSubmissionTimestamp?: Date;
-    visibility?: number;
-  }
-
   export interface Assignment {
     alias: string;
     assignment_type: string;
