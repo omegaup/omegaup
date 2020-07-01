@@ -20,19 +20,21 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'alias-changed': (alias: string): void => {
-            api.Problem.details({ problem_alias: alias })
+            api.Problem.details({ problem_alias: alias }, { quiet: true })
               .then(data => {
-                if (!data.exists) {
-                  ui.dismissNotifications();
-                  return;
-                }
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
                     alias: ui.escape(alias),
                   }),
                 );
               })
-              .catch(ui.apiError);
+              .catch(error => {
+                if (error.httpStatusCode == 404) {
+                  ui.dismissNotifications();
+                  return;
+                }
+                ui.apiError(error);
+              });
           },
         },
       });

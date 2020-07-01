@@ -21,15 +21,14 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'unlock-solution': () => {
-            api.Problem.solution({
-              problem_alias: payload.alias,
-              forfeit_problem: true,
-            })
+            api.Problem.solution(
+              {
+                problem_alias: payload.alias,
+                forfeit_problem: true,
+              },
+              { quiet: true },
+            )
               .then(data => {
-                if (!data.exists || !data.solution) {
-                  ui.error(T.wordsProblemOrSolutionNotExist);
-                  return;
-                }
                 problemSolution.status = 'unlocked';
                 problemSolution.solution = data.solution;
                 ui.info(
@@ -39,7 +38,13 @@ OmegaUp.on('ready', () => {
                   }),
                 );
               })
-              .catch(ui.apiError);
+              .catch(error => {
+                if (error.httpStatusCode == 404) {
+                  ui.error(T.wordsProblemOrSolutionNotExist);
+                  return;
+                }
+                ui.apiError(error);
+              });
           },
           'get-tokens': () => {
             api.ProblemForfeited.getCounts()
@@ -54,14 +59,20 @@ OmegaUp.on('ready', () => {
           },
           'get-solution': () => {
             if (payload.solution_status === 'unlocked') {
-              api.Problem.solution({ problem_alias: payload.alias })
+              api.Problem.solution(
+                { problem_alias: payload.alias },
+                { quiet: true },
+              )
                 .then(data => {
-                  if (!data.exists || !data.solution) {
-                    return;
-                  }
                   problemSolution.solution = data.solution;
                 })
-                .catch(ui.apiError);
+                .catch(error => {
+                  if (error.httpStatusCode == 404) {
+                    ui.error(T.wordsProblemOrSolutionNotExist);
+                    return;
+                  }
+                  ui.apiError(error);
+                });
             }
           },
         },
