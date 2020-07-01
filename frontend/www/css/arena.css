@@ -148,22 +148,6 @@ body#only-problem #problems .main {
 	padding: 0.2em;
 }
 
-#problem .title {
-	text-align: center;
-	font-size: 1.5em;
-	margin: 1em;
-}
-
-#problem .data {
-	width: 30em;
-	margin: 10px auto;
-}
-
-#problem .data td {
-	border: 1px solid #000;
-	padding: 2px;
-}
-
 #problem .statement {
 	max-width: 50em;
 }

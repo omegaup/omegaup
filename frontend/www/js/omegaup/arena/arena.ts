@@ -12,6 +12,7 @@ import * as typeahead from '../typeahead';
 import * as ui from '../ui';
 
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
+import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
@@ -52,24 +53,6 @@ export interface ArenaOptions {
   scoreboardToken: string | null;
   shouldShowFirstAssociatedIdentityRunWarning: boolean;
   partialScore: boolean;
-}
-
-export interface Problem {
-  title: string;
-  alias: string;
-  commit: string;
-  languages: string[];
-  letter?: string;
-  points: number;
-  input_limit?: number;
-  quality_payload?: types.ProblemQualityPayload;
-  runs?: types.Run[];
-  source?: string;
-  settings?: types.ProblemSettings;
-  statement?: types.ProblemStatement;
-  problemsetter?: { creation_date?: Date; name: string; username: string };
-  lastSubmission?: Date;
-  nextSubmissionTimestamp?: Date;
 }
 
 export interface RunsState {
@@ -168,7 +151,7 @@ export class Arena {
   options: ArenaOptions;
 
   // Currently opened problem.
-  currentProblem: Problem = {
+  currentProblem: omegaup.ArenaProblem = {
     title: '',
     alias: '',
     commit: '',
@@ -197,7 +180,7 @@ export class Arena {
 
   // The set of problems in this contest.
   problems: {
-    [alias: string]: Problem;
+    [alias: string]: omegaup.ArenaProblem;
   } = {};
 
   // WebSocket for real-time updates.
@@ -281,6 +264,10 @@ export class Arena {
     isProblemsetOpened: boolean;
     problemAlias: string;
   };
+
+  problemSettingsSummary:
+    | (Vue & { problem: omegaup.ArenaProblem })
+    | null = null;
 
   qualityNominationForm:
     | (Vue & { qualityPayload: types.ProblemQualityPayload })
@@ -1574,28 +1561,25 @@ export class Arena {
         this.navbarProblems.activeProblem = this.currentProblem.alias;
       }
 
-      const update = (problem: Problem) => {
+      const update = (problem: omegaup.ArenaProblem) => {
         // TODO: Make #problem a component
         $('#summary').hide();
         $('#problem').show();
-        $('#problem > .title').text(
-          `${problem.letter}. ${ui.escape(problem.title)}`,
-        );
-        $('#problem .data .points').text(problem.points);
-        $('#problem .memory_limit').text(
-          `${problem.settings?.limits.MemoryLimit ??
-            (1024 * 1024) / 1024 / 1024} MiB`,
-        );
-        $('#problem .time_limit').text(
-          problem.settings?.limits.TimeLimit ?? '',
-        );
-        $('#problem .overall_wall_time_limit').text(
-          problem.settings?.limits.OverallWallTimeLimit ?? '',
-        );
-        if (problem.input_limit) {
-          $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
-        } else {
-          $('#problem .input_limit').text('');
+        if (this.problemSettingsSummary !== null) {
+          this.problemSettingsSummary.problem = problem;
+        } else if (document.getElementById('problem-settings-summary')) {
+          this.problemSettingsSummary = new Vue({
+            el: '#problem-settings-summary',
+            render: function(createElement) {
+              return createElement('omegaup-problem-settings-summary', {
+                props: { problem: this.problem, inArena: true },
+              });
+            },
+            components: {
+              'omegaup-problem-settings-summary': problem_SettingsSummary,
+            },
+            data: { problem: problem },
+          });
         }
         this.renderProblem(problem);
         const karelLangs = ['kp', 'kj'];
@@ -1816,7 +1800,7 @@ export class Arena {
     });
   }
 
-  renderProblem(problem: Problem): void {
+  renderProblem(problem: omegaup.ArenaProblem): void {
     this.currentProblem = problem;
     const statementElement = <HTMLElement>(
       document.querySelector('#problem div.statement')

@@ -2,6 +2,7 @@ import * as ui from './ui';
 import * as api from './api';
 import * as errors from './errors';
 import * as time from './time';
+import { types } from './api_types';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
@@ -103,6 +104,27 @@ export namespace omegaup {
 
   export interface ArenaContests {
     [timeType: string]: omegaup.Contest[];
+  }
+
+  export interface ArenaProblem {
+    problem_id?: number;
+    title: string;
+    alias: string;
+    commit: string;
+    languages: string[];
+    letter?: string;
+    points: number;
+    input_limit?: number;
+    quality_payload?: types.ProblemQualityPayload;
+    quality_seal?: boolean;
+    runs?: types.Run[];
+    source?: string;
+    settings?: types.ProblemSettings;
+    statement?: types.ProblemStatement;
+    problemsetter?: { creation_date?: Date; name: string; username: string };
+    lastSubmission?: Date;
+    nextSubmissionTimestamp?: Date;
+    visibility?: number;
   }
 
   export interface Assignment {
