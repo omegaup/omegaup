@@ -2278,7 +2278,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, exists: true, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}|array{exists: false}
+     * @return array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $lang
@@ -2310,20 +2310,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r
         );
-        $result = self::getValidProblemAndProblemset(
+        [
+            'problem' => $problem,
+            'problemset' => $problemset,
+        ] = self::getValidProblemAndProblemset(
             $r->identity,
             $r['contest_alias'],
             $r['problem_alias'],
             !is_null($r['statement_type']) ? strval($r['statement_type']) : '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
-        [
-            'exists' => $problemExists,
-            'problem' => $problem,
-            'problemset' => $problemset,
-        ] = $result;
-        if (!$problemExists || is_null($problem)) {
-            return $result;
+        if (is_null($problem)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
         }
         $details = self::getProblemDetails(
             $r->identity,
@@ -2335,11 +2335,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['contest_alias']
         );
         if (is_null($details)) {
-            return [
-                'exists' => false,
-            ];
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
         }
-        $details['exists'] = true;
         return $details;
     }
 
@@ -2609,7 +2608,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{exists: bool, solution?: ProblemStatement}
+     * @return array{solution: ProblemStatement}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param bool|null $forfeit_problem
@@ -2634,9 +2633,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
         if (is_null($response['problem'])) {
-            return [
-                'exists' => false,
-            ];
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemset = $response['problemset'];
         $problem = $response['problem'];
@@ -2654,9 +2651,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem->problem_id
             );
             if (is_null($problemsetProblem)) {
-                return [
-                    'exists' => false,
-                ];
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
             }
             $commit = $problemsetProblem->commit;
             $version = strval($problemsetProblem->version);
@@ -2696,7 +2693,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'exists' => true,
             'solution' => \OmegaUp\Controllers\Problem::getProblemSolution(
                 $problem,
                 $commit,

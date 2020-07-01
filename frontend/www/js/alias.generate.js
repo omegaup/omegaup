@@ -853,16 +853,20 @@ omegaup.OmegaUp.on('ready', function() {
   var aliasLength = 0;
 
   function onAliasReady(data) {
-    if (!data.exists) {
-      onAliasNew();
-      return;
-    }
     omegaup.UI.error(
       omegaup.UI.formatString(omegaup.T.aliasAlreadyInUse, {
         alias: omegaup.UI.escape($('#alias').val()),
       }),
     );
     $('#alias').trigger('focus');
+  }
+
+  function onAliasError(error) {
+    if (error.httpStatusCode == 404) {
+      onAliasNew();
+      return;
+    }
+    omegaup.UI.apiError(error);
   }
 
   function onAliasNew() {
@@ -872,27 +876,30 @@ omegaup.OmegaUp.on('ready', function() {
   switch (formName) {
     case 'problems':
       existsFn = function(alias) {
-        omegaup.API.Problem.details({ problem_alias: alias })
+        omegaup.API.Problem.details({ problem_alias: alias }, { quiet: true })
           .then(onAliasReady)
-          .catch(omegaup.UI.apiError);
+          .catch(onAliasError);
       };
       aliasLength = 32;
       break;
 
     case 'groups':
       existsFn = function(alias) {
-        omegaup.API.Group.details({ group_alias: alias })
+        omegaup.API.Group.details({ group_alias: alias }, { quiet: true })
           .then(onAliasReady)
-          .catch(omegaup.UI.apiError);
+          .catch(onAliasError);
       };
       aliasLength = 50;
       break;
 
     case 'interviews':
       existsFn = function(alias) {
-        omegaup.API.Interview.details({ interview_alias: alias })
+        omegaup.API.Interview.details(
+          { interview_alias: alias },
+          { quiet: true },
+        )
           .then(onAliasReady)
-          .catch(omegaup.UI.apiError);
+          .catch(onAliasError);
       };
       aliasLength = 32;
       break;

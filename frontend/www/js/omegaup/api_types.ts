@@ -1103,7 +1103,7 @@ export namespace types {
     max_points: number;
     name: string;
     order: number;
-    problemset_id?: number;
+    problemset_id: number;
     publish_time_delay?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -1649,21 +1649,21 @@ export namespace types {
     assignment_type?: string;
     contest_alias?: string;
     courseAssignments?: {
-      name: string;
-      description: string;
       alias: string;
-      publish_time_delay?: number;
       assignment_type: string;
-      start_time: Date;
+      description: string;
       finish_time?: Date;
       max_points: number;
+      name: string;
       order: number;
+      problemset_id: number;
+      publish_time_delay?: number;
       scoreboard_url: string;
       scoreboard_url_admin: string;
+      start_time: Date;
     }[];
     description?: string;
     director?: string;
-    exists?: boolean;
     feedback?: string;
     finish_time?: Date;
     languages?: string[];
@@ -1681,8 +1681,8 @@ export namespace types {
     problemset_id?: number;
     requests_user_information?: string;
     scoreboard?: number;
-    show_scoreboard_after?: boolean;
     show_penalty?: boolean;
+    show_scoreboard_after?: boolean;
     start_time?: Date;
     submission_deadline?: Date;
     submissions_gap?: number;
@@ -2571,14 +2571,13 @@ export namespace messages {
   export type GroupCreateScoreboardResponse = {};
   export type GroupDetailsRequest = { [key: string]: any };
   export type GroupDetailsResponse = {
-    exists: boolean;
-    group?: {
+    group: {
       create_time: number;
       alias?: string;
       name?: string;
       description?: string;
     };
-    scoreboards?: {
+    scoreboards: {
       alias: string;
       create_time: string;
       description?: string;
@@ -2697,7 +2696,7 @@ export namespace messages {
     description?: string;
     contest_alias?: string;
     problemset_id?: number;
-    users?: {
+    users: {
       user_id?: number;
       username: string;
       access_time?: Date;
@@ -2705,7 +2704,6 @@ export namespace messages {
       opened_interview: boolean;
       country?: string;
     }[];
-    exists: boolean;
   };
   export type InterviewListRequest = { [key: string]: any };
   export type InterviewListResponse = {
@@ -2760,25 +2758,24 @@ export namespace messages {
   export type ProblemDetailsRequest = { [key: string]: any };
   export type _ProblemDetailsServerResponse = any;
   export type ProblemDetailsResponse = {
-    accepted?: number;
+    accepted: number;
     admin?: boolean;
-    alias?: string;
-    allow_user_add_tags?: boolean;
-    commit?: string;
-    creation_date?: Date;
+    alias: string;
+    allow_user_add_tags: boolean;
+    commit: string;
+    creation_date: Date;
     difficulty?: number;
-    email_clarifications?: boolean;
-    exists: boolean;
-    input_limit?: number;
-    languages?: string[];
-    order?: string;
-    points?: number;
+    email_clarifications: boolean;
+    input_limit: number;
+    languages: string[];
+    order: string;
+    points: number;
     preferred_language?: string;
     problemsetter?: types.ProblemsetterInfo;
-    quality_seal?: boolean;
+    quality_seal: boolean;
     runs?: types.Run[];
-    score?: number;
-    settings?: types.ProblemSettings;
+    score: number;
+    settings: types.ProblemSettings;
     solvers?: {
       language: string;
       memory: number;
@@ -2787,12 +2784,12 @@ export namespace messages {
       username: string;
     }[];
     source?: string;
-    statement?: types.ProblemStatement;
-    submissions?: number;
-    title?: string;
-    version?: string;
-    visibility?: number;
-    visits?: number;
+    statement: types.ProblemStatement;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
   };
   export type ProblemListRequest = { [key: string]: any };
   export type ProblemListResponse = {
@@ -2820,10 +2817,7 @@ export namespace messages {
   export type ProblemSelectVersionRequest = { [key: string]: any };
   export type ProblemSelectVersionResponse = {};
   export type ProblemSolutionRequest = { [key: string]: any };
-  export type ProblemSolutionResponse = {
-    exists: boolean;
-    solution?: types.ProblemStatement;
-  };
+  export type ProblemSolutionResponse = { solution: types.ProblemStatement };
   export type ProblemStatsRequest = { [key: string]: any };
   export type ProblemStatsResponse = {
     cases_stats: { [key: string]: number };

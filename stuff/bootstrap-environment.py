@@ -107,8 +107,7 @@ def _does_resource_exist(s, request):
         api_endpoint += '/'
     if api_endpoint == '/problem/create/':
         if s.request('/problem/details/',
-                     {'problem_alias':
-                      request['params']['problem_alias']})['exists']:
+                     {'problem_alias': request['params']['problem_alias']}):
             logging.warning('Problem %s exists, skipping',
                             request['params']['problem_alias'])
             return True
@@ -134,7 +133,7 @@ def _does_resource_exist(s, request):
                             request['params']['alias'])
             return True
     if api_endpoint == '/user/create/':
-        if s.request('/user/profile',
+        if s.request('/user/profile/',
                      {'username': request['params']['username']}):
             logging.warning('User %s exists, skipping',
                             request['params']['username'])
