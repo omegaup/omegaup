@@ -2,7 +2,6 @@ import * as ui from './ui';
 import * as api from './api';
 import * as errors from './errors';
 import * as time from './time';
-import { types } from './api_types';
 
 // This is the JavaScript version of the frontend's Experiments class.
 export class Experiments {
