@@ -725,9 +725,9 @@ export namespace types {
       );
     }
 
-    export function ProblemSettingsSumaryPayload(
+    export function ProblemSettingsSummaryPayload(
       elementId: string = 'payload',
-    ): types.ProblemSettingsSumaryPayload {
+    ): types.ProblemSettingsSummaryPayload {
       return (x => {
         x.problem = (x => {
           x.creation_date = ((x: number) => new Date(x * 1000))(
@@ -1485,6 +1485,7 @@ export namespace types {
     };
     input_limit: number;
     languages: string[];
+    letter?: string;
     order: string;
     points: number;
     preferred_language?: string;
@@ -1665,7 +1666,7 @@ export namespace types {
     };
   }
 
-  export interface ProblemSettingsSumaryPayload {
+  export interface ProblemSettingsSummaryPayload {
     problem: types.ProblemDetails;
     problem_admin: boolean;
   }
