@@ -566,6 +566,35 @@ export namespace types {
       );
     }
 
+    export function IntroDetailsPayload(
+      elementId: string = 'payload',
+    ): types.IntroDetailsPayload {
+      return (x => {
+        x.details = (x => {
+          x.assignments = (x => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map(x => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
@@ -993,7 +1022,7 @@ export namespace types {
     needsBasicInformation?: boolean;
     privacyStatement?: types.PrivacyStatement;
     requestsUserInformation?: string;
-    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface ContestListItem {
@@ -1264,6 +1293,12 @@ export namespace types {
     templates: { [key: string]: string };
   }
 
+  export interface IntroDetailsPayload {
+    details: types.CourseDetails;
+    progress?: types.AssignmentProgress;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+  }
+
   export interface LimitsSettings {
     ExtraWallTime: string;
     MemoryLimit: number | string;
@@ -1414,7 +1449,7 @@ export namespace types {
     runs?: types.Run[];
     score: number;
     settings: types.ProblemSettings;
-    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     solution_status?: string;
     solvers?: {
       language: string;
