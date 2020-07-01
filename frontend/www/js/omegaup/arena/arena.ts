@@ -36,6 +36,7 @@ export interface ArenaOptions {
   assignmentAlias: string | null;
   contestAlias: string | null;
   courseAlias: string | null;
+  courseName: string | null;
   disableClarifications: boolean;
   disableSockets: boolean;
   isInterview: boolean;
@@ -439,6 +440,7 @@ export class Arena {
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
+      const self = this;
       this.navbarProblems = new Vue({
         el: '#arena-navbar-problems',
         render: function(createElement) {
@@ -448,6 +450,9 @@ export class Arena {
               activeProblem: this.activeProblem,
               inAssignment: !!options.courseAlias,
               digitsAfterDecimalPoint: options.partialScore ? 2 : 0,
+              courseAlias: options.courseAlias,
+              courseName: options.courseName,
+              currentAssignment: self.currentProblemset,
             },
             on: {
               'navigate-to-problem': (problemAlias: string) => {
@@ -845,7 +850,7 @@ export class Arena {
           return createElement('omegaup-arena-navbar-assignments', {
             props: {
               assignments: problemset.courseAssignments,
-              currentAssignmentAlias: problemset.alias,
+              currentAssignment: problemset,
             },
             on: {
               'navigate-to-assignment': (assignmentAlias: string) => {
@@ -2169,6 +2174,7 @@ export function GetDefaultOptions(): ArenaOptions {
     assignmentAlias: null,
     contestAlias: null,
     courseAlias: null,
+    courseName: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
     onlyProblemAlias: null,
