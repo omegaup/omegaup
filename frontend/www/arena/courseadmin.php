@@ -5,13 +5,8 @@ require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
     function (\OmegaUp\Request $r): array {
-        return [
-            'smartyProperties' => [],
-            'template' => 'arena.course.admin.tpl',
-            'inContest' => (
-                !isset($_REQUEST['is_practice']) ||
-                boolval($_REQUEST['is_practice']) !== true
-            ),
-        ];
+        return \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+            $r
+        );
     }
 );

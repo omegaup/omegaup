@@ -4204,29 +4204,9 @@ Get general user info
 
 ### Returns
 
-| Name                 | Type                                                          |
-| -------------------- | ------------------------------------------------------------- |
-| `birth_date`         | `Date`                                                        |
-| `classname`          | `string`                                                      |
-| `country`            | `string`                                                      |
-| `country_id`         | `string`                                                      |
-| `email`              | `string`                                                      |
-| `gender`             | `string`                                                      |
-| `graduation_date`    | `Date`                                                        |
-| `gravatar_92`        | `string`                                                      |
-| `hide_problem_tags`  | `boolean`                                                     |
-| `is_private`         | `boolean`                                                     |
-| `locale`             | `string`                                                      |
-| `name`               | `string`                                                      |
-| `preferred_language` | `string`                                                      |
-| `rankinfo`           | `{ name?: string; problems_solved?: number; rank?: number; }` |
-| `scholar_degree`     | `string`                                                      |
-| `school`             | `string`                                                      |
-| `school_id`          | `number`                                                      |
-| `state`              | `string`                                                      |
-| `state_id`           | `string`                                                      |
-| `username`           | `string`                                                      |
-| `verified`           | `boolean`                                                     |
+```typescript
+types.UserProfileInfo;
+```
 
 ## `/api/user/removeExperiment/`
 

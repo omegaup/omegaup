@@ -198,7 +198,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{country: string, state: null|string, school: null|string, email: null|string, locale: null|string}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -208,8 +208,34 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     IFNULL(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
+                    isc.`graduation_date` AS graduation_date,
                     e.`email`,
-                    l.`name` AS locale
+                    l.`name` AS locale,
+                    u.`birth_date`,
+                    u.`scholar_degree`,
+                    u.`hide_problem_tags`,
+                    u.`verified`,
+                    i.`gender`,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
                 FROM
                     Identities i
                 LEFT JOIN
@@ -230,11 +256,23 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{country: string, email: null|string, locale: null|string, school: null|string, state: null|string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
+        $identity = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
         );
+        if (is_null($identity)) {
+            return null;
+        }
+
+        $identity['hide_problem_tags'] = boolval(
+            $identity['hide_problem_tags']
+        );
+        $identity['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $identity['birth_date']
+        );
+
+        return $identity;
     }
 
     public static function isUserAssociatedWithIdentityOfGroup(
