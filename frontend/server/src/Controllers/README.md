@@ -2680,34 +2680,9 @@ Entry point for Problem Details API
 
 ### Returns
 
-| Name                   | Type                                                                                     |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| `accepted`             | `number`                                                                                 |
-| `admin`                | `boolean`                                                                                |
-| `alias`                | `string`                                                                                 |
-| `allow_user_add_tags`  | `boolean`                                                                                |
-| `commit`               | `string`                                                                                 |
-| `creation_date`        | `Date`                                                                                   |
-| `difficulty`           | `number`                                                                                 |
-| `email_clarifications` | `boolean`                                                                                |
-| `input_limit`          | `number`                                                                                 |
-| `languages`            | `string[]`                                                                               |
-| `order`                | `string`                                                                                 |
-| `points`               | `number`                                                                                 |
-| `preferred_language`   | `string`                                                                                 |
-| `problemsetter`        | `types.ProblemsetterInfo`                                                                |
-| `quality_seal`         | `boolean`                                                                                |
-| `runs`                 | `types.Run[]`                                                                            |
-| `score`                | `number`                                                                                 |
-| `settings`             | `types.ProblemSettings`                                                                  |
-| `solvers`              | `{ language: string; memory: number; runtime: number; time: Date; username: string; }[]` |
-| `source`               | `string`                                                                                 |
-| `statement`            | `types.ProblemStatement`                                                                 |
-| `submissions`          | `number`                                                                                 |
-| `title`                | `string`                                                                                 |
-| `version`              | `string`                                                                                 |
-| `visibility`           | `number`                                                                                 |
-| `visits`               | `number`                                                                                 |
+```typescript
+types.ProblemDetails;
+```
 
 ## `/api/problem/list/`
 

@@ -2757,40 +2757,7 @@ export namespace messages {
   export type ProblemDeleteResponse = {};
   export type ProblemDetailsRequest = { [key: string]: any };
   export type _ProblemDetailsServerResponse = any;
-  export type ProblemDetailsResponse = {
-    accepted: number;
-    admin?: boolean;
-    alias: string;
-    allow_user_add_tags: boolean;
-    commit: string;
-    creation_date: Date;
-    difficulty?: number;
-    email_clarifications: boolean;
-    input_limit: number;
-    languages: string[];
-    order: string;
-    points: number;
-    preferred_language?: string;
-    problemsetter?: types.ProblemsetterInfo;
-    quality_seal: boolean;
-    runs?: types.Run[];
-    score: number;
-    settings: types.ProblemSettings;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
-    source?: string;
-    statement: types.ProblemStatement;
-    submissions: number;
-    title: string;
-    version: string;
-    visibility: number;
-    visits: number;
-  };
+  export type ProblemDetailsResponse = types.ProblemDetails;
   export type ProblemListRequest = { [key: string]: any };
   export type ProblemListResponse = {
     results: types.ProblemListItem[];
