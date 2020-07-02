@@ -166,6 +166,7 @@ export default class AddProblem extends Vue {
     order: 1,
     points: this.points,
     title: '',
+    input_limit: 0,
   };
   versionLog: omegaup.Commit[] = [];
   useLatestVersion = true;

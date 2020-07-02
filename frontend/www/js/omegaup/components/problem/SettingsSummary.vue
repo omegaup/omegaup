@@ -23,31 +23,31 @@
           v-bind:title="T.wordsBannedProblem"
           v-if="problem.visibility <= -2"
         ></span>
-        <template v-if="showEditLink">
-          (<a href="/problem/{$problem_alias}/edit/">{{ T.wordsEdit }}</a
-          >)
-        </template>
+      </template>
+      <template v-if="showEditLink">
+        (<a href="/problem/{$problem_alias}/edit/">{{ T.wordsEdit }}</a
+        >)
       </template>
     </h1>
     <table>
       <tr>
-        <td>{{ T.wordsPoints }}</td>
+        <th scope="row">{{ T.wordsPoints }}</th>
         <td>{{ problem.points }}</td>
-        <td>{{ T.arenaCommonMemoryLimit }}</td>
+        <th scope="row">{{ T.arenaCommonMemoryLimit }}</th>
         <td data-memory-limit>{{ memoryLimit }}</td>
       </tr>
       <tr>
-        <td>{{ T.arenaCommonTimeLimit }}</td>
+        <th scope="row">{{ T.arenaCommonTimeLimit }}</th>
         <td>{{ timeLimit }}</td>
-        <td>{{ T.arenaCommonOverallWallTimeLimit }}</td>
+        <th scope="row">{{ T.arenaCommonOverallWallTimeLimit }}</th>
         <td>{{ overallWallTimeLimit }}</td>
       </tr>
       <tr>
         <template v-if="!showVisibilityIndicators">
-          <td>{{ T.wordsInOut }}</td>
+          <th scope="row">{{ T.wordsInOut }}</th>
           <td>{{ T.wordsConsole }}</td>
         </template>
-        <td>{{ T.problemEditFormInputLimit }}</td>
+        <th scope="row">{{ T.problemEditFormInputLimit }}</th>
         <td>{{ inputLimit }}</td>
       </tr>
     </table>
@@ -65,8 +65,14 @@
     width: 30em;
     margin: 10px auto;
     td {
+      text-align: center;
       border: 1px solid #000;
       padding: 2px;
+    }
+    th[scope='row'] {
+      border: 1px solid #000;
+      padding: 2px;
+      font-weight: bold;
     }
   }
 }
@@ -80,7 +86,7 @@ import { types } from '../../api_types';
 
 @Component
 export default class ProblemSettingsSummary extends Vue {
-  @Prop() problem!: types.ProblemDetails;
+  @Prop() problem!: types.ArenaProblemDetails;
   @Prop({ default: false }) showVisibilityIndicators!: boolean;
   @Prop({ default: false }) showEditLink!: boolean;
 

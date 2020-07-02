@@ -65,21 +65,22 @@ export interface ArenaOptions {
 }
 
 export interface Problem {
-  title: string;
   alias: string;
   commit: string;
+  input_limit: number;
   languages: string[];
+  lastSubmission?: Date;
   letter?: string;
+  nextSubmissionTimestamp?: Date;
   points: number;
-  input_limit?: number;
+  problemsetter?: types.ProblemsetterInfo;
+  quality_seal: boolean;
   quality_payload?: types.ProblemQualityPayload;
   runs?: types.Run[];
-  source?: string;
   settings?: types.ProblemSettings;
+  source?: string;
   statement?: types.ProblemStatement;
-  problemsetter?: { creation_date?: Date; name: string; username: string };
-  lastSubmission?: Date;
-  nextSubmissionTimestamp?: Date;
+  title: string;
 }
 
 export interface RunsState {
@@ -185,6 +186,8 @@ export class Arena {
     source: '',
     languages: [],
     points: 0,
+    input_limit: 0,
+    quality_seal: false,
   };
 
   // The current problemset.
@@ -292,7 +295,9 @@ export class Arena {
     problemAlias: string;
   };
 
-  problemSettingsSummary: (Vue & { problem: Problem }) | null = null;
+  problemSettingsSummary:
+    | (Vue & { problem: types.ArenaProblemDetails })
+    | null = null;
 
   qualityNominationForm:
     | (Vue & { qualityPayload: types.ProblemQualityPayload })

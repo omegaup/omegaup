@@ -25,6 +25,7 @@ const baseSettingsSummaryProps = {
     submissions: 0,
     version: '587cb50672aa364c75e16b638ec7ca7289e24b08',
     visits: 0,
+    letter: 'A',
     alias: 'sumas',
     commit: '587cb50672aa364c75e16b638ec7ca7289e24b08',
     input_limit: 10240,
@@ -54,7 +55,7 @@ const baseSettingsSummaryProps = {
     },
     title: 'Sumas',
     visibility: 2,
-  } as types.ProblemDetails,
+  } as types.ArenaProblemDetails,
 };
 
 const limits = {
@@ -75,9 +76,12 @@ describe('SettingsSummary.vue', () => {
   });
 
   it('Should handle problem settings summary out of contest', () => {
-    Object.assign(baseSettingsSummaryProps, { showVisibilityIndicators: true });
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: baseSettingsSummaryProps,
+      propsData: Object.assign(
+        baseSettingsSummaryProps,
+        baseSettingsSummaryProps.problem,
+        { showVisibilityIndicators: true },
+      ),
     });
 
     expect(wrapper.text()).not.toContain(T.wordsInOut);
@@ -85,11 +89,12 @@ describe('SettingsSummary.vue', () => {
   });
 
   it('Should handle problem settings summary with memory limit as string', () => {
-    Object.assign(baseSettingsSummaryProps.problem.settings, {
-      limits: limits,
-    });
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: baseSettingsSummaryProps,
+      propsData: Object.assign(
+        baseSettingsSummaryProps,
+        baseSettingsSummaryProps.problem.settings,
+        { limits: limits },
+      ),
     });
 
     expect(wrapper.find('td[data-memory-limit]').text()).toContain('32 MiB');
