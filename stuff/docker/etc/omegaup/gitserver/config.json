@@ -7,7 +7,10 @@
 		"DataSourceName": "omegaup:omegaup@tcp(mysql)/omegaup"
 	},
 	"Gitserver": {
+		"PublicKey": "",
 		"AllowDirectPushToMaster": true,
+		"SecretToken": "secret",
+		"AllowSecretTokenAuthentication": true,
 		"FrontendAuthorizationProblemRequestURL": "http://frontend:8000/api/authorization/problem/"
 	}
 }

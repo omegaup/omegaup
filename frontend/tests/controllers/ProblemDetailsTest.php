@@ -387,19 +387,24 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Solutions that don't exist don't cause an exception.
+     * Solutions that don't exist raise an exception.
      */
     public function testShowSolutionInexistent() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
         ]));
         $login = self::login($problemData['author']);
-        {
-            $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
+        try {
+            \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['request']['problem_alias'],
             ]));
-            $this->assertEmpty($response['solution']['markdown']);
+            $this->fail('Solution should have not been found');
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            $this->assertEquals(
+                'resourceNotFound',
+                $e->getMessage()
+            );
         }
     }
 
