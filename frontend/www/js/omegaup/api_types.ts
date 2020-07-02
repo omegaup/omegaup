@@ -903,6 +903,7 @@ export namespace types {
     source?: string;
     statement?: types.ProblemStatement;
     title: string;
+    visibility: number;
   }
 
   export interface AssignmentProgress {
