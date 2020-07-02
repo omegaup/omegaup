@@ -784,14 +784,14 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 | `languages`                 | `string[]`                  |
 | `needs_basic_information`   | `boolean`                   |
 | `opened`                    | `boolean`                   |
-| `partial_score`             | `boolean`                   |
 | `original_contest_alias`    | `string`                    |
 | `original_problemset_id`    | `number`                    |
+| `partial_score`             | `boolean`                   |
 | `penalty`                   | `number`                    |
 | `penalty_calc_policy`       | `string`                    |
 | `penalty_type`              | `string`                    |
-| `problems`                  | `types.ProblemsetProblem[]` |
 | `points_decay_factor`       | `number`                    |
+| `problems`                  | `types.ProblemsetProblem[]` |
 | `problemset_id`             | `number`                    |
 | `requests_user_information` | `string`                    |
 | `scoreboard`                | `number`                    |
