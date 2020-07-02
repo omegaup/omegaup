@@ -50,12 +50,10 @@
                   ].split(' ')[0]
                 }}
               </h5>
-              <p><small>Lenguaje de programación</small></p>
+              <p>
+                <small>{{ T.wordsProgrammingLanguage }}</small>
+              </p>
             </div>
-
-            <!--<p class="mb-0">{{ profile.email.split('@')[0] }}</p>
-            <p>@{{ profile.email.split('@')[1] }}</p>
-            <p>{{ profile.school }}</p>-->
           </div>
           <div class="mb-3 text-center" v-if="profile.email">
             <a class="btn btn-primary btn-sm" href="/profile/edit/">{{
