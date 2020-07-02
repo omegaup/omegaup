@@ -9,8 +9,6 @@ OmegaUp.on('ready', function() {
   let qualityPayload = JSON.parse(
     document.getElementById('quality-payload').innerText,
   );
-  let problemStatement = document.getElementsByClassName('statement')[0]
-    .innerText;
 
   let qualityNominationForm = new Vue({
     el: '#qualitynomination-popup',
