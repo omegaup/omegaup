@@ -66,37 +66,42 @@ OmegaUp.on('ready', () => {
                 problemEdit.markdownContents = statements[language];
                 return;
               }
-              api.Problem.details({
-                problem_alias: payload.alias,
-                statement_type: 'markdown',
-                show_solvers: false,
-                lang: language,
-              })
+              api.Problem.details(
+                {
+                  problem_alias: payload.alias,
+                  statement_type: 'markdown',
+                  show_solvers: false,
+                  lang: language,
+                },
+                { quiet: true },
+              )
                 .then(response => {
-                  if (!response.exists || !response.statement) {
-                    return;
-                  }
                   if (response.statement.language !== language) {
                     response.statement.markdown = '';
                   }
                   statements[language] = response.statement.markdown;
                   problemEdit.markdownContents = response.statement.markdown;
                 })
-                .catch(ui.apiError);
+                .catch(error => {
+                  if (error.httpStatusCode == 404) {
+                    return;
+                  }
+                  ui.apiError(error);
+                });
             } else {
               problemEdit.markdownSolutionContents = currentMarkdown;
               if (solutions.hasOwnProperty(language)) {
                 problemEdit.markdownSolutionContents = solutions[language];
                 return;
               }
-              api.Problem.solution({
-                problem_alias: payload.alias,
-                lang: language,
-              })
+              api.Problem.solution(
+                {
+                  problem_alias: payload.alias,
+                  lang: language,
+                },
+                { quiet: true },
+              )
                 .then(response => {
-                  if (!response.exists || !response.solution) {
-                    return;
-                  }
                   if (response.solution.language !== language) {
                     response.solution.markdown = '';
                   }
@@ -104,7 +109,12 @@ OmegaUp.on('ready', () => {
                   problemEdit.markdownSolutionContents =
                     response.solution.markdown;
                 })
-                .catch(ui.apiError);
+                .catch(error => {
+                  if (error.httpStatusCode == 404) {
+                    return;
+                  }
+                  ui.apiError(error);
+                });
             }
           },
           'add-tag': (alias: string, tagname: string, isPublic: boolean) => {

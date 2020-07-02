@@ -78,7 +78,14 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
+        $visibleAttributes = [
+            'is_private',
+            'username',
+            'rankinfo',
+            'classname',
+            'hide_problem_tags',
+            'verified',
+        ];
         foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 continue;

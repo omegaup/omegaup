@@ -2128,7 +2128,6 @@ Details of a group (scoreboards)
 
 | Name          | Type                                                                           |
 | ------------- | ------------------------------------------------------------------------------ |
-| `exists`      | `boolean`                                                                      |
 | `group`       | `{ create_time: number; alias: string; name: string; description: string; }`   |
 | `scoreboards` | `{ alias: string; create_time: string; description: string; name: string; }[]` |
 
@@ -2429,7 +2428,6 @@ _Nothing_
 | `contest_alias` | `string`                                                                                                                 |
 | `problemset_id` | `number`                                                                                                                 |
 | `users`         | `{ user_id: number; username: string; access_time: Date; email: string; opened_interview: boolean; country: string; }[]` |
-| `exists`        | `boolean`                                                                                                                |
 
 ## `/api/interview/list/`
 
@@ -2682,36 +2680,9 @@ Entry point for Problem Details API
 
 ### Returns
 
-| Name                   | Type                                                                                     |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| `accepted`             | `number`                                                                                 |
-| `admin`                | `boolean`                                                                                |
-| `alias`                | `string`                                                                                 |
-| `allow_user_add_tags`  | `boolean`                                                                                |
-| `commit`               | `string`                                                                                 |
-| `creation_date`        | `Date`                                                                                   |
-| `difficulty`           | `number`                                                                                 |
-| `email_clarifications` | `boolean`                                                                                |
-| `exists`               | `boolean`                                                                                |
-| `input_limit`          | `number`                                                                                 |
-| `languages`            | `string[]`                                                                               |
-| `order`                | `string`                                                                                 |
-| `points`               | `number`                                                                                 |
-| `preferred_language`   | `string`                                                                                 |
-| `problemsetter`        | `types.ProblemsetterInfo`                                                                |
-| `quality_seal`         | `boolean`                                                                                |
-| `runs`                 | `types.Run[]`                                                                            |
-| `score`                | `number`                                                                                 |
-| `settings`             | `types.ProblemSettings`                                                                  |
-| `show_diff`            | `string`                                                                                 |
-| `solvers`              | `{ language: string; memory: number; runtime: number; time: Date; username: string; }[]` |
-| `source`               | `string`                                                                                 |
-| `statement`            | `types.ProblemStatement`                                                                 |
-| `submissions`          | `number`                                                                                 |
-| `title`                | `string`                                                                                 |
-| `version`              | `string`                                                                                 |
-| `visibility`           | `number`                                                                                 |
-| `visits`               | `number`                                                                                 |
+```typescript
+types.ProblemDetails;
+```
 
 ## `/api/problem/list/`
 
@@ -2918,7 +2889,6 @@ Returns the solution for a problem if conditions are satisfied.
 
 | Name       | Type                     |
 | ---------- | ------------------------ |
-| `exists`   | `boolean`                |
 | `solution` | `types.ProblemStatement` |
 
 ## `/api/problem/stats/`
@@ -4197,29 +4167,9 @@ Get general user info
 
 ### Returns
 
-| Name                 | Type                                                          |
-| -------------------- | ------------------------------------------------------------- |
-| `birth_date`         | `Date`                                                        |
-| `classname`          | `string`                                                      |
-| `country`            | `string`                                                      |
-| `country_id`         | `string`                                                      |
-| `email`              | `string`                                                      |
-| `gender`             | `string`                                                      |
-| `graduation_date`    | `Date`                                                        |
-| `gravatar_92`        | `string`                                                      |
-| `hide_problem_tags`  | `boolean`                                                     |
-| `is_private`         | `boolean`                                                     |
-| `locale`             | `string`                                                      |
-| `name`               | `string`                                                      |
-| `preferred_language` | `string`                                                      |
-| `rankinfo`           | `{ name?: string; problems_solved?: number; rank?: number; }` |
-| `scholar_degree`     | `string`                                                      |
-| `school`             | `string`                                                      |
-| `school_id`          | `number`                                                      |
-| `state`              | `string`                                                      |
-| `state_id`           | `string`                                                      |
-| `username`           | `string`                                                      |
-| `verified`           | `boolean`                                                     |
+```typescript
+types.UserProfileInfo;
+```
 
 ## `/api/user/removeExperiment/`
 
