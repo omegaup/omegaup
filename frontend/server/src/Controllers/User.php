@@ -8,6 +8,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
+ * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
@@ -20,6 +21,10 @@ namespace OmegaUp\Controllers;
  * @psalm-type IndexPayload=array{coderOfTheMonthData: array{all: UserProfile|null, female: UserProfile|null}, currentUserInfo: array{username?: string}, userRank: list<CoderOfTheMonth>, schoolOfTheMonthData: array{country_id: null|string, country: null|string, name: string, school_id: int, state: null|string}|null, schoolRank: list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}>}
  * @psalm-type CoderOfTheMonthPayload=array{codersOfCurrentMonth: CoderOfTheMonthList, codersOfPreviousMonth: CoderOfTheMonthList, candidatesToCoderOfTheMonth: list<array{category: string, classname: string, coder_of_the_month_id: int, country_id: string, description: null|string, interview_url: null|string, problems_solved: int, ranking: int, school_id: int|null, score: float, selected_by: int|null, time: string, username: string}>, isMentor: bool, category: string, options?: array{canChooseCoder: bool, coderIsSelected: bool}}
  * @psalm-type UserProfileInfo=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: null|string, country_id: null|string, email?: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null|string, gravatar_92: null|string, hide_problem_tags: bool, is_private: bool, locale: null|string, name: null|string, preferred_language: null|string, rankinfo: array{author_ranking: int|null, name: null|string, problems_solved: int|null, rank: int|null}, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool|null}
+ * @psalm-type UserProfileContests=array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int}>
+ * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
+ * @psalm-type UserListItem=array{label: string, value: string}
+ * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3626,33 +3631,59 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: UserProfileInfo}, template: string}
      */
     public static function getProfileDetailsForSmarty(\OmegaUp\Request $r) {
+        self::authenticateOrAllowUnauthenticatedRequest($r);
+        $identity = self::resolveTargetIdentity($r);
+        if (is_null($identity)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'username'
+            );
+        }
         try {
-            self::authenticateOrAllowUnauthenticatedRequest($r);
-
-            $identity = self::resolveTargetIdentity($r);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterNotFound',
-                    'Identity'
-                );
-            }
-            $smartyProperties = [
-                'profile' => self::getProfileDetails($r->identity, $identity),
+            return [
+                'smartyProperties' => [
+                    'payload' => [
+                        'profile' => self::getProfileDetails(
+                            $r->identity,
+                            $identity
+                        ),
+                        'contests' => self::apiContestStats($r)['contests'],
+                        'solvedProblems' => self::apiProblemsSolved(
+                            $r
+                        )['problems'],
+                        'unsolvedProblems' => self::apiListUnsolvedProblems(
+                            $r
+                        )['problems'],
+                        'createdProblems' => self::apiProblemsCreated(
+                            $r
+                        )['problems'],
+                        'stats' => self::apiStats($r)['runs'],
+                        'badges' => \OmegaUp\Controllers\Badge::apiList($r),
+                        'ownedBadges' => \OmegaUp\Controllers\Badge::apiMyList(
+                            $r
+                        )['badges'],
+                    ],
+                    'title' => 'omegaupTitleProfile'
+                ],
+                'template' => 'user.profile.tpl',
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $smartyProperties = [
-                'STATUS_ERROR' => $e->getErrorMessage(),
+            return [
+                'smartyProperties' => [
+                    'payload' => ['statusError' => $e->getErrorMessage()],
+                    'title' => 'omegaupTitleProfile'
+                ],
+                'template' => 'user.profile.tpl',
             ];
         }
-        return [
-            'smartyProperties' => $smartyProperties,
-            'template' => 'user.profile.tpl',
-        ];
     }
 
     /**
