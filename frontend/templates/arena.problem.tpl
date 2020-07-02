@@ -16,31 +16,31 @@
   <div id="problems" class="tab">
     <div id="problem" class="main">
       <h1 class="title">
-        {$payload['problem_id']}. {$title|escape}
-        {if $quality_seal || $visibility == 3}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
-        {if $visibility == 1 || $visibility == -1}<span class="glyphicon glyphicon-warning-sign" title="{#wordsWarningProblem#}"></span>{/if}
-        {if $visibility == 0 || $visibility == -1}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
-        {if $visibility <= -2}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
-        {if $problem_admin}
-          (<a href="/problem/{$problem_alias}/edit/">{#wordsEdit#}</a>)
+        {$settings_summary_payload['problem']['problem_id']}. {$settings_summary_payload['problem']['title']|escape}
+        {if $settings_summary_payload['problem']['quality_seal'] || $settings_summary_payload['problem']['visibility'] == 3}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
+        {if $settings_summary_payload['problem']['visibility'] == 1 || $settings_summary_payload['problem']['visibility'] == -1}<span class="glyphicon glyphicon-warning-sign" title="{#wordsWarningProblem#}"></span>{/if}
+        {if $settings_summary_payload['problem']['visibility'] == 0 || $settings_summary_payload['problem']['visibility'] == -1}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
+        {if $settings_summary_payload['problem']['visibility'] <= -2}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
+        {if $settings_summary_payload['problem_admin']}
+          (<a href="/problem/{$settings_summary_payload['problem']['alias']}/edit/">{#wordsEdit#}</a>)
         {/if}
       </h1>
       <table class="data">
         <tr>
           <td>{#wordsPoints#}</td>
-          <td class="points">{$points|escape}</td>
+          <td class="points">{$settings_summary_payload['problem']['points']|escape}</td>
           <td>{#wordsMemoryLimit#}</td>
-          <td class="memory_limit">{$memory_limit|escape}</td>
+          <td class="memory_limit">{$settings_summary_payload['problem']['settings']['limits']['MemoryLimit']|escape}</td>
         </tr>
         <tr>
           <td>{#wordsTimeLimit#}</td>
-          <td class="time_limit">{$time_limit|escape}</td>
+          <td class="time_limit">{$settings_summary_payload['problem']['settings']['limits']['TimeLimit']|escape}</td>
           <td>{#wordsOverallWallTimeLimit#}</td>
-          <td class="overall_wall_time_limit">{$overall_wall_time_limit|escape}</td>
+          <td class="overall_wall_time_limit">{$settings_summary_payload['problem']['settings']['limits']['OverallWallTimeLimit']|escape}</td>
         </tr>
         <tr>
           <td>{#problemEditFormInputLimit#}</td>
-          <td class="input_limit">{$input_limit|escape}</td>
+          <td class="input_limit">{$settings_summary_payload['problem']['input_limit'] / 1024|escape} KiB</td>
         </tr>
       </table>
       {if $karel_problem}
