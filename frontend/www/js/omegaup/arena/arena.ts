@@ -74,6 +74,7 @@ export interface Problem {
   source?: string;
   statement?: types.ProblemStatement;
   title: string;
+  visibility: number;
 }
 
 export interface RunsState {
@@ -181,6 +182,7 @@ export class Arena {
     points: 0,
     input_limit: 0,
     quality_seal: false,
+    visibility: 2,
   };
 
   // The current problemset.
