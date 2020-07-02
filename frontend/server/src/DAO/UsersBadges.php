@@ -31,7 +31,7 @@ class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
                 ORDER BY
                     ub.assignation_time ASC;';
         $args = [$user->user_id];
-        /** @var list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string, first_assignation: null, owners_count: int, total_users: int}> */
+        /** @var list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 
