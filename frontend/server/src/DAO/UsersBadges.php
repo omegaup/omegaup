@@ -15,7 +15,7 @@ namespace OmegaUp\DAO;
  */
 class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
     /**
-     * @return list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string, first_assignation: null, owners_count: int, total_users: int}>
+     * @return list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}>
      */
     public static function getUserOwnedBadges(\OmegaUp\DAO\VO\Users $user): array {
         $sql = 'SELECT
