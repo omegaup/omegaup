@@ -393,15 +393,12 @@ class TypeMapper {
         );
     }
 
-    /**
-     * @param array{description: string, specials: array<string, array<int, string>>} $docComment
-     */
     public function convertMethod(
         \ReflectionMethod $reflectionMethod,
-        $docComment,
+        \Psalm\Internal\Scanner\ParsedDocblock $docComment,
         string $controllerClassBasename
     ): Method {
-        $returns = $docComment['specials']['return'];
+        $returns = $docComment->tags['return'];
         if (count($returns) != 1) {
             throw new \Exception('More @return annotations than expected!');
         }
@@ -456,9 +453,9 @@ class TypeMapper {
                 $reflectionMethod->name,
                 3
             ),
-            $docComment['description'],
+            $docComment->description,
             RequestParam::parse(
-                $docComment['specials']['omegaup-request-param'] ?? []
+                $docComment->tags['omegaup-request-param'] ?? []
             ),
             $conversionResult,
             $responseTypeMapping
@@ -480,16 +477,25 @@ class APIGenerator {
         $this->typeMapper = new TypeMapper($this->daoTypes);
     }
 
+    private function parseDocComment(string $docblock): \Psalm\Internal\Scanner\ParsedDocblock {
+        /** @psalm-suppress DeprecatedMethod Workaround for https://github.com/vimeo/psalm/issues/3735 */
+        [
+            'description' => $description,
+            'specials' => $tags,
+        ] = \Psalm\DocComment::parse($docblock);
+        return new \Psalm\Internal\Scanner\ParsedDocblock($description, $tags);
+    }
+
     public function addController(string $controllerClassBasename): void {
         /** @var class-string */
         $controllerClassName = "\\OmegaUp\\Controllers\\{$controllerClassBasename}";
         $reflectionClass = new \ReflectionClass($controllerClassName);
 
-        $docComment = \Psalm\DocComment::parse(
-            $reflectionClass->getDocComment()
+        $docComment = $this->parseDocComment(
+            strval($reflectionClass->getDocComment())
         );
-        if (isset($docComment['specials']['psalm-type'])) {
-            foreach ($docComment['specials']['psalm-type'] as $typeAlias) {
+        if (isset($docComment->tags['psalm-type'])) {
+            foreach ($docComment->tags['psalm-type'] as $typeAlias) {
                 [
                     $typeName,
                     $typeExpansion,
@@ -513,7 +519,7 @@ class APIGenerator {
 
         $controller = new Controller(
             $controllerClassBasename,
-            $docComment['description']
+            $docComment->description
         );
 
         foreach (
@@ -533,8 +539,8 @@ class APIGenerator {
                 // JavaScript, so they are not exposed.
                 continue;
             }
-            $docComment = \Psalm\DocComment::parse(
-                $reflectionMethod->getDocComment()
+            $docComment = $this->parseDocComment(
+                strval($reflectionMethod->getDocComment())
             );
             $apiMethodName = strtolower(
                 $reflectionMethod->name[3]
@@ -574,10 +580,10 @@ class APIGenerator {
                         ReflectionProperty::IS_PUBLIC
                     ) as $reflectionProperty
                 ) {
-                    $docComment = \Psalm\DocComment::parse(
-                        $reflectionProperty->getDocComment()
+                    $docComment = $this->parseDocComment(
+                        strval($reflectionProperty->getDocComment())
                     );
-                    $returns = $docComment['specials']['var'];
+                    $returns = $docComment->tags['var'];
                     if (count($returns) != 1) {
                         throw new \Exception(
                             'More @var annotations than expected!'
