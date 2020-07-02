@@ -8,7 +8,7 @@ import { Problem, ContestResult } from '../linkable_resource';
 
 OmegaUp.on('ready', function() {
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  const profile = payload.profile;
+  const profile = payload.payload;
   let viewProfile = new Vue({
     el: '#user-profile',
     render: function(createElement) {

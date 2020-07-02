@@ -879,6 +879,64 @@ export namespace types {
       );
     }
 
+    export function UserProfileDetailsPayload(
+      elementId: string = 'payload',
+    ): types.UserProfileDetailsPayload {
+      return (x => {
+        x.profile = (x => {
+          if (x.birth_date)
+            x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
+          if (x.graduation_date)
+            x.graduation_date = ((x: number) => new Date(x * 1000))(
+              x.graduation_date,
+            );
+          return x;
+        })(x.profile);
+        x.contests = (x => {
+          if (x instanceof Object) {
+            Object.keys(x).forEach(
+              y =>
+                (x[y] = (x => {
+                  x.data = (x => {
+                    x.start_time = ((x: number) => new Date(x * 1000))(
+                      x.start_time,
+                    );
+                    x.finish_time = ((x: number) => new Date(x * 1000))(
+                      x.finish_time,
+                    );
+                    x.last_updated = ((x: number) => new Date(x * 1000))(
+                      x.last_updated,
+                    );
+                    return x;
+                  })(x.data);
+                  return x;
+                })(x[y])),
+            );
+          }
+          return x;
+        })(x.contests);
+        x.ownedBadges = (x => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map(x => {
+            if (x.assignation_time)
+              x.assignation_time = ((x: number) => new Date(x * 1000))(
+                x.assignation_time,
+              );
+            if (x.first_assignation)
+              x.first_assignation = ((x: number) => new Date(x * 1000))(
+                x.first_assignation,
+              );
+            return x;
+          });
+        })(x.ownedBadges);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function UserRankTablePayload(
       elementId: string = 'payload',
     ): types.UserRankTablePayload {
@@ -932,10 +990,9 @@ export namespace types {
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;
-    unlocked?: boolean;
     first_assignation?: Date;
-    total_users?: number;
-    owners_count?: number;
+    owners_count: number;
+    total_users: number;
   }
 
   export interface BadgeDetailsPayload {
@@ -2041,6 +2098,32 @@ export namespace types {
     verified: boolean;
   }
 
+  export interface UserProfileContests {
+    [key: string]: {
+      data: {
+        alias: string;
+        title: string;
+        start_time: Date;
+        finish_time: Date;
+        last_updated: Date;
+      };
+      place: number;
+    };
+  }
+
+  export interface UserProfileDetailsPayload {
+    statusError?: string;
+    profile: types.UserProfileInfo;
+    contests: types.UserProfileContests;
+    solvedProblems: types.Problem[];
+    unsolvedProblems: types.Problem[];
+    createdProblems: types.Problem[];
+    stats: types.UserProfileStats[];
+    badges: string[];
+    ownedBadges: types.Badge[];
+    programmingLanguages: { [key: string]: string };
+  }
+
   export interface UserProfileInfo {
     birth_date?: Date;
     classname: string;
@@ -2068,6 +2151,12 @@ export namespace types {
     state_id?: string;
     username?: string;
     verified?: boolean;
+  }
+
+  export interface UserProfileStats {
+    date?: string;
+    runs: number;
+    verdict: string;
   }
 
   export interface UserRank {
