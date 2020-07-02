@@ -31,18 +31,18 @@ export function markdownConverter(
       <div class="panel-body">
         <form role="form">
           <div class="form-horizontal">
-            <div class="form-group">
-              <div class="col-sm-10">
-                <label class="col-sm-2 control-label">${T.libinteractiveOs}</label>
+            <div class="form-group row">
+              <label class="col-xs-6 col-sm-2 control-label">${T.libinteractiveOs}</label>
+              <div class="col-xs-6 col-sm-10">
                 <select class="form-control download-os">
                   <option value="unix">Linux/Mac OS X</option>
                   <option value="windows">Windows</option>
                 </select>
               </div>
             </div>
-            <div class="form-group">
-              <div class="col-sm-10">
-                <label class="col-sm-2 control-label">${T.libinteractiveLanguage}</label>
+            <div class="form-group row">
+              <label class="col-xs-6 col-sm-2 control-label">${T.libinteractiveLanguage}</label>
+              <div class="col-xs-6 col-sm-10">
                 <select class="form-control download-lang">
                   <option value="c" selected="selected">C</option>
                   <option value="cpp">C++</option>
@@ -52,14 +52,14 @@ export function markdownConverter(
                 </select>
               </div>
             </div>
-            <div class="form-group">
-              <strong class="col-sm-2 control-label">${T.libinteractiveFilename}</strong>
-              <div class="col-sm-10">
+            <div class="form-group row">
+              <strong class="col-xs-6 col-sm-2 control-label">${T.libinteractiveFilename}</strong>
+              <div class="col-xs-6 col-sm-10">
                 <span class="libinteractive-interface-name"></span>.<span class="libinteractive-extension">c</span>
               </div>
             </div>
-            <div class="form-group">
-              <div class="col-sm-offset-2 col-sm-10">
+            <div class="form-group row">
+              <div class="col-xs-12 col-sm-offset-2 offset-sm-2 col-sm-10">
                 <button type="submit" class="btn btn-primary active">
                   ${T.libinteractiveDownload}
                 </button>

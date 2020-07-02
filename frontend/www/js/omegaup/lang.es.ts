@@ -1070,6 +1070,7 @@ const translations: { [key: string]: string; } = {
   reportProblemFormThanksForReview: "\u00a1Gracias por tu reporte!",
   requestDate: "Fecha de solicitud",
   resendInterviewEmail: "Reenviar correo",
+  resourceNotFound: "Recurso no encontrado.",
   reviewerNomination: "Calificar el problema como revisor",
   reviewerNominationCategory: "\u00bfCual es la categor\u00eda de este problema?",
   reviewerNominationFormTitle: "\u00a1Califica este problema!",

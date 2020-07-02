@@ -1,5 +1,16 @@
 <template>
   <div class="problem-list">
+    <div class="active" data-breadcrumbs v-if="inAssignment">
+      <span>
+        <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
+        <a class="breadcrumbs-link" v-bind:href="urlAssignment">{{
+          courseName
+        }}</a>
+        <template v-if="currentAssignment">
+          > <span class="breadcrumbs-link">{{ currentAssignment.name }}</span>
+        </template>
+      </span>
+    </div>
     <div class="summary" v-bind:class="{ active: !activeProblem }">
       <a class="name" href="#problems">{{ T.wordsSummary }}</a>
     </div>
@@ -37,11 +48,9 @@
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <a
-            class="name"
-            v-on:click="$emit('navigate-to-problem', problem.alias)"
-            >{{ problem.text }}</a
-          >
+          <a class="name" v-on:click="onNavigateToProblem(problem)">{{
+            problem.text
+          }}</a>
         </div>
       </div>
     </div>
@@ -49,9 +58,14 @@
 </template>
 
 <style>
+.problem-list .breadcrumbs-link {
+  display: inherit;
+}
+
 .problem-list > div {
   width: 19em;
   margin-bottom: 0.5em;
+  padding-top: 0.2em;
   background: #ddd;
   border: solid 1px #ccc;
   border-width: 1px 0 1px 1px;
@@ -109,13 +123,24 @@ library.add(fas);
 export default class ArenaNavbarProblems extends Vue {
   @Prop() problems!: omegaup.ContestProblem[];
   @Prop() activeProblem!: string | null;
+  @Prop() courseAlias!: string | null;
+  @Prop() courseName!: string | null;
   @Prop() inAssignment!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+  @Prop({ default: null }) currentAssignment!: omegaup.Assignment | null;
 
   T = T;
 
   getProblemTypeTitle(acceptsSubmissions: boolean): string {
     return acceptsSubmissions ? T.wordsProblem : T.wordsLecture;
+  }
+
+  get urlAssignment(): string {
+    return `/course/${this.courseAlias}/`;
+  }
+
+  onNavigateToProblem(problem: omegaup.ContestProblem) {
+    this.$emit('navigate-to-problem', problem.alias);
   }
 }
 </script>

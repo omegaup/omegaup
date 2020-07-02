@@ -272,7 +272,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{exists: bool, group?: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards?: list<array{alias: string, create_time: string, description: null|string, name: string}>}
+     * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<array{alias: string, create_time: string, description: null|string, name: string}>}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -282,26 +282,24 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
         $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
         if (is_null($group)) {
-            return [
-                'exists' => false,
-            ];
+            throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
         $scoreboards = \OmegaUp\DAO\GroupsScoreboards::getByGroup(
             intval($group->group_id)
         );
 
-        $response = [
-            'exists' => true,
-            'scoreboards' => [],
-        ];
         /** @var array{create_time: int, alias: null|string, name: null|string, description: null|string} */
-        $response['group'] = $group->asFilteredArray([
+        $filteredGroup = $group->asFilteredArray([
             'create_time',
             'alias',
             'name',
             'description',
         ]);
+        $response = [
+            'group' => $filteredGroup,
+            'scoreboards' => [],
+        ];
         foreach ($scoreboards as $scoreboard) {
             /** @var array{alias: string, create_time: string, description: null|string, name: string} */
             $response['scoreboards'][] = $scoreboard->asFilteredArray([

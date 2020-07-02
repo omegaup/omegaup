@@ -1,10 +1,10 @@
 <template>
   <div class="card">
-    <form class="card-body form" enctype="multipart/form-data" method="post">
-      <div class="row">
-        <label class="font-weight-bold"
-          >{{ T.statementLanguage }}
-          <select name="statement-language" v-model="currentLanguage">
+    <div class="card-body">
+      <div class="row" v-if="showEditControls">
+        <div class="form-group col-md-6">
+          <label class="font-weight-bold">{{ T.statementLanguage }}</label>
+          <select class="form-control" v-model="currentLanguage">
             <option
               v-bind:markdown-contents.sync="currentMarkdown"
               v-bind:value="language"
@@ -12,7 +12,14 @@
               >{{ getLanguageNameText(language) }}</option
             >
           </select>
-        </label>
+        </div>
+        <div
+          class="form-group col-md-6"
+          v-bind:class="{ 'has-error': errors.includes('message') }"
+        >
+          <label class="control-label">{{ T.problemEditCommitMessage }}</label>
+          <input class="form-control" v-model="commitMessage" />
+        </div>
       </div>
       <div class="row">
         <div class="col-md-6">
@@ -27,6 +34,7 @@
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
             v-bind:markdown="currentMarkdown"
+            preview="true"
           ></omegaup-markdown>
           <template v-if="markdownType === 'statements'">
             <hr />
@@ -52,21 +60,19 @@
           </template>
         </div>
       </div>
-      <div class="row">
-        <div
-          class="form-group col-md-12"
-          v-bind:class="{ 'has-error': errors.includes('message') }"
-        >
-          <label class="control-label">{{ T.problemEditCommitMessage }}</label>
-          <input class="form-control" name="message" v-model="commitMessage" />
-        </div>
-      </div>
-      <div class="row">
+    </div>
+    <div class="card-footer" v-if="showEditControls">
+      <form
+        class="row"
+        enctype="multipart/form-data"
+        method="post"
+        v-on:submit="onSubmit"
+      >
         <div class="col-md-12">
           <button
             class="btn btn-primary"
+            type="submit"
             v-bind:disabled="commitMessage === ''"
-            v-on:click="handleEditMarkdown"
           >
             {{
               markdownType === 'solutions'
@@ -75,16 +81,17 @@
             }}
           </button>
         </div>
-      </div>
-      <input
-        type="hidden"
-        name="contents"
-        v-bind:value="JSON.stringify(this.statements)"
-      />
-      <input type="hidden" name="directory" v-bind:value="markdownType" />
-      <input type="hidden" name="problem_alias" v-bind:value="alias" />
-      <input type="hidden" name="request" value="markdown" />
-    </form>
+        <input type="hidden" name="message" v-bind:value="commitMessage" />
+        <input
+          type="hidden"
+          name="contents"
+          v-bind:value="JSON.stringify(this.statements)"
+        />
+        <input type="hidden" name="directory" v-bind:value="markdownType" />
+        <input type="hidden" name="problem_alias" v-bind:value="alias" />
+        <input type="hidden" name="request" value="markdown" />
+      </form>
+    </div>
   </div>
 </template>
 
@@ -97,7 +104,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
+import { Vue, Component, Emit, Prop, Watch, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -130,6 +137,7 @@ export default class ProblemStatementEdit extends Vue {
   @Prop() markdownContents!: string;
   @Prop() initialLanguage!: string;
   @Prop() markdownType!: string;
+  @Prop({ default: true }) showEditControls!: boolean;
 
   T = T;
   commitMessage = T.updateStatementsCommitMessage;
@@ -195,7 +203,13 @@ export default class ProblemStatementEdit extends Vue {
     );
   }
 
-  handleEditMarkdown(e: Event) {
+  @Emit('update:markdownContents')
+  @Watch('currentMarkdown')
+  onCurrentMarkdownChange(newMarkdown: string, oldMarkdown: string): string {
+    return newMarkdown;
+  }
+
+  onSubmit(e: Event) {
     this.errors = [];
     this.statements[this.currentLanguage] = this.currentMarkdown;
     if (this.commitMessage) {

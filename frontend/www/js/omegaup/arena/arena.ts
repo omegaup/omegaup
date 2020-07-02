@@ -4,12 +4,12 @@ import * as Highcharts from 'highcharts/highstock';
 
 import * as api from '../api';
 import T from '../lang';
-import * as markdown from '../markdown';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
 import * as time from '../time';
 import * as typeahead from '../typeahead';
 import * as ui from '../ui';
+import * as markdown from '../markdown';
 
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
@@ -21,14 +21,15 @@ import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
+import omegaup_Markdown from '../components/Markdown.vue';
 import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 
 import ArenaAdmin from './admin_arena';
 
-import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
-
 export { ArenaAdmin };
+
+import * as MarkdownConverter from '@/third_party/js/pagedown/Markdown.Converter.js';
 
 Vue.use(Vuex);
 
@@ -36,6 +37,7 @@ export interface ArenaOptions {
   assignmentAlias: string | null;
   contestAlias: string | null;
   courseAlias: string | null;
+  courseName: string | null;
   disableClarifications: boolean;
   disableSockets: boolean;
   isInterview: boolean;
@@ -219,9 +221,6 @@ export class Arena {
   // The last known scoreboard event stream.
   currentEvents: types.ScoreboardEvent[] = [];
 
-  // The Markdown-to-HTML converter.
-  markdownConverter: Markdown.Converter = markdown.markdownConverter();
-
   // If we have admin powers in this contest.
   problemsetAdmin: boolean = false;
 
@@ -295,6 +294,12 @@ export class Arena {
         notifications: types.Notification[];
       })
     | null = null;
+
+  markdownView: Vue & {
+    markdown: string;
+    imageMapping: MarkdownConverter.ImageMapping;
+    problemSettings: markdown.ProblemSettings;
+  };
 
   runDetailsView:
     | (Vue & {
@@ -439,6 +444,7 @@ export class Arena {
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
+      const self = this;
       this.navbarProblems = new Vue({
         el: '#arena-navbar-problems',
         render: function(createElement) {
@@ -448,6 +454,9 @@ export class Arena {
               activeProblem: this.activeProblem,
               inAssignment: !!options.courseAlias,
               digitsAfterDecimalPoint: options.partialScore ? 2 : 0,
+              courseAlias: options.courseAlias,
+              courseName: options.courseName,
+              currentAssignment: self.currentProblemset,
             },
             on: {
               'navigate-to-problem': (problemAlias: string) => {
@@ -601,6 +610,33 @@ export class Arena {
     const summaryElement = document.getElementById('summary');
     if (summaryElement) {
       this.summaryView.$mount(summaryElement);
+    }
+
+    // Markdown view.
+    this.markdownView = new Vue({
+      render: function(createElement) {
+        return createElement('omegaup-markdown', {
+          props: {
+            markdown: this.markdown,
+            imageMapping: this.imageMapping,
+            problemSettings: this.problemSettings,
+          },
+        });
+      },
+      data: {
+        markdown: '',
+        imageMapping: <MarkdownConverter.ImageMapping>{},
+        problemSettings: <markdown.ProblemSettings>{},
+      },
+      components: {
+        'omegaup-markdown': omegaup_Markdown,
+      },
+    });
+    const problemStatementElement = document.querySelector(
+      '#problem div.statement',
+    );
+    if (problemStatementElement) {
+      this.markdownView.$mount(problemStatementElement);
     }
 
     this.navbarAssignments = null;
@@ -845,7 +881,7 @@ export class Arena {
           return createElement('omegaup-arena-navbar-assignments', {
             props: {
               assignments: problemset.courseAssignments,
-              currentAssignmentAlias: problemset.alias,
+              currentAssignment: problemset,
             },
             on: {
               'navigate-to-assignment': (assignmentAlias: string) => {
@@ -1818,15 +1854,10 @@ export class Arena {
 
   renderProblem(problem: Problem): void {
     this.currentProblem = problem;
-    const statementElement = <HTMLElement>(
-      document.querySelector('#problem div.statement')
-    );
     if (problem.statement) {
-      statementElement.innerHTML = this.markdownConverter.makeHtmlWithImages(
-        problem.statement.markdown,
-        problem.statement.images,
-        problem.settings,
-      );
+      this.markdownView.markdown = problem.statement.markdown;
+      this.markdownView.imageMapping = problem.statement.images;
+      this.markdownView.problemSettings = problem.settings;
     }
     const creationDateElement = <HTMLElement>(
       document.querySelector('#problem .problem-creation-date')
@@ -1840,7 +1871,7 @@ export class Arena {
     ui.renderSampleToClipboardButton();
 
     const libinteractiveInterfaceNameElement = <HTMLElement>(
-      statementElement.querySelector('span.libinteractive-interface-name')
+      this.markdownView.$el.querySelector('span.libinteractive-interface-name')
     );
     if (
       libinteractiveInterfaceNameElement &&
@@ -1852,7 +1883,6 @@ export class Arena {
       );
     }
     this.installLibinteractiveHooks();
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, statementElement]);
 
     this.updateAllowedLanguages(problem.languages);
 
@@ -2169,6 +2199,7 @@ export function GetDefaultOptions(): ArenaOptions {
     assignmentAlias: null,
     contestAlias: null,
     courseAlias: null,
+    courseName: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
     onlyProblemAlias: null,
