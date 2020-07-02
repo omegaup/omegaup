@@ -6,4 +6,5 @@ var MathJax = {
     ],
     processEscapes: true,
   },
+  skipStartupTypeset: true,
 };

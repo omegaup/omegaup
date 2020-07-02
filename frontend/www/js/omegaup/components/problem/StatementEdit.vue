@@ -34,6 +34,7 @@
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
             v-bind:markdown="currentMarkdown"
+            preview="true"
           ></omegaup-markdown>
           <template v-if="markdownType === 'statements'">
             <hr />
