@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.ProblemSettingsSumaryPayload(
+  const payload = types.payloadParsers.ProblemSettingsSummaryPayload(
     'settings-summary-payload',
   );
   const problemSettingsSummary = new Vue({
