@@ -5,7 +5,9 @@
 /**
  * RunController
  *
+ * @psalm-type ProblemCasesContents=array<string, array{in: string, out: string}>
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases?: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
@@ -831,7 +833,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $run_alias
      *
-     * @return array{admin: bool, alias: string, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, guid: string, judged_by?: string, language: string, logs?: string, source?: string}
+     * @return RunDetails
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -849,8 +851,11 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
+        if (is_null($run->commit) || is_null($run->version)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
+        }
         $problem = \OmegaUp\DAO\Problems::getByPK($submission->problem_id);
-        if (is_null($problem)) {
+        if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
         $problemset = null;
@@ -933,7 +938,144 @@ class Run extends \OmegaUp\Controllers\Controller {
             $response['judged_by'] = strval($run->judged_by);
         }
 
+        $cases = self::getProblemCasesMetadata(
+            'cases',
+            $problem->alias,
+            $run->commit
+        );
+        /** @var int */
+        $responseSize = array_reduce(
+            $cases,
+            /**
+             * @param array{mode: int, type: string, id: string, size: int, path: string} $case
+             */
+            function (int $sum, $case): int {
+                return $sum + $case['size'];
+            },
+            0
+        );
+
+        if (
+            $problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_NONE
+            || $responseSize > 4096 // Forcing to hide diffs when inputs/outpus exceed 4kb
+        ) {
+            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_NONE;
+            return $response;
+        }
+        if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_ALL) {
+            $response['cases'] = self::getProblemCasesContents(
+                'cases',
+                $problem->alias,
+                $run->commit
+            );
+            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_ALL;
+            return $response;
+        }
+        $response['cases'] = self::getProblemCasesContents(
+            'examples',
+            $problem->alias,
+            $run->commit
+        );
+        $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_EXAMPLES;
+        // Removing cases values until this PR be approved and merged to PR #3800
+        $response['cases'] = [];
+
         return $response;
+    }
+
+    /**
+     * @return ProblemCasesContents
+     */
+    private static function getProblemCasesContents(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_CASES_CONTENTS,
+            "{$problemAlias}-{$revision}-{$directory}",
+            /** @return ProblemCasesContents */
+            function () use (
+                $directory,
+                $problemAlias,
+                $revision
+            ) {
+                return self::getProblemCasesContentsImpl(
+                    $directory,
+                    $problemAlias,
+                    $revision
+                );
+            },
+            24 * 60 * 60 // expire in 1 day
+        );
+    }
+
+    /**
+     * @return ProblemCasesContents
+     */
+    private static function getProblemCasesContentsImpl(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problemAlias,
+            $revision
+        );
+
+        $existingCases = self::getProblemCasesMetadata(
+            $directory,
+            $problemAlias,
+            $revision
+        );
+        $response = [];
+        foreach ($existingCases as $file) {
+            [$_, $filename] = explode("{$directory}/", $file['path']);
+            $extension = pathinfo($filename, PATHINFO_EXTENSION);
+            \OmegaUp\Validators::validateInEnum(
+                $extension,
+                'extension',
+                ['in', 'out']
+            );
+            $caseName = basename($filename, ".{$extension}");
+            if (!isset($response[$caseName])) {
+                $response[$caseName] = [
+                    'in' => '',
+                    'out' => '',
+                ];
+            }
+            $caseContents = $problemArtifacts->get($file['path']);
+            if ($extension === 'in') {
+                $response[$caseName]['in'] = $caseContents;
+            } else {
+                $response[$caseName]['out'] = $caseContents;
+            }
+        }
+        return $response;
+    }
+
+    /**
+     * @return list<array{mode: int, type: string, id: string, size: int, path: string}>
+     */
+    private static function getProblemCasesMetadata(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES_FILES,
+            "{$problemAlias}-{$revision}-{$directory}",
+            /** @return list<array{id: string, mode: int, path: string, size: int, type: string}> */
+            function () use ($problemAlias, $revision, $directory) {
+                $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                    $problemAlias,
+                    $revision
+                );
+
+                return $problemArtifacts->lsTreeRecursive($directory);
+            },
+            24 * 60 * 60 // expire in 1 day
+        );
     }
 
     /**

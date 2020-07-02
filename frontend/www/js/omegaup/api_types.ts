@@ -1387,6 +1387,10 @@ export namespace types {
     username: string;
   }
 
+  export interface ProblemCasesContents {
+    [key: string]: { in: string; out: string };
+  }
+
   export interface ProblemDetails {
     accepted: number;
     admin?: boolean;
@@ -1745,6 +1749,45 @@ export namespace types {
     alias: string;
     country: string;
     contest_alias?: string;
+  }
+
+  export interface RunDetails {
+    admin: boolean;
+    alias: string;
+    cases?: types.ProblemCasesContents;
+    compile_error?: string;
+    details?: {
+      compile_meta?: { [key: string]: types.RunMetadata };
+      contest_score: number;
+      groups?: {
+        cases: {
+          contest_score: number;
+          max_score: number;
+          meta: types.RunMetadata;
+          name: string;
+          score: number;
+          verdict: string;
+        }[];
+        contest_score: number;
+        group: string;
+        max_score: number;
+        score: number;
+        verdict?: string;
+      }[];
+      judged_by: string;
+      max_score?: number;
+      memory?: number;
+      score: number;
+      time?: number;
+      verdict: string;
+      wall_time?: number;
+    };
+    guid: string;
+    judged_by?: string;
+    language: string;
+    logs?: string;
+    show_diff: string;
+    source?: string;
   }
 
   export interface RunMetadata {
@@ -2931,42 +2974,7 @@ export namespace messages {
     nextSubmissionTimestamp: Date;
   };
   export type RunDetailsRequest = { [key: string]: any };
-  export type RunDetailsResponse = {
-    admin: boolean;
-    alias: string;
-    compile_error?: string;
-    details?: {
-      compile_meta?: { [key: string]: types.RunMetadata };
-      contest_score: number;
-      groups?: {
-        cases: {
-          contest_score: number;
-          max_score: number;
-          meta: types.RunMetadata;
-          name: string;
-          score: number;
-          verdict: string;
-        }[];
-        contest_score: number;
-        group: string;
-        max_score: number;
-        score: number;
-        verdict?: string;
-      }[];
-      judged_by: string;
-      max_score?: number;
-      memory?: number;
-      score: number;
-      time?: number;
-      verdict: string;
-      wall_time?: number;
-    };
-    guid: string;
-    judged_by?: string;
-    language: string;
-    logs?: string;
-    source?: string;
-  };
+  export type RunDetailsResponse = types.RunDetails;
   export type RunDisqualifyRequest = { [key: string]: any };
   export type RunDisqualifyResponse = {};
   export type RunListRequest = { [key: string]: any };
