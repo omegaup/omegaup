@@ -33,6 +33,14 @@ export { ArenaAdmin };
 
 Vue.use(Vuex);
 
+declare global {
+  namespace MathJax {
+    namespace Hub {
+      function Queue(params: any[]): void;
+    }
+  }
+}
+
 export interface ArenaOptions {
   assignmentAlias: string | null;
   contestAlias: string | null;

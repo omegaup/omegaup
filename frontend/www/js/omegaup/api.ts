@@ -2,6 +2,10 @@
 import { messages } from './api_types';
 import { addError } from './errors';
 
+interface ApiCallOptions {
+  quiet?: boolean;
+}
+
 export function apiCall<
   RequestType extends { [key: string]: any },
   ServerResponseType,
@@ -9,10 +13,11 @@ export function apiCall<
 >(
   url: string,
   transform?: (result: ServerResponseType) => ResponseType,
-): (params?: RequestType) => Promise<ResponseType> {
-  return (params?: RequestType) =>
+): (params?: RequestType, options?: ApiCallOptions) => Promise<ResponseType> {
+  return (params?: RequestType, options?: ApiCallOptions) =>
     new Promise((accept, reject) => {
       let responseOk = true;
+      let responseStatus = 200;
       fetch(
         url,
         params
@@ -48,12 +53,19 @@ export function apiCall<
             return;
           }
           responseOk = response.ok;
+          responseStatus = response.status;
           return response.json();
         })
         .then(data => {
           if (!responseOk) {
-            addError(data);
-            console.error(data);
+            if (typeof data === 'object' && !Array.isArray(data)) {
+              data.status = 'error';
+              data.httpStatusCode = responseStatus;
+            }
+            if (!options?.quiet) {
+              addError(data);
+              console.error(data);
+            }
             reject(data);
             return;
           }
@@ -64,9 +76,15 @@ export function apiCall<
           }
         })
         .catch(err => {
-          const errorData = { status: 'error', error: err };
-          addError(errorData);
-          console.error(errorData);
+          const errorData = {
+            status: 'error',
+            error: err,
+            httpStatusCode: responseStatus,
+          };
+          if (!options?.quiet) {
+            addError(errorData);
+            console.error(errorData);
+          }
           reject(errorData);
         });
     });
@@ -943,17 +961,16 @@ export const Interview = {
     messages._InterviewDetailsServerResponse,
     messages.InterviewDetailsResponse
   >('/api/interview/details/', x => {
-    if (x.users)
-      x.users = (x => {
-        if (!Array.isArray(x)) {
-          return x;
-        }
-        return x.map(x => {
-          if (x.access_time)
-            x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
-          return x;
-        });
-      })(x.users);
+    x.users = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.access_time)
+          x.access_time = ((x: number) => new Date(x * 1000))(x.access_time);
+        return x;
+      });
+    })(x.users);
     return x;
   }),
   list: apiCall<messages.InterviewListRequest, messages.InterviewListResponse>(
@@ -1038,8 +1055,7 @@ export const Problem = {
     messages._ProblemDetailsServerResponse,
     messages.ProblemDetailsResponse
   >('/api/problem/details/', x => {
-    if (x.creation_date)
-      x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
+    x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
     if (x.problemsetter)
       x.problemsetter = (x => {
         if (x.creation_date)
@@ -1187,9 +1203,9 @@ export const Problemset = {
           return x;
         }
         return x.map(x => {
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         });
       })(x.courseAssignments);
