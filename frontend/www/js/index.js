@@ -1,4 +1,4 @@
-(function() {
+(function () {
   if (
     typeof omegaup === 'undefined' ||
     typeof omegaup.API === 'undefined' ||

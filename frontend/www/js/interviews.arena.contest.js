@@ -1,4 +1,4 @@
-omegaup.OmegaUp.on('ready', function() {
+omegaup.OmegaUp.on('ready', function () {
   var arenaInstance = new arena.Arena({
     contestAlias: /\/interview\/([^\/]+)\/arena/.exec(
       window.location.pathname,

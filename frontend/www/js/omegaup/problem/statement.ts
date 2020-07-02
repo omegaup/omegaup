@@ -48,7 +48,7 @@ OmegaUp.on('ready', () => {
 
   const problemDetails = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-statementedit', {
         props: {
           alias: 'problema',

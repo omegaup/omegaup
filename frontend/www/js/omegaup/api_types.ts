@@ -48,8 +48,8 @@ export namespace types {
     export function BadgeDetailsPayload(
       elementId: string = 'payload',
     ): types.BadgeDetailsPayload {
-      return (x => {
-        x.badge = (x => {
+      return ((x) => {
+        x.badge = ((x) => {
           if (x.assignation_time)
             x.assignation_time = ((x: number) => new Date(x * 1000))(
               x.assignation_time,
@@ -69,12 +69,12 @@ export namespace types {
     export function BadgeListPayload(
       elementId: string = 'payload',
     ): types.BadgeListPayload {
-      return (x => {
-        x.ownedBadges = (x => {
+      return ((x) => {
+        x.ownedBadges = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
-          return x.map(x => {
+          return x.map((x) => {
             if (x.assignation_time)
               x.assignation_time = ((x: number) => new Date(x * 1000))(
                 x.assignation_time,
@@ -111,8 +111,8 @@ export namespace types {
     export function ContestIntroPayload(
       elementId: string = 'payload',
     ): types.ContestIntroPayload {
-      return (x => {
-        x.contest = (x => {
+      return ((x) => {
+        x.contest = ((x) => {
           x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
@@ -126,12 +126,12 @@ export namespace types {
     export function ContestListMinePayload(
       elementId: string = 'payload',
     ): types.ContestListMinePayload {
-      return (x => {
-        x.contests = (x => {
+      return ((x) => {
+        x.contests = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
-          return x.map(x => {
+          return x.map((x) => {
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
             x.last_updated = ((x: number) => new Date(x * 1000))(
               x.last_updated,
@@ -153,13 +153,13 @@ export namespace types {
     export function ContestListPayload(
       elementId: string = 'payload',
     ): types.ContestListPayload {
-      return (x => {
-        x.contests = (x => {
-          x.current = (x => {
+      return ((x) => {
+        x.contests = ((x) => {
+          x.current = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -173,11 +173,11 @@ export namespace types {
               return x;
             });
           })(x.current);
-          x.future = (x => {
+          x.future = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -192,11 +192,11 @@ export namespace types {
             });
           })(x.future);
           if (x.participating)
-            x.participating = (x => {
+            x.participating = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
               }
-              return x.map(x => {
+              return x.map((x) => {
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
@@ -212,11 +212,11 @@ export namespace types {
                 return x;
               });
             })(x.participating);
-          x.past = (x => {
+          x.past = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -230,11 +230,11 @@ export namespace types {
               return x;
             });
           })(x.past);
-          x.public = (x => {
+          x.public = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -248,11 +248,11 @@ export namespace types {
               return x;
             });
           })(x.public);
-          x.recommended_current = (x => {
+          x.recommended_current = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -266,11 +266,11 @@ export namespace types {
               return x;
             });
           })(x.recommended_current);
-          x.recommended_past = (x => {
+          x.recommended_past = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
               );
@@ -303,13 +303,13 @@ export namespace types {
     export function CourseDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseDetailsPayload {
-      return (x => {
-        x.details = (x => {
-          x.assignments = (x => {
+      return ((x) => {
+        x.details = ((x) => {
+          x.assignments = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               if (x.finish_time)
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
@@ -332,13 +332,13 @@ export namespace types {
     export function CourseEditPayload(
       elementId: string = 'payload',
     ): types.CourseEditPayload {
-      return (x => {
-        x.course = (x => {
-          x.assignments = (x => {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               if (x.finish_time)
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
@@ -352,11 +352,11 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.course);
-        x.identityRequests = (x => {
+        x.identityRequests = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
-          return x.map(x => {
+          return x.map((x) => {
             if (x.last_update)
               x.last_update = ((x: number) => new Date(x * 1000))(
                 x.last_update,
@@ -368,7 +368,7 @@ export namespace types {
           });
         })(x.identityRequests);
         if (x.selectedAssignment)
-          x.selectedAssignment = (x => {
+          x.selectedAssignment = ((x) => {
             if (x.finish_time)
               x.finish_time = ((x: number) => new Date(x * 1000))(
                 x.finish_time,
@@ -385,16 +385,16 @@ export namespace types {
     export function CourseListPayload(
       elementId: string = 'payload',
     ): types.CourseListPayload {
-      return (x => {
-        x.courses = (x => {
-          x.admin = (x => {
-            x.filteredCourses = (x => {
-              x.current = (x => {
-                x.courses = (x => {
+      return ((x) => {
+        x.courses = ((x) => {
+          x.admin = ((x) => {
+            x.filteredCourses = ((x) => {
+              x.current = ((x) => {
+                x.courses = ((x) => {
                   if (!Array.isArray(x)) {
                     return x;
                   }
-                  return x.map(x => {
+                  return x.map((x) => {
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -407,12 +407,12 @@ export namespace types {
                 })(x.courses);
                 return x;
               })(x.current);
-              x.past = (x => {
-                x.courses = (x => {
+              x.past = ((x) => {
+                x.courses = ((x) => {
                   if (!Array.isArray(x)) {
                     return x;
                   }
-                  return x.map(x => {
+                  return x.map((x) => {
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -429,14 +429,14 @@ export namespace types {
             })(x.filteredCourses);
             return x;
           })(x.admin);
-          x.public = (x => {
-            x.filteredCourses = (x => {
-              x.current = (x => {
-                x.courses = (x => {
+          x.public = ((x) => {
+            x.filteredCourses = ((x) => {
+              x.current = ((x) => {
+                x.courses = ((x) => {
                   if (!Array.isArray(x)) {
                     return x;
                   }
-                  return x.map(x => {
+                  return x.map((x) => {
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -449,12 +449,12 @@ export namespace types {
                 })(x.courses);
                 return x;
               })(x.current);
-              x.past = (x => {
-                x.courses = (x => {
+              x.past = ((x) => {
+                x.courses = ((x) => {
                   if (!Array.isArray(x)) {
                     return x;
                   }
-                  return x.map(x => {
+                  return x.map((x) => {
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -471,14 +471,14 @@ export namespace types {
             })(x.filteredCourses);
             return x;
           })(x.public);
-          x.student = (x => {
-            x.filteredCourses = (x => {
-              x.current = (x => {
-                x.courses = (x => {
+          x.student = ((x) => {
+            x.filteredCourses = ((x) => {
+              x.current = ((x) => {
+                x.courses = ((x) => {
                   if (!Array.isArray(x)) {
                     return x;
                   }
-                  return x.map(x => {
+                  return x.map((x) => {
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -491,12 +491,12 @@ export namespace types {
                 })(x.courses);
                 return x;
               })(x.current);
-              x.past = (x => {
-                x.courses = (x => {
+              x.past = ((x) => {
+                x.courses = ((x) => {
                   if (!Array.isArray(x)) {
                     return x;
                   }
-                  return x.map(x => {
+                  return x.map((x) => {
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -532,10 +532,10 @@ export namespace types {
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
-      return (x => {
-        x.coderOfTheMonthData = (x => {
+      return ((x) => {
+        x.coderOfTheMonthData = ((x) => {
           if (x.all)
-            x.all = (x => {
+            x.all = ((x) => {
               if (x.birth_date)
                 x.birth_date = ((x: number) => new Date(x * 1000))(
                   x.birth_date,
@@ -547,7 +547,7 @@ export namespace types {
               return x;
             })(x.all);
           if (x.female)
-            x.female = (x => {
+            x.female = ((x) => {
               if (x.birth_date)
                 x.birth_date = ((x: number) => new Date(x * 1000))(
                   x.birth_date,
@@ -569,13 +569,13 @@ export namespace types {
     export function IntroDetailsPayload(
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
-      return (x => {
-        x.details = (x => {
-          x.assignments = (x => {
+      return ((x) => {
+        x.details = ((x) => {
+          x.assignments = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               if (x.finish_time)
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
@@ -598,10 +598,10 @@ export namespace types {
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
-      return (x => {
+      return ((x) => {
         x.creation_date = ((x: number) => new Date(x * 1000))(x.creation_date);
         if (x.problemsetter)
-          x.problemsetter = (x => {
+          x.problemsetter = ((x) => {
             if (x.creation_date)
               x.creation_date = ((x: number) => new Date(x * 1000))(
                 x.creation_date,
@@ -609,21 +609,21 @@ export namespace types {
             return x;
           })(x.problemsetter);
         if (x.runs)
-          x.runs = (x => {
+          x.runs = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
           })(x.runs);
         if (x.solvers)
-          x.solvers = (x => {
+          x.solvers = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             });
@@ -637,10 +637,10 @@ export namespace types {
     export function ProblemDetailsv2Payload(
       elementId: string = 'payload',
     ): types.ProblemDetailsv2Payload {
-      return (x => {
-        x.problem = (x => {
+      return ((x) => {
+        x.problem = ((x) => {
           if (x.problemsetter)
-            x.problemsetter = (x => {
+            x.problemsetter = ((x) => {
               if (x.creation_date)
                 x.creation_date = ((x: number) => new Date(x * 1000))(
                   x.creation_date,
@@ -658,17 +658,17 @@ export namespace types {
     export function ProblemEditPayload(
       elementId: string = 'payload',
     ): types.ProblemEditPayload {
-      return (x => {
-        x.log = (x => {
+      return ((x) => {
+        x.log = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
-          return x.map(x => {
-            x.author = (x => {
+          return x.map((x) => {
+            x.author = ((x) => {
               if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.author);
-            x.committer = (x => {
+            x.committer = ((x) => {
               if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.committer);
@@ -676,7 +676,7 @@ export namespace types {
           });
         })(x.log);
         if (x.problemsetter)
-          x.problemsetter = (x => {
+          x.problemsetter = ((x) => {
             if (x.creation_date)
               x.creation_date = ((x: number) => new Date(x * 1000))(
                 x.creation_date,
@@ -684,12 +684,12 @@ export namespace types {
             return x;
           })(x.problemsetter);
         if (x.publishedRevision)
-          x.publishedRevision = (x => {
-            x.author = (x => {
+          x.publishedRevision = ((x) => {
+            x.author = ((x) => {
               if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.author);
-            x.committer = (x => {
+            x.committer = ((x) => {
               if (x.time) x.time = ((x: number) => new Date(x * 1000))(x.time);
               return x;
             })(x.committer);
@@ -728,10 +728,10 @@ export namespace types {
     export function ProblemSettingsSummaryPayload(
       elementId: string = 'payload',
     ): types.ProblemSettingsSummaryPayload {
-      return (x => {
-        x.problem = (x => {
+      return ((x) => {
+        x.problem = ((x) => {
           if (x.problemsetter)
-            x.problemsetter = (x => {
+            x.problemsetter = ((x) => {
               if (x.creation_date)
                 x.creation_date = ((x: number) => new Date(x * 1000))(
                   x.creation_date,
@@ -739,11 +739,11 @@ export namespace types {
               return x;
             })(x.problemsetter);
           if (x.runs)
-            x.runs = (x => {
+            x.runs = ((x) => {
               if (!Array.isArray(x)) {
                 return x;
               }
-              return x.map(x => {
+              return x.map((x) => {
                 x.time = ((x: number) => new Date(x * 1000))(x.time);
                 return x;
               });
@@ -791,7 +791,7 @@ export namespace types {
     export function StatsPayload(
       elementId: string = 'payload',
     ): types.StatsPayload {
-      return (x => {
+      return ((x) => {
         if (x.max_wait_time)
           x.max_wait_time = ((x: number) => new Date(x * 1000))(
             x.max_wait_time,
@@ -805,13 +805,13 @@ export namespace types {
     export function StudentProgressPayload(
       elementId: string = 'payload',
     ): types.StudentProgressPayload {
-      return (x => {
-        x.course = (x => {
-          x.assignments = (x => {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               if (x.finish_time)
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
@@ -834,13 +834,13 @@ export namespace types {
     export function StudentsProgressPayload(
       elementId: string = 'payload',
     ): types.StudentsProgressPayload {
-      return (x => {
-        x.course = (x => {
-          x.assignments = (x => {
+      return ((x) => {
+        x.course = ((x) => {
+          x.assignments = ((x) => {
             if (!Array.isArray(x)) {
               return x;
             }
-            return x.map(x => {
+            return x.map((x) => {
               if (x.finish_time)
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
@@ -863,12 +863,12 @@ export namespace types {
     export function SubmissionsListPayload(
       elementId: string = 'payload',
     ): types.SubmissionsListPayload {
-      return (x => {
-        x.submissions = (x => {
+      return ((x) => {
+        x.submissions = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
-          return x.map(x => {
+          return x.map((x) => {
             x.time = ((x: number) => new Date(x * 1000))(x.time);
             return x;
           });
@@ -882,13 +882,13 @@ export namespace types {
     export function UserProfileDetailsPayload(
       elementId: string = 'payload',
     ): types.UserProfileDetailsPayload {
-      return (x => {
-        x.contests = (x => {
+      return ((x) => {
+        x.contests = ((x) => {
           if (x instanceof Object) {
             Object.keys(x).forEach(
-              y =>
-                (x[y] = (x => {
-                  x.data = (x => {
+              (y) =>
+                (x[y] = ((x) => {
+                  x.data = ((x) => {
                     x.finish_time = ((x: number) => new Date(x * 1000))(
                       x.finish_time,
                     );
@@ -906,11 +906,11 @@ export namespace types {
           }
           return x;
         })(x.contests);
-        x.ownedBadges = (x => {
+        x.ownedBadges = ((x) => {
           if (!Array.isArray(x)) {
             return x;
           }
-          return x.map(x => {
+          return x.map((x) => {
             if (x.assignation_time)
               x.assignation_time = ((x: number) => new Date(x * 1000))(
                 x.assignation_time,
@@ -922,7 +922,7 @@ export namespace types {
             return x;
           });
         })(x.ownedBadges);
-        x.profile = (x => {
+        x.profile = ((x) => {
           if (x.birth_date)
             x.birth_date = ((x: number) => new Date(x * 1000))(x.birth_date);
           if (x.graduation_date)

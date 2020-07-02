@@ -76,7 +76,7 @@
           v-bind:all-languages="contest.available_languages"
           v-bind:update="true"
           v-on:emit-update-contest="
-            newFormComponent => $emit('update-contest', newFormComponent)
+            (newFormComponent) => $emit('update-contest', newFormComponent)
           "
         ></omegaup-contest-new-form>
       </div>
@@ -86,14 +86,15 @@
           v-bind:initialPoints="contest.partial_score ? 100 : 1"
           v-bind:data="problems"
           v-on:emit-add-problem="
-            addProblemComponent => $emit('add-problem', addProblemComponent)
+            (addProblemComponent) => $emit('add-problem', addProblemComponent)
           "
           v-on:emit-change-alias="
             (addProblemComponent, newProblemAlias) =>
               $emit('get-versions', newProblemAlias, addProblemComponent)
           "
           v-on:emit-remove-problem="
-            addProblemComponent => $emit('remove-problem', addProblemComponent)
+            (addProblemComponent) =>
+              $emit('remove-problem', addProblemComponent)
           "
           v-on:emit-runs-diff="
             (addProblemComponent, versions, selectedCommit) =>
@@ -110,7 +111,8 @@
             T.contestNewFormAdmissionModeDescription
           "
           v-on:emit-update-admission-mode="
-            publishComponent => $emit('update-admission-mode', publishComponent)
+            (publishComponent) =>
+              $emit('update-admission-mode', publishComponent)
           "
         ></omegaup-common-publish>
       </div>
@@ -119,12 +121,14 @@
           v-bind:contest="contest"
           v-bind:data="users"
           v-on:emit-add-user="
-            contestantComponent => $emit('add-user', contestantComponent)
+            (contestantComponent) => $emit('add-user', contestantComponent)
           "
           v-on:emit-remove-user="
-            contestantComponent => $emit('remove-user', contestantComponent)
+            (contestantComponent) => $emit('remove-user', contestantComponent)
           "
-          v-on:emit-save-end-time="selected => $emit('save-end-time', selected)"
+          v-on:emit-save-end-time="
+            (selected) => $emit('save-end-time', selected)
+          "
         ></omegaup-contest-contestant>
         <omegaup-common-requests
           v-bind:data="requests"
@@ -142,10 +146,10 @@
           v-bind:data="groups"
           v-if="isIdentitiesExperimentEnabled"
           v-on:emit-add-group="
-            groupsComponent => $emit('add-group', groupsComponent)
+            (groupsComponent) => $emit('add-group', groupsComponent)
           "
           v-on:emit-remove-group="
-            groupsComponent => $emit('remove-group', groupsComponent)
+            (groupsComponent) => $emit('remove-group', groupsComponent)
           "
         ></omegaup-contest-groups>
       </div>
@@ -154,21 +158,21 @@
           v-bind:initial-admins="admins"
           v-bind:has-parent-component="true"
           v-on:emit-add-admin="
-            addAdminComponent => $emit('add-admin', addAdminComponent)
+            (addAdminComponent) => $emit('add-admin', addAdminComponent)
           "
           v-on:emit-remove-admin="
-            addAdminComponent => $emit('remove-admin', addAdminComponent)
+            (addAdminComponent) => $emit('remove-admin', addAdminComponent)
           "
         ></omegaup-contest-admins>
         <omegaup-contest-group-admins
           v-bind:initial-groups="groupAdmins"
           v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('add-group-admin', groupAdminsComponent)
           "
           v-on:emit-remove-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('remove-group-admin', groupAdminsComponent)
           "
         ></omegaup-contest-group-admins>
@@ -179,7 +183,7 @@
       <div class="tab-pane active" v-if="showTab === 'clone'">
         <omegaup-contest-clone
           v-on:emit-clone="
-            cloneComponent => $emit('clone-contest', cloneComponent)
+            (cloneComponent) => $emit('clone-contest', cloneComponent)
           "
         ></omegaup-contest-clone>
       </div>

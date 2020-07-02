@@ -133,7 +133,7 @@
                 class="form-control typeahead school"
                 type="text"
                 v-model="school_name"
-                v-on:change="onChange"/><input
+                v-on:change="onChange" /><input
                 class="school_id"
                 type="hidden"
                 v-model="school_id"
@@ -198,8 +198,8 @@
                 cols="30"
                 rows="5"
                 v-model="description"
-              ></textarea
-            ></label>
+              ></textarea>
+            </label>
           </div>
           <div class="form-group col-md-4 pull-right">
             <div class="pull-right">

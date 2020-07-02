@@ -57,11 +57,9 @@
               <td>
                 <a
                   class="text-center"
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${homework.alias}/${
-                      course.is_admin ? 'admin/' : ''
-                    }`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${
+                    homework.alias
+                  }/${course.is_admin ? 'admin/' : ''}`"
                 >
                   {{ homework.name }}
                 </a>
@@ -77,27 +75,21 @@
               </td>
               <td class="text-center" v-if="course.is_admin">
                 <a
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url}/`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url}/`"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
                     T.wordsPublic
                   }}</a
                 >
                 <a
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url_admin}/`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url_admin}/`"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
                     T.wordsAdmin
                   }}</a
                 >
                 <a
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${homework.alias}/admin/#runs`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${homework.alias}/admin/#runs`"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'tachometer-alt']" />
                   {{ T.wordsRuns }}
@@ -112,9 +104,7 @@
           data-button-homework
           class="btn btn-primary float-right"
           v-if="course.is_admin"
-          v-bind:href="
-            `/course/${course.alias}/edit/#assignments/new/homework/`
-          "
+          v-bind:href="`/course/${course.alias}/edit/#assignments/new/homework/`"
           >{{ T.wordsNewHomework }}</a
         >
       </div>
@@ -144,11 +134,9 @@
               <td>
                 <a
                   class="text-center"
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${exam.alias}/${
-                      course.is_admin ? 'admin/' : ''
-                    }`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${
+                    exam.alias
+                  }/${course.is_admin ? 'admin/' : ''}`"
                 >
                   {{ exam.name }}
                 </a>
@@ -164,27 +152,21 @@
               </td>
               <td class="text-center" v-if="course.is_admin">
                 <a
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url}/`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url}/`"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
                     T.wordsPublic
                   }}</a
                 >
                 <a
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url_admin}/`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url_admin}/`"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
                     T.wordsAdmin
                   }}</a
                 >
                 <a
-                  v-bind:href="
-                    `/course/${course.alias}/assignment/${exam.alias}/admin/#runs`
-                  "
+                  v-bind:href="`/course/${course.alias}/assignment/${exam.alias}/admin/#runs`"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'tachometer-alt']" />
                   {{ T.wordsRuns }}
@@ -241,13 +223,13 @@ export default class CourseDetails extends Vue {
 
   get filteredHomeworks(): omegaup.Assignment[] {
     return this.course.assignments.filter(
-      assignment => assignment.assignment_type === 'homework',
+      (assignment) => assignment.assignment_type === 'homework',
     );
   }
 
   get filteredExams(): omegaup.Assignment[] {
     return this.course.assignments.filter(
-      assignment => assignment.assignment_type === 'test',
+      (assignment) => assignment.assignment_type === 'test',
     );
   }
 

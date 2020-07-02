@@ -31,7 +31,7 @@ export default {
       default: null,
     },
   },
-  mounted: function() {
+  mounted: function () {
     this._editor = monaco.editor.create(this.$el, {
       autoIndent: true,
       formatOnPaste: true,
@@ -47,16 +47,16 @@ export default {
     });
   },
   methods: {
-    onResize: function() {
+    onResize: function () {
       this._editor.layout();
     },
   },
   computed: {
-    language: function() {
+    language: function () {
       if (this.initialLanguage) return this.initialLanguage;
       return Util.vuexGet(this.store, this.storeMapping.language);
     },
-    module: function() {
+    module: function () {
       if (this.initialModule) return this.initialModule;
       return Util.vuexGet(this.store, this.storeMapping.module);
     },
@@ -68,29 +68,29 @@ export default {
         Util.vuexSet(this.store, this.storeMapping.contents, value);
       },
     },
-    filename: function() {
+    filename: function () {
       return (
         this.module +
         '.' +
         (this.extension || Util.languageExtensionMapping[this.language])
       );
     },
-    title: function() {
+    title: function () {
       return this.filename;
     },
-    visible: function() {
+    visible: function () {
       if (!this.storeMapping.visible) return true;
       return Util.vuexGet(this.store, this.storeMapping.visible);
     },
   },
   watch: {
-    language: function(value) {
+    language: function (value) {
       monaco.editor.setModelLanguage(
         this._model,
         Util.languageMonacoModelMapping[value],
       );
     },
-    contents: function(value) {
+    contents: function (value) {
       if (this._model.getValue() != value) this._model.setValue(value);
     },
   },

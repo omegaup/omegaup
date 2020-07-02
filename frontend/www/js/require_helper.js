@@ -1,5 +1,5 @@
 if (typeof require === 'undefined') {
-  window.require = function(name) {
+  window.require = function (name) {
     if (name.endsWith('omegaup.js')) {
       return omegaup;
     }

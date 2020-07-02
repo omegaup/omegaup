@@ -155,10 +155,11 @@
           v-bind:initial-admins="data.admins"
           v-bind:has-parent-component="true"
           v-on:emit-add-admin="
-            addAdminComponent => $emit('add-admin', addAdminComponent.username)
+            (addAdminComponent) =>
+              $emit('add-admin', addAdminComponent.username)
           "
           v-on:emit-remove-admin="
-            addAdminComponent =>
+            (addAdminComponent) =>
               $emit('remove-admin', addAdminComponent.selected.username)
           "
         ></omegaup-common-admins>
@@ -166,11 +167,11 @@
           v-bind:initial-groups="data.groupsAdmins"
           v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('add-group-admin', groupAdminsComponent.groupAlias)
           "
           v-on:emit-remove-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('remove-group-admin', groupAdminsComponent.groupAlias)
           "
         ></omegaup-common-groupadmins>

@@ -5,7 +5,7 @@ import T from '../lang';
 import Vue from 'vue';
 import contest_Edit from '../components/contest/Edit.vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const contestAlias = /\/contest\/([^\/]+)\/edit\/?.*/.exec(
     window.location.pathname,
   )[1];
@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
   function refresh(ev, api, param, key) {
     key = key || param;
     api({ contest_alias: contestAlias })
-      .then(response => {
+      .then((response) => {
         ev[param] = response[key] || response;
         ev.$parent[param] = response[key] || response;
       })
@@ -36,7 +36,7 @@ OmegaUp.on('ready', function() {
       admins = admins.admins;
       let contest_edit = new Vue({
         el: '#contest-edit',
-        render: function(createElement) {
+        render: function (createElement) {
           return createElement('omegaup-contest-edit', {
             props: {
               data: {
@@ -54,7 +54,7 @@ OmegaUp.on('ready', function() {
                 this.arbitrateRequest(ev, username, true),
               'deny-request': (ev, username) =>
                 this.arbitrateRequest(ev, username, false),
-              'update-contest': function(ev) {
+              'update-contest': function (ev) {
                 api.Contest.update({
                   contest_alias: contestAlias,
                   title: ev.title,
@@ -79,7 +79,7 @@ OmegaUp.on('ready', function() {
                   needs_basic_information: ev.needsBasicInformation,
                   requests_user_information: ev.requestsUserInformation,
                 })
-                  .then(data => {
+                  .then((data) => {
                     ui.success(
                       T.contestEditContestEdited +
                         ` <a href="/arena/${contestAlias}/">${T.contestEditGoToContest}</a>`,
@@ -87,7 +87,7 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.apiError);
               },
-              'add-problem': function(ev) {
+              'add-problem': function (ev) {
                 api.Contest.addProblem({
                   contest_alias: contestAlias,
                   order_in_contest: ev.order,
@@ -98,7 +98,7 @@ OmegaUp.on('ready', function() {
                       ? ev.selectedRevision.commit
                       : undefined,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     if (response.status != 'ok') {
                       ui.error(response.error || 'error');
                       return;
@@ -108,12 +108,12 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.apiError);
               },
-              'remove-problem': function(ev) {
+              'remove-problem': function (ev) {
                 api.Contest.removeProblem({
                   contest_alias: contestAlias,
                   problem_alias: ev.selected.alias,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     if (response.status != 'ok') {
                       ui.error(response.error || 'error');
                       return;
@@ -129,7 +129,7 @@ OmegaUp.on('ready', function() {
                   contest_alias: ev.contestAlias,
                   version: selectedCommit.version,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     versions.$set(
                       versions.runsDiff,
                       selectedCommit.version,
@@ -140,7 +140,7 @@ OmegaUp.on('ready', function() {
               },
               'get-versions': (problemAlias, problemComponent) => {
                 api.Problem.versions({ problem_alias: problemAlias })
-                  .then(function(result) {
+                  .then(function (result) {
                     problemComponent.versionLog = result.log;
                     let currentProblem = null;
                     for (const problem of problemComponent.problems) {
@@ -162,12 +162,12 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.apiError);
               },
-              'update-admission-mode': function(ev) {
+              'update-admission-mode': function (ev) {
                 api.Contest.update({
                   contest_alias: contestAlias,
                   admission_mode: ev.admissionMode,
                 })
-                  .then(data => {
+                  .then((data) => {
                     ui.success(
                       T.contestEditContestEdited +
                         ` <a href="/arena/${contestAlias}/">${T.contestEditGoToContest}</a>`,
@@ -179,22 +179,22 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.apiError);
               },
-              'add-user': function(ev) {
+              'add-user': function (ev) {
                 let contestants = [];
                 if (ev.contestants !== '')
                   contestants = ev.contestants.split(',');
                 if (ev.contestant !== '') contestants.push(ev.contestant);
                 Promise.allSettled(
-                  contestants.map(contestant =>
+                  contestants.map((contestant) =>
                     api.Contest.addUser({
                       contest_alias: contestAlias,
                       usernameOrEmail: contestant.trim(),
                     }),
                   ),
                 )
-                  .then(results => {
+                  .then((results) => {
                     let contestantsWithError = [];
-                    results.forEach(result => {
+                    results.forEach((result) => {
                       if (result.status === 'rejected') {
                         contestantsWithError.push(result.reason.userEmail);
                       }
@@ -213,12 +213,12 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.ignoreError);
               },
-              'remove-user': function(ev) {
+              'remove-user': function (ev) {
                 api.Contest.removeUser({
                   contest_alias: contestAlias,
                   usernameOrEmail: ev.selected.username,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     if (response.status != 'ok') {
                       ui.error(response.error || 'error');
                     }
@@ -227,18 +227,18 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.apiError);
               },
-              'save-end-time': function(selected) {
+              'save-end-time': function (selected) {
                 api.Contest.updateEndTimeForIdentity({
                   contest_alias: contestAlias,
                   username: selected.username,
                   end_time: selected.end_time.getTime() / 1000,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     ui.success(T.userEndTimeUpdatedSuccessfully);
                   })
                   .catch(ui.apiError);
               },
-              'clone-contest': function(ev) {
+              'clone-contest': function (ev) {
                 api.Contest.clone({
                   contest_alias: contestAlias,
                   title: ev.title,
@@ -246,50 +246,50 @@ OmegaUp.on('ready', function() {
                   description: ev.description,
                   start_time: ev.startTime.getTime() / 1000,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     ui.success(T.contestEditContestClonedSuccessfully);
                   })
                   .catch(ui.apiError);
               },
-              'add-group': function(ev) {
+              'add-group': function (ev) {
                 api.Contest.addGroup({
                   contest_alias: contestAlias,
                   group: ev.groupName,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     ui.success(T.contestGroupAdded);
                     refresh(ev, api.Contest.users, 'groups', 'groups');
                   })
                   .catch(ui.apiError);
               },
-              'remove-group': function(ev) {
+              'remove-group': function (ev) {
                 api.Contest.removeGroup({
                   contest_alias: contestAlias,
                   group: ev.selected.alias,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     ui.success(T.contestGroupRemoved);
                     refresh(ev, api.Contest.users, 'groups', 'groups');
                   })
                   .catch(ui.apiError);
               },
-              'add-admin': function(ev) {
+              'add-admin': function (ev) {
                 api.Contest.addAdmin({
                   contest_alias: contestAlias,
                   usernameOrEmail: ev.username,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     ui.success(T.adminAdded);
                     refresh(ev, api.Contest.admins, 'admins');
                   })
                   .catch(ui.apiError);
               },
-              'remove-admin': function(ev) {
+              'remove-admin': function (ev) {
                 api.Contest.removeAdmin({
                   contest_alias: contestAlias,
                   usernameOrEmail: ev.selected.username,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     if (response.status != 'ok') {
                       ui.error(response.error || 'error');
                       return;
@@ -299,12 +299,12 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.apiError);
               },
-              'add-group-admin': function(ev) {
+              'add-group-admin': function (ev) {
                 api.Contest.addGroupAdmin({
                   contest_alias: contestAlias,
                   group: ev.groupAlias,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     ui.success(T.groupAdminAdded);
                     refresh(
                       ev,
@@ -315,12 +315,12 @@ OmegaUp.on('ready', function() {
                   })
                   .catch(ui.apiError);
               },
-              'remove-group-admin': function(ev) {
+              'remove-group-admin': function (ev) {
                 api.Contest.removeGroupAdmin({
                   contest_alias: contestAlias,
                   group: ev.selected.alias,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     ui.success(T.groupAdminRemoved);
                     refresh(
                       ev,
@@ -335,7 +335,7 @@ OmegaUp.on('ready', function() {
           });
         },
         methods: {
-          arbitrateRequest: function(ev, username, resolution) {
+          arbitrateRequest: function (ev, username, resolution) {
             const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
             api.Contest.arbitrateRequest({
               contest_alias: contestAlias,
@@ -343,7 +343,7 @@ OmegaUp.on('ready', function() {
               resolution: resolution,
               note: resolutionText,
             })
-              .then(function(response) {
+              .then(function (response) {
                 ui.success(T.successfulOperation);
                 refresh(ev, api.Contest.requests, 'requests', 'users');
               })

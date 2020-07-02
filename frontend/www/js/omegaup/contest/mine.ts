@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
   let showAllContests = false;
   const contestMine = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-contest-mine', {
         props: {
           contests: this.contests,
@@ -38,7 +38,7 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 UI.success(T.updateItemsSuccess);
               })
-              .catch(error => {
+              .catch((error) => {
                 UI.error(UI.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
@@ -49,7 +49,7 @@ OmegaUp.on('ready', () => {
             api.Contest.contestants({
               contest_alias: contestAlias,
             })
-              .then(result => {
+              .then((result) => {
                 if (!result.contestants) {
                   return;
                 }
@@ -102,7 +102,7 @@ OmegaUp.on('ready', () => {
 
   function fillContestsTable(showAllContests: boolean): void {
     (showAllContests ? api.Contest.adminList() : api.Contest.myList())
-      .then(result => {
+      .then((result) => {
         contestMine.contests = result.contests;
       })
       .catch(UI.apiError);

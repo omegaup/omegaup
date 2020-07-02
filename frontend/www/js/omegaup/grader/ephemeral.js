@@ -738,7 +738,7 @@ const layout = new GoldenLayout(
 );
 
 function RegisterVueComponent(layout, componentName, component, componentMap) {
-  layout.registerComponent(componentName, function(container, componentState) {
+  layout.registerComponent(componentName, function (container, componentState) {
     container.on('open', () => {
       let vueComponents = {};
       vueComponents[componentName] = component;
@@ -753,7 +753,7 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       }
       let vue = new Vue({
         el: container.getElement()[0],
-        render: function(createElement) {
+        render: function (createElement) {
           return createElement(componentName, {
             props: props,
           });
@@ -763,7 +763,7 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       let vueComponent = vue.$children[0];
       if (vueComponent.title) {
         container.setTitle(vueComponent.title);
-        vueComponent.$watch('title', function(title) {
+        vueComponent.$watch('title', function (title) {
           container.setTitle(title);
         });
       }
@@ -821,7 +821,7 @@ function initialize() {
     sourceAndSettings.addChild(validatorSettings);
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
-    function(value) {
+    function (value) {
       if (value) sourceAndSettings.addChild(validatorSettings);
       else layout.root.getItemsById(validatorSettings.id)[0].remove();
     },
@@ -834,7 +834,7 @@ function initialize() {
   }
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
-    function(value) {
+    function (value) {
       if (value) {
         sourceAndSettings.addChild(interactiveIdlSettings);
         sourceAndSettings.addChild(interactiveMainSourceSettings);
@@ -886,7 +886,7 @@ function initialize() {
     // Whenever a case is selected, show the cases tab.
     store.watch(
       Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
-      value => {
+      (value) => {
         if (store.getters.isUpdatingSettings) return;
         casesColumn.parent.setActiveContentItem(casesColumn);
       },
@@ -910,7 +910,7 @@ if (window.ResizeObserver) {
 }
 onResized();
 
-document.getElementById('language').addEventListener('change', function() {
+document.getElementById('language').addEventListener('change', function () {
   store.commit('request.language', this.value);
   document.getElementById('language').value = this.value;
   if (!Util.languageExtensionMapping.hasOwnProperty(this.value)) return;
@@ -938,10 +938,10 @@ function onFilesZipReady(blob) {
     return;
   }
   let reader = new FileReader();
-  reader.addEventListener('loadend', e => {
+  reader.addEventListener('loadend', (e) => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
-      .then(zip => {
+      .then((zip) => {
         if (componentMapping.zipviewer) {
           componentMapping.zipviewer.zip = zip;
         }
@@ -950,7 +950,7 @@ function onFilesZipReady(blob) {
           zip.file('Main/compile.err').async('string'),
           zip.file('Main/compile.out').async('string'),
         ])
-          .then(values => {
+          .then((values) => {
             for (let value of values) {
               if (!value) continue;
               store.commit('compilerOutput', value);
@@ -964,7 +964,7 @@ function onFilesZipReady(blob) {
           zip
             .file(filename)
             .async('string')
-            .then(contents => {
+            .then((contents) => {
               store.commit('output', {
                 name: filename,
                 contents: contents,
@@ -980,7 +980,7 @@ function onFilesZipReady(blob) {
 
 store.watch(
   Object.getOwnPropertyDescriptor(store.getters, 'isDirty').get,
-  function(value) {
+  function (value) {
     let downloadLabelElement = document.getElementById('download-label');
     if (!value || !downloadLabelElement) return;
 
@@ -995,15 +995,15 @@ store.watch(
   },
 );
 
-document.getElementById('upload').addEventListener('change', e => {
+document.getElementById('upload').addEventListener('change', (e) => {
   let files = e.target.files;
   if (!files.length) return;
 
   let reader = new FileReader();
-  reader.addEventListener('loadend', e => {
+  reader.addEventListener('loadend', (e) => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
-      .then(zip => {
+      .then((zip) => {
         store.commit('reset');
         store.commit('removeCase', 'long');
         let cases = {};
@@ -1026,7 +1026,7 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('currentCase', caseName);
                 store.commit('inputIn', value);
               })
@@ -1034,7 +1034,7 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(caseOutFileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('currentCase', caseName);
                 store.commit('inputOut', value);
               })
@@ -1046,7 +1046,7 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('Validator', 'custom');
                 store.commit('ValidatorLanguage', extension);
                 store.commit(
@@ -1066,7 +1066,7 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('Interactive', true);
                 store.commit('InteractiveModuleName', moduleName);
                 store.commit('request.input.interactive.idl', value);
@@ -1079,7 +1079,7 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('Interactive', true);
                 store.commit('InteractiveLanguage', extension);
                 store.commit('request.input.interactive.main_source', value);
@@ -1092,7 +1092,7 @@ document.getElementById('upload').addEventListener('change', e => {
           zip
             .file('testplan')
             .async('string')
-            .then(value => {
+            .then((value) => {
               for (let line of value.split('\n')) {
                 if (line.startsWith('#') || line.trim() == '') continue;
                 let tokens = line.split(/\s+/);
@@ -1111,7 +1111,7 @@ document.getElementById('upload').addEventListener('change', e => {
           zip
             .file('settings.json')
             .async('string')
-            .then(value => {
+            .then((value) => {
               value = JSON.parse(value);
               if (value.hasOwnProperty('Limits')) {
                 for (let name of [
@@ -1142,7 +1142,7 @@ document.getElementById('upload').addEventListener('change', e => {
   reader.readAsArrayBuffer(files[0]);
 });
 
-document.getElementById('download').addEventListener('click', e => {
+document.getElementById('download').addEventListener('click', (e) => {
   let downloadLabelElement = document.getElementById('download-label');
   if (downloadLabelElement.className.indexOf('fa-download') != -1) return true;
   e.preventDefault();
@@ -1207,7 +1207,7 @@ document.getElementById('download').addEventListener('click', e => {
 
   zip
     .generateAsync({ type: 'blob' })
-    .then(blob => {
+    .then((blob) => {
       downloadLabelElement.className = downloadLabelElement.className.replace(
         'fa-file-archive-o',
         'fa-download',
@@ -1219,7 +1219,7 @@ document.getElementById('download').addEventListener('click', e => {
     .catch(Util.asyncError);
 });
 
-document.getElementsByTagName('form')[0].addEventListener('submit', e => {
+document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
   e.preventDefault();
   document.getElementsByTagName('button')[0].setAttribute('disabled', '');
   fetch('run/new/', {
@@ -1229,7 +1229,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
     }),
     body: JSON.stringify(store.state.request),
   })
-    .then(response => {
+    .then((response) => {
       if (!response.ok) return null;
       history.replaceState(
         undefined,
@@ -1238,7 +1238,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
       );
       return response.formData();
     })
-    .then(formData => {
+    .then((formData) => {
       document.getElementsByTagName('button')[0].removeAttribute('disabled');
       if (!formData) {
         onDetailsJsonReady({
@@ -1253,7 +1253,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
 
       if (formData.has('details.json')) {
         let reader = new FileReader();
-        reader.addEventListener('loadend', function() {
+        reader.addEventListener('loadend', function () {
           onDetailsJsonReady(JSON.parse(reader.result));
         });
         reader.readAsText(formData.get('details.json'));
@@ -1261,7 +1261,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
 
       if (formData.has('logs.txt.gz')) {
         let reader = new FileReader();
-        reader.addEventListener('loadend', function() {
+        reader.addEventListener('loadend', function () {
           if (reader.result.byteLength == 0) {
             store.commit('logs', '');
             return;
@@ -1336,7 +1336,7 @@ function setSettings(settings) {
 // popped into a full-blown tab.
 window.addEventListener(
   'message',
-  e => {
+  (e) => {
     if (e.origin != window.location.origin || !e.data) return;
 
     switch (e.data.method) {
@@ -1359,11 +1359,11 @@ function onHashChanged() {
 
   let token = window.location.hash.substring(1);
   fetch(`run/${token}/request.json`)
-    .then(response => {
+    .then((response) => {
       if (!response.ok) return null;
       return response.json();
     })
-    .then(request => {
+    .then((request) => {
       if (!request) {
         store.commit('reset');
         store.commit('logs', '');
@@ -1392,25 +1392,25 @@ function onHashChanged() {
       }
       store.commit('request', request);
       fetch(`run/${token}/details.json`)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) return {};
           return response.json();
         })
         .then(onDetailsJsonReady)
         .catch(Util.asyncError);
       fetch(`run/${token}/files.zip`)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) return null;
           return response.blob();
         })
         .then(onFilesZipReady)
         .catch(Util.asyncError);
       fetch(`run/${token}/logs.txt`)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) return '';
           return response.text();
         })
-        .then(text => store.commit('logs', text))
+        .then((text) => store.commit('logs', text))
         .catch(Util.asyncError);
     })
     .catch(Util.asyncError);

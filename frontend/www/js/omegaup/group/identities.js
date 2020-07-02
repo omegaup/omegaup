@@ -6,25 +6,25 @@ import T from '../lang';
 import Vue from 'vue';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let groupAlias = /\/group\/([^\/]+)\/?/.exec(window.location.pathname)[1];
   let groupIdentities = new Vue({
     el: '#create-identities',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-group-identites', {
         props: { identities: this.identities, groupAlias: this.groupAlias },
         on: {
-          'bulk-identities': function(identities) {
+          'bulk-identities': function (identities) {
             api.Identity.bulkCreate({
               identities: JSON.stringify(identities),
               group_alias: groupAlias,
             })
-              .then(function(data) {
+              .then(function (data) {
                 UI.success(T.groupsIdentitiesSuccessfullyCreated);
               })
               .catch(UI.apiError);
           },
-          'download-identities': function(identities) {
+          'download-identities': function (identities) {
             const csv = CSV.serialize({
               fields: [
                 { id: 'username' },
@@ -45,11 +45,11 @@ OmegaUp.on('ready', function() {
             hiddenElement.download = 'identities.csv';
             hiddenElement.click();
           },
-          'read-csv': function(identitiesComponent, fileUpload) {
+          'read-csv': function (identitiesComponent, fileUpload) {
             identitiesComponent.identities = [];
             CSV.fetch({
               file: fileUpload.files[0],
-            }).done(function(dataset) {
+            }).done(function (dataset) {
               if (dataset.fields.length != 6) {
                 UI.error(T.groupsInvalidCsv);
                 return;
@@ -84,8 +84,8 @@ OmegaUp.on('ready', function() {
       let arr = new Uint8Array(2 * len);
       window.crypto.getRandomValues(arr);
       return Array.from(
-        arr.filter(value => value <= 255 - (255 % validChars.length)),
-        value => validChars[value % validChars.length],
+        arr.filter((value) => value <= 255 - (255 % validChars.length)),
+        (value) => validChars[value % validChars.length],
       )
         .join('')
         .substr(0, len);

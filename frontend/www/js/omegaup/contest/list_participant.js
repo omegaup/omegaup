@@ -3,7 +3,7 @@ import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let payloadElement = document.getElementById('my-next-contests-payload');
   let payload = { contests: [] };
   if (payloadElement) {
@@ -14,7 +14,7 @@ OmegaUp.on('ready', function() {
   }
   let contestMyList = new Vue({
     el: '#my-next-contests',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('my-next-contests', {
         props: {
           contests: this.contests,

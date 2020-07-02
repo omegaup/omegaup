@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
   const problemSolution = new Vue({
     el: '#problem-solution',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-solution', {
         props: {
           status: this.status,
@@ -28,7 +28,7 @@ OmegaUp.on('ready', () => {
               },
               { quiet: true },
             )
-              .then(data => {
+              .then((data) => {
                 problemSolution.status = 'unlocked';
                 problemSolution.solution = data.solution;
                 ui.info(
@@ -38,7 +38,7 @@ OmegaUp.on('ready', () => {
                   }),
                 );
               })
-              .catch(error => {
+              .catch((error) => {
                 if (error.httpStatusCode == 404) {
                   ui.error(T.wordsProblemOrSolutionNotExist);
                   return;
@@ -48,7 +48,7 @@ OmegaUp.on('ready', () => {
           },
           'get-tokens': () => {
             api.ProblemForfeited.getCounts()
-              .then(data => {
+              .then((data) => {
                 problemSolution.allTokens = data.allowed;
                 problemSolution.availableTokens = data.allowed - data.seen;
                 if (problemSolution.availableTokens <= 0) {
@@ -63,10 +63,10 @@ OmegaUp.on('ready', () => {
                 { problem_alias: payload.alias },
                 { quiet: true },
               )
-                .then(data => {
+                .then((data) => {
                   problemSolution.solution = data.solution;
                 })
-                .catch(error => {
+                .catch((error) => {
                   if (error.httpStatusCode == 404) {
                     ui.error(T.wordsProblemOrSolutionNotExist);
                     return;

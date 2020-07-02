@@ -15,12 +15,12 @@ export default {
       default: 'vs-dark',
     },
   },
-  data: function() {
+  data: function () {
     return {
       title: 'diff',
     };
   },
-  mounted: function() {
+  mounted: function () {
     this._originalModel = monaco.editor.createModel(
       this.originalContents,
       'text/plain',
@@ -40,7 +40,7 @@ export default {
     });
   },
   methods: {
-    onResize: function() {
+    onResize: function () {
       this._editor.layout();
     },
   },
@@ -53,10 +53,10 @@ export default {
     },
   },
   watch: {
-    originalContents: function(value) {
+    originalContents: function (value) {
       this._originalModel.setValue(value);
     },
-    modifiedContents: function(value) {
+    modifiedContents: function (value) {
       this._modifiedModel.setValue(value);
     },
   },

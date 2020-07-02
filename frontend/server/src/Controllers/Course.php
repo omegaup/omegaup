@@ -3767,7 +3767,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         return $scoreboard->generate(
-            /*$withRunDetails=*/false,
+            /*$withRunDetails=*/            false,
             /*$sortByName=*/false
         );
     }
