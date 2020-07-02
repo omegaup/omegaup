@@ -41,7 +41,7 @@ declare module '@/third_party/js/pagedown/Markdown.Editor.js' {
     convertImagesToLinks?: boolean;
     panels?: {
       buttonBar: HTMLElement;
-      preview: HTMLElement;
+      preview: HTMLElement | null;
       input: HTMLElement;
     };
   }

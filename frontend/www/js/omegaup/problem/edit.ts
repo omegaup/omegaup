@@ -36,6 +36,8 @@ OmegaUp.on('ready', () => {
           markdownContents: this.markdownContents,
           markdownSolutionContents: this.markdownSolutionContents,
           problemLevel: this.problemLevel,
+          selectedPublicTags: this.selectedPublicTags,
+          selectedPrivateTags: this.selectedPrivateTags,
         },
         on: {
           'update-problem-level': (levelTag?: string) => {
@@ -64,37 +66,42 @@ OmegaUp.on('ready', () => {
                 problemEdit.markdownContents = statements[language];
                 return;
               }
-              api.Problem.details({
-                problem_alias: payload.alias,
-                statement_type: 'markdown',
-                show_solvers: false,
-                lang: language,
-              })
+              api.Problem.details(
+                {
+                  problem_alias: payload.alias,
+                  statement_type: 'markdown',
+                  show_solvers: false,
+                  lang: language,
+                },
+                { quiet: true },
+              )
                 .then(response => {
-                  if (!response.exists || !response.statement) {
-                    return;
-                  }
                   if (response.statement.language !== language) {
                     response.statement.markdown = '';
                   }
                   statements[language] = response.statement.markdown;
                   problemEdit.markdownContents = response.statement.markdown;
                 })
-                .catch(ui.apiError);
+                .catch(error => {
+                  if (error.httpStatusCode == 404) {
+                    return;
+                  }
+                  ui.apiError(error);
+                });
             } else {
               problemEdit.markdownSolutionContents = currentMarkdown;
               if (solutions.hasOwnProperty(language)) {
                 problemEdit.markdownSolutionContents = solutions[language];
                 return;
               }
-              api.Problem.solution({
-                problem_alias: payload.alias,
-                lang: language,
-              })
+              api.Problem.solution(
+                {
+                  problem_alias: payload.alias,
+                  lang: language,
+                },
+                { quiet: true },
+              )
                 .then(response => {
-                  if (!response.exists || !response.solution) {
-                    return;
-                  }
                   if (response.solution.language !== language) {
                     response.solution.markdown = '';
                   }
@@ -102,7 +109,12 @@ OmegaUp.on('ready', () => {
                   problemEdit.markdownSolutionContents =
                     response.solution.markdown;
                 })
-                .catch(ui.apiError);
+                .catch(error => {
+                  if (error.httpStatusCode == 404) {
+                    return;
+                  }
+                  ui.apiError(error);
+                });
             }
           },
           'add-tag': (alias: string, tagname: string, isPublic: boolean) => {
@@ -111,18 +123,33 @@ OmegaUp.on('ready', () => {
               name: tagname,
               public: isPublic,
             })
-              .then(response => {
+              .then(() => {
                 ui.success(T.tagAdded);
+                if (isPublic) {
+                  this.selectedPublicTags.push(tagname);
+                } else {
+                  this.selectedPrivateTags.push(tagname);
+                }
               })
               .catch(ui.apiError);
           },
-          'remove-tag': (alias: string, tagname: string) => {
+          'remove-tag': (alias: string, tagname: string, isPublic: boolean) => {
             api.Problem.removeTag({
               problem_alias: alias,
               name: tagname,
             })
-              .then(response => {
+              .then(() => {
                 ui.success(T.tagRemoved);
+                // FIXME: For some reason this is not being reactive
+                if (isPublic) {
+                  this.selectedPublicTags = this.selectedPublicTags.filter(
+                    tag => tag !== tagname,
+                  );
+                } else {
+                  this.selectedPrivateTags = this.selectedPrivateTags.filter(
+                    tag => tag !== tagname,
+                  );
+                }
               })
               .catch(ui.apiError);
           },
@@ -245,6 +272,8 @@ OmegaUp.on('ready', () => {
       markdownContents: payload.statement.markdown,
       markdownSolutionContents: payload.solution.markdown,
       problemLevel: payload.problemLevel,
+      selectedPublicTags: payload.selectedPublicTags,
+      selectedPrivateTags: payload.selectedPrivateTags,
     },
     components: {
       'omegaup-problem-edit': problem_Edit,

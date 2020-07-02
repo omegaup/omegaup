@@ -235,7 +235,7 @@ def assert_js_errors(driver,
                  '\tMatched errors:\n\t\t{matched_errors}\n'
                  '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
                  '\tMissed paths:\n\t\t{missed_paths}\n'
-                 '\tMissed messages:\n\t\t{missed_messages}').format(
+                 '\tMissed messages:\n\t\t{missed_messages}\n').format(
                      matched_errors='\n'.join(
                          json.dumps(entry) for entry in matched_errors),
                      unmatched_errors='\n'.join(
@@ -310,9 +310,9 @@ def message_matches(message: str, message_list: Sequence[str]) -> bool:
 
         return False
 
-    # No quoted messages found, so let's try to do a suffix match.
+    # No quoted messages found, so let's try to do a substring match.
     for whitelisted_message in message_list:
-        if message.endswith(whitelisted_message):
+        if whitelisted_message in message:
             return True
 
     return False
@@ -356,14 +356,18 @@ def create_group(driver, group_title, description):
             EC.element_to_be_clickable(
                 (By.XPATH,
                  ('//a[@href = "/group/new/"]')))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//input[@name = "title"]'))).send_keys(group_title)
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//textarea[@name = "description"]'))).send_keys(description)
+    with assert_js_errors(
+            driver,
+            expected_messages=('/api/group/details/',)
+    ):
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "title"]'))).send_keys(group_title)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//textarea[@name = "description"]'))).send_keys(description)
 
     with driver.page_transition():
         driver.wait.until(

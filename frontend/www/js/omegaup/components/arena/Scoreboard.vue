@@ -3,8 +3,8 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
-    <label
-      ><input
+    <label v-if="this.showInvitedUsersFilter">
+      <input
         class="toggle-contestants"
         type="checkbox"
         v-model="onlyShowExplicitlyInvited"
@@ -165,6 +165,7 @@ export default class ArenaScoreboard extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() ranking!: types.ScoreboardRankingEntry[];
   @Prop() lastUpdated!: Date;
+  @Prop({ default: true }) showInvitedUsersFilter!: boolean;
   @Prop({ default: true }) showPenalty!: boolean;
   @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
 
@@ -208,6 +209,9 @@ export default class ArenaScoreboard extends Vue {
   }
 
   showUser(userIsInvited: boolean): boolean {
+    // Invited users filter is only available in contests, in a course all users
+    // are visible in scoreboard.
+    if (!this.showInvitedUsersFilter) return true;
     return userIsInvited || !this.onlyShowExplicitlyInvited;
   }
 }

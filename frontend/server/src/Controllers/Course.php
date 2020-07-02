@@ -12,7 +12,7 @@
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problemset_id?: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, basic_information_required: bool, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, name: string, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -31,6 +31,7 @@
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<CourseStudent>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
+ * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -1398,18 +1399,18 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         // Get the associated problemset with this assignment
-        $problemSet = \OmegaUp\DAO\Assignments::getProblemset(
+        $problemset = \OmegaUp\DAO\Assignments::getProblemset(
             $course->course_id,
             $r['assignment_alias']
         );
-        if (is_null($problemSet) || is_null($problemSet->problemset_id)) {
+        if (is_null($problemset) || is_null($problemset->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
             );
         }
 
         $runCount = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-            intval($problemSet->problemset_id)
+            intval($problemset->problemset_id)
         );
 
         if ($runCount > 0) {
@@ -1421,14 +1422,30 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\DAO::transBegin();
 
         try {
-            \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
-                $problemSet->problemset_id
+            \OmegaUp\DAO\Assignments::unlinkProblemset(
+                $assignment,
+                $problemset
             );
 
-            \OmegaUp\DAO\Assignments::deleteWithProblemset(
-                $assignment,
-                $problemSet
+            \OmegaUp\DAO\ProblemsetAccessLog::removeAccessLogFromProblemset(
+                $problemset->problemset_id
             );
+
+            \OmegaUp\DAO\ProblemsetIdentities::removeIdentitiesFromProblemset(
+                $problemset->problemset_id
+            );
+
+            \OmegaUp\DAO\ProblemsetProblemOpened::removeProblemOpenedFromProblemset(
+                $problemset->problemset_id
+            );
+
+            \OmegaUp\DAO\ProblemsetProblems::removeProblemsFromProblemset(
+                $problemset->problemset_id
+            );
+
+            \OmegaUp\DAO\Assignments::delete($assignment);
+
+            \OmegaUp\DAO\Problemsets::delete($problemset);
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
@@ -2408,10 +2425,58 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: array{details?: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning?: bool}, showRanking?: bool}, template: string}|array{smartyProperties: array{LOAD_MATHJAX: bool, payload: CourseDetailsPayload, title: string}, entrypoint: string}
+     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{LOAD_MATHJAX: bool, payload: CourseDetailsPayload, title: string}, entrypoint: string}
      */
     public static function getCourseDetailsForSmarty(\OmegaUp\Request $r): array {
         return self::getIntroDetails($r);
+    }
+
+    /**
+     * @omegaup-request-param mixed $assignment_alias
+     * @omegaup-request-param mixed $course_alias
+     * @omegaup-request-param bool|null $is_practice
+     *
+     * @return array{inContest: bool, smartyProperties: array{payload: IntroDetailsPayload}, template: string}
+     */
+    public static function getCourseAdminDetailsForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureMainUserIdentity();
+
+        $isPractice = $r->ensureOptionalBool('is_practice') ?? false;
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['course_alias'],
+            'course_alias'
+        );
+        $course = self::validateCourseExists($r['course_alias']);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+        $group = self::resolveGroup($course);
+        if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
+        }
+        \OmegaUp\Validators::validateStringNonEmpty(
+            $r['assignment_alias'],
+            'assignment_alias'
+        );
+        $assignment = self::validateCourseAssignmentAlias(
+            $course,
+            $r['assignment_alias']
+        );
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'shouldShowFirstAssociatedIdentityRunWarning' => false,
+                    'details' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                ],
+            ],
+            'template' => 'arena.course.admin.tpl',
+            'inContest' => !$isPractice,
+        ];
     }
 
     /**
@@ -2669,7 +2734,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: array{details?: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning?: bool}, showRanking?: bool}, template: string}|array{smartyProperties: array{LOAD_MATHJAX: bool, payload: CourseDetailsPayload, title: string}, entrypoint: string}
+     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{LOAD_MATHJAX: bool, payload: CourseDetailsPayload, title: string}, entrypoint: string}
      */
     public static function getIntroDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2738,6 +2803,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'LOAD_MATHJAX' => true,
                 'payload' => [
+                    'shouldShowFirstAssociatedIdentityRunWarning' => false,
                     'details' => $commonDetails,
                     'progress' => \OmegaUp\DAO\Courses::getAssignmentsProgress(
                         $course->course_id,
@@ -2777,6 +2843,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
                             $r->user
                         ),
+                        'details' => $commonDetails,
                     ],
                 ],
                 'template' => 'arena.contest.course.tpl',
@@ -3700,8 +3767,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         return $scoreboard->generate(
-            false /*withRunDetails*/,
-            true /*sortByName*/
+            /*$withRunDetails=*/false,
+            /*$sortByName=*/false
         );
     }
 
