@@ -357,7 +357,7 @@ const translations: { [key: string]: string; } = {
   courseStudentRemoved: "Estudiante quitado del curso exitosamente.",
   courseStudentsEmpty: "No hay estudiantes",
   courseStudentsProgress: "Progreso de los estudiantes",
-  courseStudentsProgressExportToSpreadsheet: "Exportar tabla como",
+  courseStudentsProgressExportToSpreadsheet: "Exportar tabla como:",
   courseSubmissionsList: "Lista de env\u00edos en un curso",
   courseUpdateAlreadyHasRuns: "La duraci\u00f3n de la tarea no se puede cambiar si ya tiene soluciones revisadas.",
   courseViewProgress: "Ver progreso",

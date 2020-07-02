@@ -38,7 +38,7 @@
         <div class="card sticky-top sticky-offset">
           <div class="card-header p-1">
             <p class="card-title text-sm-center mb-1">
-              {{ T.courseStudentsProgressExportToSpreadsheet }}:
+              {{ T.courseStudentsProgressExportToSpreadsheet }}
             </p>
           </div>
           <div class="card-body">
