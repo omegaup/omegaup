@@ -2060,7 +2060,7 @@ export namespace types {
     solvedProblems: types.Problem[];
     unsolvedProblems: types.Problem[];
     createdProblems: types.Problem[];
-    stats: types.UserProfileStats;
+    stats: types.UserProfileStats[];
     badges: string[];
     ownedBadges: types.Badge[];
     programmingLanguages: { [key: string]: string };
@@ -2100,7 +2100,6 @@ export namespace types {
     runs: number;
     verdict: string;
   }
-  [];
 
   export interface UserRank {
     rank: {
