@@ -96,6 +96,12 @@ class RequestParam {
                 $annotationDescription
             );
         }
+        usort(
+            $result,
+            function (RequestParam $a, RequestParam $b): int {
+                return strcmp($a->name, $b->name);
+            }
+        );
         return $result;
     }
 }
@@ -218,6 +224,7 @@ class TypeMapper {
                 if ($type instanceof \Psalm\Type\Atomic\ObjectLike) {
                     $convertedProperties = [];
                     $propertyTypes = [];
+                    ksort($type->properties);
                     foreach ($type->properties as $propertyName => $propertyType) {
                         if (is_numeric($propertyName)) {
                             throw new \Exception(
@@ -387,6 +394,7 @@ class TypeMapper {
                 join(', ', $conversionFunction)
             );
         }
+        sort($typeNames);
         return new ConversionResult(
             join('|', $typeNames),
             $requiresConversion ? $conversionFunction[0] : null
@@ -846,6 +854,7 @@ EOD;
                 } else {
                     echo "| Name | Type |\n";
                     echo "|------|------|\n";
+                    ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
                         echo "| `{$paramName}` | `{$paramType}` |\n";
                     }
