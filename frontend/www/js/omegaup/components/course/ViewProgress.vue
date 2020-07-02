@@ -38,21 +38,21 @@
         <div class="card sticky-top sticky-offset">
           <div class="card-header p-1">
             <p class="card-title text-sm-center mb-1">
-              {{ T.courseStudentsProgressExportToSpreadsheet }}
+              {{ T.courseStudentsProgressExportToSpreadsheet }}:
             </p>
           </div>
           <div class="card-body">
             <a
-              class="btn btn-primary btn-sm mb-1"
+              class="btn btn-primary btn-sm mr-1"
               v-bind:download="csvFilename"
               v-bind:href="csvDataUrl"
-              >{{ T.wordsExport }}.csv</a
+              >.csv</a
             >
             <a
               class="btn btn-primary btn-sm"
               v-bind:download="odsFilename"
               v-bind:href="odsDataUrl"
-              >{{ T.wordsExport }}.ods</a
+              >.ods</a
             >
           </div>
         </div>
