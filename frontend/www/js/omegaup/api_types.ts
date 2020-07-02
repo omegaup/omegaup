@@ -725,6 +725,37 @@ export namespace types {
       );
     }
 
+    export function ProblemSettingsSummaryPayload(
+      elementId: string = 'payload',
+    ): types.ProblemSettingsSummaryPayload {
+      return (x => {
+        x.problem = (x => {
+          if (x.problemsetter)
+            x.problemsetter = (x => {
+              if (x.creation_date)
+                x.creation_date = ((x: number) => new Date(x * 1000))(
+                  x.creation_date,
+                );
+              return x;
+            })(x.problemsetter);
+          if (x.runs)
+            x.runs = (x => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map(x => {
+                x.time = ((x: number) => new Date(x * 1000))(x.time);
+                return x;
+              });
+            })(x.runs);
+          return x;
+        })(x.problem);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ProblemsMineInfoPayload(
       elementId: string = 'payload',
     ): types.ProblemsMineInfoPayload {
@@ -855,6 +886,23 @@ export namespace types {
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
+  }
+
+  export interface ArenaProblemDetails {
+    alias: string;
+    commit: string;
+    input_limit: number;
+    languages: string[];
+    letter?: string;
+    points: number;
+    problem_id?: number;
+    problemsetter?: types.ProblemsetterInfo;
+    quality_seal: boolean;
+    runs?: types.Run[];
+    settings?: types.ProblemSettings;
+    source?: string;
+    statement?: types.ProblemStatement;
+    title: string;
   }
 
   export interface AssignmentProgress {
@@ -1398,6 +1446,7 @@ export namespace types {
     email_clarifications: boolean;
     input_limit: number;
     languages: string[];
+    letter?: string;
     order: string;
     points: number;
     preferred_language?: string;
@@ -1440,6 +1489,7 @@ export namespace types {
     };
     input_limit: number;
     languages: string[];
+    letter?: string;
     order: string;
     points: number;
     preferred_language?: string;
@@ -1620,6 +1670,11 @@ export namespace types {
     };
   }
 
+  export interface ProblemSettingsSummaryPayload {
+    problem: types.ArenaProblemDetails;
+    problem_admin: boolean;
+  }
+
   export interface ProblemStatement {
     images: { [key: string]: string };
     language: string;
@@ -1703,11 +1758,13 @@ export namespace types {
     alias: string;
     commit: string;
     difficulty: number;
+    input_limit: number;
     languages: string;
     letter: string;
     order: number;
     points: number;
     quality_payload?: types.ProblemQualityPayload;
+    quality_seal: boolean;
     submissions: number;
     title: string;
     version: string;
@@ -2194,7 +2251,7 @@ export namespace messages {
   export type ContestDetailsRequest = { [key: string]: any };
   export type _ContestDetailsServerResponse = any;
   export type ContestDetailsResponse = {
-    admin?: boolean;
+    admin: boolean;
     admission_mode: string;
     alias: string;
     description: string;
@@ -2204,14 +2261,14 @@ export namespace messages {
     languages: string[];
     needs_basic_information: boolean;
     opened: boolean;
-    partial_score: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
+    partial_score: boolean;
     penalty: number;
     penalty_calc_policy: string;
     penalty_type: string;
-    problems: types.ProblemsetProblem[];
     points_decay_factor: number;
+    problems: types.ProblemsetProblem[];
     problemset_id: number;
     requests_user_information: string;
     scoreboard: number;
