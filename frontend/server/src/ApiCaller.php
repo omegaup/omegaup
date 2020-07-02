@@ -301,6 +301,15 @@ class ApiCaller {
             );
         }
 
+        if ($apiException->getcode() == 400) {
+            self::$log->info("{$apiException}");
+            header('HTTP/1.1 400 Bad Request');
+            die(
+                file_get_contents(
+                    sprintf('%s/www/400.html', strval(OMEGAUP_ROOT))
+                )
+            );
+        }
         if ($apiException->getCode() == 401) {
             self::$log->info("{$apiException}");
             header(

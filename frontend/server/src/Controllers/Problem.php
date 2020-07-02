@@ -2000,6 +2000,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'utf-8'
             );
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            throw $e;
         } catch (\Exception $e) {
             throw new \OmegaUp\Exceptions\InvalidFilesystemOperationException(
                 'statementNotFound'
