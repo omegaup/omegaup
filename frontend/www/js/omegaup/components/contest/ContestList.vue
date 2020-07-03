@@ -98,9 +98,9 @@
               class="glyphicon glyphicon-link"
               v-bind:href="
                 '/arena/' +
-                  contest.alias +
-                  '/scoreboard/' +
-                  contest.scoreboard_url
+                contest.alias +
+                '/scoreboard/' +
+                contest.scoreboard_url
               "
               v-bind:title="T.contestScoreboardLink"
               v-if="contest.scoreboard_url"
@@ -112,9 +112,9 @@
               class="glyphicon glyphicon-link"
               v-bind:href="
                 '/arena/' +
-                  contest.alias +
-                  '/scoreboard/' +
-                  contest.scoreboard_url_admin
+                contest.alias +
+                '/scoreboard/' +
+                contest.scoreboard_url_admin
               "
               v-bind:title="T.contestScoreboardAdminLink"
               v-if="contest.scoreboard_url_admin"

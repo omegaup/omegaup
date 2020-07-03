@@ -28,8 +28,8 @@
       <tr
         v-if="
           showRanking &&
-            typeof contest.scoreboard === 'number' &&
-            duration != Infinity
+          typeof contest.scoreboard === 'number' &&
+          duration != Infinity
         "
       >
         <td>
@@ -71,9 +71,10 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
-import omegaup_Markdown from '../Markdown.vue';
 import * as ui from '../../ui';
 import * as time from '../../time';
+
+import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {

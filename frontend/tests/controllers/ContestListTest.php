@@ -152,7 +152,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         {
             $login = self::login($contestData['director']);
             $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
-                /*$owner=*/null,
+                /*$owner=*/                null,
                 /*$name=*/null,
                 /*$description=*/null,
                 /*$alias=*/null,

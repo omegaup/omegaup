@@ -244,7 +244,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $interview_alias
      *
-     * @return array{description?: null|string, contest_alias?: null|string, problemset_id?: int|null, users?: list<array{user_id: int|null, username: string, access_time: \OmegaUp\Timestamp|null, email: null|string, opened_interview: bool, country: null|string}>, exists: bool}
+     * @return array{description: null|string, contest_alias: null|string, problemset_id: int|null, users: list<array{user_id: int|null, username: string, access_time: \OmegaUp\Timestamp|null, email: null|string, opened_interview: bool, country: null|string}>}
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -253,9 +253,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
             strval($r['interview_alias'])
         );
         if (is_null($interview)) {
-            return [
-                'exists' => false,
-            ];
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'interviewNotFound'
+            );
         }
 
         // Only admins can view interview details
@@ -293,7 +293,6 @@ class Interview extends \OmegaUp\Controllers\Controller {
             'contest_alias' => $interview->alias,
             'problemset_id' => $interview->problemset_id,
             'users' => $users,
-            'exists' => true,
         ];
     }
 

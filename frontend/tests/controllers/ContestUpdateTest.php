@@ -1044,7 +1044,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
-            /*$params=*/null,
+            /*$params=*/            null,
             $directorLogin
         );
 

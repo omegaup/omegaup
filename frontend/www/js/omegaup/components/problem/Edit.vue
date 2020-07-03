@@ -116,9 +116,8 @@
 
       <div class="tab-pane active" v-if="showTab === 'markdown'">
         <omegaup-problem-statementedit
-          v-bind:markdown-contents="markdownContents"
-          v-bind:initial-language="data.statement.language"
-          v-bind:markdown-type="'statements'"
+          v-bind:statement="data.statement"
+          markdown-type="statements"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:source="data.source"
@@ -155,9 +154,10 @@
 
       <div class="tab-pane active" v-if="showTab === 'solution'">
         <omegaup-problem-statementedit
-          v-bind:markdown-contents="markdownSolutionContents"
-          v-bind:initial-language="data.solution.language"
-          v-bind:markdown-type="'solutions'"
+          v-bind:statement="
+            data.solution || { markdown: '', language: 'es', images: {} }
+          "
+          markdown-type="solutions"
           v-bind:title="data.title"
           v-on:emit-update-markdown-contents="
             (solutions, newLanguage, currentMarkdown) =>
@@ -177,10 +177,11 @@
           v-bind:initial-admins="initialAdmins"
           v-bind:has-parent-component="true"
           v-on:emit-add-admin="
-            addAdminComponent => $emit('add-admin', addAdminComponent.username)
+            (addAdminComponent) =>
+              $emit('add-admin', addAdminComponent.username)
           "
           v-on:emit-remove-admin="
-            addAdminComponent =>
+            (addAdminComponent) =>
               $emit('remove-admin', addAdminComponent.selected.username)
           "
         ></omegaup-problem-admins>
@@ -188,11 +189,11 @@
           v-bind:initial-groups="initialGroups"
           v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('add-group-admin', groupAdminsComponent.groupAlias)
           "
           v-on:emit-remove-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('remove-group-admin', groupAdminsComponent.groupAlias)
           "
         ></omegaup-problem-groupadmins>
@@ -210,7 +211,7 @@
           v-bind:selected-public-tags="data.selectedPublicTags"
           v-bind:selected-private-tags="data.selectedPrivateTags"
           v-on:emit-update-problem-level="
-            levelTag => $emit('update-problem-level', levelTag)
+            (levelTag) => $emit('update-problem-level', levelTag)
           "
           v-on:emit-add-tag="
             (alias, tagname, isPublic) =>
@@ -289,8 +290,8 @@ export default class ProblemEdit extends Vue {
   @Prop() data!: types.ProblemEditPayload;
   @Prop() initialAdmins!: types.ProblemAdmin[];
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
-  @Prop() markdownContents!: string;
-  @Prop() markdownSolutionContents!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
+  @Prop() statement!: types.ProblemStatement;
 
   T = T;
   alias = this.data.alias;

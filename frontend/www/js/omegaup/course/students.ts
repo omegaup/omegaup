@@ -6,12 +6,12 @@ import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = types.payloadParsers.StudentsProgressPayload();
 
   const viewProgress = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-viewprogress', {
         props: {
           T: T,

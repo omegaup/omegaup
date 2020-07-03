@@ -5,16 +5,14 @@ import T from '../lang';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let qualityPayload = JSON.parse(
     document.getElementById('quality-payload').innerText,
   );
-  let problemStatement = document.getElementsByClassName('statement')[0]
-    .innerText;
 
   let qualityNominationForm = new Vue({
     el: '#qualitynomination-popup',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('qualitynomination-popup', {
         props: {
           nominated: this.nominated,
@@ -27,7 +25,7 @@ OmegaUp.on('ready', function() {
           problemAlias: this.problemAlias,
         },
         on: {
-          submit: function(ev) {
+          submit: function (ev) {
             let contents = {};
             if (!ev.solved && ev.tried) {
               contents.before_ac = true;
@@ -47,7 +45,7 @@ OmegaUp.on('ready', function() {
               contents: JSON.stringify(contents),
             }).catch(UI.apiError);
           },
-          dismiss: function(ev) {
+          dismiss: function (ev) {
             let contents = {};
             if (!ev.solved && ev.tried) {
               contents.before_ac = true;
@@ -57,7 +55,7 @@ OmegaUp.on('ready', function() {
               nomination: 'dismissal',
               contents: JSON.stringify(contents),
             })
-              .then(function(data) {
+              .then(function (data) {
                 UI.info(T.qualityNominationRateProblemDesc);
               })
               .catch(UI.apiError);

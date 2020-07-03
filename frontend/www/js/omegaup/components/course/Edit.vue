@@ -91,7 +91,7 @@
           v-bind:course="data.course"
           v-on:emit-cancel="onCancel"
           v-on:emit-submit="
-            formComponent => $emit('submit-edit-course', formComponent)
+            (formComponent) => $emit('submit-edit-course', formComponent)
           "
         ></omegaup-course-form>
       </div>
@@ -106,10 +106,10 @@
           v-bind:course-alias="data.course.alias"
           v-bind:visibility-mode="visibilityMode"
           v-on:emit-new="onNewAssignment"
-          v-on:emit-edit="assignment => onEditAssignment(assignment)"
-          v-on:emit-add-problems="assignment => onAddProblems(assignment)"
+          v-on:emit-edit="(assignment) => onEditAssignment(assignment)"
+          v-on:emit-add-problems="(assignment) => onAddProblems(assignment)"
           v-on:emit-delete="
-            assignment => $emit('delete-assignment', assignment)
+            (assignment) => $emit('delete-assignment', assignment)
           "
           v-on:emit-sort-homeworks="
             (courseAlias, homeworksAliases) =>
@@ -130,7 +130,7 @@
           v-bind:invalid-parameter-name="invalidParameterName"
           v-on:emit-cancel="onResetAssignmentForm"
           v-on:emit-submit="
-            assignmentFormComponent =>
+            (assignmentFormComponent) =>
               $emit('submit-new-assignment', assignmentFormComponent)
           "
         ></omegaup-course-assignment-details>
@@ -152,7 +152,7 @@
               $emit('add-problem', assignment, problemAlias)
           "
           v-on:emit-select-assignment="
-            assignment => $emit('select-assignment', assignment)
+            (assignment) => $emit('select-assignment', assignment)
           "
           v-on:emit-remove="
             (assignment, problem) =>
@@ -162,7 +162,7 @@
             (assignmentAlias, problemsAlias) =>
               $emit('sort-problems', assignmentAlias, problemsAlias)
           "
-          v-on:emit-tags="tags => $emit('tags-problems', tags)"
+          v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
         ></omegaup-course-problem-list>
       </div>
 
@@ -179,7 +179,7 @@
           "
           v-bind:course-alias="data.course.alias"
           v-on:emit-update-admission-mode="
-            admisionMode => $emit('update-admission-mode', admisionMode)
+            (admisionMode) => $emit('update-admission-mode', admisionMode)
           "
         ></omegaup-course-admision-mode>
       </div>
@@ -194,13 +194,15 @@
           v-bind:course-alias="data.course.alias"
           v-bind:identity-requests="data.identityRequests"
           v-on:emit-add-student="
-            participants => $emit('add-student', participants)
+            (participants) => $emit('add-student', participants)
           "
-          v-on:emit-remove-student="student => $emit('remove-student', student)"
+          v-on:emit-remove-student="
+            (student) => $emit('remove-student', student)
+          "
           v-on:emit-accept-request="
-            username => $emit('accept-request', username)
+            (username) => $emit('accept-request', username)
           "
-          v-on:emit-deny-request="username => $emit('deny-request', username)"
+          v-on:emit-deny-request="(username) => $emit('deny-request', username)"
         ></omegaup-course-add-students>
       </div>
 
@@ -214,11 +216,11 @@
             v-bind:initial-admins="data.admins"
             v-bind:has-parent-component="true"
             v-on:emit-add-admin="
-              addAdminComponent =>
+              (addAdminComponent) =>
                 $emit('add-admin', addAdminComponent.username)
             "
             v-on:emit-remove-admin="
-              addAdminComponent =>
+              (addAdminComponent) =>
                 $emit('remove-admin', addAdminComponent.selected.username)
             "
           ></omegaup-common-admins>
@@ -228,11 +230,11 @@
             v-bind:initial-groups="data.groupsAdmins"
             v-bind:has-parent-component="true"
             v-on:emit-add-group-admin="
-              groupAdminsComponent =>
+              (groupAdminsComponent) =>
                 $emit('add-group-admin', groupAdminsComponent.groupAlias)
             "
             v-on:emit-remove-group-admin="
-              groupAdminsComponent =>
+              (groupAdminsComponent) =>
                 $emit('remove-group-admin', groupAdminsComponent.groupAlias)
             "
           ></omegaup-common-groupadmins>

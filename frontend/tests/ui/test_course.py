@@ -148,7 +148,7 @@ def test_user_ranking_course(driver):
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH, ('//a[contains(@href, "#ranking")]')))).click()
-            if driver.browser.current_url.endswith(f'#ranking'):
+            if driver.browser.current_url.endswith('#ranking'):
                 break
         assert (('#ranking') in
                 driver.browser.current_url), driver.browser.current_url

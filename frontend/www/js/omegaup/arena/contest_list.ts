@@ -21,7 +21,7 @@ OmegaUp.on('ready', () => {
   }
   const contestList = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
           initialQuery: this.initialQuery,
