@@ -1210,7 +1210,7 @@ export namespace types {
     max_points: number;
     name: string;
     order: number;
-    problemset_id?: number;
+    problemset_id: number;
     publish_time_delay?: number;
     scoreboard_url: string;
     scoreboard_url_admin: string;
@@ -1775,7 +1775,7 @@ export namespace types {
       max_points: number;
       name: string;
       order: number;
-      problemset_id?: number;
+      problemset_id: number;
       publish_time_delay?: number;
       scoreboard_url: string;
       scoreboard_url_admin: string;

@@ -121,7 +121,7 @@
           "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
-          ref="assignment_details_list"
+          ref="assignment-details-list"
           v-bind:visibility-mode="visibilityMode"
           v-bind:unlimited-duration-course="!data.course.finish_time"
           v-bind:finish-time-course="data.course.finish_time"
@@ -311,6 +311,8 @@ const emptyAssignment: types.CourseAssignment = {
   },
 })
 export default class CourseEdit extends Vue {
+  @Ref('assignment-details-list')
+  readonly assignmentDetailsList!: course_AssignmentDetails;
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
@@ -330,7 +332,7 @@ export default class CourseEdit extends Vue {
   onNewAssignment(): void {
     this.visibilityMode = omegaup.VisibilityMode.New;
 
-    (this.$refs.assignment_details_list as HTMLElement).scrollIntoView();
+    this.assignmentDetailsList.scrollIntoView();
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
@@ -338,7 +340,7 @@ export default class CourseEdit extends Vue {
 
     this.assignment = assignment;
 
-    (this.$refs.assignment_details_list as HTMLElement).scrollIntoView();
+    this.assignmentDetailsList.scrollIntoView();
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {
@@ -364,11 +366,11 @@ export default class CourseEdit extends Vue {
 
   @Watch('initialTab')
   onInitialTabChanged(newValue: string): void {
-    if (availableTabs.includes(this.initialTab)) {
-      this.showTab = newValue;
+    if (!availableTabs.includes(this.initialTab)) {
+      this.showTab = 'course';
       return;
     }
-    this.showTab = 'course';
+    this.showTab = newValue;
   }
 }
 </script>
