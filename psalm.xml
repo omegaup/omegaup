@@ -38,4 +38,12 @@
     <plugins>
         <plugin filename="frontend/server/src/Psalm/RequestParamChecker.php" />
     </plugins>
+
+    <issueHandlers>
+        <InvalidDocblock>
+            <errorLevel type="suppress">
+                <file name="frontend/server/libs/third_party/paseto/src/Parsing/PasetoMessage.php" />
+            </errorLevel>
+        </InvalidDocblock>
+    </issueHandlers>
 </psalm>

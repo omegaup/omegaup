@@ -72,11 +72,9 @@
         <div class="karel-js-link my-3" v-if="problem.karel_problem">
           <a
             class="p-3"
-            v-bind:href="
-              `/karel.js/${
-                problem.sample_input ? `#mundo:${problem.sample_input}` : ''
-              }`
-            "
+            v-bind:href="`/karel.js/${
+              problem.sample_input ? `#mundo:${problem.sample_input}` : ''
+            }`"
             target="_blank"
           >
             {{ T.openInKarelJs }}

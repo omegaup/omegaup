@@ -5,12 +5,12 @@ import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   var payload = JSON.parse(document.getElementById('payload').innerText);
 
   var adminUser = new Vue({
     el: '#admin-user',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-admin-user', {
         props: {
           emails: payload.emails,
@@ -22,13 +22,13 @@ OmegaUp.on('ready', function() {
           verified: this.verified,
         },
         on: {
-          'change-experiment': function(experiment) {
+          'change-experiment': function (experiment) {
             if (experiment.selected) {
               api.User.addExperiment({
                 username: payload.username,
                 experiment: experiment.value.name,
               })
-                .then(function() {
+                .then(function () {
                   UI.success(T.userEditSuccess);
                 })
                 .catch(UI.apiError);
@@ -37,19 +37,19 @@ OmegaUp.on('ready', function() {
                 username: payload.username,
                 experiment: experiment.value.name,
               })
-                .then(function() {
+                .then(function () {
                   UI.success(T.userEditSuccess);
                 })
                 .catch(UI.apiError);
             }
           },
-          'change-role': function(role) {
+          'change-role': function (role) {
             if (role.selected) {
               api.User.addRole({
                 username: payload.username,
                 role: role.value.name,
               })
-                .then(function() {
+                .then(function () {
                   UI.success(T.userEditSuccess);
                 })
                 .catch(UI.apiError);
@@ -58,15 +58,15 @@ OmegaUp.on('ready', function() {
                 username: payload.username,
                 role: role.value.name,
               })
-                .then(function() {
+                .then(function () {
                   UI.success(T.userEditSuccess);
                 })
                 .catch(UI.apiError);
             }
           },
-          'verify-user': function() {
+          'verify-user': function () {
             api.User.verifyEmail({ usernameOrEmail: payload.username })
-              .then(function() {
+              .then(function () {
                 adminUser.verified = true;
               })
               .catch(UI.apiError);

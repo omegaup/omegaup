@@ -5,10 +5,10 @@ import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   var viewProgress = new Vue({
     el: '#intro div',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-schools-intro', {
         props: {
           T: T,

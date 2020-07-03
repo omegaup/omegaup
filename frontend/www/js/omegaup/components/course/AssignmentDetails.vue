@@ -163,8 +163,8 @@
                 rows="5"
                 v-model="description"
                 required
-              ></textarea
-            ></label>
+              ></textarea>
+            </label>
           </div>
         </div>
         <div class="form-group pull-right">

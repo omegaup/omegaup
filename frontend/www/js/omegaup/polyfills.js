@@ -5,7 +5,7 @@
 
 // From https://developer.mozilla.org/en-US/docs/Web/API/NodeList/forEach
 if (window.NodeList && !window.NodeList.prototype.forEach) {
-  window.NodeList.prototype.forEach = function(callback, thisArg) {
+  window.NodeList.prototype.forEach = function (callback, thisArg) {
     thisArg = thisArg || window;
     for (var i = 0; i < this.length; i++) {
       callback.call(thisArg, this[i], i, this);
@@ -15,10 +15,10 @@ if (window.NodeList && !window.NodeList.prototype.forEach) {
 
 if (window.Node && !window.Node.prototype.innerText && Object.defineProperty) {
   Object.defineProperty(window.Node.prototype, 'innerText', {
-    get: function() {
+    get: function () {
       return this.textContent;
     },
-    set: function(value) {
+    set: function (value) {
       this.textContent = value;
     },
   });
@@ -31,7 +31,7 @@ if (window.Element && !window.Element.prototype.matches)
     window.Element.prototype.webkitMatchesSelector;
 
 if (window.Element && !window.Element.prototype.closest) {
-  window.Element.prototype.closest = function(s) {
+  window.Element.prototype.closest = function (s) {
     var el = this;
     if (!document.documentElement.contains(el)) return null;
     do {
@@ -62,15 +62,15 @@ if (!String.prototype.padStart) {
 
 // From https://medium.com/trabe/using-promise-allsettled-now-e1767d43e480
 if (window.Promise && !Promise.allSettled) {
-  Promise.allSettled = promises =>
+  Promise.allSettled = (promises) =>
     Promise.all(
       promises.map((promise, i) =>
         promise
-          .then(value => ({
+          .then((value) => ({
             status: 'fulfilled',
             value,
           }))
-          .catch(reason => ({
+          .catch((reason) => ({
             status: 'rejected',
             reason,
           })),

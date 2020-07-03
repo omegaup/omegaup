@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
 
   const schoolsRank = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-schools-rank', {
         props: {
           page: payload.page,

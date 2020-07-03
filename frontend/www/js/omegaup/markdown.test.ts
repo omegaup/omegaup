@@ -3,8 +3,8 @@ import expect from 'expect';
 import * as markdown from './markdown';
 
 describe('markdown', () => {
-  describe('markdownConverter', () => {
-    let converter = markdown.markdownConverter();
+  describe('Converter', () => {
+    const converter = new markdown.Converter();
 
     it('Should handle trivial inputs', () => {
       expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');

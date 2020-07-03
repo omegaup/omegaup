@@ -937,6 +937,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
             $response['judged_by'] = strval($run->judged_by);
         }
+        // Removing cases values until this PR be approved and merged to PR #3800
+        $response['show_diff'] = 'examples';
+        $response['cases'] = [];
 
         $cases = self::getProblemCasesMetadata(
             'cases',

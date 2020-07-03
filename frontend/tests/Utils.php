@@ -274,6 +274,8 @@ class Utils {
     }
 
     private static function shellExec(string $command): void {
+        $log = \Logger::getLogger('\\OmegaUp\\Test\\Utils::shellExec()');
+        $log->info("========== Starting {$command}");
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
         $proc = proc_open(
             $command,
@@ -292,6 +294,7 @@ class Utils {
         $stderr = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
         $processStatus = proc_close($proc);
+        $log->info("========== Finished {$command}: {$processStatus}");
         if ($processStatus != 0) {
             throw new \Exception(
                 "Failed to run `{$command}`: status={$processStatus}\nstdout={$stdout}\nstderr={$stderr}"
@@ -323,6 +326,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/update_ranks.py' .
              ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --update-coder-of-the-month ' .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
@@ -341,6 +345,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/aggregate_feedback.py' .
              ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
@@ -356,6 +361,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/assign_badges.py' .
              ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .

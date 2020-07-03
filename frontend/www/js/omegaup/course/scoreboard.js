@@ -3,7 +3,7 @@ import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as UI from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(
     document.getElementById('header-payload').innerText,
   );
@@ -27,7 +27,7 @@ OmegaUp.on('ready', function() {
     assignment: arena.options.assignmentAlias,
     token: arena.options.scoreboardToken,
   })
-    .then(function(course) {
+    .then(function (course) {
       arena.initProblemsetId(course);
       arena.initProblems(course);
       arena.initClock(course.start_time, course.finish_time);
@@ -40,7 +40,7 @@ OmegaUp.on('ready', function() {
         .then(arena.rankingChange.bind(arena))
         .catch(UI.ignoreError);
       if (new Date() < course.finish_time && !arena.socket) {
-        setInterval(function() {
+        setInterval(function () {
           api.Problemset.scoreboard({
             problemset_id: arena.options.problemsetId,
             token: arena.options.scoreboardToken,

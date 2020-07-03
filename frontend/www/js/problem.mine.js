@@ -1,10 +1,10 @@
-(function() {
+(function () {
   function fillProblemsTable() {
     ($('#show-admin-problems').prop('checked')
       ? omegaup.API.Problem.adminList()
       : omegaup.API.Problem.myList()
     )
-      .then(function(result) {
+      .then(function (result) {
         $('#problem-list .added').remove();
         for (var i = 0; i < result.problems.length; i++) {
           var row = $('#problem-list .problem-list-template')
@@ -62,9 +62,9 @@
   $('#show-admin-problems').on('click', fillProblemsTable);
 
   function makePublic(isPublic) {
-    return function() {
+    return function () {
       var promises = [];
-      $('input[type=checkbox]').each(function() {
+      $('input[type=checkbox]').each(function () {
         if (this.checked) {
           promises.push(
             omegaup.API.Problem.update({
@@ -80,7 +80,7 @@
         .then(() => {
           omegaup.UI.success(omegaup.T.updateItemsSuccess);
         })
-        .catch(error => {
+        .catch((error) => {
           omegaup.UI.error(
             omegaup.UI.formatString(omegaup.T.bulkOperationError, error),
           );

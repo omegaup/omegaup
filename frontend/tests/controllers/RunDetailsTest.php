@@ -23,7 +23,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a problem
         $this->problemData = \OmegaUp\Test\Factories\Problem::createProblem(
-            /*$params=*/null,
+            /*$params=*/            null,
             $adminLogin
         );
 

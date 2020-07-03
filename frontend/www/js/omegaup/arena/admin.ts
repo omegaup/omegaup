@@ -29,7 +29,7 @@ OmegaUp.on('ready', () => {
     api.Contest.adminDetails({
       contest_alias: arenaInstance.options.contestAlias,
     })
-      .then(contest => {
+      .then((contest) => {
         if (!contest.admin) {
           if (!OmegaUp.loggedIn) {
             window.location.href = `/login/?redirect=${encodeURIComponent(
@@ -70,7 +70,7 @@ OmegaUp.on('ready', () => {
             ...problem,
             languages: problem.languages
               .split(',')
-              .filter(language => language !== ''),
+              .filter((language) => language !== ''),
           };
           if (arenaInstance.navbarProblems) {
             arenaInstance.navbarProblems.problems.push({
@@ -93,7 +93,7 @@ OmegaUp.on('ready', () => {
         api.Contest.users({
           contest_alias: arenaInstance.options.contestAlias,
         })
-          .then(data => {
+          .then((data) => {
             for (var ind in data.users) {
               var user = data.users[ind];
               var receiver = user.is_owner
