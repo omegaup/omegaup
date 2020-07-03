@@ -131,7 +131,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import * as markdown from '../markdown';
-import * as MarkdownConverter from '@/third_party/js/pagedown/Markdown.Converter.js';
+import { types } from '../api_types';
 
 import { VueMathjax } from 'vue-mathjax';
 
@@ -142,18 +142,18 @@ import { VueMathjax } from 'vue-mathjax';
 })
 export default class Markdown extends Vue {
   @Prop() markdown!: string;
-  @Prop({ default: null }) imageMapping!: MarkdownConverter.ImageMapping | null;
-  @Prop({ default: null }) problemSettings!: markdown.ProblemSettings | null;
+  @Prop({ default: null }) imageMapping!: markdown.ImageMapping | null;
+  @Prop({ default: null }) problemSettings!: types.ProblemSettings | null;
   @Prop({ default: false }) preview!: boolean;
 
-  markdownConverter = markdown.markdownConverter({ preview: this.preview });
+  markdownConverter = new markdown.Converter({ preview: this.preview });
 
   get html(): string {
     if (this.problemSettings || this.imageMapping) {
       return this.markdownConverter.makeHtmlWithImages(
         this.markdown,
         this.imageMapping || {},
-        this.problemSettings || {},
+        this.problemSettings || undefined,
       );
     }
     return this.markdownConverter.makeHtml(this.markdown);
