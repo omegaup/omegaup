@@ -30,8 +30,6 @@ import ArenaAdmin from './admin_arena';
 
 export { ArenaAdmin };
 
-import * as MarkdownConverter from '@/third_party/js/pagedown/Markdown.Converter.js';
-
 Vue.use(Vuex);
 
 export interface ArenaOptions {
@@ -307,8 +305,8 @@ export class Arena {
 
   markdownView: Vue & {
     markdown: string;
-    imageMapping: MarkdownConverter.ImageMapping;
-    problemSettings: markdown.ProblemSettings;
+    imageMapping: markdown.ImageMapping;
+    problemSettings?: types.ProblemSettings;
   };
 
   runDetailsView:
@@ -635,8 +633,8 @@ export class Arena {
       },
       data: {
         markdown: '',
-        imageMapping: <MarkdownConverter.ImageMapping>{},
-        problemSettings: <markdown.ProblemSettings>{},
+        imageMapping: <markdown.ImageMapping>{},
+        problemSettings: <types.ProblemSettings | undefined>undefined,
       },
       components: {
         'omegaup-markdown': omegaup_Markdown,
