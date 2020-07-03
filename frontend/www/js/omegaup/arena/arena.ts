@@ -12,7 +12,6 @@ import * as ui from '../ui';
 import * as markdown from '../markdown';
 
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
-import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 import arena_Navbar_Assignments from '../components/arena/NavbarAssignments.vue';
 import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue';
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
@@ -23,6 +22,7 @@ import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
+import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 

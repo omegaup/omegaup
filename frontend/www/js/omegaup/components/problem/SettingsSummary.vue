@@ -66,13 +66,14 @@
     margin: 10px auto;
     td {
       text-align: center;
-      border: 1px solid #000;
-      padding: 2px;
     }
+    th[scope='row'] {
+      font-weight: bold;
+    }
+    td,
     th[scope='row'] {
       border: 1px solid #000;
       padding: 2px;
-      font-weight: bold;
     }
   }
 }

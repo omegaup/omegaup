@@ -17,11 +17,7 @@ const baseSettingsSummaryProps = {
     email_clarifications: true,
     order: 'normal',
     score: 100,
-    statement: {
-      images: {},
-      language: 'es',
-      markdown: '',
-    },
+    statement: { images: {}, language: 'es', markdown: '' },
     submissions: 0,
     version: '587cb50672aa364c75e16b638ec7ca7289e24b08',
     visits: 0,
@@ -34,13 +30,7 @@ const baseSettingsSummaryProps = {
     problem_id: 1,
     quality_seal: false,
     settings: {
-      cases: {
-        sample: {
-          in: '1 2\n',
-          out: '3\n',
-          weight: 1,
-        },
-      },
+      cases: { sample: { in: '1 2\n', out: '3\n', weight: 1 } },
       limits: {
         ExtraWallTime: '0s',
         MemoryLimit: 33554432,
@@ -48,22 +38,11 @@ const baseSettingsSummaryProps = {
         OverallWallTimeLimit: '1s',
         TimeLimit: '1s',
       },
-      validator: {
-        name: 'token-numeric',
-        tolerance: 1e-9,
-      },
+      validator: { name: 'token-numeric', tolerance: 1e-9 },
     },
     title: 'Sumas',
     visibility: 2,
   } as types.ArenaProblemDetails,
-};
-
-const limits = {
-  ExtraWallTime: '0s',
-  MemoryLimit: '32 MiB',
-  OutputLimit: 10240,
-  OverallWallTimeLimit: '1s',
-  TimeLimit: '1s',
 };
 
 describe('SettingsSummary.vue', () => {
@@ -77,11 +56,9 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle problem settings summary out of contest', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: Object.assign(
-        baseSettingsSummaryProps,
-        baseSettingsSummaryProps.problem,
-        { showVisibilityIndicators: true },
-      ),
+      propsData: Object.assign({}, baseSettingsSummaryProps, {
+        showVisibilityIndicators: true,
+      }),
     });
 
     expect(wrapper.text()).not.toContain(T.wordsInOut);
@@ -90,11 +67,9 @@ describe('SettingsSummary.vue', () => {
 
   it('Should handle problem settings summary with memory limit as string', () => {
     const wrapper = mount(problem_SettingsSummary, {
-      propsData: Object.assign(
-        baseSettingsSummaryProps,
-        baseSettingsSummaryProps.problem.settings,
-        { limits: limits },
-      ),
+      propsData: Object.assign({}, baseSettingsSummaryProps, {
+        problem: { settings: { limits: { MemoryLimit: '32 MiB' } } },
+      }),
     });
 
     expect(wrapper.find('td[data-memory-limit]').text()).toContain('32 MiB');
