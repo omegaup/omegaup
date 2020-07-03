@@ -227,9 +227,6 @@ class Cache {
     const SCHOOL_RANK = 'school-rank';
     const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
     const TAGS_LIST = 'tags-list-';
-    const PROBLEM_CASES_CONTENTS = 'problem-cases-contents-';
-    const DATA_CASES_FILES = 'data-cases-files-';
-    const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
 
     /** @var \Logger */
     private $log;
