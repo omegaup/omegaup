@@ -709,17 +709,6 @@ export const Course = {
         return x;
       });
     })(x.admin);
-    x.student = (x => {
-      if (!Array.isArray(x)) {
-        return x;
-      }
-      return x.map(x => {
-        if (x.finish_time)
-          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-        return x;
-      });
-    })(x.student);
     x.public = (x => {
       if (!Array.isArray(x)) {
         return x;
@@ -731,6 +720,17 @@ export const Course = {
         return x;
       });
     })(x.public);
+    x.student = (x => {
+      if (!Array.isArray(x)) {
+        return x;
+      }
+      return x.map(x => {
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      });
+    })(x.student);
     return x;
   }),
   listSolvedProblems: apiCall<
@@ -911,8 +911,8 @@ export const GroupScoreboard = {
         return x;
       }
       return x.map(x => {
-        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
         return x;
       });
     })(x.contests);
@@ -1372,11 +1372,11 @@ export const Run = {
     messages._RunCreateServerResponse,
     messages.RunCreateResponse
   >('/api/run/create/', x => {
-    x.submission_deadline = ((x: number) => new Date(x * 1000))(
-      x.submission_deadline,
-    );
     x.nextSubmissionTimestamp = ((x: number) => new Date(x * 1000))(
       x.nextSubmissionTimestamp,
+    );
+    x.submission_deadline = ((x: number) => new Date(x * 1000))(
+      x.submission_deadline,
     );
     return x;
   }),
@@ -1518,14 +1518,14 @@ export const User = {
           y =>
             (x[y] = (x => {
               x.data = (x => {
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
                 x.finish_time = ((x: number) => new Date(x * 1000))(
                   x.finish_time,
                 );
                 x.last_updated = ((x: number) => new Date(x * 1000))(
                   x.last_updated,
+                );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
                 return x;
               })(x.data);
