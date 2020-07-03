@@ -10,7 +10,6 @@ import { Problem, ContestResult } from '../linkable_resource';
 
 OmegaUp.on('ready', function() {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  console.log(payload);
   const viewProfile = new Vue({
     el: '#main-container',
     render: function(createElement) {
@@ -23,7 +22,6 @@ OmegaUp.on('ready', function() {
               if (contest.place === null || now <= contest.data.finish_time) {
                 return null;
               }
-              console.log(typeof contest.place);
               return new ContestResult(contest);
             })
             .filter(contest => !!contest),
@@ -137,9 +135,6 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'update-period-statistics': (e, categories, data) => {
-            // console.log(e);
-            // console.log(categories);
-            // console.log(data);
             e.periodStatisticOptions.xAxis.categories = categories;
             e.periodStatisticOptions.series = data;
           },
