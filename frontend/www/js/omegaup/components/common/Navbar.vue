@@ -64,7 +64,7 @@
             class="nav-courses"
             v-bind:class="{ active: navbarSection === 'courses' }"
           >
-            <a href="/schools/">{{ T.navCourses }}</a>
+            <a href="/course/">{{ T.navCourses }}</a>
           </li>
           <li
             class="dropdown nav-problems"

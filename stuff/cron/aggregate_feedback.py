@@ -286,13 +286,12 @@ def replace_voted_tags(dbconn: MySQLdb.connections.Connection,
                                `t`.`name` IN (%s);""" %
                         ', '.join('%s' for _ in problem_tags),
                         (problem_id,) + tuple(problem_tags))
-            for msg in cur.messages:
-                if isinstance(msg, tuple) and msg[0] == cur.Warning:
-                    if msg[1][1] == MySQLdb.constants.ER.DUP_ENTRY:
-                        # It is somewhat expected to get duplicate entries.
-                        continue
+            for level, code, message in dbconn.show_warnings():
+                if code == MySQLdb.constants.ER.DUP_ENTRY:
+                    # It is somewhat expected to get duplicate entries.
+                    continue
                 logging.warning('Warning while updated tags in problem %d: %r',
-                                problem_id, msg)
+                                problem_id, (level, code, message))
             dbconn.commit()
     except:  # noqa: bare-except
         logging.exception('Failed to replace voted tags')
