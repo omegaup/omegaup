@@ -86,7 +86,6 @@ module.exports = {
       './frontend/www/js/omegaup/qualitynomination/details.js',
     qualitynomination_qualityreview:
       './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
-    schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     school_of_the_month:
       './frontend/www/js/omegaup/schools/schoolofthemonth.ts',
     school_profile: './frontend/www/js/omegaup/schools/profile.ts',
