@@ -85,7 +85,7 @@ def test_create_group_with_identities_and_restrictions(driver):
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, '//a[@href = "/schools/"]'))).click()
+                    (By.XPATH, '//a[@href = "/course/"]'))).click()
         assert not driver.browser.find_elements_by_css_selector(
             'a[href="/course/new/"]')
 
