@@ -1615,7 +1615,7 @@ export class Arena {
         } else if (document.getElementById('problem-settings-summary')) {
           this.problemSettingsSummary = new Vue({
             el: '#problem-settings-summary',
-            render: function(createElement) {
+            render: function (createElement) {
               return createElement('omegaup-problem-settings-summary', {
                 props: { problem: this.problem },
               });

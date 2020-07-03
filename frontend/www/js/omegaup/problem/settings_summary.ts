@@ -9,7 +9,7 @@ OmegaUp.on('ready', () => {
   );
   const problemSettingsSummary = new Vue({
     el: '#problem-settings-summary',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-settings-summary', {
         props: {
           problem: payload.problem,
