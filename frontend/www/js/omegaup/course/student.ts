@@ -22,7 +22,7 @@ OmegaUp.on('ready', () => {
 
   const viewStudent = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-viewstudent', {
         props: {
           assignments: payload.course.assignments,
@@ -42,7 +42,7 @@ OmegaUp.on('ready', () => {
               assignment_alias: assignment.alias,
               usernameOrEmail: student.username,
             })
-              .then(data => {
+              .then((data) => {
                 viewStudent.problems = data.problems;
               })
               .catch(UI.apiError);

@@ -9,14 +9,14 @@ import login_PasswordRecover from '../components/login/PasswordRecover.vue';
 OmegaUp.on('ready', () => {
   let loginPaswwordRecover = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-login-password-recover', {
         on: {
-          'forgot-password': function(email: string) {
+          'forgot-password': function (email: string) {
             api.Reset.create({
               email: email,
             })
-              .then(function(data) {
+              .then(function (data) {
                 UI.success(data.message ?? '');
               })
               .catch(UI.apiError);

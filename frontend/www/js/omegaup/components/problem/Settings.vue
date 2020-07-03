@@ -30,7 +30,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="form-group  col-md-6">
+      <div class="form-group col-md-6">
         <label for="validator_time_limit">{{
           T.problemEditFormValidatorTimeLimit
         }}</label>
@@ -43,7 +43,7 @@
         />
       </div>
 
-      <div class="form-group  col-md-6">
+      <div class="form-group col-md-6">
         <label for="time_limit">{{ T.problemEditFormTimeLimit }}</label>
         <input
           name="time_limit"
@@ -82,7 +82,7 @@
     </div>
 
     <div class="row">
-      <div class="form-group  col-md-6">
+      <div class="form-group col-md-6">
         <label for="memory_limit">{{ T.problemEditFormMemoryLimit }}</label>
         <input
           name="memory_limit"

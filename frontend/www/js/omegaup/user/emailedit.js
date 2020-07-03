@@ -4,19 +4,19 @@ import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let EmailEdit = new Vue({
     el: '#user-email-edit',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('userEmailEdit', {
         props: {
           initialEmail: this.email,
         },
         on: {
-          submit: function(newEmail) {
+          submit: function (newEmail) {
             api.User.updateMainEmail({ email: newEmail })
-              .then(function(response) {
+              .then(function (response) {
                 ui.success(T.userEditSuccessfulEmailUpdate);
               })
               .catch(ui.apiError);

@@ -26,9 +26,7 @@
             ></omegaup-user-username>
             <img
               height="11"
-              v-bind:src="
-                `/media/flags/${profile.country_id.toLowerCase()}.png`
-              "
+              v-bind:src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
               v-bind:title="profile.country_id"
               v-if="profile.country_id"
               width="16"
@@ -97,7 +95,7 @@
           "
           v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
           v-on:emit-update-aggregate-statistics="
-            profileComponent =>
+            (profileComponent) =>
               $emit('update-aggregate-statistics', profileComponent)
           "
           v-if="charts"

@@ -18,23 +18,22 @@ OmegaUp.on('ready', () => {
     [payload.statement.language]: payload.statement.markdown,
   };
   const solutions: types.Statements = {
-    [payload.statement.language]: payload.solution.markdown,
+    [payload.statement?.language || 'es']: payload.solution?.markdown || '',
   };
   const problemEdit = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-edit', {
         props: {
           data: payload,
           originalVisibility: payload.visibility,
           initialAdmins: this.initialAdmins,
           initialGroups: this.initialGroups,
-          initialLanguage: payload.statement.language,
           log: payload.log,
           publishedRevision: this.publishedRevision,
           value: this.publishedRevision,
-          markdownContents: this.markdownContents,
-          markdownSolutionContents: this.markdownSolutionContents,
+          statement: this.statement,
+          solution: this.solution,
           problemLevel: this.problemLevel,
           selectedPublicTags: this.selectedPublicTags,
           selectedPrivateTags: this.selectedPrivateTags,
@@ -45,7 +44,7 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.alias,
               level_tag: levelTag,
             })
-              .then(response => {
+              .then((response) => {
                 ui.success(T.problemLevelUpdated);
                 this.problemLevel = levelTag;
               })
@@ -61,9 +60,9 @@ OmegaUp.on('ready', () => {
             // component won't detect any change if two different language
             // solutions are the same.
             if (markdownType === 'statements') {
-              problemEdit.markdownContents = currentMarkdown;
+              problemEdit.statement.markdown = currentMarkdown;
               if (statements.hasOwnProperty(language)) {
-                problemEdit.markdownContents = statements[language];
+                problemEdit.statement.markdown = statements[language];
                 return;
               }
               api.Problem.details(
@@ -75,23 +74,23 @@ OmegaUp.on('ready', () => {
                 },
                 { quiet: true },
               )
-                .then(response => {
+                .then((response) => {
                   if (response.statement.language !== language) {
                     response.statement.markdown = '';
                   }
                   statements[language] = response.statement.markdown;
-                  problemEdit.markdownContents = response.statement.markdown;
+                  problemEdit.statement = response.statement;
                 })
-                .catch(error => {
+                .catch((error) => {
                   if (error.httpStatusCode == 404) {
                     return;
                   }
                   ui.apiError(error);
                 });
             } else {
-              problemEdit.markdownSolutionContents = currentMarkdown;
+              problemEdit.solution.markdown = currentMarkdown;
               if (solutions.hasOwnProperty(language)) {
-                problemEdit.markdownSolutionContents = solutions[language];
+                problemEdit.solution.markdown = solutions[language];
                 return;
               }
               api.Problem.solution(
@@ -101,15 +100,19 @@ OmegaUp.on('ready', () => {
                 },
                 { quiet: true },
               )
-                .then(response => {
-                  if (response.solution.language !== language) {
-                    response.solution.markdown = '';
+                .then((response) => {
+                  const solution = response.solution || {
+                    language: 'es',
+                    markdown: '',
+                    images: {},
+                  };
+                  if (solution.language !== language) {
+                    solution.markdown = '';
                   }
-                  solutions[language] = response.solution.markdown;
-                  problemEdit.markdownSolutionContents =
-                    response.solution.markdown;
+                  solutions[language] = solution.markdown;
+                  problemEdit.solution = solution;
                 })
-                .catch(error => {
+                .catch((error) => {
                   if (error.httpStatusCode == 404) {
                     return;
                   }
@@ -143,11 +146,11 @@ OmegaUp.on('ready', () => {
                 // FIXME: For some reason this is not being reactive
                 if (isPublic) {
                   this.selectedPublicTags = this.selectedPublicTags.filter(
-                    tag => tag !== tagname,
+                    (tag) => tag !== tagname,
                   );
                 } else {
                   this.selectedPrivateTags = this.selectedPrivateTags.filter(
-                    tag => tag !== tagname,
+                    (tag) => tag !== tagname,
                   );
                 }
               })
@@ -164,7 +167,7 @@ OmegaUp.on('ready', () => {
               allow_user_add_tags: allowTags,
               message: `${T.problemEditFormAllowUserAddTags}: ${allowTags}`,
             })
-              .then(response => {
+              .then((response) => {
                 ui.success(T.problemEditUpdatedSuccessfully);
               })
               .catch(ui.apiError);
@@ -222,7 +225,7 @@ OmegaUp.on('ready', () => {
               commit: selectedRevision.commit,
               update_published: updatePublished,
             })
-              .then(response => {
+              .then((response) => {
                 problemEdit.publishedRevision = selectedRevision;
                 ui.success(T.problemVersionUpdated);
               })
@@ -236,7 +239,7 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.alias,
               version: selectedCommit.version,
             })
-              .then(response => {
+              .then((response) => {
                 Vue.set(
                   versions.runsDiff,
                   selectedCommit.version,
@@ -247,7 +250,7 @@ OmegaUp.on('ready', () => {
           },
           remove: (problemAlias: string) => {
             api.Problem.delete({ problem_alias: problemAlias })
-              .then(response => {
+              .then((response) => {
                 window.location.href = '/problem/mine/';
               })
               .catch(ui.apiError);
@@ -258,7 +261,7 @@ OmegaUp.on('ready', () => {
     methods: {
       refreshProblemAdmins: (): void => {
         api.Problem.admins({ problem_alias: payload.alias })
-          .then(data => {
+          .then((data) => {
             problemEdit.initialAdmins = data.admins;
             problemEdit.initialGroups = data.group_admins;
           })
@@ -269,8 +272,12 @@ OmegaUp.on('ready', () => {
       initialAdmins: payload.admins,
       initialGroups: payload.groupAdmins,
       publishedRevision: payload.publishedRevision,
-      markdownContents: payload.statement.markdown,
-      markdownSolutionContents: payload.solution.markdown,
+      statement: payload.statement,
+      solution: payload.solution || {
+        language: 'es',
+        markdown: '',
+        images: {},
+      },
       problemLevel: payload.problemLevel,
       selectedPublicTags: payload.selectedPublicTags,
       selectedPrivateTags: payload.selectedPrivateTags,

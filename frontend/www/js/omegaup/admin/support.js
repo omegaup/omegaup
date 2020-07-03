@@ -5,10 +5,10 @@ import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let adminSupport = new Vue({
     el: '#admin-support',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-admin-support', {
         props: {
           username: this.username,
@@ -17,12 +17,12 @@ OmegaUp.on('ready', function() {
           lastLogin: this.lastLogin,
         },
         on: {
-          'search-email': function(email) {
+          'search-email': function (email) {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;
             api.User.extraInformation({ email: email })
-              .then(function(data) {
+              .then(function (data) {
                 adminSupport.username = data.username;
                 adminSupport.verified = data.verified;
                 adminSupport.lastLogin =
@@ -32,28 +32,28 @@ OmegaUp.on('ready', function() {
               })
               .catch(UI.apiError);
           },
-          'verify-user': function(email) {
+          'verify-user': function (email) {
             api.User.verifyEmail({ usernameOrEmail: email })
-              .then(function() {
+              .then(function () {
                 adminSupport.verified = true;
                 UI.success(T.userVerified);
               })
               .catch(UI.apiError);
           },
-          'generate-token': function(email) {
+          'generate-token': function (email) {
             api.Reset.generateToken({
               email: email,
             })
-              .then(function(data) {
+              .then(function (data) {
                 UI.success(T.passwordResetTokenWasGeneratedSuccessfully);
                 adminSupport.link = data.link;
               })
               .catch(UI.apiError);
           },
-          'copy-token': function() {
+          'copy-token': function () {
             UI.success(T.passwordResetLinkCopiedToClipboard);
           },
-          reset: function() {
+          reset: function () {
             adminSupport.username = null;
             adminSupport.link = null;
             adminSupport.verified = false;

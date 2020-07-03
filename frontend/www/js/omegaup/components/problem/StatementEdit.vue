@@ -34,6 +34,7 @@
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
             v-bind:markdown="currentMarkdown"
+            v-bind:image-mapping="statement.images"
             preview="true"
           ></omegaup-markdown>
           <template v-if="markdownType === 'statements'">
@@ -134,15 +135,14 @@ export default class ProblemStatementEdit extends Vue {
   @Prop() title!: string;
   @Prop() source!: string;
   @Prop({ default: null }) problemsetter!: types.ProblemsetterInfo;
-  @Prop() markdownContents!: string;
-  @Prop() initialLanguage!: string;
+  @Prop() statement!: types.ProblemStatement;
   @Prop() markdownType!: string;
   @Prop({ default: true }) showEditControls!: boolean;
 
   T = T;
   commitMessage = T.updateStatementsCommitMessage;
-  currentLanguage = this.initialLanguage;
-  currentMarkdown = this.markdownContents;
+  currentLanguage = this.statement.language;
+  currentMarkdown = this.statement.markdown;
   errors: string[] = [];
   languages = ['es', 'en', 'pt'];
   statements: types.Statements = {};
@@ -172,24 +172,10 @@ export default class ProblemStatementEdit extends Vue {
     }
   }
 
-  @Watch('initialLanguage')
-  onInitialLanguageChange(newInitial: string): void {
-    this.currentLanguage = newInitial;
-  }
-
-  @Watch('markdownType')
-  onInitialMarkdownTypeChange(
-    newMarkdownType: string,
-    oldMarkdownType: string,
-  ): void {
-    this.currentLanguage = this.initialLanguage;
-    this.currentMarkdown = this.markdownContents;
-  }
-
-  @Watch('markdownContents')
-  onMarkdownContentsChange(newMarkdown: string): void {
-    this.currentMarkdown = newMarkdown;
-    this.statements[this.currentLanguage] = newMarkdown;
+  @Watch('statement')
+  onStatementChange(newStatement: types.ProblemStatement): void {
+    this.currentLanguage = newStatement.language;
+    this.currentMarkdown = newStatement.markdown;
   }
 
   @Watch('currentLanguage')
@@ -203,10 +189,17 @@ export default class ProblemStatementEdit extends Vue {
     );
   }
 
-  @Emit('update:markdownContents')
+  @Emit('update:statement')
   @Watch('currentMarkdown')
-  onCurrentMarkdownChange(newMarkdown: string, oldMarkdown: string): string {
-    return newMarkdown;
+  onCurrentMarkdownChange(
+    newMarkdown: string,
+    oldMarkdown: string,
+  ): types.ProblemStatement {
+    return {
+      images: this.statement.images,
+      language: this.statement.language,
+      markdown: newMarkdown,
+    };
   }
 
   onSubmit(e: Event) {

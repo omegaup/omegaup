@@ -28,8 +28,8 @@
       <tr
         v-if="
           showRanking &&
-            typeof contest.scoreboard === 'number' &&
-            duration != Infinity
+          typeof contest.scoreboard === 'number' &&
+          duration != Infinity
         "
       >
         <td>

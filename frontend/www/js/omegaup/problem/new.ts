@@ -13,7 +13,7 @@ OmegaUp.on('ready', () => {
   }
   const problemNew = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-new', {
         props: {
           data: payload,
@@ -21,14 +21,14 @@ OmegaUp.on('ready', () => {
         on: {
           'alias-changed': (alias: string): void => {
             api.Problem.details({ problem_alias: alias }, { quiet: true })
-              .then(data => {
+              .then((data) => {
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
                     alias: ui.escape(alias),
                   }),
                 );
               })
-              .catch(error => {
+              .catch((error) => {
                 if (error.httpStatusCode == 404) {
                   ui.dismissNotifications();
                   return;

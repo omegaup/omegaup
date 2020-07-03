@@ -27,7 +27,7 @@
  * @psalm-type ProblemAdmin=array{role: string, username: string}
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
- * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, solution: ProblemStatement, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
  * @psalm-type ProblemDetailsv2Payload=array{nominationStatus?: NominationStatus, problem: ProblemInfo, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, selectedTags: list<SelectedTag>|null, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
@@ -1969,9 +1969,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the resource, plus some metadata.
+     * @return ProblemStatement|null The contents of the resource, plus some metadata.
      */
-    public static function getProblemResourceImpl(array $params): array {
+    public static function getProblemResourceImpl(array $params): ?array {
         if (is_null($params['alias'])) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -2000,6 +2000,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
                 'utf-8'
             );
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            return null;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             throw $e;
         } catch (\Exception $e) {
@@ -2044,18 +2046,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{language: string, markdown: string, images: array<string, string>} The contents of the file.
+     * @return ProblemStatement|null The contents of the file.
      */
     public static function getProblemStatement(
         string $alias,
         string $commit,
         string $language
-    ): array {
+    ): ?array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$alias}-{$commit}-{$language}-markdown",
-            /** @return array{language: string, images: array<string, string>, markdown: string} */
-            function () use ($alias, $commit, $language) {
+            /** @return ProblemStatement|null */
+            function () use ($alias, $commit, $language): ?array {
                 return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'statements',
                     'alias' => $alias,
@@ -2083,12 +2085,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Problems $problem,
         string $commit,
         string $language
-    ): array {
+    ): ?array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            /** @return array{language: string, markdown: string, images: array<string, string>} */
-            function () use ($problem, $commit, $language): array {
+            /** @return ProblemStatement|null */
+            function () use ($problem, $commit, $language): ?array {
                 return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
                     'directory' => 'solutions',
                     'alias' => strval($problem->alias),
@@ -2378,7 +2380,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Get the extra problem details with all the validations
      *
-     * @return ProblemDetails|null
+     * @return ProblemDetails
      */
     private static function getProblemDetails(
         ?\OmegaUp\DAO\VO\Identities $loggedIdentity,
@@ -2411,6 +2413,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $commit,
             $statementLanguage
         );
+        if (is_null($response['statement'])) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'statementNotFound'
+            );
+        }
         $response['settings'] = \OmegaUp\Controllers\Problem::getProblemSettingsDistrib(
             $problem,
             $commit
@@ -2610,7 +2617,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
-     * @return array{solution: ProblemStatement}
+     * @return array{solution: ProblemStatement|null}
      *
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param bool|null $forfeit_problem
@@ -2661,6 +2668,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $version = strval($problemsetProblem->version);
         }
 
+        $response = [
+            'solution' => \OmegaUp\Controllers\Problem::getProblemSolution(
+                $problem,
+                $commit,
+                $lang
+            ),
+        ];
+
         if (
             !\OmegaUp\Authorization::canViewProblemSolution(
                 $r->identity,
@@ -2688,19 +2703,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'allowedSolutionsLimitReached'
                 );
             }
-            \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
-                'user_id' => $r->user->user_id,
-                'problem_id' => $problem->problem_id
-            ]));
+            if (!is_null($response['solution'])) {
+                // We don't consume a token if there is no solution.
+                \OmegaUp\DAO\ProblemsForfeited::create(new \OmegaUp\DAO\VO\ProblemsForfeited([
+                    'user_id' => $r->user->user_id,
+                    'problem_id' => $problem->problem_id
+                ]));
+            }
         }
 
-        return [
-            'solution' => \OmegaUp\Controllers\Problem::getProblemSolution(
-                $problem,
-                $commit,
-                $lang
-            ),
-        ];
+        return $response;
     }
 
     /**

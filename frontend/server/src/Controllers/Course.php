@@ -3424,13 +3424,18 @@ class Course extends \OmegaUp\Controllers\Controller {
 
                 $nominationStatus['tried'] = $tried;
                 $nominationStatus['solved'] = $solved;
-                $nominationStatus['language'] = \OmegaUp\Controllers\Problem::getProblemStatement(
+                $problemStatement = \OmegaUp\Controllers\Problem::getProblemStatement(
                     $problem['alias'],
                     $problem['commit'],
                     \OmegaUp\Controllers\Identity::getPreferredLanguage(
                         $identity
                     )
-                )['language'];
+                );
+                $nominationStatus['language'] = (
+                    !is_null($problemStatement) ?
+                    $problemStatement['language'] :
+                    'es'
+                );
             }
             $nominationStatus['canNominateProblem'] = !is_null($user);
             $nominationStatus['problemAlias'] = $problem['alias'];
@@ -3767,7 +3772,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         return $scoreboard->generate(
-            /*$withRunDetails=*/false,
+            /*$withRunDetails=*/            false,
             /*$sortByName=*/false
         );
     }

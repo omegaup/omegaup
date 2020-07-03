@@ -48,7 +48,7 @@ OmegaUp.on('ready', () => {
 
   const problemDetails = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-statementedit', {
         props: {
           alias: 'problema',
@@ -59,8 +59,11 @@ OmegaUp.on('ready', () => {
             name: 'tu-usuario',
             username: 'tu_usuario',
           },
-          markdownContents: markdownStatement,
-          initialLanguage: 'es',
+          statement: <types.ProblemStatement>{
+            markdown: markdownStatement,
+            language: 'es',
+            images: {},
+          },
           markdownType: 'statements',
           showEditControls: false,
         },

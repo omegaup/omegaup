@@ -7,7 +7,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseDetailsPayload();
   const courseDetails = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-details', {
         props: {
           course: payload.details,

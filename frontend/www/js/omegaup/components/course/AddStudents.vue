@@ -17,7 +17,7 @@
             v-bind:title="T.courseEditAddStudentsTooltip"
           ></span>
           <omegaup-autocomplete
-            v-bind:init="el => typeahead.userTypeahead(el)"
+            v-bind:init="(el) => typeahead.userTypeahead(el)"
             v-model="participant"
           ></omegaup-autocomplete>
         </div>
