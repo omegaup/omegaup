@@ -255,7 +255,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import course_AssignmentDetails from './AssignmentDetails.vue';
@@ -284,6 +284,7 @@ const availableTabs = [
   'clone',
 ];
 const emptyAssignment: types.CourseAssignment = {
+  problemset_id: 0,
   alias: '',
   description: '',
   name: '',
@@ -312,7 +313,7 @@ const emptyAssignment: types.CourseAssignment = {
 })
 export default class CourseEdit extends Vue {
   @Ref('assignment-details-list')
-  readonly assignmentDetailsList!: course_AssignmentDetails;
+  readonly assignmentDetailsList!: HTMLElement;
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
@@ -331,21 +332,17 @@ export default class CourseEdit extends Vue {
 
   onNewAssignment(): void {
     this.visibilityMode = omegaup.VisibilityMode.New;
-
     this.assignmentDetailsList.scrollIntoView();
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
     this.visibilityMode = omegaup.VisibilityMode.Edit;
-
     this.assignment = assignment;
-
     this.assignmentDetailsList.scrollIntoView();
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {
     this.visibilityMode = omegaup.VisibilityMode.AddProblem;
-
     this.selectedAssignment = assignment;
     this.showTab = 'problems';
     this.$emit('add-problems');
