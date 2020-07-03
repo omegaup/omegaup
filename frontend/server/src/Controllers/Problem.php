@@ -4148,9 +4148,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (is_null($details)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
-        $details['settings']['limits']['MemoryLimit'] = (intval(
-            $details['settings']['limits']['MemoryLimit']
-        ) / 1024 / 1024) . ' MiB';
         $result = [
             'source' => (
                 isset($details['source']) ?

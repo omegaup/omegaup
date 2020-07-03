@@ -372,6 +372,7 @@ export namespace omegaup {
     alias: string;
     commit?: string;
     difficulty?: number;
+    input_limit: number;
     languages?: string;
     letter?: string;
     order: number;
