@@ -116,9 +116,8 @@ import * as markdown from '../../markdown';
 import omegaup_Markdown from '../Markdown.vue';
 import user_Username from '../user/Username.vue';
 
-const markdownConverter = markdown.markdownConverter({
+const markdownConverter = new markdown.Converter({
   preview: true,
-  imageMapping: {},
 });
 
 @Component({
@@ -149,7 +148,7 @@ export default class ProblemStatementEdit extends Vue {
   markdownEditor: Markdown.Editor | null = null;
 
   mounted(): void {
-    this.markdownEditor = new Markdown.Editor(markdownConverter, '', {
+    this.markdownEditor = new Markdown.Editor(markdownConverter.converter, '', {
       panels: {
         buttonBar: this.markdownButtonBar,
         preview: null,
