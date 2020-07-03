@@ -113,7 +113,7 @@ function escapeXml(str: string): string {
 }
 
 function toCsv(table: string[][]): string {
-  return table.map(row => row.map(escapeCsv).join(',')).join('\r\n');
+  return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
 }
 
 function toOds(courseName: string, table: string[][]): string {

@@ -118,7 +118,7 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     let self = this;
-    window.addEventListener('popstate', function(ev: PopStateEvent): void {
+    window.addEventListener('popstate', function (ev: PopStateEvent): void {
       self.selectedStudent =
         (ev.state && ev.state.student) || self.initialStudent;
     });

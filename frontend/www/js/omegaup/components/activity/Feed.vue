@@ -247,7 +247,7 @@ export default class ActivityFeed extends Vue {
       users.sort();
       origins.push({
         origin: origin,
-        usernames: users.map(u => {
+        usernames: users.map((u) => {
           return { username: u, classname: self.classByUser[u] };
         }),
       });

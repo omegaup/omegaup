@@ -177,10 +177,11 @@
           v-bind:initial-admins="initialAdmins"
           v-bind:has-parent-component="true"
           v-on:emit-add-admin="
-            addAdminComponent => $emit('add-admin', addAdminComponent.username)
+            (addAdminComponent) =>
+              $emit('add-admin', addAdminComponent.username)
           "
           v-on:emit-remove-admin="
-            addAdminComponent =>
+            (addAdminComponent) =>
               $emit('remove-admin', addAdminComponent.selected.username)
           "
         ></omegaup-problem-admins>
@@ -188,11 +189,11 @@
           v-bind:initial-groups="initialGroups"
           v-bind:has-parent-component="true"
           v-on:emit-add-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('add-group-admin', groupAdminsComponent.groupAlias)
           "
           v-on:emit-remove-group-admin="
-            groupAdminsComponent =>
+            (groupAdminsComponent) =>
               $emit('remove-group-admin', groupAdminsComponent.groupAlias)
           "
         ></omegaup-problem-groupadmins>
@@ -210,7 +211,7 @@
           v-bind:selected-public-tags="data.selectedPublicTags"
           v-bind:selected-private-tags="data.selectedPrivateTags"
           v-on:emit-update-problem-level="
-            levelTag => $emit('update-problem-level', levelTag)
+            (levelTag) => $emit('update-problem-level', levelTag)
           "
           v-on:emit-add-tag="
             (alias, tagname, isPublic) =>

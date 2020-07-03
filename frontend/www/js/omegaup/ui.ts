@@ -9,10 +9,7 @@ export function navigateTo(href: string): void {
 
 function escapeString(s: string): string {
   if (typeof s !== 'string') return '';
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 export { escapeString as escape };
@@ -25,7 +22,7 @@ export function buildURLQuery(queryParameters: {
       const encodedKey = encodeURIComponent(key);
       if (Array.isArray(value)) {
         return value
-          .map(entry => `${encodedKey}[]=${encodeURIComponent(entry)}`)
+          .map((entry) => `${encodedKey}[]=${encodeURIComponent(entry)}`)
           .join('&');
       }
       return `${encodedKey}=${encodeURIComponent(value)}`;
@@ -234,7 +231,7 @@ export function copyToClipboard(value: string): void {
 export function renderSampleToClipboardButton(): void {
   document
     .querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
-    .forEach(function(item, index) {
+    .forEach(function (item, index) {
       const preElement = item.querySelector('pre');
       if (!preElement) {
         // This can only happen if a user messed up with the markdown of a

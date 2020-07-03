@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolOfTheMonthPayload();
   let schoolOfTheMonthList = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('school-of-the-month-list', {
         props: {
           schoolsOfPreviousMonth: payload.schoolsOfPreviousMonth,
@@ -24,7 +24,7 @@ OmegaUp.on('ready', () => {
           schoolIsSelected: this.schoolIsSelected,
         },
         on: {
-          'select-school': function(schoolId: number) {
+          'select-school': function (schoolId: number) {
             api.School.selectSchoolOfTheMonth({
               school_id: schoolId,
             })

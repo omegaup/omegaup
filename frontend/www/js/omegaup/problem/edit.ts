@@ -22,7 +22,7 @@ OmegaUp.on('ready', () => {
   };
   const problemEdit = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-edit', {
         props: {
           data: payload,
@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.alias,
               level_tag: levelTag,
             })
-              .then(response => {
+              .then((response) => {
                 ui.success(T.problemLevelUpdated);
                 this.problemLevel = levelTag;
               })
@@ -75,14 +75,14 @@ OmegaUp.on('ready', () => {
                 },
                 { quiet: true },
               )
-                .then(response => {
+                .then((response) => {
                   if (response.statement.language !== language) {
                     response.statement.markdown = '';
                   }
                   statements[language] = response.statement.markdown;
                   problemEdit.markdownContents = response.statement.markdown;
                 })
-                .catch(error => {
+                .catch((error) => {
                   if (error.httpStatusCode == 404) {
                     return;
                   }
@@ -101,7 +101,7 @@ OmegaUp.on('ready', () => {
                 },
                 { quiet: true },
               )
-                .then(response => {
+                .then((response) => {
                   if (response.solution.language !== language) {
                     response.solution.markdown = '';
                   }
@@ -109,7 +109,7 @@ OmegaUp.on('ready', () => {
                   problemEdit.markdownSolutionContents =
                     response.solution.markdown;
                 })
-                .catch(error => {
+                .catch((error) => {
                   if (error.httpStatusCode == 404) {
                     return;
                   }
@@ -143,11 +143,11 @@ OmegaUp.on('ready', () => {
                 // FIXME: For some reason this is not being reactive
                 if (isPublic) {
                   this.selectedPublicTags = this.selectedPublicTags.filter(
-                    tag => tag !== tagname,
+                    (tag) => tag !== tagname,
                   );
                 } else {
                   this.selectedPrivateTags = this.selectedPrivateTags.filter(
-                    tag => tag !== tagname,
+                    (tag) => tag !== tagname,
                   );
                 }
               })
@@ -164,7 +164,7 @@ OmegaUp.on('ready', () => {
               allow_user_add_tags: allowTags,
               message: `${T.problemEditFormAllowUserAddTags}: ${allowTags}`,
             })
-              .then(response => {
+              .then((response) => {
                 ui.success(T.problemEditUpdatedSuccessfully);
               })
               .catch(ui.apiError);
@@ -222,7 +222,7 @@ OmegaUp.on('ready', () => {
               commit: selectedRevision.commit,
               update_published: updatePublished,
             })
-              .then(response => {
+              .then((response) => {
                 problemEdit.publishedRevision = selectedRevision;
                 ui.success(T.problemVersionUpdated);
               })
@@ -236,7 +236,7 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.alias,
               version: selectedCommit.version,
             })
-              .then(response => {
+              .then((response) => {
                 Vue.set(
                   versions.runsDiff,
                   selectedCommit.version,
@@ -247,7 +247,7 @@ OmegaUp.on('ready', () => {
           },
           remove: (problemAlias: string) => {
             api.Problem.delete({ problem_alias: problemAlias })
-              .then(response => {
+              .then((response) => {
                 window.location.href = '/problem/mine/';
               })
               .catch(ui.apiError);
@@ -258,7 +258,7 @@ OmegaUp.on('ready', () => {
     methods: {
       refreshProblemAdmins: (): void => {
         api.Problem.admins({ problem_alias: payload.alias })
-          .then(data => {
+          .then((data) => {
             problemEdit.initialAdmins = data.admins;
             problemEdit.initialGroups = data.group_admins;
           })

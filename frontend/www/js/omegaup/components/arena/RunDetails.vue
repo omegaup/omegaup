@@ -108,9 +108,7 @@
           <li>
             <a
               class="details"
-              v-bind:href="
-                `/api/run/download/run_alias/${data.guid}/complete/true/`
-              "
+              v-bind:href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
               v-if="data.problem_admin"
               >{{ T.wordsDownloadDetails }}</a
             >

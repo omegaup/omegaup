@@ -38,7 +38,7 @@ OmegaUp.on('ready', () => {
     contest_alias: arenaInstance.options.contestAlias,
     token: arenaInstance.options.scoreboardToken,
   })
-    .then(contest => {
+    .then((contest) => {
       arenaInstance.initProblemsetId(contest);
       arenaInstance.initProblems(contest);
       arenaInstance.initClock(contest.start_time, contest.finish_time, null);

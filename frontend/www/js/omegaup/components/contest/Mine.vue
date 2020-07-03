@@ -84,17 +84,13 @@
               </td>
               <td>
                 <a
-                  v-bind:href="
-                    `https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`
-                  "
+                  v-bind:href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`"
                   >{{ time.formatDateTime(contest.start_time) }}</a
                 >
               </td>
               <td>
                 <a
-                  v-bind:href="
-                    `https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`
-                  "
+                  v-bind:href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`"
                   >{{ time.formatDateTime(contest.finish_time) }}</a
                 >
               </td>
@@ -103,9 +99,7 @@
               </td>
               <td>
                 <a
-                  v-bind:href="
-                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`
-                  "
+                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
                   v-if="contest.scoreboard_url"
                 >
                   <font-awesome-icon
@@ -115,9 +109,7 @@
                 </a>
                 <a
                   class="ml-1"
-                  v-bind:href="
-                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`
-                  "
+                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
                   v-if="contest.scoreboard_url_admin"
                 >
                   <font-awesome-icon

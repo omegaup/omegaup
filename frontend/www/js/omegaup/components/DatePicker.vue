@@ -44,7 +44,7 @@ export default class DatePicker extends Vue {
         weekStart: 1,
         format: self.format,
       })
-      .on('changeDate', ev => {
+      .on('changeDate', (ev) => {
         self.$emit('input', ev.date);
       })
       .datepicker('setValue', self.value);

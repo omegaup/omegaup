@@ -145,7 +145,7 @@
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
                     class="form-control"
-                    v-bind:init="el => typeahead.problemTypeahead(el)"
+                    v-bind:init="(el) => typeahead.problemTypeahead(el)"
                     v-model="problemAlias"
                   ></omegaup-autocomplete
                 ></label>
@@ -244,7 +244,7 @@ export default class CourseProblemList extends Vue {
     this.$emit(
       'sort',
       this.assignment.alias,
-      this.assignmentProblems.map(problem => problem.alias),
+      this.assignmentProblems.map((problem) => problem.alias),
     );
     this.problemsOrderChanged = false;
   }

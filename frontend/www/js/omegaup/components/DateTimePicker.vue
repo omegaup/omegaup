@@ -53,27 +53,16 @@ export default class DateTimePicker extends Vue {
         defaultDate: self.value,
         locale: T.locale,
       })
-      .on('change', ev => {
-        self.$emit(
-          'input',
-          $(self.$el)
-            .data('datetimepicker')
-            .getDate(),
-        );
+      .on('change', (ev) => {
+        self.$emit('input', $(self.$el).data('datetimepicker').getDate());
       });
 
-    $(this.$el)
-      .data('datetimepicker')
-      .setDate(self.value);
+    $(this.$el).data('datetimepicker').setDate(self.value);
     if (self.start !== null) {
-      $(this.$el)
-        .data('datetimepicker')
-        .setStartDate(self.start);
+      $(this.$el).data('datetimepicker').setStartDate(self.start);
     }
     if (self.finish !== null) {
-      $(this.$el)
-        .data('datetimepicker')
-        .setEndDate(self.finish);
+      $(this.$el).data('datetimepicker').setEndDate(self.finish);
     }
   }
 
@@ -90,9 +79,7 @@ export default class DateTimePicker extends Vue {
   onPropertyChanged(newValue: Date) {
     this.stringValue = time.formatDateTimeLocal(newValue);
     if (this.usedFallback) {
-      $(this.$el)
-        .data('datetimepicker')
-        .setDate(newValue);
+      $(this.$el).data('datetimepicker').setDate(newValue);
     }
   }
 }

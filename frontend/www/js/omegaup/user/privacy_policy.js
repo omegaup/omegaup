@@ -5,24 +5,24 @@ import T from '../lang';
 import * as api from '../api';
 import * as UI from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
 
   let privacyPolicy = new Vue({
     el: '#privacy-policy',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-privacy-policy', {
         props: {
           policyMarkdown: this.policyMarkdown,
           saved: this.saved,
         },
         on: {
-          submit: function(ev) {
+          submit: function (ev) {
             api.User.acceptPrivacyPolicy({
               privacy_git_object_id: payload.git_object_id,
               statement_type: payload.statement_type,
             })
-              .then(function(data) {
+              .then(function (data) {
                 UI.info(T.wordsPrivacyPolicyAccepted);
                 privacyPolicy.saved = true;
               })
