@@ -127,6 +127,9 @@ jobs:
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
 
+      - name: Get docker container
+        run: docker pull "$(grep --only-matching 'omegaup/hook_tools:\w\+' stuff/lint.sh)"
+
       - name: Run linters
         run: |
           # Create optional directories to simplify psalm config.

@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
   const finishTime = new Date(startTime.getTime() + 5 * 60 * 60 * 1000);
   const contestNew = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-contest-new', {
         props: {
           allLanguages: payload.languages,
@@ -23,7 +23,7 @@ OmegaUp.on('ready', () => {
         on: {
           'create-contest': (contest: omegaup.Contest): void => {
             api.Contest.create(contest)
-              .then(data => {
+              .then((data) => {
                 window.location.replace(
                   `/contest/${contest.alias}/edit/#problems`,
                 );

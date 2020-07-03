@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CoderOfTheMonthPayload();
   let coderOfTheMonthList = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-coder-of-the-month-list', {
         props: {
           codersOfCurrentMonth: payload.codersOfCurrentMonth,
@@ -25,12 +25,12 @@ OmegaUp.on('ready', () => {
           category: payload.category,
         },
         on: {
-          'select-coder': function(coderUsername: string, category: string) {
+          'select-coder': function (coderUsername: string, category: string) {
             api.User.selectCoderOfTheMonth({
               username: coderUsername,
               category: category,
             })
-              .then(function() {
+              .then(function () {
                 ui.success(
                   payload.category == 'all'
                     ? T.coderOfTheMonthSelectedSuccessfully

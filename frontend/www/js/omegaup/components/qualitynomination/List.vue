@@ -15,20 +15,20 @@
         </div>
         <div class="col-md-4">
           <omegaup-autocomplete
-            v-bind:init="el => typeahead.problemTypeahead(el)"
+            v-bind:init="(el) => typeahead.problemTypeahead(el)"
             v-model="queryProblem"
             v-bind:placeholder="T.wordsKeyword"
             class="form-control"
             v-show="selectColumn == 'problem_alias'"
           ></omegaup-autocomplete>
           <omegaup-autocomplete
-            v-bind:init="el => typeahead.userTypeahead(el)"
+            v-bind:init="(el) => typeahead.userTypeahead(el)"
             v-model="queryUsername"
             v-bind:placeholder="T.wordsKeyword"
             class="form-control"
             v-show="
               selectColumn == 'nominator_username' ||
-                selectColumn == 'author_username'
+              selectColumn == 'author_username'
             "
           ></omegaup-autocomplete>
         </div>
@@ -114,7 +114,8 @@
       <omegaup-common-paginator
         v-bind:pager-items="pagerItems"
         v-on:page-changed="
-          page => $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
+          (page) =>
+            $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
         "
       ></omegaup-common-paginator>
     </div>

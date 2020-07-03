@@ -8,7 +8,7 @@ OmegaUp.on('ready', () => {
 
   const commonFooter = new Vue({
     el: '#common-footer',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-common-footer', {
         props: {
           isLoggedIn: (payload && payload.isLoggedIn) || false,

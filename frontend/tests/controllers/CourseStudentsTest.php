@@ -150,7 +150,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testStudentASsignmentProgress() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
-            /*$nAssignments=*/ 2
+            /*$nAssignments=*/            2
         );
         $studentsInCourse = 2;
 
@@ -204,7 +204,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'source' => $submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/ null,
+                /*$runData=*/                null,
                 1,
                 'AC',
                 null,
@@ -220,7 +220,7 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
                 'source' => $submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
-                /*$runData=*/ null,
+                /*$runData=*/                null,
                 1,
                 'AC',
                 null,
