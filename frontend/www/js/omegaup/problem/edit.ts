@@ -18,7 +18,7 @@ OmegaUp.on('ready', () => {
     [payload.statement.language]: payload.statement.markdown,
   };
   const solutions: types.Statements = {
-    [payload.statement.language]: payload.solution.markdown,
+    [payload.statement?.language || 'es']: payload.solution?.markdown || '',
   };
   const problemEdit = new Vue({
     el: '#main-container',
@@ -29,12 +29,11 @@ OmegaUp.on('ready', () => {
           originalVisibility: payload.visibility,
           initialAdmins: this.initialAdmins,
           initialGroups: this.initialGroups,
-          initialLanguage: payload.statement.language,
           log: payload.log,
           publishedRevision: this.publishedRevision,
           value: this.publishedRevision,
-          markdownContents: this.markdownContents,
-          markdownSolutionContents: this.markdownSolutionContents,
+          statement: this.statement,
+          solution: this.solution,
           problemLevel: this.problemLevel,
           selectedPublicTags: this.selectedPublicTags,
           selectedPrivateTags: this.selectedPrivateTags,
@@ -61,9 +60,9 @@ OmegaUp.on('ready', () => {
             // component won't detect any change if two different language
             // solutions are the same.
             if (markdownType === 'statements') {
-              problemEdit.markdownContents = currentMarkdown;
+              problemEdit.statement.markdown = currentMarkdown;
               if (statements.hasOwnProperty(language)) {
-                problemEdit.markdownContents = statements[language];
+                problemEdit.statement.markdown = statements[language];
                 return;
               }
               api.Problem.details(
@@ -80,7 +79,7 @@ OmegaUp.on('ready', () => {
                     response.statement.markdown = '';
                   }
                   statements[language] = response.statement.markdown;
-                  problemEdit.markdownContents = response.statement.markdown;
+                  problemEdit.statement = response.statement;
                 })
                 .catch((error) => {
                   if (error.httpStatusCode == 404) {
@@ -89,9 +88,9 @@ OmegaUp.on('ready', () => {
                   ui.apiError(error);
                 });
             } else {
-              problemEdit.markdownSolutionContents = currentMarkdown;
+              problemEdit.solution.markdown = currentMarkdown;
               if (solutions.hasOwnProperty(language)) {
-                problemEdit.markdownSolutionContents = solutions[language];
+                problemEdit.solution.markdown = solutions[language];
                 return;
               }
               api.Problem.solution(
@@ -102,12 +101,16 @@ OmegaUp.on('ready', () => {
                 { quiet: true },
               )
                 .then((response) => {
-                  if (response.solution.language !== language) {
-                    response.solution.markdown = '';
+                  const solution = response.solution || {
+                    language: 'es',
+                    markdown: '',
+                    images: {},
+                  };
+                  if (solution.language !== language) {
+                    solution.markdown = '';
                   }
-                  solutions[language] = response.solution.markdown;
-                  problemEdit.markdownSolutionContents =
-                    response.solution.markdown;
+                  solutions[language] = solution.markdown;
+                  problemEdit.solution = solution;
                 })
                 .catch((error) => {
                   if (error.httpStatusCode == 404) {
@@ -269,8 +272,12 @@ OmegaUp.on('ready', () => {
       initialAdmins: payload.admins,
       initialGroups: payload.groupAdmins,
       publishedRevision: payload.publishedRevision,
-      markdownContents: payload.statement.markdown,
-      markdownSolutionContents: payload.solution.markdown,
+      statement: payload.statement,
+      solution: payload.solution || {
+        language: 'es',
+        markdown: '',
+        images: {},
+      },
       problemLevel: payload.problemLevel,
       selectedPublicTags: payload.selectedPublicTags,
       selectedPrivateTags: payload.selectedPrivateTags,

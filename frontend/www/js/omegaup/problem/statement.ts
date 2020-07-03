@@ -59,8 +59,11 @@ OmegaUp.on('ready', () => {
             name: 'tu-usuario',
             username: 'tu_usuario',
           },
-          markdownContents: markdownStatement,
-          initialLanguage: 'es',
+          statement: <types.ProblemStatement>{
+            markdown: markdownStatement,
+            language: 'es',
+            images: {},
+          },
           markdownType: 'statements',
           showEditControls: false,
         },

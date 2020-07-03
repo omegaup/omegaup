@@ -29,6 +29,10 @@ OmegaUp.on('ready', () => {
               { quiet: true },
             )
               .then((data) => {
+                if (!data.solution) {
+                  ui.error(T.wordsProblemOrSolutionNotExist);
+                  return;
+                }
                 problemSolution.status = 'unlocked';
                 problemSolution.solution = data.solution;
                 ui.info(
@@ -64,6 +68,10 @@ OmegaUp.on('ready', () => {
                 { quiet: true },
               )
                 .then((data) => {
+                  if (!data.solution) {
+                    ui.error(T.wordsProblemOrSolutionNotExist);
+                    return;
+                  }
                   problemSolution.solution = data.solution;
                 })
                 .catch((error) => {

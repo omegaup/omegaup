@@ -1602,7 +1602,7 @@ export namespace types {
     publishedRevision?: types.ProblemVersion;
     selectedPrivateTags: string[];
     selectedPublicTags: string[];
-    solution: types.ProblemStatement;
+    solution?: types.ProblemStatement;
     source: string;
     statement: types.ProblemStatement;
     statusError?: string;
@@ -2931,7 +2931,7 @@ export namespace messages {
   export type ProblemSelectVersionRequest = { [key: string]: any };
   export type ProblemSelectVersionResponse = {};
   export type ProblemSolutionRequest = { [key: string]: any };
-  export type ProblemSolutionResponse = { solution: types.ProblemStatement };
+  export type ProblemSolutionResponse = { solution?: types.ProblemStatement };
   export type ProblemStatsRequest = { [key: string]: any };
   export type ProblemStatsResponse = {
     cases_stats: { [key: string]: number };

@@ -116,9 +116,8 @@
 
       <div class="tab-pane active" v-if="showTab === 'markdown'">
         <omegaup-problem-statementedit
-          v-bind:markdown-contents="markdownContents"
-          v-bind:initial-language="data.statement.language"
-          v-bind:markdown-type="'statements'"
+          v-bind:statement="data.statement"
+          markdown-type="statements"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:source="data.source"
@@ -155,9 +154,10 @@
 
       <div class="tab-pane active" v-if="showTab === 'solution'">
         <omegaup-problem-statementedit
-          v-bind:markdown-contents="markdownSolutionContents"
-          v-bind:initial-language="data.solution.language"
-          v-bind:markdown-type="'solutions'"
+          v-bind:statement="
+            data.solution || { markdown: '', language: 'es', images: {} }
+          "
+          markdown-type="solutions"
           v-bind:title="data.title"
           v-on:emit-update-markdown-contents="
             (solutions, newLanguage, currentMarkdown) =>
@@ -290,8 +290,8 @@ export default class ProblemEdit extends Vue {
   @Prop() data!: types.ProblemEditPayload;
   @Prop() initialAdmins!: types.ProblemAdmin[];
   @Prop() initialGroups!: types.ProblemGroupAdmin[];
-  @Prop() markdownContents!: string;
-  @Prop() markdownSolutionContents!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
+  @Prop() statement!: types.ProblemStatement;
 
   T = T;
   alias = this.data.alias;
