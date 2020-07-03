@@ -31,14 +31,14 @@
           <td v-if="!request.accepted">
             <button
               class="close"
-              style="color:red"
+              style="color: red;"
               v-on:click="onDenyRequest(request.username)"
             >
               ×
             </button>
             <button
               class="close"
-              style="color:green"
+              style="color: green;"
               v-on:click="onAcceptRequest(request.username)"
             >
               ✓

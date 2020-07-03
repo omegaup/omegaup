@@ -1,4 +1,4 @@
-$(function() {
+$(function () {
   $('.navbar #nav-groups').addClass('active');
 
   var formData = $('#form-data');
@@ -9,7 +9,7 @@ $(function() {
 
   if (formPage === 'edit') {
     omegaup.API.Contest.list()
-      .then(function(contests) {
+      .then(function (contests) {
         for (var i = 0; i < contests.results.length; i++) {
           contest = contests.results[i];
           $('#contests').append(
@@ -21,7 +21,7 @@ $(function() {
       })
       .catch(omegaup.UI.apiError);
 
-    $('#scoreboard-add-contest-form').on('submit', function() {
+    $('#scoreboard-add-contest-form').on('submit', function () {
       omegaup.API.GroupScoreboard.addContest({
         group_alias: groupAlias,
         scoreboard_alias: scoreboardAlias,
@@ -29,7 +29,7 @@ $(function() {
         only_ac: $('#only-ac').val(),
         weight: $('#weight').val(),
       })
-        .then(function(data) {
+        .then(function (data) {
           omegaup.UI.success(omegaup.T.groupEditScoreboardsContestsAdded);
           refreshScoreboardContests();
         })
@@ -45,7 +45,7 @@ $(function() {
         group_alias: groupAlias,
         scoreboard_alias: scoreboardAlias,
       })
-        .then(function(gScoreboard) {
+        .then(function (gScoreboard) {
           $('#scoreboard-contests').empty();
 
           for (var i = 0; i < gScoreboard.contests.length; i++) {
@@ -73,14 +73,14 @@ $(function() {
                       ' glyphicon-remove"></span></button></td>',
                   ).on(
                     'click',
-                    (function(contestAlias) {
-                      return function(e) {
+                    (function (contestAlias) {
+                      return function (e) {
                         omegaup.API.GroupScoreboard.removeContest({
                           group_alias: groupAlias,
                           scoreboard_alias: scoreboardAlias,
                           contest_alias: contestAlias,
                         })
-                          .then(function(response) {
+                          .then(function (response) {
                             omegaup.UI.success(
                               omegaup.T.groupEditScoreboardsContestsRemoved,
                             );
@@ -103,7 +103,7 @@ $(function() {
       group_alias: groupAlias,
       scoreboard_alias: scoreboardAlias,
     })
-      .then(function(scoreboard) {
+      .then(function (scoreboard) {
         var ranking = scoreboard['ranking'];
         $('#scoreboard-title').html(scoreboard.scoreboard.name);
 

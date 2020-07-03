@@ -7,7 +7,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const problemDetails = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
           problem: payload.problem,

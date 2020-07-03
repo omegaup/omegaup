@@ -10,26 +10,26 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolProfileDetailsPayload();
 
   const solvedProblemsCountData = payload.monthly_solved_problems.map(
-    solvedProblemsCount => solvedProblemsCount.problems_solved,
+    (solvedProblemsCount) => solvedProblemsCount.problems_solved,
   );
   const solvedProblemsCountCategories = payload.monthly_solved_problems.map(
-    solvedProblemsCount =>
+    (solvedProblemsCount) =>
       `${solvedProblemsCount.year}-${solvedProblemsCount.month}`,
   );
 
   const schoolProfile = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-school-profile', {
         props: {
           codersOfTheMonth: payload.coders_of_the_month.map(
-            coder => new SchoolCoderOfTheMonth(coder),
+            (coder) => new SchoolCoderOfTheMonth(coder),
           ),
           country: payload.country,
           name: payload.school_name,
           rank: payload.ranking,
           stateName: payload.state_name,
-          users: payload.school_users.map(user => new SchoolUser(user)),
+          users: payload.school_users.map((user) => new SchoolUser(user)),
           chartOptions: {
             chart: {
               type: 'line',

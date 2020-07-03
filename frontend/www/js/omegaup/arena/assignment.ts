@@ -21,8 +21,8 @@ OmegaUp.on('ready', () => {
     course: arenaInstance.options.courseAlias,
     assignment: arenaInstance.options.assignmentAlias,
   })
-    .then(results => arenaInstance.problemsetLoaded(results))
-    .catch(e => arenaInstance.problemsetLoadedError(e));
+    .then((results) => arenaInstance.problemsetLoaded(results))
+    .catch((e) => arenaInstance.problemsetLoadedError(e));
 
   window.addEventListener('hashchange', () => arenaInstance.onHashChanged());
 });

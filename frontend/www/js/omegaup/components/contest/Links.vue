@@ -28,17 +28,13 @@
             </td>
             <td>
               <a
-                v-bind:href="
-                  `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}`
-                "
+                v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}`"
                 >{{ T.contestScoreboardLink }}</a
               >
             </td>
             <td>
               <a
-                v-bind:href="
-                  `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}`
-                "
+                v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}`"
                 >{{ T.contestScoreboardAdminLink }}</a
               >
             </td>

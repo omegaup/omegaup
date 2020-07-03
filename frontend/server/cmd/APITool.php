@@ -96,6 +96,12 @@ class RequestParam {
                 $annotationDescription
             );
         }
+        usort(
+            $result,
+            function (RequestParam $a, RequestParam $b): int {
+                return strcmp($a->name, $b->name);
+            }
+        );
         return $result;
     }
 }
@@ -218,6 +224,7 @@ class TypeMapper {
                 if ($type instanceof \Psalm\Type\Atomic\ObjectLike) {
                     $convertedProperties = [];
                     $propertyTypes = [];
+                    ksort($type->properties);
                     foreach ($type->properties as $propertyName => $propertyType) {
                         if (is_numeric($propertyName)) {
                             throw new \Exception(
@@ -261,7 +268,7 @@ class TypeMapper {
                         }
                         $propertyTypes[] = "{$propertyName}: {$conversionResult->typescriptExpansion};";
                     }
-                    $conversionFunction[] = 'x => { ' . join(
+                    $conversionFunction[] = '(x) => { ' . join(
                         ' ',
                         $convertedProperties
                     ) . ' return x; }';
@@ -275,7 +282,7 @@ class TypeMapper {
                     if (!is_null($conversionResult->conversionFunction)) {
                         $requiresConversion = true;
                         $conversionFunction[] = (
-                            "x => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
+                            "(x) => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
                         );
                     }
                     $typeNames[] = "{$conversionResult->typescriptExpansion}[]";
@@ -300,7 +307,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
+                                "(x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;
@@ -315,7 +322,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
+                                "(x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;
@@ -387,6 +394,7 @@ class TypeMapper {
                 join(', ', $conversionFunction)
             );
         }
+        sort($typeNames);
         return new ConversionResult(
             join('|', $typeNames),
             $requiresConversion ? $conversionFunction[0] : null
@@ -711,10 +719,10 @@ export function apiCall<
               method: 'POST',
               body: Object.keys(params)
                 .filter(
-                  key =>
+                  (key) =>
                     params[key] !== null && typeof params[key] !== 'undefined',
                 )
-                .map(key => {
+                .map((key) => {
                   if (params[key] instanceof Date) {
                     return `${encodeURIComponent(key)}=${encodeURIComponent(
                       Math.round(params[key].getTime() / 1000),
@@ -732,7 +740,7 @@ export function apiCall<
             }
           : undefined,
       )
-        .then(response => {
+        .then((response) => {
           if (response.status == 499) {
             // If we cancel the connection, let's just swallow the error since
             // the user is not going to see it.
@@ -742,7 +750,7 @@ export function apiCall<
           responseStatus = response.status;
           return response.json();
         })
-        .then(data => {
+        .then((data) => {
           if (!responseOk) {
             if (typeof data === 'object' && !Array.isArray(data)) {
               data.status = 'error';
@@ -761,7 +769,7 @@ export function apiCall<
             accept(data);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           const errorData = {
             status: 'error',
             error: err,
@@ -846,6 +854,7 @@ EOD;
                 } else {
                     echo "| Name | Type |\n";
                     echo "|------|------|\n";
+                    ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
                         echo "| `{$paramName}` | `{$paramType}` |\n";
                     }

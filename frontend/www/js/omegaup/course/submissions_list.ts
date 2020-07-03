@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseSubmissionsListPayload();
   const submissionsList = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-submissions-list', {
         props: {
           solvedProblems: payload.solvedProblems,

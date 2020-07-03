@@ -14,7 +14,7 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="/"
-          ><img alt="omegaUp" src="/media/omegaup_curves.png"/>
+          ><img alt="omegaUp" src="/media/omegaup_curves.png" />
           <img
             alt="lockdown"
             title="lockdown"
@@ -172,7 +172,7 @@
               data-toggle="dropdown"
               data-nav-user
               href="#"
-              ><img v-bind:src="gravatarURL51"/>
+              ><img v-bind:src="gravatarURL51" />
               <span class="username" v-bind:title="currentUsername">{{
                 currentUsername
               }}</span>

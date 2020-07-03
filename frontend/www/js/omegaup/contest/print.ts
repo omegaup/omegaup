@@ -5,7 +5,7 @@ import { types } from '../api_types';
 import omegaup_Markdown from '../components/Markdown.vue';
 
 (() => {
-  document.querySelectorAll('div.problem').forEach(problem => {
+  document.querySelectorAll('div.problem').forEach((problem) => {
     const problemDetails = <types.ProblemDetails>(
       JSON.parse(
         (<HTMLElement>problem.querySelector('script.payload')).innerText,
@@ -14,7 +14,7 @@ import omegaup_Markdown from '../components/Markdown.vue';
 
     const contestIntro = new Vue({
       el: <HTMLElement>problem.querySelector('div.statement'),
-      render: function(createElement) {
+      render: function (createElement) {
         return createElement('omegaup-markdown', {
           props: {
             markdown: problemDetails.statement.markdown,

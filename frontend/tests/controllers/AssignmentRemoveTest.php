@@ -6,7 +6,7 @@
 class AssignmentRemoveTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAssignmentRemove() {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
-            /*$numberOfAssignments=*/5
+            /*$numberOfAssignments=*/            5
         );
 
         $login = self::login($courseData['admin']);

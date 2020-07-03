@@ -6,7 +6,7 @@
           <div class="form-group">
             <label>{{ T.wordsUser }}</label>
             <omegaup-autocomplete
-              v-bind:init="el => typeahead.userTypeahead(el)"
+              v-bind:init="(el) => typeahead.userTypeahead(el)"
               v-model="contestant"
             ></omegaup-autocomplete>
           </div>

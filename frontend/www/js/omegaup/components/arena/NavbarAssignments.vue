@@ -69,7 +69,7 @@ export default class ArenaNavbarAssignments extends Vue {
   private get currentAssignmentIndex(): number {
     // Getting index of current assignment
     return this.assignments.findIndex(
-      assignment => assignment.alias === this.currentAssignment.alias,
+      (assignment) => assignment.alias === this.currentAssignment.alias,
     );
   }
 }
