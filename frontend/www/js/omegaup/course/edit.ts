@@ -20,7 +20,7 @@ OmegaUp.on('ready', () => {
   const courseAlias = payload.course.alias;
   const courseEdit = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-edit', {
         props: {
           data: this.data,
@@ -48,7 +48,7 @@ OmegaUp.on('ready', () => {
                 accept(ev.school_id);
               } else if (ev.school_name) {
                 api.School.create({ name: ev.school_name })
-                  .then(response => {
+                  .then((response) => {
                     accept(response.school_id);
                   })
                   .catch(ui.apiError);
@@ -56,7 +56,7 @@ OmegaUp.on('ready', () => {
                 accept(null);
               }
             })
-              .then(schoolId => {
+              .then((schoolId) => {
                 const params = {
                   course_alias: courseAlias,
                   name: ev.name,
@@ -129,7 +129,7 @@ OmegaUp.on('ready', () => {
                   ui.success(T.courseAssignmentUpdated);
                   this.refreshAssignmentsList();
                 })
-                .catch(error => {
+                .catch((error) => {
                   ui.apiError(error);
                   component.showAssignmentDetails = true;
                   this.invalidParameterName = error.parameter || '';
@@ -153,7 +153,7 @@ OmegaUp.on('ready', () => {
                   ui.success(T.courseAssignmentAdded);
                   this.refreshAssignmentsList();
                 })
-                .catch(error => {
+                .catch((error) => {
                   ui.apiError(error);
                   component.showAssignmentDetails = true;
                   this.invalidParameterName = error.parameter || '';
@@ -174,7 +174,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
             })
-              .then(data => {
+              .then((data) => {
                 ui.success(T.courseAssignmentDeleted);
                 this.refreshAssignmentsList();
               })
@@ -240,7 +240,7 @@ OmegaUp.on('ready', () => {
               problem_alias: problem.alias,
               assignment_alias: assignment.alias,
             })
-              .then(response => {
+              .then((response) => {
                 ui.success(T.courseAssignmentProblemRemoved);
                 this.refreshProblemList(assignment);
               })
@@ -262,7 +262,7 @@ OmegaUp.on('ready', () => {
           },
           'tags-problems': (tags: string[]) => {
             api.Problem.list({ tag: tags.join() })
-              .then(data => {
+              .then((data) => {
                 //this.data.taggedProblems = data.results;
               })
               .catch(ui.apiError);
@@ -290,16 +290,16 @@ OmegaUp.on('ready', () => {
               return;
             }
             Promise.allSettled(
-              participants.map(participant =>
+              participants.map((participant) =>
                 api.Course.addStudent({
                   course_alias: courseAlias,
                   usernameOrEmail: participant.trim(),
                 }),
               ),
             )
-              .then(results => {
+              .then((results) => {
                 let participantsWithError = [];
-                results.forEach(result => {
+                results.forEach((result) => {
                   if (result.status === 'rejected') {
                     participantsWithError.push(result.reason.userEmail);
                   }
@@ -322,7 +322,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               usernameOrEmail: student.username,
             })
-              .then(data => {
+              .then((data) => {
                 this.refreshStudentList();
                 ui.success(T.courseStudentRemoved);
               })
@@ -337,7 +337,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               usernameOrEmail: useradmin,
             })
-              .then(data => {
+              .then((data) => {
                 ui.success(T.adminAdded);
                 this.refreshCourseAdmins();
               })
@@ -348,7 +348,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               usernameOrEmail: username,
             })
-              .then(data => {
+              .then((data) => {
                 this.refreshCourseAdmins();
                 ui.success(T.adminRemoved);
               })
@@ -359,7 +359,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               group: groupAlias,
             })
-              .then(data => {
+              .then((data) => {
                 ui.success(T.groupAdminAdded);
                 this.refreshCourseAdmins();
               })
@@ -370,7 +370,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               group: groupAlias,
             })
-              .then(data => {
+              .then((data) => {
                 this.refreshCourseAdmins();
                 ui.success(T.groupAdminRemoved);
               })
@@ -383,7 +383,7 @@ OmegaUp.on('ready', () => {
               alias: alias,
               start_time: startTime.getTime() / 1000,
             })
-              .then(data => {
+              .then((data) => {
                 ui.success(
                   ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: alias,
@@ -399,19 +399,19 @@ OmegaUp.on('ready', () => {
     methods: {
       refreshStudentList: (): void => {
         api.Course.listStudents({ course_alias: courseAlias })
-          .then(response => {
+          .then((response) => {
             courseEdit.data.students = response.students;
           })
           .catch(ui.apiError);
         api.Course.requests({ course_alias: courseAlias })
-          .then(response => {
+          .then((response) => {
             courseEdit.data.identityRequests = response.users;
           })
           .catch(ui.apiError);
       },
       refreshAssignmentsList: (): void => {
         api.Course.listAssignments({ course_alias: courseAlias })
-          .then(response => {
+          .then((response) => {
             courseEdit.data.course.assignments = response.assignments;
             component.onResetAssignmentForm();
           })
@@ -422,14 +422,14 @@ OmegaUp.on('ready', () => {
           assignment: assignment.alias,
           course: courseAlias,
         })
-          .then(response => {
+          .then((response) => {
             courseEdit.data.assignmentProblems = response.problems;
           })
           .catch(ui.apiError);
       },
       refreshCourseAdmins: (): void => {
         api.Course.admins({ course_alias: courseAlias })
-          .then(response => {
+          .then((response) => {
             courseEdit.data.admins = response.admins;
             courseEdit.data.groupsAdmins = response.group_admins;
           })
@@ -442,7 +442,7 @@ OmegaUp.on('ready', () => {
           resolution: resolution,
           note: '',
         })
-          .then(response => {
+          .then((response) => {
             ui.success(T.successfulOperation);
             courseEdit.refreshStudentList();
           })
