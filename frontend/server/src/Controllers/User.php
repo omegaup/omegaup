@@ -3665,11 +3665,12 @@ class User extends \OmegaUp\Controllers\Controller {
                         'createdProblems' => self::apiProblemsCreated(
                             $r
                         )['problems'],
-                        'stats' => self::apiStats($r)['runs'],
+                        'stats' => self::apiStats($r),
                         'badges' => \OmegaUp\Controllers\Badge::apiList($r),
                         'ownedBadges' => \OmegaUp\Controllers\Badge::apiMyList(
                             $r
                         )['badges'],
+                        'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
                     ],
                     'title' => 'omegaupTitleProfile'
                 ],
