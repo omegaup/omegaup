@@ -15,14 +15,6 @@ Vue.directive('Sortable', {
 });
 Vue.use(Clipboard);
 
-interface PromiseConstructor {
-  allSettled(
-    promises: Array<Promise<any>>,
-  ): Promise<
-    Array<{ status: 'fulfilled' | 'rejected'; value?: any; reason?: any }>
-  >;
-}
-
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
