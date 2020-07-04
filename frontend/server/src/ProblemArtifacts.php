@@ -29,14 +29,19 @@ class ProblemArtifacts {
             GitServerBrowser::buildShowURL($this->alias, $this->revision, $path)
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        $result = $browser->exec();
-        if (!is_string($result)) {
+        $response = $browser->exec();
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Failed to get contents for {$this->alias}:{$this->revision}/{$path}"
+                "Failed to get contents for {$this->alias}:{$this->revision}/{$path}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
-            throw new \OmegaUp\Exceptions\InternalServerErrorException();
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
         }
-        return $result;
+        return $response;
     }
 
     public function exists(string $path): bool {
@@ -61,14 +66,19 @@ class ProblemArtifacts {
             )
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        $result = $browser->exec();
-        if (!is_string($result)) {
+        $response = $browser->exec();
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Failed to get contents for {$this->alias}:{$this->revision}"
+                "Failed to get contents for {$this->alias}:{$this->revision}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
-            throw new \OmegaUp\Exceptions\InternalServerErrorException();
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
         }
-        return $result;
+        return $response;
     }
 
     /**
@@ -89,9 +99,12 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
-        if (!is_string($response)) {
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Failed to get entries of {$path} for problem {$this->alias} at revision {$this->revision}"
+                "Failed to get tree entries for {$this->alias}:{$this->revision}/{$path}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
             return [];
         }
@@ -163,9 +176,12 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
-        if (!is_string($response)) {
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Invalid commit for problem {$this->alias} at revision {$this->revision}"
+                "Invalid commit for problem {$this->alias} at revision {$this->revision}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
             return null;
         }
@@ -190,9 +206,12 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
-        if (!is_string($response)) {
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Failed to get log for problem {$this->alias} at revision {$this->revision}"
+                "Failed to get log for problem {$this->alias} at revision {$this->revision}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
             return [];
         }

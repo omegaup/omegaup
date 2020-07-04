@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   let showAllProblems = false;
   const problemsMine = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-mine', {
         props: {
           problems: this.problems,
@@ -47,7 +47,7 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 UI.success(T.updateItemsSuccess);
               })
-              .catch(error => {
+              .catch((error) => {
                 UI.error(UI.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
@@ -80,7 +80,7 @@ OmegaUp.on('ready', () => {
           page: pageNumber,
         })
     )
-      .then(result => {
+      .then((result) => {
         problemsMine.pagerItems = result.pagerItems;
         problemsMine.problems = result.problems;
       })

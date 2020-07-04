@@ -13,7 +13,7 @@ OmegaUp.on('ready', () => {
 
   let loginPaswwordRecover = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-login-password-reset', {
         props: {
           email: payload.email,
@@ -32,7 +32,7 @@ OmegaUp.on('ready', () => {
               password: password,
               password_confirmation: passwordConfirmation,
             })
-              .then(data => {
+              .then((data) => {
                 UI.success(data.message ?? '');
               })
               .catch(UI.apiError);

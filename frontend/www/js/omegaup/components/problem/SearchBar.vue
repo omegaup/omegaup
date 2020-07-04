@@ -13,7 +13,7 @@
       <div class="form-group mr-2 mt-1">
         <omegaup-autocomplete
           class="form-control"
-          v-bind:init="el => typeahead.problemTypeahead(el)"
+          v-bind:init="(el) => typeahead.problemTypeahead(el)"
           v-model="keyword"
           v-bind:placeholder="T.wordsKeywordSearch"
           name="query"

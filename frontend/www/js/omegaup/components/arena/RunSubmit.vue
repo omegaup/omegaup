@@ -135,9 +135,10 @@ export default class ArenaRunSubmit extends Vue {
 
     allLanguages
       .filter(
-        item => this.languages.includes(item.language) || item.language === '',
+        (item) =>
+          this.languages.includes(item.language) || item.language === '',
       )
-      .forEach(optionItem => {
+      .forEach((optionItem) => {
         allowedLanguages[optionItem.language] = optionItem.name;
       });
     return allowedLanguages;
@@ -184,7 +185,7 @@ export default class ArenaRunSubmit extends Vue {
     if (file) {
       const reader = new FileReader();
 
-      reader.onload = e => {
+      reader.onload = (e) => {
         const result = e.target?.result ?? null;
         if (result === null) return;
         this.$emit('submit-run', result as string, this.selectedLanguage);

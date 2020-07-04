@@ -178,9 +178,7 @@
                   v-bind:icon="['fas', 'eye-slash']"
                 />
                 <a
-                  v-bind:class="
-                    `badge custom-badge custom-badge-${tag.source} m-1 p-2`
-                  "
+                  v-bind:class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
                   v-for="tag in problem.tags"
                   >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a

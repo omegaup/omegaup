@@ -159,7 +159,7 @@ export default class SchoolProfile extends Vue {
   }
 
   updateUsers(newSortBy: string): void {
-    this.users.forEach(user => (user.displayField = newSortBy));
+    this.users.forEach((user) => (user.displayField = newSortBy));
     this.sortBy = newSortBy;
   }
 }

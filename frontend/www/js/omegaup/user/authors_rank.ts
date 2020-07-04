@@ -7,7 +7,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.AuthorRankTablePayload();
   const authorsRank = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-author-rank', {
         props: {
           page: payload.page,

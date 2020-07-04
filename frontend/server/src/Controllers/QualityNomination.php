@@ -884,7 +884,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         }
 
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
-            /* nominator */ null,
+            /* nominator */            null,
             /* assignee */ null,
             $offset,
             $rowCount,

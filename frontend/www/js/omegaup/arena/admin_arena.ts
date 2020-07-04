@@ -24,7 +24,7 @@ export default class ArenaAdmin {
     this.setUpPagers();
     this.runsList = new Vue({
       el: globalRuns ? '#main-container' : '#runs table.runs',
-      render: function(createElement) {
+      render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
             contestAlias: arena.options.contestAlias,
@@ -48,7 +48,7 @@ export default class ArenaAdmin {
                 return;
               }
               api.Run.disqualify({ run_alias: run.guid })
-                .then(data => {
+                .then((data) => {
                   run.type = 'disqualified';
                   arena.updateRunFallback(run.guid);
                 })
@@ -59,7 +59,7 @@ export default class ArenaAdmin {
             },
             rejudge: (run: types.Run) => {
               api.Run.rejudge({ run_alias: run.guid, debug: false })
-                .then(data => {
+                .then((data) => {
                   run.status = 'rejudging';
                   self.arena.updateRunFallback(run.guid);
                 })
@@ -113,7 +113,7 @@ export default class ArenaAdmin {
           this.arena.elements.clarification,
         ).val(),
       })
-        .then(response => {
+        .then((response) => {
           this.arena.hideOverlay();
           this.refreshClarifications();
         })
@@ -150,18 +150,18 @@ export default class ArenaAdmin {
       options.problem_alias = this.arena.options.onlyProblemAlias;
       api.Problem.runs(options)
         .then(time.remoteTimeAdapter)
-        .then(response => this.runsChanged(response))
+        .then((response) => this.runsChanged(response))
         .catch(ui.apiError);
     } else if (this.arena.options.contestAlias === 'admin') {
       api.Run.list(options)
         .then(time.remoteTimeAdapter)
-        .then(response => this.runsChanged(response))
+        .then((response) => this.runsChanged(response))
         .catch(ui.ignoreError);
     } else if (this.arena.options.contestAlias != null) {
       options.contest_alias = this.arena.options.contestAlias;
       api.Contest.runs(options)
         .then(time.remoteTimeAdapter)
-        .then(response => this.runsChanged(response))
+        .then((response) => this.runsChanged(response))
         .catch(ui.apiError);
     } else {
       options.course_alias = this.arena.options.courseAlias || undefined;
@@ -169,7 +169,7 @@ export default class ArenaAdmin {
         this.arena.options.assignmentAlias || undefined;
       api.Course.runs(options)
         .then(time.remoteTimeAdapter)
-        .then(response => this.runsChanged(response))
+        .then((response) => this.runsChanged(response))
         .catch(ui.apiError);
     }
   }
@@ -182,7 +182,7 @@ export default class ArenaAdmin {
         rowcount: this.arena.clarificationsRowcount,
       })
         .then(time.remoteTimeAdapter)
-        .then(response =>
+        .then((response) =>
           this.arena.clarificationsChange(response.clarifications),
         )
         .catch(ui.apiError);

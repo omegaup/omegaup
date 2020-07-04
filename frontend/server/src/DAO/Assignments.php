@@ -10,7 +10,9 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\Assignments}.
  *
  * @access public
- * @return \OmegaUp\DAO\VO\Problemsets|null
+ * @package docs
+ *
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  */
 class Assignments extends \OmegaUp\DAO\Base\Assignments {
     public static function getProblemset(
@@ -146,9 +148,9 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     }
 
     /**
-     * Get the course assigments sorted by order and start_time
+     * Get the course assignments sorted by order and start_time
      *
-     * @return list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<CourseAssignment>
      */
     final public static function getSortedCourseAssignments(
         int $courseId
@@ -162,7 +164,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                `a`.`assignment_type`,
                `a`.`start_time`,
                `a`.`finish_time`,
+               `a`.`max_points`,
+               `a`.`publish_time_delay`,
                `a`.`order`,
+                COUNT(`s`.`submission_id`) AS `has_runs`,
                `ps`.`scoreboard_url`,
                `ps`.`scoreboard_url_admin`
             FROM
@@ -171,19 +176,31 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 `Problemsets` `ps`
             ON
                 `ps`.`problemset_id` = `a`.`problemset_id`
+            LEFT JOIN
+                `Submissions` `s`
+            ON
+                `ps`.`problemset_id` = `s`.`problemset_id`
             WHERE
                 course_id = ?
+            GROUP BY
+                `a`.`assignment_id`
             ORDER BY
                 `order` ASC,
                 `start_time` ASC,
                 `a`.`assignment_id` ASC;
         ';
 
-        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, name: string, order: int, problemset_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
         );
+        $assignments = [];
+        foreach ($rs as $row) {
+            $row['has_runs'] = $row['has_runs'] > 0;
+            $assignments[] = $row;
+        }
+        return $assignments;
     }
 
     /**

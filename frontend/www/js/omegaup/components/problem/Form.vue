@@ -24,7 +24,7 @@
       >
         <div class="row">
           <div
-            class="form-group  col-md-6"
+            class="form-group col-md-6"
             v-bind:class="{ 'has-error': errors.includes('title') }"
           >
             <label class="control-label">{{ T.wordsTitle }}</label>
@@ -38,7 +38,7 @@
           </div>
 
           <div
-            class="form-group  col-md-6"
+            class="form-group col-md-6"
             v-bind:class="{ 'has-error': errors.includes('alias') }"
           >
             <label class="control-label">{{ T.wordsAlias }}</label>
@@ -121,7 +121,7 @@
 
         <div class="row">
           <div
-            class="form-group  col-md-6"
+            class="form-group col-md-6"
             v-bind:class="{ 'has-error': errors.includes('source') }"
           >
             <label class="control-label">{{ T.problemEditSource }}</label>
@@ -158,7 +158,7 @@
         ></omegaup-problem-tags>
         <div class="row" v-else="">
           <div
-            class="form-group  col-md-12"
+            class="form-group col-md-12"
             v-bind:class="{ 'has-error': errors.includes('message') }"
           >
             <label class="control-label">{{

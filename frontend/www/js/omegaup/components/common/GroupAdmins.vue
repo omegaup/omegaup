@@ -14,7 +14,7 @@
             ></span>
             <omegaup-autocomplete
               class="form-control"
-              v-bind:init="el => typeahead.groupTypeahead(el)"
+              v-bind:init="(el) => typeahead.groupTypeahead(el)"
               v-bind:value.sync="groupAlias"
             ></omegaup-autocomplete>
           </label>

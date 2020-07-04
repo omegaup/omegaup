@@ -7,7 +7,7 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.BadgeDetailsPayload();
   const badgeDetails = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-badge-details', {
         props: {
           badge: payload.badge,

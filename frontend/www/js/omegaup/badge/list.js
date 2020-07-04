@@ -5,11 +5,11 @@ import T from '../lang';
 import * as api from '../api';
 import * as UI from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let badgeList = new Vue({
     el: '#badges-list',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-badge-list', {
         props: {
           allBadges: this.allBadges,
@@ -28,16 +28,16 @@ OmegaUp.on('ready', function() {
   });
   if (payload.logged_in) {
     api.Badge.myList({})
-      .then(function(data) {
+      .then(function (data) {
         badgeList.visitorBadges = new Set(
-          data['badges'].map(badge => badge.badge_alias),
+          data['badges'].map((badge) => badge.badge_alias),
         );
       })
       .catch(UI.apiError);
   }
 
   api.Badge.list({})
-    .then(function(data) {
+    .then(function (data) {
       badgeList.allBadges = new Set(data);
     })
     .catch(UI.apiError);

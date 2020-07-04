@@ -207,7 +207,7 @@ export default class ProblemHistogram extends Vue {
   get barsWidth(): number[] {
     const maxValue = Math.max(...this.histogram);
     if (maxValue === 0) return [0, 0, 0, 0, 0];
-    return this.histogram.map(value => (value / maxValue) * 100);
+    return this.histogram.map((value) => (value / maxValue) * 100);
   }
 }
 </script>
