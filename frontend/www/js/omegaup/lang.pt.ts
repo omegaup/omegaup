@@ -1107,6 +1107,7 @@ const translations: { [key: string]: string; } = {
   scoreboardmerge: "Unir painel de avalia\u00e7\u00e3o",
   searchUser: "Pesquisar usu\u00e1rio",
   selectAction: "Selecionar a\u00e7\u00e3o",
+  selectProblemLevel: "Selecionar o n\u00edvel do problema",
   selectProblemToGetVersions: "Selecione o problema e pressione Enter ou clique no bot\u00e3o Obter vers\u00f5es para mostrar todas as diferentes vers\u00f5es do problema.",
   sendInvitesToCandidates: "Enviar correos",
   showLinks: "V\u00ednculos",

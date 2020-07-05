@@ -1107,6 +1107,7 @@ const translations: { [key: string]: string; } = {
   scoreboardmerge: "Merge scorboard",
   searchUser: "Search user",
   selectAction: "Select action",
+  selectProblemLevel: "Select problem level",
   selectProblemToGetVersions: "Select the problem and press Enter or click on Get versions button to show all the different versions of the problem.",
   sendInvitesToCandidates: "Send emails",
   showLinks: "Links",

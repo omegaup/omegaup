@@ -2630,6 +2630,7 @@ Create a new problem
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
 | `source`                  | `mixed`     |             |
@@ -2951,6 +2952,7 @@ Update problem contents
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `redirect`                | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
@@ -3006,6 +3008,7 @@ Updates problem solution only
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
 | `solution`                | `mixed`     |             |
@@ -3042,6 +3045,7 @@ Updates problem statement only
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
 | `source`                  | `mixed`     |             |
