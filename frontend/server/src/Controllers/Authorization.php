@@ -22,16 +22,15 @@ class Authorization extends \OmegaUp\Controllers\Controller {
             $r['username'],
             'username'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['token'],
-            'token'
-        );
 
         // This is not supposed to be called by end-users, but by the
         // gitserver. Regular sessions cannot be used since they
         // expire, so use a pre-shared secret to authenticate that
         // grants admin-level privileges just for this call.
-        if ($r['token'] !== OMEGAUP_GITSERVER_SECRET_TOKEN) {
+        if (
+            strval($r['token']) !== OMEGAUP_GITSERVER_SECRET_TOKEN ||
+            empty(OMEGAUP_GITSERVER_SECRET_TOKEN)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 

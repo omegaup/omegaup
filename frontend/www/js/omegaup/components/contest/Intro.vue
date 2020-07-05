@@ -26,7 +26,7 @@
               v-on:submit.prevent="onStartContest"
               v-if="
                 contest.admission_mode !== 'registration' ||
-                  contest.user_registration_accepted
+                contest.user_registration_accepted
               "
             >
               <p

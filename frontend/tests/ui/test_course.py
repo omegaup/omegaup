@@ -148,7 +148,7 @@ def test_user_ranking_course(driver):
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.XPATH, ('//a[contains(@href, "#ranking")]')))).click()
-            if driver.browser.current_url.endswith(f'#ranking'):
+            if driver.browser.current_url.endswith('#ranking'):
                 break
         assert (('#ranking') in
                 driver.browser.current_url), driver.browser.current_url
@@ -247,7 +247,7 @@ def enter_course_assignments_page(driver, course_alias):
     '''Steps to enter into scoreboard page'''
 
     schools_link_element = driver.wait.until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[href="/schools/"]')))
+        EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[href="/course/"]')))
     with driver.page_transition(target_url=driver.url('/course/')):
         for _ in range(10):
             try:
@@ -271,7 +271,7 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
     with driver.page_transition(target_url=driver.url('/course/')):
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[href="/schools/"]'))).click()
+                (By.CSS_SELECTOR, 'a[href="/course/"]'))).click()
 
     with driver.page_transition(target_url=driver.url('/course/new/')):
         driver.wait.until(
@@ -415,7 +415,7 @@ def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/schools/"]'))).click()
+                (By.XPATH, '//a[@href = "/course/"]'))).click()
 
     course_url = '/course/%s' % course_alias
     with driver.page_transition():

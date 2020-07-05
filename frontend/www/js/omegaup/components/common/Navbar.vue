@@ -14,7 +14,7 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="/"
-          ><img alt="omegaUp" src="/media/omegaup_curves.png"/>
+          ><img alt="omegaUp" src="/media/omegaup_curves.png" />
           <img
             alt="lockdown"
             title="lockdown"
@@ -64,7 +64,7 @@
             class="nav-courses"
             v-bind:class="{ active: navbarSection === 'courses' }"
           >
-            <a href="/schools/">{{ T.navCourses }}</a>
+            <a href="/course/">{{ T.navCourses }}</a>
           </li>
           <li
             class="dropdown nav-problems"
@@ -172,7 +172,7 @@
               data-toggle="dropdown"
               data-nav-user
               href="#"
-              ><img v-bind:src="gravatarURL51"/>
+              ><img v-bind:src="gravatarURL51" />
               <span class="username" v-bind:title="currentUsername">{{
                 currentUsername
               }}</span>

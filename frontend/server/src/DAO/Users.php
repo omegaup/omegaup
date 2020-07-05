@@ -79,9 +79,9 @@ class Users extends \OmegaUp\DAO\Base\Users {
     }
     /**
      * @param int $user_id
-     * @return array{classname: string, country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, scholar_degree: null|string, state: null|string, state_id: null|string, hide_problem_tags: bool, verified: bool|null}|null
     */
-    final public static function getExtendedProfileDataByPk(int $user_id): ?array {
+    final public static function getExtendedProfileDataByPk(int $userId): ?array {
         $sql = 'SELECT
                     IFNULL(c.`name`, "xx") AS country,
                     c.`country_id` AS country_id,
@@ -92,6 +92,11 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     isc.`graduation_date` AS graduation_date,
                     e.`email`,
                     l.`name` AS locale,
+                    IF(u.`is_private` = 1, NULL, u.`birth_date`) AS birth_date,
+                    IF(u.`is_private` = 1, NULL, u.`scholar_degree`) AS scholar_degree,
+                    IF(u.`is_private` = 1, NULL, u.`hide_problem_tags`) AS hide_problem_tags,
+                    IF(u.`is_private` = 1, NULL, u.`verified`) AS verified,
+                    IF(u.`is_private` = 1, NULL, i.`gender`) AS gender,
                     IFNULL(
                         (
                             SELECT urc.classname FROM
@@ -132,9 +137,22 @@ class Users extends \OmegaUp\DAO\Base\Users {
                     u.`user_id` = ?
                 LIMIT
                     1;';
-        $params = [$user_id];
-        /** @var array{classname: string, country: string, country_id: null|string, email: null|string, graduation_date: null|string, locale: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        /** @var array{birth_date: null|string, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, verified: bool|null}|null */
+        $user = \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$userId]
+        );
+
+        if (is_null($user)) {
+            return null;
+        }
+
+        $user['hide_problem_tags'] = boolval($user['hide_problem_tags']);
+        $user['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $user['birth_date']
+        );
+
+        return $user;
     }
 
     public static function getHideTags(?int $identityId): bool {

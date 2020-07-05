@@ -29,7 +29,7 @@ jobs:
 
       - name: Download gitserver
         run: |
-          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.11/omegaup-gitserver.tar.xz'
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.12/omegaup-gitserver.tar.xz'
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
           # omegaup-gitserver depends on libinteractive.
@@ -41,7 +41,8 @@ jobs:
         run: |
           python3 -m pip install --user setuptools
           python3 -m pip install --user wheel
-          python3 -m pip install --user mysqlclient
+          python3 -m pip install --user \
+            mysqlclient==2.0.1
 
       - name: Validate composer.json and composer.lock
         run: composer validate
@@ -126,6 +127,9 @@ jobs:
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress
+
+      - name: Get docker container
+        run: docker pull "$(grep --only-matching 'omegaup/hook_tools:\w\+' stuff/lint.sh)"
 
       - name: Run linters
         run: |
@@ -216,8 +220,12 @@ jobs:
           python3 -m pip install --user setuptools
           python3 -m pip install --user wheel
           python3 -m pip install --user --upgrade urllib3
-          python3 -m pip install --user mysqlclient selenium pytest \
-            pytest-xdist flaky
+          python3 -m pip install --user \
+            mysqlclient==2.0.1 \
+            selenium \
+            pytest \
+            pytest-xdist \
+            flaky
 
       - name: Install composer dependencies
         run: composer install --prefer-dist --no-progress

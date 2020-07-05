@@ -26,7 +26,7 @@ export default {
     },
   },
   computed: {
-    filename: function() {
+    filename: function () {
       if (typeof this.storeMapping.module !== 'undefined') {
         return (
           Util.vuexGet(this.store, this.storeMapping.module) +
@@ -45,7 +45,7 @@ export default {
         Util.vuexSet(this.store, this.storeMapping.contents, value);
       },
     },
-    title: function() {
+    title: function () {
       return this.filename;
     },
   },

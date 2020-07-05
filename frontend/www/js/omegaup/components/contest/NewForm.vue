@@ -381,7 +381,7 @@ export default class NewForm extends Vue {
   fillIcpc(): void {
     const languagesKeys = Object.keys(this.allLanguages);
     this.languages = languagesKeys.filter(
-      lang =>
+      (lang) =>
         lang.includes('c11') ||
         lang.includes('cpp') ||
         lang.includes('py') ||

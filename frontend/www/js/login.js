@@ -1,4 +1,4 @@
-omegaup.OmegaUp.on('ready', function() {
+omegaup.OmegaUp.on('ready', function () {
   var payload = JSON.parse(document.getElementById('payload').innerText);
 
   function registerAndLogin(ev) {
@@ -32,7 +32,7 @@ omegaup.OmegaUp.on('ready', function() {
       password: $('#reg_pass').val(),
       recaptcha: recaptchaResponse,
     })
-      .then(function(data) {
+      .then(function (data) {
         // registration callback
         $('#user').val($('#reg_email').val());
         $('#pass').val($('#reg_pass').val());
@@ -50,7 +50,7 @@ function signInCallback(googleUser) {
   omegaup.API.Session.googleLogin({
     storeToken: googleUser.getAuthResponse().id_token,
   })
-    .then(function(data) {
+    .then(function (data) {
       window.location.reload();
     })
     .catch(omegaup.UI.apiError);

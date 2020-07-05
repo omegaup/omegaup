@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   const headerPayload = types.payloadParsers.CommonPayload();
   let courseList = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-list', {
         props: {
           courses: payload.courses,

@@ -48,7 +48,7 @@ import T from '../../lang';
 @Component
 export default class ArenaNavbarAssignments extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
-  @Prop() currentAssignmentAlias!: string;
+  @Prop() currentAssignment!: omegaup.Assignment;
 
   T = T;
 
@@ -69,7 +69,7 @@ export default class ArenaNavbarAssignments extends Vue {
   private get currentAssignmentIndex(): number {
     // Getting index of current assignment
     return this.assignments.findIndex(
-      assignment => assignment.alias === this.currentAssignmentAlias,
+      (assignment) => assignment.alias === this.currentAssignment.alias,
     );
   }
 }
