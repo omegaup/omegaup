@@ -618,20 +618,6 @@ class NoOpGrader extends \OmegaUp\Grader {
         }
 
         $out = fopen('php://output', 'w');
-        if (!is_string($this->_resources[$path])) {
-            foreach (
-                range(
-                    0,
-                    $this->_resources[$path]->numFiles - 1
-                ) as $i => $file
-            ) {
-                $stat = $this->_resources[$path]->statIndex($i);
-                fputs($out, basename($stat['name']) . PHP_EOL);
-            }
-            fclose($out);
-            return true;
-        }
-
         fputs($out, $this->_resources[$path]);
         fclose($out);
         return true;
