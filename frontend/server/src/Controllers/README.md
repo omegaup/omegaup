@@ -1699,9 +1699,9 @@ List course assignments
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                            |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `assignments` | `{ alias: string; assignment_type: string; description: string; finish_time: Date; has_runs: boolean; name: string; order: number; scoreboard_url: string; scoreboard_url_admin: string; start_time: Date; }[]` |
+| Name          | Type                       |
+| ------------- | -------------------------- |
+| `assignments` | `types.CourseAssignment[]` |
 
 ## `/api/course/listCourses/`
 

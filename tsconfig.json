@@ -2,10 +2,10 @@
   "compilerOptions": {
     "outDir": "./built/",
     "sourceMap": true,
-    "target": "es5",
+    "target": "es6",
     "downlevelIteration": true,
     "strict": true,
-    "module": "es2015",
+    "module": "es6",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "listFiles": true,

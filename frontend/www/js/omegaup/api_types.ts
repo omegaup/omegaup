@@ -1206,6 +1206,7 @@ export namespace types {
     assignment_type: string;
     description: string;
     finish_time?: Date;
+    has_runs: boolean;
     max_points: number;
     name: string;
     order: number;
@@ -1630,10 +1631,12 @@ export namespace types {
     extraWallTime: number | string;
     inputLimit: number | string;
     languages: string;
+    levelTags: string[];
     memoryLimit: number | string;
     message?: string;
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
+    publicTags: string[];
     selectedTags?: types.SelectedTag[];
     showDiff: string;
     source: string;
@@ -1773,6 +1776,7 @@ export namespace types {
       assignment_type: string;
       description: string;
       finish_time?: Date;
+      has_runs: boolean;
       max_points: number;
       name: string;
       order: number;
@@ -2685,18 +2689,7 @@ export namespace messages {
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;
   export type CourseListAssignmentsResponse = {
-    assignments: {
-      alias: string;
-      assignment_type: string;
-      description: string;
-      finish_time?: Date;
-      has_runs: boolean;
-      name: string;
-      order: number;
-      scoreboard_url: string;
-      scoreboard_url_admin: string;
-      start_time: Date;
-    }[];
+    assignments: types.CourseAssignment[];
   };
   export type CourseListCoursesRequest = { [key: string]: any };
   export type _CourseListCoursesServerResponse = any;

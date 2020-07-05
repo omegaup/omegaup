@@ -15,34 +15,9 @@
   {/if}
   <div id="problems" class="tab">
     <div id="problem" class="main">
-      <h1 class="title">
-        {$settings_summary_payload['problem']['problem_id']}. {$settings_summary_payload['problem']['title']|escape}
-        {if $settings_summary_payload['problem']['quality_seal'] || $settings_summary_payload['problem']['visibility'] == 3}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
-        {if $settings_summary_payload['problem']['visibility'] == 1 || $settings_summary_payload['problem']['visibility'] == -1}<span class="glyphicon glyphicon-warning-sign" title="{#wordsWarningProblem#}"></span>{/if}
-        {if $settings_summary_payload['problem']['visibility'] == 0 || $settings_summary_payload['problem']['visibility'] == -1}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
-        {if $settings_summary_payload['problem']['visibility'] <= -2}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
-        {if $settings_summary_payload['problem_admin']}
-          (<a href="/problem/{$settings_summary_payload['problem']['alias']}/edit/">{#wordsEdit#}</a>)
-        {/if}
-      </h1>
-      <table class="data">
-        <tr>
-          <td>{#wordsPoints#}</td>
-          <td class="points">{$settings_summary_payload['problem']['points']|escape}</td>
-          <td>{#wordsMemoryLimit#}</td>
-          <td class="memory_limit">{$settings_summary_payload['problem']['settings']['limits']['MemoryLimit']|escape}</td>
-        </tr>
-        <tr>
-          <td>{#wordsTimeLimit#}</td>
-          <td class="time_limit">{$settings_summary_payload['problem']['settings']['limits']['TimeLimit']|escape}</td>
-          <td>{#wordsOverallWallTimeLimit#}</td>
-          <td class="overall_wall_time_limit">{$settings_summary_payload['problem']['settings']['limits']['OverallWallTimeLimit']|escape}</td>
-        </tr>
-        <tr>
-          <td>{#problemEditFormInputLimit#}</td>
-          <td class="input_limit">{$settings_summary_payload['problem']['input_limit'] / 1024|escape} KiB</td>
-        </tr>
-      </table>
+      <div id="problem-settings-summary"></div>
+      <script type="text/json" id="settings-summary-payload">{$settings_summary_payload|json_encode}</script>
+      {js_include entrypoint="problem_settings_summary"}
       {if $karel_problem}
         <div class="karel-js-link">
           <a href="/karel.js/{if !empty($sample_input)}#mundo:{$sample_input|escape:url}{/if}" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
@@ -119,9 +94,6 @@
   </div>
 </div>
 <div id="overlay">
-  {if !empty($payload)}
-    <script type="text/json" id="payload">{$payload|json_encode}</script>
-  {/if}
   <div id="run-submit"></div>
   <div id="run-details"></div>
 </div>

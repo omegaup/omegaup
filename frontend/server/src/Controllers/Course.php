@@ -12,7 +12,7 @@
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CourseDetails=array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, basic_information_required: bool, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, name: string, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -1299,7 +1299,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{assignments: list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, name: string, order: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}>}
+     * @return array{assignments: list<CourseAssignment>}
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
@@ -1341,10 +1341,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         ];
         $time = \OmegaUp\Time::get();
         foreach ($assignments as $assignment) {
-            $assignment['has_runs'] = \OmegaUp\DAO\Submissions::countTotalSubmissionsOfProblemset(
-                intval($assignment['problemset_id'])
-            ) > 0;
-            unset($assignment['problemset_id']);
             if (
                 $assignment['start_time']->time > $time &&
                 !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
@@ -1569,73 +1565,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return $response;
-    }
-
-    /**
-     * It checks whether user has previous activity in any course in order to
-     * redirect to right location
-     *
-     * @return array{smartyProperties: array<empty, empty>, template: string}
-     */
-    public static function schoolsIndexForSmarty(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
-        try {
-            $r->ensureIdentity();
-        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // User is not logged. Anyways, we need to show intro school page
-            return [
-                'smartyProperties' => [],
-                'template' => 'schools.intro.tpl',
-            ];
-        }
-
-        if (
-            !empty(
-                \OmegaUp\DAO\Courses::getCoursesForStudent(
-                    $r->identity->identity_id
-                )
-            )
-        ) {
-            die(header('Location: /course/'));
-        }
-
-        // Default values to search courses for logged user
-        $page = 1;
-        $pageSize = 1;
-        if (\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
-            if (
-                !empty(
-                    \OmegaUp\DAO\Courses::getAll(
-                        $page,
-                        $pageSize,
-                        'course_id',
-                        'DESC'
-                    )
-                )
-            ) {
-                die(header('Location: /course/'));
-            }
-        }
-
-        if (
-            !empty(
-                \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
-                    $r->identity->identity_id,
-                    $page,
-                    $pageSize
-                )
-            )
-        ) {
-            die(header('Location: /course/'));
-        }
-        // User is logged in, but there is no information about courses
-        return [
-            'smartyProperties' => [],
-            'template' => 'schools.intro.tpl',
-        ];
     }
 
     /**

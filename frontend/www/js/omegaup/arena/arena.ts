@@ -22,6 +22,7 @@ import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
+import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
 import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 
@@ -55,21 +56,23 @@ export interface ArenaOptions {
 }
 
 export interface Problem {
-  title: string;
   alias: string;
   commit: string;
+  input_limit: number;
   languages: string[];
+  lastSubmission?: Date;
   letter?: string;
+  nextSubmissionTimestamp?: Date;
   points: number;
-  input_limit?: number;
+  problemsetter?: types.ProblemsetterInfo;
+  quality_seal: boolean;
   quality_payload?: types.ProblemQualityPayload;
   runs?: types.Run[];
-  source?: string;
   settings?: types.ProblemSettings;
+  source?: string;
   statement?: types.ProblemStatement;
-  problemsetter?: { creation_date?: Date; name: string; username: string };
-  lastSubmission?: Date;
-  nextSubmissionTimestamp?: Date;
+  title: string;
+  visibility: number;
 }
 
 export interface RunsState {
@@ -175,6 +178,9 @@ export class Arena {
     source: '',
     languages: [],
     points: 0,
+    input_limit: 0,
+    quality_seal: false,
+    visibility: 2,
   };
 
   // The current problemset.
@@ -278,6 +284,10 @@ export class Arena {
     isProblemsetOpened: boolean;
     problemAlias: string;
   };
+
+  problemSettingsSummary:
+    | (Vue & { problem: types.ArenaProblemDetails })
+    | null = null;
 
   qualityNominationForm:
     | (Vue & { qualityPayload: types.ProblemQualityPayload })
@@ -1598,25 +1608,21 @@ export class Arena {
         // TODO: Make #problem a component
         $('#summary').hide();
         $('#problem').show();
-        $('#problem > .title').text(
-          `${problem.letter}. ${ui.escape(problem.title)}`,
-        );
-        $('#problem .data .points').text(problem.points);
-        $('#problem .memory_limit').text(
-          `${
-            problem.settings?.limits.MemoryLimit ?? (1024 * 1024) / 1024 / 1024
-          } MiB`,
-        );
-        $('#problem .time_limit').text(
-          problem.settings?.limits.TimeLimit ?? '',
-        );
-        $('#problem .overall_wall_time_limit').text(
-          problem.settings?.limits.OverallWallTimeLimit ?? '',
-        );
-        if (problem.input_limit) {
-          $('#problem .input_limit').text(`${problem.input_limit / 1024} KiB`);
-        } else {
-          $('#problem .input_limit').text('');
+        if (this.problemSettingsSummary !== null) {
+          this.problemSettingsSummary.problem = problem;
+        } else if (document.getElementById('problem-settings-summary')) {
+          this.problemSettingsSummary = new Vue({
+            el: '#problem-settings-summary',
+            render: function (createElement) {
+              return createElement('omegaup-problem-settings-summary', {
+                props: { problem: this.problem },
+              });
+            },
+            components: {
+              'omegaup-problem-settings-summary': problem_SettingsSummary,
+            },
+            data: { problem: problem },
+          });
         }
         this.renderProblem(problem);
         const karelLangs = ['kp', 'kj'];

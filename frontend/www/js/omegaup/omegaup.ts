@@ -68,6 +68,13 @@ export namespace omegaup {
     selected: boolean;
   }
 
+  export enum VisibilityMode {
+    Default,
+    New,
+    Edit,
+    AddProblem,
+  }
+
   export enum AdmissionMode {
     Private = 'private',
     Registration = 'registration',
@@ -372,6 +379,7 @@ export namespace omegaup {
     alias: string;
     commit?: string;
     difficulty?: number;
+    input_limit: number;
     languages?: string;
     letter?: string;
     order: number;
