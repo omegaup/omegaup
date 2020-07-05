@@ -97,12 +97,32 @@ class Utils {
             "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
             "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         );
-        // An empty zip file.
+        // Creating the zip file.
+        $outputFilesContent = [
+            'easy.00.out' => 3,
+            'easy.01.out' => 5,
+            'medium.00.out' => 300,
+            'medium.01.out' => 6912,
+            'sample.out' => 3,
+        ];
+
+        $temp = tmpfile();
+        $path = tempnam(sys_get_temp_dir(), 'files');
+        $zip = new \ZipArchive();
+        $filename = 'files.zip';
+        if ($zip->open($path, \ZipArchive::CREATE) === true) {
+            foreach ($outputFilesContent as $fileName => $fileContent) {
+                $temp = tmpfile();
+                $path = tempnam(sys_get_temp_dir(), 'out');
+                fwrite($temp, $fileContent);
+                $zip->addFromString($fileName, $fileContent);
+                fclose($temp);
+            }
+        }
         \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
-            'files.zip',
-            "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
-            "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            $filename,
+            $zip
         );
     }
 

@@ -148,13 +148,17 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 50);
 
         ob_start();
-        \OmegaUp\Controllers\Run::downloadSubmission(
-            $runData['response']['guid'],
-            $this->identity,
-            /*$passthru=*/true,
-            /*$skipAuthorization=*/true
-        );
-        $zipContents = ob_get_contents();
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+                'show_diff' => true,
+            ]));
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // Expected exception
+            $zipContents = ob_get_contents();
+            error_log(print_r($zipContents, true));
+        }
         ob_end_clean();
 
         $this->assertTrue(true);

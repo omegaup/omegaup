@@ -208,10 +208,13 @@ class Grader {
         );
     }
 
+    /**
+     * @param string|\ZipArchive $contents
+     */
     public function setGraderResourceForTesting(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        string $contents
+        $contents
     ): void {
         // Not implemented.
         throw new \BadMethodCallException();
