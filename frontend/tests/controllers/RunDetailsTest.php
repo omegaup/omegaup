@@ -136,6 +136,50 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testDownload() {
+        $adminLogin = self::login($this->admin);
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 50);
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+                'show_diff' => true,
+            ]));
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+        $zipFile = tmpfile();
+        $zipPath = tempnam(sys_get_temp_dir(), 'files');
+        file_put_contents($zipPath, ob_get_contents());
+        ob_end_clean();
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::RDONLY) !== true) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        $expectedFiles = [
+            'easy.00.out',
+            'easy.01.out',
+            'medium.00.out',
+            'medium.01.out',
+            'sample.out',
+        ];
+        foreach ($expectedFiles as $index => $file) {
+            $this->assertEquals($zip->statIndex($index)['name'], $file);
+        }
+
+        $this->assertEquals($zip->numFiles, 5);
+    }
+
     /**
      * User only can see run details for submissions when gets the verdict AC
      */

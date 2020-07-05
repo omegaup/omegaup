@@ -1049,7 +1049,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Given the run alias, returns a .zip file with all the .out files generated for a run.
      *
-     * @omegaup-request-param mixed $run_alias
+     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param bool $show_diff
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
@@ -1059,6 +1060,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         // Get the user who is calling this API
         $r->ensureIdentity();
+        $showDiff = $r->ensureOptionalBool('show_diff') ?? false;
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['run_alias'],
@@ -1068,7 +1070,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             !self::downloadSubmission(
                 $r['run_alias'],
                 $r->identity,
-                /*passthru=*/true
+                /*$passthru=*/true,
+                /*$skipAuthorization=*/$showDiff
             )
         ) {
             http_response_code(404);
@@ -1085,7 +1088,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $passthru
+        bool $passthru,
+        bool $skipAuthorization = false
     ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (
@@ -1106,18 +1110,21 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
+        if (
+            !$skipAuthorization &&
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
 
         if ($passthru) {
-            header('Content-Type: application/zip');
-            header(
-                "Content-Disposition: attachment; filename={$submission->guid}.zip"
-            );
-            return self::getGraderResourcePassthru($run, 'files.zip');
+            $headers = [
+                'Content-Type: application/zip',
+                "Content-Disposition: attachment; filename={$submission->guid}.zip",
+            ];
+            return self::getGraderResourcePassthru($run, 'files.zip', $headers);
         }
         return self::getGraderResource($run, 'files.zip');
     }
@@ -1141,21 +1148,25 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param list<string> $headers
      * @return bool|null|string
      */
     private static function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
-        string $filename
+        string $filename,
+        array $headers = []
     ) {
         $result = \OmegaUp\Grader::getInstance()->getGraderResourcePassthru(
             $run,
             $filename,
-            /*missingOk=*/true
+            /*missingOk=*/true,
+            $headers
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/true
+                /*passthru=*/true,
+                $headers
             );
         }
         return $result;
@@ -1164,13 +1175,15 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Given the run resouce path, fetches its contents from S3.
      *
-     * @param  string $resourcePath The run's resource path.
-     * @param  bool   $passthru     Whether to output directly.
-     * @return ?string              The contents of the resource (or an empty string) if successful. null otherwise.
+     * @param  string       $resourcePath The run's resource path.
+     * @param  bool         $passthru     Whether to output directly.
+     * @param  list<string> $httpHeaders
+     * @return ?string                    The contents of the resource (or an empty string) if successful. null otherwise.
      */
     private static function downloadResourceFromS3(
         string $resourcePath,
-        bool $passthru
+        bool $passthru,
+        array $httpHeaders = []
     ): ?string {
         if (
             !defined('AWS_CLI_SECRET_ACCESS_KEY') ||
@@ -1287,6 +1300,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $output = curl_exec($curl);
         if ($passthru) {
+            foreach ($httpHeaders as $header) {
+                header($header);
+            }
             $result = '';
         } else {
             $result = strval($output);
@@ -1331,7 +1347,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
                 return $totals;
             },
-            24 * 60 * 60 /*expire in 1 day*/
+            24 * 60 * 60 // expire in 1 day
         );
     }
 
