@@ -25,12 +25,13 @@ class Utils {
     /**
      * Given a run guid, set a score for its run
      *
-     * @param ?int    $runID            The ID of the run.
-     * @param ?string $runGuid          The GUID of the submission.
-     * @param float   $points           The score of the run
-     * @param string  $verdict          The verdict of the run.
-     * @param ?int    $submitDelay      The number of minutes worth of penalty.
-     * @param int     $problemsetPoints The max score of the run for the problemset.
+     * @param ?int                       $runID              The ID of the run.
+     * @param ?string                    $runGuid            The GUID of the submission.
+     * @param float                      $points             The score of the run
+     * @param string                     $verdict            The verdict of the run.
+     * @param ?int                       $submitDelay        The number of minutes worth of penalty.
+     * @param int                        $problemsetPoints   The max score of the run for the problemset.
+     * @param array<string, string>|null $outputFilesContent The content to compress in files.zip.
      */
     public static function gradeRun(
         ?int $runId = null,
@@ -38,7 +39,8 @@ class Utils {
         float $points = 1,
         string $verdict = 'AC',
         ?int $submitDelay = null,
-        int $problemsetPoints = 100
+        int $problemsetPoints = 100,
+        ?array $outputFilesContent = null
     ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
@@ -98,16 +100,27 @@ class Utils {
             "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         );
         // Creating the zip file.
-        $outputFilesContent = [
-            'easy.00.out' => '3',
-            'easy.01.out' => '5',
-            'medium.00.out' => '300',
-            'medium.01.out' => '6912',
-            'sample.out' => '3',
-        ];
+        $filesContentsAsString = self::createZipFileWithContent(
+            $outputFilesContent
+        );
 
+        \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
+            $run,
+            'files.zip',
+            $filesContentsAsString
+        );
+    }
+
+    /**
+     * @param array<string, string>|null $filesContents
+     */
+    private static function createZipFileWithContent($filesContents): string {
+        if (is_null($filesContents)) {
+            return "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
+                   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
+        }
         $zipFile = tmpfile();
-        $zipPath = tempnam(sys_get_temp_dir(), 'files');
+        $zipPath = stream_get_meta_data($zipFile)['uri'];
         $zip = new \ZipArchive();
         if (
             $zip->open(
@@ -117,7 +130,7 @@ class Utils {
         ) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
-        foreach ($outputFilesContent as $fileName => $fileContent) {
+        foreach ($filesContents as $fileName => $fileContent) {
             if ($zip->addFromString($fileName, $fileContent) !== true) {
                 throw new \OmegaUp\Exceptions\NotFoundException();
             }
@@ -125,11 +138,7 @@ class Utils {
         if ($zip->close() !== true) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
-        \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
-            $run,
-            'files.zip',
-            file_get_contents($zipPath)
-        );
+        return file_get_contents($zipPath);
     }
 
     private static function setUpDefaultDataConfig(): void {

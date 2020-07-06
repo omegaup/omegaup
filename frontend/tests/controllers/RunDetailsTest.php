@@ -145,7 +145,24 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->identity,
             $login
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 50);
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            $outputFilesContent
+        );
 
         ob_start();
         try {
@@ -158,7 +175,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             // This is expected.
         }
         $zipFile = tmpfile();
-        $zipPath = tempnam(sys_get_temp_dir(), 'files');
+        $zipPath = stream_get_meta_data($zipFile)['uri'];
         file_put_contents($zipPath, ob_get_contents());
         ob_end_clean();
 
@@ -166,15 +183,23 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         if ($zip->open($zipPath, \ZipArchive::RDONLY) !== true) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
-        $expectedFiles = [
-            'easy.00.out',
-            'easy.01.out',
-            'medium.00.out',
-            'medium.01.out',
-            'sample.out',
-        ];
-        foreach ($expectedFiles as $index => $file) {
+
+        $index = 0;
+        foreach ($outputFilesContent as $file => $fileContent) {
             $this->assertEquals($zip->statIndex($index)['name'], $file);
+            $fp = $zip->getStream($file);
+            if (!$fp) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
+            $content = '';
+            while (!feof($fp)) {
+                $content .= fread($fp, 2);
+            }
+            fclose($fp);
+
+            $this->assertEquals($content, $fileContent);
+
+            $index++;
         }
 
         $this->assertEquals($zip->numFiles, 5);
