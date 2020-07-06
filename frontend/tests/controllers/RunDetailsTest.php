@@ -365,49 +365,25 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with valid show_diff values.
      *
-     * @return list<list<string>>
+    * @return list<array{0: string, 1: array<string, array<string, string>>}>
      */
     public function showDiffValueProvider(): array {
-        $expectedCases = [
-            'none' => [],
-            'examples' => [
-                'sample' => [
-                    'in' => "1 2\n",
-                    'out' => "3\n",
-                ],
-            ],
-            'all' => [
-                'easy.00' => [
-                    'in' => "1 2\n",
-                    'out' => "3\n",
-                ],
-                'easy.01' => [
-                    'in' => "2 3\n",
-                    'out' => "5\n",
-                ],
-                'medium.00' => [
-                    'in' => "100 200\n",
-                    'out' => "300\n",
-                ],
-                'medium.01' => [
-                    'in' => "1234 5678\n",
-                    'out' => "6912\n",
-                ],
-                'sample' => [
-                    'in' => "1 2\n",
-                    'out' => "3\n",
-                ],
-            ],
-        ];
         return [
-            ['none', $expectedCases['none']],
-            ['examples', $expectedCases['examples']],
-            ['all', $expectedCases['all']],
+            ['none', []],
+            ['examples', ['sample' => ['in' => "1 2\n", 'out' => "3\n"]]],
+            ['all', [
+                    'easy.00' => ['in' => "1 2\n", 'out' => "3\n"],
+                    'easy.01' => ['in' => "2 3\n", 'out' => "5\n"],
+                    'medium.00' => ['in' => "100 200\n", 'out' => "300\n"],
+                    'medium.01' => ['in' => "1234 5678\n", 'out' => "6912\n"],
+                    'sample' => ['in' => "1 2\n", 'out' => "3\n"],
+                ],
+            ],
         ];
     }
 
     /**
-     * @param array{all: array<string, array{in: string, out: string}, examples: array<string, array{in: string, out: string}, none: array<string, array{in: string, out: string}}
+     * @param array<string, array<string, string>> $cases
      * @dataProvider showDiffValueProvider
      */
     public function testRunDetailsForProblemWithValidShowDiffValues(
@@ -453,5 +429,49 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($response['cases'], $cases);
+    }
+
+    public function testRunDetailsCasesAreHiddenWhenFileIsLargerThan4KB() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'bigtestproblem.zip',
+                'show_diff' => 'all',
+            ])
+        );
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $this->identity,
+            $login
+        );
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+        );
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(
+            new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        // Cases are not visible, because of the size file restrictions
+        $this->assertEquals($response['cases'], []);
     }
 }
