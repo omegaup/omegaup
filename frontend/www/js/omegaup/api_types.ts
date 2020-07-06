@@ -1629,10 +1629,12 @@ export namespace types {
     extraWallTime: number | string;
     inputLimit: number | string;
     languages: string;
+    levelTags: string[];
     memoryLimit: number | string;
     message?: string;
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
+    publicTags: string[];
     selectedTags?: types.SelectedTag[];
     source: string;
     statusError: string;

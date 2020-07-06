@@ -25,7 +25,7 @@
         ></span>
       </template>
       <template v-if="showEditLink">
-        (<a href="/problem/{$problem_alias}/edit/">{{ T.wordsEdit }}</a
+        (<a v-bind:href="`/problem/${problem.alias}/edit/`">{{ T.wordsEdit }}</a
         >)
       </template>
     </h1>
