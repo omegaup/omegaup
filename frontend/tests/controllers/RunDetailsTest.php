@@ -361,4 +361,97 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $acRunData['details']['runs'][0]['contest_alias']
         );
     }
+
+    /**
+     * A PHPUnit data provider for the test with valid show_diff values.
+     *
+     * @return list<list<string>>
+     */
+    public function showDiffValueProvider(): array {
+        $expectedCases = [
+            'none' => [],
+            'examples' => [
+                'sample' => [
+                    'in' => "1 2\n",
+                    'out' => "3\n",
+                ],
+            ],
+            'all' => [
+                'easy.00' => [
+                    'in' => "1 2\n",
+                    'out' => "3\n",
+                ],
+                'easy.01' => [
+                    'in' => "2 3\n",
+                    'out' => "5\n",
+                ],
+                'medium.00' => [
+                    'in' => "100 200\n",
+                    'out' => "300\n",
+                ],
+                'medium.01' => [
+                    'in' => "1234 5678\n",
+                    'out' => "6912\n",
+                ],
+                'sample' => [
+                    'in' => "1 2\n",
+                    'out' => "3\n",
+                ],
+            ],
+        ];
+        return [
+            ['none', $expectedCases['none']],
+            ['examples', $expectedCases['examples']],
+            ['all', $expectedCases['all']],
+        ];
+    }
+
+    /**
+     * @param array{all: array<string, array{in: string, out: string}, examples: array<string, array{in: string, out: string}, none: array<string, array{in: string, out: string}}
+     * @dataProvider showDiffValueProvider
+     */
+    public function testRunDetailsForProblemWithValidShowDiffValues(
+        string $showDiffValue,
+        array $cases
+    ) {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'show_diff' => $showDiffValue,
+            ])
+        );
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $this->identity,
+            $login
+        );
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+        );
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(
+            new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertEquals($response['cases'], $cases);
+    }
 }

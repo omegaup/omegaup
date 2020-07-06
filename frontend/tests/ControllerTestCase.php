@@ -618,7 +618,6 @@ class NoOpGrader extends \OmegaUp\Grader {
         }
 
         $out = fopen('php://output', 'w');
-
         fputs($out, $this->_resources[$path]);
         fclose($out);
         return true;
