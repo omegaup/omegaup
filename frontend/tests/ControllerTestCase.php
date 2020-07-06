@@ -526,7 +526,7 @@ class ScopedEmailSender {
  * \OmegaUp\Grader::grade(), without executing the contents.
  */
 class NoOpGrader extends \OmegaUp\Grader {
-    /** @var array<string, string|\ZipArchive> */
+    /** @var array<string, string> */
     private $_resources = [];
 
     /** @var array<string, string> */
@@ -618,32 +618,16 @@ class NoOpGrader extends \OmegaUp\Grader {
         }
 
         $out = fopen('php://output', 'w');
-        if (!is_string($this->_resources[$path])) {
-            foreach (
-                range(
-                    0,
-                    $this->_resources[$path]->numFiles - 1
-                ) as $i => $file
-            ) {
-                $stat = $this->_resources[$path]->statIndex($i);
-                fputs($out, basename($stat['name']) . PHP_EOL);
-            }
-            fclose($out);
-            return true;
-        }
 
         fputs($out, $this->_resources[$path]);
         fclose($out);
         return true;
     }
 
-    /**
-     * @param string|\ZipArchive $contents
-     */
     public function setGraderResourceForTesting(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        $contents
+        string $contents
     ): void {
         $path = "{$run->run_id}/{$filename}";
         $this->_resources[$path] = $contents;

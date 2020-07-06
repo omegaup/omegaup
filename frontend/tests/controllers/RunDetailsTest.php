@@ -145,7 +145,24 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->identity,
             $login
         );
-        \OmegaUp\Test\Factories\Run::gradeRun($runData, 1, 'AC', 50);
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+        );
 
         ob_start();
         try {
@@ -155,13 +172,32 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
                 'show_diff' => true,
             ]));
         } catch (\OmegaUp\Exceptions\ExitException $e) {
-            // Expected exception
-            $zipContents = ob_get_contents();
-            error_log(print_r($zipContents, true));
+            // This is expected.
         }
+        $zipFile = tmpfile();
+        $zipPath = stream_get_meta_data($zipFile)['uri'];
+        file_put_contents($zipPath, ob_get_contents());
         ob_end_clean();
 
-        $this->assertTrue(true);
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::RDONLY) !== true) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+
+        foreach ($outputFilesContent as $file => $fileContent) {
+            $this->assertEquals($zip->statName($file)['name'], $file);
+            $fp = $zip->getStream($file);
+            if (!$fp) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
+            $content = '';
+            while (!feof($fp)) {
+                $content .= fread($fp, 1024);
+            }
+            fclose($fp);
+
+            $this->assertEquals($content, $fileContent);
+        }
     }
 
     /**

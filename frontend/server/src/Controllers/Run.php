@@ -1257,7 +1257,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if ($passthru) {
             $headers = [
                 'Content-Type: application/zip',
-                "Content-Disposition: attachment; filename={$submission->guid}.zip"
+                "Content-Disposition: attachment; filename={$submission->guid}.zip",
             ];
             return self::getGraderResourcePassthru($run, 'files.zip', $headers);
         }
