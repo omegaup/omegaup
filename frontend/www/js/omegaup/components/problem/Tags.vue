@@ -36,7 +36,7 @@
                 <button
                   type="button"
                   class="btn btn-danger"
-                  v-on:click="removeTag(tag, true /* public */)"
+                  v-on:click="removeTag(tag, /*public=*/ true)"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'trash']" />
                 </button>

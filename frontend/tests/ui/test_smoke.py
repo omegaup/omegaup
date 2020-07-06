@@ -180,6 +180,15 @@ def create_problem(driver, problem_alias):
                  '//input[@name = "input_limit"]')))
         input_limit.clear()
         input_limit.send_keys('1024')
+        problem_level = driver.wait.until(
+            EC.visibility_of_element_located(
+                (
+                    By.CSS_SELECTOR,
+                    'option[value="problemLevelBasicKarel"]'
+                )
+            )
+        )
+        problem_level.click()
         # Alias should be set automatically
         driver.browser.find_element_by_name('source').send_keys('test')
         # Make the problem public

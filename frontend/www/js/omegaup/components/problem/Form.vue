@@ -328,7 +328,6 @@ export default class ProblemForm extends Vue {
     ) {
       return;
     }
-    ui.error(T.editFieldRequired);
     if (!this.title) {
       this.errors.push('title');
     }
@@ -347,7 +346,10 @@ export default class ProblemForm extends Vue {
     if (this.isUpdate && !this.message) {
       this.errors.push('message');
     }
-    e.preventDefault();
+    if (this.errors.length !== 0) {
+      ui.error(T.editFieldRequired);
+      e.preventDefault();
+    }
   }
 
   get selectedPublicTags(): string[] {
