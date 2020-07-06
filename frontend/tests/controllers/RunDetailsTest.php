@@ -161,7 +161,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             /*$runGuid=*/null,
             /*$runID*/null,
             /*$problemsetPoints*/100,
-            $outputFilesContent
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
         );
 
         ob_start();
@@ -184,25 +184,20 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
 
-        $index = 0;
         foreach ($outputFilesContent as $file => $fileContent) {
-            $this->assertEquals($zip->statIndex($index)['name'], $file);
+            $this->assertEquals($zip->statName($file)['name'], $file);
             $fp = $zip->getStream($file);
             if (!$fp) {
                 throw new \OmegaUp\Exceptions\NotFoundException();
             }
             $content = '';
             while (!feof($fp)) {
-                $content .= fread($fp, 2);
+                $content .= fread($fp, 1024);
             }
             fclose($fp);
 
             $this->assertEquals($content, $fileContent);
-
-            $index++;
         }
-
-        $this->assertEquals($zip->numFiles, 5);
     }
 
     /**

@@ -25,13 +25,13 @@ class Utils {
     /**
      * Given a run guid, set a score for its run
      *
-     * @param ?int                       $runID              The ID of the run.
-     * @param ?string                    $runGuid            The GUID of the submission.
-     * @param float                      $points             The score of the run
-     * @param string                     $verdict            The verdict of the run.
-     * @param ?int                       $submitDelay        The number of minutes worth of penalty.
-     * @param int                        $problemsetPoints   The max score of the run for the problemset.
-     * @param array<string, string>|null $outputFilesContent The content to compress in files.zip.
+     * @param ?int    $runID              The ID of the run.
+     * @param ?string $runGuid            The GUID of the submission.
+     * @param float   $points             The score of the run
+     * @param string  $verdict            The verdict of the run.
+     * @param ?int    $submitDelay        The number of minutes worth of penalty.
+     * @param int     $problemsetPoints   The max score of the run for the problemset.
+     * @param ?string $outputFileContents The content to compress in files.zip.
      */
     public static function gradeRun(
         ?int $runId = null,
@@ -40,7 +40,7 @@ class Utils {
         string $verdict = 'AC',
         ?int $submitDelay = null,
         int $problemsetPoints = 100,
-        ?array $outputFilesContent = null
+        ?string $outputFileContents = null
     ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
@@ -100,25 +100,20 @@ class Utils {
             "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         );
         // Creating the zip file.
-        $filesContentsAsString = self::createZipFileWithContent(
-            $outputFilesContent
-        );
-
         \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
             'files.zip',
-            $filesContentsAsString
+            $outputFileContents ?? (
+                "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
+                "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            )
         );
     }
 
     /**
-     * @param array<string, string>|null $filesContents
+     * @param array<string, string> $filesContents
      */
-    private static function createZipFileWithContent($filesContents): string {
-        if (is_null($filesContents)) {
-            return "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
-                   "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00";
-        }
+    public static function zipFileForContents($filesContents): string {
         $zipFile = tmpfile();
         $zipPath = stream_get_meta_data($zipFile)['uri'];
         $zip = new \ZipArchive();
