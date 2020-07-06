@@ -136,6 +136,70 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testDownload() {
+        $adminLogin = self::login($this->admin);
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+        );
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+                'show_diff' => true,
+            ]));
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+        $zipFile = tmpfile();
+        $zipPath = stream_get_meta_data($zipFile)['uri'];
+        file_put_contents($zipPath, ob_get_contents());
+        ob_end_clean();
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::RDONLY) !== true) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+
+        foreach ($outputFilesContent as $file => $fileContent) {
+            $this->assertEquals($zip->statName($file)['name'], $file);
+            $fp = $zip->getStream($file);
+            if (!$fp) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
+            $content = '';
+            while (!feof($fp)) {
+                $content .= fread($fp, 1024);
+            }
+            fclose($fp);
+
+            $this->assertEquals($content, $fileContent);
+        }
+    }
+
     /**
      * User only can see run details for submissions when gets the verdict AC
      */

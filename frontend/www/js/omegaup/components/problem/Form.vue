@@ -150,12 +150,24 @@
           </div>
         </div>
 
-        <omegaup-problem-tags
-          v-bind:initialTags="data.tags"
-          v-bind:initialSelectedTags="data.selectedTags || []"
-          v-bind:alias="data.alias"
-          v-if="!isUpdate"
-        ></omegaup-problem-tags>
+        <template v-if="!isUpdate">
+          <omegaup-problem-tags
+            v-bind:public-tags="data.publicTags"
+            v-bind:level-tags="data.levelTags"
+            v-bind:alias="data.alias"
+            v-on:emit-add-tag="addTag"
+            v-on:emit-remove-tag="removeTag"
+            v-bind:selected-private-tags="selectedPrivateTags"
+            v-bind:selected-public-tags="selectedPublicTags"
+            v-bind:can-add-new-tags="true"
+          ></omegaup-problem-tags>
+          <input
+            name="selected_tags"
+            v-bind:value="selectedTagsList"
+            type="hidden"
+          />
+        </template>
+
         <div class="row" v-else="">
           <div
             class="form-group col-md-12"
@@ -321,21 +333,34 @@ export default class ProblemForm extends Vue {
     e.preventDefault();
   }
 
+  get selectedPublicTags(): string[] {
+    return this.selectedTags
+      .filter((tag) => tag.public === true)
+      .map((tag) => tag.tagname);
+  }
+
+  get selectedPrivateTags(): string[] {
+    return this.selectedTags
+      .filter((tag) => tag.public === false)
+      .map((tag) => tag.tagname);
+  }
+
+  addTag(alias: string, tagname: string, isPublic: boolean): void {
+    this.selectedTags.push({
+      tagname: tagname,
+      public: isPublic,
+    });
+  }
+
+  removeTag(alias: string, tagname: string, isPublic: boolean): void {
+    this.selectedTags = this.selectedTags.filter(
+      (tag) => tag.tagname !== tagname,
+    );
+  }
+
   onUploadFile(ev: InputEvent): void {
     const uploadedFile = <HTMLInputElement>ev.target;
     this.hasFile = uploadedFile.files !== null;
-  }
-
-  onAddTag(tagname: string, isPublic: boolean): void {
-    this.selectedTags.push({ tagname: tagname, public: isPublic });
-    this.tags = this.tags.filter((val, index, arr) => val.name !== tagname);
-  }
-
-  onRemoveTag(tagname: string): void {
-    this.tags.push({ name: tagname });
-    this.selectedTags = this.selectedTags.filter(
-      (val, index, arr) => val.tagname !== tagname,
-    );
   }
 
   onGenerateAlias(): void {

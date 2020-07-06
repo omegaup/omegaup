@@ -3,6 +3,16 @@
     data-markdown-statement
     v-bind:formula="html"
     v-bind:safe="false"
+    v-bind:options="{
+      tex2jax: {
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)'],
+        ],
+        processEscapes: true,
+      },
+      skipStartupTypeset: true,
+    }"
   ></vue-mathjax>
 </template>
 
