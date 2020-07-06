@@ -131,7 +131,7 @@ OmegaUp.on('ready', () => {
                 })
                 .catch((error) => {
                   ui.apiError(error);
-                  component.showAssignmentDetails = true;
+                  component.visibilityMode = omegaup.VisibilityMode.Edit;
                   this.invalidParameterName = error.parameter || '';
                 });
             } else {
@@ -155,7 +155,7 @@ OmegaUp.on('ready', () => {
                 })
                 .catch((error) => {
                   ui.apiError(error);
-                  component.showAssignmentDetails = true;
+                  component.visibilityMode = omegaup.VisibilityMode.New;
                   this.invalidParameterName = error.parameter || '';
                 });
             }
@@ -215,7 +215,7 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 ui.success(T.courseAssignmentProblemAdded);
                 this.refreshProblemList(assignment);
-                component.showFormProblem = false;
+                component.visibilityMode = omegaup.VisibilityMode.AddProblem;
               })
               .catch(ui.apiError);
           },
@@ -298,7 +298,7 @@ OmegaUp.on('ready', () => {
               ),
             )
               .then((results) => {
-                let participantsWithError = [];
+                let participantsWithError: string[] = [];
                 results.forEach((result) => {
                   if (result.status === 'rejected') {
                     participantsWithError.push(result.reason.userEmail);
