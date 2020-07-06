@@ -217,12 +217,13 @@ class Run {
      * Given a run, set a score to a given run
      *
      * @param ?array{contestant: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, response: array{guid: string, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}}  $runData     The run.
-     * @param float   $points           The score of the run
-     * @param string  $verdict          The verdict of the run.
-     * @param ?int    $submitDelay      The number of minutes worth of penalty.
-     * @param ?string $runGuid          The GUID of the submission.
-     * @param ?int    $runID            The ID of the run.
-     * @param int     $problemsetPoints The max score of the run for the problemset.
+     * @param float   $points             The score of the run
+     * @param string  $verdict            The verdict of the run.
+     * @param ?int    $submitDelay        The number of minutes worth of penalty.
+     * @param ?string $runGuid            The GUID of the submission.
+     * @param ?int    $runID              The ID of the run.
+     * @param int     $problemsetPoints   The max score of the run for the problemset.
+     * @param ?string $outputFilesContent The content to compress in files.zip.
      */
     public static function gradeRun(
         ?array $runData,
@@ -231,7 +232,8 @@ class Run {
         ?int $submitDelay = null,
         ?string $runGuid = null,
         ?int $runId = null,
-        int $problemsetPoints = 100
+        int $problemsetPoints = 100,
+        ?string $outputFilesContent = null
     ): void {
         if (!is_null($runGuid)) {
             $guid = $runGuid;
@@ -246,7 +248,8 @@ class Run {
             $points,
             $verdict,
             $submitDelay,
-            $problemsetPoints
+            $problemsetPoints,
+            $outputFilesContent
         );
     }
 }
