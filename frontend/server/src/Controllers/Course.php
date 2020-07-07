@@ -2354,7 +2354,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{LOAD_MATHJAX: bool, payload: CourseDetailsPayload, title: string}, entrypoint: string}
+     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
      */
     public static function getCourseDetailsForSmarty(\OmegaUp\Request $r): array {
         return self::getIntroDetails($r);
@@ -2663,7 +2663,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{LOAD_MATHJAX: bool, payload: CourseDetailsPayload, title: string}, entrypoint: string}
+     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
      */
     public static function getIntroDetails(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -2730,7 +2730,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $entrypointResponse = [
             'smartyProperties' => [
-                'LOAD_MATHJAX' => true,
                 'payload' => [
                     'shouldShowFirstAssociatedIdentityRunWarning' => false,
                     'details' => $commonDetails,
