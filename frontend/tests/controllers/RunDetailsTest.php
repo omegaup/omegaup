@@ -472,6 +472,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // Cases are not visible, because of the size file restrictions
+        $this->assertEquals($response['show_diff'], 'none');
         $this->assertEquals($response['cases'], []);
     }
 }

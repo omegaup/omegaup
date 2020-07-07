@@ -960,7 +960,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         if (
             $problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_NONE
-            || $responseSize > 4096 // Forcing to hide diffs when inputs/outpus exceed 4kb
+            || $responseSize > 4096 // Forcing to hide diffs when inputs/outputs exceed 4kb
         ) {
             $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_NONE;
             return $response;
