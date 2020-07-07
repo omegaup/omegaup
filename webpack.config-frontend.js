@@ -173,12 +173,6 @@ module.exports = {
           minSize: 50 * 1024,
           priority: 10,
         },
-        iso_3166_2_js: {
-          name: 'iso-3166-2.js',
-          test: /\/frontend\/www\/third_party\/js\/iso-3166-2.js\//,
-          chunks: 'all',
-          priority: 10,
-        },
         commons: {
           name: 'commons',
           chunks: 'initial',

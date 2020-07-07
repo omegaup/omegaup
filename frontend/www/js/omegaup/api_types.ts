@@ -2188,6 +2188,7 @@ export namespace types {
     locale?: string;
     name?: string;
     preferred_language?: string;
+    programming_languages: { [key: string]: string };
     rankinfo: {
       author_ranking?: number;
       name?: string;
