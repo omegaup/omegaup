@@ -1,6 +1,6 @@
 <template>
-  <div class="omegaup-course-problemlist panel">
-    <div class="panel-heading">
+  <div class="omegaup-course-problemlist card">
+    <div class="card-header">
       <form class="problemlist">
         <div class="row">
           <div class="form-group col-md-8">
@@ -17,7 +17,10 @@
               </select></label
             >
           </div>
-          <div class="form-group col-md-4 pull-right" v-show="assignment.alias">
+          <div
+            class="form-group col-md-4 pull-right"
+            v-show="assignment && assignment.alias"
+          >
             <label
               >&nbsp;
               <button
@@ -47,23 +50,19 @@
       <tbody v-sortable="{ onUpdate: sort }">
         <tr v-bind:key="problem.letter" v-for="problem in assignmentProblems">
           <td>
-            <a v-bind:title="T.courseAssignmentProblemReorder"
-              ><span
-                aria-hidden="true"
-                class="glyphicon glyphicon-move handle"
-              ></span
-            ></a>
+            <a v-bind:title="T.courseAssignmentProblemReorder">
+              <font-awesome-icon icon="arrows-alt" />
+            </a>
           </td>
           <td>{{ problem.title }}</td>
           <td class="button-column">
             <a
+              href="#"
               v-bind:title="T.courseAssignmentProblemRemove"
-              v-on:click="$emit('remove', assignment, problem)"
-              ><span
-                aria-hidden="true"
-                class="glyphicon glyphicon-remove"
-              ></span
-            ></a>
+              v-on:click="$emit('emit-remove', assignment, problem)"
+            >
+              <font-awesome-icon icon="trash" />
+            </a>
           </td>
         </tr>
       </tbody>
@@ -71,6 +70,7 @@
     <div>
       <a
         class="btn btn-primary"
+        href="#"
         v-bind:class="{ disabled: !problemsOrderChanged }"
         role="button"
         v-on:click="saveNewOrder"
@@ -78,7 +78,7 @@
         {{ T.wordsSaveNewOrder }}
       </a>
     </div>
-    <div class="panel-footer" v-show="showForm">
+    <div class="card-footer" v-show="showForm">
       <form>
         <div class="row">
           <div class="col-md-4" v-show="showTopicsAndDifficulty">
@@ -154,13 +154,13 @@
                 </p>
               </div>
             </div>
-            <div class="form-group pull-right">
+            <div class="form-group text-right">
               <button
-                class="btn btn-primary"
+                class="btn btn-primary mr-2"
                 type="submit"
                 v-bind:disabled="problemAlias.length == 0"
                 v-on:click.prevent="
-                  $emit('add-problem', assignment, problemAlias)
+                  $emit('emit-add-problem', assignment, problemAlias)
                 "
               >
                 {{ T.courseAddProblemsAdd }}
@@ -177,9 +177,9 @@
         </div>
       </form>
     </div>
-    <!-- panel-body -->
+    <!-- card-body -->
   </div>
-  <!-- panel -->
+  <!-- card -->
 </template>
 
 <style>
@@ -196,9 +196,21 @@ import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class CourseProblemList extends Vue {
@@ -206,11 +218,12 @@ export default class CourseProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: omegaup.Assignment;
+  @Prop() visibilityMode!: omegaup.VisibilityMode;
 
   typeahead = typeahead;
   T = T;
-  assignment: Partial<omegaup.Assignment> = {};
-  showForm = false;
+  assignment: Partial<omegaup.Assignment> = this.selectedAssignment;
+  showForm = this.visibilityMode === omegaup.VisibilityMode.AddProblem;
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
@@ -229,6 +242,10 @@ export default class CourseProblemList extends Vue {
     this.problemAlias = '';
     this.difficulty = 'intro';
     this.topics = [];
+
+    Vue.nextTick(() => {
+      document.querySelector('.card-footer')?.scrollIntoView();
+    });
   }
 
   sort(event: any) {
@@ -242,7 +259,7 @@ export default class CourseProblemList extends Vue {
 
   saveNewOrder() {
     this.$emit(
-      'sort',
+      'emit-sort',
       this.assignment.alias,
       this.assignmentProblems.map((problem) => problem.alias),
     );
@@ -251,7 +268,7 @@ export default class CourseProblemList extends Vue {
 
   @Watch('assignment')
   onAssignmentChange(newVal: omegaup.Assignment): void {
-    this.$emit('assignment', newVal);
+    this.$emit('emit-select-assignment', newVal);
   }
 
   @Watch('selectedAssignment')
@@ -266,7 +283,7 @@ export default class CourseProblemList extends Vue {
 
   @Watch('tags')
   onTagsChange() {
-    this.$emit('tags', this.tags);
+    this.$emit('emit-tags', this.tags);
   }
 }
 </script>

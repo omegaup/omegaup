@@ -1,13 +1,13 @@
 <template>
-  <div class="omegaup-course-details panel-primary panel">
-    <div class="panel-heading" v-if="!update">
-      <h3 class="panel-title">{{ T.courseNew }}</h3>
+  <div class="omegaup-course-details card">
+    <div class="card-header" v-if="!update">
+      <h3 class="card-title">{{ T.courseNew }}</h3>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <form class="form" v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
-            <label
+            <label class="faux-label"
               >{{ T.wordsName }}
               <input
                 class="form-control"
@@ -17,7 +17,7 @@
             /></label>
           </div>
           <div class="form-group col-md-4">
-            <label
+            <label class="faux-label"
               >{{ T.courseNewFormShortTitle_alias_ }}
               <span
                 aria-hidden="true"
@@ -67,7 +67,7 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label
+            <label class="faux-label"
               >{{ T.courseNewFormStartDate }}
               <span
                 aria-hidden="true"
@@ -108,7 +108,7 @@
             </div>
           </div>
           <div class="form-group col-md-4">
-            <label
+            <label class="faux-label"
               >{{ T.courseNewFormEndDate }}
               <span
                 aria-hidden="true"
@@ -126,7 +126,7 @@
         </div>
         <div class="row">
           <div class="form-group col-md-4">
-            <label
+            <label class="faux-label"
               >{{ T.profileSchool }}
               <input
                 autocomplete="off"
@@ -201,24 +201,22 @@
               ></textarea>
             </label>
           </div>
-          <div class="form-group col-md-4 pull-right">
-            <div class="pull-right">
-              <button class="btn btn-primary submit" type="submit">
-                <template v-if="update">
-                  {{ T.courseNewFormUpdateCourse }}
-                </template>
-                <template v-else="">
-                  {{ T.courseNewFormScheduleCourse }}
-                </template>
-              </button>
-              <button
-                class="btn btn-secondary"
-                type="reset"
-                v-on:click.prevent="onCancel"
-              >
-                {{ T.wordsCancel }}
-              </button>
-            </div>
+          <div class="form-group col-md-12 text-right">
+            <button class="btn btn-primary mr-2 submit" type="submit">
+              <template v-if="update">
+                {{ T.courseNewFormUpdateCourse }}
+              </template>
+              <template v-else="">
+                {{ T.courseNewFormScheduleCourse }}
+              </template>
+            </button>
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              v-on:click.prevent="onCancel"
+            >
+              {{ T.wordsCancel }}
+            </button>
           </div>
         </div>
       </form>
@@ -232,6 +230,10 @@
 }
 .omegaup-course-details .faux-label {
   font-weight: bold;
+}
+
+.twitter-typeahead {
+  width: 100%;
 }
 </style>
 
@@ -295,10 +297,10 @@ export default class CourseDetails extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('submit', this);
+    this.$emit('emit-submit', this);
   }
 
-  @Emit('cancel')
+  @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
   }

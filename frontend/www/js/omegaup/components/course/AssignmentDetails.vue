@@ -1,6 +1,6 @@
 <template>
-  <div class="omegaup-course-assignmentdetails panel" v-show="show">
-    <div class="panel-body">
+  <div class="omegaup-course-assignmentdetails card" v-show="show">
+    <div class="card-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
           <div
@@ -23,13 +23,9 @@
           >
             <label
               >{{ T.courseNewFormShortTitle_alias_ }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseAssignmentNewFormShortTitle_alias_Desc"
-              ></span>
+                icon="info-circle" />
               <input
                 class="form-control alias"
                 type="text"
@@ -46,13 +42,10 @@
           >
             <label
               >{{ T.courseAssignmentNewFormType }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseAssignmentNewFormTypeDesc"
-              ></span>
+                icon="info-circle"
+              />
               <select class="form-control" v-model="assignmentType" required>
                 <option value="homework">
                   {{ T.wordsHomework }}
@@ -73,13 +66,9 @@
           >
             <label
               >{{ T.courseNewFormStartDate }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseAssignmentNewFormStartDateDesc"
-              ></span>
+                icon="info-circle" />
               <omegaup-datetimepicker
                 v-bind:enabled="!assignment.has_runs"
                 v-model="startTime"
@@ -91,14 +80,11 @@
           <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormUnlimitedDuration }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormUnlimitedDurationDesc"
-              ></span
-            ></span>
+                icon="info-circle"
+              />
+            </span>
             <div
               class="form-control container-fluid"
               v-bind:class="{
@@ -131,13 +117,9 @@
           >
             <label
               >{{ T.courseNewFormEndDate }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseAssignmentNewFormEndDateDesc"
-              ></span>
+                icon="info-circle" />
               <omegaup-datetimepicker
                 v-bind:enabled="!unlimitedDuration"
                 v-bind:readonly="false"
@@ -167,8 +149,8 @@
             </label>
           </div>
         </div>
-        <div class="form-group pull-right">
-          <button class="btn btn-primary submit" type="submit">
+        <div class="form-group text-right">
+          <button class="btn btn-primary submit mr-2" type="submit">
             <template v-if="update">
               {{ T.courseAssignmentNewFormUpdate }}
             </template>
@@ -201,15 +183,29 @@ import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
 
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class CourseAssignmentDetails extends Vue {
-  @Prop() update!: boolean;
+  @Prop({
+    default: omegaup.VisibilityMode.Default,
+  })
+  visibilityMode!: omegaup.VisibilityMode;
   @Prop() assignment!: omegaup.Assignment;
-  @Prop({ default: false }) show!: boolean;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
@@ -223,6 +219,12 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
+  update =
+    this.visibilityMode === omegaup.VisibilityMode.Default ||
+    this.visibilityMode === omegaup.VisibilityMode.Edit;
+  show =
+    this.visibilityMode === omegaup.VisibilityMode.New ||
+    this.visibilityMode === omegaup.VisibilityMode.Edit;
 
   @Watch('assignment')
   onAssignmentChange() {
@@ -239,13 +241,13 @@ export default class CourseAssignmentDetails extends Vue {
     this.unlimitedDuration = !this.assignment.finish_time;
   }
 
-  @Emit('cancel')
+  @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
   }
 
   onSubmit(): void {
-    this.$emit('submit', this);
+    this.$emit('emit-submit', this);
   }
 }
 </script>
