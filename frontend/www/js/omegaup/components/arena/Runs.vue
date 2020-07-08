@@ -111,7 +111,7 @@
                 >{{ T.wordsUser }}:
                 <omegaup-autocomplete
                   v-bind:init="initUserAutocomplete"
-                  v-bind:value.sync="filterUsername"
+                  v-model="filterUsername"
                 ></omegaup-autocomplete>
               </label>
               <button
@@ -123,6 +123,22 @@
                 &times;
               </button>
             </template>
+
+            <div class="row">
+              <div class="col-sm col-12" v-if="filters.length > 0">
+                <span class="btn btn-secondary mr-3" v-for="filter in filters">
+                  <span class="mr-2"
+                    >{{ filter.name }}: {{ filter.value }}</span
+                  >
+                  <a v-on:click="onRemoveFilter(filter.name)">
+                    <font-awesome-icon v-bind:icon="['fas', 'times']" />
+                  </a>
+                </span>
+                <a v-on:click="onRemoveFilter('all')" href="#">
+                  <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
+                </a>
+              </div>
+            </div>
           </div>
         </caption>
         <thead>
@@ -179,21 +195,34 @@
                 v-bind:classname="run.classname"
                 v-bind:username="run.username"
                 v-bind:country="run.country_id"
-                v-bind:linkify="true"
+                v-bind:linkify="false"
+                v-on:emit-click="(username) => (filterUsername = username)"
               ></omegaup-user-username>
+              <a v-bind:href="`/profile/${run.username}/`" class="ml-2">
+                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              </a>
             </td>
             <td v-if="showContest">
               <a
-                v-bind:href="
-                  run.contest_alias ? `/arena/${run.contest_alias}/` : ''
-                "
+                href="#"
+                v-on:click="onEmitFilterChanged(run.contest_alias, 'contest')"
                 >{{ run.contest_alias }}</a
               >
+              <a
+                v-bind:href="`/arena/${run.contest_alias}/`"
+                v-if="run.contest_alias"
+                class="ml-2"
+              >
+                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              </a>
             </td>
             <td v-if="showProblem">
-              <a v-bind:href="`/arena/problem/${run.alias}/`">{{
+              <a href="#" v-on:click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
+              <a v-bind:href="`/arena/problem/${run.alias}/`" class="ml-2">
+                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              </a>
             </td>
             <td
               v-bind:style="{ backgroundColor: statusColor(run) }"
@@ -280,11 +309,15 @@ import {
   faRedoAlt,
   faBan,
   faSearchPlus,
+  faExternalLinkAlt,
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faQuestionCircle);
 library.add(faRedoAlt);
 library.add(faBan);
 library.add(faSearchPlus);
+library.add(faExternalLinkAlt);
+library.add(faTimes);
 
 declare global {
   interface JQuery {
@@ -299,7 +332,7 @@ declare global {
     'omegaup-user-username': user_Username,
   },
 })
-export default class Runs extends Vue {
+export default class ArenaRuns extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -328,6 +361,8 @@ export default class Runs extends Vue {
   filterStatus: string = '';
   filterUsername: string = '';
   filterVerdict: string = '';
+  filterContest: string = '';
+  filters: { name: string; value: string }[] = [];
 
   get filteredRuns(): types.Run[] {
     if (
@@ -335,6 +370,7 @@ export default class Runs extends Vue {
       !this.filterProblem &&
       !this.filterStatus &&
       !this.filterUsername &&
+      !this.filterContest &&
       !this.filterVerdict
     ) {
       return this.runs;
@@ -359,6 +395,9 @@ export default class Runs extends Vue {
         return false;
       }
       if (this.filterUsername && run.username !== this.filterUsername) {
+        return false;
+      }
+      if (this.filterContest && run.contest_alias !== this.filterContest) {
         return false;
       }
       return true;
@@ -522,7 +561,7 @@ export default class Runs extends Vue {
 
   @Watch('filterLanguage')
   onFilterLanguageChanged(newValue: string, oldValue: string) {
-    this.$emit('filter-changed');
+    this.onEmitFilterChanged(newValue, 'language');
   }
 
   @Watch('filterOffset')
@@ -531,23 +570,77 @@ export default class Runs extends Vue {
   }
 
   @Watch('filterProblem')
-  onFilterProblemChanged(newValue: number, oldValue: number) {
-    this.$emit('filter-changed');
+  onFilterProblemChanged(newValue: string, oldValue: number) {
+    this.onEmitFilterChanged(newValue, 'problem');
   }
 
   @Watch('filterStatus')
-  onFilterStatusChanged(newValue: number, oldValue: number) {
-    this.$emit('filter-changed');
+  onFilterStatusChanged(newValue: string, oldValue: number) {
+    this.onEmitFilterChanged(newValue, 'status');
   }
 
   @Watch('filterUsername')
-  onFilterUsernameChanged(newValue: number, oldValue: number) {
-    this.$emit('filter-changed');
+  onFilterUsernameChanged(newValue: string, oldValue: number) {
+    this.onEmitFilterChanged(newValue, 'username');
   }
 
   @Watch('filterVerdict')
-  onFilterVerdictChanged(newValue: number, oldValue: number) {
+  onFilterVerdictChanged(newValue: string, oldValue: number) {
+    this.onEmitFilterChanged(newValue, 'verdict');
+  }
+
+  onEmitFilterChanged(value: string, filter: string): void {
+    this.filterOffset = 0;
+    if (!value) {
+      this.filters = this.filters.filter((item) => item.name !== filter);
+    } else {
+      if (filter === 'contest') {
+        // This field does not appear as filter
+        this.filterContest = value;
+      }
+      const index = this.filters.findIndex((item) => item.name === filter);
+      if (index === -1) {
+        this.filters.push({ name: filter, value: value });
+        return;
+      }
+      this.filters[index] = { name: filter, value: value };
+    }
     this.$emit('filter-changed');
+  }
+
+  onRemoveFilter(filter: string): void {
+    if (filter === 'all') {
+      this.filterLanguage = '';
+      this.filterProblem = '';
+      this.filterStatus = '';
+      this.filterUsername = '';
+      this.filterVerdict = '';
+      this.filterContest = '';
+      this.filterOffset = 0;
+
+      this.filters = [];
+      return;
+    }
+    switch (filter) {
+      case 'language':
+        this.filterLanguage = '';
+        break;
+      case 'problem':
+        this.filterProblem = '';
+        break;
+      case 'status':
+        this.filterStatus = '';
+        break;
+      case 'username':
+        this.filterUsername = '';
+        break;
+      case 'verdict':
+        this.filterVerdict = '';
+        break;
+      case 'contest':
+        this.filterContest = '';
+    }
+    this.filters = this.filters.filter((item) => item.name !== filter);
   }
 }
 </script>

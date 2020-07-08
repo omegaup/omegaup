@@ -11,6 +11,19 @@
       >{{ name || username }}</a
     ></span
   >
+  <span v-else-if="!!$listeners['emit-click']">
+    <omegaup-countryflag
+      v-bind:country="country"
+      v-if="country != null"
+    ></omegaup-countryflag
+    ><a
+      href="#"
+      v-bind:class="classname"
+      v-bind:title="username"
+      v-on:click="$emit('emit-click', username)"
+      >{{ name || username }}</a
+    ></span
+  >
   <span v-bind:class="classname" v-bind:title="username" v-else="">
     <omegaup-countryflag
       v-bind:country="country"
