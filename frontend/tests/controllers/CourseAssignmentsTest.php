@@ -9,27 +9,33 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Login admin and getting assignments list
         $adminLogin = self::login($courseData['admin']);
-        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
-        ]));
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias']
+            ])
+        );
 
         $aliases = [];
         foreach ($assignments['assignments'] as $assignment) {
             $aliases[] = $assignment['alias'];
         }
 
-        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias'],
-            'assignments' => json_encode($aliases),
-        ]));
+        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignments' => json_encode($aliases),
+            ])
+        );
 
         // Getting one more time assignments list with original order
-        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
-        ]));
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias']
+            ])
+        );
 
         // ordering assignments
         $assignments['assignments'][0]['order'] = 1;
@@ -60,15 +66,19 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
             $assignments['assignments'][0]['alias'],
         ];
 
-        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias'],
-            'assignments' => json_encode($aliases),
-        ]));
-        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
-        ]));
+        \OmegaUp\Controllers\Course::apiUpdateAssignmentsOrder(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignments' => json_encode($aliases),
+            ])
+        );
+        $assignments = \OmegaUp\Controllers\Course::apiListAssignments(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias']
+            ])
+        );
 
         // Asserting that the new ordering is not equal that original
         foreach ($assignments['assignments'] as $index => $assignment) {
@@ -77,5 +87,88 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                 $originalOrder[$index]['alias']
             );
         }
+    }
+
+    public function testAllAdminsCanSeeAdminMode() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // Login admin and getting assignments list
+        $adminLogin = self::login($courseData['admin']);
+        [
+            'assignments' => $assignments,
+        ] = \OmegaUp\Controllers\Course::apiListAssignments(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias']
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $assignments[0]['alias'],
+            ])
+        );
+
+        $this->assertArrayHasKey('smartyProperties', $details);
+        $this->assertArrayHasKey('payload', $details['smartyProperties']);
+        $this->assertArrayHasKey(
+            'details',
+            $details['smartyProperties']['payload']
+        );
+
+        // A new student is added to course
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identity
+        );
+
+        $userLogin = self::login($identity);
+
+        // Student tries to access into the course in admin mode
+        try {
+            \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+                new \OmegaUp\Request([
+                    'auth_token' => $userLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $assignments[0]['alias'],
+                ])
+            );
+            $this->fails('User should not have access to admin mode');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        $adminLogin = self::login($courseData['admin']);
+
+        // Making admin to the user previously created
+        \OmegaUp\Controllers\Course::apiAddAdmin(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'usernameOrEmail' => $identity->username,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $addedAdminLogin = self::login($identity);
+
+        // Now, user is able to access into a course in admin mode
+        $details = \OmegaUp\Controllers\Course::getCourseAdminDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $addedAdminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'assignment_alias' => $assignments[0]['alias'],
+            ])
+        );
+
+        $this->assertArrayHasKey('smartyProperties', $details);
+        $this->assertArrayHasKey('payload', $details['smartyProperties']);
+        $this->assertArrayHasKey(
+            'details',
+            $details['smartyProperties']['payload']
+        );
     }
 }
