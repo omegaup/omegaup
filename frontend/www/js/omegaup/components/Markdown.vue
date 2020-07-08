@@ -1,19 +1,5 @@
 <template>
-  <vue-mathjax
-    data-markdown-statement
-    v-bind:formula="html"
-    v-bind:safe="false"
-    v-bind:options="{
-      tex2jax: {
-        inlineMath: [
-          ['$', '$'],
-          ['\\(', '\\)'],
-        ],
-        processEscapes: true,
-      },
-      skipStartupTypeset: true,
-    }"
-  ></vue-mathjax>
+  <div data-markdown-statement ref="root" v-bind:html="html"></div>
 </template>
 
 <style lang="scss">
@@ -139,19 +125,31 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../markdown';
 import { types } from '../api_types';
 
-import { VueMathjax } from 'vue-mathjax';
+declare global {
+  interface Window {
+    MathJax?: {
+      tex: any;
+      startup: {
+        typeset: boolean;
+        elements?: HTMLElement[];
+        ready: () => void;
+        defaultReady?: () => void;
+      };
+      typeset?: (elements?: HTMLElement[]) => void;
+      options: any;
+      loader: any;
+    };
+  }
+}
 
-@Component({
-  components: {
-    'vue-mathjax': VueMathjax,
-  },
-})
+@Component
 export default class Markdown extends Vue {
   @Prop() markdown!: string;
+  @Ref() root!: HTMLElement;
   @Prop({ default: null }) imageMapping!: markdown.ImageMapping | null;
   @Prop({ default: null }) problemSettings!: types.ProblemSettings | null;
   @Prop({ default: false }) preview!: boolean;
@@ -167,6 +165,82 @@ export default class Markdown extends Vue {
       );
     }
     return this.markdownConverter.makeHtml(this.markdown);
+  }
+
+  mounted(): void {
+    this.renderMathJax();
+  }
+
+  @Watch('markdown')
+  onMarkdownChanged(val: string, oldVal: string) {
+    this.renderMathJax();
+  }
+
+  private renderMathJax(): void {
+    this.root.innerHTML = this.html;
+    if (!window.MathJax?.startup) {
+      window.MathJax = {
+        tex: {
+          inlineMath: [
+            ['$', '$'],
+            ['\\(', '\\)'],
+          ],
+          processEscapes: true,
+          autoload: { color: [], colorV2: ['color'] },
+          packages: { '[+]': ['noerrors'] },
+        },
+        startup: {
+          typeset: true,
+          elements: [],
+          ready: () => {
+            if (!window.MathJax?.startup) {
+              return;
+            }
+            if (window.MathJax.startup.defaultReady) {
+              window.MathJax.startup.defaultReady();
+            }
+            if (
+              window.MathJax.startup.elements &&
+              window.MathJax.startup.elements.length > 0 &&
+              window.MathJax.typeset
+            ) {
+              window.MathJax.typeset(window.MathJax.startup.elements.splice(0));
+            }
+          },
+        },
+        options: {
+          ignoreHtmlClass: 'tex2jax_ignore',
+          processHtmlClass: 'tex2jax_process',
+        },
+        loader: { load: ['[tex]/noerrors'] },
+      };
+      // Now that the global MathJax config is set, we can lazily load the
+      // library. The element to be rendered will be queued up in
+      // MathJax.startup.elements.
+      let scriptElement: HTMLScriptElement | null = <HTMLScriptElement | null>(
+        document.getElementById('MathJax-script')
+      );
+      if (!scriptElement) {
+        scriptElement = document.createElement('script');
+        scriptElement.src = '/third_party/js/mathjax/es5/tex-svg.js';
+        scriptElement.id = 'MathJax-script';
+        document.head.appendChild(scriptElement);
+      }
+    }
+
+    if (!window.MathJax.typeset) {
+      // In case the library hasn't quite finished loading completely, add the
+      // current element to the queue of elements that need to be rendered.
+      if (!window.MathJax.startup.elements) {
+        window.MathJax.startup.elements = [];
+      }
+      if (window.MathJax.startup.elements.indexOf(this.root) === -1) {
+        window.MathJax.startup.elements.push(this.root);
+      }
+      return;
+    }
+
+    window.MathJax.typeset([this.root]);
   }
 }
 </script>

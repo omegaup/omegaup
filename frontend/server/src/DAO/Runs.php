@@ -189,8 +189,13 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $val[] = $status;
         }
         if (!is_null($verdict)) {
-            $where[] = 'r.verdict = ?';
-            $val[] = $verdict;
+            if ($verdict === 'NO-AC') {
+                $where[] = 'r.verdict <> ?';
+                $val[] = 'AC';
+            } else {
+                $where[] = 'r.verdict = ?';
+                $val[] = $verdict;
+            }
         }
         if (!is_null($problem_id)) {
             $where[] = 's.problem_id = ?';
