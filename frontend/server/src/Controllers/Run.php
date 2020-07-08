@@ -941,7 +941,142 @@ class Run extends \OmegaUp\Controllers\Controller {
         $response['show_diff'] = 'examples';
         $response['cases'] = [];
 
+        $cases = self::getProblemCasesMetadata(
+            'cases',
+            $problem->alias,
+            $run->commit
+        );
+        /** @var int */
+        $responseSize = array_reduce(
+            $cases,
+            /**
+             * @param array{mode: int, type: string, id: string, size: int, path: string} $case
+             */
+            function (int $sum, $case): int {
+                return $sum + $case['size'];
+            },
+            0
+        );
+
+        if (
+            $problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_NONE
+            || $responseSize > 4096 // Forcing to hide diffs when inputs/outputs exceed 4kb
+        ) {
+            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_NONE;
+            return $response;
+        }
+        if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_ALL) {
+            $response['cases'] = self::getProblemCasesContents(
+                'cases',
+                $problem->alias,
+                $run->commit
+            );
+            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_ALL;
+            return $response;
+        }
+        $response['cases'] = self::getProblemCasesContents(
+            'examples',
+            $problem->alias,
+            $run->commit
+        );
+        $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_EXAMPLES;
+
         return $response;
+    }
+
+    /**
+     * @return ProblemCasesContents
+     */
+    private static function getProblemCasesContents(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_CASES_CONTENTS,
+            "{$problemAlias}-{$revision}-{$directory}",
+            /** @return ProblemCasesContents */
+            function () use (
+                $directory,
+                $problemAlias,
+                $revision
+            ) {
+                return self::getProblemCasesContentsImpl(
+                    $directory,
+                    $problemAlias,
+                    $revision
+                );
+            },
+            24 * 60 * 60 // expire in 1 day
+        );
+    }
+
+    /**
+     * @return ProblemCasesContents
+     */
+    private static function getProblemCasesContentsImpl(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problemAlias,
+            $revision
+        );
+
+        $existingCases = self::getProblemCasesMetadata(
+            $directory,
+            $problemAlias,
+            $revision
+        );
+        $response = [];
+        foreach ($existingCases as $file) {
+            [$_, $filename] = explode("{$directory}/", $file['path']);
+            $extension = pathinfo($filename, PATHINFO_EXTENSION);
+            \OmegaUp\Validators::validateInEnum(
+                $extension,
+                'extension',
+                ['in', 'out']
+            );
+            $caseName = basename($filename, ".{$extension}");
+            if (!isset($response[$caseName])) {
+                $response[$caseName] = [
+                    'in' => '',
+                    'out' => '',
+                ];
+            }
+            $caseContents = $problemArtifacts->get($file['path']);
+            if ($extension === 'in') {
+                $response[$caseName]['in'] = $caseContents;
+            } else {
+                $response[$caseName]['out'] = $caseContents;
+            }
+        }
+        return $response;
+    }
+
+    /**
+     * @return list<array{mode: int, type: string, id: string, size: int, path: string}>
+     */
+    private static function getProblemCasesMetadata(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES_FILES,
+            "{$problemAlias}-{$revision}-{$directory}",
+            /** @return list<array{id: string, mode: int, path: string, size: int, type: string}> */
+            function () use ($problemAlias, $revision, $directory) {
+                $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                    $problemAlias,
+                    $revision
+                );
+
+                return $problemArtifacts->lsTreeRecursive($directory);
+            },
+            24 * 60 * 60 // expire in 1 day
+        );
     }
 
     /**
