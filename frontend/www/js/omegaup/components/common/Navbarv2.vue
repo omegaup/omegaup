@@ -89,13 +89,13 @@
                 {{ T.navCourses }}
               </a>
               <div class="dropdown-menu">
-                <a class="dropdown-item" href="/course" data-nav-courses-all>
+                <a class="dropdown-item" href="/course/" data-nav-courses-all>
                   {{ T.navAllCourses }}
                 </a>
                 <template v-if="isMainUserIdentity">
                   <a
                     class="dropdown-item"
-                    href="/course/new"
+                    href="/course/new/"
                     data-nav-courses-create
                   >
                     {{ T.buttonCreateCourse }}
