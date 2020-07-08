@@ -20,7 +20,6 @@
     <script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
     {js_include entrypoint="omegaup" runtime}
-    <script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
 
     {if isset($inArena) && $inArena}
       {js_include entrypoint="arena"}
