@@ -2450,7 +2450,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['accepted'] = $problem->accepted;
         $response['difficulty'] = $problem->difficulty;
         $response['creation_date'] = $problem->creation_date;
-        $response['source'] = $problem->source ?? '';
+        $response['source'] = strval($problem->source);
         $response['order'] = $problem->order;
         $response['visibility'] = $problem->visibility;
         $response['email_clarifications'] = $problem->email_clarifications;

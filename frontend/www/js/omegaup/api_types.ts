@@ -1876,7 +1876,7 @@ export namespace types {
   export interface RunDetails {
     admin: boolean;
     alias: string;
-    cases?: types.ProblemCasesContents;
+    cases: types.ProblemCasesContents;
     compile_error?: string;
     details?: {
       compile_meta?: { [key: string]: types.RunMetadata };
@@ -1904,7 +1904,7 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
-    feedback: string;
+    feedback?: string;
     guid: string;
     judged_by?: string;
     language: string;

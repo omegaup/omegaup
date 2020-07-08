@@ -6,8 +6,8 @@
  * RunController
  *
  * @psalm-type ProblemCasesContents=array<string, array{in: string, out: string, output?: string}>
- * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
- * @psalm-type RunDetails=array{admin: bool, alias: string, cases?: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?:string}
+ * @psalm-type RunMetadata=array{memory: int, sys_time: int, time: float, verdict: string, wall_time: float}
+ * @psalm-type RunDetails=array{admin: bool, alias: string, cases: ProblemCasesContents, compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float, verdict?: string}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, feedback?: string, guid: string, judged_by?: string, language: string, logs?: string, show_diff: string, source?: string, source_link?: bool, source_name?: string, source_url?: string}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  */
 class Run extends \OmegaUp\Controllers\Controller {
@@ -981,71 +981,6 @@ class Run extends \OmegaUp\Controllers\Controller {
         );
         $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_EXAMPLES;
 
-        if ($problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS) {
-            $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
-            return $response;
-        }
-        $problemArtifacts = new \OmegaUp\ProblemArtifacts($problem->alias);
-        if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_ALL_DIFFS) {
-            $dataCases = self::getProblemCases($problemArtifacts, 'cases');
-            if (is_null($dataCases)) {
-                // Forcing to hide diffs when inputs or outpus exceeds 4kb
-                $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
-                return $response;
-            }
-            $response['cases'] = $dataCases;
-            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ALL_DIFFS;
-            return $response;
-        }
-        $dataCases = self::getProblemCases($problemArtifacts, 'examples');
-        if (is_null($dataCases)) {
-            // Forcing to hide diffs when inputs or outpus exceeds 4kb
-            $response['show_diff'] = \OmegaUp\ProblemParams::NO_SHOW_DIFFS;
-            return $response;
-        }
-        $response['cases'] = $dataCases;
-        $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_ONLY_EXAMPLE_DIFF;
-
-        return $response;
-    }
-
-    /**
-     * @return ProblemCases|null
-     */
-    private static function getProblemCases(
-        \OmegaUp\ProblemArtifacts $problemArtifacts,
-        string $casesType
-    ): ?array {
-        $existingCases = $problemArtifacts->lsTreeRecursive($casesType);
-        $response = [];
-        $sizeFiles = [];
-        foreach ($existingCases as $file) {
-            /** @var array{contents: string, id: string, size: int} $problemContent */
-            $problemContent = json_decode(
-                $problemArtifacts->get(
-                    $file['path'],
-                    /*$quiet=*/false,
-                    /*$includeHeaders=*/false
-                ),
-                /*$assoc=*/true
-            );
-            [$_, $filename] = explode("{$casesType}/", $file['path']);
-            $extension = pathinfo($filename, PATHINFO_EXTENSION);
-            $basename = basename($filename, ".{$extension}");
-            if (!isset($response[$basename])) {
-                $response[$basename] = [];
-            }
-            /* @var string $contents */
-            $contents = base64_decode($problemContent['contents']);
-            $response[$basename][$extension] = $contents;
-            if (!isset($sizeFiles[$extension])) {
-                $sizeFiles[$extension] = 0;
-            }
-            $sizeFiles[$extension] += $problemContent['size'];
-        }
-        if ($sizeFiles['in'] > 4000 || $sizeFiles['out'] > 4000) {
-            return null;
-        }
         return $response;
     }
 
@@ -1317,12 +1252,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
-        }
-        if (
-            $showDiff
-            && $problem->show_diff === \OmegaUp\ProblemParams::NO_SHOW_DIFFS
-        ) {
-            return;
         }
 
         if ($passthru) {
