@@ -4,6 +4,7 @@ import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
+import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
 import course_Edit from '../components/course/Edit.vue';
 import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
@@ -80,35 +81,24 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'submit-new-assignment': (
-            ev: Vue & {
-              alias: string;
-              assignmentType: string;
-              description: string;
-              name: string;
-              startTime: Date;
-              finishTime: Date;
-              unlimitedDuration: boolean;
-              update: boolean;
-            },
-          ) => {
+          'submit-new-assignment': (source: course_AssignmentDetails) => {
             const params = {
-              name: ev.name,
-              description: ev.description,
-              start_time: ev.startTime.getTime() / 1000,
-              assignment_type: ev.assignmentType,
+              name: source.name,
+              description: source.description,
+              start_time: source.startTime.getTime() / 1000,
+              assignment_type: source.assignmentType,
             };
-            if (ev.update) {
+            if (source.update) {
               Object.assign(params, {
-                assignment: ev.alias,
+                assignment: source.alias,
                 course: courseAlias,
               });
 
-              if (ev.unlimitedDuration) {
+              if (source.unlimitedDuration) {
                 Object.assign(params, { unlimited_duration: true });
               } else {
                 Object.assign(params, {
-                  finish_time: ev.finishTime.getTime() / 1000,
+                  finish_time: source.finishTime.getTime() / 1000,
                 });
               }
 
@@ -124,15 +114,15 @@ OmegaUp.on('ready', () => {
                 });
             } else {
               Object.assign(params, {
-                alias: ev.alias,
+                alias: source.alias,
                 course_alias: courseAlias,
               });
 
-              if (ev.unlimitedDuration) {
+              if (source.unlimitedDuration) {
                 Object.assign(params, { unlimited_duration: true });
               } else {
                 Object.assign(params, {
-                  finish_time: ev.finishTime.getTime() / 1000,
+                  finish_time: source.finishTime.getTime() / 1000,
                 });
               }
 
