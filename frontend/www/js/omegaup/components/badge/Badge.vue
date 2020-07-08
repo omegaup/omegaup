@@ -1,9 +1,10 @@
 <template>
-  <figure class="badge-container" v-tooltip="description">
+  <figure class="col-md-3 col-sm-3 badge-container" v-tooltip="description">
     <a class="badge-icon" v-bind:href="`/badge/${this.badge.badge_alias}/`"
       ><img
         v-bind:class="{ 'badge-gray': !this.badge.unlocked }"
         v-bind:src="this.iconUrl"
+        class="img-responsive"
     /></a>
 
     <figcaption class="badge-name">
@@ -14,12 +15,14 @@
 
 <style>
 .badge-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-align: center;
 }
+
+figure {
+  max-height: 10rem !important;
+}
+
 .badge-icon {
   display: block;
   height: 70%;
@@ -29,7 +32,7 @@
   max-height: 100%;
 }
 .badge-name {
-  padding-top: 5px;
+  padding-top: 0.5rem;
 }
 .badge-gray {
   filter: grayscale(100%);

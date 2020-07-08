@@ -32,6 +32,12 @@ class UserCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Verify users are not in mailing list by default
         $this->assertEquals(0, $user->in_mailing_list);
+
+        // Check user profile progress. It should be less than 50%
+        $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
+            $user
+        );
+        $this->assertLessThan(50, $profileProgress);
     }
 
     /**

@@ -71,12 +71,12 @@ class MySQLConnection {
     }
 
     private function connect(): void {
-        $this->_connection = mysqli_init();
+        $this->_connection = \mysqli_init();
         $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
         $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
         if (
-            !$this->_connection->real_connect(
+            !@$this->_connection->real_connect(
                 'p:' . OMEGAUP_DB_HOST,
                 OMEGAUP_DB_USER,
                 OMEGAUP_DB_PASS,
@@ -84,9 +84,9 @@ class MySQLConnection {
             )
         ) {
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
-                'Failed to connect to MySQL (' . mysqli_connect_errno() . '): '
-                . mysqli_connect_error(),
-                mysqli_connect_errno()
+                'Failed to connect to MySQL (' . \mysqli_connect_errno() . '): '
+                . \mysqli_connect_error(),
+                \mysqli_connect_errno()
             );
         }
         $this->_connection->autocommit(false);
@@ -157,6 +157,8 @@ class MySQLConnection {
         for ($i = 0; $i < count($params); ++$i) {
             if (is_null($params[$i])) {
                 $chunks[] = 'NULL';
+            } elseif ($params[$i] instanceof \OmegaUp\Timestamp) {
+                $chunks[] = "FROM_UNIXTIME({$params[$i]->time})";
             } elseif (is_int($params[$i]) || is_float($params[$i])) {
                 $chunks[] = $params[$i];
             } elseif (is_bool($params[$i])) {

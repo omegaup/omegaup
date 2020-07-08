@@ -2,15 +2,16 @@ import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
-import * as UI from '../ui';
+import * as api from '../api';
+import * as ui from '../ui';
+import { Problem, ContestResult } from '../linkable_resource';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  const profile = payload.profile;
+  const profile = payload.payload;
   let viewProfile = new Vue({
     el: '#user-profile',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
           profile: this.profile,
@@ -30,7 +31,7 @@ OmegaUp.on('ready', function() {
             e.periodStatisticOptions.xAxis.categories = categories;
             e.periodStatisticOptions.series = data;
           },
-          'update-aggregate-statistics': e =>
+          'update-aggregate-statistics': (e) =>
             (e.aggregateStatisticOptions.series[0].data =
               e.normalizedRunCounts),
         },
@@ -47,7 +48,7 @@ OmegaUp.on('ready', function() {
       charts: null,
       periodStatisticOptions: {
         title: {
-          text: UI.formatString(T.profileStatisticsVerdictsOf, {
+          text: ui.formatString(T.profileStatisticsVerdictsOf, {
             user: profile.username,
           }),
         },
@@ -101,7 +102,7 @@ OmegaUp.on('ready', function() {
       },
       aggregateStatisticOptions: {
         title: {
-          text: UI.formatString(T.profileStatisticsVerdictsOf, {
+          text: ui.formatString(T.profileStatisticsVerdictsOf, {
             user: profile.username,
           }),
         },
@@ -118,7 +119,7 @@ OmegaUp.on('ready', function() {
           title: { text: '' },
         },
         title: {
-          text: UI.formatString(T.profileStatisticsVerdictsOf, {
+          text: ui.formatString(T.profileStatisticsVerdictsOf, {
             user: profile.username,
           }),
         },
@@ -145,7 +146,7 @@ OmegaUp.on('ready', function() {
       },
     },
     computed: {
-      rank: function() {
+      rank: function () {
         switch (profile.classname) {
           case 'user-rank-unranked':
             return T.profileRankUnrated;
@@ -167,51 +168,65 @@ OmegaUp.on('ready', function() {
     },
   });
 
-  API.User.contestStats({ username: profile.username })
-    .then(function(data) {
-      viewProfile.contests = data;
+  api.User.contestStats({ username: profile.username })
+    .then((result) => {
+      viewProfile.contests = Object.values(result.contests)
+        .map((contest) => {
+          const now = new Date();
+          if (contest.place === null || now <= contest.data.finish_time) {
+            return null;
+          }
+          return new ContestResult(contest);
+        })
+        .filter((contest) => !!contest);
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 
-  API.User.problemsSolved({ username: profile.username })
-    .then(function(data) {
-      viewProfile.solvedProblems = data['problems'];
-    })
-    .catch(UI.apiError);
-
-  API.User.listUnsolvedProblems({ username: profile.username })
-    .then(function(data) {
-      viewProfile.unsolvedProblems = data['problems'];
-    })
-    .catch(UI.apiError);
-
-  API.User.problemsCreated({ username: profile.username })
-    .then(function(data) {
-      viewProfile.createdProblems = data['problems'];
-    })
-    .catch(UI.apiError);
-
-  if (payload.logged_in) {
-    API.Badge.myList({})
-      .then(function(data) {
-        viewProfile.visitorBadges = new Set(
-          data['badges'].map(badge => badge.badge_alias),
-        );
-      })
-      .catch(UI.apiError);
-  }
-
-  API.Badge.userList({ target_username: profile.username })
-    .then(function(data) {
-      viewProfile.profileBadges = new Set(
-        data['badges'].map(badge => badge.badge_alias),
+  api.User.problemsSolved({ username: profile.username })
+    .then((result) => {
+      viewProfile.solvedProblems = result.problems.map(
+        (problem) => new Problem(problem),
       );
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 
-  API.User.stats({ username: profile.username })
-    .then(function(data) {
-      viewProfile.charts = data;
+  api.User.listUnsolvedProblems({ username: profile.username })
+    .then((result) => {
+      viewProfile.unsolvedProblems = result.problems.map(
+        (problem) => new Problem(problem),
+      );
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
+
+  api.User.problemsCreated({ username: profile.username })
+    .then((result) => {
+      viewProfile.createdProblems = result.problems.map(
+        (problem) => new Problem(problem),
+      );
+    })
+    .catch(ui.apiError);
+
+  if (payload.logged_in) {
+    api.Badge.myList({})
+      .then((result) => {
+        viewProfile.visitorBadges = new Set(
+          result.badges.map((badge) => badge.badge_alias),
+        );
+      })
+      .catch(ui.apiError);
+  }
+
+  api.Badge.userList({ target_username: profile.username })
+    .then((result) => {
+      viewProfile.profileBadges = new Set(
+        result.badges.map((badge) => badge.badge_alias),
+      );
+    })
+    .catch(ui.apiError);
+
+  api.User.stats({ username: profile.username })
+    .then((result) => {
+      viewProfile.charts = result;
+    })
+    .catch(ui.apiError);
 });

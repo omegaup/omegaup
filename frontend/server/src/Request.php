@@ -94,9 +94,8 @@ class Request extends \ArrayObject {
      * Ensures that the value associated with the key is a bool.
      */
     public function ensureBool(
-        string $key,
-        bool $required = true
-    ): void {
+        string $key
+    ): bool {
         /** @var mixed */
         $val = $this->offsetGet($key);
         if (is_int($val)) {
@@ -104,17 +103,37 @@ class Request extends \ArrayObject {
         } elseif (is_bool($val)) {
             $this[$key] = $val;
         } else {
-            if (empty($val)) {
-                if (!$required) {
-                    return;
-                }
+            if ($val === '0' || $val === 'false') {
+                $this[$key] = false;
+            } elseif (empty($val)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterEmpty',
                     $key
                 );
+            } else {
+                $this[$key] = $val == '1' || $val == 'true';
             }
-            $this[$key] = $val == '1' || $val == 'true';
         }
+        return boolval($this[$key]);
+    }
+
+    /**
+     * Ensures that the value associated with the key is a bool or null.
+     */
+    public function ensureOptionalBool(
+        string $key,
+        bool $required = false
+    ): ?bool {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return null;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        return self::ensureBool($key);
     }
 
     /**
@@ -123,13 +142,9 @@ class Request extends \ArrayObject {
     public function ensureInt(
         string $key,
         ?int $lowerBound = null,
-        ?int $upperBound = null,
-        bool $required = true
-    ): void {
+        ?int $upperBound = null
+    ): int {
         if (!self::offsetExists($key)) {
-            if (!$required) {
-                return;
-            }
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
@@ -144,6 +159,7 @@ class Request extends \ArrayObject {
             $upperBound
         );
         $this[$key] = intval($val);
+        return intval($val);
     }
 
     /**
@@ -154,27 +170,17 @@ class Request extends \ArrayObject {
         ?int $lowerBound = null,
         ?int $upperBound = null,
         bool $required = false
-    ): void {
+    ): ?int {
         if (!self::offsetExists($key)) {
             if (!$required) {
-                return;
+                return null;
             }
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
             );
         }
-        /** @var mixed */
-        $val = $this->offsetGet($key);
-        if (!is_null($val)) {
-            \OmegaUp\Validators::validateNumberInRange(
-                $val,
-                $key,
-                $lowerBound,
-                $upperBound
-            );
-            $this[$key] = intval($val);
-        }
+        return self::ensureInt($key, $lowerBound, $upperBound);
     }
 
     /**
@@ -184,7 +190,7 @@ class Request extends \ArrayObject {
         string $key,
         ?int $lowerBound = null,
         ?int $upperBound = null
-    ): void {
+    ): \OmegaUp\Timestamp {
         if (!self::offsetExists($key)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
@@ -199,33 +205,31 @@ class Request extends \ArrayObject {
             $lowerBound,
             $upperBound
         );
-        $this[$key] = intval($val);
+        if ($val instanceof \OmegaUp\Timestamp) {
+            $timestampVal = $val;
+        } else {
+            $timestampVal = new \OmegaUp\Timestamp(intval($val));
+        }
+        $this[$key] = $timestampVal;
+        return $timestampVal;
     }
 
     public function ensureOptionalTimestamp(
         string $key,
         ?int $lowerBound = null,
         ?int $upperBound = null,
-        bool $required
-    ): void {
+        bool $required = false
+    ): ?\OmegaUp\Timestamp {
         if (!self::offsetExists($key)) {
             if (!$required) {
-                return;
+                return null;
             }
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
             );
         }
-        /** @var mixed */
-        $val = $this->offsetGet($key);
-        \OmegaUp\Validators::validateTimestampInRange(
-            $val,
-            $key,
-            $lowerBound,
-            $upperBound
-        );
-        $this[$key] = intval($val);
+        return $this->ensureTimestamp($key, $lowerBound, $upperBound);
     }
 
     /**

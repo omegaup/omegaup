@@ -1,14 +1,19 @@
 <template>
-  <div class="panel-body tab-container">
+  <div class="card-body tab-container">
     <ul class="nav nav-tabs">
       <li
         class="nav-item"
-        v-bind:class="{ active: activeTab === filteredCourses.timeType }"
-        v-if="filteredCourses.courses.length > 0"
+        v-if="filteredCourses.courses"
         v-on:click="showTab = filteredCourses.timeType"
-        v-for="filteredCourses in courses.filteredCourses"
+        v-for="(filteredCourses, timeType) in courses.filteredCourses"
       >
-        <a data-toggle="tab">{{ filteredCourses.tabName }}</a>
+        <a
+          data-toggle="tab"
+          class="nav-link"
+          href="#"
+          v-bind:class="{ active: activeTab === filteredCourses.timeType }"
+          >{{ getTabName(filteredCourses.timeType) }}</a
+        >
       </li>
     </ul>
 
@@ -28,7 +33,7 @@
                   <th>{{ T.wordsEndTime }}</th>
                   <th>{{ T.wordsNumHomeworks }}</th>
                   <th>{{ T.wordsNumTests }}</th>
-                  <th colspan="2" v-if="courses.accessMode === 'admin'">
+                  <th colspan="3" v-if="courses.accessMode === 'admin'">
                     {{ T.wordsActions }}
                   </th>
                 </tr>
@@ -53,17 +58,27 @@
                   <template v-if="courses.accessMode === 'admin'">
                     <td>
                       <a
-                        class="glyphicon glyphicon-list-alt"
-                        v-bind:href="`/course/${course.alias}/list/`"
-                        v-bind:title="T.courseListSubmissionsByGroup"
-                      ></a>
+                        v-bind:href="`/course/${course.alias}/edit/`"
+                        v-bind:title="T.omegaupTitleCourseEdit"
+                      >
+                        <font-awesome-icon icon="edit" />
+                      </a>
                     </td>
                     <td>
                       <a
-                        class="glyphicon glyphicon-time"
+                        v-bind:href="`/course/${course.alias}/list/`"
+                        v-bind:title="T.courseListSubmissionsByGroup"
+                      >
+                        <font-awesome-icon icon="list-alt" />
+                      </a>
+                    </td>
+                    <td>
+                      <a
                         v-bind:href="`/course/${course.alias}/activity/`"
                         v-bind:title="T.wordsActivityReport"
-                      ></a>
+                      >
+                        <font-awesome-icon icon="clock" />
+                      </a>
                     </td>
                   </template>
                 </tr>
@@ -76,13 +91,34 @@
   </div>
 </template>
 
+<style>
+.nav-tabs .nav-item {
+  margin-bottom: -2px;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as time from '../../time';
 
-@Component
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+})
 export default class CourseFilteredList extends Vue {
   @Prop() courses!: omegaup.Course[];
   @Prop() activeTab!: string;
@@ -90,5 +126,11 @@ export default class CourseFilteredList extends Vue {
   T = T;
   time = time;
   showTab = this.activeTab;
+
+  getTabName(timeType: string): string {
+    if (timeType === 'current') return T.courseListCurrentCourses;
+    if (timeType === 'past') return T.courseListPastCourses;
+    return '';
+  }
 }
 </script>

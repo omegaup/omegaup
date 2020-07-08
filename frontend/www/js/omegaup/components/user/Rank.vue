@@ -16,23 +16,13 @@
       <label
         ><omegaup-autocomplete
           class="form-control"
-          v-bind:init="el => typeahead.userTypeahead(el)"
+          v-bind:init="(el) => typeahead.userTypeahead(el)"
           v-model="searchedUsername"
         ></omegaup-autocomplete
       ></label>
       <button class="btn btn-primary" type="button" v-on:click="onSubmit">
         {{ T.searchUser }}
       </button>
-      <template v-if="page &gt; 1">
-        <a class="prev" v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a>
-        <span class="delimiter" v-show="shouldShowNextPage">|</span>
-      </template>
-      <a
-        class="next"
-        v-bind:href="nextPageFilter"
-        v-show="shouldShowNextPage"
-        >{{ T.wordsNextPage }}</a
-      >
       <template v-if="Object.keys(availableFilters).length &gt; 0">
         <select class="filter" v-model="filter" v-on:change="onFilterChange">
           <option value="">
@@ -48,10 +38,10 @@
         </select>
       </template>
       <template v-else-if="!isLogged &amp;&amp; !isIndex">
-        <span class="label label-info">{{ T.mustLoginToFilterUsers }}</span>
+        <span class="badge badge-info">{{ T.mustLoginToFilterUsers }}</span>
       </template>
       <template v-else-if="!isIndex">
-        <span class="label label-info">{{
+        <span class="badge badge-info">{{
           T.mustUpdateBasicInfoToFilterUsers
         }}</span>
       </template>
@@ -68,46 +58,36 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(rank, index) in ranking">
-          <th scope="row">{{ rank.ranking }}</th>
+        <tr v-bind:key="index" v-for="(user, index) in ranking">
+          <th scope="row">{{ user.rank }}</th>
           <td>
             <omegaup-countryflag
-              v-bind:country="rank.country"
+              v-bind:country="user.country"
             ></omegaup-countryflag>
             <omegaup-user-username
-              v-bind:classname="rank.classname"
+              v-bind:classname="user.classname"
               v-bind:linkify="true"
-              v-bind:username="rank.username"
+              v-bind:username="user.username"
             ></omegaup-user-username>
-            <span v-if="rank.name && length !== 5"
+            <span v-if="user.name && length !== 5"
               ><br />
-              {{ rank.name }}</span
+              {{ user.name }}</span
             >
           </td>
-          <td class="text-right">{{ rank.score }}</td>
+          <td class="text-right">{{ user.score }}</td>
           <td class="text-right" v-if="!isIndex">
-            {{ rank.problemsSolvedUser }}
+            {{ user.problems_solved }}
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="card-footer">
-      <template v-if="isIndex">
-        <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
-      </template>
-      <template v-else="">
-        <template v-if="page &gt; 1">
-          <a class="prev" v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a>
-          <span class="delimiter" v-show="shouldShowNextPage"
-            >|</span
-          > </template
-        ><a
-          class="next"
-          v-bind:href="nextPageFilter"
-          v-show="shouldShowNextPage"
-          >{{ T.wordsNextPage }}</a
-        >
-      </template>
+    <div class="card-footer" v-if="isIndex">
+      <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
+    </div>
+    <div class="card-footer" v-else="">
+      <omegaup-common-paginator
+        v-bind:pagerItems="pagerItems"
+      ></omegaup-common-paginator>
     </div>
   </div>
 </template>
@@ -116,12 +96,14 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import { OmegaUp } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as UI from '../../ui';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 interface Rank {
   country: string;
@@ -137,6 +119,7 @@ interface Rank {
     'omegaup-autocomplete': Autocomplete,
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class UserRank extends Vue {
@@ -148,6 +131,7 @@ export default class UserRank extends Vue {
   @Prop() filter!: string;
   @Prop() ranking!: Rank[];
   @Prop() resultTotal!: number;
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
   UI = UI;
@@ -192,10 +176,6 @@ export default class UserRank extends Vue {
         this.filter,
       )}`;
     else return `/rank?page=${this.page - 1}`;
-  }
-
-  get shouldShowNextPage(): boolean {
-    return this.length * this.page < this.resultTotal;
   }
 }
 </script>

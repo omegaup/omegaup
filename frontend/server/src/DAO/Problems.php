@@ -79,7 +79,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
-     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}>, count: int}
+     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int, problem_id: int}>, count: int}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -142,10 +142,21 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!is_null($query)) {
-            $clauses[] = [
-                "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                [$query, $query],
-            ];
+            if (is_numeric($query)) {
+                $clauses[] = [
+                    "(
+                      p.title LIKE CONCAT('%', ?, '%') OR
+                      p.alias LIKE CONCAT('%', ?, '%') OR
+                      p.problem_id = ?
+                    )",
+                    [$query, $query, intval($query)],
+                ];
+            } else {
+                $clauses[] = [
+                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
+                    [$query, $query],
+                ];
+            }
         }
 
         if ($identityType === IDENTITY_ADMIN) {
@@ -311,6 +322,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $sql .= " ORDER BY p.problem_id {$collation} {$order} ";
         } elseif ($orderBy == 'points' && $order == 'desc') {
             $sql .= ' ORDER BY `points` DESC, `accepted` ASC, `submissions` DESC ';
+        } elseif (($orderBy == 'difficulty' || $orderBy == 'quality') && $order == 'asc') {
+            $sql .= " ORDER BY p.{$orderBy} IS NULL, p.{$orderBy} ASC";
         } else {
             $sql .= " ORDER BY `{$orderBy}` {$collation} {$order} ";
         }
@@ -326,7 +339,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
-            'title','quality', 'difficulty', 'alias', 'visibility',
+            'title', 'quality', 'difficulty', 'alias', 'visibility', 'problem_id',
             'quality_histogram', 'difficulty_histogram', 'quality_seal',
         ];
         $problems = [];
@@ -340,7 +353,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
             );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool} */
+            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, problem_id: int} */
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
@@ -407,10 +420,10 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         );
     }
 
-    final public static function getPracticeDeadline(int $problemId): int {
+    final public static function getPracticeDeadline(int $problemId): ?\OmegaUp\Timestamp {
         $sql = '
             SELECT
-                IFNULL(UNIX_TIMESTAMP(MAX(finish_time)), 0)
+                MAX(finish_time)
             FROM
                 Contests c
             INNER JOIN
@@ -418,7 +431,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             WHERE
                 pp.problem_id = ?;
         ';
-        /** @var int */
+        /** @var \OmegaUp\Timestamp|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
             [$problemId]
@@ -540,10 +553,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN
                 Problems p ON p.acl_id = a.acl_id
             WHERE
-                p.visibility = ? AND
+                (
+                    p.visibility >= ? OR
+                    p.visibility = ?
+                ) AND
                 i.identity_id = ?;';
 
-        $params = [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $identityId];
+        $params = [
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            $identityId,
+        ];
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -556,33 +576,33 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return list<array{alias: string, title: string, username: string}>
+     * @return list<array{alias: string, solved: bool, title: string, username: string}>
      */
-    final public static function getSolvedProblemsByUsersOfCourse(
-        string $courseAlias
-    ): array {
-        $sql = "
-            SELECT
+    public static function getProblemsByUsersInACourse(string $courseAlias) {
+        $sql  = '
+           SELECT
                 rp.alias,
                 rp.title,
+                IFNULL(rp.solved, FALSE) AS solved,
                 i.username
             FROM
-                Courses c
+                Identities i
             INNER JOIN
                 Groups_Identities gi
             ON
-                c.group_id = gi.group_id
-            INNER JOIN
-                Identities i
-            ON
                 gi.identity_id = i.identity_id
+            INNER JOIN
+                Courses c
+            ON
+                c.group_id = gi.group_id
             INNER JOIN
                 (
                 SELECT
                     p.problem_id,
                     p.alias,
                     p.title,
-                    s.identity_id
+                    s.identity_id,
+                    MAX(r.score) = 1 AS solved
                 FROM
                     Submissions s
                 INNER JOIN
@@ -594,8 +614,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ON
                     p.problem_id = s.problem_id
                 WHERE
-                    r.verdict = 'AC'
-                    AND p.visibility = ?
+                    p.visibility = ?
                 GROUP BY
                     p.problem_id, s.identity_id
                 ) rp
@@ -606,79 +625,24 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 AND gi.accept_teacher = true
             ORDER BY
                 i.username ASC,
-                rp.problem_id DESC;";
-
-        /** @var list<array{alias: string, title: string, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
-        );
-    }
-
-    /**
-     * @return list<array{alias: string, title: string, username: string}>
-     */
-    final public static function getUnsolvedProblemsByUsersOfCourse(
-        string $courseAlias
-    ): array {
-        $sql = '
-            SELECT
-                rp.alias,
-                rp.title,
-                i.username
-            FROM
-                Identities i
-            INNER JOIN
-                Groups_Identities gi
-            ON
-                gi.identity_id = i.identity_id
-            INNER JOIN
-                Courses c
-            ON
-                c.group_id = gi.group_id
-            INNER JOIN
-                (
-                SELECT
-                    pp.problem_id,
-                    pp.alias,
-                    pp.title,
-                    s.identity_id,
-                    MAX(r.score) AS max_score
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = s.current_run_id
-                INNER JOIN
-                    Problems pp
-                ON
-                    pp.problem_id = s.problem_id
-                WHERE
-                    pp.visibility = ?
-                GROUP BY
-                    pp.problem_id, s.identity_id
-                HAVING
-                    max_score < 1
-                ) rp
-            ON
-                rp.identity_id = i.identity_id
-            INNER JOIN
-                Problems p
-            ON
-                rp.problem_id = p.problem_id
-            WHERE
-                c.alias = ?
-                AND gi.accept_teacher = true
-            ORDER BY
-                i.username ASC,
                 rp.problem_id DESC;';
 
-        /** @var list<array{alias: string, title: string, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
-        );
+        $problemsUsers = [];
+        foreach (
+            /** @var list<array{alias: string, solved: int, title: string, username: string}> */
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
+            ) as $problemsUser
+        ) {
+            $problemsUser['alias'] = strval($problemsUser['alias']);
+            $problemsUser['title'] = strval($problemsUser['title']);
+            $problemsUser['username'] = strval($problemsUser['username']);
+            $problemsUser['solved'] = boolval($problemsUser['solved']);
+            $problemsUsers[] = $problemsUser;
+        }
+
+        return $problemsUsers;
     }
 
     final public static function hasTriedToSolveProblem(
@@ -1074,7 +1038,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     final public static function isVisible(\OmegaUp\DAO\VO\Problems $problem): bool {
-        return intval($problem->visibility) >= 1;
+        return (intval(
+            $problem->visibility
+        ) >= \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING  || intval(
+            $problem->visibility
+        ) == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED);
     }
 
     public static function deleteProblem(int $problemId): int {

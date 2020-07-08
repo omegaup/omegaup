@@ -9,13 +9,11 @@ namespace OmegaUp\DAO;
  * para almacenar de forma permanente y recuperar instancias de objetos
  * {@link \OmegaUp\DAO\VO\Clarifications}.
  *
- * @author alanboy
- * @access public
- * @package docs
+ * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  */
 class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     /**
-     * @return list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}>
+     * @return list<Clarification>
      */
     final public static function GetProblemsetClarifications(
         int $problemset_id,
@@ -26,6 +24,7 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
     ) {
         $sql = 'SELECT
                   c.clarification_id,
+                  con.alias `contest_alias`,
                   p.alias `problem_alias`,
                   i.username `author`,
                   r.username `receiver`,
@@ -41,6 +40,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                   `Identities` r ON r.identity_id = c.receiver_id
                 INNER JOIN
                   `Problems` p ON p.problem_id = c.problem_id
+                INNER JOIN
+                  `Problemsets` ps ON ps.problemset_id = c.problemset_id
+                LEFT JOIN
+                  `Contests` con ON con.contest_id = ps.contest_id
                 WHERE
                   c.problemset_id = ? ';
         $val = [$problemset_id];
@@ -58,12 +61,12 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{answer: null|string, author: string, clarification_id: int, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
+        /** @var list<array{answer: null|string, author: string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
-     * @return list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}>
+     * @return list<Clarification>
      */
     final public static function GetProblemClarifications(
         int $problemId,
@@ -77,8 +80,10 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $sql = '
                 SELECT
                     c.clarification_id,
+                    p.alias AS problem_alias,
                     con.alias AS contest_alias,
                     i.username AS author,
+                    r.username `receiver`,
                     c.message,
                     c.answer,
                     c.`time`,
@@ -87,21 +92,27 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
                     Clarifications c
                 INNER JOIN
                     Identities i ON i.identity_id = c.author_id
+                LEFT JOIN
+                    Identities r ON r.identity_id = c.receiver_id
             ';
         } else {
             $sql = '
                 SELECT
                     c.clarification_id,
+                    p.alias AS problem_alias,
                     con.alias AS contest_alias,
-                    NULL AS author,
+                    "" AS author,
+                    CAST(NULL AS CHAR) AS receiver,
                     c.message,
-                    c.`time`,
                     c.answer,
+                    c.`time`,
                     c.public
                 FROM Clarifications c
             ';
         }
         $sql .= '
+            INNER JOIN
+              `Problems` p ON p.problem_id = c.problem_id
             LEFT JOIN
                 Contests con ON con.problemset_id = c.problemset_id
             WHERE
@@ -121,7 +132,21 @@ class Clarifications extends \OmegaUp\DAO\Base\Clarifications {
             $val[] = intval($rowcount);
         }
 
-        /** @var list<array{clarification_id: int, contest_alias: string, author: null|string, message: string, time: \OmegaUp\Timestamp, answer: null|string, public: bool}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
+        $result = [];
+        /** @var array{answer: null|string, author: string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                $val
+            ) as $row
+        ) {
+            if (!$admin) {
+                $row['author'] = null;
+                $row['receiver'] = null;
+            }
+            $result[] = $row;
+        }
+
+        return $result;
     }
 }

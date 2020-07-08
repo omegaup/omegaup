@@ -77,7 +77,6 @@ class LegacyUser extends \OmegaUp\Test\BadgesTestCase {
             )
         );
         $date = date_format($date, 'Y-m-d');
-        print($date);
         \OmegaUp\Time::setTimeForTesting(strtotime($date));
 
         $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
@@ -138,9 +137,9 @@ class LegacyUser extends \OmegaUp\Test\BadgesTestCase {
             'window_length' => '0',
             'scoreboard' => 100,
             'points_decay_factor' => 0,
-            'partial_score' => 1,
+            'partial_score' => 'true',
             'submissions_gap' => 1200,
-            'feedback' => 'yes',
+            'feedback' => 'detailed',
             'penalty_type' => 'contest_start',
             'penalty_calc_policy' => 'sum',
             'admission_mode' => 'private',

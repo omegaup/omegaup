@@ -8,7 +8,7 @@
       v-bind:class="classname"
       v-bind:title="username"
       v-bind:href="`/profile/${username}/`"
-      >{{ username }}</a
+      >{{ name || username }}</a
     ></span
   >
   <span v-bind:class="classname" v-bind:title="username" v-else="">
@@ -16,7 +16,7 @@
       v-bind:country="country"
       v-if="country != null"
     ></omegaup-countryflag
-    >{{ username }}</span
+    >{{ name || username }}</span
   >
 </template>
 
@@ -62,6 +62,7 @@ import CountryFlag from '../CountryFlag.vue';
 })
 export default class UserName extends Vue {
   @Prop() username!: string;
+  @Prop({ default: null }) name!: string;
   @Prop() classname!: string;
   @Prop() linkify!: boolean;
   @Prop() country!: string;

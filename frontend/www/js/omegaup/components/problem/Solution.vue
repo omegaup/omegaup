@@ -1,16 +1,15 @@
 <template>
   <div class="panel">
-    <div
-      v-show="showSolution"
-      class="solution"
-      v-html="solution"
-      ref="solutionRef"
-    ></div>
-    <div class="interstitial" v-if="!showSolution">
-      <p>{{ statusMessage }}</p>
+    <omegaup-markdown
+      v-if="showSolution"
+      v-bind:markdown="solution.markdown"
+      v-bind:image-mapping="solution.images"
+    ></omegaup-markdown>
+    <div class="interstitial" v-else="showSolution">
+      <p v-html="statusMessage"></p>
       <p
         v-html="
-          UI.formatString(T.solutionTokens, {
+          ui.formatString(T.solutionTokens, {
             available: availableTokens,
             total: allTokens,
           })
@@ -56,33 +55,26 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import { types } from '../../api_types';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
-  @Prop() solution!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() availableTokens!: number;
   @Prop() allTokens!: number;
 
   T = T;
-  UI = UI;
-
-  mounted(): void {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
-  }
-
-  @Watch('solution')
-  onSolutionUpdated() {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
-  }
-
-  @Watch('showSolution')
-  onShowSolutionUpdated() {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
-  }
+  ui = ui;
 
   get showSolution(): boolean {
     return this.status === 'unlocked' && this.solution !== null;

@@ -231,7 +231,7 @@ export default class ProblemFinderWizard extends Vue {
 
   get tagObjects(): TagObject[] {
     const tagObjects: TagObject[] = [];
-    this.possibleTags.forEach(tagObject => {
+    this.possibleTags.forEach((tagObject) => {
       tagObjects.push({
         key: tagObject.name,
         value: T.hasOwnProperty(tagObject.name)
@@ -249,13 +249,13 @@ export default class ProblemFinderWizard extends Vue {
       min_difficulty: this.difficultyRange[0],
       max_difficulty: this.difficultyRange[1],
       order_by: this.selectedPriority,
-      mode: 'desc',
+      sort_order: 'desc',
     };
     if (this.karel) {
       queryParameters.only_karel = true;
     }
     if (this.selectedTags.length > 0) {
-      queryParameters.tag = this.selectedTags.map(tag => tag.key);
+      queryParameters.tag = this.selectedTags.map((tag) => tag.key);
     }
     this.$emit('search-problems', queryParameters);
   }

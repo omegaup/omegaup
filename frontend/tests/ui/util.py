@@ -136,12 +136,12 @@ def create_run(driver, problem_alias, filename):
                                  'frontend/tests/resources/%s' % filename)
     with open(resource_path, 'r') as f:
         driver.browser.execute_script(
-            'document.querySelector("#submit .CodeMirror")'
+            'document.querySelector("form[data-run-submit] .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
     original_url = driver.browser.current_url
     driver.browser.find_element_by_css_selector(
-        '#submit input[type="submit"]').submit()
+        'form[data-run-submit] button[type="submit"]').submit()
     driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')
@@ -235,7 +235,7 @@ def assert_js_errors(driver,
                  '\tMatched errors:\n\t\t{matched_errors}\n'
                  '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
                  '\tMissed paths:\n\t\t{missed_paths}\n'
-                 '\tMissed messages:\n\t\t{missed_messages}').format(
+                 '\tMissed messages:\n\t\t{missed_messages}\n').format(
                      matched_errors='\n'.join(
                          json.dumps(entry) for entry in matched_errors),
                      unmatched_errors='\n'.join(
@@ -310,9 +310,9 @@ def message_matches(message: str, message_list: Sequence[str]) -> bool:
 
         return False
 
-    # No quoted messages found, so let's try to do a suffix match.
+    # No quoted messages found, so let's try to do a substring match.
     for whitelisted_message in message_list:
-        if message.endswith(whitelisted_message):
+        if whitelisted_message in message:
             return True
 
     return False
@@ -325,7 +325,7 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//tr/td/a[contains(@href, "%s")][text()="%s"]' %
+                 '//tr/td/a[contains(@href, "%s")][contains(text(), "%s")]' %
                  (alias, scoreboard)))).click()
     assert (url in driver.browser.current_url), driver.browser.current_url
 
@@ -356,14 +356,18 @@ def create_group(driver, group_title, description):
             EC.element_to_be_clickable(
                 (By.XPATH,
                  ('//a[@href = "/group/new/"]')))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//input[@name = "title"]'))).send_keys(group_title)
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//textarea[@name = "description"]'))).send_keys(description)
+    with assert_js_errors(
+            driver,
+            expected_messages=('/api/group/details/',)
+    ):
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "title"]'))).send_keys(group_title)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//textarea[@name = "description"]'))).send_keys(description)
 
     with driver.page_transition():
         driver.wait.until(

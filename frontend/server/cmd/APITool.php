@@ -96,6 +96,12 @@ class RequestParam {
                 $annotationDescription
             );
         }
+        usort(
+            $result,
+            function (RequestParam $a, RequestParam $b): int {
+                return strcmp($a->name, $b->name);
+            }
+        );
         return $result;
     }
 }
@@ -218,6 +224,7 @@ class TypeMapper {
                 if ($type instanceof \Psalm\Type\Atomic\ObjectLike) {
                     $convertedProperties = [];
                     $propertyTypes = [];
+                    ksort($type->properties);
                     foreach ($type->properties as $propertyName => $propertyType) {
                         if (is_numeric($propertyName)) {
                             throw new \Exception(
@@ -261,7 +268,7 @@ class TypeMapper {
                         }
                         $propertyTypes[] = "{$propertyName}: {$conversionResult->typescriptExpansion};";
                     }
-                    $conversionFunction[] = 'x => { ' . join(
+                    $conversionFunction[] = '(x) => { ' . join(
                         ' ',
                         $convertedProperties
                     ) . ' return x; }';
@@ -275,7 +282,7 @@ class TypeMapper {
                     if (!is_null($conversionResult->conversionFunction)) {
                         $requiresConversion = true;
                         $conversionFunction[] = (
-                            "x => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
+                            "(x) => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
                         );
                     }
                     $typeNames[] = "{$conversionResult->typescriptExpansion}[]";
@@ -300,7 +307,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
+                                "(x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;
@@ -315,7 +322,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
+                                "(x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;
@@ -387,21 +394,19 @@ class TypeMapper {
                 join(', ', $conversionFunction)
             );
         }
+        sort($typeNames);
         return new ConversionResult(
             join('|', $typeNames),
             $requiresConversion ? $conversionFunction[0] : null
         );
     }
 
-    /**
-     * @param array{description: string, specials: array<string, array<int, string>>} $docComment
-     */
     public function convertMethod(
         \ReflectionMethod $reflectionMethod,
-        $docComment,
+        \Psalm\Internal\Scanner\ParsedDocblock $docComment,
         string $controllerClassBasename
     ): Method {
-        $returns = $docComment['specials']['return'];
+        $returns = $docComment->tags['return'];
         if (count($returns) != 1) {
             throw new \Exception('More @return annotations than expected!');
         }
@@ -456,9 +461,9 @@ class TypeMapper {
                 $reflectionMethod->name,
                 3
             ),
-            $docComment['description'],
+            $docComment->description,
             RequestParam::parse(
-                $docComment['specials']['omegaup-request-param'] ?? []
+                $docComment->tags['omegaup-request-param'] ?? []
             ),
             $conversionResult,
             $responseTypeMapping
@@ -480,16 +485,25 @@ class APIGenerator {
         $this->typeMapper = new TypeMapper($this->daoTypes);
     }
 
+    private function parseDocComment(string $docblock): \Psalm\Internal\Scanner\ParsedDocblock {
+        /** @psalm-suppress DeprecatedMethod Workaround for https://github.com/vimeo/psalm/issues/3735 */
+        [
+            'description' => $description,
+            'specials' => $tags,
+        ] = \Psalm\DocComment::parse($docblock);
+        return new \Psalm\Internal\Scanner\ParsedDocblock($description, $tags);
+    }
+
     public function addController(string $controllerClassBasename): void {
         /** @var class-string */
         $controllerClassName = "\\OmegaUp\\Controllers\\{$controllerClassBasename}";
         $reflectionClass = new \ReflectionClass($controllerClassName);
 
-        $docComment = \Psalm\DocComment::parse(
-            $reflectionClass->getDocComment()
+        $docComment = $this->parseDocComment(
+            strval($reflectionClass->getDocComment())
         );
-        if (isset($docComment['specials']['psalm-type'])) {
-            foreach ($docComment['specials']['psalm-type'] as $typeAlias) {
+        if (isset($docComment->tags['psalm-type'])) {
+            foreach ($docComment->tags['psalm-type'] as $typeAlias) {
                 [
                     $typeName,
                     $typeExpansion,
@@ -513,7 +527,7 @@ class APIGenerator {
 
         $controller = new Controller(
             $controllerClassBasename,
-            $docComment['description']
+            $docComment->description
         );
 
         foreach (
@@ -533,8 +547,8 @@ class APIGenerator {
                 // JavaScript, so they are not exposed.
                 continue;
             }
-            $docComment = \Psalm\DocComment::parse(
-                $reflectionMethod->getDocComment()
+            $docComment = $this->parseDocComment(
+                strval($reflectionMethod->getDocComment())
             );
             $apiMethodName = strtolower(
                 $reflectionMethod->name[3]
@@ -574,10 +588,10 @@ class APIGenerator {
                         ReflectionProperty::IS_PUBLIC
                     ) as $reflectionProperty
                 ) {
-                    $docComment = \Psalm\DocComment::parse(
-                        $reflectionProperty->getDocComment()
+                    $docComment = $this->parseDocComment(
+                        strval($reflectionProperty->getDocComment())
                     );
-                    $returns = $docComment['specials']['var'];
+                    $returns = $docComment->tags['var'];
                     if (count($returns) != 1) {
                         throw new \Exception(
                             'More @var annotations than expected!'
@@ -620,19 +634,17 @@ class APIGenerator {
                 ) {
                     continue;
                 }
+                echo "   export function {$typeName}(elementId: string = 'payload'): types.{$typeName} {\n";
                 if (is_null($conversionResult->conversionFunction)) {
-                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
                     echo "     return JSON.parse(\n";
                     echo "       (<HTMLElement>document.getElementById(elementId)).innerText,\n";
                     echo "     );\n\n";
-                    echo "   }\n\n";
                 } else {
-                    echo "   export function {$typeName}(elementId: string): types.{$typeName} {\n";
                     echo "     return ({$conversionResult->conversionFunction})(\n";
                     echo "       JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),\n";
                     echo "     );\n\n";
-                    echo "   }\n\n";
                 }
+                echo "   }\n\n";
             }
             echo "  }\n\n";
 
@@ -678,26 +690,16 @@ class APIGenerator {
         echo "}\n";
     }
 
-    public function generateDeclarations(): void {
-        echo "// generated by frontend/server/cmd/APITool.php. DO NOT EDIT.\n";
-        echo "import { controllers } from './api_types';\n";
-        echo "\n";
-        echo "const API = {\n";
-
-        ksort($this->controllers);
-        foreach ($this->controllers as $controller) {
-            echo "  {$controller->classBasename}: controllers.{$controller->classBasename},\n";
-        }
-        echo "};\n";
-        echo "\n";
-        echo "export { API as default };\n";
-    }
-
-    public function generateTransitional(): void {
-        echo "// generated by frontend/server/cmd/APITool.php. DO NOT EDIT.\n";
-        echo "import { messages } from './api_types';\n";
-        echo "import { addError } from './errors';\n\n";
+    public function generateApi(): void {
         echo <<<'EOD'
+// generated by frontend/server/cmd/APITool.php. DO NOT EDIT.
+import { messages } from './api_types';
+import { addError } from './errors';
+
+interface ApiCallOptions {
+  quiet?: boolean;
+}
+
 export function apiCall<
   RequestType extends { [key: string]: any },
   ServerResponseType,
@@ -705,23 +707,31 @@ export function apiCall<
 >(
   url: string,
   transform?: (result: ServerResponseType) => ResponseType,
-): (params?: RequestType) => Promise<ResponseType> {
-  return (params?: RequestType) =>
+): (params?: RequestType, options?: ApiCallOptions) => Promise<ResponseType> {
+  return (params?: RequestType, options?: ApiCallOptions) =>
     new Promise((accept, reject) => {
       let responseOk = true;
+      let responseStatus = 200;
       fetch(
         url,
         params
           ? {
               method: 'POST',
               body: Object.keys(params)
-                .filter(key => typeof params[key] !== 'undefined')
-                .map(
-                  key =>
-                    `${encodeURIComponent(key)}=${encodeURIComponent(
-                      params[key],
-                    )}`,
+                .filter(
+                  (key) =>
+                    params[key] !== null && typeof params[key] !== 'undefined',
                 )
+                .map((key) => {
+                  if (params[key] instanceof Date) {
+                    return `${encodeURIComponent(key)}=${encodeURIComponent(
+                      Math.round(params[key].getTime() / 1000),
+                    )}`;
+                  }
+                  return `${encodeURIComponent(key)}=${encodeURIComponent(
+                    params[key],
+                  )}`;
+                })
                 .join('&'),
               headers: {
                 'Content-Type':
@@ -730,19 +740,26 @@ export function apiCall<
             }
           : undefined,
       )
-        .then(response => {
+        .then((response) => {
           if (response.status == 499) {
             // If we cancel the connection, let's just swallow the error since
             // the user is not going to see it.
             return;
           }
           responseOk = response.ok;
+          responseStatus = response.status;
           return response.json();
         })
-        .then(data => {
+        .then((data) => {
           if (!responseOk) {
-            addError(data);
-            console.error(data);
+            if (typeof data === 'object' && !Array.isArray(data)) {
+              data.status = 'error';
+              data.httpStatusCode = responseStatus;
+            }
+            if (!options?.quiet) {
+              addError(data);
+              console.error(data);
+            }
             reject(data);
             return;
           }
@@ -752,10 +769,16 @@ export function apiCall<
             accept(data);
           }
         })
-        .catch(err => {
-          const errorData = { status: 'error', error: err };
-          addError(errorData);
-          console.error(errorData);
+        .catch((err) => {
+          const errorData = {
+            status: 'error',
+            error: err,
+            httpStatusCode: responseStatus,
+          };
+          if (!options?.quiet) {
+            addError(errorData);
+            console.error(errorData);
+          }
           reject(errorData);
         });
     });
@@ -831,6 +854,7 @@ EOD;
                 } else {
                     echo "| Name | Type |\n";
                     echo "|------|------|\n";
+                    ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
                         echo "| `{$paramName}` | `{$paramType}` |\n";
                     }
@@ -857,6 +881,23 @@ function listDir(string $path): Generator {
     closedir($dh);
 }
 
+// Psalm requires having a ProjectAnalyzer instance set up in order to resolve
+// some more complex types.
+//
+// It's a bit brittle to be fiddling with internal objects, but there is no
+// other way to get a valid instance.
+$rootDirectory = dirname(__DIR__, 3);
+define('PSALM_VERSION', \PackageVersions\Versions::getVersion('vimeo/psalm'));
+$projectAnalyzer = new \Psalm\Internal\Analyzer\ProjectAnalyzer(
+    \Psalm\Config::loadFromXMLFile(
+        "{$rootDirectory}/psalm.xml",
+        $rootDirectory
+    ),
+    new \Psalm\Internal\Provider\Providers(
+        new \Psalm\Internal\Provider\FileProvider()
+    )
+);
+
 $options = getopt('', ['file:']);
 if (!isset($options['file']) || !is_string($options['file'])) {
     throw new \Exception('Missing option for --file');
@@ -874,10 +915,8 @@ foreach ($controllerFiles as $controllerFile) {
 }
 if ($options['file'] == 'api_types.ts') {
     $apiGenerator->generateTypes();
-} elseif ($options['file'] == 'api.d.ts') {
-    $apiGenerator->generateDeclarations();
-} elseif ($options['file'] == 'api_transitional.ts') {
-    $apiGenerator->generateTransitional();
+} elseif ($options['file'] == 'api.ts') {
+    $apiGenerator->generateApi();
 } elseif ($options['file'] == 'README.md') {
     $apiGenerator->generateDocumentation();
 } else {

@@ -3,7 +3,9 @@
   <div id="summary" class="main">
     <!-- id-lint on -->
     <h1>{{ ui.contestTitle(contest) }}</h1>
-    <p>{{ contest.description }}</p>
+    <omegaup-markdown
+      v-bind:markdown="(contest && contest.description) || ''"
+    ></omegaup-markdown>
     <table>
       <tr v-if="showDeadlines">
         <td>
@@ -23,7 +25,13 @@
           }}
         </td>
       </tr>
-      <tr v-if="showRanking && duration != Infinity">
+      <tr
+        v-if="
+          showRanking &&
+          typeof contest.scoreboard === 'number' &&
+          duration != Infinity
+        "
+      >
         <td>
           <strong>{{ T.arenaPracticeScoreboardCutoff }}</strong>
         </td>
@@ -66,7 +74,13 @@ import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import * as time from '../../time';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class ContestSummary extends Vue {
   @Prop() contest!: omegaup.Contest;
   @Prop({ default: true }) showDeadlines!: boolean;

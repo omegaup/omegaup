@@ -13,6 +13,14 @@ class Grader {
     const REQUEST_MODE_RAW = 2;
     const REQUEST_MODE_PASSTHRU = 3;
 
+    /**
+     * This is needed to prevent Psalm from complaining every time this shows
+     * up, since this can be set to true in tests.
+     *
+     * @var bool
+     */
+    private static $OMEGAUP_GRADER_FAKE = OMEGAUP_GRADER_FAKE;
+
     public static function getInstance(): \OmegaUp\Grader {
         if (is_null(self::$_instance)) {
             self::$_instance = new \OmegaUp\Grader();
@@ -33,7 +41,7 @@ class Grader {
      * @throws \Exception
      */
     public function grade(\OmegaUp\DAO\VO\Runs $run, string $source): void {
-        if (OMEGAUP_GRADER_FAKE) {
+        if (self::$OMEGAUP_GRADER_FAKE) {
             if (is_null($run->submission_id)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('runNotFound');
             }
@@ -62,7 +70,7 @@ class Grader {
      * @throws \Exception
      */
     public function rejudge(array $runs, bool $debug): void {
-        if (OMEGAUP_GRADER_FAKE) {
+        if (self::$OMEGAUP_GRADER_FAKE) {
             return;
         }
         $this->curlRequest(
@@ -86,7 +94,7 @@ class Grader {
      * @throws \Exception
      */
     public function getSource(string $guid): string {
-        if (OMEGAUP_GRADER_FAKE) {
+        if (self::$OMEGAUP_GRADER_FAKE) {
             return file_get_contents("/tmp/{$guid}");
         }
         /** @var string */
@@ -102,7 +110,7 @@ class Grader {
      * @return GraderStatus
      */
     public function status(): array {
-        if (OMEGAUP_GRADER_FAKE) {
+        if (self::$OMEGAUP_GRADER_FAKE) {
             return [
                 'status' => 'ok',
                 'broadcaster_sockets' => 0,
@@ -132,7 +140,7 @@ class Grader {
         int $userId = -1,
         bool $userOnly = false
     ): void {
-        if (OMEGAUP_GRADER_FAKE) {
+        if (self::$OMEGAUP_GRADER_FAKE) {
             return;
         }
         $this->curlRequest(
@@ -158,7 +166,7 @@ class Grader {
         string $filename,
         bool $missingOk = false
     ): ?string {
-        if (OMEGAUP_GRADER_FAKE) {
+        if (self::$OMEGAUP_GRADER_FAKE) {
             return null;
         }
         /** @var null|string */
@@ -173,13 +181,20 @@ class Grader {
         );
     }
 
+    /**
+     * @param list<string> $fileHeaders
+     */
     public function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $missingOk = false
+        bool $missingOk = false,
+        array $fileHeaders = []
     ): ?bool {
-        if (OMEGAUP_GRADER_FAKE) {
+        if (self::$OMEGAUP_GRADER_FAKE) {
             return null;
+        }
+        foreach ($fileHeaders as $header) {
+            header($header);
         }
         /** @var null|bool */
         return $this->curlRequest(

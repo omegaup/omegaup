@@ -24,7 +24,9 @@ class IdentitiesSchools extends \OmegaUp\DAO\Base\IdentitiesSchools {
                 $identity->current_identity_school_id
             );
             if (!is_null($identitySchool)) {
-                $identitySchool->end_time = \OmegaUp\Time::get();
+                $identitySchool->end_time = new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get()
+                );
                 \OmegaUp\DAO\IdentitiesSchools::update($identitySchool);
             }
         }

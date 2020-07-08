@@ -49,8 +49,8 @@ class ProblemsetProblemOpened extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['open_time'])) {
             /**
-             * @var string|int|float $data['open_time']
-             * @var int $this->open_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['open_time']
+             * @var \OmegaUp\Timestamp $this->open_time
              */
             $this->open_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -58,7 +58,9 @@ class ProblemsetProblemOpened extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->open_time = \OmegaUp\Time::get();
+            $this->open_time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
     }
 
@@ -89,7 +91,7 @@ class ProblemsetProblemOpened extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $open_time;  // CURRENT_TIMESTAMP
 }

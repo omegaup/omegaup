@@ -76,7 +76,7 @@
               class="nav-item nav-courses"
               v-bind:class="{ active: navbarSection === 'courses' }"
             >
-              <a class="nav-link px-2" href="/schools/">{{ T.navCourses }}</a>
+              <a class="nav-link px-2" href="/course/">{{ T.navCourses }}</a>
             </li>
             <li
               class="nav-item dropdown nav-problems"
@@ -135,6 +135,9 @@
               <div class="dropdown-menu">
                 <a class="dropdown-item" href="/rank/">{{
                   T.navUserRanking
+                }}</a>
+                <a class="dropdown-item" href="/rank/authors/">{{
+                  T.navAuthorRanking
                 }}</a>
                 <a class="dropdown-item" href="/rank/schools/">{{
                   T.navSchoolRanking
@@ -230,7 +233,20 @@
                   >
                     <font-awesome-icon v-bind:icon="['fas', 'user']" />
                     {{ T.navViewProfile }}
+                    <div class="progress mt-2" v-if="profileProgress !== 0">
+                      <div
+                        class="progress-bar progress-bar-striped bg-info"
+                        role="progressbar"
+                        v-bind:style="{ width: `${profileProgress}%` }"
+                        v-bind:aria-valuenow="profileProgress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                      ></div>
+                    </div>
                   </a>
+                  <a class="dropdown-item" href="/badge/list/">{{
+                    T.navViewBadges
+                  }}</a>
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems
                   }}</a>
@@ -286,7 +302,6 @@ nav.navbar {
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import notifications_List from '../notification/List.vue';
@@ -323,9 +338,10 @@ export default class Navbar extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
   @Prop() graderQueueLength!: number;
   @Prop() errorMessage!: string | null;
-  @Prop() initialClarifications!: omegaup.Clarification[];
+  @Prop({ default: 0 }) profileProgress!: number;
+  @Prop() initialClarifications!: types.Clarification[];
 
-  clarifications: omegaup.Clarification[] = this.initialClarifications;
+  clarifications: types.Clarification[] = this.initialClarifications;
   T = T;
 
   get formattedLoginURL(): string {
@@ -336,8 +352,8 @@ export default class Navbar extends Vue {
     return this.isAdmin && !this.omegaUpLockDown && !this.inContest;
   }
 
-  readNotifications(notifications: types.Notification[]): void {
-    this.$emit('read-notifications', notifications);
+  readNotifications(notifications: types.Notification[], url?: string): void {
+    this.$emit('read-notifications', notifications, url);
   }
 }
 </script>

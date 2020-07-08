@@ -26,9 +26,7 @@
             ></omegaup-user-username>
             <img
               height="11"
-              v-bind:src="
-                `/media/flags/${profile.country_id.toLowerCase()}.png`
-              "
+              v-bind:src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
               v-bind:title="profile.country_id"
               v-if="profile.country_id"
               width="16"
@@ -97,7 +95,7 @@
           "
           v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
           v-on:emit-update-aggregate-statistics="
-            profileComponent =>
+            (profileComponent) =>
               $emit('update-aggregate-statistics', profileComponent)
           "
           v-if="charts"
@@ -126,7 +124,7 @@ import user_Username from './Username.vue';
 import user_Charts from './Charts.vue';
 import badge_List from '../badge/List.vue';
 import gridPaginator from '../GridPaginator.vue';
-import { Problem, ContestResult } from '../../types.ts';
+import { Problem, ContestResult } from '../../linkable_resource';
 
 @Component({
   components: {

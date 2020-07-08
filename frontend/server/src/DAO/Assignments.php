@@ -10,7 +10,9 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\Assignments}.
  *
  * @access public
- * @return \OmegaUp\DAO\VO\Problemsets|null
+ * @package docs
+ *
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  */
 class Assignments extends \OmegaUp\DAO\Base\Assignments {
     public static function getProblemset(
@@ -146,39 +148,80 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     }
 
     /**
-     * Get the course assigments sorted by order and start_time
+     * Get the course assignments sorted by order and start_time
      *
-     * @return list<array{problemset_id: int, name: string, description: string, alias: string, assignment_type: string, start_time: int, finish_time: int|null, order: int, scoreboard_url: string, scoreboard_url_admin: string}>
+     * @return list<CourseAssignment>
      */
     final public static function getSortedCourseAssignments(
         int $courseId
     ): array {
-        $sql = 'SELECT
-                   `a`.`problemset_id`,
-                   `a`.`name`,
-                   `a`.`description`,
-                   `a`.`alias`,
-                   `a`.`assignment_type`,
-                   UNIX_TIMESTAMP(`a`.`start_time`) AS `start_time`,
-                   UNIX_TIMESTAMP(`a`.`finish_time`) AS `finish_time`,
-                   `a`.`order`,
-                   `ps`.`scoreboard_url`,
-                   `ps`.`scoreboard_url_admin`
-                FROM
-                    `Assignments` `a`
-                INNER JOIN
-                    `Problemsets` `ps`
-                ON
-                    `ps`.`problemset_id` = `a`.`problemset_id`
-                WHERE
-                    course_id = ?
-                ORDER BY
-                    `order` ASC, `start_time` ASC';
+        $sql = '
+            SELECT
+               `a`.`problemset_id`,
+               `a`.`name`,
+               `a`.`description`,
+               `a`.`alias`,
+               `a`.`assignment_type`,
+               `a`.`start_time`,
+               `a`.`finish_time`,
+               `a`.`max_points`,
+               `a`.`publish_time_delay`,
+               `a`.`order`,
+                COUNT(`s`.`submission_id`) AS `has_runs`,
+               `ps`.`scoreboard_url`,
+               `ps`.`scoreboard_url_admin`
+            FROM
+                `Assignments` `a`
+            INNER JOIN
+                `Problemsets` `ps`
+            ON
+                `ps`.`problemset_id` = `a`.`problemset_id`
+            LEFT JOIN
+                `Submissions` `s`
+            ON
+                `ps`.`problemset_id` = `s`.`problemset_id`
+            WHERE
+                course_id = ?
+            GROUP BY
+                `a`.`assignment_id`
+            ORDER BY
+                `order` ASC,
+                `start_time` ASC,
+                `a`.`assignment_id` ASC;
+        ';
 
-        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: int|null, name: string, order: int, problemset_id: int, scoreboard_url: string, scoreboard_url_admin: string, start_time: int}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: int, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
+        );
+        $assignments = [];
+        foreach ($rs as $row) {
+            $row['has_runs'] = $row['has_runs'] > 0;
+            $assignments[] = $row;
+        }
+        return $assignments;
+    }
+
+    /**
+     * Since Problemsets and Assignments tables are related to each other, it
+     * is necessary to unlink the assignment in Problemsets table.
+     */
+    public static function unlinkProblemset(
+        \OmegaUp\DAO\VO\Assignments $assignment,
+        \OmegaUp\DAO\VO\Problemsets $problemset
+    ): void {
+        $sql = '
+            UPDATE
+                `Problemsets`
+            SET
+                `assignment_id` = NULL
+            WHERE
+                `problemset_id` = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute(
+            $sql,
+            [$problemset->problemset_id]
         );
     }
 }

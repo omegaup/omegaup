@@ -78,7 +78,15 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
         $response = \OmegaUp\Controllers\User::apiProfile($r);
 
-        $visibleAttributes = ['is_private', 'username', 'rankinfo', 'classname'];
+        $visibleAttributes = [
+            'is_private',
+            'username',
+            'rankinfo',
+            'classname',
+            'hide_problem_tags',
+            'verified',
+            'programming_languages',
+        ];
         foreach ($response as $k => $v) {
             if (in_array($k, $visibleAttributes)) {
                 continue;
@@ -137,6 +145,8 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
                 $this->assertNotNull($v);
             }
         }
+        $this->assertNull($response['rankinfo']['author_ranking']);
+        unset($response['rankinfo']['author_ranking']);
         foreach ($response['rankinfo'] as $k => $v) {
             $this->assertNotNull($v);
         }
@@ -434,5 +444,104 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
                 })['runs']
             );
         }
+    }
+
+    /**
+     * A PHPUnit data provider for all the tests that can accept a status.
+     *
+     * @return list<array{0: string, 1: int}>
+     */
+    public function qualityNominationsDemotionStatusProvider(): array {
+        return [
+            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED],
+            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING],
+        ];
+    }
+
+    /**
+     * Check that can search nominations.
+     * @dataProvider qualityNominationsDemotionStatusProvider
+     */
+    public function testCreatedProblemWithDemotionNomination(
+        string $status,
+        int $visibilityPrivate
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
+        ));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_nominator'
+            ]
+        ));
+        $login = self::login($identity);
+
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                ],
+                'rationale' => 'qwert',
+                'reason' => 'offensive',
+            ]),
+        ]));
+
+        \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => 'ew plus something else'
+            ])
+        );
+
+        $login = self::login($author);
+        // Since the problem is public, this function should retrieve 1 problem.
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertCount(1, $response['problems']);
+        $this->assertEquals('problem_1', $response['problems'][0]['alias']);
+
+        // Now make one of those problems private, results must change
+        \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' =>  $problemData['request']['problem_alias'],
+            'visibility' => $visibilityPrivate,
+            'message' => 'public -> private',
+        ]));
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+
+        $this->assertEmpty($response['problems']);
+
+        // Now, as another user, request the problems created by initial user
+        ['user' => $otherUser, 'identity' => $otherIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($otherIdentity);
+
+        $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'username' => $identity->username
+        ]));
+        $this->assertEmpty($response['problems']);
     }
 }

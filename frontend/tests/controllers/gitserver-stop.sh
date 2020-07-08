@@ -2,8 +2,13 @@
 
 set -e
 
-DIR="$(realpath "$(dirname "$0")")"
-PIDFILE="${DIR}/gitserver.pid"
+if [[ $# -ne 1 ]]; then
+	echo "Usage: $0 <runfiles directory>"
+	exit 1
+fi
+
+RUNFILES="$1"
+PIDFILE="${RUNFILES}/gitserver.pid"
 
 if [ -f "${PIDFILE}" ]; then
 	# Ignore failures in case the pidfile was stale.

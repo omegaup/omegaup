@@ -1,11 +1,11 @@
 <template>
-  <div class="omegaup-course-viewstudent panel">
-    <div class="page-header">
+  <div class="omegaup-course-viewstudent card">
+    <div class="card-header">
       <h2>
         <a v-bind:href="courseUrl">{{ course.name }}</a>
       </h2>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <form>
         <select v-model="selectedStudent">
           <option v-bind:value="student" v-for="student in students">
@@ -39,6 +39,7 @@
                 data-toggle="tab"
                 href="#home"
                 role="tab"
+                v-bind:data-problem-alias="problem.alias"
                 v-on:click="selectedProblem = problem"
               >
                 <template v-if="problem.runs.length &gt; 0">
@@ -53,8 +54,8 @@
               {{ T.courseAssignmentProblemRunsEmpty }}
             </div>
           </div>
-          <div class="panel" v-else="">
-            <div class="panel-header">
+          <div class="card" v-else="">
+            <div class="card-header">
               <pre>{{ bestRunSource(selectedProblem) }}</pre>
             </div>
             <table class="table table-striped">
@@ -91,22 +92,23 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
-import * as time from '../../ui';
+import * as time from '../../time';
 
 @Component
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: omegaup.Course;
-  @Prop() initialStudent!: omegaup.CourseStudent;
+  @Prop() initialStudent!: types.CourseStudent;
   @Prop() problems!: omegaup.CourseProblem[];
-  @Prop() students!: omegaup.CourseStudent[];
+  @Prop() students!: types.CourseStudent[];
 
   T = T;
   time = time;
   selectedAssignment: Partial<omegaup.Assignment> = {};
   selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
-  selectedStudent: Partial<omegaup.CourseStudent> = this.initialStudent || {};
+  selectedStudent: Partial<types.CourseStudent> = this.initialStudent || {};
 
   data(): { [name: string]: any } {
     return {
@@ -116,7 +118,7 @@ export default class CourseViewStudent extends Vue {
 
   mounted(): void {
     let self = this;
-    window.addEventListener('popstate', function(ev: PopStateEvent): void {
+    window.addEventListener('popstate', function (ev: PopStateEvent): void {
       self.selectedStudent =
         (ev.state && ev.state.student) || self.initialStudent;
     });
@@ -152,11 +154,11 @@ export default class CourseViewStudent extends Vue {
 
   @Watch('selectedStudent')
   onSelectedStudentChange(
-    newVal: omegaup.CourseStudent,
-    oldVal: omegaup.CourseStudent,
+    newVal?: types.CourseStudent,
+    oldVal?: types.CourseStudent,
   ) {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
-    if (newVal && oldVal && newVal.username == oldVal.username) {
+    if (!newVal || newVal?.username === oldVal?.username) {
       return;
     }
     window.history.pushState(

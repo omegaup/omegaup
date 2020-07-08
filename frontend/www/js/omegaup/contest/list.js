@@ -1,6 +1,6 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
@@ -8,8 +8,8 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   function fillContestsTable() {
-    (contestList.showAdmin ? API.Contest.adminList() : API.Contest.myList())
-      .then(result => {
+    (contestList.showAdmin ? api.Contest.adminList() : api.Contest.myList())
+      .then((result) => {
         contestList.contests = result.contests;
       })
       .catch(UI.apiError);
@@ -29,7 +29,7 @@ OmegaUp.on('ready', () => {
 
   let contestList = new Vue({
     el: '#contest_list',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-contest-contestlist', {
         props: {
           contests: this.contests,
@@ -37,13 +37,13 @@ OmegaUp.on('ready', () => {
           title: T.wordsContests,
         },
         on: {
-          'toggle-show-admin': showAdmin => {
+          'toggle-show-admin': (showAdmin) => {
             this.showAdmin = showAdmin;
             fillContestsTable();
           },
           'bulk-update': (ev, selectedContests, admissionMode) =>
             this.changeAdmissionMode(ev, selectedContests, admissionMode),
-          'download-csv-users': contestAlias =>
+          'download-csv-users': (contestAlias) =>
             this.downloadCsvUsers(contestAlias),
         },
       });
@@ -58,8 +58,8 @@ OmegaUp.on('ready', () => {
     methods: {
       changeAdmissionMode: (ev, selectedContests, admissionMode) => {
         Promise.all(
-          selectedContests.map(contestAlias =>
-            API.Contest.update({
+          selectedContests.map((contestAlias) =>
+            api.Contest.update({
               contest_alias: contestAlias,
               admission_mode: admissionMode,
             }),
@@ -68,18 +68,18 @@ OmegaUp.on('ready', () => {
           .then(() => {
             UI.success(T.updateItemsSuccess);
           })
-          .catch(error => {
+          .catch((error) => {
             UI.error(UI.formatString(T.bulkOperationError, error));
           })
           .finally(() => {
             fillContestsTable();
           });
       },
-      downloadCsvUsers: contestAlias => {
-        API.Contest.contestants({
+      downloadCsvUsers: (contestAlias) => {
+        api.Contest.contestants({
           contest_alias: contestAlias,
         })
-          .then(result => {
+          .then((result) => {
             if (result.status != 'ok') {
               return;
             }

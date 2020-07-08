@@ -99,6 +99,18 @@
             </div>
           </div>
         </li>
+        <li class="fbSettingsListItem clearfix uiListItem">
+          <div class="pvm phs fbSettingsListLink clearfix">
+            <div class="pls fbSettingsListItemLabel">
+              <strong>{{ T.profileAuthorRank }}</strong>
+            </div>
+            <div class="fbSettingsListItemContent fcg">
+              <strong>
+                {{ profile.rankinfo.author_ranking || T.authorRankUnranked }}
+              </strong>
+            </div>
+          </div>
+        </li>
       </ul>
     </div>
     <a

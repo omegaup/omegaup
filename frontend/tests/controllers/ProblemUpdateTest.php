@@ -14,6 +14,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
+        \OmegaUp\Test\Factories\Problem::initPublicTags();
     }
 
     /**
@@ -58,6 +59,42 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemData['problem']->problem_id
         );
         $this->assertEquals(2, count($problemLanguages));
+    }
+
+    /**
+     * Test for updating the level of a problem
+     */
+    public function testUpdateProblemLevel() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemAuthor = $problemData['author'];
+        $login = self::login($problemAuthor);
+
+        $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+            $problemData['problem']
+        );
+        $this->assertNull($problemLevel);
+
+        $selectedLevel = 'problemLevelBasicKarel';
+        \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'level_tag' => $selectedLevel,
+        ]));
+        $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+            $problemData['problem']
+        );
+        $this->assertEquals($selectedLevel, $problemLevel);
+
+        $selectedLevel = 'problemLevelBasicIntroductionToProgramming';
+        \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'level_tag' => $selectedLevel,
+        ]));
+        $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+            $problemData['problem']
+        );
+        $this->assertEquals($selectedLevel, $problemLevel);
     }
 
     public function testUpdateProblemTitleAndContents() {
@@ -649,6 +686,28 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
     }
 
+    public function testAddOnlyPrivateTags() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
+            'visibility' => 0
+        ]));
+        $login = self::login($problemData['author']);
+        \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'name' => 'test-tag',
+            'public' => false,
+        ]));
+
+        $response = \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'name' => 'test-tag',
+        ]));
+        $this->assertTrue($response['tags'][0]['public']);
+        $this->assertFalse($response['tags'][1]['public']);
+    }
+
     /**
      * Tests that problems cannot change their visibility under some scenarios.
      */
@@ -833,7 +892,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             [
                 [
-                    'name' => 'lenguaje',
+                    'name' => 'problemRestrictedTagLanguage',
                     'public' => '1',
                 ],
             ],
@@ -847,17 +906,17 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['problem']->alias,
             'name' => 'foo',
-            'public' => 'true',
+            'public' => false,
         ]));
         $this->assertEquals(
             [
                 [
-                    'name' => 'lenguaje',
+                    'name' => 'problemRestrictedTagLanguage',
                     'public' => '1',
                 ],
                 [
                     'name' => 'foo',
-                    'public' => '1',
+                    'public' => false,
                 ],
             ],
             \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
@@ -875,7 +934,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             [
                 [
-                    'name' => 'lenguaje',
+                    'name' => 'problemRestrictedTagLanguage',
                     'public' => '1',
                 ],
             ],
@@ -886,16 +945,67 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         try {
+            \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['problem']->alias,
+                'name' => 'problemTagTestTag',
+                'public' => false,
+            ]));
+            $this->fail('Should have failed.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('tagPrefixRestricted', $e->getMessage());
+        }
+
+        try {
             \OmegaUp\Controllers\Problem::apiRemoveTag(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'problem_alias' => $problemData['problem']->alias,
-                'name' => 'lenguaje',
+                'name' => 'problemRestrictedTagLanguage',
                 'public' => 'true',
             ]));
             $this->fail('Should not have been able to remove restricted tag');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('tagRestricted', $e->getMessage());
         }
+
+        $testTags = [
+            'test-tag-a',
+            'test-tag-b',
+        ];
+        \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'name' => $testTags[0],
+            'public' => false,
+        ]));
+
+        \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['problem']->alias,
+            'name' => $testTags[1],
+            'public' => false,
+        ]));
+
+        $privateTags = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+            $problemData['problem'],
+            !\OmegaUp\Authorization::canEditProblem(
+                $problemData['author'],
+                $problemData['problem']
+            ),
+            /*public=*/ false
+        );
+        $this->assertEquals($testTags, $privateTags);
+
+        ['user' => $extraUser, 'identity' => $extraIdentity] = \OmegaUp\Test\Factories\User::createUser();
+        $privateTags = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+            $problemData['problem'],
+            !\OmegaUp\Authorization::canEditProblem(
+                $extraIdentity,
+                $problemData['problem']
+            ),
+            /*public=*/ false
+        );
+        $this->assertEmpty($privateTags);
     }
 
     /**
@@ -1901,6 +2011,78 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEqualSets(
             $allowUserAddTagsValue,
             $problem->allow_user_add_tags
+        );
+    }
+
+    public function testUpdateStatementProblemViaSubmit() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Login API
+        $login = self::login($problemData['author']);
+
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemData['request']['problem_alias'],
+            ])
+        )['smartyProperties'];
+
+        $this->assertArrayHasKey('statement', $response['payload']);
+
+        $originalStatement = $response['payload']['statement'];
+        $newStatement = [
+            'language' => $originalStatement['language'],
+            'images' => [],
+            'markdown' => 'New markdown',
+        ];
+        $markdownPT = 'Markdown in pt language';
+        $contents = json_encode([
+            $newStatement['language'] => $newStatement['markdown'],
+            'pt' => $markdownPT,
+        ]);
+
+        // Updating more than one statement at the same time
+        $response = \OmegaUp\Controllers\Problem::getProblemEditDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem' => $problemData['request']['problem_alias'],
+                'request' => 'markdown',
+                'message' => 'Change in statement',
+                'directory' => 'statements',
+                'contents' => $contents,
+            ])
+        )['smartyProperties'];
+
+        // Getting problem details for preferred user language('es')
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+            ])
+        );
+        $this->assertEquals(
+            $newStatement['language'],
+            $response['statement']['language']
+        );
+        $this->assertStringContainsString(
+            $newStatement['markdown'],
+            $response['statement']['markdown']
+        );
+
+        // Getting problem details for an specific language('pt')
+        $response = \OmegaUp\Controllers\Problem::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'lang' => 'pt'
+            ])
+        );
+
+        $this->assertEquals('pt', $response['statement']['language']);
+        $this->assertStringContainsString(
+            $markdownPT,
+            $response['statement']['markdown']
         );
     }
 }

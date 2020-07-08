@@ -51,7 +51,15 @@
               ></a>
             </td>
             <td class="button-column">
+              <span
+                v-bind:title="T.assignmentRemoveAlreadyHasRuns"
+                aria-hidden="true"
+                class="glyphicon glyphicon-remove disabled"
+                v-if="assignment.has_runs"
+              ></span>
               <a
+                href="#"
+                v-else=""
                 v-bind:title="T.courseAssignmentDelete"
                 v-on:click="$emit('delete', assignment)"
                 ><span
@@ -63,6 +71,16 @@
           </tr>
         </tbody>
       </table>
+      <div>
+        <a
+          class="btn btn-primary"
+          v-bind:class="{ disabled: !homeworksOrderChanged }"
+          role="button"
+          v-on:click="saveNewOrder('homeworks')"
+        >
+          {{ T.wordsSaveNewOrder }}
+        </a>
+      </div>
       <hr />
       <table class="table table-striped">
         <thead>
@@ -108,6 +126,16 @@
           </tr>
         </tbody>
       </table>
+      <div>
+        <a
+          class="btn btn-primary"
+          v-bind:class="{ disabled: !testsOrderChanged }"
+          role="button"
+          v-on:click="saveNewOrder('tests')"
+        >
+          {{ T.wordsSaveNewOrder }}
+        </a>
+      </div>
     </div>
     <div class="panel-footer">
       <form class="new">
@@ -129,6 +157,12 @@
   </div>
 </template>
 
+<style>
+.disabled {
+  color: lightgrey;
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -139,6 +173,8 @@ export default class CourseAssignmentList extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() courseAlias!: string;
 
+  testsOrderChanged = false;
+  homeworksOrderChanged = false;
   T = T;
 
   get homeworks(): omegaup.Assignment[] {
@@ -163,7 +199,7 @@ export default class CourseAssignmentList extends Vue {
       0,
       this.homeworks.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort-homeworks', this.courseAlias, this.homeworks);
+    this.homeworksOrderChanged = true;
   }
 
   sortTests(event: any): void {
@@ -172,7 +208,19 @@ export default class CourseAssignmentList extends Vue {
       0,
       this.tests.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort-tests', this.courseAlias, this.tests);
+    this.testsOrderChanged = true;
+  }
+
+  saveNewOrder(type: string): void {
+    let param: string[] = [];
+    if (type === 'homeworks') {
+      param = this.homeworks.map((homework) => homework.alias);
+      this.homeworksOrderChanged = false;
+    } else {
+      param = this.tests.map((test) => test.alias);
+      this.testsOrderChanged = false;
+    }
+    this.$emit(`sort-${type}`, this.courseAlias, param);
   }
 }
 </script>

@@ -8,7 +8,6 @@ import contextlib
 import json
 import logging
 import os.path
-import sys
 import time
 import urllib
 
@@ -17,7 +16,7 @@ import pytest
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 
@@ -197,6 +196,27 @@ class Driver:  # pylint: disable=too-many-instance-attributes
                  '//%s//div[@data-value = "%s"]' %
                  (parent_xpath, value)))).click()
 
+    def send_keys(self,  # pylint: disable=no-self-use
+                  element: WebElement,
+                  value: str,
+                  retries: int = 10) -> None:
+        '''Helper to _really_ send keys to an element.
+
+        For some yet unexplained reason when running in non-headless mode, the
+        interactions with text elements do not always register by the browser.
+        This causes input elements to remain empty even after sending the keys.
+
+        This method sends the keys and then ensures that the value of the
+        element is the expected string, retrying if necessary.
+        '''
+
+        for _ in range(retries):
+            element.clear()
+            element.send_keys(value)
+            if element.get_attribute('value') == value:
+                return
+        logging.error('Failed to send keys to the element')
+
     @contextlib.contextmanager
     def login_user(self):
         '''Logs in as a user, and logs out when out of scope.'''
@@ -303,11 +323,11 @@ class Driver:  # pylint: disable=too-many-instance-attributes
             'Invalid URL redirect. Expected %s, got %s' % (
                 home_page_url, self.browser.current_url))
 
-    def annotate(self, message, level=logging.INFO):
+    def annotate(self,  # pylint: disable=no-self-use
+                 message: str,
+                 level=logging.INFO) -> None:
         '''Add an annotation to the run's log.'''
 
-        if util.CI:
-            self.browser.execute_script("sauce:context=%s" % message)
         logging.log(level, message)
 
     def update_run_score(self, run_id, verdict, score):
@@ -490,10 +510,6 @@ def pytest_pyfunc_call(pyfuncitem):
     _SUCCESS = False
     if 'driver' not in pyfuncitem.funcargs:
         return
-    if util.CI:
-        # When running in CI, we have movies, screenshots and logs in
-        # Sauce Labs.
-        return
     try:
         current_driver = pyfuncitem.funcargs['driver']
         try:
@@ -545,59 +561,27 @@ def pytest_generate_tests(metafunc):
 def _get_browser(request, browser_name):
     '''Gets a browser object from the request parameters.'''
 
-    if util.CI:
-        capabilities = {
-            'tunnelIdentifier': os.environ['TRAVIS_JOB_NUMBER'],
-            'name': 'Travis CI run %s[%s]' % (
-                os.environ.get('TRAVIS_BUILD_NUMBER', ''), browser_name),
-            'build': os.environ.get('TRAVIS_BUILD_NUMBER', ''),
-            'tags': [os.environ.get('TRAVIS_PYTHON_VERSION', '3'), 'CI'],
-            'extendedDebugging': 'true',
-            'loggingPrefs': {'browser': 'ALL'},
-        }
-        # Add browser configuration
-        capabilities.update({
-            'browserName': browser_name,
-            'version': '69.0',
-            'chromedriverVersion': '2.41',
-            'seleniumVersion': '3.13',
-            'platform': 'Windows 10',
-            'screenResolution': '%dx%d' % _WINDOW_SIZE,
-        })
-        hub_url = 'http://%s:%s@localhost:4445/wd/hub' % (
-            os.environ.get('SAUCE_USERNAME', 'lhchavez'),
-            os.environ['SAUCE_ACCESS_KEY']
-        )
-        return webdriver.Remote(desired_capabilities=capabilities,
-                                command_executor=hub_url)
     if browser_name == 'chrome':
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.binary_location = '/usr/bin/google-chrome'
         chrome_options.add_experimental_option(
             'prefs', {'intl.accept_languages': 'en_US'})
         chrome_options.add_argument('--lang=en-US')
         if request.config.option.headless:
             chrome_options.add_argument('--headless')
-        chrome_capabilities = DesiredCapabilities.CHROME
-        chrome_capabilities['loggingPrefs'] = {'browser': 'ALL'}
+        chrome_options.set_capability('loggingPrefs', {'browser': 'ALL'})
         chrome_browser = webdriver.Chrome(
-            options=chrome_options,
-            desired_capabilities=chrome_capabilities)
+            options=chrome_options)
         chrome_browser.set_window_size(*_WINDOW_SIZE)
         return chrome_browser
-    firefox_capabilities = DesiredCapabilities.FIREFOX
-    firefox_capabilities['marionette'] = True
-    firefox_capabilities['loggingPrefs'] = {'browser': 'ALL'}
     firefox_options = webdriver.firefox.options.Options()
-    firefox_profile = webdriver.FirefoxProfile()
-    firefox_profile.set_preference(
+    firefox_options.set_capability('marionette', True)
+    firefox_options.set_capability('loggingPrefs', {'browser': 'ALL'})
+    firefox_options.profile = webdriver.FirefoxProfile()
+    firefox_options.profile.set_preference(
         'webdriver.log.file', '/tmp/firefox_console')
-    if request.config.option.headless:
-        firefox_options.add_argument('-headless')
+    firefox_options.headless = request.config.option.headless
     firefox_browser = webdriver.Firefox(
-        capabilities=firefox_capabilities,
-        options=firefox_options,
-        firefox_profile=firefox_profile)
+        options=firefox_options)
     firefox_browser.set_window_size(*_WINDOW_SIZE)
     return firefox_browser
 
@@ -608,10 +592,6 @@ def driver(request, browser_name):
 
     try:
         browser = _get_browser(request, browser_name)
-        if util.CI:
-            print(('\n\nYou can see the report at '
-                   'https://saucelabs.com/beta/tests/%s/commands') %
-                  browser.session_id, file=sys.stderr)
 
         browser.implicitly_wait(_DEFAULT_TIMEOUT)
         if browser_name != 'firefox':
@@ -627,13 +607,6 @@ def driver(request, browser_name):
                          os.environ.get('PYTEST_XDIST_WORKER', 'w0'),
                          request.config.option)
         finally:
-            if util.CI:
-                try:
-                    browser.execute_script("sauce:job-result=%s" %
-                                           str(_SUCCESS).lower())
-                except WebDriverException:
-                    # Test is done. Just ignore the error.
-                    pass
             browser.quit()
     except:  # noqa: bare-except
         logging.exception('Failed to initialize')

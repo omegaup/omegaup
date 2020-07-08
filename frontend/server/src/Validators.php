@@ -140,9 +140,11 @@ class Validators {
             );
         }
         if (self::isRestrictedAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'aliasInUse'
             );
+            $exception->addCustomMessageToArray('parameter', $parameterName);
+            throw $exception;
         }
         if (!self::isValidAlias($parameter)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -379,13 +381,16 @@ class Validators {
         if (!self::isPresent($parameter, $parameterName, true)) {
             return;
         }
-        if (!is_numeric($parameter)) {
+        if (is_numeric($parameter)) {
+            $parameter = intval($parameter);
+        } elseif ($parameter instanceof \OmegaUp\Timestamp) {
+            $parameter = $parameter->time;
+        } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotADate',
                 $parameterName
             );
         }
-        $parameter = intval($parameter);
         if (!is_null($lowerBound) && $parameter < $lowerBound) {
             $exception = new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterDateTooSmall',

@@ -1,48 +1,132 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
+  <div class="card">
+    <div class="card-body">
       <form class="form" v-on:submit.prevent="onAddTag(tagname, public)">
         <div class="form-group">
-          <label>{{ T.wordsTags }}</label>
-          <input
-            name="tag_name"
-            v-model="tagname"
+          <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
+          <vue-typeahead-bootstrap
             v-if="canAddNewTags"
-            type="text"
-            size="20"
-            class="form-control"
-            autocomplete="off"
-          />
+            v-bind:data="publicTags"
+            v-bind:serializer="publicTagsSerializer"
+            v-on:hit="addPublicTag"
+            v-bind:auto-close="true"
+            v-bind:placeholder="T.publicTagsPlaceholder"
+          >
+          </vue-typeahead-bootstrap>
         </div>
-        <div class="form-group">
-          <div class="tag-list pull-left">
-            <a
-              class="tag pull-left"
-              href="#tags"
-              v-bind:data-key="tag.name"
-              v-for="tag in tags"
-              v-on:click="onAddTag(tag.name, public)"
-            >
-              {{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}
-            </a>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagName }}
+              </th>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagDelete }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="tag in selectedPublicTags" v-bind:key="tag">
+              <td class="align-middle">
+                <a v-bind:href="`/problem/?tag[]=${tag}`">
+                  {{ T.hasOwnProperty(tag) ? T[tag] : tag }}
+                </a>
+              </td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  v-on:click="removeTag(tag, true /* public */)"
+                >
+                  <font-awesome-icon v-bind:icon="['fas', 'trash']" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <template v-if="!hidePrivateTags">
+          <div class="form-group">
+            <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                v-model="newPrivateTag"
+                v-bind:placeholder="T.privateTagsPlaceholder"
+              />
+              <div class="input-group-append">
+                <button
+                  class="btn btn-outline-primary"
+                  type="button"
+                  v-bind:disabled="newPrivateTag === ''"
+                  v-on:click.prevent="addPrivateTag"
+                >
+                  {{ T.wordsAddTag }}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center" scope="col">
+                  {{ T.contestEditTagName }}
+                </th>
+                <th class="text-center" scope="col">
+                  {{ T.contestEditTagDelete }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="tag in selectedPrivateTags" v-bind:key="tag">
+                <td class="align-middle">
+                  <a v-bind:href="`/problem/?tag[]=${tag}`">
+                    {{ tag }}
+                  </a>
+                </td>
+                <td class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    v-on:click="removeTag(tag, false /* public */)"
+                  >
+                    <font-awesome-icon v-bind:icon="['fas', 'trash']" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
         <div class="form-group">
-          <label>{{ T.problemEditTagPublic }}</label>
-          <select class="form-control" v-model="public">
-            <option v-bind:value="false" selected="selected">
-              {{ T.wordsNo }}
+          <label class="font-weight-bold">{{ T.wordsLevel }}</label>
+          <select class="form-control" v-model="problemLevelTag">
+            <option v-for="levelTag in levelTags" v-bind:value="levelTag">
+              {{ T[levelTag] }}
             </option>
-            <option v-bind:value="true">{{ T.wordsYes }}</option>
           </select>
-        </div>
-        <div class="form-group">
-          <button class="btn btn-primary" v-if="canAddNewTags" type="submit">
-            {{ T.wordsAddTag }}
+          <small class="form-text text-muted mb-2">{{ T.levelTagHelp }}</small>
+          <button
+            type="button"
+            class="btn btn-primary"
+            v-bind:disabled="
+              !problemLevelTag || problemLevel === problemLevelTag
+            "
+            v-on:click.prevent="onUpdateProblemLevel"
+          >
+            {{ T.updateProblemLevel }}
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger ml-1"
+            v-bind:disabled="!problemLevel"
+            v-on:click.prevent="onDeleteProblemLevel"
+          >
+            {{ T.deleteProblemLevel }}
           </button>
         </div>
+        <!-- TODO: Change this for BS4 version -->
         <div class="form-group">
-          <label class="switch-container">
+          <label class="switch-container font-weight-bold">
             <div class="switch">
               <input type="checkbox" v-model="allowTags" />
               <span class="slider round"></span>
@@ -54,50 +138,6 @@
         </div>
       </form>
     </div>
-
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th>{{ T.contestEditTagName }}</th>
-          <th>{{ T.contestEditTagPublic }}</th>
-          <th>{{ T.contestEditTagDelete }}</th>
-        </tr>
-      </thead>
-      <tbody class="problem-tags">
-        <tr v-for="selectedTag in selectedTags">
-          <td class="tag-name">
-            <a
-              v-bind:data-key="selectedTag.tagname"
-              v-bind:href="`/problem/?tag[]=${selectedTag.tagname}`"
-            >
-              {{
-                T.hasOwnProperty(selectedTag.tagname)
-                  ? T[selectedTag.tagname]
-                  : selectedTag.tagname
-              }}
-            </a>
-          </td>
-          <td class="is_public">
-            {{ selectedTag.public ? T.wordsYes : T.wordsNo }}
-          </td>
-          <td>
-            <button
-              type="button"
-              class="close"
-              v-on:click="onRemoveTag(selectedTag.tagname)"
-            >
-              &times;
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <input
-      type="hidden"
-      name="selected_tags"
-      v-bind:value="selectedTagsList"
-      v-if="!canAddNewTags"
-    />
     <input
       type="hidden"
       name="allow_user_add_tags"
@@ -191,43 +231,75 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
+import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
-@Component
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+library.add(faTrash);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+    VueTypeaheadBootstrap,
+  },
+})
 export default class ProblemTags extends Vue {
-  @Prop() initialTags!: omegaup.Tag[];
-  @Prop({ default: [] }) initialSelectedTags!: types.SelectedTag[];
+  @Prop({ default: null }) problemLevel!: string | null;
+  @Prop() publicTags!: string[];
+  @Prop() selectedPublicTags!: string[];
+  @Prop() selectedPrivateTags!: string[];
+  @Prop() levelTags!: string[];
   @Prop() alias!: string;
   @Prop({ default: '' }) title!: string;
   @Prop({ default: true }) initialAllowTags!: boolean;
   @Prop({ default: false }) canAddNewTags!: boolean;
+  @Prop({ default: false }) hidePrivateTags!: boolean;
 
   T = T;
-  tags = this.initialTags;
-  selectedTags = this.initialSelectedTags;
   allowTags = this.initialAllowTags;
-  public = false;
-  tagname = '';
+  problemLevelTag: string | null = this.problemLevel;
+  newPrivateTag = '';
 
-  get selectedTagsList(): string {
-    return JSON.stringify(this.selectedTags);
-  }
-
-  onAddTag(tagname: string, isPublic: boolean): void {
-    this.selectedTags.push({ tagname: tagname, public: isPublic });
-    this.tags = this.tags.filter(val => val.name !== tagname);
-    if (this.canAddNewTags) {
-      this.$emit('add-tag', this.alias, tagname, isPublic);
+  addPublicTag(tag: string): void {
+    if (this.canAddNewTags && !this.selectedPublicTags.includes(tag)) {
+      this.$emit('emit-add-tag', this.alias, tag, true);
     }
   }
 
-  onRemoveTag(tagname: string): void {
-    this.tags.push({ name: tagname });
-    this.selectedTags = this.selectedTags.filter(
-      val => val.tagname !== tagname,
-    );
-    if (this.canAddNewTags) {
-      this.$emit('remove-tag', this.alias, tagname);
+  addPrivateTag(): void {
+    if (
+      this.canAddNewTags &&
+      this.newPrivateTag !== '' &&
+      !this.selectedPrivateTags.includes(this.newPrivateTag)
+    ) {
+      this.$emit('emit-add-tag', this.alias, this.newPrivateTag, false);
+      this.newPrivateTag = '';
     }
+  }
+
+  removeTag(tag: string, isPublic: boolean): void {
+    if (this.canAddNewTags) {
+      this.$emit('emit-remove-tag', this.alias, tag, isPublic);
+    }
+  }
+
+  onUpdateProblemLevel(): void {
+    if (this.problemLevelTag) {
+      this.$emit('emit-update-problem-level', this.problemLevelTag);
+    }
+  }
+
+  onDeleteProblemLevel(): void {
+    this.$emit('emit-update-problem-level');
+    this.problemLevelTag = null;
+  }
+
+  publicTagsSerializer(tagname: string): string {
+    if (T.hasOwnProperty(tagname)) {
+      return T[tagname];
+    }
+    return tagname;
   }
 
   @Watch('allowTags')
@@ -235,7 +307,12 @@ export default class ProblemTags extends Vue {
     if (!this.canAddNewTags) {
       return;
     }
-    this.$emit('change-allow-user-add-tag', this.alias, this.title, newValue);
+    this.$emit(
+      'emit-change-allow-user-add-tag',
+      this.alias,
+      this.title,
+      newValue,
+    );
   }
 }
 </script>

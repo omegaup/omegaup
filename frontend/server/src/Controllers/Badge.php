@@ -4,9 +4,10 @@ namespace OmegaUp\Controllers;
 
 /**
  * BadgesController
- *
- * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp|null, badge_alias: string, unlocked?: boolean, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
+
+ * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type BadgeDetailsPayload=array{badge: Badge}
+ * @psalm-type BadgeListPayload=array{badges: list<string>, ownedBadges: list<Badge>}
  */
 class Badge extends \OmegaUp\Controllers\Controller {
     /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
@@ -139,17 +140,36 @@ class Badge extends \OmegaUp\Controllers\Controller {
             $badgeAlias
         );
         return [
+            'assignation_time' => null,
             'badge_alias' => $badgeAlias,
             'first_assignation' => $firstAssignation,
             'total_users' => $totalUsers,
             'owners_count' => $ownersCount,
         ];
     }
+    /**
+     * @return array{smartyProperties: array{payload: BadgeListPayload, title: string}, entrypoint: string}
+     */
+    public static function getBadgeListForSmarty(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        $badges = self::apiList($r);
+        $ownedBadges = self::apiMyList($r);
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'badges' => $badges,
+                    'ownedBadges' => $ownedBadges['badges']
+                ],
+                'title' => 'omegaupTitleBadges'
+            ],
+            'entrypoint' => 'badge_list',
+        ];
+    }
 
     /**
      * @omegaup-request-param mixed $badge_alias
      *
-     * @return array{smartyProperties: array{badgeDetailsPayload: BadgeDetailsPayload}, template: string}
+     * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: string}, entrypoint: string}
      */
     public static function getDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
@@ -164,7 +184,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
         );
         return [
             'smartyProperties' => [
-                'badgeDetailsPayload' => [
+                'payload' => [
                     'badge' => (
                         self::getBadgeDetails($r['badge_alias']) +
                         [
@@ -177,8 +197,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
                         ]
                     ),
                 ],
+                'title' => 'omegaupTitleBadges'
             ],
-            'template' => 'badge.details.tpl',
+            'entrypoint' => 'badge_details',
         ];
     }
 }

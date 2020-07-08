@@ -273,17 +273,17 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update length
         $login = self::login($contestData['director']);
+        $contestData['request']['start_time'] += 1;
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
-            'start_time' => $contestData['request']['start_time'] + 1,
+            'start_time' => $contestData['request']['start_time'],
         ]);
 
         // Call API
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // Check contest data from DB
-        $contestData['request']['start_time'] = $r['start_time'];
         $this->assertContest($contestData['request']);
     }
 
@@ -300,19 +300,18 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update title
         $login = self::login($contestData['director']);
+        $contestData['request']['title'] = 'New title';
         $r = new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'start_time' => $contestData['request']['start_time'],
-            'title' => 'New title',
+            'title' => $contestData['request']['title'],
         ]);
 
         // Call API
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
 
         // Check contest data from DB
-        $contestData['request']['start_time'] = $r['start_time'];
-        $contestData['request']['title'] = $r['title'];
         $this->assertContest($contestData['request']);
     }
 
@@ -321,13 +320,15 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
      * active contest
      */
     public function testUpdatePenaltyTypeFromAContest() {
-        $originalTime = \OmegaUp\Time::get();
+        $originalTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
         // Create a contest with one problem.
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams([
             'startTime' => $originalTime,
             'lastUpdated' => $originalTime,
-            'finishTime' => $originalTime + 60 * 60,
+            'finishTime' => new \OmegaUp\Timestamp(
+                $originalTime->time + 60 * 60
+            ),
         ]));
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -337,7 +338,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create a run
         {
-            \OmegaUp\Time::setTimeForTesting($originalTime + 5 * 60);
+            \OmegaUp\Time::setTimeForTesting($originalTime->time + 5 * 60);
             ['user' => $contestant, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
             \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
 
@@ -353,14 +354,14 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             );
 
             // The run is sent 10 minutes after contest starts.
-            \OmegaUp\Time::setTimeForTesting($originalTime + 10 * 60);
+            \OmegaUp\Time::setTimeForTesting($originalTime->time + 10 * 60);
             $runData = \OmegaUp\Test\Factories\Run::createRun(
                 $problemData,
                 $contestData,
                 $identity
             );
             \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.0, 'AC', 10);
-            \OmegaUp\Time::setTimeForTesting($originalTime);
+            \OmegaUp\Time::setTimeForTesting($originalTime->time);
         }
 
         $directorLogin = self::login($contestData['director']);
@@ -467,15 +468,15 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $directorLogin = self::login($contestData['director']);
 
-        $r = new \OmegaUp\Request([
+        // Explicitly join contest
+        \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
-        ]);
-
-        // Explicitly join contest
-        \OmegaUp\Controllers\Contest::apiOpen($r);
-
-        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
+        ]));
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
 
         // Create a run
         $runData = \OmegaUp\Test\Factories\Run::createRun(
@@ -489,23 +490,33 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'Window length is not setted'
         );
 
-        $r['window_length'] = 0;
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
-
-        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'window_length' => 0,
+        ]));
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
 
         $this->assertNull(
             $contest['window_length'],
-            'Window length is not setted, because 0 is not a valid value'
+            'Window length is not set, because 0 is not a valid value'
         );
 
-        $windowLength = 10;
-        $r['window_length'] = $windowLength;
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
-
-        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
+        $windowLength = 10;
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'window_length' => $windowLength,
+        ]));
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
 
         $this->assertEquals($windowLength, $contest['window_length']);
 
@@ -520,19 +531,24 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 $contestantIdentity
             );
             $this->fail(
-                'User could not create a run when is out of contest time'
+                'Contestant should not have been able to create a run outside of contest time'
             );
         } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         }
 
-        $windowLength = 40;
-        $r['window_length'] = $windowLength;
         // Call API
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
-
-        $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
+        $windowLength = 40;
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+            'window_length' => $windowLength,
+        ]));
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
+            'contest_alias' => $contestData['request']['alias'],
+            'auth_token' => $directorLogin->auth_token,
+        ]));
 
         $this->assertEquals($windowLength, $contest['window_length']);
 
@@ -543,11 +559,13 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $contestantIdentity
         );
 
-        $r['window_length'] = 'Not valid';
-
         try {
             // Call API
-            \OmegaUp\Controllers\Contest::apiUpdate($r);
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $directorLogin->auth_token,
+                'window_length' => 'Not valid',
+            ]));
             $this->fail('Only numbers are allowed in window_length field');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Pass
@@ -569,7 +587,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'username' => $contestantIdentity->username,
-            'end_time' => $identities['users'][$index]['access_time'] + 60 * 60,
+            'end_time' => $identities['users'][$index]['access_time']->time + 60 * 60,
         ]));
 
         $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
@@ -581,22 +599,25 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             if ($identity['username'] === $contestantIdentity->username) {
                 // Identity with extended time
                 $this->assertEquals(
-                    $identity['end_time'],
-                    $identity['access_time'] + 60 * 60
+                    $identity['end_time']->time,
+                    $identity['access_time']->time + 60 * 60
                 );
             } else {
                 // Other identities keep end time with window length
                 $this->assertEquals(
-                    $identity['end_time'],
-                    $identity['access_time'] + $windowLength * 60
+                    $identity['end_time']->time,
+                    $identity['access_time']->time + $windowLength * 60
                 );
             }
         }
 
         // Updating window_length in the contest, to check whether user keeps the extension
         $windowLength = 20;
-        $r['window_length'] = $windowLength;
-        $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $directorLogin->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'window_length' => $windowLength,
+        ]));
 
         $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
             'auth_token' => $directorLogin->auth_token,
@@ -606,16 +627,18 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($identities['users'] as $identity) {
             // End time for all participants has been updated and extended time for the identity is no longer available
             $this->assertEquals(
-                $identity['end_time'],
-                $identity['access_time'] + $windowLength * 60
+                $identity['end_time']->time,
+                $identity['access_time']->time + $windowLength * 60
             );
         }
 
         // Updating window_length in the contest out of the valid range
-        $windowLength = 140;
-        $r['window_length'] = $windowLength;
         try {
-            \OmegaUp\Controllers\Contest::apiUpdate($r);
+            \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'window_length' => 140,
+            ]));
             $this->fail('Window length can not greater than contest length');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             // Pass
@@ -631,14 +654,16 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a problem
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $originalTime = \OmegaUp\Time::get();
+        $originalTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
         // Create contest with 5 hours and a window length 20 of minutes
         $contest = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'windowLength' => 20,
                 'startTime' => $originalTime,
-                'finishTime' => $originalTime + 60 * 5 * 60,
+                'finishTime' => new \OmegaUp\Timestamp(
+                    $originalTime->time + 60 * 5 * 60
+                ),
             ])
         );
 
@@ -655,7 +680,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Factories\Contest::addUser($contest, $identity);
 
         // User joins the contest 4 hours and 50 minutes after it starts
-        $updatedTime = $originalTime + 290 * 60;
+        $updatedTime = $originalTime->time + 290 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         \OmegaUp\Test\Factories\Contest::openContest($contest, $identity);
         $directorLogin = self::login($contest['director']);
@@ -683,7 +708,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         } finally {
-            \OmegaUp\Time::setTimeForTesting($originalTime);
+            \OmegaUp\Time::setTimeForTesting($originalTime->time);
         }
     }
 
@@ -694,14 +719,16 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a problem
         $problem = \OmegaUp\Test\Factories\Problem::createProblem();
 
-        $originalTime = \OmegaUp\Time::get();
+        $originalTime = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
         // Create contest with 5 hours and a window length 60 of minutes
         $contest = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
                 'windowLength' => 60,
                 'startTime' => $originalTime,
-                'finishTime' => $originalTime + 60 * 5 * 60,
+                'finishTime' => new \OmegaUp\Timestamp(
+                    $originalTime->time + 60 * 5 * 60
+                ),
             ])
         );
 
@@ -726,11 +753,11 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
-            'finish_time' => $originalTime + 60 * 5 * 60,
+            'finish_time' => $originalTime->time + 60 * 5 * 60,
         ]));
 
         // User creates a run 50 minutes later, it is ok
-        $updatedTime = $originalTime + 50 * 60;
+        $updatedTime = $originalTime->time + 50 * 60;
         \OmegaUp\Time::setTimeForTesting($updatedTime);
         $run = \OmegaUp\Test\Factories\Run::createRun(
             $problem,
@@ -756,7 +783,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             // Pass
             $this->assertEquals('runNotInsideContest', $e->getMessage());
         } finally {
-            \OmegaUp\Time::setTimeForTesting($originalTime);
+            \OmegaUp\Time::setTimeForTesting($originalTime->time);
         }
     }
 
@@ -948,5 +975,260 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $identity
         );
         \OmegaUp\Test\Factories\Run::gradeRun($run, 1.0, 'AC', 10);
+    }
+
+    public function testCreateSubmissionAfterUpdateContest() {
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        $login = self::login($contestData['director']);
+
+        // Call API
+        $response = \OmegaUp\Controllers\Contest::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'admission_mode' => 'public',
+                'languages' => '',
+            ])
+        );
+
+        $this->createRunInContest($contestData);
+    }
+
+    /**
+     * A PHPUnit data provider for the test with different partial score values.
+     *
+     * @return list<array{0: bool, 1: int, 2: float, 3: float}>
+     */
+    public function partialScoreValueProvider(): array {
+        return [
+            [false, 1, 0, 0.05],
+            [true, 1, 0.05, 0],
+            [false, 100, 0, 5],
+            [true, 100, 5, 0],
+        ];
+    }
+
+    /**
+     * @dataProvider partialScoreValueProvider
+     */
+    public function testCreateContestWhenPartialScoreIsUpdated(
+        bool $initialPartialScore,
+        int $problemsetProblemPoints,
+        float $expectedContestScoreBeforeUpdate,
+        float $expectedContestScoreAfterUpdate
+    ) {
+        // Get user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $partialScore = $initialPartialScore;
+
+        // Get a contest, partial_score default value is $partialScore
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['partialScore' => $partialScore]
+            )
+        );
+
+        $directorLogin = self::login($contestData['director']);
+
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            /*$params=*/            null,
+            $directorLogin
+        );
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData,
+            $problemsetProblemPoints
+        );
+
+        // Add user to contest
+        \OmegaUp\Test\Factories\Contest::addUser($contestData, $identity);
+
+        $login = self::login($identity);
+
+        // Explicitly join contest
+        \OmegaUp\Controllers\Contest::apiOpen(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertEquals($partialScore, $contest['partial_score']);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            0.05,
+            /*$verdict=*/'PA',
+            /*$submitDelay=*/null,
+            /*$runGuid=*/null,
+            /*$runId=*/null,
+            $problemsetProblemPoints
+        );
+
+        $directorLogin = self::login($contestData['director']);
+
+        $this->assertAPIsShowCorrectContestScore(
+            $contestData['request']['alias'],
+            $contestData['contest']->problemset_id,
+            $problemData['request']['problem_alias'],
+            $directorLogin->auth_token,
+            $runData['response']['guid'],
+            $expectedContestScoreBeforeUpdate,
+            $partialScore,
+            $identity->username
+        );
+
+        $partialScore = !$initialPartialScore;
+
+        // Call API to update partial score
+        \OmegaUp\Controllers\Contest::apiUpdate(
+            new \OmegaUp\Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contestData['request']['alias'],
+                'partial_score' => $partialScore,
+            ])
+        );
+
+        $login = self::login($identity);
+
+        $contest = \OmegaUp\Controllers\Contest::apiDetails(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestData['request']['alias'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertEquals($partialScore, $contest['partial_score']);
+
+        $this->assertAPIsShowCorrectContestScore(
+            $contestData['request']['alias'],
+            $contestData['contest']->problemset_id,
+            $problemData['request']['problem_alias'],
+            $directorLogin->auth_token,
+            $runData['response']['guid'],
+            $expectedContestScoreAfterUpdate,
+            $partialScore,
+            $identity->username
+        );
+    }
+
+    private function assertAPIsShowCorrectContestScore(
+        string $contestAlias,
+        int $problemsetId,
+        string $problemAlias,
+        string $directorToken,
+        string $runGuid,
+        float $expectedContestScore,
+        bool $partialScore,
+        string $contestantUsername
+    ) {
+        $runs = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
+            'contest_alias' => $contestAlias,
+            'auth_token' => $directorToken,
+        ]))['runs'];
+        $this->assertCount(1, $runs);
+        $run = $runs[0];
+        $status = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
+            'run_alias' => $runGuid,
+            'auth_token' => $directorToken,
+        ]));
+        $reportRankingProblems = \OmegaUp\Controllers\Contest::apiReport(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestAlias,
+                'auth_token' => $directorToken,
+            ])
+        )['ranking'];
+        $this->assertCount(1, $reportRankingProblems);
+        $this->assertCount(1, $reportRankingProblems[0]['problems']);
+        $report = $reportRankingProblems[0]['problems'][0];
+        $scoreboardProblems = \OmegaUp\Controllers\Contest::apiScoreboard(
+            new \OmegaUp\Request([
+                'contest_alias' => $contestAlias,
+                'auth_token' => $directorToken,
+            ])
+        )['ranking'];
+        $this->assertCount(1, $scoreboardProblems);
+        $this->assertCount(1, $scoreboardProblems[0]['problems']);
+        $scoreboard = $scoreboardProblems[0]['problems'][0];
+        $problemRuns = \OmegaUp\Controllers\Problem::apiRuns(
+            new \OmegaUp\Request([
+                'problem_alias' => $problemAlias,
+                'auth_token' => $directorToken,
+                'show_all' => true,
+            ])
+        )['runs'];
+        $this->assertCount(1, $problemRuns);
+        $problemRun = $problemRuns[0];
+        $details = \OmegaUp\Controllers\Run::apiDetails(new \OmegaUp\Request([
+            'run_alias' => $runGuid,
+            'auth_token' => $directorToken,
+        ]))['details'];
+        $bestScore = \OmegaUp\Controllers\Problem::apiBestScore(
+            new \OmegaUp\Request([
+                'auth_token' => $directorToken,
+                'problem_alias' => $problemAlias,
+                'problemset_id' => $problemsetId,
+                'username' => $contestantUsername,
+            ])
+        )['score'];
+
+        // This function gets details to download contest runs details
+        [$download] = \OmegaUp\DAO\Runs::getByProblemset($problemsetId);
+
+        $this->assertEquals($expectedContestScore, $run['contest_score']);
+        $this->assertEquals($expectedContestScore, $status['contest_score']);
+        $this->assertEquals($expectedContestScore, $scoreboard['points']);
+        $this->assertEquals($expectedContestScore, $details['contest_score']);
+        $this->assertEquals($expectedContestScore, $bestScore);
+        $this->assertEquals($expectedContestScore, $download['contest_score']);
+        $this->assertEquals(
+            $expectedContestScore,
+            $problemRun['contest_score']
+        );
+        if ($partialScore) {
+            $this->assertArrayHasKey('run_details', $report);
+        } else {
+            $this->assertArrayNotHasKey('run_details', $report);
+        }
+
+        // Get admin
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createAdminUser();
+        $adminLogin = self::login($admin);
+        $runsList = \OmegaUp\Controllers\Run::apiList(new \OmegaUp\Request([
+            'problem_alias' => $problemAlias,
+            'auth_token' => $adminLogin->auth_token,
+        ]))['runs'];
+        $this->assertCount(1, $runsList);
+        $runList = $runsList[0];
+        $this->assertEquals(
+            $expectedContestScore,
+            $runList['contest_score']
+        );
     }
 }

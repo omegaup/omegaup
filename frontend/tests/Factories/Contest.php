@@ -52,19 +52,19 @@ class ContestParams {
 
     /**
      * @readonly
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $startTime;
 
     /**
      * @readonly
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $finishTime;
 
     /**
      * @readonly
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $lastUpdated;
 
@@ -75,7 +75,19 @@ class ContestParams {
     public $penaltyCalcPolicy;
 
     /**
-     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, windowLength?: ?int, languages?: ?list<string>, startTime?: int, finishTime?: int, lastUpdated?: int, penaltyCalcPolicy?: string} $params
+     * @readonly
+     * @var string
+     */
+    public $feedback;
+
+    /**
+     * @readonly
+     * @var bool
+     */
+    public $partialScore;
+
+    /**
+     * @param array{title?: string, admissionMode?: string, basicInformation?: bool, requestsUserInformation?: string, contestDirector?: \OmegaUp\DAO\VO\Identities, contestDirectorUser?: \OmegaUp\DAO\VO\Users, partialScore?: bool, windowLength?: ?int, languages?: ?list<string>, startTime?: \OmegaUp\Timestamp, finishTime?: \OmegaUp\Timestamp, lastUpdated?: \OmegaUp\Timestamp, penaltyCalcPolicy?: string, feedback?: string} $params
      */
     public function __construct($params = []) {
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
@@ -98,13 +110,33 @@ class ContestParams {
         }
         $this->windowLength = $params['windowLength'] ?? null;
         $this->languages = $params['languages'] ?? null;
-        $this->startTime = $params['startTime'] ?? (\OmegaUp\Time::get() - 60 * 60);
-        $this->finishTime = $params['finishTime'] ?? (\OmegaUp\Time::get() + 60 * 60);
-        $this->lastUpdated = $params['lastUpdated'] ?? (\OmegaUp\Time::get() + 60 * 60);
+        $this->startTime = (
+            $params['startTime'] ??
+            new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 60 * 60)
+        );
+        $this->finishTime = (
+            $params['finishTime'] ??
+            new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60)
+        );
+        $this->lastUpdated = (
+            $params['lastUpdated'] ??
+            new \OmegaUp\Timestamp(\OmegaUp\Time::get() + 60 * 60)
+        );
         $this->penaltyCalcPolicy = $params['penaltyCalcPolicy'] ?? 'sum';
+        $this->feedback = $params['feedback'] ?? 'detailed';
+        $this->partialScore = $params['partialScore'] ?? true;
     }
 }
 
+/**
+ * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
+ * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
+ * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemSettings=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettings, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
+ * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
+ * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ */
 class Contest {
     /**
      * Returns a Request object with complete context to create a contest.
@@ -120,22 +152,26 @@ class Contest {
         $r = new \OmegaUp\Request([
             'title' => $params->title,
             'description' => 'description',
-            'start_time' => $params->startTime,
-            'finish_time' => $params->finishTime,
-            'last_updated' => $params->lastUpdated,
+            'start_time' => (new \OmegaUp\Timestamp($params->startTime))->time,
+            'finish_time' => (new \OmegaUp\Timestamp(
+                $params->finishTime
+            ))->time,
+            'last_updated' => (new \OmegaUp\Timestamp(
+                $params->lastUpdated
+            ))->time,
             'window_length' => $params->windowLength,
             'admission_mode' => $params->admissionMode,
             'alias' => substr($params->title, 0, 20),
             'points_decay_factor' => '0.02',
-            'partial_score' => '0',
+            'partial_score' => $params->partialScore,
             'submissions_gap' => '60',
-            'feedback' => 'yes',
+            'feedback' => $params->feedback,
             'penalty' => 100,
             'scoreboard' => 100,
             'penalty_type' => 'contest_start',
             'languages' => $params->languages,
             'recommended' => 0, // This is just a default value, it is not honored by apiCreate.
-            'basic_information' => $params->basicInformation,
+            'needs_basic_information' => $params->basicInformation,
             'requests_user_information' => $params->requestsUserInformation,
             'penalty_calc_policy' => $params->penaltyCalcPolicy,
         ]);
@@ -195,7 +231,7 @@ class Contest {
         $r['auth_token'] = $login->auth_token;
 
         // Call the API
-        $response = \OmegaUp\Controllers\Contest::apiCreate($r);
+        $response = \OmegaUp\Controllers\Contest::apiCreate(clone $r);
         if ($params->admissionMode === 'public') {
             self::forcePublic($contestData, $params->lastUpdated);
             $r['admission_mode'] = 'public';
@@ -217,7 +253,8 @@ class Contest {
      */
     public static function addProblemToContest(
         $problemData,
-        $contestData
+        $contestData,
+        int $points = 100
     ): void {
         // Log in as contest director
         $login = \OmegaUp\Test\ControllerTestCase::login(
@@ -229,7 +266,7 @@ class Contest {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => $problemData['request']['problem_alias'],
-            'points' => 100,
+            'points' => $points,
             'order_in_contest' => 1,
         ]));
     }
@@ -276,15 +313,17 @@ class Contest {
      * @param array{problem: \OmegaUp\DAO\VO\Problems, author: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, authorUser: \OmegaUp\DAO\VO\Users} $problemData
      * @param array{contest: \OmegaUp\DAO\VO\Contests|null, director: \OmegaUp\DAO\VO\Identities, request: \OmegaUp\Request, userDirector: \OmegaUp\DAO\VO\Users} $contestData
      * @param \OmegaUp\DAO\VO\Identities $user
+     *
+     * @return ProblemDetails
      */
     public static function openProblemInContest(
         $contestData,
         $problemData,
         $user
-    ): void {
+    ): array {
         $login = \OmegaUp\Test\ControllerTestCase::login($user);
 
-        \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+        return \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'problem_alias' => strval($problemData['request']['problem_alias']),
@@ -385,7 +424,7 @@ class Contest {
      */
     public static function forcePublic(
         array $contestData,
-        ?int $lastUpdated = null
+        ?\OmegaUp\Timestamp $lastUpdated = null
     ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
             strval($contestData['request']['alias'])

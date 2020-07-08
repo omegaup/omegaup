@@ -1,5 +1,5 @@
 import { Experiments, EventListenerList, OmegaUp } from './omegaup.ts';
-import API from './api.js';
+import * as API from './api';
 import * as Markdown from './markdown';
 import * as Time from './time';
 import * as Typeahead from './typeahead';

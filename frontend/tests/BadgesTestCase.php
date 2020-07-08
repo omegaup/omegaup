@@ -8,7 +8,9 @@ namespace OmegaUp\Test;
  * @author carlosabcs
  */
 class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
+    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is definitely defined. */
     const OMEGAUP_BADGES_ROOT = OMEGAUP_ROOT . '/badges';
+    /** @psalm-suppress MixedOperand OMEGAUP_ROOT is definitely defined. */
     const BADGES_TESTS_ROOT = OMEGAUP_ROOT . '/tests/badges';
     const MAX_BADGE_SIZE = 20 * 1024;
     const ICON_FILE = 'icon.svg';
@@ -17,16 +19,14 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
     const TEST_FILE = 'test.json';
 
     /**
-     * @readonly
-     * @var \OmegaUp\FileUploader
+     * @var \OmegaUp\FileUploader|null
      */
-    private $originalFileUploader;
+    private $originalFileUploader = null;
 
     public function setUp(): void {
         parent::setUp();
         \OmegaUp\Time::setTimeForTesting(null);
-        \OmegaUp\Test\Utils::cleanupFilesAndDB();
-        $this->originalFileUploader = \OmegaUp\FileHandler::getfileUploader();
+        $this->originalFileUploader = \OmegaUp\FileHandler::getFileUploader();
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
@@ -34,11 +34,15 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
 
     public function tearDown(): void {
         parent::tearDown();
+        $this->assertNotNull($this->originalFileUploader);
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->originalFileUploader
         );
     }
 
+    /**
+     * @return list<int>
+     */
     public static function getSortedResults(string $query) {
         /** @var list<array{user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($query);
@@ -46,7 +50,7 @@ class BadgesTestCase extends \OmegaUp\Test\ControllerTestCase {
         foreach ($rs as $user) {
             $results[] = $user['user_id'];
         }
-        asort($results);
+        sort($results);
         return $results;
     }
 }

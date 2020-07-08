@@ -45,8 +45,8 @@ class Notifications extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['timestamp'])) {
             /**
-             * @var string|int|float $data['timestamp']
-             * @var int $this->timestamp
+             * @var \OmegaUp\Timestamp|string|int|float $data['timestamp']
+             * @var \OmegaUp\Timestamp $this->timestamp
              */
             $this->timestamp = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -54,7 +54,9 @@ class Notifications extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->timestamp = \OmegaUp\Time::get();
+            $this->timestamp = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['read'])) {
             $this->read = boolval(
@@ -87,7 +89,7 @@ class Notifications extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $timestamp;  // CURRENT_TIMESTAMP
 

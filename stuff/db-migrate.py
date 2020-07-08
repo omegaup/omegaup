@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# type: ignore
 # pylint: disable=invalid-name
 # This program is intended to be invoked from the console, not to be used as a
 # module.
@@ -28,13 +27,17 @@ import contextlib
 import logging
 import os.path
 import sys
+import time
+import urllib.error
+from typing import Iterator, List, Optional, Sequence, Tuple
 
 import database_utils
+from lib import aws
 
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
-def _revision(args, auth):
+def _revision(args: argparse.Namespace, auth: Sequence[str]) -> int:
     '''Returns the latest revision that has been applied to the database.
 
     Returns 0 if no revision has been applied.
@@ -47,12 +50,12 @@ def _revision(args, auth):
             auth=auth).strip())
 
 
-def _scripts():
+def _scripts() -> List[Tuple[int, str, str]]:
     '''
     Returns the list of scripts in the frontend/database/ directory in the
     omegaUp checkout, ordered by revision.
     '''
-    scripts = []
+    scripts: List[Tuple[int, str, str]] = []
     scripts_dir = os.path.join(OMEGAUP_ROOT, 'frontend', 'database')
     for filename in os.listdir(scripts_dir):
         if not filename.endswith('.sql'):
@@ -66,53 +69,133 @@ def _scripts():
     return scripts
 
 
+def _set_aws_rds_timeout(args: argparse.Namespace,
+                         auth: Sequence[str],
+                         timeout: Optional[int] = None,
+                         retries: int = 10) -> None:
+    '''Set the MySQL through AWS RDS timeouts.'''
+    del auth  # unused
+    access_key, secret_key = aws.get_credentials(args.aws_username)
+
+    while True:
+        try:
+            if timeout is None:
+                aws.request(access_key,
+                            secret_key,
+                            region=args.aws_rds_region,
+                            service='rds',
+                            request_parameters={
+                                'Action': 'ResetDBParameterGroup',
+                                'DBParameterGroupName':
+                                args.aws_rds_parameter_group_name,
+                                'Parameters.member.1.ApplyMethod': 'immediate',
+                                'Parameters.member.1.ParameterName':
+                                'wait_timeout',
+                                'Version': '2014-09-01',
+                            })
+            else:
+                aws.request(access_key,
+                            secret_key,
+                            region=args.aws_rds_region,
+                            service='rds',
+                            request_parameters={
+                                'Action': 'ModifyDBParameterGroup',
+                                'DBParameterGroupName':
+                                args.aws_rds_parameter_group_name,
+                                'Parameters.member.1.ApplyMethod': 'immediate',
+                                'Parameters.member.1.ParameterName':
+                                'wait_timeout',
+                                'Parameters.member.1.ParameterValue': '10',
+                                'Version': '2014-09-01',
+                            })
+            return
+        except urllib.error.HTTPError as e:
+            body = e.read()
+            logging.error('Request failed. headers=%r, body=%s',
+                          tuple(e.headers.items()), body)
+            if (e.code != 400
+                    or b'<Code>InvalidDBParameterGroupState</Code>' not in body
+                    or retries == 0):
+                raise e
+            logging.info('Retrying, %d tries left...', retries)
+            retries -= 1
+            time.sleep(10)
+
+
+def _set_mysql_timeout(args: argparse.Namespace,
+                       auth: Sequence[str],
+                       timeout: Optional[int] = None) -> None:
+    '''Set the MySQL timeouts.'''
+    del args  # unused
+    if timeout is None:
+        timeout_str = 'DEFAULT'
+    else:
+        timeout_str = str(timeout)
+    database_utils.mysql('SET GLOBAL interactive_timeout = %s;' % timeout_str,
+                         dbname='mysql',
+                         auth=auth)
+    database_utils.mysql('SET GLOBAL wait_timeout = %s;' % timeout_str,
+                         dbname='mysql',
+                         auth=auth)
+
+
 @contextlib.contextmanager
-def _kill_other_connections_wrapper(args, auth):
+def _connection_timeout_wrapper(
+        args: argparse.Namespace,
+        auth: Sequence[str],
+        lower_timeout: str = 'no',
+        kill_other_connections: bool = False) -> Iterator[None]:
     '''A context manager that temporarily lowers the wait timeout.
 
-    This also kills any existing connections to the database. By doing so, the
-    next time they connect, they will use the lowered wait timeout, which in
-    turn should make this script be able to grab any locks within ~10s.
+    This can also also optionally kill any existing connections to the
+    database. By doing so, the next time they connect, they will use the
+    lowered wait timeout, which in turn should make this script be able to grab
+    any locks within ~10s.
     '''
-    if not args.kill_other_connections:
-        yield
-        return
-
     try:
-        logging.info('Lowering MySQL timeout...')
-        database_utils.mysql(
-            'SET GLOBAL interactive_timeout = 10;', dbname='mysql', auth=auth)
-        database_utils.mysql(
-            'SET GLOBAL wait_timeout = 10;', dbname='mysql', auth=auth)
-        logging.info('Killing all other MySQL connections...')
-        for line in database_utils.mysql(
-                'SHOW FULL PROCESSLIST;', dbname='mysql',
-                auth=auth).strip().split('\n'):
-            try:
-                database_utils.mysql(
-                    'KILL %s;' % line.split()[0], dbname='mysql', auth=auth)
-            except:  # noqa: bare-except
-                # The command already logged the error. There is one unkillable
-                # system thread and one dead thread (the one that issued the
-                # `SHOW FULL PROCESSLIST;` query.
-                pass
+        if lower_timeout == 'mysql':
+            logging.info('Lowering MySQL timeout...')
+            _set_mysql_timeout(args, auth, 10)
+        elif lower_timeout == 'aws':
+            logging.info('Lowering MySQL timeout...')
+            _set_aws_rds_timeout(args, auth, 10)
+
+        if kill_other_connections:
+            logging.info('Killing all other MySQL connections...')
+            for line in database_utils.mysql(
+                    'SHOW FULL PROCESSLIST;', dbname='mysql',
+                    auth=auth).strip().split('\n'):
+                try:
+                    database_utils.mysql(
+                        'KILL %s;' % line.split()[0],
+                        dbname='mysql',
+                        auth=auth)
+                except:  # noqa: bare-except
+                    # The command already logged the error. There is one
+                    # unkillable system thread and one dead thread (the one
+                    # that issued the `SHOW FULL PROCESSLIST;` query.
+                    pass
+        else:
+            # If we are not killing connections, at least sleep on it.
+            time.sleep(10)
+
         yield
     finally:
-        logging.info('Restoring MySQL timeout...')
-        database_utils.mysql(
-            'SET GLOBAL wait_timeout = DEFAULT;', dbname='mysql', auth=auth)
-        database_utils.mysql(
-            'SET GLOBAL interactive_timeout = DEFAULT;',
-            dbname='mysql',
-            auth=auth)
+        if lower_timeout == 'mysql':
+            logging.info('Restoring MySQL timeout...')
+            _set_mysql_timeout(args, auth, None)
+        elif lower_timeout == 'aws':
+            logging.info('Restoring MySQL timeout...')
+            _set_aws_rds_timeout(args, auth, None)
 
 
-def exists(args, auth):  # pylint: disable=unused-argument
+def exists(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Determines whether the metadata database is present.
 
     Exits with 1 (error) if the metadata database has not been installed.
     This is a helper command for Puppet.
     '''
+    del args  # unused
     if not database_utils.mysql(
             'SHOW DATABASES LIKE "_omegaup_metadata";', auth=auth):
         sys.exit(1)
@@ -122,7 +205,7 @@ def exists(args, auth):  # pylint: disable=unused-argument
         sys.exit(1)
 
 
-def latest(args, auth):
+def latest(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Determines whether the latest revision is deployed.
 
     Exits with 1 (error) if the latest script in the checkout has not been
@@ -132,7 +215,9 @@ def latest(args, auth):
         sys.exit(1)
 
 
-def migrate(args, auth, update_metadata=True):
+def migrate(args: argparse.Namespace,
+            auth: Sequence[str],
+            update_metadata: bool = True) -> None:
     '''Performs the database schema migration.
 
     This command applies all scripts that have not yet been applied in order,
@@ -142,8 +227,18 @@ def migrate(args, auth, update_metadata=True):
     latest_revision = 0
     if update_metadata:
         latest_revision = _revision(args, auth)
-    with _kill_other_connections_wrapper(args, auth):
-        for revision, name, path in _scripts():
+    scripts = _scripts()
+    if not scripts:
+        # If there are no scripts that need to be run, there is no need to even
+        # touch the connection timeout.
+        return
+
+    with _connection_timeout_wrapper(
+            args,
+            auth,
+            lower_timeout=args.lower_timeout,
+            kill_other_connections=args.kill_other_connections):
+        for revision, name, path in scripts:
             if latest_revision >= revision:
                 continue
             if args.limit and revision > args.limit:
@@ -171,8 +266,9 @@ def migrate(args, auth, update_metadata=True):
             logging.info('Done running script for revision %d', revision)
 
 
-def validate(args, auth):  # pylint: disable=unused-argument
+def validate(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Validates that the versioning is has no repeated or missing entries.'''
+    del args, auth  # unused
 
     expected_revision = 0
     valid = True
@@ -186,9 +282,11 @@ def validate(args, auth):  # pylint: disable=unused-argument
         sys.exit(1)
 
 
-def ensure(args, auth):  # pylint: disable=unused-argument
+def ensure(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Creates both the metadata database and table, if they don't exist yet.
     '''
+    del args  # unused
+
     database_utils.mysql(
         'CREATE DATABASE IF NOT EXISTS `_omegaup_metadata`;', auth=auth)
     # This is the table that tracks the migrations. |id| is the revision,
@@ -206,7 +304,7 @@ def ensure(args, auth):  # pylint: disable=unused-argument
         auth=auth)
 
 
-def reset(args, auth):
+def reset(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Forces the metadata table to be in a particular revision.
 
     Note that this does not apply or unapply any changes to the actual
@@ -225,18 +323,22 @@ def reset(args, auth):
             auth=auth)
 
 
-def print_revision(args, auth):
+def print_revision(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Prints the current revision.'''
     print(_revision(args, auth))
 
 
-def purge(args, auth):
+def purge(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Use purge to start from scratch.
 
     Drops & re-creates databases including the metadata. Note that purge will
     not re-apply the schema.
     '''
-    with _kill_other_connections_wrapper(args, auth):
+    with _connection_timeout_wrapper(
+            args,
+            auth,
+            lower_timeout=args.lower_timeout,
+            kill_other_connections=args.kill_other_connections):
         for dbname in args.databases.split(','):
             logging.info('Dropping database %s', dbname)
             database_utils.mysql(
@@ -249,7 +351,7 @@ def purge(args, auth):
             logging.info('Done creating database %s', dbname)
 
 
-def schema(args, auth):
+def schema(args: argparse.Namespace, auth: Sequence[str]) -> None:
     '''Prints the schema without modifying the usual database tables.
 
     This does touch the database, but is restricted to a dummy database
@@ -268,7 +370,7 @@ def schema(args, auth):
     database_utils.mysql('DROP DATABASE `%s`;' % _SCHEMA_DB, auth=auth)
 
 
-def main():
+def main() -> None:
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser()
@@ -277,14 +379,33 @@ def main():
         default=database_utils.default_config_file(),
         help='.my.cnf file that stores credentials')
     parser.add_argument(
+        '--hostname', default=None, type=str,
+        help='Hostname of the MySQL server')
+    parser.add_argument(
         '--username', default='root', help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument(
+        '--aws-username',
+        default='omegaup-rds-deploy',
+        help='The name of the AWS user to change the RDS timeout')
+    parser.add_argument(
+        '--aws-rds-region',
+        default='us-east-1',
+        help='The region of the RDS database')
+    parser.add_argument(
+        '--aws-rds-parameter-group-name',
+        default='omegaup-frontend',
+        help='The name of the Parameter Group name')
+    parser.add_argument(
+        '--lower-timeout',
+        default='mysql',
+        choices=('no', 'mysql', 'aws'),
+        help='Temporarily lower the wait timeout.')
+    parser.add_argument(
         '--kill-other-connections',
         action='store_true',
-        help=('Kill all connections to MySQL and '
-              'temporarily lower the wait timeout.'))
+        help='Kill all connections to MySQL.')
     subparsers = parser.add_subparsers(dest='command')
     subparsers.required = True
 
@@ -361,7 +482,8 @@ def main():
     auth = database_utils.authentication(
         config_file=args.mysql_config_file,
         username=args.username,
-        password=args.password)
+        password=args.password,
+        hostname=args.hostname)
     args.func(args, auth)
 
 

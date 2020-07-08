@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
-     * @return array<string, array{name: string, description: string, start_time: int, finish_time: int|null, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int|null, problems: array{problem_alias: string, problem_id: int}[]}>
+     * @return array<string, array{name: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, order: int, max_points: float, assignment_alias: string, assignment_type: string, publish_time_delay: int|null, problems: array{problem_alias: string, problem_id: int}[]}>
      */
     final public static function getProblemsAssignmentByCourseAlias(
         \OmegaUp\DAO\VO\Courses $course
@@ -24,8 +24,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 a.name,
                 a.alias AS assignment_alias,
                 a.description,
-                UNIX_TIMESTAMP(a.start_time) AS start_time,
-                UNIX_TIMESTAMP(a.finish_time) AS finish_time,
+                a.start_time,
+                a.finish_time,
                 a.assignment_type,
                 a.order,
                 a.max_points,
@@ -43,10 +43,12 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             WHERE
                 c.alias = ?
             ORDER BY
-                a.`assignment_id`, pp.`order`, `pp`.`problem_id` ASC;
+                a.`assignment_id` ASC,
+                pp.`order` ASC,
+                `pp`.`problem_id` ASC;
         ';
         $val = [$course->alias];
-        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: int|null, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, publish_time_delay: int|null, start_time: int}> $problemsAssignments */
+        /** @var list<array{assignment_alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problem_alias: string, problem_id: int, publish_time_delay: int|null, start_time: \OmegaUp\Timestamp}> $problemsAssignments */
         $problemsAssignments = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $val
@@ -101,7 +103,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
      * Get problemset problems including problemset alias, points, and order
      *
-     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
@@ -115,6 +117,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     p.visits,
                     p.submissions,
                     p.accepted,
+                    p.quality_seal,
+                    p.input_limit,
                     IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
                     p.languages,
@@ -132,10 +136,61 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
+        );
+    }
+
+    /**
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     */
+    final public static function getProblemsByAssignmentAlias(
+        string $assignmentAlias,
+        string $courseAlias
+    ): array {
+        // Build SQL statement
+        $sql = 'SELECT
+                    p.title,
+                    p.problem_id,
+                    p.alias,
+                    p.visibility,
+                    p.visits,
+                    p.submissions,
+                    p.accepted,
+                    p.quality_seal,
+                    p.input_limit,
+                    IFNULL(p.difficulty, 0.0) AS difficulty,
+                    pp.order,
+                    p.languages,
+                    pp.points,
+                    pp.commit,
+                    pp.version
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problemset_Problems pp
+                ON
+                    pp.problem_id = p.problem_id
+                INNER JOIN
+                    Assignments a
+                ON
+                    a.problemset_id = pp.problemset_id
+                INNER JOIN
+                    Courses c
+                ON
+                    c.course_id = a.course_id
+                WHERE
+                    a.alias = ?
+                    AND c.alias = ?
+                ORDER BY
+                    pp.order, pp.problem_id ASC;';
+
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$assignmentAlias, $courseAlias]
         );
     }
 
@@ -283,7 +338,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         \OmegaUp\DAO\VO\Users $user,
         string $updatePublished
     ): void {
-        $now = \OmegaUp\Time::get();
+        $now = new \OmegaUp\Timestamp(\OmegaUp\Time::get());
 
         if ($updatePublished === \OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS) {
             $sql = '
@@ -304,7 +359,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 SET
                     pp.commit = ?, pp.version = ?
                 WHERE
-                    UNIX_TIMESTAMP(c.finish_time) >= ? AND
+                    c.finish_time >= ? AND
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
@@ -334,7 +389,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 SET
                     pp.commit = ?, pp.version = ?
                 WHERE
-                    UNIX_TIMESTAMP(a.finish_time) >= ? AND
+                    a.finish_time >= ? AND
                     pp.problem_id = ? AND
                     acl.owner_id = ?;
             ';
@@ -362,7 +417,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ON
                     c.contest_id = p.contest_id
                 WHERE
-                    UNIX_TIMESTAMP(c.finish_time) >= ? AND
+                    c.finish_time >= ? AND
                     pp.problem_id = ?;
             ';
             /** @var list<array{acl_id: int, problemset_id: int}> */
@@ -388,7 +443,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ON
                     a.assignment_id = p.assignment_id
                 WHERE
-                    UNIX_TIMESTAMP(a.finish_time) >= ? AND
+                    a.finish_time >= ? AND
                     pp.problem_id = ?;
             ';
             /** @var list<array{acl_id: int, problemset_id: int}> */
@@ -479,10 +534,10 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         $sql = '
             INSERT IGNORE INTO
                 Runs (
-                    submission_id, version, verdict
+                    submission_id, version, commit, verdict
                 )
             SELECT
-                s.submission_id, ?, "JE"
+                s.submission_id, ?, ?, "JE"
             FROM
                 Submissions s
             WHERE
@@ -493,6 +548,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
         ';
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [
             $problemsetProblem->version,
+            $problemsetProblem->commit,
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
         ]);
@@ -520,5 +576,16 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             $problemsetProblem->problemset_id,
             $problemsetProblem->problem_id,
         ]);
+    }
+
+    /**
+     * It removes all the problems belong to problemset and return the number of
+     * affected rows
+     */
+    public static function removeProblemsFromProblemset(int $problemsetId): int {
+        $sql = 'DELETE FROM `Problemset_Problems` WHERE problemset_id = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problemsetId]);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }

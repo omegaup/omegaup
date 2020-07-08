@@ -79,30 +79,38 @@ class Contests extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['start_time'])) {
             /**
-             * @var string|int|float $data['start_time']
-             * @var int $this->start_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['start_time']
+             * @var \OmegaUp\Timestamp $this->start_time
              */
             $this->start_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $data['start_time']
                 )
             );
+        } else {
+            $this->start_time = new \OmegaUp\Timestamp(
+                946706400
+            ); // 2000-01-01 06:00:00
         }
         if (isset($data['finish_time'])) {
             /**
-             * @var string|int|float $data['finish_time']
-             * @var int $this->finish_time
+             * @var \OmegaUp\Timestamp|string|int|float $data['finish_time']
+             * @var \OmegaUp\Timestamp $this->finish_time
              */
             $this->finish_time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
                     $data['finish_time']
                 )
             );
+        } else {
+            $this->finish_time = new \OmegaUp\Timestamp(
+                946706400
+            ); // 2000-01-01 06:00:00
         }
         if (isset($data['last_updated'])) {
             /**
-             * @var string|int|float $data['last_updated']
-             * @var int $this->last_updated
+             * @var \OmegaUp\Timestamp|string|int|float $data['last_updated']
+             * @var \OmegaUp\Timestamp $this->last_updated
              */
             $this->last_updated = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -110,7 +118,9 @@ class Contests extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->last_updated = \OmegaUp\Time::get();
+            $this->last_updated = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['window_length'])) {
             $this->window_length = intval(
@@ -234,21 +244,21 @@ class Contests extends \OmegaUp\DAO\VO\VO {
     /**
      * Hora de inicio de este concurso
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
-    public $start_time = 946706400; // 2000-01-01 06:00:00
+    public $start_time;  // 2000-01-01 06:00:00
 
     /**
      * Hora de finalizacion de este concurso
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
-    public $finish_time = 946706400; // 2000-01-01 06:00:00
+    public $finish_time;  // 2000-01-01 06:00:00
 
     /**
      * Indica la hora en que se actualizó de privado a público un concurso o viceversa
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $last_updated;  // CURRENT_TIMESTAMP
 
@@ -309,11 +319,11 @@ class Contests extends \OmegaUp\DAO\VO\VO {
     public $submissions_gap = 60;
 
     /**
-     * [Campo no documentado]
+     * Indica la cantidad de información que se mostrará en los detalles de un envío. "detailed" muestra el veredicto de la solución caso por caso. "summary" muestra porcentaje de casos que tuvo bien, así como el veredicto del caso con peor calificación. "none" oculta toda la información de los veredictos.
      *
-     * @var string|null
+     * @var string
      */
-    public $feedback = null;
+    public $feedback = 'none';
 
     /**
      * Entero indicando el número de minutos con que se penaliza por recibir un no-accepted

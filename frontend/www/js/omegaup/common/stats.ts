@@ -2,13 +2,13 @@ import common_Stats from '../components/common/Stats.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import { types } from '../api_types';
 import * as ui from '../ui';
 import * as Highcharts from 'highcharts';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.StatsPayload('stats-payload');
+  const payload = types.payloadParsers.StatsPayload();
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
@@ -20,11 +20,11 @@ OmegaUp.on('ready', () => {
   const getStats = (entityType: string): void => {
     if (entityType === 'contest') {
       api.Contest.stats({ contest_alias: payload.alias })
-        .then(s => Vue.set(statsChart, 'stats', s))
+        .then((s) => Vue.set(statsChart, 'stats', s))
         .catch(ui.apiError);
     } else {
       api.Problem.stats({ problem_alias: payload.alias })
-        .then(s => Vue.set(statsChart, 'stats', s))
+        .then((s) => Vue.set(statsChart, 'stats', s))
         .catch(ui.apiError);
     }
   };
@@ -72,8 +72,8 @@ OmegaUp.on('ready', () => {
   };
 
   let statsChart = new Vue({
-    el: '#common-stats',
-    render: function(createElement) {
+    el: '#main-container',
+    render: function (createElement) {
       return createElement('omegaup-common-stats', {
         props: {
           stats: this.stats,

@@ -174,6 +174,59 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
     return scores
 
 
+def update_author_rank(cur: MySQLdb.cursors.BaseCursor) -> None:
+    '''Updates the author's ranking'''
+    logging.info('Updating authors ranking...')
+    cur.execute('''
+        SELECT
+            `u`.`user_id`,
+            `i`.`username`,
+            `i`.`name`,
+            `i`.`country_id`,
+            `i`.`state_id`,
+            `isc`.`school_id`,
+            SUM(`p`.`quality`) AS `author_score`
+        FROM
+            `Problems` AS `p`
+        INNER JOIN
+            `ACLs` AS `a` ON `a`.`acl_id` = `p`.`acl_id`
+        INNER JOIN
+            `Users` AS `u` ON `u`.`user_id` = `a`.`owner_id`
+        INNER JOIN
+            `Identities` AS `i` ON `i`.`identity_id` = `u`.`main_identity_id`
+        LEFT JOIN
+            `Identities_Schools` AS `isc`
+        ON
+            `isc`.`identity_school_id` = `i`.`current_identity_school_id`
+        WHERE
+            `p`.`quality` IS NOT NULL
+        GROUP BY
+            `u`.`user_id`
+        ORDER BY
+            `author_score` DESC
+    ''')
+
+    prev_score = None
+    rank = 0
+    for index, row in enumerate(cur):
+        if row['author_score'] != prev_score:
+            rank = index + 1
+        prev_score = row['author_score']
+        cur.execute('''
+                    INSERT INTO
+                        `User_Rank` (`user_id`, `username`, `author_score`,
+                                     `author_ranking`, `name`, `country_id`,
+                                     `state_id`, `school_id`)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ON DUPLICATE KEY
+                        UPDATE
+                            author_ranking = %s,
+                            author_score = %s;''',
+                    (row['user_id'], row['username'], row['author_score'],
+                     rank, row['name'], row['country_id'], row['state_id'],
+                     row['school_id'], rank, row['author_score']))
+
+
 def update_user_rank_cutoffs(cur: MySQLdb.cursors.BaseCursor,
                              scores: Sequence[float]) -> None:
     '''Updates the user ranking cutoff table.'''
@@ -467,16 +520,16 @@ def update_coder_of_the_month_candidates(
             1)
 
     # First make sure there are not already selected coder of the month
-        cur.execute('''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `Coder_Of_The_Month`
-                WHERE
-                    `time` = %s AND
-                    `selected_by` IS NOT NULL AND
-                    `category` = %s;
-                ''', (first_day_of_next_month, category))
+    cur.execute('''
+            SELECT
+                COUNT(*) AS `count`
+            FROM
+                `Coder_Of_The_Month`
+            WHERE
+                `time` = %s AND
+                `selected_by` IS NOT NULL AND
+                `category` = %s;
+            ''', (first_day_of_next_month, category))
     for row in cur:
         if row['count'] > 0:
             logging.info('Skipping because already exist selected coder')
@@ -614,7 +667,8 @@ def update_coder_of_the_month_candidates(
 def update_users_stats(
         cur: MySQLdb.cursors.BaseCursor,
         dbconn: MySQLdb.connections.Connection,
-        date: datetime.date) -> None:
+        date: datetime.date,
+        update_coder_of_the_month: bool) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
     try:
@@ -627,20 +681,31 @@ def update_users_stats(
             raise
 
         try:
-            update_coder_of_the_month_candidates(cur, date, 'all')
+            update_author_rank(cur)
             dbconn.commit()
         except:  # noqa: bare-except
-            logging.exception(
-                'Failed to update candidates to coder of the month')
+            logging.exception('Failed to update authors ranking')
             raise
 
-        try:
-            update_coder_of_the_month_candidates(cur, date, 'female')
-            dbconn.commit()
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to update candidates to coder of the month female')
-            raise
+        if update_coder_of_the_month:
+            try:
+                update_coder_of_the_month_candidates(cur, date, 'all')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month')
+                raise
+
+            try:
+                update_coder_of_the_month_candidates(cur, date, 'female')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month female')
+                raise
+        else:
+            logging.info('Skipping updating Coder of the Month')
+
         logging.info('Users stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all users stats')
@@ -690,6 +755,9 @@ def main() -> None:
                         type=_parse_date,
                         default=_default_date(),
                         help='The date the command should take as today')
+    parser.add_argument('--update-coder-of-the-month',
+                        action='store_true',
+                        help='Update the Coder of the Month')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -698,7 +766,8 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             update_problem_accepted_stats(cur)
-            update_users_stats(cur, dbconn, args.date)
+            update_users_stats(cur, dbconn, args.date,
+                               args.update_coder_of_the_month)
             update_schools_stats(cur, dbconn, args.date)
     finally:
         dbconn.close()

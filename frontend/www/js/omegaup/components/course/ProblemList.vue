@@ -68,10 +68,20 @@
         </tr>
       </tbody>
     </table>
+    <div>
+      <a
+        class="btn btn-primary"
+        v-bind:class="{ disabled: !problemsOrderChanged }"
+        role="button"
+        v-on:click="saveNewOrder"
+      >
+        {{ T.wordsSaveNewOrder }}
+      </a>
+    </div>
     <div class="panel-footer" v-show="showForm">
       <form>
         <div class="row">
-          <div class="col-md-4" v-show="showTopicsAndLevel">
+          <div class="col-md-4" v-show="showTopicsAndDifficulty">
             <div class="form-group">
               <label
                 >{{ T.wordsTopics }}
@@ -91,26 +101,26 @@
             </div>
             <div class="form-group">
               <label
-                >{{ T.wordsLevels }}
-                <select class="form-control" v-model="level">
+                >{{ T.wordsDifficulty }}
+                <select class="form-control" v-model="difficulty">
                   <option value="intro">
-                    {{ T.problemLevelIntro }}
+                    {{ T.problemDifficultyIntro }}
                   </option>
                   <option value="easy">
-                    {{ T.problemLevelEasy }}
+                    {{ T.problemDifficultyEasy }}
                   </option>
                   <option value="medium">
-                    {{ T.problemLevelMedium }}
+                    {{ T.problemDifficultyMedium }}
                   </option>
                   <option value="hard">
-                    {{ T.problemLevelHard }}
+                    {{ T.problemDifficultyHard }}
                   </option>
                 </select></label
               >
             </div>
           </div>
           <div class="col-md-8">
-            <div class="row" v-show="showTopicsAndLevel">
+            <div class="row" v-show="showTopicsAndDifficulty">
               <div class="form-group col-md-12">
                 <label
                   >{{ T.wordsProblems }}
@@ -135,7 +145,7 @@
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
                     class="form-control"
-                    v-bind:init="el => typeahead.problemTypeahead(el)"
+                    v-bind:init="(el) => typeahead.problemTypeahead(el)"
                     v-model="problemAlias"
                   ></omegaup-autocomplete
                 ></label>
@@ -181,6 +191,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
@@ -192,7 +203,7 @@ import Autocomplete from '../Autocomplete.vue';
 })
 export default class CourseProblemList extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
-  @Prop() assignmentProblems!: omegaup.AssignmentProblem[];
+  @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: omegaup.Assignment;
 
@@ -200,22 +211,23 @@ export default class CourseProblemList extends Vue {
   T = T;
   assignment: Partial<omegaup.Assignment> = {};
   showForm = false;
-  level = 'intro';
+  difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
   problemAlias = '';
-  showTopicsAndLevel = false;
+  showTopicsAndDifficulty = false;
+  problemsOrderChanged = false;
 
   get tags(): string[] {
     let t = this.topics.slice();
-    t.push(this.level);
+    t.push(this.difficulty);
     return t;
   }
 
   onShowForm(): void {
     this.showForm = true;
     this.problemAlias = '';
-    this.level = 'intro';
+    this.difficulty = 'intro';
     this.topics = [];
   }
 
@@ -225,7 +237,16 @@ export default class CourseProblemList extends Vue {
       0,
       this.assignmentProblems.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort', this.assignment, this.assignmentProblems);
+    this.problemsOrderChanged = true;
+  }
+
+  saveNewOrder() {
+    this.$emit(
+      'sort',
+      this.assignment.alias,
+      this.assignmentProblems.map((problem) => problem.alias),
+    );
+    this.problemsOrderChanged = false;
   }
 
   @Watch('assignment')

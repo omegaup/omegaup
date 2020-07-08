@@ -19,9 +19,12 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         return !is_null(self::getByPK($identityId, $problemsetId));
     }
 
+    /**
+     * @param \OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews $container
+     */
     public static function checkAndSaveFirstTimeAccess(
         \OmegaUp\DAO\VO\Identities $identity,
-        object $container,
+        $container,
         bool $grantAccess = false,
         bool $shareUserInformation = false
     ): \OmegaUp\DAO\VO\ProblemsetIdentities {
@@ -58,12 +61,29 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         }
         if (is_null($problemsetIdentity->access_time)) {
             // If its set to default time, update it
-            $problemsetIdentity->access_time = $currentTime;
-            $finishTime = intval($container->finish_time);
-            if (!empty($container->window_length)) {
-                $finishTime = min(
-                    $currentTime + intval($container->window_length) * 60,
-                    $finishTime
+            $problemsetIdentity->access_time = new \OmegaUp\Timestamp(
+                $currentTime
+            );
+            /** @var \OmegaUp\Timestamp|null */
+            $finishTime = (
+                empty($container->finish_time) ?
+                null :
+                $container->finish_time
+            );
+            $windowLength = (
+                empty($container->window_length) ?
+                null :
+                intval($container->window_length) * 60
+            );
+            if (
+                !empty($windowLength) &&
+                (
+                    is_null($finishTime) ||
+                    $finishTime->time > $currentTime + $windowLength
+                )
+            ) {
+                $finishTime = new \OmegaUp\Timestamp(
+                    $currentTime + $windowLength
                 );
             }
             $problemsetIdentity->end_time = $finishTime;
@@ -74,12 +94,12 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
     }
 
     /**
-     * @return list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}>
+     * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}>
      */
     public static function getWithExtraInformation(int $problemsetId): array {
         $sql = 'SELECT
-                    UNIX_TIMESTAMP(pi.access_time) as access_time,
-                    UNIX_TIMESTAMP(pi.end_time) as end_time,
+                    pi.access_time,
+                    pi.end_time,
                     i.username,
                     i.country_id,
                     IF(a.owner_id=i.identity_id, 1, NULL) as is_owner
@@ -100,10 +120,55 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                 WHERE
                     p.problemset_id = ?;';
 
-        /** @var list<array{access_time: int|null, country_id: null|string, end_time: int|null, is_owner: int|null, username: string}> */
+        /** @var list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
+        );
+    }
+
+    /**
+     * @return list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, username: string, name: null|string}>
+     */
+    public static function searchUsers(
+        string $usernameOrName,
+        int $problemsetId
+    ): array {
+        $sql = 'SELECT DISTINCT
+                    i.username,
+                    i.name,
+                    i.country_id,
+                    pi.access_time,
+                    pi.end_time
+                FROM
+                    Problemset_Identities pi
+                INNER JOIN
+                    Identities i
+                ON
+                    i.identity_id = pi.identity_id
+                INNER JOIN
+                    Problemsets p
+                ON
+                    p.problemset_id = pi.problemset_id
+                WHERE
+                    p.problemset_id = ? AND
+                    (
+                        i.username = ? OR
+                        i.name = ? OR
+                        i.username LIKE CONCAT("%", ?, "%") OR
+                        i.name LIKE CONCAT("%", ?, "%")
+                    );';
+
+        /** @var list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, name: null|string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
+                $problemsetId,
+                $usernameOrName,
+                $usernameOrName,
+                $usernameOrName,
+                $usernameOrName
+            ]
         );
     }
 
@@ -153,7 +218,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
                     `Problemset_Identities`
                 SET
                     `end_time` = LEAST(
-                        FROM_UNIXTIME(?),
+                        ?,
                         DATE_ADD(`access_time`, INTERVAL ? MINUTE)
                      )
                 WHERE
@@ -178,7 +243,7 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         $sql = 'UPDATE
                     `Problemset_Identities`
                 SET
-                    `end_time` = FROM_UNIXTIME(?)
+                    `end_time` = ?
                 WHERE
                     `problemset_id` = ?;';
 
@@ -210,6 +275,20 @@ class ProblemsetIdentities extends \OmegaUp\DAO\Base\ProblemsetIdentities {
         ];
 
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+    }
+
+    final public static function removeIdentitiesFromProblemset(
+        int $problemsetId
+    ): int {
+        $sql = '
+            DELETE FROM
+                `Problemset_Identities`
+            WHERE
+                `problemset_id` = ?;';
+
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, [$problemsetId]);
+
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 }

@@ -30,7 +30,7 @@
 import * as Util from './util';
 
 export default {
-  data: function() {
+  data: function () {
     return {
       zip: null,
       active: null,
@@ -38,11 +38,11 @@ export default {
     };
   },
   methods: {
-    select: function(item) {
+    select: function (item) {
       this.active = item.name;
       item
         .async('string')
-        .then(value => {
+        .then((value) => {
           this.contents = value;
         })
         .catch(Util.asyncError);

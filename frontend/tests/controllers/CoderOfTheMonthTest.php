@@ -103,18 +103,18 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $r['auth_token']
         );
         $graduationDate = null;
-        if (!is_null($identityDb->current_identity_school_id)) {
+        if (!is_null($identityDb['current_identity_school_id'])) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $identityDb->current_identity_school_id
+                $identityDb['current_identity_school_id']
             );
             if (!is_null($identitySchool)) {
                 $graduationDate = $identitySchool->graduation_date;
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb->name);
-        $this->assertEquals($r['country_id'], $identityDb->country_id);
-        $this->assertEquals($r['state_id'], $identityDb->state_id);
+        $this->assertEquals($r['name'], $identityDb['name']);
+        $this->assertEquals($r['country_id'], $identityDb['country_id']);
+        $this->assertEquals($r['state_id'], $identityDb['state_id']);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(
             gmdate(
@@ -125,7 +125,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb->language_id);
+        $this->assertEquals($locale->language_id, $identityDb['language_id']);
     }
 
     /**
@@ -163,7 +163,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             ->modify('first day of last month')
             ->format('Y-m-d');
 
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
         $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
         $this->createRuns($extraIdentity, $runCreationDate, 1 /*numRuns*/);
@@ -228,8 +227,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'category' => $category,
         ]));
 
-        // Just one Coder of The Month, the one calculated on the previous test.
-        $this->assertNotEmpty($response['coders']);
+        // There are no previous Coders of The Month.
+        $this->assertEmpty($response['coders']);
 
         // Adding parameter date should return the same value, it helps
         // to test getMonthlyList function.
@@ -239,7 +238,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             'date' => date('Y-m-d', \OmegaUp\Time::get()),
             'category' => $category,
         ]));
-        $this->assertNotEmpty($response['coders']);
+        $this->assertEmpty($response['coders']);
     }
 
     /**
@@ -291,7 +290,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
                 '-4 month'
             )
         );
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         $runCreationDate = date_format($runCreationDate, 'Y-m-d');
         $this->createRuns($identity1, $runCreationDate, 1 /*numRuns*/);
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
@@ -323,23 +321,23 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
         $this->getCoderOfTheMonth($today, '-1 month', $category);
 
-        // First run api with invalid school_id
+        // First run function with invalid school_id
         try {
-            \OmegaUp\Controllers\School::apiSchoolCodersOfTheMonth(new \OmegaUp\Request([
-                'school_id' => 1231,
-            ]));
+            \OmegaUp\Controllers\School::getSchoolCodersOfTheMonth(
+                1231
+            );
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals($e->getMessage(), 'schoolNotFound');
         }
 
-        // Now run api with valid school_id
-        $result = \OmegaUp\Controllers\School::apiSchoolCodersOfTheMonth(new \OmegaUp\Request([
-            'school_id' => $school->school_id,
-        ]));
+        // Now run function with valid school_id
+        $results = \OmegaUp\Controllers\School::getSchoolCodersOfTheMonth(
+            $school->school_id
+        );
         // Get all usernames and verify that only identity1 username
         // and identity2 username are part of results
         $resultCoders = [];
-        foreach ($result['coders'] as $res) {
+        foreach ($results as $res) {
             $resultCoders[] = $res['username'];
         }
 
@@ -403,10 +401,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCoderOfTheMonthAfterYear(string $category) {
         $gender = $category == 'all' ? 'male' : 'female';
-        // Cleaning Rank and Runs tables in order to avoid this test fails in
-        // the moment of calculate the coder of the month
-        \OmegaUp\Test\Utils::deleteAllRanks();
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         [
             'user' => $userLastYear,
             'identity' => $identity,
@@ -565,7 +559,6 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         self::updateIdentity($identity2, $gender);
         ['identity' => $identity3] = \OmegaUp\Test\Factories\User::createUser();
         self::updateIdentity($identity3, $gender);
-        \OmegaUp\Test\Utils::deleteAllPreviousRuns();
         $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 2);
         $this->createRuns($identity1, $runCreationDate->format('Y-m-d'), 4);
         $this->createRuns($identity2, $runCreationDate->format('Y-m-d'), 4);

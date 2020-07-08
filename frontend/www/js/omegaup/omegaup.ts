@@ -1,5 +1,5 @@
 import * as ui from './ui';
-import * as api from './api_transitional';
+import * as api from './api';
 import * as errors from './errors';
 import * as time from './time';
 
@@ -68,16 +68,44 @@ export namespace omegaup {
     selected: boolean;
   }
 
+  export enum VisibilityMode {
+    Default,
+    New,
+    Edit,
+    AddProblem,
+  }
+
   export enum AdmissionMode {
     Private = 'private',
     Registration = 'registration',
     Public = 'public',
   }
 
+  export enum ColumnType {
+    Number = 'number',
+    String = 'string',
+  }
+
+  export enum CountdownFormat {
+    EventCountdown,
+    WaitBetweenUploadsSeconds,
+  }
+
+  export enum SortOrder {
+    Ascending = 'asc',
+    Descending = 'desc',
+  }
+
   export enum RequestsUserInformation {
     No = 'no',
     Optional = 'optional',
     Required = 'required',
+  }
+
+  export enum SubmissionFeedback {
+    None = 'none',
+    Summary = 'summary',
+    Detailed = 'detailed',
   }
 
   export interface ArenaContests {
@@ -88,7 +116,7 @@ export namespace omegaup {
     alias: string;
     assignment_type: string;
     description: string;
-    finish_time: Date;
+    finish_time: Date | null;
     has_runs?: boolean;
     max_points?: number;
     name: string;
@@ -99,17 +127,6 @@ export namespace omegaup {
     start_time: Date;
   }
 
-  export interface AssignmentProblem {
-    alias: string;
-    commit: string;
-    languages: string;
-    letter: string;
-    order: number;
-    points: number;
-    title: string;
-    version: string;
-  }
-
   export interface Case {
     contest_score: number;
     max_score: number;
@@ -117,16 +134,6 @@ export namespace omegaup {
     name: string;
     score: number;
     verdict: string;
-  }
-
-  export interface Clarification {
-    clarification_id: number;
-    problem_alias: string;
-    author: string;
-    message: string;
-    answer?: string;
-    public: number;
-    receiver?: string;
   }
 
   export interface CoderOfTheMonth extends Profile {
@@ -154,8 +161,8 @@ export namespace omegaup {
   export interface Contest {
     alias: string;
     title: string;
-    window_length?: number;
-    start_time?: Date;
+    window_length?: null | number;
+    start_time: Date;
     finish_time?: Date;
     admission_mode?: AdmissionMode;
     contestant_must_register?: boolean;
@@ -168,7 +175,7 @@ export namespace omegaup {
     needs_basic_information?: boolean;
     opened?: boolean;
     original_contest_alias?: string;
-    original_problemset_id?: string;
+    original_problemset_id?: number;
     partial_score?: boolean;
     penalty?: number;
     penalty_calc_policy?: string;
@@ -176,7 +183,8 @@ export namespace omegaup {
     points_decay_factor?: number;
     problems?: omegaup.Problem[];
     problemset_id?: number;
-    requests_user_information?: omegaup.RequestsUserInformation;
+    requests_user_information?: string;
+    user_registration_accepted?: boolean;
     rerun_id?: number;
     scoreboard?: number;
     scoreboard_url?: string;
@@ -204,7 +212,7 @@ export namespace omegaup {
     acceptsSubmissions: boolean;
     bestScore: number;
     maxScore: number;
-    active: boolean;
+    hasRuns?: boolean;
   }
 
   export interface ContestResult {
@@ -223,7 +231,7 @@ export namespace omegaup {
     assignments: Assignment[];
     basic_information_required: boolean;
     description: string;
-    finish_time: Date;
+    finish_time: Date | null;
     is_admin: boolean;
     name: string;
     public: boolean;
@@ -232,7 +240,7 @@ export namespace omegaup {
     school_name: string;
     show_scoreboard: boolean;
     start_time: Date;
-    student_count: boolean;
+    student_count: number;
   }
 
   export interface CourseAdmin {
@@ -259,7 +267,7 @@ export namespace omegaup {
     penalty: number;
     score: number;
     source: string;
-    time: string;
+    time: Date;
     verdict: string;
   }
 
@@ -371,6 +379,7 @@ export namespace omegaup {
     alias: string;
     commit?: string;
     difficulty?: number;
+    input_limit: number;
     languages?: string;
     letter?: string;
     order: number;
@@ -399,7 +408,7 @@ export namespace omegaup {
     min_difficulty: number;
     max_difficulty: number;
     order_by: string;
-    mode: string;
+    sort_order: string;
     only_karel?: boolean;
     tag?: string[];
   }
@@ -408,6 +417,7 @@ export namespace omegaup {
     rank: number;
     name?: string;
     problems_solved: number;
+    author_ranking: number | null;
   }
 
   export interface Scoreboard {
@@ -416,26 +426,6 @@ export namespace omegaup {
     place: number;
     totalPenalty: number;
     totalPoints: number;
-  }
-
-  export interface ScoreboardUser extends User {
-    country?: string;
-    is_invited: boolean;
-    place: number;
-    problems: ScoreboardUserProblem[];
-    total: {
-      penalty: number;
-      points: number;
-    };
-  }
-
-  export interface ScoreboardUserProblem {
-    alias: string;
-    penalty: number;
-    pending?: boolean;
-    percent: number;
-    points: number;
-    runs: number;
   }
 
   export interface Statement {
@@ -493,6 +483,7 @@ export namespace omegaup {
     admin?: boolean;
     compile_error?: string;
     details?: Details;
+    feedback?: SubmissionFeedback;
     groups?: DetailsGroup[];
     guid: string;
     judged_by: string;
@@ -503,12 +494,6 @@ export namespace omegaup {
     source_link?: boolean;
     source_name?: string;
     source_url?: string;
-  }
-
-  export interface SchoolCoderOfTheMonth {
-    classname: string;
-    time: string;
-    username: string;
   }
 
   export interface SchoolOfTheMonth extends SchoolsRank {
@@ -537,10 +522,6 @@ export namespace omegaup {
     email: string;
     name: string;
     time: string;
-  }
-
-  export interface Solutions {
-    [language: string]: string;
   }
 
   export interface Stats {

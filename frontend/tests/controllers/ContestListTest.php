@@ -152,7 +152,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         {
             $login = self::login($contestData['director']);
             $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
-                /*$owner=*/null,
+                /*$owner=*/                null,
                 /*$name=*/null,
                 /*$description=*/null,
                 /*$alias=*/null,
@@ -690,13 +690,15 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         // Create three PUBLIC contests
         $contests[0] = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'lastUpdated' => \OmegaUp\Time::get(),
+                'lastUpdated' => new \OmegaUp\Timestamp(\OmegaUp\Time::get()),
             ])
         );
 
         $contests[1] = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'lastUpdated' => \OmegaUp\Time::get() + 1,
+                'lastUpdated' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() + 1
+                ),
             ])
         );
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
@@ -706,7 +708,9 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $contests[2] = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams([
-                'lastUpdated' => \OmegaUp\Time::get() + 2,
+                'lastUpdated' => new \OmegaUp\Timestamp(
+                    \OmegaUp\Time::get() + 2
+                ),
             ])
         );
         $originalOrderContest = [

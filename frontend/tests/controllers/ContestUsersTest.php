@@ -15,11 +15,24 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $n = 10;
         $users = [];
         $identities = [];
-        for ($i = 0; $i < $n; $i++) {
-            // Create a user
-            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
-            // Add it to the contest
+        ['user' => $users[0], 'identity' => $identities[0]] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'username' => 'test_contest_user_0',
+        ]));
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $identities[0]
+        );
+
+        ['user' => $users[1], 'identity' => $identities[1]] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'username' => 'test_contest_user_1',
+        ]));
+        \OmegaUp\Test\Factories\Contest::addUser(
+            $contestData,
+            $identities[1]
+        );
+        for ($i = 2; $i < $n; $i++) {
+            ['user' => $users[$i], 'identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
             \OmegaUp\Test\Factories\Contest::addUser(
                 $contestData,
                 $identities[$i]
@@ -46,7 +59,15 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Contest::apiUsers($r);
 
         // Check that we have n+1 users
-        $this->assertEquals($n + 1, count($response['users']));
+        $this->assertCount($n + 1, $response['users']);
+
+        // Call search API
+        $response = \OmegaUp\Controllers\Contest::apiSearchUsers(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']['alias'],
+            'query' => 'test_contest_user_'
+        ]));
+        $this->assertCount(2, $response);
     }
 
     public function testContestActivityReport() {
@@ -109,7 +130,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties'];
+        )['smartyProperties']['payload'];
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
@@ -217,7 +238,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties'];
+        )['smartyProperties']['payload'];
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
     }

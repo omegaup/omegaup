@@ -3,9 +3,14 @@
 namespace OmegaUp\Controllers;
 
 /**
- * @psalm-type ProblemsetProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter?: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}
- * @psalm-type ScoreboardRankingEntry=array{country: null|string, is_invited: bool, name: null|string, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}
- * @psalm-type Scoreboard=array{finish_time?: int|null, problems?: list<array{alias: string, order: int}>, ranking?: list<ScoreboardRankingEntry>, start_time?: int, time?: int, title?: string}
+ * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}
+ * @psalm-type ProblemsetProblem=array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type Problemset=array{admin?: bool, admission_mode?: string, alias?: string, assignment_type?: null|string, contest_alias?: null|string, courseAssignments?: list<array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}>, description: null|string, director?: null|string, feedback?: string, finish_time?: \OmegaUp\Timestamp|null, languages?: list<string>, name?: string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, partial_score?: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<ProblemsetProblem>, problemset_id: int|null, requests_user_information?: string, scoreboard?: int, show_penalty?: bool, show_scoreboard_after?: bool, start_time?: \OmegaUp\Timestamp, submission_deadline?: \OmegaUp\Timestamp|null, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, opened_interview: bool, user_id: int|null, username: string}>, window_length?: int|null}
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
+ * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+ * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  */
 class Problemset extends \OmegaUp\Controllers\Controller {
     public static function validateAddProblemToProblemset(
@@ -95,17 +100,16 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return Problemset
+     *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $course
      * @omegaup-request-param mixed $interview_alias
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     * @omegaup-request-param mixed $username
-     *
-     * @return array{admin?: bool, admission_mode?: string, alias?: string, assignment_type?: null|string, contest_alias?: null|string, description?: null|string, director?: \OmegaUp\DAO\VO\Identities|null|string, exists?: bool, feedback?: string, finish_time?: null|int, languages?: list<string>, name?: null|string, needs_basic_information?: bool, opened?: bool, original_contest_alias?: null|string, original_problemset_id?: int|null, partial_score?: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problems?: list<ProblemsetProblem>, problemset_id?: int|null, requests_user_information?: string, scoreboard?: int, show_scoreboard_after?: bool, start_time?: int, submission_deadline?: int, submissions_gap?: int, title?: string, users?: list<array{access_time: \OmegaUp\Timestamp|null, country: null|string, email: null|string, opened_interview: bool, user_id: int|null, username: string}>, window_length?: int|null}
      */
     public static function apiDetails(\OmegaUp\Request $r) {
         [
@@ -140,15 +144,15 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return Scoreboard
+     *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     *
-     * @return Scoreboard
      */
     public static function apiScoreboard(\OmegaUp\Request $r): array {
         [
@@ -175,23 +179,30 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             );
         }
         // There is no scoreboard for interviews yet
-        return [];
+        return [
+            'problems' => [],
+            'ranking' => [],
+            'start_time' => new \OmegaUp\Timestamp(0),
+            'finish_time' => new \OmegaUp\Timestamp(0),
+            'time' => new \OmegaUp\Timestamp(0),
+            'title' => '',
+        ];
     }
 
     /**
      * Returns the Scoreboard events
      *
+     * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @return array{events: list<ScoreboardEvent>}
+     *
      * @omegaup-request-param mixed $assignment
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
-     *
-     * @throws \OmegaUp\Exceptions\NotFoundException
-     *
-     * @return array{events: list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}>}
      */
     public static function apiScoreboardEvents(\OmegaUp\Request $r): array {
         [
@@ -221,17 +232,17 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $problemset_id
-     * @omegaup-request-param mixed $token
-     * @omegaup-request-param mixed $tokens
-     *
      * @param \OmegaUp\Request $r $r['tokens'][0] = invalid filter $r['tokens'][1] = Type of filter (all-events, user, contest, problemset, problem) $r['tokens'][2] = Id of entity ($tokens[2]) $r['tokens'][3] = Token given by the filter
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
      * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}, request: \OmegaUp\Request}
+     *
+     * @omegaup-request-param mixed $auth_token
+     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param int $problemset_id
+     * @omegaup-request-param mixed $token
+     * @omegaup-request-param mixed $tokens
      */
     public static function wrapRequest(\OmegaUp\Request $r): array {
         $r->ensureInt('problemset_id');
@@ -253,11 +264,13 @@ class Problemset extends \OmegaUp\Controllers\Controller {
             if (isset($r['auth_token']) && is_string($r['auth_token'])) {
                 $request['auth_token'] = $r['auth_token'];
             }
+            /** @psalm-suppress MixedArgument $r['tokens'] is definitely an array here. */
             if (
                 isset($r['tokens']) &&
                 is_array($r['tokens']) &&
                 count($r['tokens']) >= 4
             ) {
+                /** @psalm-suppress MixedArrayAccess $r['tokens'] is definitely an array here. */
                 $request['token'] = strval($r['tokens'][3]);
             }
             $response = \OmegaUp\Controllers\Contest::validateDetails($request);

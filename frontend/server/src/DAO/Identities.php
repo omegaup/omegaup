@@ -73,7 +73,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 Identities i
             WHERE
                 i.username LIKE CONCAT('%', ?, '%') OR
-                i.username LIKE CONCAT('%', ?, '%')
+                i.name LIKE CONCAT('%', ?, '%')
             LIMIT 100";
         $args = [$usernameOrName, $usernameOrName, $usernameOrName, $usernameOrName];
 
@@ -126,16 +126,16 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: null|int}
+     * @return null|array{within_last_day: bool, verified: bool, username: string, last_login: \OmegaUp\Timestamp|null}
      */
     public static function getExtraInformation(string $email): ?array {
         $sql = 'SELECT
-                  UNIX_TIMESTAMP(u.reset_sent_at) AS reset_sent_at,
+                  u.reset_sent_at,
                   u.verified,
                   IFNULL(i.username, "") AS `username`,
                   (
                     SELECT
-                      MAX(UNIX_TIMESTAMP(ill.time))
+                      MAX(ill.time)
                     FROM
                       Identity_Login_Log AS ill
                     WHERE
@@ -157,15 +157,18 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                   u.user_id DESC
                 LIMIT
                   0, 1';
-        /** @var array{last_login: int|null, reset_sent_at: int|null, username: string, verified: bool}|null */
+        /** @var array{last_login: \OmegaUp\Timestamp|null, reset_sent_at: \OmegaUp\Timestamp|null, username: string, verified: bool}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, [$email]);
         if (empty($rs)) {
             return null;
         }
         return [
-            'within_last_day' => (\OmegaUp\Time::get() - intval(
-                $rs['reset_sent_at']
-            )) < 60 * 60 * 24,
+            'within_last_day' => (
+                !is_null($rs['reset_sent_at']) &&
+                (
+                    \OmegaUp\Time::get() - intval($rs['reset_sent_at']->time)
+                ) < 60 * 60 * 24
+            ),
             'verified' => $rs['verified'] == 1,
             'username' => $rs['username'],
             'last_login' => $rs['last_login'],
@@ -195,7 +198,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{country: string, state: null|string, school: null|string, email: null|string, locale: null|string}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -205,8 +208,34 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     IFNULL(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
+                    isc.`graduation_date` AS graduation_date,
                     e.`email`,
-                    l.`name` AS locale
+                    l.`name` AS locale,
+                    u.`birth_date`,
+                    u.`scholar_degree`,
+                    u.`hide_problem_tags`,
+                    u.`verified`,
+                    i.`gender`,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
                 FROM
                     Identities i
                 LEFT JOIN
@@ -227,11 +256,23 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{country: string, email: null|string, locale: null|string, school: null|string, state: null|string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
+        $identity = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
         );
+        if (is_null($identity)) {
+            return null;
+        }
+
+        $identity['hide_problem_tags'] = boolval(
+            $identity['hide_problem_tags']
+        );
+        $identity['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $identity['birth_date']
+        );
+
+        return $identity;
     }
 
     public static function isUserAssociatedWithIdentityOfGroup(

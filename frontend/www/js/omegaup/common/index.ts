@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.IndexPayload('payload');
+  const payload = types.payloadParsers.IndexPayload();
 
   const ranking = payload.userRank.map((user, index) => ({
     rank: index + 1,
@@ -17,7 +17,7 @@ OmegaUp.on('ready', () => {
 
   const commonIndex = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-homepage', {
         props: {
           coderOfTheMonth: payload.coderOfTheMonthData

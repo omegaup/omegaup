@@ -2,13 +2,13 @@ import contest_ScoreboardMerge from '../components/contest/ScoreboardMerge.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as UI from '../ui';
-import * as api from '../api_transitional';
+import * as api from '../api';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   var scoreboardMerge = new Vue({
     el: '#scoreboard-merge',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-contest-scoreboardmerge', {
         props: {
           availableContests: this.contests,
@@ -17,11 +17,11 @@ OmegaUp.on('ready', function() {
           aliases: this.aliases,
         },
         on: {
-          'get-scoreboard': function(contestAliases) {
+          'get-scoreboard': function (contestAliases) {
             api.Contest.scoreboardMerge({
               contest_aliases: contestAliases.map(encodeURIComponent).join(','),
             })
-              .then(function(ranks) {
+              .then(function (ranks) {
                 const ranking = ranks.ranking;
                 let scoreboard = [],
                   aliases = [],
@@ -59,9 +59,9 @@ OmegaUp.on('ready', function() {
         },
       });
     },
-    mounted: function() {
+    mounted: function () {
       api.Contest.list()
-        .then(function(contests) {
+        .then(function (contests) {
           scoreboardMerge.contests = contests.results;
         })
         .catch(UI.apiError);

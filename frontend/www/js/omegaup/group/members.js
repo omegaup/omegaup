@@ -1,18 +1,18 @@
 import group_Members from '../components/group/Members.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const formData = document.querySelector('#form-data');
   const groupAlias = formData.getAttribute('data-alias');
   const payload = JSON.parse(document.getElementById('payload').innerText);
 
   let groupMembers = new Vue({
     el: '#group-members div.list',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-group-members', {
         props: {
           identities: this.identities,
@@ -23,32 +23,32 @@ OmegaUp.on('ready', function() {
           showChangePasswordForm: this.showChangePasswordForm,
         },
         on: {
-          'add-member': function(groupMembersInstance, username) {
-            API.Group.addUser({
+          'add-member': function (groupMembersInstance, username) {
+            api.Group.addUser({
               group_alias: groupAlias,
               usernameOrEmail: username,
             })
-              .then(function(data) {
+              .then(function (data) {
                 refreshMemberList();
                 UI.success(T.groupEditMemberAdded);
                 groupMembersInstance.reset();
               })
               .catch(UI.apiError);
           },
-          'edit-identity': function(groupMembersInstance, identity) {
+          'edit-identity': function (groupMembersInstance, identity) {
             groupMembersInstance.showEditForm = true;
             groupMembersInstance.showChangePasswordForm = false;
             groupMembersInstance.identity = identity;
             groupMembersInstance.username = identity.username;
           },
-          'edit-identity-member': function(
+          'edit-identity-member': function (
             identityEditInstance,
             groupMembersInstance,
             identity,
             countryId,
             stateId,
           ) {
-            API.Identity.update({
+            api.Identity.update({
               username: identity.username,
               name: identity.name,
               country_id: countryId,
@@ -57,24 +57,30 @@ OmegaUp.on('ready', function() {
               group_alias: groupAlias,
               original_username: identityEditInstance.username,
             })
-              .then(function(data) {
+              .then(function (data) {
                 UI.success(T.groupEditMemberUpdated);
                 groupMembersInstance.showEditForm = false;
                 refreshMemberList();
               })
               .catch(UI.apiError);
           },
-          'change-password-identity': function(groupMembersInstance, username) {
+          'change-password-identity': function (
+            groupMembersInstance,
+            username,
+          ) {
             groupMembersInstance.showEditForm = false;
             groupMembersInstance.showChangePasswordForm = true;
             groupMembersInstance.username = username;
           },
-          'change-password-identity': function(groupMembersInstance, username) {
+          'change-password-identity': function (
+            groupMembersInstance,
+            username,
+          ) {
             groupMembersInstance.showEditForm = false;
             groupMembersInstance.showChangePasswordForm = true;
             groupMembersInstance.username = username;
           },
-          'change-password-identity-member': function(
+          'change-password-identity-member': function (
             groupMembersInstance,
             username,
             newPassword,
@@ -85,12 +91,12 @@ OmegaUp.on('ready', function() {
               return;
             }
 
-            API.Identity.changePassword({
+            api.Identity.changePassword({
               group_alias: groupAlias,
               password: newPassword,
               username: username,
             })
-              .then(function(data) {
+              .then(function (data) {
                 refreshMemberList();
                 UI.success(T.groupEditMemberPasswordUpdated);
                 groupMembersInstance.showChangePasswordForm = false;
@@ -98,18 +104,18 @@ OmegaUp.on('ready', function() {
               })
               .catch(UI.apiError);
           },
-          remove: function(username) {
-            API.Group.removeUser({
+          remove: function (username) {
+            api.Group.removeUser({
               group_alias: groupAlias,
               usernameOrEmail: username,
             })
-              .then(function(data) {
+              .then(function (data) {
                 refreshMemberList();
                 UI.success(T.groupEditMemberRemoved);
               })
               .catch(UI.apiError);
           },
-          cancel: function(groupMembersInstance) {
+          cancel: function (groupMembersInstance) {
             refreshMemberList();
             groupMembersInstance.showEditForm = false;
             groupMembersInstance.showChangePasswordForm = false;
@@ -132,8 +138,8 @@ OmegaUp.on('ready', function() {
   });
 
   function refreshMemberList() {
-    API.Group.members({ group_alias: groupAlias })
-      .then(function(data) {
+    api.Group.members({ group_alias: groupAlias })
+      .then(function (data) {
         groupMembers.identities = [];
         groupMembers.identitiesCsv = [];
         for (let identity of data.identities) {

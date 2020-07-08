@@ -1,30 +1,41 @@
 import course_Form from '../components/course/Form.vue';
 import { OmegaUp } from '../omegaup';
-import API from '../api.js';
+import * as api from '../api';
 import * as UI from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
-  var defaultDate = Date.create(Date.now());
-  defaultDate.set({ seconds: 0 });
-  var defaultStartTime = Date.create(defaultDate);
-  defaultDate.setDate(defaultDate.getDate() + 30);
-  var defaultFinishTime = Date.create(defaultDate);
+OmegaUp.on('ready', function () {
+  var defaultStartTime = new Date();
+  defaultStartTime.setSeconds(0);
+  var defaultFinishTime = new Date(defaultStartTime);
+  defaultFinishTime.setDate(defaultFinishTime.getDate() + 30);
 
   var details = new Vue({
     el: '#course-details',
-    render: function(createElement) {
-      return createElement('omegaup-course-details', {
-        props: { T: T, update: false, course: this.course },
+    render: function (createElement) {
+      return createElement('omegaup-course-form', {
+        props: {
+          course: {
+            alias: '',
+            description: '',
+            start_time: defaultStartTime,
+            finish_time: defaultFinishTime,
+            show_scoreboard: false,
+            name: '',
+            school_name: '',
+            basic_information_required: false,
+            requests_user_information: 'no',
+          },
+        },
         on: {
-          submit: function(ev) {
+          submit: function (ev) {
             new Promise((accept, reject) => {
               if (ev.school_id) {
                 accept(ev.school_id);
               } else if (ev.school_name) {
-                API.School.create({ name: ev.school_name })
-                  .then(data => {
+                api.School.create({ name: ev.school_name })
+                  .then((data) => {
                     accept(data.school_id);
                   })
                   .catch(UI.apiError);
@@ -32,7 +43,7 @@ OmegaUp.on('ready', function() {
                 accept(null);
               }
             })
-              .then(function(school_id) {
+              .then(function (school_id) {
                 const params = {
                   alias: ev.alias,
                   name: ev.name,
@@ -50,7 +61,7 @@ OmegaUp.on('ready', function() {
                   params.finish_time = ev.finishTime.getTime() / 1000;
                 }
 
-                API.Course.create(params)
+                api.Course.create(params)
                   .then(() => {
                     window.location.replace(
                       '/course/' + ev.alias + '/edit/#assignments',
@@ -60,20 +71,14 @@ OmegaUp.on('ready', function() {
               })
               .catch(UI.apiError);
           },
-          cancel: function() {
+          cancel: function () {
             window.location = '/course/';
           },
         },
       });
     },
-    data: {
-      course: {
-        start_time: defaultStartTime,
-        finish_time: defaultFinishTime,
-      },
-    },
     components: {
-      'omegaup-course-details': course_Form,
+      'omegaup-course-form': course_Form,
     },
   });
 });

@@ -19,6 +19,7 @@ class Runs extends \OmegaUp\DAO\VO\VO {
         'run_id' => true,
         'submission_id' => true,
         'version' => true,
+        'commit' => true,
         'status' => true,
         'verdict' => true,
         'runtime' => true,
@@ -53,6 +54,11 @@ class Runs extends \OmegaUp\DAO\VO\VO {
         if (isset($data['version'])) {
             $this->version = strval(
                 $data['version']
+            );
+        }
+        if (isset($data['commit'])) {
+            $this->commit = strval(
+                $data['commit']
             );
         }
         if (isset($data['status'])) {
@@ -92,8 +98,8 @@ class Runs extends \OmegaUp\DAO\VO\VO {
         }
         if (isset($data['time'])) {
             /**
-             * @var string|int|float $data['time']
-             * @var int $this->time
+             * @var \OmegaUp\Timestamp|string|int|float $data['time']
+             * @var \OmegaUp\Timestamp $this->time
              */
             $this->time = (
                 \OmegaUp\DAO\DAO::fromMySQLTimestamp(
@@ -101,7 +107,9 @@ class Runs extends \OmegaUp\DAO\VO\VO {
                 )
             );
         } else {
-            $this->time = \OmegaUp\Time::get();
+            $this->time = new \OmegaUp\Timestamp(
+                \OmegaUp\Time::get()
+            );
         }
         if (isset($data['judged_by'])) {
             $this->judged_by = strval(
@@ -132,6 +140,13 @@ class Runs extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $version = null;
+
+    /**
+     * El hash SHA1 del commit en la rama master del problema con el que se realizó el envío.
+     *
+     * @var string|null
+     */
+    public $commit = null;
 
     /**
      * [Campo no documentado]
@@ -185,7 +200,7 @@ class Runs extends \OmegaUp\DAO\VO\VO {
     /**
      * [Campo no documentado]
      *
-     * @var int
+     * @var \OmegaUp\Timestamp
      */
     public $time;  // CURRENT_TIMESTAMP
 

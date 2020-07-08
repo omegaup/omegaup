@@ -1,0 +1,15 @@
+{
+    "es": {
+      "name": "Graduado del Curso C++",
+      "description": "El usuario ha resuelto más del 60% del curso de C++."
+    },
+    "en": {
+      "name": "C++ Course Graduate",
+      "description": "The user has solved more than 60% of C++ course."
+    },
+    "pt": {
+      "name": "Pós-graduação C++",
+      "description": "O usuário tem resolvido mais de 60% do curso de C++."
+    }
+  }
+  

@@ -35,6 +35,9 @@ class ApiCaller {
                 200
             );
             return $response;
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // The controller has explicitly requested to exit.
+            exit;
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             $apiException = $e;
         } catch (\Exception $e) {
@@ -298,6 +301,15 @@ class ApiCaller {
             );
         }
 
+        if ($apiException->getcode() == 400) {
+            self::$log->info("{$apiException}");
+            header('HTTP/1.1 400 Bad Request');
+            die(
+                file_get_contents(
+                    sprintf('%s/www/400.html', strval(OMEGAUP_ROOT))
+                )
+            );
+        }
         if ($apiException->getCode() == 401) {
             self::$log->info("{$apiException}");
             header(

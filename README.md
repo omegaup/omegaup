@@ -39,9 +39,13 @@ Todo el código de omegaUp está distribuido bajo la licencia BSD.
 
 ## Navegadores Soportados
 
-Los navegadores oficialmente soportados son los siguientes:
+Los navegadores oficialmente soportados son aquellos que soportan [ECMAScript
+2015 (ES6)](https://caniuse.com/#feat=es6), e incluyen los siguientes:
 
-* [Chrome](https://www.chromium.org/getting-involved/dev-channel): Stable Channel
-* [Firefox](https://www.mozilla.org/en-US/firefox/releases/): V.46+
-* [Internet Explorer](https://support.microsoft.com/en-us/help/969393/information-about-internet-explorer-versions): 10 Consumer Preview
-* [Microsoft Edge](https://www.microsoft.com/es-mx/windows/microsoft-edge): All versions
+* [Chrome](https://www.google.com/chrome/): 51
+* [Firefox](http://mozilla.org/firefox/releases/): 68
+* [Edge](https://www.microsoft.com/edge): 12
+* [Safari](https://www.apple.com/safari/): 12
+
+Esto también incluye todos los navegadores basados en Blink / WebKit cuyas
+versiones sean compatibles con las de Chrome / Safari.

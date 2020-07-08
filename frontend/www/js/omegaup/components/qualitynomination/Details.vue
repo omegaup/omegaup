@@ -1,9 +1,9 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title">{{ T.wordsReviewingProblem }}</h2>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">{{ T.wordsReviewingProblem }}</h2>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
       <div class="container-fluid">
         <div class="row">
           <div class="col-sm-3">
@@ -51,7 +51,7 @@
             <strong>{{ T.wordsDetails }}</strong>
           </div>
           <div class="col-sm-8">
-            <pre>{{ this.contents }}</pre>
+            <pre class="border rounded bg-light">{{ this.contents }}</pre>
           </div>
         </div>
         <div class="row">
@@ -67,7 +67,10 @@
           </div>
           <div
             class="col-sm-8"
-            v-bind:class="{ 'has-error': !rationale, 'has-success': rationale }"
+            v-bind:class="{
+              'has-error': !rationale,
+              'has-success': rationale,
+            }"
           >
             <textarea
               class="form-control"
@@ -79,30 +82,30 @@
         </div>
         <div
           class="row"
-          v-if="this.nomination == 'demotion' &amp;&amp; this.reviewer == true"
+          v-if="this.nomination == 'demotion' && this.reviewer == true"
         >
           <div class="col-sm-3">
             <strong>{{ T.wordsVerdict }}</strong>
           </div>
-          <div class="col-sm-8">
+          <div class="col-sm-8 text-center">
             <button
               class="btn btn-danger"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('banned')"
+              v-on:click="showConfirmationDialog('banned')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
               class="btn btn-success"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('resolved')"
+              v-on:click="showConfirmationDialog('resolved')"
             >
               {{ T.wordsKeepProblem }}
             </button>
             <button
               class="btn btn-warning"
               v-bind:disabled="!rationale"
-              v-on:click="markResolution('warning')"
+              v-on:click="showConfirmationDialog('warning')"
             >
               {{ T.wordsWarningProblem }}
             </button>
@@ -110,6 +113,15 @@
         </div>
       </div>
     </div>
+    <omegaup-common-confirmation
+      v-if="showConfirmation"
+      v-bind:question="T.demotionProblemMultipleQuestion"
+      v-bind:answer-yes="T.demotionProblemMultipleAnswerYes"
+      v-bind:answer-no="T.demotionProblemMultipleAnswerNo"
+      v-on:close="showConfirmation = false"
+      v-on:yes="markResolution(true)"
+      v-on:no="markResolution(false)"
+    ></omegaup-common-confirmation>
   </div>
 </template>
 
@@ -117,6 +129,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import confirmation from '../common/Confirmation.vue';
 
 interface QualityNominationContents {
   original: string;
@@ -124,7 +137,11 @@ interface QualityNominationContents {
   reason: string;
 }
 
-@Component
+@Component({
+  components: {
+    'omegaup-common-confirmation': confirmation,
+  },
+})
 export default class QualityNominationDetails extends Vue {
   @Prop() author!: omegaup.User;
   @Prop() contents!: QualityNominationContents;
@@ -138,6 +155,8 @@ export default class QualityNominationDetails extends Vue {
 
   T = T;
   rationale = this.initialRationale;
+  showConfirmation = false;
+  status = 'banned';
 
   userUrl(alias: string): string {
     return `/profile/${alias}/`;
@@ -147,8 +166,14 @@ export default class QualityNominationDetails extends Vue {
     return `/arena/problem/${alias}/`;
   }
 
-  markResolution(newStatus: string): void {
-    this.$emit('mark-resolution', this, newStatus);
+  markResolution(all: boolean): void {
+    this.showConfirmation = false;
+    this.$emit('mark-resolution', this, this.status, all);
+  }
+
+  showConfirmationDialog(status: string): void {
+    this.status = status;
+    this.showConfirmation = true;
   }
 }
 </script>

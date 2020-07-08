@@ -34,18 +34,18 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             $r['auth_token']
         );
         $graduationDate = null;
-        if (!is_null($identityDb->current_identity_school_id)) {
+        if (!is_null($identityDb['current_identity_school_id'])) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $identityDb->current_identity_school_id
+                $identityDb['current_identity_school_id']
             );
             if (!is_null($identitySchool)) {
                 $graduationDate = $identitySchool->graduation_date;
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb->name);
-        $this->assertEquals($r['country_id'], $identityDb->country_id);
-        $this->assertEquals($r['state_id'], $identityDb->state_id);
+        $this->assertEquals($r['name'], $identityDb['name']);
+        $this->assertEquals($r['country_id'], $identityDb['country_id']);
+        $this->assertEquals($r['state_id'], $identityDb['state_id']);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(
             gmdate(
@@ -56,7 +56,7 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb->language_id);
+        $this->assertEquals($locale->language_id, $identityDb['language_id']);
 
         // Edit all fields again with diff values
         $locale = \OmegaUp\DAO\Languages::getByName('pseudo');
@@ -79,18 +79,18 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($token);
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken($token);
         $graduationDate = null;
-        if (!is_null($identityDb->current_identity_school_id)) {
+        if (!is_null($identityDb['current_identity_school_id'])) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(
-                $identityDb->current_identity_school_id
+                $identityDb['current_identity_school_id']
             );
             if (!is_null($identitySchool)) {
                 $graduationDate = $identitySchool->graduation_date;
             }
         }
 
-        $this->assertEquals($r['name'], $identityDb->name);
-        $this->assertEquals($r['country_id'], $identityDb->country_id);
-        $this->assertEquals($r['state_id'], $identityDb->state_id);
+        $this->assertEquals($r['name'], $identityDb['name']);
+        $this->assertEquals($r['country_id'], $identityDb['country_id']);
+        $this->assertEquals($r['state_id'], $identityDb['state_id']);
         $this->assertEquals($r['scholar_degree'], $userDb->scholar_degree);
         $this->assertEquals(
             gmdate(
@@ -101,14 +101,54 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         // Graduation date without school is not saved on database.
         $this->assertNull($graduationDate);
-        $this->assertEquals($locale->language_id, $identityDb->language_id);
+        $this->assertEquals($locale->language_id, $identityDb['language_id']);
 
         // Double check language update with the appropiate API
         $identity = \OmegaUp\DAO\AuthTokens::getIdentityByToken($token);
+        unset($identity['classname']);
         $this->assertEquals(
             $locale->name,
-            \OmegaUp\Controllers\Identity::getPreferredLanguage($identity)
+            \OmegaUp\Controllers\Identity::getPreferredLanguage(
+                new \OmegaUp\DAO\VO\Identities($identity)
+            )
         );
+    }
+
+    public function testFillAllProfileFields() {
+        // Create the user to edit
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $locale = \OmegaUp\DAO\Languages::getByName('pt');
+        $states = \OmegaUp\DAO\States::getByCountry('MX');
+        $token = $login->auth_token;
+        $r = new \OmegaUp\Request([
+            'auth_token' => $token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'country_id' => 'MX',
+            'state_id' => $states[0]->state_id,
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'gender' => 'female',
+            'scholar_degree' => 'master',
+            'birth_date' => strtotime('1998-01-01'),
+            'graduation_date' => strtotime('2016-02-02'),
+            'preferred_language' => 'c',
+            'locale' => $locale->name,
+        ]);
+
+        \OmegaUp\Controllers\User::apiUpdate($r);
+
+        $user = \OmegaUp\DAO\Users::getByPK($user->user_id);
+        $identity = \OmegaUp\DAO\Identities::getByPK($user->main_identity_id);
+
+        $profile = \OmegaUp\Controllers\User::getProfileImpl(
+            $user,
+            $identity
+        );
+        $profileProgress = \OmegaUp\Controllers\User::getProfileProgress(
+            $user
+        );
+        $this->assertEquals(100.0, $profileProgress);
     }
 
     /**
