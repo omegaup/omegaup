@@ -137,7 +137,7 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
                     'assignment_alias' => $assignments[0]['alias'],
                 ])
             );
-            $this->fails('User should not have access to admin mode');
+            $this->fail('User should not have access to admin mode');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
