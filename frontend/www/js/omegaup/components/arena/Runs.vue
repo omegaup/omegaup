@@ -195,7 +195,7 @@
                 v-bind:classname="run.classname"
                 v-bind:username="run.username"
                 v-bind:country="run.country_id"
-                v-bind:linkify="false"
+                v-bind:linkify="true"
                 v-on:emit-click="(username) => (filterUsername = username)"
               ></omegaup-user-username>
               <a v-bind:href="`/profile/${run.username}/`" class="ml-2">
@@ -293,7 +293,7 @@ caption {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import * as time from '../../time';
@@ -332,7 +332,7 @@ declare global {
     'omegaup-user-username': user_Username,
   },
 })
-export default class ArenaRuns extends Vue {
+export default class Runs extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -589,23 +589,23 @@ export default class ArenaRuns extends Vue {
     this.onEmitFilterChanged(newValue, 'verdict');
   }
 
+  @Emit('filter-changed')
   onEmitFilterChanged(value: string, filter: string): void {
     this.filterOffset = 0;
     if (!value) {
       this.filters = this.filters.filter((item) => item.name !== filter);
-    } else {
-      if (filter === 'contest') {
-        // This field does not appear as filter
-        this.filterContest = value;
-      }
-      const index = this.filters.findIndex((item) => item.name === filter);
-      if (index === -1) {
-        this.filters.push({ name: filter, value: value });
-        return;
-      }
-      this.filters[index] = { name: filter, value: value };
+      return;
     }
-    this.$emit('filter-changed');
+    if (filter === 'contest') {
+      // This field does not appear as filter
+      this.filterContest = value;
+    }
+    const currentFilter = this.filters.find((item) => item.name === filter);
+    if (!currentFilter) {
+      this.filters.push({ name: filter, value: value });
+    } else {
+      currentFilter.value = value;
+    }
   }
 
   onRemoveFilter(filter: string): void {
