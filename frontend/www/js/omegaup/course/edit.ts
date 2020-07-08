@@ -5,6 +5,7 @@ import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import course_Edit from '../components/course/Edit.vue';
+import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
 import Clipboard from 'v-clipboard';
 
@@ -28,26 +29,12 @@ OmegaUp.on('ready', () => {
           invalidParameterName: this.invalidParameterName,
         },
         on: {
-          'submit-edit-course': (
-            ev: Vue & {
-              alias: string;
-              description: string;
-              finishTime: Date;
-              showScoreboard: boolean;
-              startTime: Date;
-              name: string;
-              school_name: string;
-              school_id: number;
-              basic_information_required: boolean;
-              requests_user_information: boolean;
-              unlimitedDuration: boolean;
-            },
-          ) => {
+          'submit-edit-course': (source: course_Form) => {
             new Promise((accept, reject) => {
-              if (ev.school_id !== undefined) {
-                accept(ev.school_id);
-              } else if (ev.school_name) {
-                api.School.create({ name: ev.school_name })
+              if (source.school_id !== undefined) {
+                accept(source.school_id);
+              } else if (source.school_name) {
+                api.School.create({ name: source.school_name })
                   .then((response) => {
                     accept(response.school_id);
                   })
@@ -59,22 +46,23 @@ OmegaUp.on('ready', () => {
               .then((schoolId) => {
                 const params = {
                   course_alias: courseAlias,
-                  name: ev.name,
-                  description: ev.description,
-                  start_time: ev.startTime.getTime() / 1000,
-                  alias: ev.alias,
-                  show_scoreboard: ev.showScoreboard,
-                  needs_basic_information: ev.basic_information_required,
-                  requests_user_information: ev.requests_user_information,
+                  name: source.name,
+                  description: source.description,
+                  start_time: source.startTime.getTime() / 1000,
+                  alias: source.alias,
+                  show_scoreboard: source.showScoreboard,
+                  needs_basic_information: source.basic_information_required,
+                  requests_user_information: source.requests_user_information,
                   school_id: schoolId,
                 };
 
-                if (ev.unlimitedDuration) {
+                if (source.unlimitedDuration) {
                   Object.assign(params, { unlimited_duration: true });
                 } else {
                   Object.assign(params, {
                     finish_time:
-                      new Date(ev.finishTime).setHours(23, 59, 59, 999) / 1000,
+                      new Date(source.finishTime).setHours(23, 59, 59, 999) /
+                      1000,
                   });
                 }
 
@@ -82,10 +70,10 @@ OmegaUp.on('ready', () => {
                   .then(() => {
                     ui.success(
                       ui.formatString(T.courseEditCourseEditedAndGoToCourse, {
-                        alias: ev.alias,
+                        alias: source.alias,
                       }),
                     );
-                    this.data.course.name = ev.name;
+                    this.data.course.name = source.name;
                     window.scrollTo(0, 0);
                   })
                   .catch(ui.apiError);
@@ -451,18 +439,14 @@ OmegaUp.on('ready', () => {
     },
     data: {
       data: payload,
-      initialTab: '',
+      initialTab: window.location.hash
+        ? window.location.hash.substr(1).split('/')[0]
+        : '',
       invalidParameterName: '',
     },
     components: {
       'omegaup-course-edit': course_Edit,
     },
   });
-
-  let vuePath: string[] = [];
-  if (window.location.hash) {
-    vuePath = window.location.hash.split('/');
-    courseEdit.initialTab = vuePath[0].split('#')[1];
-  }
   const component = <course_Edit>courseEdit.$refs.component;
 });
