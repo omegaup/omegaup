@@ -1480,6 +1480,7 @@ const translations: { [key: string]: string; } = {
   wordsReason: "Reason",
   wordsRegistration: "Registration/open",
   wordsRejudge: "Rejudge",
+  wordsRemoveFilter: "Remove filters",
   wordsReportProblem: "Report problem",
   wordsRequired: "Required",
   wordsReset: "omegaUp: Reset password.",

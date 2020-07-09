@@ -5,6 +5,12 @@
     "target": "es6",
     "downlevelIteration": true,
     "strict": true,
+    "lib": [
+        "DOM",
+        "ES5",
+        "ScriptHost",
+        "ES2020.Promise"
+    ],
     "module": "es6",
     "moduleResolution": "node",
     "experimentalDecorators": true,

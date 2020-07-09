@@ -125,7 +125,10 @@
                     v-bind:icon="['fas', 'edit']"
                   />
                 </a>
-                <a class="ml-2" v-bind:href="`/arena/${contest.alias}/admin/`">
+                <a
+                  class="ml-2"
+                  v-bind:href="`/arena/${contest.alias}/admin/#runs`"
+                >
                   <font-awesome-icon
                     v-bind:title="T.contestListSubmissions"
                     v-bind:icon="['fas', 'tachometer-alt']"

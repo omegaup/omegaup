@@ -8,7 +8,6 @@
     {/if}
 
     {if isset($inArena) && $inArena}
-      {assign var='LOAD_MATHJAX' value='true'}
       {assign var='navbarSection' value='arena'}
     {elseif isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
       <meta name="google-signin-client_id" content="{$GOOGLECLIENTID}" />
@@ -21,7 +20,6 @@
     <script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
     {js_include entrypoint="omegaup" runtime}
-    <script type="text/javascript" src="{version_hash src="/js/require_helper.js"}"></script>
 
     {if isset($inArena) && $inArena}
       {js_include entrypoint="arena"}
@@ -35,10 +33,6 @@
       {foreach from=$scripts item=$script}
         <script type="text/javascript" src="{$script}" defer async></script>
       {/foreach}
-    {/if}
-    {if isset($LOAD_MATHJAX) && $LOAD_MATHJAX}
-      <script type="text/javascript" src="{version_hash src="/js/mathjax-config.js"}" defer></script>
-      <script type="text/javascript" src="/third_party/js/mathjax/MathJax.js?config=TeX-AMS-MML_HTMLorMML" defer></script>
     {/if}
 
     <script type="text/javascript" src="{version_hash src="/js/head.sugar_locale.js"}" defer></script>

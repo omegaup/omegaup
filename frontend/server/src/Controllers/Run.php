@@ -941,7 +941,142 @@ class Run extends \OmegaUp\Controllers\Controller {
         $response['show_diff'] = 'examples';
         $response['cases'] = [];
 
+        $cases = self::getProblemCasesMetadata(
+            'cases',
+            $problem->alias,
+            $run->commit
+        );
+        /** @var int */
+        $responseSize = array_reduce(
+            $cases,
+            /**
+             * @param array{mode: int, type: string, id: string, size: int, path: string} $case
+             */
+            function (int $sum, $case): int {
+                return $sum + $case['size'];
+            },
+            0
+        );
+
+        if (
+            $problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_NONE
+            || $responseSize > 4096 // Forcing to hide diffs when inputs/outputs exceed 4kb
+        ) {
+            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_NONE;
+            return $response;
+        }
+        if ($problem->show_diff === \OmegaUp\ProblemParams::SHOW_DIFFS_ALL) {
+            $response['cases'] = self::getProblemCasesContents(
+                'cases',
+                $problem->alias,
+                $run->commit
+            );
+            $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_ALL;
+            return $response;
+        }
+        $response['cases'] = self::getProblemCasesContents(
+            'examples',
+            $problem->alias,
+            $run->commit
+        );
+        $response['show_diff'] = \OmegaUp\ProblemParams::SHOW_DIFFS_EXAMPLES;
+
         return $response;
+    }
+
+    /**
+     * @return ProblemCasesContents
+     */
+    private static function getProblemCasesContents(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_CASES_CONTENTS,
+            "{$problemAlias}-{$revision}-{$directory}",
+            /** @return ProblemCasesContents */
+            function () use (
+                $directory,
+                $problemAlias,
+                $revision
+            ) {
+                return self::getProblemCasesContentsImpl(
+                    $directory,
+                    $problemAlias,
+                    $revision
+                );
+            },
+            24 * 60 * 60 // expire in 1 day
+        );
+    }
+
+    /**
+     * @return ProblemCasesContents
+     */
+    private static function getProblemCasesContentsImpl(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problemAlias,
+            $revision
+        );
+
+        $existingCases = self::getProblemCasesMetadata(
+            $directory,
+            $problemAlias,
+            $revision
+        );
+        $response = [];
+        foreach ($existingCases as $file) {
+            [$_, $filename] = explode("{$directory}/", $file['path']);
+            $extension = pathinfo($filename, PATHINFO_EXTENSION);
+            \OmegaUp\Validators::validateInEnum(
+                $extension,
+                'extension',
+                ['in', 'out']
+            );
+            $caseName = basename($filename, ".{$extension}");
+            if (!isset($response[$caseName])) {
+                $response[$caseName] = [
+                    'in' => '',
+                    'out' => '',
+                ];
+            }
+            $caseContents = $problemArtifacts->get($file['path']);
+            if ($extension === 'in') {
+                $response[$caseName]['in'] = $caseContents;
+            } else {
+                $response[$caseName]['out'] = $caseContents;
+            }
+        }
+        return $response;
+    }
+
+    /**
+     * @return list<array{mode: int, type: string, id: string, size: int, path: string}>
+     */
+    private static function getProblemCasesMetadata(
+        string $directory,
+        string $problemAlias,
+        string $revision
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::DATA_CASES_FILES,
+            "{$problemAlias}-{$revision}-{$directory}",
+            /** @return list<array{id: string, mode: int, path: string, size: int, type: string}> */
+            function () use ($problemAlias, $revision, $directory) {
+                $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+                    $problemAlias,
+                    $revision
+                );
+
+                return $problemArtifacts->lsTreeRecursive($directory);
+            },
+            24 * 60 * 60 // expire in 1 day
+        );
     }
 
     /**
@@ -1049,7 +1184,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Given the run alias, returns a .zip file with all the .out files generated for a run.
      *
-     * @omegaup-request-param mixed $run_alias
+     * @omegaup-request-param string $run_alias
+     * @omegaup-request-param bool $show_diff
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
@@ -1059,6 +1195,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         }
         // Get the user who is calling this API
         $r->ensureIdentity();
+        $showDiff = $r->ensureOptionalBool('show_diff') ?? false;
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['run_alias'],
@@ -1068,7 +1205,8 @@ class Run extends \OmegaUp\Controllers\Controller {
             !self::downloadSubmission(
                 $r['run_alias'],
                 $r->identity,
-                /*passthru=*/true
+                /*$passthru=*/true,
+                /*$skipAuthorization=*/$showDiff
             )
         ) {
             http_response_code(404);
@@ -1085,7 +1223,8 @@ class Run extends \OmegaUp\Controllers\Controller {
     public static function downloadSubmission(
         string $guid,
         \OmegaUp\DAO\VO\Identities $identity,
-        bool $passthru
+        bool $passthru,
+        bool $skipAuthorization = false
     ) {
         $submission = \OmegaUp\DAO\Submissions::getByGuid($guid);
         if (
@@ -1106,18 +1245,21 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        if (!\OmegaUp\Authorization::isProblemAdmin($identity, $problem)) {
+        if (
+            !$skipAuthorization &&
+            !\OmegaUp\Authorization::isProblemAdmin($identity, $problem)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );
         }
 
         if ($passthru) {
-            header('Content-Type: application/zip');
-            header(
-                "Content-Disposition: attachment; filename={$submission->guid}.zip"
-            );
-            return self::getGraderResourcePassthru($run, 'files.zip');
+            $headers = [
+                'Content-Type: application/zip',
+                "Content-Disposition: attachment; filename={$submission->guid}.zip",
+            ];
+            return self::getGraderResourcePassthru($run, 'files.zip', $headers);
         }
         return self::getGraderResource($run, 'files.zip');
     }
@@ -1141,21 +1283,25 @@ class Run extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param list<string> $headers
      * @return bool|null|string
      */
     private static function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
-        string $filename
+        string $filename,
+        array $headers = []
     ) {
         $result = \OmegaUp\Grader::getInstance()->getGraderResourcePassthru(
             $run,
             $filename,
-            /*missingOk=*/true
+            /*missingOk=*/true,
+            $headers
         );
         if (is_null($result)) {
             $result = self::downloadResourceFromS3(
                 "{$run->run_id}/{$filename}",
-                /*passthru=*/true
+                /*passthru=*/true,
+                $headers
             );
         }
         return $result;
@@ -1164,13 +1310,15 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Given the run resouce path, fetches its contents from S3.
      *
-     * @param  string $resourcePath The run's resource path.
-     * @param  bool   $passthru     Whether to output directly.
-     * @return ?string              The contents of the resource (or an empty string) if successful. null otherwise.
+     * @param  string       $resourcePath The run's resource path.
+     * @param  bool         $passthru     Whether to output directly.
+     * @param  list<string> $httpHeaders
+     * @return ?string                    The contents of the resource (or an empty string) if successful. null otherwise.
      */
     private static function downloadResourceFromS3(
         string $resourcePath,
-        bool $passthru
+        bool $passthru,
+        array $httpHeaders = []
     ): ?string {
         if (
             !defined('AWS_CLI_SECRET_ACCESS_KEY') ||
@@ -1287,6 +1435,9 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         $output = curl_exec($curl);
         if ($passthru) {
+            foreach ($httpHeaders as $header) {
+                header($header);
+            }
             $result = '';
         } else {
             $result = strval($output);
@@ -1331,7 +1482,7 @@ class Run extends \OmegaUp\Controllers\Controller {
 
                 return $totals;
             },
-            24 * 60 * 60 /*expire in 1 day*/
+            24 * 60 * 60 // expire in 1 day
         );
     }
 
