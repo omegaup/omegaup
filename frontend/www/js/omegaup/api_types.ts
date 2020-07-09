@@ -1519,6 +1519,7 @@ export namespace types {
     runs?: types.Run[];
     score: number;
     settings: types.ProblemSettings;
+    show_diff: string;
     solvers?: {
       language: string;
       memory: number;
@@ -1607,6 +1608,7 @@ export namespace types {
     publishedRevision?: types.ProblemVersion;
     selectedPrivateTags: string[];
     selectedPublicTags: string[];
+    showDiff: string;
     solution?: types.ProblemStatement;
     source: string;
     statement: types.ProblemStatement;
@@ -1636,6 +1638,7 @@ export namespace types {
     overallWallTimeLimit: number | string;
     publicTags: string[];
     selectedTags?: types.SelectedTag[];
+    showDiff: string;
     source: string;
     statusError: string;
     tags: { name?: string }[];
