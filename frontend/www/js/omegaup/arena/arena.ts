@@ -338,6 +338,7 @@ export class Arena {
   rankingChart: Highcharts.Chart | null = null;
 
   constructor(options: ArenaOptions) {
+    const self = this;
     this.options = options;
 
     // All runs in this contest/problem.
@@ -452,7 +453,6 @@ export class Arena {
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
-      const self = this;
       this.navbarProblems = new Vue({
         el: '#arena-navbar-problems',
         render: function (createElement) {
@@ -559,7 +559,6 @@ export class Arena {
 
     // Setup run submit view, if it is available.
     if (document.getElementById('run-submit') !== null) {
-      const self = this;
       self.runSubmitView = new Vue({
         el: '#run-submit',
         render: function (createElement) {
@@ -628,6 +627,11 @@ export class Arena {
             markdown: this.markdown,
             imageMapping: this.imageMapping,
             problemSettings: this.problemSettings,
+          },
+          on: {
+            rendered: () => {
+              self.onProblemRendered();
+            },
           },
         });
       },
@@ -1858,7 +1862,9 @@ export class Arena {
         date: time.formatDate(problem.problemsetter.creation_date),
       });
     }
+  }
 
+  onProblemRendered(): void {
     ui.renderSampleToClipboardButton();
 
     const libinteractiveInterfaceNameElement = <HTMLElement>(
@@ -1866,18 +1872,18 @@ export class Arena {
     );
     if (
       libinteractiveInterfaceNameElement &&
-      problem.settings?.interactive?.module_name
+      this.currentProblem.settings?.interactive?.module_name
     ) {
-      libinteractiveInterfaceNameElement.innerText = problem.settings.interactive.module_name.replace(
+      libinteractiveInterfaceNameElement.innerText = this.currentProblem.settings.interactive.module_name.replace(
         /\.idl$/,
         '',
       );
     }
     this.installLibinteractiveHooks();
 
-    this.updateAllowedLanguages(problem.languages);
+    this.updateAllowedLanguages(this.currentProblem.languages);
 
-    this.ephemeralGrader.send('setSettings', problem.settings);
+    this.ephemeralGrader.send('setSettings', this.currentProblem.settings);
   }
 
   detectShowRun(): void {

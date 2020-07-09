@@ -1482,6 +1482,7 @@ const translations: { [key: string]: string; } = {
   wordsReason: "Raz\u00e3o",
   wordsRegistration: "Registro/aberto",
   wordsRejudge: "Revaluar",
+  wordsRemoveFilter: "Remover filtros",
   wordsReportProblem: "Relatar problema",
   wordsRequired: "Obrigat\u00f3rio",
   wordsReset: "omegaUp: Redefini\u00e7\u00e3o de senha.",
