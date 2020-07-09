@@ -125,7 +125,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
+import { Vue, Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../markdown';
 import { types } from '../api_types';
 
@@ -176,6 +176,7 @@ export default class Markdown extends Vue {
     this.renderMathJax();
   }
 
+  @Emit('rendered')
   private renderMathJax(): void {
     this.root.innerHTML = this.html;
     if (!window.MathJax?.startup) {
