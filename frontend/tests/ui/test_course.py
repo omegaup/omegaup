@@ -263,17 +263,13 @@ def enter_course_assignments_page(driver, course_alias):
 @util.annotate
 def create_course(driver, course_alias: str, school_name: str) -> None:
     '''Creates one course with a new school.'''
-
-    with driver.page_transition(target_url=driver.url('/course/')):
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
+    with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[href="/course/"]'))).click()
-
-    with driver.page_transition(target_url=driver.url('/course/new/')):
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, ('a[href="/course/new/"]')))).click()
-
+                (By.CSS_SELECTOR, 'a[data-nav-courses-create]'))).click()
     driver.send_keys(
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -407,12 +403,13 @@ def add_students_course(driver, users):
 @util.annotate
 def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
     '''Enter to course previously created.'''
-
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/course/"]'))).click()
-
+                (By.CSS_SELECTOR, 'a[data-nav-courses-all]'))).click()
     course_url = '/course/%s' % course_alias
     with driver.page_transition():
         driver.wait.until(
