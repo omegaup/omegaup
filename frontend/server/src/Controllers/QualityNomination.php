@@ -632,17 +632,23 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 /*$redirect=*/ false
             );
             foreach ($nominations as $nomination) {
-                $nomination->status = strval($r['status']);
-                \OmegaUp\DAO\QualityNominations::update($nomination);
                 \OmegaUp\DAO\QualityNominationLog::create(
                     new \OmegaUp\DAO\VO\QualityNominationLog([
-                        'user_id' => $nomination->user_id,
+                        'user_id' => $r->user->user_id,
                         'qualitynomination_id' => $nomination->qualitynomination_id,
                         'from_status' => $nomination->status,
                         'to_status' => $r['status'],
                         'rationale' => $r['rationale']
                     ])
                 );
+                /**
+                * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+                */
+                $contents = json_decode($nomination->contents ?? '', true);
+                $contents['rationale'] = $r['rationale'];
+                $nomination->contents = json_encode($contents);
+                $nomination->status = strval($r['status']);
+                \OmegaUp\DAO\QualityNominations::update($nomination);
             }
             if ($r['status'] == 'banned' || $r['status'] == 'warning') {
                 self::sendNotificationEmail(
