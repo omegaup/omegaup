@@ -1,5 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import expect from 'expect';
 import Vue from 'vue';
 
@@ -13,7 +14,7 @@ describe('AddStudents.vue', () => {
       propsData: {
         courseAlias: 'course_alias',
         students: <omegaup.CourseStudent[]>[],
-        data: <omegaup.IdentityRequest[]>[],
+        data: <types.IdentityRequest[]>[],
       },
     });
 
@@ -31,11 +32,11 @@ describe('AddStudents.vue', () => {
             username: 'user',
           },
         ],
-        data: <omegaup.IdentityRequest[]>[
+        data: <types.IdentityRequest[]>[
           {
             accepted: false,
             country: 'mx',
-            last_update: null,
+            last_update: undefined,
             request_time: new Date(),
             username: 'user_1',
           },
