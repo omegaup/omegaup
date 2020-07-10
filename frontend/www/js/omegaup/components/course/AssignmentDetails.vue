@@ -3,24 +3,19 @@
     <div class="card-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
-          <div
-            class="form-group col-md-4"
-            v-bind:class="{ 'has-error': invalidParameterName === 'name' }"
-          >
+          <div class="form-group col-md-4">
             <label
               >{{ T.wordsTitle }}
               <input
                 class="form-control name"
+                v-bind:class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
                 type="text"
                 v-model="name"
                 required
             /></label>
           </div>
-          <div
-            class="form-group col-md-4"
-            v-bind:class="{ 'has-error': invalidParameterName === 'alias' }"
-          >
+          <div class="form-group col-md-4">
             <label
               >{{ T.courseNewFormShortTitle_alias_ }}
               <font-awesome-icon
@@ -28,25 +23,30 @@
                 icon="info-circle" />
               <input
                 class="form-control alias"
+                v-bind:class="{
+                  'is-invalid': invalidParameterName === 'alias',
+                }"
                 type="text"
                 v-bind:disabled="update"
                 v-model="alias"
                 required
             /></label>
           </div>
-          <div
-            class="form-group col-md-4"
-            v-bind:class="{
-              'has-error': invalidParameterName === 'assignment_type',
-            }"
-          >
+          <div class="form-group col-md-4">
             <label
               >{{ T.courseAssignmentNewFormType }}
               <font-awesome-icon
                 v-bind:title="T.courseAssignmentNewFormTypeDesc"
                 icon="info-circle"
               />
-              <select class="form-control" v-model="assignmentType" required>
+              <select
+                class="form-control"
+                v-bind:class="{
+                  'is-invalid': invalidParameterName === 'assignment_type',
+                }"
+                v-model="assignmentType"
+                required
+              >
                 <option value="homework">
                   {{ T.wordsHomework }}
                 </option>
@@ -58,12 +58,7 @@
           </div>
         </div>
         <div class="row">
-          <div
-            class="form-group col-md-4"
-            v-bind:class="{
-              'has-error': invalidParameterName === 'start_time',
-            }"
-          >
+          <div class="form-group col-md-4">
             <label
               >{{ T.courseNewFormStartDate }}
               <font-awesome-icon
@@ -74,6 +69,7 @@
                 v-model="startTime"
                 v-bind:finish="finishTimeCourse"
                 v-bind:start="startTimeCourse"
+                v-bind:is-invalid="invalidParameterName === 'start_time'"
               ></omegaup-datetimepicker
             ></label>
           </div>
@@ -88,7 +84,7 @@
             <div
               class="form-control container-fluid"
               v-bind:class="{
-                'has-error': invalidParameterName === 'unlimited_duration',
+                'is-invalid': invalidParameterName === 'unlimited_duration',
               }"
             >
               <label class="radio-inline"
@@ -109,12 +105,7 @@
               >
             </div>
           </div>
-          <div
-            class="form-group col-md-4"
-            v-bind:class="{
-              'has-error': invalidParameterName === 'finish_time',
-            }"
-          >
+          <div class="form-group col-md-4">
             <label
               >{{ T.courseNewFormEndDate }}
               <font-awesome-icon
@@ -126,21 +117,20 @@
                 v-model="finishTime"
                 v-bind:finish="finishTimeCourse"
                 v-bind:start="startTimeCourse"
+                v-bind:is-invalid="invalidParameterName === 'finish_time'"
               ></omegaup-datetimepicker
             ></label>
           </div>
         </div>
         <div class="row">
-          <div
-            class="form-group container-fluid"
-            v-bind:class="{
-              'has-error': invalidParameterName === 'description',
-            }"
-          >
+          <div class="form-group container-fluid">
             <label
               >{{ T.courseNewFormDescription }}
               <textarea
                 class="form-control"
+                v-bind:class="{
+                  'is-invalid': invalidParameterName === 'description',
+                }"
                 cols="30"
                 rows="5"
                 v-model="description"
@@ -219,16 +209,34 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
-  update =
-    this.visibilityMode === omegaup.VisibilityMode.Default ||
-    this.visibilityMode === omegaup.VisibilityMode.Edit;
-  show =
-    this.visibilityMode === omegaup.VisibilityMode.New ||
-    this.visibilityMode === omegaup.VisibilityMode.Edit;
+  show = false;
+  update = false;
 
   @Watch('assignment')
   onAssignmentChange() {
     this.reset();
+  }
+
+  @Watch('visibilityMode')
+  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
+    switch (newValue) {
+      case omegaup.VisibilityMode.New:
+        this.show = true;
+        this.update = false;
+        this.reset();
+        break;
+      case omegaup.VisibilityMode.Edit:
+        this.show = true;
+        this.update = true;
+        break;
+      case omegaup.VisibilityMode.Default:
+        this.show = false;
+        this.update = true;
+        break;
+      default:
+        this.show = false;
+        this.update = true;
+    }
   }
 
   reset(): void {

@@ -34,49 +34,54 @@
         </div>
       </form>
     </div>
-    <div class="table-body" v-if="assignmentProblems.length == 0">
-      <div class="empty-category">
+    <div class="card-body">
+      <div class="empty-category" v-if="assignmentProblems.length == 0">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
-    </div>
-    <table class="table table-striped" v-else="">
-      <thead>
-        <tr>
-          <th>{{ T.contestAddproblemProblemOrder }}</th>
-          <th>{{ T.contestAddproblemProblemName }}</th>
-          <th>{{ T.contestAddproblemProblemRemove }}</th>
-        </tr>
-      </thead>
-      <tbody v-sortable="{ onUpdate: sort }">
-        <tr v-bind:key="problem.letter" v-for="problem in assignmentProblems">
-          <td>
-            <a v-bind:title="T.courseAssignmentProblemReorder">
-              <font-awesome-icon icon="arrows-alt" />
-            </a>
-          </td>
-          <td>{{ problem.title }}</td>
-          <td class="button-column">
-            <a
-              href="#"
-              v-bind:title="T.courseAssignmentProblemRemove"
-              v-on:click="$emit('emit-remove', assignment, problem)"
+      <div v-else="">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>{{ T.contestAddproblemProblemOrder }}</th>
+              <th>{{ T.contestAddproblemProblemName }}</th>
+              <th>{{ T.contestAddproblemProblemRemove }}</th>
+            </tr>
+          </thead>
+          <tbody v-sortable="{ onUpdate: sort }">
+            <tr
+              v-bind:key="problem.letter"
+              v-for="problem in assignmentProblems"
             >
-              <font-awesome-icon icon="trash" />
-            </a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div>
-      <a
-        class="btn btn-primary"
-        href="#"
-        v-bind:class="{ disabled: !problemsOrderChanged }"
-        role="button"
-        v-on:click="saveNewOrder"
-      >
-        {{ T.wordsSaveNewOrder }}
-      </a>
+              <td>
+                <a v-bind:title="T.courseAssignmentProblemReorder">
+                  <font-awesome-icon icon="arrows-alt" />
+                </a>
+              </td>
+              <td>{{ problem.title }}</td>
+              <td class="button-column">
+                <a
+                  href="#"
+                  v-bind:title="T.courseAssignmentProblemRemove"
+                  v-on:click="$emit('emit-remove', assignment, problem)"
+                >
+                  <font-awesome-icon icon="trash" />
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <a
+            class="btn btn-primary"
+            href="#"
+            v-bind:class="{ disabled: !problemsOrderChanged }"
+            role="button"
+            v-on:click="saveNewOrder"
+          >
+            {{ T.wordsSaveNewOrder }}
+          </a>
+        </div>
+      </div>
     </div>
     <div class="card-footer" v-show="showForm">
       <form>
@@ -239,6 +244,7 @@ export default class CourseProblemList extends Vue {
 
   onShowForm(): void {
     this.showForm = true;
+    this.$emit('update:visibility-mode', omegaup.VisibilityMode.AddProblem);
     this.problemAlias = '';
     this.difficulty = 'intro';
     this.topics = [];
@@ -284,6 +290,15 @@ export default class CourseProblemList extends Vue {
   @Watch('tags')
   onTagsChange() {
     this.$emit('emit-tags', this.tags);
+  }
+
+  @Watch('visibilityMode')
+  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
+    if (newValue !== omegaup.VisibilityMode.AddProblem) {
+      this.showForm = false;
+      return;
+    }
+    this.showForm = true;
   }
 }
 </script>

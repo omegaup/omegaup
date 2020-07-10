@@ -97,6 +97,7 @@
       </div>
 
       <div
+        data-assignments-tab
         class="tab-pane active"
         role="tabpanel"
         v-if="showTab === 'assignments'"
@@ -121,7 +122,7 @@
           "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
-          ref="assignment-details-list"
+          ref="assignment-details"
           v-bind:visibility-mode="visibilityMode"
           v-bind:unlimited-duration-course="!data.course.finish_time"
           v-bind:finish-time-course="data.course.finish_time"
@@ -137,6 +138,7 @@
       </div>
 
       <div
+        data-problems-tab
         class="tab-pane active"
         role="tabpanel"
         v-if="showTab === 'problems'"
@@ -145,7 +147,7 @@
           v-bind:assignments="data.course.assignments"
           v-bind:assignment-problems="data.assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
-          v-bind:visibility-mode="visibilityMode"
+          v-bind:visibility-mode.sync="visibilityMode"
           v-bind:selected-assignment="selectedAssignment"
           v-on:emit-add-problem="
             (assignment, problemAlias) =>
@@ -185,6 +187,7 @@
       </div>
 
       <div
+        data-students-tab
         class="tab-pane active"
         role="tabpanel"
         v-if="showTab === 'students'"
@@ -312,14 +315,13 @@ const emptyAssignment: types.CourseAssignment = {
   },
 })
 export default class CourseEdit extends Vue {
-  @Ref('assignment-details-list')
-  readonly assignmentDetailsList!: HTMLElement;
+  @Ref('assignment-details') readonly assignmentDetails!: Vue;
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
 
   T = T;
-  showTab = 'course';
+  showTab = this.initialTab;
 
   visibilityMode: omegaup.VisibilityMode = omegaup.VisibilityMode.Default;
 
@@ -332,20 +334,21 @@ export default class CourseEdit extends Vue {
 
   onNewAssignment(): void {
     this.visibilityMode = omegaup.VisibilityMode.New;
-    this.assignmentDetailsList.scrollIntoView();
+    this.assignment = emptyAssignment;
+    this.assignmentDetails.$el.scrollIntoView();
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
     this.visibilityMode = omegaup.VisibilityMode.Edit;
     this.assignment = assignment;
-    this.assignmentDetailsList.scrollIntoView();
+    this.assignmentDetails.$el.scrollIntoView();
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {
     this.visibilityMode = omegaup.VisibilityMode.AddProblem;
     this.selectedAssignment = assignment;
     this.showTab = 'problems';
-    this.$emit('add-problems');
+    this.$emit('select-assignment', assignment);
   }
 
   onCancel(): void {

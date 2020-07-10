@@ -29,7 +29,7 @@ OmegaUp.on('ready', function () {
           },
         },
         on: {
-          submit: function (ev) {
+          'emit-submit': function (ev) {
             new Promise((accept, reject) => {
               if (ev.school_id) {
                 accept(ev.school_id);

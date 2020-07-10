@@ -312,11 +312,13 @@ def add_assignment(driver, assignment_alias):
             (By.XPATH, (
                 '//a[contains(@href, "#assignments")]')))).click()
     driver.wait.until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, '#assignments')))
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'div[data-assignments-tab]')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, ('#assignments .new button')))).click()
+            (By.CSS_SELECTOR,
+             'div[data-assignments-tab] .new button'))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -362,23 +364,23 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '#problems .problemlist button'))).click()
+             'div[data-problems-tab] .problemlist button'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer')))
+             '.omegaup-course-problemlist .card-footer')))
 
     driver.typeahead_helper(
-        '*[contains(@class, "panel-footer")]', problem)
+        '*[contains(@class, "card-footer")]', problem)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer '
+             '.omegaup-course-problemlist .card-footer '
              'button[type=submit]'))).click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer')))
+             '.omegaup-course-problemlist .card-footer')))
 
 
 @util.annotate
@@ -402,7 +404,7 @@ def add_students_course(driver, users):
 
     util.add_students(
         driver, users, tab_xpath='//a[contains(@href, "#students")]',
-        container_xpath='//*[@id="students"]',
+        container_xpath='//div[@data-students-tab]',
         parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))
