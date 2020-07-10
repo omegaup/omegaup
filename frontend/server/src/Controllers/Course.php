@@ -2642,7 +2642,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         ) {
             $filteredCourses['admin']['activeTab'] = 'past';
         }
-        //print_r($filteredCourses);
         return [
             'smartyProperties' => [
                 'payload' => [
