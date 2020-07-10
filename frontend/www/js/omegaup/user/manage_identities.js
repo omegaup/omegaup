@@ -2,7 +2,7 @@ import user_ManageIdentities from '../components/user/ManageIdentities.vue';
 import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 
 OmegaUp.on('ready', function () {
@@ -21,9 +21,9 @@ OmegaUp.on('ready', function () {
             })
               .then(function (data) {
                 refreshIdentityList();
-                UI.success(T.profileIdentityAdded);
+                ui.success(T.profileIdentityAdded);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -41,7 +41,7 @@ OmegaUp.on('ready', function () {
       .then(function (data) {
         manageIdentities.identities = data.identities;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   refreshIdentityList();

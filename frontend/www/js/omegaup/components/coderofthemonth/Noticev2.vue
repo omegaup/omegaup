@@ -3,7 +3,7 @@
     <div class="container-lg">
       <div class="alert alert-warning alert-dismissible fade show" role="alert">
         {{
-          UI.formatString(T.coderOfTheMonthNotice, { username: coderUsername })
+          ui.formatString(T.coderOfTheMonthNotice, { username: coderUsername })
         }}
         <button
           type="button"
@@ -28,12 +28,12 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class CoderOfTheMonthNotice extends Vue {
   @Prop() coderUsername!: string;
   T = T;
-  UI = UI;
+  ui = ui;
 }
 </script>

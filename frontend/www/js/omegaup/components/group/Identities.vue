@@ -72,7 +72,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class Identities extends Vue {
@@ -90,7 +90,7 @@ export default class Identities extends Vue {
     const regex = /.*\.(?:csv|txt)$/;
 
     if (!regex.test(fileUpload.value.toLowerCase())) {
-      UI.error(T.groupsInvalidCsv);
+      ui.error(T.groupsInvalidCsv);
       return;
     }
     this.$emit('read-csv', this, fileUpload);

@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      {{ UI.formatString(T.contestReport, { contest_alias: contestAlias }) }}
+      {{ ui.formatString(T.contestReport, { contest_alias: contestAlias }) }}
     </div>
     <div class="panel-body">
       <div v-for="contestantData in contestReport">
@@ -77,7 +77,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 interface ContestReport {
   country?: string;
@@ -99,6 +99,6 @@ export default class Report extends Vue {
   @Prop() contestAlias!: string;
 
   T = T;
-  UI = UI;
+  ui = ui;
 }
 </script>
