@@ -6,6 +6,7 @@ require('jsdom-global')(undefined, {
 });
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
+window.jQuery = global.jQuery;
 
 // This is needed for CodeMirror to work.
 global.document.createRange = () => {
