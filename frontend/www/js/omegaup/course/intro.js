@@ -1,6 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import course_Intro from '../components/course/Intro.vue';
 import Vue from 'vue';
 
@@ -39,14 +39,14 @@ OmegaUp.on('ready', function () {
               .then((data) => {
                 window.location.replace(`/course/${coursePayload.alias}/`);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'request-access-course': () => {
             api.Course.registerForCourse({ course_alias: coursePayload.alias })
               .then(() => {
                 courseIntro.userRegistrationRequested = true;
               })
-              .catch(UI.error);
+              .catch(ui.error);
           },
         },
       });

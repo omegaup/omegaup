@@ -1,7 +1,7 @@
 import { Arena } from '../arena/arena';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function () {
   const payload = JSON.parse(
@@ -12,7 +12,7 @@ OmegaUp.on('ready', function () {
   );
 
   let options = {
-    // There is no UI to show clarifications with scoreboard-only views.
+    // There is no ui to show clarifications with scoreboard-only views.
     disableClarifications: true,
     courseAlias: params[1],
     assignmentAlias: params[2],
@@ -38,7 +38,7 @@ OmegaUp.on('ready', function () {
         token: arena.options.scoreboardToken,
       })
         .then(arena.rankingChange.bind(arena))
-        .catch(UI.ignoreError);
+        .catch(ui.ignoreError);
       if (new Date() < course.finish_time && !arena.socket) {
         setInterval(function () {
           api.Problemset.scoreboard({
@@ -46,7 +46,7 @@ OmegaUp.on('ready', function () {
             token: arena.options.scoreboardToken,
           })
             .then(arena.rankingChange.bind(arena))
-            .catch(UI.ignoreError);
+            .catch(ui.ignoreError);
         }, getRankingByTokenRefresh);
       }
 
@@ -54,5 +54,5 @@ OmegaUp.on('ready', function () {
       $('#root').fadeIn('slow');
       $('#loading').fadeOut('slow');
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 });

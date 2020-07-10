@@ -2,7 +2,7 @@ import Vue from 'vue';
 import activity_Feed from '../components/activity/Feed.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function () {
   let match = /\/([^\/]+)\/([^\/]+)\/activity\/?.*/.exec(
@@ -16,13 +16,13 @@ OmegaUp.on('ready', function () {
       .then(function (report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   } else if (problemsetType == 'course') {
     api.Course.activityReport({ course_alias: problemsetAlias })
       .then(function (report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function createComponent(problemsetType, problemsetAlias, report) {

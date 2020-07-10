@@ -78,7 +78,7 @@
                 />
                 <div class="d-inline-block ml-2">
                   <a class="mr-1" v-bind:href="`/arena/${contest.alias}/`">{{
-                    UI.contestTitle(contest)
+                    ui.contestTitle(contest)
                   }}</a>
                 </div>
               </td>
@@ -182,7 +182,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import * as time from '../../time';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -216,7 +216,7 @@ export default class List extends Vue {
   @Prop() privateContestsAlert!: boolean;
 
   T = T;
-  UI = UI;
+  ui = ui;
   time = time;
   shouldShowAllContests = false;
   allContestsVisibilityOption = 'none';

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import qualitynomination_List from '../components/qualitynomination/List.vue';
 import { OmegaUp, omegaup } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import { types, messages } from '../api_types';
 
 OmegaUp.on('ready', function () {
@@ -72,7 +72,7 @@ OmegaUp.on('ready', function () {
           nominationsList.pagerItems = data.pager_items;
           nominationsList.pages = pageNumber;
         })
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     } else {
       api.QualityNomination.myList(request)
         .then((data) => {
@@ -80,7 +80,7 @@ OmegaUp.on('ready', function () {
           nominationsList.pagerItems = data.pager_items;
           nominationsList.pages = pageNumber;
         })
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     }
   }
 
