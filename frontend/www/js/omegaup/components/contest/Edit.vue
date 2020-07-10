@@ -194,6 +194,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup, OmegaUp } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
@@ -212,7 +213,7 @@ interface ContestEdit {
   contest: omegaup.Contest;
   groupAdmins: omegaup.ContestGroupAdmin[];
   problems: omegaup.Problem[];
-  requests: omegaup.IdentityRequest[];
+  requests: types.IdentityRequest[];
   users: omegaup.IdentityContest[];
   groups: omegaup.ContestGroup[];
 }
