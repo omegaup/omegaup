@@ -24,6 +24,6 @@ describe('AssignmentDetails.vue', () => {
 
     expect(
       wrapper.find('form.schedule button[type=submit].submit').text(),
-    ).toBe('some');
+    ).toBe(T.courseAssignmentNewFormSchedule);
   });
 });
