@@ -275,6 +275,9 @@
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems
                   }}</a>
+                  <a class="dropdown-item" href="/course/mine/">{{
+                    T.myCourses
+                  }}</a>
                   <a
                     class="dropdown-item"
                     href="/contest/mine/"

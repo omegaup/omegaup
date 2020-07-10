@@ -528,6 +528,7 @@ const translations: { [key: string]: string; } = {
   mustRegisterToJoinCourse: "You must register to join this course.",
   mustUpdateBasicInfoToFilterUsers: "You must update your basic information to filter users in the ranking.",
   mustWaitNToSubmit: "You have to wait %n between submissions.",
+  myCourses: "My courses",
   myInterviews: "My interviews",
   myproblemsListAddContests: "Add a contest",
   myproblemsListCreateProblem: "Create a problem",

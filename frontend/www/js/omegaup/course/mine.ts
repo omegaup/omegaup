@@ -1,4 +1,4 @@
-import course_List from '../components/course/List.vue';
+import course_List from '../components/course/Mine.vue';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -7,10 +7,9 @@ import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.CourseListPayload();
-  const headerPayload = types.payloadParsers.CommonPayload();
+  const payload = types.payloadParsers.CourseListMinePayload();
   console.log(payload);
-  console.log(headerPayload);
+  const headerPayload = types.payloadParsers.CommonPayload();
   let courseList = new Vue({
     el: '#main-container',
     render: function (createElement) {

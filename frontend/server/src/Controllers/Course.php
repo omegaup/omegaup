@@ -23,7 +23,8 @@
  * @psalm-type FilteredCourse=array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CoursesList=array{admin: list<FilteredCourse>, student: list<FilteredCourse>, public: list<FilteredCourse>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress: AssignmentProgress}
- * @psalm-type CourseListPayload=array{courses: array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, student: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, public: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}}}
+ * @psalm-type CourseListMinePayload=array{courses: array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}}}
+ * @psalm-type CourseListPayload=array{courses: array{student: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, public: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}}}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
@@ -2591,6 +2592,67 @@ class Course extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'course_student'
         ];
     }
+     /**
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: string}}
+     */
+
+    public static function getCourseMineDetailsForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $r->ensureOptionalInt('page');
+        $r->ensureOptionalInt('page_size');
+
+        $page = (isset($r['page']) ? intval($r['page']) : 1);
+        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+
+        $courses = self::getCoursesList($r->identity, $page, $pageSize);
+        $filteredCourses = [];
+        $filteredCourses['admin'] = [
+            'filteredCourses' => [
+                'current' => [
+                    'courses' => [],
+                    'timeType' => 'current',
+                ],
+                'past' => [
+                    'courses' => [],
+                    'timeType' => 'past',
+                ],
+            ],
+            'accessMode' => 'admin',
+            'activeTab' => '',
+        ];
+        foreach ($courses['admin'] as $course) {
+            if (
+                is_null($course['finish_time'])
+                || $course['finish_time']->time > \OmegaUp\Time::get()
+            ) {
+                $filteredCourses['admin']['filteredCourses']['current']['courses'][] = $course;
+                $filteredCourses['admin']['activeTab'] = 'current';
+            } else {
+                $filteredCourses['admin']['filteredCourses']['past']['courses'][] = $course;
+            }
+        }
+        if (
+            $filteredCourses['admin']['activeTab'] === ''
+            && !empty(
+                $filteredCourses['admin']['filteredCourses']['past']['courses']
+            )
+        ) {
+            $filteredCourses['admin']['activeTab'] = 'past';
+        }
+        //print_r($filteredCourses);
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'courses' => $filteredCourses,
+                ],
+                'title' => 'courseList',
+            ],
+            'entrypoint' => 'course_mine',
+        ];
+    }
 
     /**
      * @omegaup-request-param int $page
@@ -2607,7 +2669,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         $courses = self::getCoursesList($r->identity, $page, $pageSize);
-        $coursesTypes = ['public', 'student', 'admin'];
+        $coursesTypes = ['public', 'student'];
 
         $filteredCourses = [];
         foreach ($coursesTypes as $courseType) {
@@ -2645,7 +2707,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $filteredCourses[$courseType]['activeTab'] = 'past';
             }
         }
-
+        // print_r($filteredCourses);
         return [
             'smartyProperties' => [
                 'payload' => [

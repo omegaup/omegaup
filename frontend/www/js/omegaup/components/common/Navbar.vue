@@ -213,6 +213,9 @@
                   <a href="/badge/list/">{{ T.navViewBadges }}</a>
                 </li>
                 <li>
+                  <a href="/course/mine">{{ T.myCourses }} </a>
+                </li>
+                <li>
                   <a href="/problem/mine/">{{ T.navMyProblems }}</a>
                 </li>
                 <li>

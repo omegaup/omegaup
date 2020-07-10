@@ -382,9 +382,9 @@ export namespace types {
       );
     }
 
-    export function CourseListPayload(
+    export function CourseListMinePayload(
       elementId: string = 'payload',
-    ): types.CourseListPayload {
+    ): types.CourseListMinePayload {
       return ((x) => {
         x.courses = ((x) => {
           x.admin = ((x) => {
@@ -429,6 +429,19 @@ export namespace types {
             })(x.filteredCourses);
             return x;
           })(x.admin);
+          return x;
+        })(x.courses);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CourseListPayload(
+      elementId: string = 'payload',
+    ): types.CourseListPayload {
+      return ((x) => {
+        x.courses = ((x) => {
           x.public = ((x) => {
             x.filteredCourses = ((x) => {
               x.current = ((x) => {
@@ -1257,7 +1270,7 @@ export namespace types {
     role: string;
   }
 
-  export interface CourseListPayload {
+  export interface CourseListMinePayload {
     courses: {
       admin: {
         accessMode: string;
@@ -1267,6 +1280,11 @@ export namespace types {
           past: { courses: types.FilteredCourse[]; timeType: string };
         };
       };
+    };
+  }
+
+  export interface CourseListPayload {
+    courses: {
       public: {
         accessMode: string;
         activeTab: string;
