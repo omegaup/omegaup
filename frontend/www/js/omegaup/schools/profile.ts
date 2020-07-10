@@ -2,7 +2,7 @@ import Vue from 'vue';
 import school_Profile from '../components/schools/Profile.vue';
 import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import { SchoolCoderOfTheMonth, SchoolUser } from '../linkable_resource';
 
@@ -35,7 +35,7 @@ OmegaUp.on('ready', () => {
               type: 'line',
             },
             title: {
-              text: UI.formatString(T.profileSchoolMonthlySolvedProblemsCount, {
+              text: ui.formatString(T.profileSchoolMonthlySolvedProblemsCount, {
                 school: payload.school_name,
               }),
             },

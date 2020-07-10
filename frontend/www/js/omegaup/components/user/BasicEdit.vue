@@ -66,7 +66,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class UserBasicEdit extends Vue {
@@ -78,7 +78,7 @@ export default class UserBasicEdit extends Vue {
 
   formSubmit(): void {
     if (this.newPassword1 != this.newPassword2) {
-      UI.error(T.userPasswordMustBeSame);
+      ui.error(T.userPasswordMustBeSame);
       return;
     }
     this.$emit('update', this.username, this.newPassword1);

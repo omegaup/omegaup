@@ -3,10 +3,10 @@
     <h5 class="card-header">
       {{
         isIndex
-          ? UI.formatString(T.userRankOfTheMonthHeader, {
+          ? ui.formatString(T.userRankOfTheMonthHeader, {
               count: length,
             })
-          : UI.formatString(T.rankRangeHeader, {
+          : ui.formatString(T.rankRangeHeader, {
               lowCount: (page - 1) * length + 1,
               highCount: page * length,
             })
@@ -98,7 +98,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { OmegaUp } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import CountryFlag from '../CountryFlag.vue';
@@ -134,7 +134,7 @@ export default class UserRank extends Vue {
   @Prop() pagerItems!: types.PageItem[];
 
   T = T;
-  UI = UI;
+  ui = ui;
   typeahead = typeahead;
   searchedUsername = '';
 
@@ -159,7 +159,7 @@ export default class UserRank extends Vue {
     } else {
       delete queryParameters['filter'];
     }
-    window.location.search = UI.buildURLQuery(queryParameters);
+    window.location.search = ui.buildURLQuery(queryParameters);
   }
 
   get nextPageFilter(): string {

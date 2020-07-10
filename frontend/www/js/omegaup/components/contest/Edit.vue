@@ -3,8 +3,8 @@
     <div class="page-header">
       <h1>
         {{
-          UI.formatString(T.contestEditWithTitle, {
-            title: UI.contestTitle(contest),
+          ui.formatString(T.contestEditWithTitle, {
+            title: ui.contestTitle(contest),
           })
         }}
         <small
@@ -195,7 +195,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup, OmegaUp } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import contest_AddProblem from './AddProblem.vue';
 import contest_Admins from '../common/Admins.vue';
 import contest_Clone from './Clone.vue';
@@ -235,9 +235,9 @@ export default class Edit extends Vue {
   @Prop() data!: ContestEdit;
 
   T = T;
-  UI = UI;
-  showTab = UI.isVirtual(this.data.contest) ? 'contestants' : 'new_form';
-  virtual = UI.isVirtual(this.data.contest);
+  ui = ui;
+  showTab = ui.isVirtual(this.data.contest) ? 'contestants' : 'new_form';
+  virtual = ui.isVirtual(this.data.contest);
   contest = this.data.contest;
   problems = this.data.problems;
   users = this.data.users;

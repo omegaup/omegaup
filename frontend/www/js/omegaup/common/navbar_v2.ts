@@ -3,7 +3,7 @@ import { omegaup, OmegaUp } from '../omegaup';
 import * as api from '../api';
 import { types } from '../api_types';
 import T from '../lang';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -44,10 +44,10 @@ OmegaUp.on('ready', () => {
               .then((data) => {
                 commonNavbar.notifications = data.notifications;
                 if (redirectTo) {
-                  UI.navigateTo(redirectTo);
+                  ui.navigateTo(redirectTo);
                 }
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -68,7 +68,7 @@ OmegaUp.on('ready', () => {
       .then((data) => {
         commonNavbar.notifications = data.notifications;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   if (payload.isAdmin) {
