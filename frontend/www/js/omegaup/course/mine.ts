@@ -8,7 +8,6 @@ import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseListMinePayload();
-  console.log(payload);
   const headerPayload = types.payloadParsers.CommonPayload();
   let courseList = new Vue({
     el: '#main-container',
