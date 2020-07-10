@@ -330,7 +330,7 @@ export namespace omegaup {
     username: string;
     country: string;
     request_time: Date;
-    last_update: Date;
+    last_update: Date | null;
     accepted: boolean;
     admin?: UserRole;
   }
