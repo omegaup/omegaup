@@ -90,7 +90,7 @@
           v-bind:update="true"
           v-bind:course="data.course"
           v-on:emit-cancel="onCancel"
-          v-on:emit-submit="
+          v-on:submit="
             (formComponent) => $emit('submit-edit-course', formComponent)
           "
         ></omegaup-course-form>
@@ -335,13 +335,13 @@ export default class CourseEdit extends Vue {
   onNewAssignment(): void {
     this.visibilityMode = omegaup.VisibilityMode.New;
     this.assignment = emptyAssignment;
-    this.assignmentDetails.$el.scrollIntoView();
+    this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
     this.visibilityMode = omegaup.VisibilityMode.Edit;
     this.assignment = assignment;
-    this.assignmentDetails.$el.scrollIntoView();
+    this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {

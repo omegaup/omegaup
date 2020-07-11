@@ -297,7 +297,7 @@ export default class CourseDetails extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('emit-submit', this);
+    this.$emit('submit', this);
   }
 
   @Emit('emit-cancel')
