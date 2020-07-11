@@ -2601,27 +2601,26 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     public static function getCourseMineDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
 
         $courses = self::getCoursesList($r->identity, $page, $pageSize);
         $filteredCourses = [];
-        $filteredCourses['admin'] = [
-            'filteredCourses' => [
-                'current' => [
-                    'courses' => [],
-                    'timeType' => 'current',
+        $filteredCourses = [
+            'admin' => [
+                'filteredCourses' => [
+                    'current' => [
+                        'courses' => [],
+                        'timeType' => 'current',
+                    ],
+                    'past' => [
+                        'courses' => [],
+                        'timeType' => 'past',
+                    ],
                 ],
-                'past' => [
-                    'courses' => [],
-                    'timeType' => 'past',
-                ],
-            ],
-            'accessMode' => 'admin',
-            'activeTab' => '',
+                'accessMode' => 'admin',
+                'activeTab' => '',
+            ]
         ];
         foreach ($courses['admin'] as $course) {
             if (
@@ -2706,7 +2705,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $filteredCourses[$courseType]['activeTab'] = 'past';
             }
         }
-        // print_r($filteredCourses);
         return [
             'smartyProperties' => [
                 'payload' => [

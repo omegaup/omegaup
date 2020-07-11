@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-course-list', {
         props: {
           courses: payload.courses,
-          isMainUserIdentity: headerPayload?.isMainUserIdentity,
+          isMainUserIdentity: headerPayload?.isMainUserIdentity ?? false,
         },
       });
     },

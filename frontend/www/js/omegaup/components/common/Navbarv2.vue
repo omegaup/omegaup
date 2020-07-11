@@ -276,7 +276,7 @@
                     T.navMyProblems
                   }}</a>
                   <a class="dropdown-item" href="/course/mine/">{{
-                    T.myCourses
+                    T.navMyCourses
                   }}</a>
                   <a
                     class="dropdown-item"
