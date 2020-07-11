@@ -243,26 +243,6 @@
     .submit-run {
       width: 100%;
     }
-    .diff {
-      font-weight: bold;
-      .added-line {
-        background-color: #e6ffed;
-        &::before {
-          content: '+ ';
-        }
-      }
-      .deleted-line {
-        background-color: #ffeef0;
-        &::before {
-          content: '- ';
-        }
-      }
-      .context-line {
-        &::before {
-          content: '  ';
-        }
-      }
-    }
   }
   input[type='submit'] {
     font-size: 110%;
@@ -344,7 +324,6 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';
-import diff from 'fast-diff';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -393,28 +372,6 @@ export default class ArenaRunDetails extends Vue {
         return cases[caseName]?.contestantOutput ?? EMPTY_FIELD;
     }
     return EMPTY_FIELD;
-  }
-
-  showDiff(cases: types.ProblemCasesContents, caseName: string): string {
-    if (!cases[caseName]) {
-      return '-';
-    }
-    const result = diff(
-      cases[caseName].out,
-      cases[caseName].contestantOutput || '',
-    );
-    let div = '';
-    result.forEach(([diffKind, line]) => {
-      if (diffKind === -1) {
-        div += `<div class="added-line">${ui.escape(line)}</div>`;
-      } else if (diffKind === 0) {
-        div += `<div class="context-line">${ui.escape(line)}</div>`;
-      } else if (diffKind === 1) {
-        div += `<div class="deleted-line">${ui.escape(line)}</div>`;
-      }
-    });
-
-    return div;
   }
 }
 </script>
