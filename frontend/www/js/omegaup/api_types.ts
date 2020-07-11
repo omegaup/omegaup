@@ -1495,7 +1495,7 @@ export namespace types {
   }
 
   export interface ProblemCasesContents {
-    [key: string]: { in: string; out: string; output?: string };
+    [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
   export interface ProblemDetails {

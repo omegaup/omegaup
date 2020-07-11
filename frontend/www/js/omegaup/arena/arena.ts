@@ -1888,7 +1888,6 @@ export class Arena {
   }
 
   detectShowRun(): void {
-    const self = this;
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);
     if (!showRunMatch) {
@@ -1902,61 +1901,53 @@ export class Arena {
       .then((data) => {
         if (
           data.show_diff === 'none' ||
-          (self.options.contestAlias && self.options.contestAlias !== 'admin')
+          (this.options.contestAlias && this.options.contestAlias !== 'admin')
         ) {
-          self.displayRunDetails(guid, data);
+          this.displayRunDetails(guid, data);
           return;
-        } else {
-          fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
-            .then((response) => {
-              if (response.status === 200 || response.status === 0) {
-                return Promise.resolve(response.blob());
-              } else {
-                return Promise.reject(new Error(response.statusText));
-              }
-            })
-            .then(JSZip.loadAsync)
-            .then((zip: JSZip) => {
-              const result: {
-                cases: string[];
-                promises: any;
-              } = { cases: [], promises: [] };
-              zip.forEach((relativePath, zipEntry) => {
-                if (
-                  relativePath.split('.').pop() === 'out' &&
-                  relativePath.indexOf('/') === -1
-                ) {
-                  if (
-                    data.show_diff === 'examples' &&
-                    relativePath.indexOf('sample') === -1
-                  ) {
-                    return;
-                  }
-                  const pos = relativePath.lastIndexOf('.');
-                  const basename = relativePath.substring(0, pos);
-                  result.cases.push(basename);
-                  result.promises.push(zip.file(zipEntry.name).async('text'));
-                }
-              });
-              return result;
-            })
-            .then(
-              function success(response) {
-                response.promises.forEach((promise: any, index: number) => {
-                  promise
-                    .then((output: string) => {
-                      data.cases[response.cases[index]].output = output;
-                    })
-                    .catch(ui.apiError);
-                });
-                self.displayRunDetails(guid, data);
-              },
-              function error(e) {
-                console.error(e);
-              },
-            )
-            .catch(ui.apiError);
         }
+        fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
+          .then((response) => {
+            if (response.status === 200 || response.status === 0) {
+              return Promise.resolve(response.blob());
+            } else {
+              return Promise.reject(new Error(response.statusText));
+            }
+          })
+          .then(JSZip.loadAsync)
+          .then((zip: JSZip) => {
+            const result: {
+              cases: string[];
+              promises: Promise<string>[];
+            } = { cases: [], promises: [] };
+            zip.forEach(async (relativePath, zipEntry) => {
+              const pos = relativePath.lastIndexOf('.');
+              const basename = relativePath.substring(0, pos);
+              const extension = relativePath.substring(pos + 1);
+              if (extension !== 'out' || relativePath.indexOf('/') !== -1) {
+                return;
+              }
+              if (
+                data.show_diff === 'examples' &&
+                /^sample/.test(relativePath)
+              ) {
+                return;
+              }
+              result.cases.push(basename);
+              result.promises.push(zip.file(zipEntry.name).async('text'));
+            });
+            return result;
+          })
+          .then((response) => {
+            Promise.allSettled(response.promises).then((results) => {
+              results.forEach((result: any, index: number) => {
+                data.cases[response.cases[index]].contestantOutput =
+                  result.value;
+              });
+            });
+            this.displayRunDetails(guid, data);
+          })
+          .catch(ui.apiError);
       })
       .catch((error) => {
         ui.apiError(error);

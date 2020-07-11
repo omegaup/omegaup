@@ -11,19 +11,13 @@
               <th>{{ T.wordsGroup }}</th>
               <th v-if="data.feedback !== 'summary'">{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
-              <template v-if="data.show_diff !== 'none'">
-                <th>{{ T.wordsInput }}</th>
-                <th>{{ T.wordsOutputExpected }}</th>
-                <th>{{ T.wordsOutputObtained }}</th>
-                <th>{{ T.wordsDifference }}</th>
-              </template>
               <th colspan="3">{{ T.rankScore }}</th>
+              <th width="1"></th>
             </tr>
           </thead>
           <tbody v-for="element in data.groups">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
-              <th v-bind:colspan="data.show_diff !== 'none' ? 6 : 2"></th>
               <th class="text-center" v-if="element.verdict">
                 {{ element.verdict }}
               </th>
@@ -49,42 +43,74 @@
               </th>
               <th>{{ element.max_score ? element.max_score : '' }}</th>
             </tr>
-            <tr
+            <template
               v-for="problem_case in element.cases"
               v-if="groupVisible[element.group]"
             >
-              <td></td>
-              <td class="text-center">{{ problem_case.name }}</td>
-              <td class="text-center">{{ problem_case.verdict }}</td>
+              <tr>
+                <td></td>
+                <td class="text-center">{{ problem_case.name }}</td>
+                <td class="text-center">{{ problem_case.verdict }}</td>
+                <td class="score">
+                  {{
+                    problem_case.contest_score
+                      ? problem_case.contest_score
+                      : problem_case.score
+                  }}
+                </td>
+                <td class="center" width="10">
+                  {{ problem_case.max_score ? '/' : '' }}
+                </td>
+                <td>
+                  {{ problem_case.max_score ? problem_case.max_score : '' }}
+                </td>
+              </tr>
               <template v-if="data.show_diff !== 'none'">
-                <td class="text-center">
-                  {{ showDataCase(data.cases, problem_case.name, 'in') }}
-                </td>
-                <td class="text-center">
-                  {{ showDataCase(data.cases, problem_case.name, 'out') }}
-                </td>
-                <td class="text-center">
-                  {{ showDataCase(data.cases, problem_case.name, 'output') }}
-                </td>
-                <td
-                  class="text-center diff"
-                  v-html="showDiff(data.cases, problem_case.name)"
-                ></td>
+                <tr>
+                  <td colspan="6">{{ T.wordsInput }}</td>
+                </tr>
+                <tr>
+                  <td colspan="6">
+                    <pre>{{
+                      showDataCase(data.cases, problem_case.name, 'in')
+                    }}</pre>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="6">{{ T.wordsOutputExpected }}</td>
+                </tr>
+                <tr>
+                  <td colspan="6">
+                    <pre>{{
+                      showDataCase(data.cases, problem_case.name, 'out')
+                    }}</pre>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="6">{{ T.wordsOutputObtained }}</td>
+                </tr>
+                <tr>
+                  <td colspan="6">
+                    <pre>{{
+                      showDataCase(
+                        data.cases,
+                        problem_case.name,
+                        'contestantOutput',
+                      )
+                    }}</pre>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="6">{{ T.wordsDifference }}</td>
+                </tr>
+                <tr>
+                  <td
+                    colspan="6"
+                    v-html="showDiff(data.cases, problem_case.name)"
+                  ></td>
+                </tr>
               </template>
-              <td class="score">
-                {{
-                  problem_case.contest_score
-                    ? problem_case.contest_score
-                    : problem_case.score
-                }}
-              </td>
-              <td class="center" width="10">
-                {{ problem_case.max_score ? '/' : '' }}
-              </td>
-              <td>
-                {{ problem_case.max_score ? problem_case.max_score : '' }}
-              </td>
-            </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -297,6 +323,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
+import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 import diff from 'fast-diff';
@@ -336,24 +363,33 @@ export default class ArenaRunDetails extends Vue {
     caseName: string,
     caseType: string,
   ): string {
-    return cases[caseName] ? cases[caseName][caseType] : '-';
+    switch (caseType) {
+      case 'in':
+        return cases[caseName]?.in ?? '-';
+      case 'out':
+        return cases[caseName]?.out ?? '-';
+      case 'contestantOutput':
+        return cases[caseName]?.contestantOutput ?? '-';
+    }
+    return '-';
   }
 
   showDiff(cases: types.ProblemCasesContents, caseName: string): string {
     if (!cases[caseName]) {
       return '-';
     }
-    const result = diff(`${cases[caseName].out}`, `${cases[caseName].output}`);
+    const result = diff(
+      cases[caseName].out,
+      cases[caseName].contestantOutput || '',
+    );
     let span = '';
-    result.forEach((diff) => {
-      if (diff[0] === -1) {
-        span += `<span class="green">${diff[1]}</span>`;
-      }
-      if (diff[0] === 0) {
-        span += `<span>${diff[1]}</span>`;
-      }
-      if (diff[0] === 1) {
-        span += `<span class="red">${diff[1]}</span>`;
+    result.forEach((diffKind) => {
+      if (diffKind[0] === -1) {
+        span += ui.escape(`<span class="green">${diffKind[1]}</span>`);
+      } else if (diffKind[0] === 0) {
+        span += ui.escape(`<span>${diffKind[1]}</span>`);
+      } else if (diffKind[0] === 1) {
+        span += ui.escape(`<span class="red">${diffKind[1]}</span>`);
       }
     });
 
