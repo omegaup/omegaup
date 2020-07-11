@@ -76,6 +76,7 @@ OmegaUp.on('ready', () => {
                     );
                     this.data.course.name = source.name;
                     window.scrollTo(0, 0);
+                    this.refreshCourseAdminDetails();
                   })
                   .catch(ui.apiError);
               })
@@ -377,6 +378,11 @@ OmegaUp.on('ready', () => {
       });
     },
     methods: {
+      refreshCourseAdminDetails: (): void => {
+        api.Course.adminDetails({ alias: courseAlias }).then((course) => {
+          courseEdit.data.course = course;
+        });
+      },
       refreshStudentList: (): void => {
         api.Course.listStudents({ course_alias: courseAlias })
           .then((response) => {

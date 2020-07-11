@@ -156,7 +156,7 @@
           <div class="form-group col-md-12">
             <div class="text-right">
               <button
-                v-if="visibilityMode === omegaup.VisibilityMode.Default"
+                v-if="visibilityMode === VisibilityMode.Default"
                 class="btn btn-primary"
                 type="submit"
                 v-on:click.prevent="$emit('emit-new')"
@@ -206,7 +206,7 @@ export default class CourseAssignmentList extends Vue {
   testsOrderChanged = false;
   homeworksOrderChanged = false;
   T = T;
-  omegaup = omegaup;
+  VisibilityMode = omegaup.VisibilityMode;
 
   get homeworks(): omegaup.Assignment[] {
     return this.assignments.filter((assignment: omegaup.Assignment) => {
