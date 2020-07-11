@@ -5349,8 +5349,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 '/usr/share/java/libinteractive.jar',
                 'generate',
                 "{$r['name']}.idl",
-                $r['language'],
-                $r['language'],
+                strval($r['language']),
+                strval($r['language']),
                 '--makefile',
                 "--{$r['os']}",
             ];
