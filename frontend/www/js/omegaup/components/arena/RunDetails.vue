@@ -77,42 +77,19 @@
                   </td>
                 </tr>
                 <tr>
-                  <td colspan="6">{{ T.wordsOutputExpected }}</td>
-                </tr>
-                <tr>
-                  <td colspan="6">
-                    <pre>{{
-                      showDataCase(data.cases, problem_case.name, 'out')
-                    }}</pre>
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="6">{{ T.wordsOutputObtained }}</td>
-                </tr>
-                <tr>
-                  <td colspan="6">
-                    <pre>{{
-                      showDataCase(
-                        data.cases,
-                        problem_case.name,
-                        'contestantOutput',
-                      )
-                    }}</pre>
-                  </td>
-                </tr>
-                <tr>
                   <td colspan="6">{{ T.wordsDifference }}</td>
                 </tr>
                 <tr>
-                  <td colspan="6">
-                    <template v-if="!data.cases">-</template>
+                  <td colspan="6" v-if="data.cases">
                     <omegaup-arena-diff-view
-                      v-else=""
                       v-bind:left="data.cases[problem_case.name].out"
                       v-bind:right="
                         data.cases[problem_case.name].contestantOutput || ''
                       "
                     ></omegaup-arena-diff-view>
+                  </td>
+                  <td colspan="6" v-else="" class="empty-table-message">
+                    {{ EMPTY_FIELD }}
                   </td>
                 </tr>
               </template>
@@ -361,17 +338,9 @@ export default class ArenaRunDetails extends Vue {
   showDataCase(
     cases: types.ProblemCasesContents,
     caseName: string,
-    caseType: string,
+    caseType: 'in' | 'out' | 'contestantOutput',
   ): string {
-    switch (caseType) {
-      case 'in':
-        return cases[caseName]?.in ?? EMPTY_FIELD;
-      case 'out':
-        return cases[caseName]?.out ?? EMPTY_FIELD;
-      case 'contestantOutput':
-        return cases[caseName]?.contestantOutput ?? EMPTY_FIELD;
-    }
-    return EMPTY_FIELD;
+    return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
   }
 }
 </script>

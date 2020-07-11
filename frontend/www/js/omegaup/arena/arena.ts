@@ -2081,7 +2081,6 @@ export class Arena {
   }
 
   displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
-    const self = this;
     const problemAdmin = data.admin;
 
     let sourceHTML,
@@ -2147,7 +2146,7 @@ export class Arena {
         source_name: `Main.${data.language}`,
         groups: groups,
         show_diff:
-          !self.options.contestAlias || self.options.contestAlias === 'admin'
+          !this.options.contestAlias || this.options.contestAlias === 'admin'
             ? data.show_diff
             : 'none',
         feedback: <omegaup.SubmissionFeedback>(
