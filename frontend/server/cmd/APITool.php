@@ -486,12 +486,9 @@ class APIGenerator {
     }
 
     private function parseDocComment(string $docblock): \Psalm\Internal\Scanner\ParsedDocblock {
-        /** @psalm-suppress DeprecatedMethod Workaround for https://github.com/vimeo/psalm/issues/3735 */
-        [
-            'description' => $description,
-            'specials' => $tags,
-        ] = \Psalm\DocComment::parse($docblock);
-        return new \Psalm\Internal\Scanner\ParsedDocblock($description, $tags);
+        return \Psalm\DocComment::parsePreservingLength(
+            new \PhpParser\Comment\Doc($docblock)
+        );
     }
 
     public function addController(string $controllerClassBasename): void {
