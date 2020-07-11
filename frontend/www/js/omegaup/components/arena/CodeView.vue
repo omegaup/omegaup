@@ -66,7 +66,7 @@ interface EditorOptions {
     'codemirror-editor': codemirror,
   },
 })
-export default class ArenaCodeView extends Vue {
+export default class CodeView extends Vue {
   @Prop() language!: string;
   @Prop({ default: false }) readonly!: boolean;
   @Prop() value!: string;
