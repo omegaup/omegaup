@@ -3667,13 +3667,17 @@ class User extends \OmegaUp\Controllers\Controller {
                             $r
                         )['problems'],
                         'stats' => self::apiStats($r),
-                        'badges' => \OmegaUp\Controllers\Badge::apiList($r),
-                        'ownedBadges' => \OmegaUp\Controllers\Badge::apiMyList(
-                            $r
-                        )['badges'],
-                        'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
+                        'badges' => \OmegaUp\Controllers\Badge::getAllBadges(),
+                        'ownedBadges' => (
+                            is_null($r->user) ?
+                            [] :
+                            \OmegaUp\DAO\UsersBadges::getUserOwnedBadges(
+                                $r->user
+                            )
+                        ),
+                        'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                     ],
-                    'title' => 'omegaupTitleProfile'
+                    'title' => 'omegaupTitleProfile',
                 ],
                 'template' => 'user.profile.tpl',
             ];
