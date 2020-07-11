@@ -104,10 +104,16 @@
                   <td colspan="6">{{ T.wordsDifference }}</td>
                 </tr>
                 <tr>
-                  <td
-                    colspan="6"
-                    v-html="showDiff(data.cases, problem_case.name)"
-                  ></td>
+                  <td colspan="6">
+                    <template v-if="!data.cases">-</template>
+                    <omegaup-arena-diff-view
+                      v-else=""
+                      v-bind:left="data.cases[problem_case.name].out"
+                      v-bind:right="
+                        data.cases[problem_case.name].contestantOutput || ''
+                      "
+                    ></omegaup-arena-diff-view>
+                  </td>
                 </tr>
               </template>
             </template>
@@ -239,11 +245,22 @@
     }
     .diff {
       font-weight: bold;
-      .red {
-        color: #f00;
+      .added-line {
+        background-color: #e6ffed;
+        &::before {
+          content: '+ ';
+        }
       }
-      .green {
-        color: #0f0;
+      .deleted-line {
+        background-color: #ffeef0;
+        &::before {
+          content: '- ';
+        }
+      }
+      .context-line {
+        &::before {
+          content: '  ';
+        }
       }
     }
   }
@@ -326,6 +343,7 @@ import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
+import arena_DiffView from './DiffView.vue';
 import diff from 'fast-diff';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -341,10 +359,13 @@ interface GroupVisibility {
   [name: string]: boolean;
 }
 
+const EMPTY_FIELD = '∅';
+
 @Component({
   components: {
     FontAwesomeIcon,
     'omegaup-arena-code-view': arena_CodeView,
+    'omegaup-arena-diff-view': arena_DiffView,
   },
 })
 export default class ArenaRunDetails extends Vue {
@@ -365,13 +386,13 @@ export default class ArenaRunDetails extends Vue {
   ): string {
     switch (caseType) {
       case 'in':
-        return cases[caseName]?.in ?? '-';
+        return cases[caseName]?.in ?? EMPTY_FIELD;
       case 'out':
-        return cases[caseName]?.out ?? '-';
+        return cases[caseName]?.out ?? EMPTY_FIELD;
       case 'contestantOutput':
-        return cases[caseName]?.contestantOutput ?? '-';
+        return cases[caseName]?.contestantOutput ?? EMPTY_FIELD;
     }
-    return '-';
+    return EMPTY_FIELD;
   }
 
   showDiff(cases: types.ProblemCasesContents, caseName: string): string {
@@ -382,18 +403,18 @@ export default class ArenaRunDetails extends Vue {
       cases[caseName].out,
       cases[caseName].contestantOutput || '',
     );
-    let span = '';
-    result.forEach((diffKind) => {
-      if (diffKind[0] === -1) {
-        span += ui.escape(`<span class="green">${diffKind[1]}</span>`);
-      } else if (diffKind[0] === 0) {
-        span += ui.escape(`<span>${diffKind[1]}</span>`);
-      } else if (diffKind[0] === 1) {
-        span += ui.escape(`<span class="red">${diffKind[1]}</span>`);
+    let div = '';
+    result.forEach(([diffKind, line]) => {
+      if (diffKind === -1) {
+        div += `<div class="added-line">${ui.escape(line)}</div>`;
+      } else if (diffKind === 0) {
+        div += `<div class="context-line">${ui.escape(line)}</div>`;
+      } else if (diffKind === 1) {
+        div += `<div class="deleted-line">${ui.escape(line)}</div>`;
       }
     });
 
-    return span;
+    return div;
   }
 }
 </script>

@@ -1908,11 +1908,10 @@ export class Arena {
         }
         fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
           .then((response) => {
-            if (response.status === 200 || response.status === 0) {
-              return Promise.resolve(response.blob());
-            } else {
+            if (!response.ok) {
               return Promise.reject(new Error(response.statusText));
             }
+            return Promise.resolve(response.blob());
           })
           .then(JSZip.loadAsync)
           .then((zip: JSZip) => {
@@ -1929,7 +1928,7 @@ export class Arena {
               }
               if (
                 data.show_diff === 'examples' &&
-                /^sample/.test(relativePath)
+                relativePath.indexOf('sample/') === 0
               ) {
                 return;
               }
