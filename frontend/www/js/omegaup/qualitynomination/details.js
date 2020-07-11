@@ -3,7 +3,7 @@ import qualitynomination_Details from '../components/qualitynomination/Details.v
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function () {
   let payload = JSON.parse(document.getElementById('payload').innerText);
@@ -34,7 +34,7 @@ OmegaUp.on('ready', function () {
         on: {
           'mark-resolution': function (viewDetails, newStatus, all) {
             if (!viewDetails.rationale) {
-              UI.error(T.editFieldRequired);
+              ui.error(T.editFieldRequired);
               return;
             }
             api.QualityNomination.resolve({
@@ -45,9 +45,9 @@ OmegaUp.on('ready', function () {
               all: all,
             })
               .then(function (data) {
-                UI.success(T.qualityNominationResolutionSuccess);
+                ui.success(T.qualityNominationResolutionSuccess);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });

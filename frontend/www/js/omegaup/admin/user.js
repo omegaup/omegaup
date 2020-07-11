@@ -1,7 +1,7 @@
 import admin_User from '../components/admin/User.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
@@ -29,18 +29,18 @@ OmegaUp.on('ready', function () {
                 experiment: experiment.value.name,
               })
                 .then(function () {
-                  UI.success(T.userEditSuccess);
+                  ui.success(T.userEditSuccess);
                 })
-                .catch(UI.apiError);
+                .catch(ui.apiError);
             } else {
               api.User.removeExperiment({
                 username: payload.username,
                 experiment: experiment.value.name,
               })
                 .then(function () {
-                  UI.success(T.userEditSuccess);
+                  ui.success(T.userEditSuccess);
                 })
-                .catch(UI.apiError);
+                .catch(ui.apiError);
             }
           },
           'change-role': function (role) {
@@ -50,18 +50,18 @@ OmegaUp.on('ready', function () {
                 role: role.value.name,
               })
                 .then(function () {
-                  UI.success(T.userEditSuccess);
+                  ui.success(T.userEditSuccess);
                 })
-                .catch(UI.apiError);
+                .catch(ui.apiError);
             } else {
               api.User.removeRole({
                 username: payload.username,
                 role: role.value.name,
               })
                 .then(function () {
-                  UI.success(T.userEditSuccess);
+                  ui.success(T.userEditSuccess);
                 })
-                .catch(UI.apiError);
+                .catch(ui.apiError);
             }
           },
           'verify-user': function () {
@@ -69,7 +69,7 @@ OmegaUp.on('ready', function () {
               .then(function () {
                 adminUser.verified = true;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });

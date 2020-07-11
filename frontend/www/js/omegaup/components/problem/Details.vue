@@ -104,7 +104,7 @@
           </div>
           <div>
             {{
-              UI.formatString(T.wordsUploadedOn, {
+              ui.formatString(T.wordsUploadedOn, {
                 date: time.formatDate(problem.problemsetter.creation_date),
               })
             }}
@@ -139,7 +139,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
@@ -179,7 +179,7 @@ export default class ProblemDetails extends Vue {
   @Prop() nominationStatus!: types.NominationStatus;
 
   T = T;
-  UI = UI;
+  ui = ui;
   time = time;
   selectedTab = 'problems';
 

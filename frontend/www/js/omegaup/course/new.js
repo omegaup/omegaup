@@ -1,7 +1,7 @@
 import course_Form from '../components/course/Form.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
@@ -38,7 +38,7 @@ OmegaUp.on('ready', function () {
                   .then((data) => {
                     accept(data.school_id);
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               } else {
                 accept(null);
               }
@@ -67,9 +67,9 @@ OmegaUp.on('ready', function () {
                       '/course/' + ev.alias + '/edit/#assignments',
                     );
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           cancel: function () {
             window.location = '/course/';

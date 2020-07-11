@@ -55,18 +55,18 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 
 @Component
 export default class Requests extends Vue {
-  @Prop() data!: omegaup.IdentityRequest[];
+  @Prop() data!: types.IdentityRequest[];
   @Prop() textAddParticipant!: string;
 
   T = T;
   time = time;
-  requests: omegaup.IdentityRequest[] = this.data;
+  requests: types.IdentityRequest[] = this.data;
 
   onAcceptRequest(username: string): void {
     this.$emit('emit-accept-request', this, username);

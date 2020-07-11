@@ -16,7 +16,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import { Chart } from 'highcharts-vue';
 
 @Component({
@@ -33,7 +33,7 @@ export default class Stats extends Vue {
   T = T;
 
   get totalRuns(): string {
-    return UI.formatString(T.totalRuns, { numRuns: this.stats.total_runs });
+    return ui.formatString(T.totalRuns, { numRuns: this.stats.total_runs });
   }
 
   @Watch('stats')

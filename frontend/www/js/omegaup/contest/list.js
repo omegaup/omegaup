@@ -1,7 +1,7 @@
 import contest_ContestList from '../components/contest/ContestList.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
 import Vue from 'vue';
@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
       .then((result) => {
         contestList.contests = result.contests;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   const payloadElement = document.getElementById('payload');
@@ -66,10 +66,10 @@ OmegaUp.on('ready', () => {
           ),
         )
           .then(() => {
-            UI.success(T.updateItemsSuccess);
+            ui.success(T.updateItemsSuccess);
           })
           .catch((error) => {
-            UI.error(UI.formatString(T.bulkOperationError, error));
+            ui.error(ui.formatString(T.bulkOperationError, error));
           })
           .finally(() => {
             fillContestsTable();
@@ -118,7 +118,7 @@ OmegaUp.on('ready', () => {
 
             link.click(); // This will download the data
           })
-          .catch(UI.apiError);
+          .catch(ui.apiError);
       },
     },
   });
