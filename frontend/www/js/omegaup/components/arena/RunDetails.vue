@@ -1,5 +1,5 @@
 <template>
-  <form class="run-details-view">
+  <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
       <div class="cases" v-if="data.groups">
@@ -84,7 +84,7 @@
                     <omegaup-arena-diff-view
                       v-bind:left="data.cases[problem_case.name].out"
                       v-bind:right="
-                        data.cases[problem_case.name].contestantOutput || ''
+                        getContestantOutput(data.cases, problem_case.name)
                       "
                     ></omegaup-arena-diff-view>
                   </td>
@@ -342,6 +342,10 @@ export default class ArenaRunDetails extends Vue {
     caseType: 'in' | 'out' | 'contestantOutput',
   ): string {
     return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
+  }
+
+  getContestantOutput(cases: types.ProblemCasesContents, name: string): string {
+    return cases[name]?.contestantOutput ?? '';
   }
 }
 </script>

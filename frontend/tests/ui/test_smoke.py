@@ -89,10 +89,10 @@ def test_create_problem(driver):
 
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH, '//form[@class="run-details-view"]')))
+                (By.CSS, '[data-run-details-view]')))
 
         textarea = driver.browser.find_element_by_xpath(
-            '//form[@class="run-details-view"]//div[@class="CodeMirror-code"]')
+            '//form[@data-run-details-view]//div[@class="CodeMirror-code"]')
 
         assert textarea.text is not None
 

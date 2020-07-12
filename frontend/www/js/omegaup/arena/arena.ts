@@ -1940,8 +1940,10 @@ export class Arena {
           .then((response) => {
             Promise.allSettled(response.promises).then((results) => {
               results.forEach((result: any, index: number) => {
-                data.cases[response.cases[index]].contestantOutput =
-                  result.value;
+                if (data.cases[response.cases[index]]) {
+                  data.cases[response.cases[index]].contestantOutput =
+                    result.value;
+                }
               });
             });
             this.displayRunDetails(guid, data);
@@ -2155,8 +2157,9 @@ export class Arena {
         ),
       });
     }
-    (<HTMLElement>document.querySelector('.run-details-view')).style.display =
-      'block';
+    (<HTMLElement>(
+      document.querySelector('[data-run-details-view]')
+    )).style.display = 'block';
   }
 
   trackRun(run: types.Run): void {
