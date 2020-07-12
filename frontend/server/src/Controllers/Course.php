@@ -171,10 +171,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 if (!isset($problemData['points'])) {
                     $problemData['points'] = 100; // Set 100 as default
                 }
-                \OmegaUp\Validators::validateNumber(
-                    $problemData['points'],
-                    'points'
-                );
                 $addedProblems[] = $problemData;
             }
         }

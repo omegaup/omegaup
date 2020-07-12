@@ -11,6 +11,7 @@
 	<ul class="nav nav-tabs" id="sections">
 		<li class="active"><a href="#edit" data-toggle="tab">{#courseEdit#}</a></li>
 		<li><a href="#assignments" data-toggle="tab">{#wordsAssignments#}</a></li>
+		<li><a href="#problems" data-toggle="tab">{#wordsProblems#}</a></li>
 		<li><a href="#admission-mode" data-toggle="tab">{#contestNewFormAdmissionMode#}</a></li>
 		<li><a href="#students" data-toggle="tab">{#courseEditStudents#}</a></li>
 		<li><a href="#admins" data-toggle="tab">{#courseEditAdmins#}</a></li>

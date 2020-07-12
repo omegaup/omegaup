@@ -167,82 +167,6 @@
             </label>
           </div>
         </div>
-        <!-- Problem list editor -->
-        <div class="panel-footer" v-show="!update">
-          <form>
-            <div class="row">
-              <div class="row">
-                <div class="form-group col-md-12">
-                  <label
-                    >{{ T.wordsProblem }}
-
-                    <omegaup-autocomplete
-                      class="form-control"
-                      v-bind:init="(el) => typeahead.problemTypeahead(el)"
-                      v-model="currentProblem.alias"
-                    ></omegaup-autocomplete
-                  ></label>
-
-                  <p class="help-block">
-                    {{ T.courseAddProblemsAssignmentsDesc }}
-                  </p>
-                </div>
-              </div>
-              <div class="form-group pull-right">
-                <button
-                  class="btn btn-primary"
-                  type="submit"
-                  v-bind:disabled="currentProblem.alias.length == 0"
-                  v-on:click.prevent="$emit('add-problem', currentProblem)"
-                >
-                  {{ T.courseEditAddProblems }}
-                </button>
-              </div>
-            </div>
-          </form>
-        </div>
-        <div class="row">
-          <div class="table-body" v-if="assignmentProblems.length == 0">
-            <div class="empty-category">
-              {{ T.courseAssignmentProblemsEmpty }}
-            </div>
-          </div>
-          <table class="table table-striped" v-else="">
-            <thead>
-              <tr>
-                <th>{{ T.contestAddproblemProblemOrder }}</th>
-                <th>{{ T.contestAddproblemProblemName }}</th>
-                <th>{{ T.contestAddproblemProblemRemove }}</th>
-              </tr>
-            </thead>
-            <tbody v-sortable="{ onUpdate: sort }">
-              <tr
-                v-bind:key="problem.letter"
-                v-for="problem in assignmentProblems"
-              >
-                <td>
-                  <a v-bind:title="T.courseAssignmentProblemReorder"
-                    ><span
-                      aria-hidden="true"
-                      class="glyphicon glyphicon-move handle"
-                    ></span
-                  ></a>
-                </td>
-                <td>{{ problem.alias }}</td>
-                <td class="button-column">
-                  <a
-                    v-bind:title="T.courseAssignmentProblemRemove"
-                    v-on:click="onProblemRemove(problem)"
-                    ><span
-                      aria-hidden="true"
-                      class="glyphicon glyphicon-remove"
-                    ></span
-                  ></a>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary submit" type="submit">
             <template v-if="update">
@@ -274,16 +198,12 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
 import T from '../../lang';
-import * as typeahead from '../../typeahead';
 import DateTimePicker from '../DateTimePicker.vue';
-import Autocomplete from '../Autocomplete.vue';
 
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
-    'omegaup-autocomplete': Autocomplete,
   },
 })
 export default class CourseAssignmentDetails extends Vue {
@@ -292,11 +212,9 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop({ default: false }) show!: boolean;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
-  @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
 
-  typeahead = typeahead;
   T = T;
   alias = this.assignment.alias || '';
   assignmentType = this.assignment.assignment_type || 'homework';
@@ -305,11 +223,9 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
-  currentProblem = { alias: '', title: '' };
-  problemsOrderChanged = false;
 
   @Watch('assignment')
-  onAssignmentChange(newVal: omegaup.Assignment) {
+  onAssignmentChange() {
     this.reset();
   }
 
@@ -321,7 +237,6 @@ export default class CourseAssignmentDetails extends Vue {
     this.name = this.assignment.name;
     this.startTime = this.assignment.start_time || new Date();
     this.unlimitedDuration = !this.assignment.finish_time;
-    this.currentProblem = { alias: '', title: '' };
   }
 
   @Emit('cancel')
@@ -331,16 +246,6 @@ export default class CourseAssignmentDetails extends Vue {
 
   onSubmit(): void {
     this.$emit('submit', this);
-  }
-
-  sort(event: any) {
-    this.assignmentProblems.splice(
-      event.newIndex,
-      0,
-      this.assignmentProblems.splice(event.oldIndex, 1)[0],
-    );
-    this.problemsOrderChanged = true;
-    //this.$emit('sort', this.assignment, this.assignmentProblems);
   }
 }
 </script>
