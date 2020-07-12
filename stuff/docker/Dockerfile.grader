@@ -9,7 +9,7 @@ RUN apt-get update -y && \
     apt-get clean
 
 RUN curl -sL https://github.com/omegaup/quark/releases/download/v1.1.34/omegaup-backend.tar.xz | tar xJ -C /
-RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar -o /usr/share/java/libinteractive.jar
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.26/libinteractive.jar -o /usr/share/java/libinteractive.jar
 RUN mkdir -p /etc/omegaup/grader
 
 RUN useradd --create-home --shell=/bin/bash ubuntu
