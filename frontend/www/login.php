@@ -84,9 +84,11 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
         is_string($_GET['redirect']) &&
         shouldRedirect($_GET['redirect'])
     ) {
-        die(header("Location: {$_GET['redirect']}"));
+        header("Location: {$_GET['redirect']}");
+        die();
     }
-    die(header('Location: /profile/'));
+    header('Location: /profile/');
+    die();
 } elseif ($triedToLogin) {
     if (isset($response['error'])) {
         $smarty->assign('ERROR_TO_USER', 'NATIVE_LOGIN_FAILED');
