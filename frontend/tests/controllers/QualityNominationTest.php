@@ -796,7 +796,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
         );
 
-        $rationale ='rationale';
+        $rationale = 'rationale';
         \OmegaUp\Controllers\QualityNomination::apiResolve(
             new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
@@ -811,18 +811,23 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals($rationale,$details['contents']['rationale']);
-        
-        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination($qualitynomination['qualitynomination_id']);
-        
-        $this->assertCount(1,$logs);
-        $this->assertEquals(\OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,$logs[0]->user_id);
-        $this->assertEquals('open',$logs[0]->from_status);
-        $this->assertEquals($status,$logs[0]->to_status);
-        $this->assertEquals($rationale,$logs[0]->rationale);
+        $this->assertEquals($rationale, $details['contents']['rationale']);
+
+        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
+            $qualitynomination['qualitynomination_id']
+        );
+
+        $this->assertCount(1, $logs);
+        $this->assertEquals(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
+            $logs[0]->user_id
+        );
+        $this->assertEquals('open', $logs[0]->from_status);
+        $this->assertEquals($status, $logs[0]->to_status);
+        $this->assertEquals($rationale, $logs[0]->rationale);
 
         // Revert ban.
-        $rationale='problem solved';
+        $rationale = 'problem solved';
         $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
             new \OmegaUp\Request([
                 'auth_token' => $reviewerLogin->auth_token,
@@ -837,15 +842,20 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $reviewerLogin->auth_token,
             'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
         ]));
-        $this->assertEquals($rationale,$details['contents']['rationale']);
+        $this->assertEquals($rationale, $details['contents']['rationale']);
 
-        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination($qualitynomination['qualitynomination_id']);
-        
-        $this->assertCount(2,$logs);
-        $this->assertEquals(\OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,$logs[1]->user_id);
-        $this->assertEquals($status,$logs[1]->from_status);
-        $this->assertEquals('resolved',$logs[1]->to_status);
-        $this->assertEquals($rationale,$logs[1]->rationale);
+        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
+            $qualitynomination['qualitynomination_id']
+        );
+
+        $this->assertCount(2, $logs);
+        $this->assertEquals(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
+            $logs[1]->user_id
+        );
+        $this->assertEquals($status, $logs[1]->from_status);
+        $this->assertEquals('resolved', $logs[1]->to_status);
+        $this->assertEquals($rationale, $logs[1]->rationale);
     }
 
     /**

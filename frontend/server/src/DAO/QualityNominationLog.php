@@ -12,7 +12,6 @@ namespace OmegaUp\DAO;
  * @access public
  */
 class QualityNominationLog extends \OmegaUp\DAO\Base\QualityNominationLog {
-
     /**
      * This function gets contents of QualityNomination table
      *
