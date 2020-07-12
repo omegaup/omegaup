@@ -89,7 +89,7 @@ def test_create_problem(driver):
 
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.CSS, '[data-run-details-view]')))
+                (By.CSS_SELECTOR, '[data-run-details-view]')))
 
         textarea = driver.browser.find_element_by_xpath(
             '//form[@data-run-details-view]//div[@class="CodeMirror-code"]')
