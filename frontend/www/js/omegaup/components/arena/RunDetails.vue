@@ -327,6 +327,7 @@ const EMPTY_FIELD = '∅';
 export default class ArenaRunDetails extends Vue {
   @Prop() data!: types.RunDetails;
 
+  EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
 
