@@ -1,6 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import qualitynomination_ReviewerPopup from '../components/qualitynomination/ReviewerPopup.vue';
 import Vue from 'vue';
 
@@ -25,7 +25,7 @@ OmegaUp.on('ready', function () {
                 problem_alias: nominationPayload.problem_alias,
                 nomination: 'quality_tag',
                 contents: JSON.stringify(contents),
-              }).catch(UI.apiError);
+              }).catch(ui.apiError);
             },
           },
         });

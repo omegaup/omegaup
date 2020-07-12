@@ -13,7 +13,7 @@
             v-bind:value="contest.alias"
             v-for="contest in availableContests"
           >
-            {{ UI.contestTitle(contest) }}
+            {{ ui.contestTitle(contest) }}
           </option>
         </select>
       </legend>
@@ -101,7 +101,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class ScoreboardMerge extends Vue {
@@ -111,7 +111,7 @@ export default class ScoreboardMerge extends Vue {
   @Prop() aliases!: Array<string>;
 
   T = T;
-  UI = UI;
+  ui = ui;
   selectedContests: Array<string> = [];
 
   @Emit('get-scoreboard')

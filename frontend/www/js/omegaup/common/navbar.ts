@@ -3,7 +3,7 @@ import common_NavbarV2 from '../components/common/Navbarv2.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import { types } from '../api_types';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -40,7 +40,7 @@ OmegaUp.on('ready', () => {
               .then((data) => {
                 commonNavbar.notifications = data.notifications;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -74,7 +74,7 @@ OmegaUp.on('ready', () => {
       .then((data) => {
         commonNavbar.notifications = data.notifications;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   if (payload.isAdmin) {

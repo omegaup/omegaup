@@ -2,7 +2,7 @@ import course_ViewStudent from '../components/course/ViewStudent.vue';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
               .then((data) => {
                 viewStudent.problems = data.problems;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });

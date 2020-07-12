@@ -1,7 +1,7 @@
 import group_Identities from '../components/group/Identities.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
@@ -20,9 +20,9 @@ OmegaUp.on('ready', function () {
               group_alias: groupAlias,
             })
               .then(function (data) {
-                UI.success(T.groupsIdentitiesSuccessfullyCreated);
+                ui.success(T.groupsIdentitiesSuccessfullyCreated);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'download-identities': function (identities) {
             const csv = CSV.serialize({
@@ -51,7 +51,7 @@ OmegaUp.on('ready', function () {
               file: fileUpload.files[0],
             }).done(function (dataset) {
               if (dataset.fields.length != 6) {
-                UI.error(T.groupsInvalidCsv);
+                ui.error(T.groupsInvalidCsv);
                 return;
               }
               for (let cells of dataset.records) {

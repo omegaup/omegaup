@@ -3,7 +3,7 @@ import user_Privacy_Policy from '../components/user/PrivacyPolicy.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -23,10 +23,10 @@ OmegaUp.on('ready', function () {
               statement_type: payload.statement_type,
             })
               .then(function (data) {
-                UI.info(T.wordsPrivacyPolicyAccepted);
+                ui.info(T.wordsPrivacyPolicyAccepted);
                 privacyPolicy.saved = true;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });

@@ -2380,7 +2380,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         $group = self::resolveGroup($course);
-        if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
+        if (
+            !\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)
+            && !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException(
                 'userNotAllowed'
             );

@@ -326,15 +326,6 @@ export namespace omegaup {
     country_id?: string;
   }
 
-  export interface IdentityRequest {
-    username: string;
-    country: string;
-    request_time: Date;
-    last_update: Date;
-    accepted: boolean;
-    admin?: UserRole;
-  }
-
   export interface Languages {
     [language: string]: string;
   }

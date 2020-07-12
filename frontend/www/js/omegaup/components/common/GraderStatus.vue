@@ -24,7 +24,7 @@
       <pre
         style="width: 50em;"
         v-if="graderInfo !== null"
-        v-html="UI.prettyPrintJSON(graderInfo.queue)"
+        v-html="ui.prettyPrintJSON(graderInfo.queue)"
       ></pre>
     </li>
   </ul>
@@ -66,7 +66,7 @@ ul {
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class GraderStatus extends Vue {
@@ -75,7 +75,7 @@ export default class GraderStatus extends Vue {
   @Prop() graderInfo!: types.GraderStatus | null;
 
   T = T;
-  UI = UI;
+  ui = ui;
 
   get graderStatusMessage(): string {
     return this.status === 'ok' ? 'Grader OK' : 'Grader DOWN';
