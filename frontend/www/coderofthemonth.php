@@ -1,12 +1,11 @@
 <?php
+namespace OmegaUp;
+require_once(dirname(__DIR__, 1) . '/server/bootstrap.php');
 
-require_once('../server/bootstrap_smarty.php');
-
-$request = new Request([
-    'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN')
-]);
-
-$response = UserController::apiCoderOfTheMonthList($request);
-$smarty->assign('coders', $response['coders']);
-
-$smarty->display('../templates/codersofthemonth.tpl');
+\OmegaUp\UITools::render(
+    function (\OmegaUp\Request $r): array {
+        return \OmegaUp\Controllers\User::getCoderOfTheMonthDetailsForSmarty(
+            $r
+        );
+    }
+);

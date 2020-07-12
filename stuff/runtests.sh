@@ -22,9 +22,10 @@ fi
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/db-migrate.py validate
 /usr/bin/python3 $OMEGAUP_ROOT/stuff/policy-tool.py validate
 
-/usr/bin/phpunit \
-	--bootstrap $OMEGAUP_ROOT/frontend/tests/bootstrap.php \
-	--configuration $OMEGAUP_ROOT/frontend/tests/phpunit.xml \
-	$FILTER_ARG $OMEGAUP_ROOT/frontend/tests/controllers
+# This runs the controllers + badges PHPUnit tests, as well as the MySQL return
+# type check.
+$OMEGAUP_ROOT/stuff/mysql_types.sh
+
+./vendor/bin/psalm
 
 /usr/bin/python3 -m pytest $OMEGAUP_ROOT/frontend/tests/ui/ -s

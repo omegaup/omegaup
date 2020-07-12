@@ -1,87 +1,143 @@
 <template>
-  <div class="omegaup-course-viewprogress panel">
-    <div class="page-header">
-      <h2><a v-bind:href="courseUrl">{{ course.name }}</a></h2>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-10">
+        <div class="omegaup-course-viewprogress card">
+          <div class="card-header">
+            <h2>
+              <a v-bind:href="courseUrl">{{ course.name }}</a>
+            </h2>
+          </div>
+          <div class="card-body table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>{{ T.wordsName }}</th>
+                  <th class="score" v-for="assignment in assignments">
+                    {{ assignment.name }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="student in students">
+                  <td>
+                    <a v-bind:href="studentProgressUrl(student)">{{
+                      student.name || student.username
+                    }}</a>
+                  </td>
+                  <td class="score" v-for="assignment in assignments">
+                    {{ Math.round(score(student, assignment)) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="card sticky-top sticky-offset">
+          <div class="card-header p-1">
+            <p class="card-title text-sm-center mb-1">
+              {{ T.courseStudentsProgressExportToSpreadsheet }}
+            </p>
+          </div>
+          <div class="card-body">
+            <a
+              class="btn btn-primary btn-sm mr-1"
+              v-bind:download="csvFilename"
+              v-bind:href="csvDataUrl"
+              >.csv</a
+            >
+            <a
+              class="btn btn-primary btn-sm"
+              v-bind:download="odsFilename"
+              v-bind:href="odsDataUrl"
+              >.ods</a
+            >
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="panel-body">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>{{ T.wordsName }}</th>
-            <th class="score"
-                v-for="assignment in assignments">{{ assignment.name }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="student in students">
-            <td>
-              <a v-bind:href="studentProgressUrl(student)">{{ student.name || student.username
-              }}</a>
-            </td>
-            <td class="score"
-                v-for="assignment in assignments">{{ Math.round(score(student, assignment)) }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div><!-- panel-body -->
-    <div class="panel-footer">
-      {{ T.courseStudentsProgressExportToSpreadsheet }}: <a v-bind:download="csvFilename"
-           v-bind:href="csvDataUrl">.csv</a> <a v-bind:download="odsFilename"
-           v-bind:href="odsDataUrl">.ods</a>
-    </div>
-  </div><!-- panel -->
+  </div>
+  <!-- panel -->
 </template>
 
-<script>
-import AsyncComputed from 'vue-async-computed';
+<style>
+.panel-body {
+  overflow: auto;
+  white-space: nowrap;
+}
+.sticky-offset {
+  top: 4rem;
+}
+</style>
+
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import AsyncComputedPlugin from 'vue-async-computed';
+import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
-import Vue from 'vue';
 
-Vue.use(AsyncComputed);
+Vue.use(AsyncComputedPlugin);
 
-function escapeCsv(cell) {
-  if (typeof(cell) === 'undefined' || typeof(cell) === 'null') {
+function escapeCsv(cell: any): string {
+  if (typeof cell === 'undefined') {
     return '';
   }
-  if (typeof(cell) === 'number') {
+  if (typeof cell === 'number') {
     cell = Math.round(cell);
   }
-  if (typeof(cell) !== 'string') {
+  if (typeof cell !== 'string') {
     cell = JSON.stringify(cell);
   }
-  if (cell.indexOf(',') === -1 && cell.indexOf('"') === -1 &&
-      cell.indexOf("'") === -1) {
+  if (
+    cell.indexOf(',') === -1 &&
+    cell.indexOf('"') === -1 &&
+    cell.indexOf("'") === -1
+  ) {
     return cell;
   }
   return '"' + cell.replace('"', '""') + '"';
 }
 
-function escapeXml(str) {
-  return str.replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/'/g, '&apos;')
-      .replace(/"/g, '&quot;');
+function escapeXml(str: string): string {
+  if (str === null) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/'/g, '&apos;')
+    .replace(/"/g, '&quot;');
 }
 
-function toCsv(table) {
+function toCsv(table: string[][]): string {
   return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
 }
 
-function toOds(courseName, table) {
+function toOds(courseName: string, table: string[][]): string {
   let result = '<table:table table:name="' + escapeXml(courseName) + '">\n';
-  result += '<table:table-column table:number-columns-repeated="' +
-            table[0].length + '"/>\n';
+  result +=
+    '<table:table-column table:number-columns-repeated="' +
+    table[0].length +
+    '"/>\n';
   for (let row of table) {
     result += '<table:table-row>\n';
     for (let cell of row) {
       if (typeof cell === 'number') {
-        result += '<table:table-cell office:value-type="float" office:value="' +
-                  cell + '"><text:p>' + cell.toPrecision(2) +
-                  '</text:p></table:table-cell>';
+        let num: number = cell;
+        result +=
+          '<table:table-cell office:value-type="float" office:value="' +
+          cell +
+          '"><text:p>' +
+          num.toPrecision(2) +
+          '</text:p></table:table-cell>';
       } else {
-        result += '<table:table-cell office:value-type="string"><text:p>' +
-                  escapeXml(cell) + '</text:p></table:table-cell>';
+        result +=
+          '<table:table-cell office:value-type="string"><text:p>' +
+          escapeXml(cell) +
+          '</text:p></table:table-cell>';
       }
     }
     result += '</table:table-row>\n';
@@ -90,59 +146,72 @@ function toOds(courseName, table) {
   return result;
 }
 
-export default {
-  props: {
-    T: Object,
-    course: Object,
-    students: Array,
-    assignments: Array,
-  },
-  data: function() { return {};},
-  methods: {
-    score: function(student, assignment) {
-      let score = student.progress[assignment.alias] || '0';
-      return parseFloat(score);
-    },
-    studentProgressUrl: function(student) {
-      return '/course/' + this.course.alias + '/student/' + student.username +
-             '/';
-    },
-  },
-  computed: {
-    courseUrl: function() { return '/course/' + this.course.alias + '/';},
-    progressTable: function() {
-      let table = [];
-      let header = [this.T.profileUsername, this.T.wordsName];
+@Component
+export default class CourseViewProgress extends Vue {
+  @Prop() assignments!: omegaup.Assignment[];
+  @Prop() course!: omegaup.Course;
+  @Prop() students!: omegaup.CourseStudent[];
+
+  T = T;
+
+  score(
+    student: omegaup.CourseStudent,
+    assignment: omegaup.Assignment,
+  ): number {
+    let score = student.progress[assignment.alias] || 0;
+    return parseFloat(String(score));
+  }
+
+  studentProgressUrl(student: omegaup.CourseStudent): string {
+    return `/course/${this.course.alias}/student/${student.username}/`;
+  }
+
+  get courseUrl(): string {
+    return `/course/${this.course.alias}/`;
+  }
+
+  get progressTable(): string[][] {
+    let table: string[][] = [];
+    let header = [T.profileUsername, T.wordsName];
+    for (let assignment of this.assignments) {
+      header.push(assignment.name);
+    }
+    table.push(header);
+    for (let student of this.students) {
+      let row: string[] = [student.username, student.name];
       for (let assignment of this.assignments) {
-        header.push(assignment.name);
+        row.push(String(this.score(student, assignment)));
       }
-      table.push(header);
-      for (let student of this.students) {
-        let row = [student.username, student.name];
-        for (let assignment of this.assignments) {
-          row.push(this.score(student, assignment));
-        }
-        table.push(row);
-      }
-      return table;
-    },
-    csvFilename: function() { return this.course.alias + '.csv';},
-    csvDataUrl: function() {
-      let table = this.progressTable;
-      let blob = new Blob([toCsv(table)], {type: 'text/csv;charset=utf-8;'});
-      return window.URL.createObjectURL(blob);
-    },
-    odsFilename: function() { return this.course.alias + '.ods';},
-  },
-  asyncComputed: {
-    async odsDataUrl() {
-      let zip = new JSZip();
-      zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
-        compression: 'STORE',
-      });
-      let metaInf = zip.folder('META-INF');
-      let table = this.progressTable;
-      metaInf.file('manifest.xml', `<?xml version="1.0" encoding="UTF-8"?>
+      table.push(row);
+    }
+    return table;
+  }
+
+  get csvFilename(): string {
+    return `${this.course.alias}.csv`;
+  }
+
+  get csvDataUrl() {
+    let table = this.progressTable;
+    let blob = new Blob([toCsv(table)], { type: 'text/csv;charset=utf-8;' });
+    return window.URL.createObjectURL(blob);
+  }
+
+  get odsFilename(): string {
+    return `${this.course.alias}.ods`;
+  }
+
+  @AsyncComputed()
+  async odsDataUrl(): Promise<string> {
+    let zip = new JSZip();
+    zip.file('mimetype', 'application/vnd.oasis.opendocument.spreadsheet', {
+      compression: 'STORE',
+    });
+    let metaInf = zip.folder('META-INF');
+    let table = this.progressTable;
+    metaInf.file(
+      'manifest.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
 <manifest:manifest
     xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0"
     manifest:version="1.2">
@@ -151,18 +220,27 @@ export default {
  <manifest:file-entry manifest:full-path="content.xml" manifest:media-type="text/xml"/>
  <manifest:file-entry manifest:full-path="meta.xml" manifest:media-type="text/xml"/>
  <manifest:file-entry manifest:full-path="styles.xml" manifest:media-type="text/xml"/>
-</manifest:manifest>`);
-      zip.file('styles.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</manifest:manifest>`,
+    );
+    zip.file(
+      'styles.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     office:version="1.2">
-</office:document-styles>`);
-      zip.file('settings.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</office:document-styles>`,
+    );
+    zip.file(
+      'settings.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-settings
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     office:version="1.2">
-</office:document-settings>`);
-      zip.file('meta.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</office:document-settings>`,
+    );
+    zip.file(
+      'meta.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-meta
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0"
@@ -170,32 +248,30 @@ export default {
   <office:meta>
     <meta:generator>omegaUp</meta:generator>
   </office:meta>
-</office:document-meta>`);
-      zip.file('content.xml', `<?xml version="1.0" encoding="UTF-8"?>
+</office:document-meta>`,
+    );
+    zip.file(
+      'content.xml',
+      `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content
     xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
     xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
     xmlns:table="urn:oasis:names:tc:opendocument:xmlns:table:1.0"
     office:version="1.2">
   <office:body>
-    <office:spreadsheet>` + toOds(this.course.name, table) +
-                                  `</office:spreadsheet>
+    <office:spreadsheet>` +
+        toOds(this.course.name, table) +
+        `</office:spreadsheet>
   </office:body>
-</office:document-content>`);
-      return window.URL.createObjectURL(await zip.generateAsync({
+</office:document-content>`,
+    );
+    return window.URL.createObjectURL(
+      await zip.generateAsync({
         type: 'blob',
         mimeType: 'application/ods',
         compression: 'DEFLATE',
-      }));
-    },
-  },
-};
-
-</script>
-
-<style>
-.panel-body {
-  overflow: auto;
-  white-space: nowrap;
+      }),
+    );
+  }
 }
-</style>
+</script>

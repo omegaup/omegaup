@@ -1,15 +1,25 @@
 <?php
+namespace OmegaUp;
+require_once(dirname(__DIR__, 1) . '/server/bootstrap.php');
 
-require_once('../server/bootstrap_smarty.php');
-
-$c_Session = new SessionController;
-
-if ($c_Session->CurrentSessionAvailable()) {
-    $c_Session->UnRegisterSession();
+if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
+    \OmegaUp\Controllers\Session::unregisterSession();
 }
 
-if (isset($_REQUEST['redirect'])) {
-    die(header('Location: ' . $_REQUEST['redirect']));
-} else {
-    die(header('Location: /login'));
-}
+\OmegaUp\UITools::render(
+    function (\OmegaUp\Request $r): array {
+        $scripts = [];
+        if (
+            defined('OMEGAUP_GOOGLE_CLIENTID') &&
+            !empty(OMEGAUP_GOOGLE_CLIENTID)
+        ) {
+            $scripts[] = 'https://apis.google.com/js/api.js';
+        }
+        return [
+            'smartyProperties' => [
+                'scripts' => $scripts,
+            ],
+            'entrypoint' => 'logout',
+        ];
+    }
+);

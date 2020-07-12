@@ -1,14 +1,14 @@
 import group_GroupList from '../components/group/GroupList.vue';
-import {OmegaUp} from '../omegaup.js';
+import { OmegaUp } from '../omegaup';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let payload = JSON.parse(document.getElementById('payload').innerText);
   let groupList = new Vue({
     el: '#group_list',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-group-grouplist', {
-        props: {groups: this.groups},
+        props: { groups: this.groups },
       });
     },
     data: {

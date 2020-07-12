@@ -1,9 +1,9 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleGroups#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleGroups#}" inline}
 
 <div id="group_list"></div>
 
 <script type="text/json" id="payload">{$payload|json_encode}</script>
-<script type="text/javascript" src="{version_hash src="/js/dist/group_list.js"}"></script>
+{js_include entrypoint="group_list"}
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

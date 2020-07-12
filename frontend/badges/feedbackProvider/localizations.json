@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Proveedor de Feedback",
+    "description": "El usuario ha enviado la calificación de al menos un problema."
+  },
+  "en": {
+    "name": "Feedback Provider",
+    "description": "User has provided feedback for at least one problem."
+  },
+  "pt": {
+    "name": "Provedor de Feedback",
+    "description": "O usuário tem enviado a qualificação de pelo menos um problema."
+  }
+}

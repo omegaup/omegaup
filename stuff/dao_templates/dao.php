@@ -1,116 +1,236 @@
 <?php
+/** ************************************************************************ *
+ *                    !ATENCION!                                             *
+ *                                                                           *
+ * Este codigo es generado automáticamente. Si lo modificas, tus cambios     *
+ * serán reemplazados la proxima vez que se autogenere el código.            *
+ *                                                                           *
+ * ************************************************************************* */
 
-/** ******************************************************************************* *
-  *                    !ATENCION!                                                   *
-  *                                                                                 *
-  * Este codigo es generado automaticamente. Si lo modificas tus cambios seran      *
-  * reemplazados la proxima vez que se autogenere el codigo.                        *
-  *                                                                                 *
-  * ******************************************************************************* */
+namespace OmegaUp\DAO\Base;
 
 /** {{ table.class_name }} Data Access Object (DAO) Base.
  *
  * Esta clase contiene toda la manipulacion de bases de datos que se necesita
  * para almacenar de forma permanente y recuperar instancias de objetos
- * {@link {{ table.class_name }}}.
+ * {@link \OmegaUp\DAO\VO\{{ table.class_name }}}.
  * @access public
  * @abstract
- *
  */
-abstract class {{ table.class_name }}DAOBase {
-{%- if table.columns|selectattr('primary_key')|list %}
-{%- if table.columns|rejectattr('primary_key')|list %}
+abstract class {{ table.class_name }} {
+{%- if table.columns|selectattr('primary_key')|list and table.columns|rejectattr('primary_key')|list and not table.columns|selectattr('auto_increment')|list %}
     /**
      * Guardar registros.
      *
-     * Este metodo guarda el estado actual del objeto {@link {{ table.class_name }}}
+     * Este metodo guarda el estado actual del objeto {@link \OmegaUp\DAO\VO\{{ table.class_name }}}
      * pasado en la base de datos. La llave primaria indicará qué instancia va
      * a ser actualizada en base de datos. Si la llave primara o combinación de
      * llaves primarias que describen una fila que no se encuentra en la base de
-     * datos, entonces save() creará una nueva fila, insertando en ese objeto
-     * el ID recién creado.
+     * datos, entonces replace() creará una nueva fila.
      *
-     * @static
-     * @throws Exception si la operacion fallo.
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }}
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
+     * @throws \OmegaUp\Exceptions\NotFoundException si las columnas de la
+     * llave primaria están vacías.
+     *
+     * @param \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }} El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\{{ table.class_name }}}.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de filas afectadas.
      */
-    final public static function save({{ table.class_name }} ${{ table.name }}) {
-        if (is_null(self::getByPK({{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(', ') }}))) {
-            return {{ table.class_name }}DAOBase::create(${{ table.name }});
+    final public static function replace(
+        \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }}
+    ): int {
+        if (
+            {{ table.columns|selectattr('primary_key')|listformat('empty(${table.name}->{.name})', table=table)|join(' ||\n            ') }}
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
-        return {{ table.class_name }}DAOBase::update(${{ table.name }});
+        $sql = '
+            REPLACE INTO
+                {{ table.name }} (
+                    {{ table.columns|listformat('`{.name}`', table=table)|join(',\n                    ') }}
+                ) VALUES (
+                    {{ table.columns|listformat('?', table=table)|join(',\n                    ') }}
+                );';
+        $params = [
+  {%- for column in table.columns %}
+    {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                ${{ table.name }}->{{ column.name }}
+            ),
+    {%- elif column.php_type in ('?bool', '?int') and not column.primary_key %}
+            (
+                !is_null(${{ table.name }}->{{ column.name }}) ?
+                intval(${{ table.name }}->{{ column.name }}) :
+                null
+            ),
+    {%- elif column.php_type == '?float' %}
+            (
+                !is_null(${{ table.name }}->{{ column.name }}) ?
+                floatval(${{ table.name }}->{{ column.name }}) :
+                null
+            ),
+    {%- elif column.php_type in ('bool', 'int') %}
+            intval(${{ table.name }}->{{ column.name }}),
+    {%- elif column.php_type == 'float' %}
+            floatval(${{ table.name }}->{{ column.name }}),
+    {%- else %}
+            ${{ table.name }}->{{ column.name }},
+    {%- endif %}
+  {%- endfor %}
+        ];
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
-
+{% endif %}
+{%- if table.columns|selectattr('primary_key')|list and table.columns|rejectattr('primary_key')|list %}
     /**
      * Actualizar registros.
      *
-     * @static
-     * @return Filas afectadas
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a actualizar.
+     * @param \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }} El objeto de tipo {{ table.class_name }} a actualizar.
+     *
+     * @return int Número de filas afectadas
      */
-    final public static function update({{ table.class_name }} ${{ table.name }}) {
-        $sql = 'UPDATE `{{ table.name }}` SET {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(', ') }} WHERE {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND ') }};';
+    final public static function update(
+        \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }}
+    ): int {
+        $sql = '
+            UPDATE
+                `{{ table.name }}`
+            SET
+                {{ table.columns|rejectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(',\n                ') }}
+            WHERE
+                (
+                    {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?', table=table)|join(' AND\n                    ') }}
+                );';
         $params = [
-{%- for column in table.columns|rejectattr('primary_key') %}
+  {%- for column in table.columns|rejectattr('primary_key') %}
+    {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                ${{ table.name }}->{{ column.name }}
+            ),
+    {%- elif column.php_type in ('?bool', '?int') %}
+            (
+                is_null(${{ table.name }}->{{ column.name }}) ?
+                null :
+                intval(${{ table.name }}->{{ column.name }})
+            ),
+    {%- elif column.php_type == '?float' %}
+            (
+                is_null(${{ table.name }}->{{ column.name }}) ?
+                null :
+                floatval(${{ table.name }}->{{ column.name }})
+            ),
+    {%- elif column.php_type in ('bool', 'int') %}
+            intval(${{ table.name }}->{{ column.name }}),
+    {%- elif column.php_type == 'float' %}
+            floatval(${{ table.name }}->{{ column.name }}),
+    {%- else %}
             ${{ table.name }}->{{ column.name }},
-{%- endfor %}
-{%- for column in table.columns|selectattr('primary_key') %}
+    {%- endif %}
+  {%- endfor %}
+  {%- for column in table.columns|selectattr('primary_key') %}
+    {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                ${{ table.name }}->{{ column.name }}
+            ),
+    {%- elif column.php_type in ('?bool', '?int') %}
+            (
+                is_null(${{ table.name }}->{{ column.name }}) ?
+                null :
+                intval(${{ table.name }}->{{ column.name }})
+            ),
+    {%- elif column.php_type == '?float' %}
+            (
+                is_null(${{ table.name }}->{{ column.name }}) ?
+                null :
+                floatval(${{ table.name }}->{{ column.name }})
+            ),
+    {%- elif column.php_type in ('bool', 'int') %}
+            intval(${{ table.name }}->{{ column.name }}),
+    {%- elif column.php_type == 'float' %}
+            floatval(${{ table.name }}->{{ column.name }}),
+    {%- else %}
             ${{ table.name }}->{{ column.name }},
-{%- endfor %}
+    {%- endif %}
+  {%- endfor %}
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        return $conn->Affected_Rows();
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
     }
 {% endif %}
+{%- if table.columns|selectattr('primary_key')|list %}
     /**
-     * Obtener {@link {{ table.class_name }}} por llave primaria.
+     * Obtener {@link \OmegaUp\DAO\VO\{{ table.class_name }}} por llave primaria.
      *
-     * Este metodo cargará un objeto {@link {{ table.class_name }}} de la base
-     * de datos usando sus llaves primarias.
+     * Este método cargará un objeto {@link \OmegaUp\DAO\VO\{{ table.class_name }}}
+     * de la base de datos usando sus llaves primarias.
      *
-     * @static
-     * @return @link {{ table.class_name }} Un objeto del tipo {@link {{ table.class_name }}}. NULL si no hay tal registro.
+     * @return ?\OmegaUp\DAO\VO\{{ table.class_name }} Un objeto del tipo
+     * {@link \OmegaUp\DAO\VO\{{ table.class_name }}} o NULL si no hay tal
+     * registro.
      */
-    final public static function getByPK({{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}) {
-        if ({{ table.columns|selectattr('primary_key')|listformat('is_null(${.name})')|join(' || ') }}) {
+    final public static function getByPK(
+        {{ table.columns|selectattr('primary_key')|listformat('{0.php_type} ${0.name}')|join(',\n        ') }}
+    ): ?\OmegaUp\DAO\VO\{{ table.class_name }} {
+  {%- if table.columns|selectattr('primary_key')|rejectattr('not_null')|list|length %}
+        if ({{ table.columns|selectattr('primary_key')|rejectattr('not_null')|listformat('is_null(${.name})')|join(' || ') }}) {
             return null;
         }
-        $sql = 'SELECT {{ table.fieldnames }} FROM {{ table.name }} WHERE ({{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }}) LIMIT 1;';
+  {%- endif %}
+        $sql = '
+            SELECT
+                {{ table.fieldnames|join(',\n                ') }}
+            FROM
+                `{{ table.name }}`
+            WHERE
+                (
+                    {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?')|join(' AND\n                    ') }}
+                )
+            LIMIT 1;';
         $params = [{{ table.columns|selectattr('primary_key')|listformat('${.name}')|join(', ') }}];
-        global $conn;
-        $rs = $conn->GetRow($sql, $params);
-        if (count($rs) == 0) {
+        $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
+        if (empty($row)) {
             return null;
         }
-        return new {{ table.class_name }}($rs);
+        return new \OmegaUp\DAO\VO\{{ table.class_name }}($row);
     }
 
     /**
      * Eliminar registros.
      *
      * Este metodo eliminará el registro identificado por la llave primaria en
-     * el objeto {{ table.class_name }} suministrado. Una vez que se ha
-     * eliminado un objeto, este no puede ser restaurado llamando a
-     * {@link save()}, ya que este último creará un nuevo registro con una
-     * llave primaria distinta a la que estaba en el objeto eliminado.
+     * el objeto {@link \OmegaUp\DAO\VO\{{ table.class_name }}} suministrado.
+     * Una vez que se ha eliminado un objeto, este no puede ser restaurado
+     * llamando a {@link replace()}, ya que este último creará un nuevo
+     * registro con una llave primaria distinta a la que estaba en el objeto
+     * eliminado.
      *
-     * Si no puede encontrar el registro a eliminar, {@link Exception} será
-     * arrojada.
+     * Si no puede encontrar el registro a eliminar,
+     * {@link \OmegaUp\Exceptions\NotFoundException} será arrojada.
      *
-     * @static
-     * @throws Exception Se arroja cuando no se encuentra el objeto a eliminar en la base de datos.
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a eliminar
+     * @param \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }} El
+     * objeto de tipo \OmegaUp\DAO\VO\{{ table.class_name }} a eliminar
+     *
+     * @throws \OmegaUp\Exceptions\NotFoundException Se arroja cuando no se
+     * encuentra el objeto a eliminar en la base de datos.
      */
-    final public static function delete({{ table.class_name }} ${{ table.name }}) {
-        $sql = 'DELETE FROM `{{ table.name }}` WHERE {{ table.columns|selectattr('primary_key')|listformat('{.name} = ?')|join(' AND ') }};';
-        $params = [{{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(', ') }}];
-        global $conn;
+    final public static function delete(
+        \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }}
+    ): void {
+        $sql = '
+            DELETE FROM
+                `{{ table.name }}`
+            WHERE
+                (
+                    {{ table.columns|selectattr('primary_key')|listformat('`{.name}` = ?')|join(' AND\n                    ') }}
+                );';
+        $params = [
+            {{ table.columns|selectattr('primary_key')|listformat('${table.name}->{.name}', table=table)|join(',\n            ') }}
+        ];
 
-        $conn->Execute($sql, $params);
-        if ($conn->Affected_Rows() == 0) {
-            throw new NotFoundException('recordNotFound');
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        if (\OmegaUp\MySQLConnection::getInstance()->Affected_Rows() == 0) {
+            throw new \OmegaUp\Exceptions\NotFoundException('recordNotFound');
         }
     }
 {% endif %}
@@ -118,32 +238,56 @@ abstract class {{ table.class_name }}DAOBase {
      * Obtener todas las filas.
      *
      * Esta funcion leerá todos los contenidos de la tabla en la base de datos
-     * y construirá un arreglo que contiene objetos de tipo {@link {{ table.class_name }}}.
+     * y construirá un arreglo que contiene objetos de tipo
+     * {@link \OmegaUp\DAO\VO\{{ table.class_name }}}.
      * Este método consume una cantidad de memoria proporcional al número de
      * registros regresados, así que sólo debe usarse cuando la tabla en
      * cuestión es pequeña o se proporcionan parámetros para obtener un menor
      * número de filas.
      *
-     * @static
-     * @param $pagina Página a ver.
-     * @param $filasPorPagina Filas por página.
-     * @param $orden Debe ser una cadena con el nombre de una columna en la base de datos.
-     * @param $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
-     * @return Array Un arreglo que contiene objetos del tipo {@link {{ table.class_name }}}.
+     * @param ?int $pagina Página a ver.
+     * @param int $filasPorPagina Filas por página.
+     * @param ?string $orden Debe ser una cadena con el nombre de una columna en la base de datos.
+     * @param string $tipoDeOrden 'ASC' o 'DESC' el default es 'ASC'
+     *
+     * @return list<\OmegaUp\DAO\VO\{{ table.class_name }}> Un arreglo que contiene objetos del tipo
+     * {@link \OmegaUp\DAO\VO\{{ table.class_name }}}.
      */
-    final public static function getAll($pagina = null, $filasPorPagina = null, $orden = null, $tipoDeOrden = 'ASC') {
-        $sql = 'SELECT {{ table.fieldnames }} from {{ table.name }}';
-        global $conn;
+    final public static function getAll(
+        ?int $pagina = null,
+        int $filasPorPagina = 100,
+        ?string $orden = null,
+        string $tipoDeOrden = 'ASC'
+    ): array {
+        $sql = '
+            SELECT
+                {{ table.fieldnames|join(',\n                ') }}
+            FROM
+                `{{ table.name }}`
+        ';
         if (!is_null($orden)) {
-            $sql .= ' ORDER BY `' . mysqli_real_escape_string($conn->_connectionID, $orden) . '` ' . ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC');
+            $sql .= (
+                ' ORDER BY `' .
+                \OmegaUp\MySQLConnection::getInstance()->escape($orden) .
+                '` ' .
+                ($tipoDeOrden == 'DESC' ? 'DESC' : 'ASC')
+            );
         }
         if (!is_null($pagina)) {
-            $sql .= ' LIMIT ' . (($pagina - 1) * $filasPorPagina) . ', ' . (int)$filasPorPagina;
+            $sql .= (
+                ' LIMIT ' .
+                (($pagina - 1) * $filasPorPagina) .
+                ', ' .
+                intval($filasPorPagina)
+            );
         }
-        $rs = $conn->Execute($sql);
         $allData = [];
-        foreach ($rs as $row) {
-            $allData[] = new {{ table.class_name }}($row);
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll($sql) as $row
+        ) {
+            $allData[] = new \OmegaUp\DAO\VO\{{ table.class_name }}(
+                $row
+            );
         }
         return $allData;
     }
@@ -152,44 +296,71 @@ abstract class {{ table.class_name }}DAOBase {
      * Crear registros.
      *
      * Este metodo creará una nueva fila en la base de datos de acuerdo con los
-     * contenidos del objeto {{ table.class_name }} suministrado.
+     * contenidos del objeto {@link \OmegaUp\DAO\VO\{{ table.class_name }}}
+     * suministrado.
      *
 {%- if column in table.columns|selectattr('auto_increment')|list %}
      * Este método asignará el valor de la columna autogenerada en el objeto
-     * {{ table.class_name }} dentro de la misma transacción.
+     * {@link \OmegaUp\DAO\VO\{{ table.class_name }}} dentro de la misma
+     * transacción.
      *
 {%- endif %}
-     * @static
-     * @return Un entero mayor o igual a cero identificando el número de filas afectadas.
-     * @param {{ table.class_name }} [${{ table.name }}] El objeto de tipo {{ table.class_name }} a crear.
+     * @param \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }} El
+     * objeto de tipo {@link \OmegaUp\DAO\VO\{{ table.class_name }}}
+     * a crear.
+     *
+     * @return int Un entero mayor o igual a cero identificando el número de
+     *             filas afectadas.
      */
-    final public static function create({{ table.class_name }} ${{ table.name }}) {
-{%- for column in table.columns|selectattr('default') %}
-        if (is_null(${{ table.name }}->{{ column.name }})) {
-{%- if column.default == 'CURRENT_TIMESTAMP' %}
-            ${{ table.name }}->{{ column.name }} = gmdate('Y-m-d H:i:s');
-{%- else %}
-            ${{ table.name }}->{{ column.name }} = '{{ column.default }}';
-{%- endif %}
-        }
-{%- endfor %}
-        $sql = 'INSERT INTO {{ table.name }} ({{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(', ') }}) VALUES ({{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(', ') }});';
+    final public static function create(
+        \OmegaUp\DAO\VO\{{ table.class_name }} ${{ table.name }}
+    ): int {
+        $sql = '
+            INSERT INTO
+                `{{ table.name }}` (
+                    {{ table.columns|rejectattr('auto_increment')|listformat('`{.name}`', table=table)|join(',\n                    ') }}
+                ) VALUES (
+                    {{ table.columns|rejectattr('auto_increment')|listformat('?', table=table)|join(',\n                    ') }}
+                );';
         $params = [
 {%- for column in table.columns|rejectattr('auto_increment') %}
-            ${{ table.name }}->{{column.name}},
+  {%- if 'timestamp' in column.type or 'datetime' in column.type %}
+            \OmegaUp\DAO\DAO::toMySQLTimestamp(
+                ${{ table.name }}->{{ column.name }}
+            ),
+  {%- elif column.php_type in ('?bool', '?int') %}
+            (
+                is_null(${{ table.name }}->{{ column.name }}) ?
+                null :
+                intval(${{ table.name }}->{{ column.name }})
+            ),
+  {%- elif column.php_type == '?float' %}
+            (
+                is_null(${{ table.name }}->{{ column.name }}) ?
+                null :
+                floatval(${{ table.name }}->{{ column.name }})
+            ),
+  {%- elif column.php_type in ('bool', 'int') %}
+            intval(${{ table.name }}->{{ column.name }}),
+  {%- elif column.php_type == 'float' %}
+            floatval(${{ table.name }}->{{ column.name }}),
+  {%- else %}
+            ${{ table.name }}->{{ column.name }},
+  {%- endif %}
 {%- endfor %}
         ];
-        global $conn;
-        $conn->Execute($sql, $params);
-        $ar = $conn->Affected_Rows();
-        if ($ar == 0) {
+        \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+        $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
+        if ($affectedRows == 0) {
             return 0;
         }
 {%- for column in table.columns|selectattr('auto_increment') %}
-        ${{ table.name }}->{{ column.name }} = $conn->Insert_ID();
+        ${{ table.name }}->{{ column.name }} = (
+            \OmegaUp\MySQLConnection::getInstance()->Insert_ID()
+        );
 {%- endfor %}
 
-        return $ar;
+        return $affectedRows;
     }
 }
 

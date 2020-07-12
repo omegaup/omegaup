@@ -1,11 +1,4 @@
 @media all {
-	body {
-		font-size: 10pt;
-		font-family: "Arial Narrow", sans-serif;
-		margin: 0;
-		padding: 0;
-	}
-
 	div.problem {
 		page-break-before: always;
 	}
@@ -48,68 +41,6 @@
 		text-align: right;
 	}
 
-	.statement p, .statement li {
-		hyphens: auto;
-		line-height: 150%;
-		text-align: justify;
-		orphans: 2;
-		widows: 2;
-		page-break-inside: avoid;
-	}
-	.statement p {
-		margin-bottom: 1.5em;
-	}
-	.statement ul {
-		list-style: disc;
-	}
-	.statement ol {
-		list-style: decimal;
-	}
-	.statement li {
-		margin-left: 2em;
-	}
-
-	.statement img {
-		max-width: 50%;
-		page-break-inside: avoid;
-	}
-
-	.statement pre {
-		line-height: 125%;
-	}
-
-	.statement table.sample_io {
-		border: 1px solid #000;
-		background: #eee;
-		margin: 0.75ex;
-		padding : 0.75ex;
-	}
-	.statement table.sample_io th {
-		padding: 0.75ex;
-	}
-	.statement table.sample_io td {
-		font-size: 10pt;
-		background: #eee;
-		vertical-align: top;
-		padding: 1.25ex;
-		border: 1px solid #000;
-	}
-	.statement table.sample_io pre {
-		white-space: pre;
-		word-break: keep-all;
-		word-wrap: normal;
-		background: transparent;
-		border: 0px;
-		padding: 0px;
-		margin: inherit;
-	}
-	figure {
-		text-align: center;
-		page-break-inside: avoid;
-	}
-	hr {
-		display: none;
-	}
 	div.libinteractive-download {
 		display: none;
 	}

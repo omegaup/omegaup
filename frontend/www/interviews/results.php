@@ -1,10 +1,12 @@
 <?php
+namespace OmegaUp;
+require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
-require_once('../../server/bootstrap_smarty.php');
-
-UITools::setProfile($smarty);
-
-$smarty->assign('admin', true);
-$smarty->assign('practice', false);
-
-$smarty->display('../../templates/interviews.results.tpl');
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
+\OmegaUp\UITools::render(
+    function (\OmegaUp\Request $r): array {
+        return \OmegaUp\Controllers\User::getInterviewResultsDetailsForSmarty(
+            $r
+        );
+    }
+);

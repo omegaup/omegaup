@@ -1,0 +1,69 @@
+<template>
+  <figure class="col-md-3 col-sm-3 badge-container" v-tooltip="description">
+    <a class="badge-icon" v-bind:href="`/badge/${this.badge.badge_alias}/`"
+      ><img
+        v-bind:class="{ 'badge-gray': !this.badge.unlocked }"
+        v-bind:src="this.iconUrl"
+        class="img-responsive"
+    /></a>
+
+    <figcaption class="badge-name">
+      {{ this.name }}
+    </figcaption>
+  </figure>
+</template>
+
+<style>
+.badge-container {
+  align-items: center;
+  text-align: center;
+}
+
+figure {
+  max-height: 10rem !important;
+}
+
+.badge-icon {
+  display: block;
+  height: 70%;
+  width: 100%;
+}
+.badge-icon img {
+  max-height: 100%;
+}
+.badge-name {
+  padding-top: 0.5rem;
+}
+.badge-gray {
+  filter: grayscale(100%);
+}
+</style>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
+
+@Component({
+  directives: {
+    tooltip: VTooltip,
+  },
+})
+export default class Badge extends Vue {
+  @Prop() badge!: types.Badge;
+
+  get name(): string {
+    return T[`badge_${this.badge.badge_alias}_name`];
+  }
+
+  get description(): string {
+    return T[`badge_${this.badge.badge_alias}_description`];
+  }
+
+  get iconUrl(): string {
+    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
+  }
+}
+</script>

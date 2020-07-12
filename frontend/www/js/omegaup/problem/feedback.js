@@ -1,20 +1,20 @@
 import Vue from 'vue';
 import problem_Feedback from '../components/problem/Feedback.vue';
-import {OmegaUp} from '../omegaup.js';
-import UI from '../ui.js';
+import { OmegaUp } from '../omegaup';
+import * as ui from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let problemFeedback = new Vue({
     el: '#problem-feedback',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-feedback', {
         props: {
           qualityHistogram: this.qualityHistogram,
           difficultyHistogram: this.difficultyHistogram,
           qualityScore: this.quality,
           difficultyScore: this.difficulty,
-        }
+        },
       });
     },
     data: {
@@ -25,6 +25,6 @@ OmegaUp.on('ready', function() {
     },
     components: {
       'omegaup-problem-feedback': problem_Feedback,
-    }
+    },
   });
 });

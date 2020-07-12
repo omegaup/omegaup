@@ -1,24 +1,7 @@
-<div class="panel panel-primary">
-	<div class="panel-body">
-		<form class="form" id="add-member-form">
-			<div class="form-group">
-				<label for="member-username">{#wordsMember#}</label>
-				<input id="member-username" name="username" value="" type="text" size="20" class="form-control" autocomplete="off" />
-			</div>
-
-			<input id="member-user" name="user" value="" type="hidden">
-
-			<button class="btn btn-primary" type='submit'>{#wordsAddMember#}</button>
-		</form>
-	</div>
-
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th>{#wordsUser#}</th>
-				<th>{#contestEditRegisteredAdminDelete#}</th>
-			</tr>
-		</thead>
-		<tbody id="group-members"></tbody>
-	</table>
+<div id="group-members" class="panel panel-primary">
+	<div class="list"></div>
+	<div class="form"></div>
 </div>
+<script type="text/json" id="payload">{$payload|json_encode}</script>
+<script src="{version_hash src="/third_party/js/iso-3166-2.js/iso3166.min.js"}"></script>
+{js_include entrypoint="group_members"}

@@ -1,16 +1,20 @@
 <?php
 
-function smarty_compiler_version_hash($params, Smarty $smarty) {
+/**
+ * @param array{src: string} $params
+ * @param \Smarty $smarty
+ */
+function smarty_compiler_version_hash(array $params, \Smarty $smarty): string {
     $src = $params['src'];
     if ($src[0] == '"' || $src[0] == "'") {
         $src = substr($src, 1, strlen($src) - 2);
     }
     $paths = [];
-    if ($src =='/js/omegaup/lang.#locale#.js') {
+    if ($src == '/js/omegaup/lang.#locale#.js') {
         $src = '/js/omegaup/lang.<?php echo $_smarty_tpl->getConfigVars("locale"); ?>.js';
         $paths = ['/js/omegaup/lang.es.js', '/js/omegaup/lang.en.js',
             '/js/omegaup/lang.pt.js', '/js/omegaup/lang.pseudo.js'];
-    } elseif ($src =='/js/omegaup/lang.#locale#.json') {
+    } elseif ($src == '/js/omegaup/lang.#locale#.json') {
         $src = '/js/omegaup/lang.<?php echo $_smarty_tpl->getConfigVars("locale"); ?>.json';
         $paths = ['/js/omegaup/lang.es.json', '/js/omegaup/lang.en.json',
             '/js/omegaup/lang.pt.json', '/js/omegaup/lang.pseudo.json'];

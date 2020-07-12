@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Creador de Problemas",
+    "description": "El usuario ha creado al menos un problema."
+  },
+  "en": {
+    "name": "Problem Setter",
+    "description": "User has created at least one problem."
+  },
+  "pt": {
+    "name": "Criador de Problemas",
+    "description": "O usuário tem criado pelo menos um problema."
+  }
+}

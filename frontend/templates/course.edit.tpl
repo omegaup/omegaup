@@ -1,5 +1,5 @@
-{include file='redirect.tpl'}
-{include file='head.tpl' htmlTitle="{#omegaupTitleCourseEdit#}"}
+{include file='redirect.tpl' inline}
+{include file='head.tpl' navbarSection='schools' headerPayload=$headerPayload htmlTitle="{#omegaupTitleCourseEdit#}" inline}
 
 <div class="panel panel-primary">
 	<div class="panel-heading">
@@ -11,6 +11,7 @@
 	<ul class="nav nav-tabs" id="sections">
 		<li class="active"><a href="#edit" data-toggle="tab">{#courseEdit#}</a></li>
 		<li><a href="#assignments" data-toggle="tab">{#wordsAssignments#}</a></li>
+		<li><a href="#admission-mode" data-toggle="tab">{#contestNewFormAdmissionMode#}</a></li>
 		<li><a href="#students" data-toggle="tab">{#courseEditStudents#}</a></li>
 		<li><a href="#admins" data-toggle="tab">{#courseEditAdmins#}</a></li>
 		<li><a href="#clone" data-toggle="tab">{#courseEditClone#}</a></li>
@@ -27,11 +28,22 @@
 			<div class="list"></div>
 			<div class="form"></div>
 		</div>
-		<div class="tab-pane" id="students">
+		<div class="tab-pane" id="admission-mode">
 			<div></div>
 		</div>
+		<div class="tab-pane" id="students">
+			<div class="requests"></div>
+			<div class="list"></div>
+		</div>
 		<div class="tab-pane" id="admins">
-			<div></div>
+			<div class="row">
+				<div class="col-md-6">
+					<div class="admins"></div>
+				</div>
+				<div class="col-md-6">
+					<div class="groups"></div>
+				</div>
+			</div>
 		</div>
 		<div class="tab-pane" id="clone">
 			<div></div>
@@ -39,5 +51,5 @@
 	</div>
 </div>
 
-<script type="text/javascript" src="{version_hash src="/js/dist/course_edit.js"}"></script>
-{include file='footer.tpl'}
+{js_include entrypoint="course_edit"}
+{include file='footer.tpl' inline}

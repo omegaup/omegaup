@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# type: ignore
 
 '''Replays a contest.'''
 
@@ -142,7 +143,7 @@ def main():
                                     'run': str(run_id)})
         ).read()
         t1 = time.time()
-        assert response == '{"status":"ok"}', response
+        assert '"status":"ok"' in response, response
         times.append(t1 - t0)
     t1_all = time.time()
 

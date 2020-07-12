@@ -1,6 +1,12 @@
 <?php
-    require_once('../server/bootstrap_smarty.php');
+namespace OmegaUp;
+require_once(dirname(__DIR__) . '/server/bootstrap.php');
 
-    $smarty->assign('LOAD_MATHJAX', true);
-
-    $smarty->display('../templates/redaccion.tpl');
+\OmegaUp\UITools::render(
+    function (\OmegaUp\Request $r): array {
+        return [
+            'smartyProperties' => [],
+            'entrypoint' => 'problem_statement',
+        ];
+    }
+);

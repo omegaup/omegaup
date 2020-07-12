@@ -8,10 +8,15 @@
       <table class="table">
         <tbody>
           <tr v-for="role in roles">
-            <td><input type="checkbox"
-                   v-model="role.value"
-                   v-on:change.prevent="onChangeRole($event, role.title)"></td>
-            <td>{{ role.title }}</td>
+            <td>
+              <input
+                type="checkbox"
+                v-model="role.value"
+                v-on:change.prevent="onChangeRole($event, role)"
+              />
+            </td>
+
+            <td>{{ role.name }}</td>
           </tr>
         </tbody>
       </table>
@@ -19,10 +24,15 @@
       <table class="table">
         <tbody>
           <tr v-for="group in groups">
-            <td><input type="checkbox"
-                   v-model="group.value"
-                   v-on:change.prevent="onChangeGroup($event, group.title)"></td>
-            <td>{{ group.title }}</td>
+            <td>
+              <input
+                type="checkbox"
+                v-model="group.value"
+                v-on:change.prevent="onChangeGroup($event, group)"
+              />
+            </td>
+
+            <td>{{ group.name }}</td>
           </tr>
         </tbody>
       </table>
@@ -30,24 +40,40 @@
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
+<script lang="ts">
+import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
 
-export default {
-  props: {
-    initialRoles: Array,
-    initialGroups: Array,
-  },
-  data: function() {
-    return {T: T, roles: this.initialRoles, groups: this.initialGroups};
-  },
-  methods: {
-    onChangeRole: function(ev, role) {
-      this.$emit('change-role', role, ev.target.checked);
-    },
-    onChangeGroup: function(ev, group) {
-      this.$emit('change-group', group, ev.target.checked);
-    },
-  },
-};
+@Component
+export default class AdminRoles extends Vue {
+  @Prop() initialRoles!: omegaup.Role[];
+  @Prop() initialGroups!: omegaup.Group[];
+
+  T = T;
+  roles: omegaup.Role[] = this.initialRoles;
+  groups: omegaup.Group[] = this.initialGroups;
+
+  @Emit()
+  onChangeRole(
+    ev: Event,
+    role: omegaup.Role,
+  ): omegaup.Selectable<omegaup.Role> {
+    return {
+      value: role,
+      selected: (<HTMLInputElement>ev.target).checked,
+    };
+  }
+
+  @Emit()
+  onChangeGroup(
+    ev: Event,
+    group: omegaup.Group,
+  ): omegaup.Selectable<omegaup.Group> {
+    return {
+      value: group,
+      selected: (<HTMLInputElement>ev.target).checked,
+    };
+  }
+}
 </script>

@@ -1,20 +1,50 @@
 <template>
-  <input class="typeahead form-control"
-        ref="input"
-        v-on:change="updateInput">
+  <input
+    class="typeahead form-control"
+    ref="input"
+    autocomplete="off"
+    v-on:change="onUpdateInput"
+    v-bind:placeholder="placeholder"
+    v-bind:name="name"
+    v-bind:value="value"
+  />
 </template>
 
-<script>
-import {UI} from '../omegaup.js';
+<style lang="scss">
+.tt-dataset {
+  background: white;
+  padding: 10px;
+  border: 1px solid gray;
+}
+</style>
 
-export default {
-  props: {
-    value: String,
-    init: Function,
-  },
-  mounted: function() { this.init($(this.$el));},
-  methods: {
-    updateInput() { this.$emit('input', this.$refs.input.value);},
-  },
-};
+<script lang="ts">
+import { Vue, Component, Watch, Prop, Emit, Ref } from 'vue-property-decorator';
+
+@Component
+export default class Autocomplete extends Vue {
+  @Ref() input!: HTMLInputElement;
+  @Prop() value!: string;
+  @Prop() placeholder!: string;
+  @Prop() name!: string;
+  @Prop() init!: (el: JQuery<HTMLElement>) => void;
+
+  mounted() {
+    this.init($(<HTMLElement>this.$refs.input));
+  }
+
+  @Emit('input')
+  onUpdateInput(): string {
+    const value = this.input.getAttribute('data-value');
+    if (value !== null) {
+      this.$emit('update:value', value);
+    }
+    return this.input.value;
+  }
+
+  @Watch('value')
+  onPropertyChanged(newValue: string, oldValue: string) {
+    this.input.value = newValue;
+  }
+}
 </script>

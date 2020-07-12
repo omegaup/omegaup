@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Administrador de Concurso",
+    "description": "El usuario ha administrado al menos un concurso."
+  },
+  "en": {
+    "name": "Contest Manager",
+    "description": "User has managed at least one contest."
+  },
+  "pt": {
+    "name": "Administrador de Concurso",
+    "description": "O usuário tem administrado pelo menos um concurso."
+  }
+}

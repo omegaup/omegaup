@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+# type: ignore
 # pylint: disable=invalid-name
 # This program is intended to be invoked from the console, not to be used as a
 # module.
@@ -93,6 +94,9 @@ def main():
                         default=database_utils.default_config_file(),
                         help='.my.cnf file that stores credentials')
     parser.add_argument('--database', default='omegaup', help='MySQL database')
+    parser.add_argument(
+        '--hostname', default=None, type=str,
+        help='Hostname of the MySQL server')
     parser.add_argument('--username', default='root',
                         help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
@@ -111,7 +115,8 @@ def main():
     args = parser.parse_args()
     auth = database_utils.authentication(config_file=args.mysql_config_file,
                                          username=args.username,
-                                         password=args.password)
+                                         password=args.password,
+                                         hostname=args.hostname)
     args.func(args, auth)
 
 

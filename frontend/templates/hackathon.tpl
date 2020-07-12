@@ -1,6 +1,5 @@
-{include file='head.tpl' htmlTitle="Hackathon omegaUp"}
+{include file='head.tpl' htmlTitle="Hackathon omegaUp" inline}
 
-<script src="https://www.google.com/jsapi?key=AIzaSyA5m1Nc8ws2BbmPRwKu5gFradvD_hgq6G0" type="text/javascript"></script>
 <div class="row">
 	<div class="col-md-12">
 		<div class="panel panel-default">
@@ -38,4 +37,4 @@
 	</div>
 </div>
 
-{include file='footer.tpl'}
+{include file='footer.tpl' inline}

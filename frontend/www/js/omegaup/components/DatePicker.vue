@@ -1,38 +1,74 @@
 <template>
-  <input class="form-control"
-        size="16"
-        type="text"
-        v-bind:disabled="!enabled">
+  <input
+    class="form-control"
+    required="required"
+    size="16"
+    type="date"
+    v-bind:disabled="!enabled"
+    v-bind:readonly="usedFallback"
+    v-model="stringValue"
+  />
 </template>
 
-<script>
-import {T} from '../omegaup.js';
-export default {
-  props: {
-    value: Date,
-    enabled: {
-      type: Boolean,
-      'default': true,
-    },
-    format: {
-      type: String,
-      'default': T.datePickerFormat,
-    },
-  },
-  data: function() { return {};},
-  watch: {
-    value: function(val) { $(this.$el)
-                               .datepicker('setValue', val);},
-  },
-  mounted: function() {
-    var self = this;
+<script lang="ts">
+import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import T from '../lang';
+import * as time from '../time';
+import '../../../third_party/js/bootstrap-datepicker.js';
+
+@Component
+export default class DatePicker extends Vue {
+  T = T;
+
+  @Prop() value!: Date;
+  @Prop({ default: true }) enabled!: boolean;
+  @Prop({ default: T.datePickerFormat }) format!: string;
+
+  private usedFallback: boolean = false;
+  private stringValue: string = time.formatDateLocal(this.value);
+
+  mounted() {
+    if ((this.$el as HTMLInputElement).type === 'text') {
+      // Even though we declared the input as having date type,
+      // browsers that don't support it will silently change the type to text.
+      // In that case, use the bootstrap datepicker.
+      this.mountedFallback();
+    }
+  }
+
+  private mountedFallback() {
+    let self = this;
+    self.usedFallback = true;
     $(self.$el)
-        .datepicker({
-          weekStart: 1,
-          format: self.format,
-        })
-        .on('changeDate', function(ev) { self.$emit('input', ev.date); })
-        .datepicker('setValue', self.value);
-  },
-};
+      .datepicker({
+        weekStart: 1,
+        format: self.format,
+      })
+      .on('changeDate', (ev) => {
+        self.$emit('input', ev.date);
+      })
+      .datepicker('setValue', self.value);
+  }
+
+  @Watch('stringValue')
+  onStringValueChanged(newStringValue: string) {
+    if (this.usedFallback) {
+      // If the fallback was used, we don't need to update anything.
+      return;
+    }
+    this.$emit('input', time.parseDateLocal(newStringValue));
+  }
+
+  @Watch('value')
+  onPropertyChanged(newValue: Date) {
+    this.stringValue = time.formatDateLocal(newValue);
+    if (this.usedFallback) {
+      $(this.$el).datepicker('setValue', newValue);
+    }
+  }
+}
 </script>
+
+<style>
+@import '../../../third_party/css/bootstrap-datepicker.css';
+</style>

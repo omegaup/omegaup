@@ -1,3 +1,4 @@
+# type: ignore
 import argparse
 import hashlib
 import os
@@ -57,14 +58,11 @@ class OmegaUpTest:
     assert username_label.text == self.username
 
   def create_problem(self):
-    nav_problems = self.driver.find_element_by_css_selector('#nav-problems')
+    nav_problems = self.driver.find_element_by_css_selector(
+      'a[data-nav-problems]')
     nav_problems.click()
-    nav_links = self.driver.find_elements_by_css_selector('#nav-problems a')
-    nav_link = None
-    for link in nav_links:
-      if link.get_attribute('innerText') == 'Create a problem':
-        nav_link = link
-        break
+    nav_link = self.driver.find_element_by_css_selector(
+      'a[data-nav-problems-create]')
     assert nav_link
     nav_link.click()
 
@@ -94,14 +92,11 @@ class OmegaUpTest:
 
   def create_contest(self):
     # Navigate to create contest
-    nav_contests = self.driver.find_element_by_css_selector('#nav-contests')
+    nav_contests = self.driver.find_element_by_css_selector(
+      'a[data-nav-contests]')
     nav_contests.click()
-    nav_links = self.driver.find_elements_by_css_selector('#nav-contests a')
-    nav_link = None
-    for link in nav_links:
-      if link.get_attribute('innerText') == 'Create a new contest':
-        nav_link = link
-        break
+    nav_link = self.driver.find_element_by_css_selector(
+      'a[data-nav-contests-create]')
     assert nav_link
     nav_link.click()
 
@@ -122,7 +117,7 @@ class OmegaUpTest:
     problem_element.submit()
 
   def go_to_contest(self):
-    self.driver.find_element_by_xpath('//a[starts-with(@href, "/arena/")]').click()
+    self.driver.find_element_by_css_selector('a[data-nav-contests-arena]').click()
     self.driver.find_element_by_link_text(self.contest_alias).click()
 
   def open_contest(self):

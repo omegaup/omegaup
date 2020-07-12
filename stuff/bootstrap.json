@@ -4,9 +4,9 @@
 		"password": "omegaup",
 		"requests": [
 			{
-				"api": "/problem/create",
+				"api": "/problem/create/",
 				"params": {
-					"visibility": 1,
+					"visibility": 2,
 					"title": "Sumas",
 					"problem_alias": "sumas",
 					"validator": "token-numeric",
@@ -18,7 +18,9 @@
 					"output_limit": 10240,
 					"input_limit": 10240,
 					"source": "omegaUp classics",
-					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"show_diff": "examples",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1
 				},
 				"files": {
@@ -26,9 +28,9 @@
 				}
 			},
 			{
-				"api": "/problem/create",
+				"api": "/problem/create/",
 				"params": {
-					"visibility": 1,
+					"visibility": 2,
 					"title": "Triangulos",
 					"problem_alias": "triangulos",
 					"validator": "token-numeric",
@@ -40,7 +42,9 @@
 					"output_limit": 10240,
 					"input_limit": 10240,
 					"source": "omegaUp classics",
-					"languages": "c,cpp,cpp11,cs,hs,java,pas,py,rb,lua",
+					"show_diff": "all",
+					"allow_user_add_tags": "true",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1
 				},
 				"files": {
@@ -48,7 +52,30 @@
 				}
 			},
 			{
-				"api": "/contest/create",
+				"api": "/problem/create/",
+				"params": {
+					"visibility": 2,
+					"title": "Karel Hello World",
+					"problem_alias": "karel-helloworld",
+					"validator": "token",
+					"time_limit": 1000,
+					"validator_time_limit": 0,
+					"overall_wall_time_limit": 1000,
+					"extra_wall_time": 0,
+					"memory_limit": 32768,
+					"output_limit": 10240,
+					"input_limit": 10240,
+					"allow_user_add_tags": "true",
+					"source": "omegaUp classics",
+					"languages": "kp,kj",
+					"email_clarifications": 1
+				},
+				"files": {
+					"problem_contents": "frontend/tests/resources/karel_helloworld.zip"
+				}
+			},
+			{
+				"api": "/contest/create/",
 				"params": {
 					"visibility": 1,
 					"title": "Prueba",
@@ -59,9 +86,9 @@
 					"window_length": "0",
 					"scoreboard": 100,
 					"points_decay_factor": 0,
-					"partial_score": 1,
+					"partial_score": "true",
 					"submissions_gap": 1200,
-					"feedback": "yes",
+					"feedback": "detailed",
 					"penalty_type": "contest_start",
 					"penalty_calc_policy": "sum",
 					"admission_mode": "private",
@@ -69,7 +96,7 @@
 				}
 			},
 			{
-				"api": "/contest/addProblem",
+				"api": "/contest/addProblem/",
 				"params": {
 					"contest_alias": "prueba",
 					"problem_alias": "triangulos",
@@ -77,7 +104,7 @@
 				}
 			},
 			{
-				"api": "/contest/addProblem",
+				"api": "/contest/addProblem/",
 				"params": {
 					"contest_alias": "prueba",
 					"problem_alias": "sumas",
@@ -85,14 +112,14 @@
 				}
 			},
 			{
-				"api": "/contest/update",
+				"api": "/contest/update/",
 				"params": {
 					"contest_alias": "prueba",
 					"admission_mode": "public"
 				}
 			},
 			{
-				"api": "/school/create",
+				"api": "/school/create/",
 				"params": {
 					"name": "Escuela curso",
 					"country_id": "MX",
@@ -100,7 +127,7 @@
 				}
 			},
 			{
-				"api": "/course/create",
+				"api": "/course/create/",
 				"params": {
 					"visibility": 1,
 					"name": "Curso de prueba",
@@ -108,14 +135,14 @@
 					"description": "Curso de prueba",
 					"start_time": "$NOW$",
 					"finish_time": "$NOW$+18000",
-					"public": 0,
+					"admission_mode": "private",
 					"school_id": 1,
 					"needs_basic_information": 0,
 					"requests_user_information": "required"
 				}
 			},
 			{
-				"api": "/course/createAssignment",
+				"api": "/course/createAssignment/",
 				"params": {
 					"course_alias": "curso-prueba",
 					"name": "Tarea de prueba",
@@ -130,7 +157,7 @@
 				}
 			},
 			{
-				"api": "/course/createAssignment",
+				"api": "/course/createAssignment/",
 				"params": {
 					"course_alias": "curso-prueba",
 					"name": "Examen de prueba",
@@ -145,7 +172,7 @@
 				}
 			},
 			{
-				"api": "/course/addProblem",
+				"api": "/course/addProblem/",
 				"params": {
 					"course_alias": "curso-prueba",
 					"assignment_alias": "tarea-prueba",
@@ -153,7 +180,7 @@
 				}
 			},
 			{
-				"api": "/course/addProblem",
+				"api": "/course/addProblem/",
 				"params": {
 					"course_alias": "curso-prueba",
 					"assignment_alias": "tarea-prueba",
@@ -161,7 +188,7 @@
 				}
 			},
 			{
-				"api": "/course/addProblem",
+				"api": "/course/addProblem/",
 				"params": {
 					"course_alias": "curso-prueba",
 					"assignment_alias": "examen-prueba",
@@ -169,7 +196,7 @@
 				}
 			},
 			{
-				"api": "/course/addProblem",
+				"api": "/course/addProblem/",
 				"params": {
 					"course_alias": "curso-prueba",
 					"assignment_alias": "examen-prueba",
@@ -177,7 +204,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "test_user_0",
 					"email": "test_user_0@localhost.localdomain",
@@ -185,7 +212,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "test_user_1",
 					"email": "test_user_1@localhost.localdomain",
@@ -193,7 +220,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "test_user_2",
 					"email": "test_user_2@localhost.localdomain",
@@ -201,7 +228,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "test_user_3",
 					"email": "test_user_3@localhost.localdomain",
@@ -209,7 +236,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "test_user_4",
 					"email": "test_user_4@localhost.localdomain",
@@ -217,7 +244,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "test_user_5",
 					"email": "test_user_5@localhost.localdomain",
@@ -225,7 +252,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "course_test_user_0",
 					"email": "course_test_user_0@localhost.localdomain",
@@ -233,7 +260,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "course_test_user_1",
 					"email": "course_test_user_1@localhost.localdomain",
@@ -241,7 +268,7 @@
 				}
 			},
 			{
-				"api": "/user/create",
+				"api": "/user/create/",
 				"params": {
 					"username": "course_test_user_2",
 					"email": "course_test_user_2@localhost.localdomain",
@@ -249,28 +276,28 @@
 				}
 			},
 			{
-				"api": "/course/addStudent",
+				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "user",
 					"course_alias": "curso-prueba"
 				}
 			},
 			{
-				"api": "/course/addStudent",
+				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_0",
 					"course_alias": "curso-prueba"
 				}
 			},
 			{
-				"api": "/course/addStudent",
+				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_1",
 					"course_alias": "curso-prueba"
 				}
 			},
 			{
-				"api": "/course/addStudent",
+				"api": "/course/addStudent/",
 				"params": {
 					"usernameOrEmail": "course_test_user_2",
 					"course_alias": "curso-prueba"
@@ -283,28 +310,37 @@
 		"password": "test_user_0",
 		"requests": [
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print sum(map(int, raw_input().strip().split()))"
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
 			},
 			{
-				"api": "/contest/open",
+				"api": "/run/create/",
+				"fail_ok": true,
+				"params": {
+					"problem_alias": "karel-helloworld",
+					"language": "kj",
+					"source": "class program { program() { turnoff(); } }"
+				}
+			},
+			{
+				"api": "/contest/open/",
 				"params": {
 					"contest_alias": "prueba"
 				}
 			},
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
-					"source": "print sum(map(int, raw_input().strip().split()))"
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
 			}
 		]
@@ -314,28 +350,28 @@
 		"password": "test_user_1",
 		"requests": [
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print 3"
+					"language": "py3",
+					"source": "print(3)"
 				}
 			},
 			{
-				"api": "/contest/open",
+				"api": "/contest/open/",
 				"params": {
 					"contest_alias": "prueba"
 				}
 			},
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
-					"source": "print 3"
+					"language": "py3",
+					"source": "print(3)"
 				}
 			}
 		]
@@ -345,28 +381,28 @@
 		"password": "test_user_2",
 		"requests": [
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print 0"
+					"language": "py3",
+					"source": "print(0)"
 				}
 			},
 			{
-				"api": "/contest/open",
+				"api": "/contest/open/",
 				"params": {
 					"contest_alias": "prueba"
 				}
 			},
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
-					"source": "print 0"
+					"language": "py3",
+					"source": "print(0)"
 				}
 			}
 		]
@@ -376,27 +412,27 @@
 		"password": "test_user_3",
 		"requests": [
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			},
 			{
-				"api": "/contest/open",
+				"api": "/contest/open/",
 				"params": {
 					"contest_alias": "prueba"
 				}
 			},
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
 					"contest_alias": "prueba",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			}
@@ -407,20 +443,20 @@
 		"password": "test_user_4",
 		"requests": [
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
-					"source": "print sum(map(int, raw_input().strip().split()))"
+					"language": "py3",
+					"source": "print(sum(int(x) for x in input().strip().split()))"
 				}
 			},
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "triangulos",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			}
@@ -431,29 +467,28 @@
 		"password": "course_test_user_0",
 		"requests": [
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
-					"language": "py",
+					"language": "py3",
 					"source": "syntax error"
 				}
 			},
 			{
-				"api": "/course/introDetails",
+				"api": "/course/introDetails/",
 				"params": {
-					"course_alias": "curso-prueba",
-					"assignment_alias": "tarea-prueba"
+					"course_alias": "curso-prueba"
 				}
 			},
 			{
-				"api": "/run/create",
+				"api": "/run/create/",
 				"fail_ok": true,
 				"params": {
 					"problem_alias": "sumas",
 					"problemset_id": 2,
-					"language": "py",
-					"source": "print 0"
+					"language": "py3",
+					"source": "print(0)"
 				}
 			}
 		]

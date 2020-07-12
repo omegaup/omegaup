@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `QualityNominations` (
   PRIMARY KEY (`qualitynomination_id`),
   KEY `user_id` (`user_id`),
   KEY `problem_id` (`problem_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La cola de nominación a promoción / democión de problemas';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='La cola de nominación a promoción / democión de problemas';
 
 ALTER TABLE `QualityNominations`
   ADD CONSTRAINT `fk_qn_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `QualityNomination_Reviewers` (
   `qualitynomination_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL COMMENT 'El revisor al que fue asignado esta nominación',
   PRIMARY KEY (`qualitynomination_id`, `user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='La lista de revisores para cada nominación';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='La lista de revisores para cada nominación';
 
 ALTER TABLE `QualityNomination_Reviewers`
   ADD CONSTRAINT `fk_qnr_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `QualityNomination_Comments` (
   PRIMARY KEY (`qualitynomination_comment_id`),
   KEY `user_id` (`user_id`),
   KEY `qualitynomination_id` (`qualitynomination_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Comentarios para una nominación';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Comentarios para una nominación';
 
 ALTER TABLE `QualityNomination_Comments`
   ADD CONSTRAINT `fk_qnc_qualitynomination_id` FOREIGN KEY (`qualitynomination_id`) REFERENCES `QualityNominations` (`qualitynomination_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -73,10 +73,10 @@ BEGIN
     SET @ties_count = 0;
 
     INSERT INTO
-        User_Rank (user_id, rank, problems_solved_count, score, username, name, country_id)
+        User_Rank (user_id, `rank`, problems_solved_count, score, username, name, country_id)
     SELECT
         user_id,
-        rank,
+        `rank`,
         problems_solved_count,
         score,
         username,
@@ -99,7 +99,7 @@ BEGIN
         CASE
             WHEN @prev_value = score THEN @rank_count
             WHEN @prev_value := score THEN @rank_count := @rank_count + 1 + @prev_ties_count
-        END AS rank
+        END AS `rank`
         FROM
         (
             SELECT
@@ -128,7 +128,7 @@ BEGIN
             ORDER BY
                 score DESC
         ) AS UsersProblemsSolved
-    ) AS Rank;
+    ) AS `Rank`;
     COMMIT;
 END$$
 DELIMITER ;

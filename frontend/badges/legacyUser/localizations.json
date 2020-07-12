@@ -1,0 +1,14 @@
+{
+  "es": {
+    "name": "Usuario Histórico",
+    "description": "El usuario ha realizado algún envío durante tres años seguidos."
+  },
+  "en": {
+    "name": "Legacy User",
+    "description": "User has made a submission for three years in a row."
+  },
+  "pt": {
+    "name": "Usuário Histórico",
+    "description": "O usuário tem um embarque por três anos seguidos."
+  }
+}

@@ -2,27 +2,34 @@
 require_once('../../server/bootstrap_smarty.php');
 
 try {
-    $r = new Request([
-            'contest_alias' => $_REQUEST['alias'],
-            'auth_token' => array_key_exists('ouat', $_REQUEST) ? $_REQUEST['ouat'] : null,
-        ]);
+    $r = new \OmegaUp\Request([
+        'contest_alias' => $_REQUEST['alias'],
+        'auth_token' => array_key_exists(
+            'ouat',
+            $_REQUEST
+        ) ? $_REQUEST['ouat'] : null,
+    ]);
 
     // Open the contest for the current user
-    $contest = ContestController::apiOpen($r);
+    $contest = \OmegaUp\Controllers\Contest::apiOpen($r);
 
     // with the contest opened, request the contest details
-    $contest = ContestController::apiDetails($r);
+    $contest = \OmegaUp\Controllers\Contest::apiDetails($r);
 } catch (Exception $e) {
     header('HTTP/1.1 404 Not Found');
     die(file_get_contents('../404.html'));
 }
 
+[
+    'auth_token' => $authToken,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+
 $problems = $contest['problems'];
 foreach ($problems as &$problem) {
-    $problem['payload'] = ProblemController::apiDetails(new Request([
+    $problem['payload'] = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
         'contest_alias' => $_REQUEST['alias'],
         'problem_alias' => $problem['alias'],
-        'auth_token' => $smarty->getTemplateVars('CURRENT_USER_AUTH_TOKEN'),
+        'auth_token' => $authToken,
     ]));
 }
 

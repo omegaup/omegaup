@@ -12,19 +12,23 @@ export default {
     storeMapping: Object,
     theme: {
       type: String,
-      'default': 'vs-dark',
+      default: 'vs-dark',
     },
   },
-  data: function() {
+  data: function () {
     return {
       title: 'diff',
     };
   },
-  mounted: function() {
-    this._originalModel =
-        monaco.editor.createModel(this.originalContents, 'text/plain');
-    this._modifiedModel =
-        monaco.editor.createModel(this.modifiedContents, 'text/plain');
+  mounted: function () {
+    this._originalModel = monaco.editor.createModel(
+      this.originalContents,
+      'text/plain',
+    );
+    this._modifiedModel = monaco.editor.createModel(
+      this.modifiedContents,
+      'text/plain',
+    );
 
     this._editor = monaco.editor.createDiffEditor(this.$el, {
       theme: this.theme,
@@ -36,7 +40,9 @@ export default {
     });
   },
   methods: {
-    onResize: function() { this._editor.layout();},
+    onResize: function () {
+      this._editor.layout();
+    },
   },
   computed: {
     originalContents() {
@@ -47,8 +53,12 @@ export default {
     },
   },
   watch: {
-    originalContents: function(value) { this._originalModel.setValue(value);},
-    modifiedContents: function(value) { this._modifiedModel.setValue(value);},
+    originalContents: function (value) {
+      this._originalModel.setValue(value);
+    },
+    modifiedContents: function (value) {
+      this._modifiedModel.setValue(value);
+    },
   },
 };
 </script>

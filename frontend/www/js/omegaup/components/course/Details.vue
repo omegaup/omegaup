@@ -1,209 +1,249 @@
 <template>
-  <div class="omegaup-course-details panel-primary panel">
-    <div class="panel-heading"
-         v-if="!update">
-      <h3 class="panel-title">{{ T.courseNew }}</h3>
+  <div>
+    <h3 class="text-center">
+      {{ course.name }}
+      <a v-if="course.is_admin" v-bind:href="`/course/${course.alias}/edit/`">
+        <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+      </a>
+    </h3>
+    <div class="my-4 markdown">
+      <omegaup-markdown v-bind:markdown="course.description"></omegaup-markdown>
     </div>
-    <div class="panel-body">
-      <form class="form"
-            v-on:submit.prevent="onSubmit">
-        <div class="row">
-          <div class="form-group col-md-8">
-            <label>{{ T.wordsName }} <input class="form-control name"
-                   type="text"
-                   v-model="name"></label>
-          </div>
-          <div class="form-group col-md-4">
-            <label>{{ T.courseNewFormShortTitle_alias_ }} <span aria-hidden="true"
-                  class="glyphicon glyphicon-info-sign"
-                  data-placement="top"
-                  data-toggle="tooltip"
-                  v-bind:title="T.courseNewFormShortTitle_alias_Desc"></span> <input class=
-                  "form-control alias"
-                   type="text"
-                   v-bind:disabled="update"
-                   v-model="alias"></label>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-4">
-            <label>{{ T.courseNewFormStartDate }} <span aria-hidden="true"
-                  class="glyphicon glyphicon-info-sign"
-                  data-placement="top"
-                  data-toggle="tooltip"
-                  v-bind:title="T.courseNewFormStartDateDesc"></span> <omegaup-datepicker v-model=
-                  "startTime"></omegaup-datepicker></label>
-          </div>
-          <div class="form-group col-md-4">
-            <label>{{ T.courseNewFormEndDate }} <span aria-hidden="true"
-                  class="glyphicon glyphicon-info-sign"
-                  data-placement="top"
-                  data-toggle="tooltip"
-                  v-bind:title="T.courseNewFormEndDateDesc"></span> <omegaup-datepicker v-model=
-                  "finishTime"></omegaup-datepicker></label>
-          </div>
-          <div class="form-group col-md-4">
-            <span class="faux-label">{{ T.courseNewFormShowScoreboard }} <span aria-hidden="true"
-                  class="glyphicon glyphicon-info-sign"
-                  data-placement="top"
-                  data-toggle="tooltip"
-                  v-bind:title="T.courseNewFormShowScoreboardDesc"></span></span>
-            <div class="form-control container-fluid">
-              <label class="radio-inline"><input type="radio"
-                     v-bind:value="true"
-                     v-model="showScoreboard">{{ T.wordsYes }}</label> <label class=
-                     "radio-inline"><input type="radio"
-                     v-bind:value="false"
-                     v-model="showScoreboard">{{ T.wordsNo }}</label>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-4">
-            <label>{{ T.profileSchool }} <input autocomplete="off"
-                   class="form-control typeahead school"
-                   type="text"
-                   v-model="school_name"
-                   v-on:change="onChange"><input class="school_id"
-                   type="hidden"
-                   v-model="school_id"></label>
-          </div>
-          <div class="form-group col-md-4">
-            <span class="faux-label">{{ T.courseNewFormBasicInformationRequired }}
-            <span aria-hidden="true"
-                  class="glyphicon glyphicon-info-sign"
-                  data-placement="top"
-                  data-toggle="tooltip"
-                  v-bind:title="T.courseNewFormBasicInformationRequiredDesc"></span></span>
-            <div class="form-control container-fluid">
-              <label class="radio-inline"><input type="radio"
-                     v-bind:value="true"
-                     v-model="basic_information_required">{{ T.wordsYes }}</label> <label class=
-                     "radio-inline"><input type="radio"
-                     v-bind:value="false"
-                     v-model="basic_information_required">{{ T.wordsNo }}</label>
-            </div>
-          </div>
-          <div class="form-group col-md-4">
-            <span class="faux-label">{{ T.courseNewFormUserInformationRequired }}
-            <span aria-hidden="true"
-                  class="glyphicon glyphicon-info-sign"
-                  data-placement="top"
-                  data-toggle="tooltip"
-                  v-bind:title="T.courseNewFormUserInformationRequiredDesc"></span></span>
-                  <select class="form-control"
-                 v-model="requests_user_information">
-              <option value="no">
-                {{ T.wordsNo }}
-              </option>
-              <option value="optional">
-                {{ T.wordsOptional }}
-              </option>
-              <option value="required">
-                {{ T.wordsRequired }}
-              </option>
-            </select>
-          </div>
-          <div class="row">
-            <div class="form-group container-fluid">
-              <label>{{ T.courseNewFormDescription }}
-              <textarea class="form-control"
-                        cols="30"
-                        rows="5"
-                        v-model="description"></textarea></label>
-            </div>
-          </div>
-          <div class="form-group pull-right">
-            <button class="btn btn-primary submit"
-                 type="submit">
-            <template v-if="update">
-              {{ T.courseNewFormUpdateCourse }}
-            </template>
-            <template v-else="">
-              {{ T.courseNewFormScheduleCourse }}
-            </template></button> <button class="btn btn-secondary"
-                 type="reset"
-                 v-on:click.prevent="onCancel">{{ T.wordsCancel }}</button>
-          </div>
-        </div>
-      </form>
+    <div v-if="course.is_admin">
+      {{
+        ui.formatString(T.courseStudentCountLabel, {
+          student_count: course.student_count,
+        })
+      }}
+      <div class="mt-2">
+        <a
+          class="btn btn-primary"
+          v-bind:href="`/course/${course.alias}/students/`"
+          >{{ T.courseStudentsProgress }}</a
+        >
+        <a
+          class="ml-2 btn btn-primary"
+          v-bind:href="`/course/${course.alias}/edit/#students`"
+          >{{ T.wordsAddStudent }}</a
+        >
+      </div>
+    </div>
+    <div class="mt-4 card">
+      <h5 class="card-header">{{ T.wordsHomeworks }}</h5>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">{{ T.wordsAssignment }}</th>
+              <th class="text-center" scope="col">{{ T.wordsProgress }}</th>
+              <th class="text-center" scope="col">{{ T.wordsStartTime }}</th>
+              <th class="text-center" scope="col">{{ T.wordsEndTime }}</th>
+              <th class="text-center" scope="col" v-if="course.is_admin">
+                {{ T.courseDetailsScoreboard }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="!filteredHomeworks.length">
+              <td class="empty-table-message" colspan="5">
+                {{ T.courseAssignmentEmpty }}
+              </td>
+            </tr>
+            <tr
+              v-else=""
+              v-for="homework in filteredHomeworks"
+              v-bind:data-homework-alias="homework.alias"
+            >
+              <td>
+                <a
+                  class="text-center"
+                  v-bind:href="`/course/${course.alias}/assignment/${
+                    homework.alias
+                  }/${course.is_admin ? 'admin/' : ''}`"
+                >
+                  {{ homework.name }}
+                </a>
+              </td>
+              <td class="text-center">
+                {{ getAssignmentProgress(progress[homework.alias]) }}
+              </td>
+              <td class="text-center">
+                {{ getFormattedTime(homework.start_time) }}
+              </td>
+              <td class="text-center">
+                {{ getFormattedTime(homework.finish_time) }}
+              </td>
+              <td class="text-center" v-if="course.is_admin">
+                <a
+                  v-bind:href="`/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url}/`"
+                >
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsPublic
+                  }}</a
+                >
+                <a
+                  v-bind:href="`/course/${course.alias}/assignment/${homework.alias}/scoreboard/${homework.scoreboard_url_admin}/`"
+                >
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsAdmin
+                  }}</a
+                >
+                <a
+                  v-bind:href="`/course/${course.alias}/assignment/${homework.alias}/admin/#runs`"
+                >
+                  <font-awesome-icon v-bind:icon="['fas', 'tachometer-alt']" />
+                  {{ T.wordsRuns }}
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <a
+          data-button-homework
+          class="btn btn-primary float-right"
+          v-if="course.is_admin"
+          v-bind:href="`/course/${course.alias}/edit/#assignments/new/homework/`"
+          >{{ T.wordsNewHomework }}</a
+        >
+      </div>
+    </div>
+    <div class="card mt-5">
+      <h5 class="card-header">{{ T.wordsExams }}</h5>
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">{{ T.wordsExam }}</th>
+              <th class="text-center" scope="col">{{ T.wordsProgress }}</th>
+              <th class="text-center" scope="col">{{ T.wordsStartTime }}</th>
+              <th class="text-center" scope="col">{{ T.wordsEndTime }}</th>
+              <th class="text-center" scope="col" v-if="course.is_admin">
+                {{ T.courseDetailsScoreboard }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="!filteredExams.length">
+              <td class="empty-table-message" colspan="5">
+                {{ T.courseExamEmpty }}
+              </td>
+            </tr>
+            <tr v-else="" v-for="exam in filteredExams">
+              <td>
+                <a
+                  class="text-center"
+                  v-bind:href="`/course/${course.alias}/assignment/${
+                    exam.alias
+                  }/${course.is_admin ? 'admin/' : ''}`"
+                >
+                  {{ exam.name }}
+                </a>
+              </td>
+              <td class="text-center">
+                {{ getAssignmentProgress(progress[exam.alias]) }}
+              </td>
+              <td class="text-center">
+                {{ getFormattedTime(exam.start_time) }}
+              </td>
+              <td class="text-center">
+                {{ getFormattedTime(exam.finish_time) }}
+              </td>
+              <td class="text-center" v-if="course.is_admin">
+                <a
+                  v-bind:href="`/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url}/`"
+                >
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsPublic
+                  }}</a
+                >
+                <a
+                  v-bind:href="`/course/${course.alias}/assignment/${exam.alias}/scoreboard/${exam.scoreboard_url_admin}/`"
+                >
+                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                    T.wordsAdmin
+                  }}</a
+                >
+                <a
+                  v-bind:href="`/course/${course.alias}/assignment/${exam.alias}/admin/#runs`"
+                >
+                  <font-awesome-icon v-bind:icon="['fas', 'tachometer-alt']" />
+                  {{ T.wordsRuns }}
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <a
+          data-button-exam
+          class="btn btn-primary float-right"
+          v-if="course.is_admin"
+          v-bind:href="`/course/${course.alias}/edit/#assignments/new/test/`"
+          >{{ T.wordsNewExam }}</a
+        >
+      </div>
     </div>
   </div>
 </template>
 
-<script>
-import UI from '../../ui.js';
-import DatePicker from '../DatePicker.vue';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as ui from '../../ui';
+import * as time from '../../time';
+import { types } from '../../api_types';
 
-export default {
-  props: {
-    T: Object,
-    update: Boolean,
-    course: Object,
-  },
-  data: function() {
-    return {
-      alias: this.course.alias,
-      description: this.course.description,
-      finishTime: this.course.finish_time || new Date(),
-      showScoreboard: !!this.course.show_scoreboard,
-      startTime: this.course.start_time || new Date(),
-      name: this.course.name,
-      school_id: this.course.school_id,
-      school_name: this.course.school_name,
-      basic_information_required: !!this.course.basic_information_required,
-      requests_user_information: this.course.requests_user_information || 'no'
-    };
-  },
-  mounted: function() {
-    let self = this;
-    UI.schoolTypeahead($('input.typeahead', self.$el), function(event, item) {
-      self.school_name = item.value;
-      self.school_id = item.id;
-    });
-  },
-  watch: {
-    course: function(val) { this.reset();},
-  },
-  methods: {
-    reset: function() {
-      this.alias = this.course.alias;
-      this.description = this.course.description;
-      this.finishTime = this.course.finish_time || new Date();
-      this.showScoreboard = !!this.course.show_scoreboard;
-      this.startTime = this.course.start_time || new Date();
-      this.name = this.course.name;
-      this.school_id = this.course.school_id;
-      this.school_name = this.course.school_name;
-      this.basic_information_required =
-          !!this.course.basic_information_required;
-      this.requests_user_information =
-          this.course.requests_user_information || 'no';
-    },
-    onSubmit: function() { this.$emit('submit', this);},
-    onCancel: function() {
-      this.reset();
-      this.$emit('cancel');
-    },
-    onChange: function() {
-      if (this.course.school_id == this.school_id) {
-        this.school_id = null;
-      } else {
-        this.course.school_id = this.school_id;
-      }
-    }
-  },
+import omegaup_Markdown from '../Markdown.vue';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faEdit,
+  faLink,
+  faTachometerAlt,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faLink, faTachometerAlt);
+
+@Component({
   components: {
-    'omegaup-datepicker': DatePicker,
+    FontAwesomeIcon,
+    'omegaup-markdown': omegaup_Markdown,
   },
-};
-</script>
+})
+export default class CourseDetails extends Vue {
+  @Prop() course!: omegaup.Course;
+  @Prop() progress!: types.AssignmentProgress[];
 
-<style>
-.omegaup-course-details .form-group>label {
-  width: 100%;
+  T = T;
+  ui = ui;
+
+  get filteredHomeworks(): omegaup.Assignment[] {
+    return this.course.assignments.filter(
+      (assignment) => assignment.assignment_type === 'homework',
+    );
+  }
+
+  get filteredExams(): omegaup.Assignment[] {
+    return this.course.assignments.filter(
+      (assignment) => assignment.assignment_type === 'test',
+    );
+  }
+
+  getAssignmentProgress(progress: types.Progress): string {
+    const percent = (progress.score / progress.max_score) * 100;
+    const percentText = progress.max_score === 0 ? '--:--' : percent.toFixed(2);
+    return progress.max_score === 0 ? percentText : `${percentText}%`;
+  }
+
+  getFormattedTime(date: Date | null): string {
+    if (date === null) {
+      return '—';
+    }
+    return time.formatDateTime(date);
+  }
 }
-.omegaup-course-details .faux-label {
-  font-weight: bold;
-}
-</style>
+</script>

@@ -1,14 +1,19 @@
-omegaup.OmegaUp.on('ready', function() {
-  var arena = new omegaup.arena.Arena({
-    contestAlias:
-        /\/interview\/([^\/]+)\/arena/.exec(window.location.pathname)[1],
-    isInterview: true
+omegaup.OmegaUp.on('ready', function () {
+  var arenaInstance = new arena.Arena({
+    contestAlias: /\/interview\/([^\/]+)\/arena/.exec(
+      window.location.pathname,
+    )[1],
+    isInterview: true,
   });
-  var admin = null;
 
-  omegaup.API.Interview.details({interview_alias: arena.options.contestAlias})
-      .then(arena.problemsetLoaded.bind(arena))
-      .fail(omegaup.UI.apiError);
+  omegaup.API.Interview.details({
+    interview_alias: arenaInstance.options.contestAlias,
+  })
+    .then(arenaInstance.problemsetLoaded.bind(arenaInstance))
+    .catch(arenaInstance.problemsetLoadedError.bind(arenaInstance));
 
-  window.addEventListener('hashchange', arena.onHashChanged.bind(arena));
+  window.addEventListener(
+    'hashchange',
+    arenaInstance.onHashChanged.bind(arenaInstance),
+  );
 });

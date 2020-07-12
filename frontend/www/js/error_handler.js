@@ -36,7 +36,7 @@ function sendError(message, filename, lineno, colno, error) {
   // Try to send the error.
   try {
     var httpRequest = new XMLHttpRequest();
-    httpRequest.onreadystatechange = function() {
+    httpRequest.onreadystatechange = function () {
       if (httpRequest.readyState !== XMLHttpRequest.DONE) return;
       if (httpRequest.status === 200) return;
 
@@ -63,10 +63,15 @@ function sendError(message, filename, lineno, colno, error) {
 if (window.addEventListener) {
   // Way too old browsers (IE8) don't even support window.addEventListener.
   // Let's stop making it worse for them and just silently degrade.
-  window.addEventListener('error', function(event) {
+  window.addEventListener('error', function (event) {
     'use strict';
-    sendError(event.message, event.filename, event.lineno, event.colno,
-              event.error);
+    sendError(
+      event.message,
+      event.filename,
+      event.lineno,
+      event.colno,
+      event.error,
+    );
     return true;
   });
 }

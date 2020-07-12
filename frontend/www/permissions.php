@@ -7,29 +7,48 @@ if (!OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT) {
     die();
 }
 
-UITools::redirectToLoginIfNotLoggedIn();
+\OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 
-$r = new Request($_REQUEST);
-$session = SessionController::apiCurrentSession($r)['session'];
+[
+    'user' => $user,
+    'identity' => $identity,
+] = \OmegaUp\Controllers\Session::getCurrentSession();
+if (
+    is_null($user) ||
+    is_null($user->user_id) ||
+    is_null($identity) ||
+    is_null($identity->username)
+) {
+    header('HTTP/1.1 404 Not found');
+    die();
+}
 
-$systemRoles = UserRolesDAO::getSystemRoles($session['user']->user_id);
-$roles = RolesDAO::getAll();
-$systemGroups = UserRolesDAO::getSystemGroups($session['user']->user_id);
-$groups = GroupsDAO::SearchByName('omegaup:');
+$systemRoles = \OmegaUp\DAO\UserRoles::getSystemRoles(
+    $user->user_id
+);
+$roles = \OmegaUp\DAO\Roles::getAll();
+$systemGroups = \OmegaUp\DAO\UserRoles::getSystemGroups(
+    $user->user_id
+);
+$groups = \OmegaUp\DAO\Groups::SearchByName('omegaup:');
 $userSystemRoles = [];
 $userSystemGroups = [];
 foreach ($roles as $key => $role) {
-    $userSystemRoles[$key]['title'] = $role->name;
-    $userSystemRoles[$key]['value'] = in_array($role->name, $systemRoles);
+    $userSystemRoles[$key] = [
+        'name' => $role->name,
+        'value' => in_array($role->name, $systemRoles),
+    ];
 }
 foreach ($groups as $key => $group) {
-    $userSystemGroups[$key]['title'] = $group->name;
-    $userSystemGroups[$key]['value'] = in_array($group->name, $systemGroups);
+    $userSystemGroups[$key] = [
+        'name' => $group->name,
+        'value' => in_array($group->name, $systemGroups),
+    ];
 }
 $payload = [
     'userSystemRoles' => $userSystemRoles,
     'userSystemGroups' => $userSystemGroups,
-    'username' => $session['user']->username,
+    'username' => $identity->username,
 ];
 
 $smarty->assign('payload', $payload);

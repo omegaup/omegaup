@@ -1,23 +1,19 @@
 <template>
-  <div class="alert alert-warning"
-       name="notice"
-       v-if="show">
-    {{ UI.formatString(T.coderOfTheMonthNotice, {username: coderUsername}) }}
+  <div class="alert alert-warning" name="notice">
+    {{ ui.formatString(T.coderOfTheMonthNotice, { username: coderUsername }) }}
   </div>
 </template>
 
-<script>
-import {T} from '../../omegaup.js';
-import UI from '../../ui.js';
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import * as ui from '../../ui';
 
-export default {
-  props: {coderUsername: String, currentUsername: String},
-  computed: {
-    show() {
-      return this.currentUsername && this.coderUsername &&
-             this.coderUsername == this.currentUsername;
-    }
-  },
-  data: function() { return {T: T, UI: UI};},
-};
+@Component
+export default class CoderOfTheMonthNotice extends Vue {
+  @Prop() coderUsername!: string;
+
+  T = T;
+  ui = ui;
+}
 </script>

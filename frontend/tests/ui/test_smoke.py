@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+# type: ignore
 
 '''Run Selenium end-to-end tests.'''
 
 import os
-
-import pytest
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -38,49 +37,48 @@ def test_login(driver):
         pass
 
 
-@pytest.mark.skipif(util.CI,
-                    reason='https://github.com/omegaup/omegaup/issues/2110')
+@util.no_javascript_errors()
+@util.annotate
+def test_js_errors(driver):
+    '''Tests assert{,_no}_js_errors().'''
+
+    # console.log() is not considered an error.
+    with util.assert_no_js_errors(driver):
+        driver.browser.execute_script('console.log("foo");')
+
+    if driver.browser_name != 'firefox':
+        # Firefox does not support this.
+        with util.assert_js_errors(driver, expected_messages=('bar', )):
+            driver.browser.execute_script('console.error("bar");')
+
+        with util.assert_no_js_errors(driver):
+            # Within an asset_js_error() context manager, messages should not
+            # be bubbled up.
+            with util.assert_js_errors(driver, expected_messages=('baz', )):
+                driver.browser.execute_script('console.error("baz");')
+
+
 @util.no_javascript_errors()
 @util.annotate
 def test_create_problem(driver):
     '''Tests creating a public problem and retrieving it.'''
 
-    problem_alias = 'unittest_problem_%s' % driver.generate_id()
+    problem_alias = 'ut_problem_%s' % driver.generate_id()
     create_problem(driver, problem_alias)
 
     with driver.login_user():
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.ID, 'nav-problems'))).click()
-        with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//li[@id = "nav-problems"]'
-                      '//a[@href = "/problem/"]')))).click()
-
-        search_box_element = driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.ID, 'problem-search-box')))
-        search_box_element.send_keys(problem_alias)
-        with driver.page_transition():
-            search_box_element.submit()
-
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 '//a[text() = "%s"]' % problem_alias))).click()
+        prepare_run(driver, problem_alias)
         assert (problem_alias in driver.browser.find_element_by_xpath(
             '//h1[@class="title"]').get_attribute('innerText'))
 
-        runs_before_submit = driver.browser.find_elements_by_xpath(
-            '//td[@class="status"]')
+        runs_before_submit = driver.browser.find_elements_by_css_selector(
+            'td[data-run-status]')
 
         filename = 'Main.java'
         util.create_run(driver, problem_alias, filename)
 
-        runs_after_submit = driver.browser.find_elements_by_xpath(
-            '//td[@class="status"]')
+        runs_after_submit = driver.browser.find_elements_by_css_selector(
+            'td[data-run-status]')
 
         assert len(runs_before_submit) + 1 == len(runs_after_submit)
 
@@ -108,6 +106,45 @@ def test_create_problem(driver):
                     assert (row in textarea.text), row
 
         driver.browser.find_element_by_id('overlay').click()
+        driver.update_score(problem_alias)
+
+    with driver.login_user():
+        prepare_run(driver, problem_alias)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//div[contains(concat(" ", normalize-space(@class), " "), '
+                 '" qualitynomination-popup ")]/form[contains(concat(" ", '
+                 'normalize-space(@class), " "), " popup ")]')))
+
+
+@util.annotate
+@util.no_javascript_errors()
+def prepare_run(driver, problem_alias):
+    ''' Entering to a problem page to create a submission.'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-problems]'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 'a[data-nav-problems-all]'))).click()
+
+    search_box_element = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             'input.tt-input[name="query"]')))
+    search_box_element.send_keys(problem_alias)
+    with driver.page_transition():
+        search_box_element.submit()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//a[text() = "%s"]' % problem_alias))).click()
 
 
 @util.annotate
@@ -117,22 +154,26 @@ def create_problem(driver, problem_alias):
     with driver.login_admin():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'nav-problems'))).click()
+                (By.CSS_SELECTOR,
+                 'a[data-nav-problems]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH,
-                     ('//li[@id = "nav-problems"]'
-                      '//a[@href = "/problem/new/"]')))).click()
+                    (By.CSS_SELECTOR,
+                     'a[data-nav-problems-create]'))).click()
 
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//input[@name = "alias"]'))).send_keys(problem_alias)
-        driver.wait.until(
-            EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//input[@name = "title"]'))).send_keys(problem_alias)
+        with util.assert_js_errors(
+                driver,
+                expected_messages=('/api/problem/details/',)
+        ):
+            driver.wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH,
+                     '//input[@name = "alias"]'))).send_keys(problem_alias)
+            driver.wait.until(
+                EC.visibility_of_element_located(
+                    (By.XPATH,
+                     '//input[@name = "title"]'))).send_keys(problem_alias)
         input_limit = driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
@@ -143,7 +184,8 @@ def create_problem(driver, problem_alias):
         driver.browser.find_element_by_name('source').send_keys('test')
         # Make the problem public
         driver.browser.find_element_by_xpath(
-            '//input[@name="visibility" and @value = "1"]').click()
+            '//input[@type = "radio" and @name = "visibility" and @value = '
+            '"true"]').click()
         contents_element = driver.browser.find_element_by_name(
             'problem_contents')
         contents_element.send_keys(os.path.join(
