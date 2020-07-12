@@ -27,7 +27,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Create course hot path
      */
     public function testCreateSchoolCourse() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $r = new \OmegaUp\Request([
@@ -56,20 +56,18 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Create course with unlimited duration
      */
     public function testCreateCourseWithUnlimitedDuration() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
         $name = \OmegaUp\Test\Utils::createRandomString();
-        $response = \OmegaUp\Controllers\Course::apiCreate(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'name' => $name,
-                'alias' => \OmegaUp\Test\Utils::createRandomString(),
-                'description' => \OmegaUp\Test\Utils::createRandomString(),
-                'start_time' => (\OmegaUp\Time::get() + 60),
-                'unlimited_duration' => true,
-            ])
-        );
+        $response = \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $name,
+            'alias' => \OmegaUp\Test\Utils::createRandomString(),
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'unlimited_duration' => true,
+        ]));
 
         $courses = \OmegaUp\DAO\Courses::findByName(
             $name
@@ -306,12 +304,10 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
         $adminLogin = self::login($courseData['admin']);
-        $response = \OmegaUp\Controllers\Course::apiListAssignments(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'course_alias' => $courseData['course_alias']
-            ])
-        );
+        $response = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias']
+        ]));
 
         $this->assertEquals(1, count($response['assignments']));
 
@@ -321,18 +317,16 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $adminLogin = self::login($courseData['admin']);
-        $response = \OmegaUp\Controllers\Course::apiListAssignments(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'course_alias' => $courseData['course_alias']
-            ])
-        );
+        $response = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'course_alias' => $courseData['course_alias']
+        ]));
 
         $this->assertEquals(5, count($response['assignments']));
     }
 
     public function testDuplicateAssignmentAliases() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
@@ -380,7 +374,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Try to create an assignment with inverted times.
      */
     public function testCreateAssignmentWithInvertedTimes() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
         $courseData = \OmegaUp\Test\Factories\Course::createCourse(
             $identity,
@@ -405,7 +399,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testCreateAssignmentWithUnlimitedDuration() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
@@ -419,17 +413,15 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Try to create an assignment with unlimited duration
         // in a non unlimited duration course.
         try {
-            \OmegaUp\Controllers\Course::apiCreateAssignment(
-                new \OmegaUp\Request([
-                    'auth_token' => $adminLogin->auth_token,
-                    'name' => \OmegaUp\Test\Utils::createRandomString(),
-                    'alias' => \OmegaUp\Test\Utils::createRandomString(),
-                    'description' => \OmegaUp\Test\Utils::createRandomString(),
-                    'course_alias' => $courseData['course_alias'],
-                    'assignment_type' => 'homework',
-                    'start_time' => (\OmegaUp\Time::get() + 120),
-                ])
-            );
+            \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'course_alias' => $courseData['course_alias'],
+                'assignment_type' => 'homework',
+                'start_time' => (\OmegaUp\Time::get() + 120),
+            ]));
             $this->fail('Should have thrown exception');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterEmpty', $e->getMessage());
@@ -559,7 +551,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * Test updating show_scoreboard attribute in the Course object
      */
     public function testUpdateCourseShowScoreboard() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         // Creating a course with one assignment and turning on show_scoreboard flag
@@ -577,16 +569,12 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identityUser] = \OmegaUp\Test\Factories\User::createUser();
 
         // User linked to course
-        [
-            'identity' => $identityStudent,
-        ] = \OmegaUp\Test\Factories\User::createUser();
-        $response = \OmegaUp\Controllers\Course::apiAddStudent(
-            new \OmegaUp\Request([
-                'auth_token' => $adminLogin->auth_token,
-                'usernameOrEmail' => $identityStudent->username,
-                'course_alias' => $courseData['course_alias'],
-            ])
-        );
+        ['user' => $student, 'identity' => $identityStudent] = \OmegaUp\Test\Factories\User::createUser();
+        $response = \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $identityStudent->username,
+            'course_alias' => $courseData['course_alias'],
+        ]));
 
         $course = \OmegaUp\DAO\Courses::getByPK(
             $courseData['request']['course']->course_id
@@ -635,7 +623,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testUpdateCourseFinishTime() {
-        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['user' => $admin, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
 
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
