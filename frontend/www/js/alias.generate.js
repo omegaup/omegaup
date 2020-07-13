@@ -826,7 +826,7 @@ var latin_map = {
   ₓ: 'x',
 };
 function latinize(str) {
-  return str.replace(/[^A-Za-z0-9\[\] ]/g, function(a) {
+  return str.replace(/[^A-Za-z0-9\[\] ]/g, function (a) {
     return latin_map[a] || a;
   });
 }
@@ -846,7 +846,7 @@ function generateAlias(title, aliasLength) {
   return title;
 }
 
-omegaup.OmegaUp.on('ready', function() {
+omegaup.OmegaUp.on('ready', function () {
   var formData = $('#form-data');
   var formName = formData.attr('data-name');
   var existsFn = null;
@@ -875,7 +875,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   switch (formName) {
     case 'problems':
-      existsFn = function(alias) {
+      existsFn = function (alias) {
         omegaup.API.Problem.details({ problem_alias: alias }, { quiet: true })
           .then(onAliasReady)
           .catch(onAliasError);
@@ -884,7 +884,7 @@ omegaup.OmegaUp.on('ready', function() {
       break;
 
     case 'groups':
-      existsFn = function(alias) {
+      existsFn = function (alias) {
         omegaup.API.Group.details({ group_alias: alias }, { quiet: true })
           .then(onAliasReady)
           .catch(onAliasError);
@@ -893,7 +893,7 @@ omegaup.OmegaUp.on('ready', function() {
       break;
 
     case 'interviews':
-      existsFn = function(alias) {
+      existsFn = function (alias) {
         omegaup.API.Interview.details(
           { interview_alias: alias },
           { quiet: true },
@@ -905,13 +905,13 @@ omegaup.OmegaUp.on('ready', function() {
       break;
   }
 
-  $('#title').on('blur', function() {
+  $('#title').on('blur', function () {
     $('#alias')
       .val(generateAlias($(this).val(), aliasLength))
       .trigger('change');
   });
 
-  $('#alias').on('change', function() {
+  $('#alias').on('change', function () {
     existsFn($('#alias').val());
   });
 });

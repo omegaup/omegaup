@@ -15,20 +15,20 @@
         </div>
         <div class="col-md-4">
           <omegaup-autocomplete
-            v-bind:init="el => typeahead.problemTypeahead(el)"
+            v-bind:init="(el) => typeahead.problemTypeahead(el)"
             v-model="queryProblem"
             v-bind:placeholder="T.wordsKeyword"
             class="form-control"
             v-show="selectColumn == 'problem_alias'"
           ></omegaup-autocomplete>
           <omegaup-autocomplete
-            v-bind:init="el => typeahead.userTypeahead(el)"
+            v-bind:init="(el) => typeahead.userTypeahead(el)"
             v-model="queryUsername"
             v-bind:placeholder="T.wordsKeyword"
             class="form-control"
             v-show="
               selectColumn == 'nominator_username' ||
-                selectColumn == 'author_username'
+              selectColumn == 'author_username'
             "
           ></omegaup-autocomplete>
         </div>
@@ -45,7 +45,7 @@
     <div class="card">
       <h3 class="card-header">
         {{
-          UI.formatString(T.nominationsRangeHeader, {
+          ui.formatString(T.nominationsRangeHeader, {
             lowCount: (pages - 1) * length + 1,
             highCount: pages * length,
           })
@@ -114,7 +114,8 @@
       <omegaup-common-paginator
         v-bind:pager-items="pagerItems"
         v-on:page-changed="
-          page => $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
+          (page) =>
+            $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
         "
       ></omegaup-common-paginator>
     </div>
@@ -125,7 +126,7 @@
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import common_Paginator from '../common/Paginatorv2.vue';
 import { types } from '../../api_types';
 import Autocomplete from '../Autocomplete.vue';
@@ -147,7 +148,7 @@ export default class QualityNominationList extends Vue {
 
   showAll = true;
   T = T;
-  UI = UI;
+  ui = ui;
   typeahead = typeahead;
 
   queryProblem = '';

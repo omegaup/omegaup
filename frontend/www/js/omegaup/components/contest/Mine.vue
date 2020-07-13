@@ -78,23 +78,19 @@
                 />
                 <div class="d-inline-block ml-2">
                   <a class="mr-1" v-bind:href="`/arena/${contest.alias}/`">{{
-                    UI.contestTitle(contest)
+                    ui.contestTitle(contest)
                   }}</a>
                 </div>
               </td>
               <td>
                 <a
-                  v-bind:href="
-                    `https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`
-                  "
+                  v-bind:href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`"
                   >{{ time.formatDateTime(contest.start_time) }}</a
                 >
               </td>
               <td>
                 <a
-                  v-bind:href="
-                    `https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`
-                  "
+                  v-bind:href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`"
                   >{{ time.formatDateTime(contest.finish_time) }}</a
                 >
               </td>
@@ -103,9 +99,7 @@
               </td>
               <td>
                 <a
-                  v-bind:href="
-                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`
-                  "
+                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
                   v-if="contest.scoreboard_url"
                 >
                   <font-awesome-icon
@@ -115,9 +109,7 @@
                 </a>
                 <a
                   class="ml-1"
-                  v-bind:href="
-                    `/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`
-                  "
+                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
                   v-if="contest.scoreboard_url_admin"
                 >
                   <font-awesome-icon
@@ -133,7 +125,10 @@
                     v-bind:icon="['fas', 'edit']"
                   />
                 </a>
-                <a class="ml-2" v-bind:href="`/arena/${contest.alias}/admin/`">
+                <a
+                  class="ml-2"
+                  v-bind:href="`/arena/${contest.alias}/admin/#runs`"
+                >
                   <font-awesome-icon
                     v-bind:title="T.contestListSubmissions"
                     v-bind:icon="['fas', 'tachometer-alt']"
@@ -187,7 +182,7 @@ import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import * as time from '../../time';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -221,7 +216,7 @@ export default class List extends Vue {
   @Prop() privateContestsAlert!: boolean;
 
   T = T;
-  UI = UI;
+  ui = ui;
   time = time;
   shouldShowAllContests = false;
   allContestsVisibilityOption = 'none';

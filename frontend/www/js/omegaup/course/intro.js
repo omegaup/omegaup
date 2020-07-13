@@ -1,16 +1,16 @@
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import course_Intro from '../components/course/Intro.vue';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let coursePayload = JSON.parse(
     document.getElementById('course-payload').innerText,
   );
   let courseIntro = new Vue({
     el: '#course-intro',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('course-intro', {
         props: {
           name: this.name,
@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
           userRegistrationAccepted: this.userRegistrationAccepted,
         },
         on: {
-          submit: ev => {
+          submit: (ev) => {
             api.Course.addStudent({
               course_alias: coursePayload.alias,
               usernameOrEmail: coursePayload.currentUsername,
@@ -36,17 +36,17 @@ OmegaUp.on('ready', function() {
                 coursePayload.statements.acceptTeacher.gitObjectId,
               statement_type: coursePayload.statements.privacy.statementType,
             })
-              .then(data => {
+              .then((data) => {
                 window.location.replace(`/course/${coursePayload.alias}/`);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'request-access-course': () => {
             api.Course.registerForCourse({ course_alias: coursePayload.alias })
               .then(() => {
                 courseIntro.userRegistrationRequested = true;
               })
-              .catch(UI.error);
+              .catch(ui.error);
           },
         },
       });

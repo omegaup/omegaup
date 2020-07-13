@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
   const headerPayload = types.payloadParsers.CommonPayload();
   const contestIntro = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-contest-intro', {
         props: {
           requestsUserInformation: payload.requestsUserInformation,

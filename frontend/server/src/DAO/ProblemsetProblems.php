@@ -103,7 +103,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     /**
      * Get problemset problems including problemset alias, points, and order
      *
-     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByProblemset(
         int $problemsetId
@@ -117,6 +117,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     p.visits,
                     p.submissions,
                     p.accepted,
+                    p.quality_seal,
+                    p.input_limit,
                     IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
                     p.languages,
@@ -134,7 +136,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]
@@ -142,7 +144,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
     }
 
     /**
-     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>
+     * @return list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>
      */
     final public static function getProblemsByAssignmentAlias(
         string $assignmentAlias,
@@ -157,6 +159,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                     p.visits,
                     p.submissions,
                     p.accepted,
+                    p.quality_seal,
+                    p.input_limit,
                     IFNULL(p.difficulty, 0.0) AS difficulty,
                     pp.order,
                     p.languages,
@@ -183,8 +187,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 ORDER BY
                     pp.order, pp.problem_id ASC;';
 
-        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}> */
-        return  \OmegaUp\MySQLConnection::getInstance()->GetAll(
+        /** @var list<array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$assignmentAlias, $courseAlias]
         );

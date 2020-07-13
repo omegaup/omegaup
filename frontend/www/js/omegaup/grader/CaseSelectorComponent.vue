@@ -96,14 +96,14 @@ export default {
     store: Object,
     storeMapping: Object,
   },
-  data: function() {
+  data: function () {
     return {
       newCaseWeight: 1,
       newCaseName: '',
     };
   },
   computed: {
-    summary: function() {
+    summary: function () {
       if (
         this.store.state.dirty ||
         !this.store.state.results ||
@@ -117,7 +117,7 @@ export default {
         this.score(this.store.state.results)
       );
     },
-    groups: function() {
+    groups: function () {
       const flatCases = Util.vuexGet(this.store, this.storeMapping.cases);
       let resultMap = {};
       for (let caseName in flatCases) {
@@ -162,13 +162,13 @@ export default {
     },
   },
   methods: {
-    caseResult: function(caseName) {
+    caseResult: function (caseName) {
       let flatCaseResults = this.store.getters.flatCaseResults;
       if (this.store.state.dirty || !flatCaseResults.hasOwnProperty(caseName))
         return null;
       return flatCaseResults[caseName];
     },
-    groupResult: function(groupName) {
+    groupResult: function (groupName) {
       let results = this.store.state.results;
       if (this.store.state.dirty || !results || !results.groups) return null;
       for (let group of results.groups) {
@@ -176,7 +176,7 @@ export default {
       }
       return null;
     },
-    verdictLabel: function(result) {
+    verdictLabel: function (result) {
       if (!result) return '…';
       if (typeof result.verdict === 'undefined') {
         if (result.contest_score == result.max_score) return '✓';
@@ -196,11 +196,11 @@ export default {
       }
       return '  ☹';
     },
-    verdictClass: function(result) {
+    verdictClass: function (result) {
       if (!result) return '';
       return result.verdict;
     },
-    verdictTooltip: function(result) {
+    verdictTooltip: function (result) {
       if (!result) return '';
       let tooltip = '';
       if (typeof result.verdict !== 'undefined') {
@@ -208,7 +208,7 @@ export default {
       }
       return tooltip + this.score(result);
     },
-    score: function(result) {
+    score: function (result) {
       if (!result) return '…';
       return (
         this.formatNumber(result.contest_score) +
@@ -216,15 +216,15 @@ export default {
         this.formatNumber(result.max_score)
       );
     },
-    formatNumber: function(value) {
+    formatNumber: function (value) {
       let str = value.toFixed(2);
       if (str.endsWith('.00')) return str.substring(0, str.length - 3);
       return str;
     },
-    selectCase: function(name) {
+    selectCase: function (name) {
       this.currentCase = name;
     },
-    createCase: function() {
+    createCase: function () {
       if (!this.newCaseName) return;
       this.store.commit('createCase', {
         name: this.newCaseName,
@@ -234,7 +234,7 @@ export default {
       this.newCaseWeight = 1;
       this.newCaseName = '';
     },
-    removeCase: function(name) {
+    removeCase: function (name) {
       this.store.commit('removeCase', name);
     },
   },

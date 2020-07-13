@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <div class="text-center">
-        <h2>{{ UI.contestTitle(contest) }}</h2>
+        <h2>{{ ui.contestTitle(contest) }}</h2>
         <div>
           <span>{{ contest.start_time.long() }}</span>
           <span>-</span>
@@ -26,7 +26,7 @@
               v-on:submit.prevent="onStartContest"
               v-if="
                 contest.admission_mode !== 'registration' ||
-                  contest.user_registration_accepted
+                contest.user_registration_accepted
               "
             >
               <p
@@ -141,7 +141,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import omegaup_Countdown from '../Countdown.vue';
 
 @Component({
@@ -157,7 +157,7 @@ export default class ContestIntro extends Vue {
   @Prop() statement!: types.PrivacyStatement;
 
   T = T;
-  UI = UI;
+  ui = ui;
   penaltyTypes = {
     none: T.contestNewFormNoPenalty,
     problem_open: T.contestNewFormByProblem,
@@ -178,7 +178,7 @@ export default class ContestIntro extends Vue {
   }
 
   get differentStartsDescription(): string {
-    return UI.formatString(T.contestIntroDifferentStarts, {
+    return ui.formatString(T.contestIntroDifferentStarts, {
       window_length: this.formatTimeInRules(this.contest?.window_length ?? 0),
     });
   }
@@ -199,7 +199,7 @@ export default class ContestIntro extends Vue {
         ((contest.finish_time.getTime() - contest.start_time.getTime()) /
           60000),
     );
-    return UI.formatString(T.contestIntroScoreboardTimePercent, {
+    return ui.formatString(T.contestIntroScoreboardTimePercent, {
       window_length: this.formatTimeInRules(minutesPercentage),
     });
   }
@@ -208,19 +208,19 @@ export default class ContestIntro extends Vue {
     if (!this.contest.submissions_gap) {
       return '';
     }
-    return UI.formatString(T.contestIntroSubmissionsSeparationDesc, {
+    return ui.formatString(T.contestIntroSubmissionsSeparationDesc, {
       window_length: this.formatTimeInRules(this.contest.submissions_gap / 60),
     });
   }
 
   get penaltyDescription(): string {
-    return UI.formatString(T.contestIntroPenaltyDesc, {
+    return ui.formatString(T.contestIntroPenaltyDesc, {
       window_length: this.formatTimeInRules(this.contest.penalty),
     });
   }
 
   get pointsDecayDescription(): string {
-    return UI.formatString(T.contestNewFormDecrementFactor, {
+    return ui.formatString(T.contestNewFormDecrementFactor, {
       window_length: this.contest.points_decay_factor,
     });
   }

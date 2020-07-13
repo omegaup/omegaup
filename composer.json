@@ -4,12 +4,12 @@
   "license": "BSD-3-Clause",
   "config": {
     "platform": {
-      "php": "7.2.19"
+      "php": "7.4.3"
     },
     "process-timeout": 1200
   },
   "require-dev": {
-      "vimeo/psalm": "3.11.2",
+      "vimeo/psalm": "^3.12.2",
       "jetbrains/phpstorm-stubs": "^2019.3",
       "phpunit/phpunit": "^8.5.2"
   },

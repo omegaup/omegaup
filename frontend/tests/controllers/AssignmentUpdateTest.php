@@ -254,7 +254,7 @@ class AssignmentUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create a course with a different courseDuration of 180.
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment(
-            /*$admin=*/ null,
+            /*$admin=*/            null,
             /*$adminLogin=*/ null,
             /*$accessMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
             /*$requestsUserInformation=*/ 'no',

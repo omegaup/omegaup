@@ -3,7 +3,7 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import * as CSV from '@/third_party/js/csv.js/csv.js';
 import contest_Mine from '../components/contest/Mine.vue';
 
@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
   let showAllContests = false;
   const contestMine = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-contest-mine', {
         props: {
           contests: this.contests,
@@ -36,10 +36,10 @@ OmegaUp.on('ready', () => {
               ),
             )
               .then(() => {
-                UI.success(T.updateItemsSuccess);
+                ui.success(T.updateItemsSuccess);
               })
-              .catch(error => {
-                UI.error(UI.formatString(T.bulkOperationError, error));
+              .catch((error) => {
+                ui.error(ui.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
                 fillContestsTable(showAllContests);
@@ -49,7 +49,7 @@ OmegaUp.on('ready', () => {
             api.Contest.contestants({
               contest_alias: contestAlias,
             })
-              .then(result => {
+              .then((result) => {
                 if (!result.contestants) {
                   return;
                 }
@@ -87,7 +87,7 @@ OmegaUp.on('ready', () => {
 
                 link.click(); // This will download the data
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -102,9 +102,9 @@ OmegaUp.on('ready', () => {
 
   function fillContestsTable(showAllContests: boolean): void {
     (showAllContests ? api.Contest.adminList() : api.Contest.myList())
-      .then(result => {
+      .then((result) => {
         contestMine.contests = result.contests;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 });

@@ -26,16 +26,16 @@
         <label
           ><omegaup-autocomplete
             class="form-control"
-            v-bind:init="el => typeahead.userTypeahead(el)"
+            v-bind:init="(el) => typeahead.userTypeahead(el)"
             v-model="searchedUsername"
           ></omegaup-autocomplete
         ></label>
         <a
           class="btn btn-primary"
           type="button"
-          v-bind:href="
-            `/submissions/${encodeURIComponent(this.searchedUsername)}/`
-          "
+          v-bind:href="`/submissions/${encodeURIComponent(
+            this.searchedUsername,
+          )}/`"
         >
           {{ T.searchUser }}
         </a>

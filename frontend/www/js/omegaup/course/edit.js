@@ -11,20 +11,20 @@ import course_Clone from '../components/course/Clone.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import API from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import Sortable from 'sortablejs';
 import Clipboard from 'v-clipboard';
 
 Vue.directive('Sortable', {
-  inserted: function(el, binding) {
+  inserted: function (el, binding) {
     new Sortable(el, binding.value || {});
   },
 });
 Vue.use(Clipboard);
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let vuePath = [];
   if (window.location.hash) {
     vuePath = window.location.hash.split('/');
@@ -33,7 +33,7 @@ OmegaUp.on('ready', function() {
       .tab('show');
   }
 
-  $('#sections').on('click', 'a', function(e) {
+  $('#sections').on('click', 'a', function (e) {
     e.preventDefault();
     // add this line
     var tabName = $(this).attr('href');
@@ -73,38 +73,38 @@ OmegaUp.on('ready', function() {
 
     // Vue lazily updates the DOM, so any interactions with `$el` need to
     // wait until the update is done.
-    Vue.nextTick(function() {
+    Vue.nextTick(function () {
       assignmentDetails.$el.scrollIntoView();
     });
   }
 
   const courseAdmins = new Vue({
     el: '#admins .admins',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-admins', {
         props: { initialAdmins: this.initialAdmins },
         on: {
-          'add-admin': useradmin => {
+          'add-admin': (useradmin) => {
             api.Course.addAdmin({
               course_alias: courseAlias,
               usernameOrEmail: useradmin,
             })
-              .then(data => {
-                UI.success(T.adminAdded);
+              .then((data) => {
+                ui.success(T.adminAdded);
                 refreshCourseAdmins();
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          'remove-admin': username => {
+          'remove-admin': (username) => {
             api.Course.removeAdmin({
               course_alias: courseAlias,
               usernameOrEmail: username,
             })
-              .then(data => {
+              .then((data) => {
                 refreshCourseAdmins();
-                UI.success(T.adminRemoved);
+                ui.success(T.adminRemoved);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -117,31 +117,31 @@ OmegaUp.on('ready', function() {
 
   const courseGroupAdmins = new Vue({
     el: '#admins .groups',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-group-admins', {
         props: { initialGroups: this.initialGroups },
         on: {
-          'add-group-admin': groupAlias => {
+          'add-group-admin': (groupAlias) => {
             api.Course.addGroupAdmin({
               course_alias: courseAlias,
               group: groupAlias,
             })
-              .then(data => {
-                UI.success(T.groupAdminAdded);
+              .then((data) => {
+                ui.success(T.groupAdminAdded);
                 refreshCourseAdmins();
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          'remove-group-admin': groupAlias => {
+          'remove-group-admin': (groupAlias) => {
             api.Course.removeGroupAdmin({
               course_alias: courseAlias,
               group: groupAlias,
             })
-              .then(data => {
+              .then((data) => {
                 refreshCourseAdmins();
-                UI.success(T.groupAdminRemoved);
+                ui.success(T.groupAdminRemoved);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -154,33 +154,31 @@ OmegaUp.on('ready', function() {
 
   var assignmentList = new Vue({
     el: '#assignments div.list',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-assignmentlist', {
         props: {
           assignments: this.assignments,
           courseAlias: courseAlias,
         },
         on: {
-          edit: function(assignment) {
+          edit: function (assignment) {
             assignmentDetails.show = true;
             assignmentDetails.update = true;
             assignmentDetails.assignment = assignment;
             assignmentDetails.$el.scrollIntoView();
             updateNewAssignmentButtonVisibility(true);
           },
-          'add-problems': function(assignment) {
+          'add-problems': function (assignment) {
             window.location.hash = 'problems';
             assignmentDetails.show = false;
             problemList.selectedAssignment = assignment;
             updateNewAssignmentButtonVisibility(true);
-            $('#sections')
-              .find('a[href="#problems"]')
-              .tab('show');
+            $('#sections').find('a[href="#problems"]').tab('show');
           },
-          delete: function(assignment) {
+          delete: function (assignment) {
             if (
               !window.confirm(
-                UI.formatString(T.courseAssignmentConfirmDelete, {
+                ui.formatString(T.courseAssignmentConfirmDelete, {
                   assignment: assignment.name,
                 }),
               )
@@ -191,32 +189,32 @@ OmegaUp.on('ready', function() {
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
             })
-              .then(function(data) {
-                UI.success(T.courseAssignmentDeleted);
+              .then(function (data) {
+                ui.success(T.courseAssignmentDeleted);
                 refreshAssignmentsList();
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           new: onNewAssignment,
-          'sort-homeworks': function(courseAlias, homeworksAliases) {
+          'sort-homeworks': function (courseAlias, homeworksAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
               assignments: JSON.stringify(homeworksAliases),
             })
               .then(() => {
-                UI.success(T.homeworksOrderUpdated);
+                ui.success(T.homeworksOrderUpdated);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          'sort-tests': function(courseAlias, testsAliases) {
+          'sort-tests': function (courseAlias, testsAliases) {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
               assignments: JSON.stringify(testsAliases),
             })
               .then(() => {
-                UI.success(T.testsOrderUpdated);
+                ui.success(T.testsOrderUpdated);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -231,7 +229,7 @@ OmegaUp.on('ready', function() {
 
   const assignmentDetails = new Vue({
     el: '#assignments div.form',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-assignmentdetails', {
         props: {
           show: this.show,
@@ -243,7 +241,7 @@ OmegaUp.on('ready', function() {
           invalidParameterName: this.invalidParameterName,
         },
         on: {
-          submit: function(ev) {
+          submit: function (ev) {
             if (ev.update) {
               const params = {
                 course: courseAlias,
@@ -261,12 +259,12 @@ OmegaUp.on('ready', function() {
               }
 
               api.Course.updateAssignment(params)
-                .then(function() {
-                  UI.success(T.courseAssignmentUpdated);
+                .then(function () {
+                  ui.success(T.courseAssignmentUpdated);
                   refreshAssignmentsList();
                 })
-                .catch(function(error) {
-                  UI.apiError(error);
+                .catch(function (error) {
+                  ui.apiError(error);
                   assignmentDetails.show = true;
                   assignmentDetails.invalidParameterName =
                     error.parameter || '';
@@ -288,13 +286,13 @@ OmegaUp.on('ready', function() {
               }
 
               api.Course.createAssignment(params)
-                .then(function() {
-                  UI.success(T.courseAssignmentAdded);
+                .then(function () {
+                  ui.success(T.courseAssignmentAdded);
                   updateNewAssignmentButtonVisibility(true);
                   refreshAssignmentsList();
                 })
-                .catch(function(error) {
-                  UI.apiError(error);
+                .catch(function (error) {
+                  ui.apiError(error);
                   assignmentDetails.show = true;
                   assignmentDetails.invalidParameterName =
                     error.parameter || '';
@@ -302,7 +300,7 @@ OmegaUp.on('ready', function() {
             }
             assignmentDetails.show = false;
           },
-          cancel: function() {
+          cancel: function () {
             assignmentDetails.show = false;
             updateNewAssignmentButtonVisibility(true);
           },
@@ -327,31 +325,31 @@ OmegaUp.on('ready', function() {
   });
 
   api.Course.adminDetails({ alias: courseAlias })
-    .then(function(course) {
+    .then(function (course) {
       $('.course-header')
         .text(course.name)
         .attr('href', '/course/' + courseAlias + '/');
       var details = new Vue({
         el: '#edit div',
-        render: function(createElement) {
+        render: function (createElement) {
           return createElement('omegaup-course-form', {
             props: { update: true, course: course },
             on: {
-              submit: function(ev) {
+              submit: function (ev) {
                 new Promise((accept, reject) => {
                   if (ev.school_id !== undefined) {
                     accept(ev.school_id);
                   } else if (ev.school_name) {
                     api.School.create({ name: ev.school_name })
-                      .then(function(data) {
+                      .then(function (data) {
                         accept(data.school_id);
                       })
-                      .catch(UI.apiError);
+                      .catch(ui.apiError);
                   } else {
                     accept(null);
                   }
                 })
-                  .then(function(school_id) {
+                  .then(function (school_id) {
                     const params = {
                       course_alias: courseAlias,
                       name: ev.name,
@@ -373,9 +371,9 @@ OmegaUp.on('ready', function() {
                     }
 
                     api.Course.update(params)
-                      .then(function() {
-                        UI.success(
-                          UI.formatString(
+                      .then(function () {
+                        ui.success(
+                          ui.formatString(
                             T.courseEditCourseEditedAndGoToCourse,
                             {
                               alias: ev.alias,
@@ -388,11 +386,11 @@ OmegaUp.on('ready', function() {
                         $('div.post.footer').show();
                         window.scrollTo(0, 0);
                       })
-                      .catch(UI.apiError);
+                      .catch(ui.apiError);
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
-              cancel: function(ev) {
+              cancel: function (ev) {
                 window.location = '/course/' + courseAlias + '/';
               },
             },
@@ -409,11 +407,11 @@ OmegaUp.on('ready', function() {
       assignmentDetails.finishTimeCourse = course.finish_time;
       assignmentDetails.startTimeCourse = course.start_time;
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 
   var problemList = new Vue({
     el: '#problems div',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-problemlist', {
         props: {
           assignments: this.assignments,
@@ -422,26 +420,26 @@ OmegaUp.on('ready', function() {
           selectedAssignment: this.selectedAssignment,
         },
         on: {
-          'add-problem': function(assignment, problemAlias) {
+          'add-problem': function (assignment, problemAlias) {
             api.Course.addProblem({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
               problem_alias: problemAlias,
             })
-              .then(function(data) {
+              .then(function (data) {
                 refreshProblemList(assignment);
                 problemList.$children[0].showForm = false;
-                UI.success(T.courseAssignmentProblemAdded);
+                ui.success(T.courseAssignmentProblemAdded);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          assignment: function(assignment) {
+          assignment: function (assignment) {
             refreshProblemList(assignment);
           },
-          remove: function(assignment, problem) {
+          remove: function (assignment, problem) {
             if (
               !window.confirm(
-                UI.formatString(T.courseAssignmentProblemConfirmRemove, {
+                ui.formatString(T.courseAssignmentProblemConfirmRemove, {
                   problem: problem.title,
                 }),
               )
@@ -453,29 +451,29 @@ OmegaUp.on('ready', function() {
               problem_alias: problem.alias,
               assignment_alias: assignment.alias,
             })
-              .then(function(response) {
-                UI.success(T.courseAssignmentProblemRemoved);
+              .then(function (response) {
+                ui.success(T.courseAssignmentProblemRemoved);
                 refreshProblemList(assignment);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          sort: function(assignmentAlias, problemsAliases) {
+          sort: function (assignmentAlias, problemsAliases) {
             api.Course.updateProblemsOrder({
               course_alias: courseAlias,
               assignment_alias: assignmentAlias,
               problems: JSON.stringify(problemsAliases),
             })
               .then(() => {
-                UI.success(T.problemsOrderUpdated);
+                ui.success(T.problemsOrderUpdated);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          tags: function(tags) {
+          tags: function (tags) {
             api.Problem.list({ tag: tags.join() })
-              .then(function(data) {
+              .then(function (data) {
                 problemList.taggedProblems = data.results;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -493,7 +491,7 @@ OmegaUp.on('ready', function() {
 
   let editAdmissionMode = new Vue({
     el: '#admission-mode div',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-admission-mode', {
         props: {
           initialAdmissionMode: this.admissionMode,
@@ -502,15 +500,15 @@ OmegaUp.on('ready', function() {
           courseAlias: courseAlias,
         },
         on: {
-          'emit-update-admission-mode': function(admissionMode) {
+          'emit-update-admission-mode': function (admissionMode) {
             api.Course.update({
               course_alias: courseAlias,
               admission_mode: admissionMode,
             })
               .then(() => {
-                UI.success(T.courseEditCourseEdited);
+                ui.success(T.courseEditCourseEdited);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -527,7 +525,7 @@ OmegaUp.on('ready', function() {
 
   let addStudents = new Vue({
     el: '#students div.list',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-addstudents', {
         props: {
           students: this.students,
@@ -539,53 +537,53 @@ OmegaUp.on('ready', function() {
             this.arbitrateRequest(ev, username, true),
           'deny-request': (ev, username) =>
             this.arbitrateRequest(ev, username, false),
-          'add-student': function(ev) {
+          'add-student': function (ev) {
             let participants = [];
             if (ev.participants !== '')
               participants = ev.participants.split(',');
             if (ev.participant !== '') participants.push(ev.participant);
             if (participants.length == 0) {
-              UI.error(T.wordsEmptyAddStudentInput);
+              ui.error(T.wordsEmptyAddStudentInput);
               return;
             }
             Promise.allSettled(
-              participants.map(participant =>
+              participants.map((participant) =>
                 api.Course.addStudent({
                   course_alias: courseAlias,
                   usernameOrEmail: participant.trim(),
                 }),
               ),
             )
-              .then(results => {
+              .then((results) => {
                 let participantsWithError = [];
-                results.forEach(result => {
+                results.forEach((result) => {
                   if (result.status === 'rejected') {
                     participantsWithError.push(result.reason.userEmail);
                   }
                 });
                 refreshStudentList();
                 if (participantsWithError.length === 0) {
-                  UI.success(T.courseStudentAdded);
+                  ui.success(T.courseStudentAdded);
                   return;
                 }
-                UI.error(
-                  UI.formatString(T.bulkUserAddError, {
+                ui.error(
+                  ui.formatString(T.bulkUserAddError, {
                     userEmail: participantsWithError.join('<br>'),
                   }),
                 );
               })
-              .catch(UI.ignoreError);
+              .catch(ui.ignoreError);
           },
-          'remove-student': function(student) {
+          'remove-student': function (student) {
             api.Course.removeStudent({
               course_alias: courseAlias,
               usernameOrEmail: student.username,
             })
-              .then(function(data) {
+              .then(function (data) {
                 refreshStudentList();
-                UI.success(T.courseStudentRemoved);
+                ui.success(T.courseStudentRemoved);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -599,11 +597,11 @@ OmegaUp.on('ready', function() {
           resolution: resolution,
           note: '',
         })
-          .then(response => {
-            UI.success(T.successfulOperation);
+          .then((response) => {
+            ui.success(T.successfulOperation);
             refreshStudentList();
           })
-          .catch(UI.apiError);
+          .catch(ui.apiError);
       },
     },
     components: {
@@ -613,27 +611,27 @@ OmegaUp.on('ready', function() {
 
   var clone = new Vue({
     el: '#clone div',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-clone', {
         props: { initialAlias: courseAlias, initialName: this.initialName },
         on: {
-          clone: function(ev) {
+          clone: function (ev) {
             api.Course.clone({
               course_alias: courseAlias,
               name: ev.name,
               alias: ev.alias,
               start_time: ev.startTime.getTime() / 1000,
             })
-              .then(function(data) {
-                UI.success(
-                  UI.formatString(T.courseEditCourseClonedSuccessfully, {
+              .then(function (data) {
+                ui.success(
+                  ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: ev.alias,
                   }),
                 );
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          cancel: function(ev) {
+          cancel: function (ev) {
             window.location = '/course/' + courseAlias + '/';
           },
         },
@@ -658,7 +656,7 @@ OmegaUp.on('ready', function() {
     if (section) {
       let fn = section[vuePath[1]];
       if (fn) {
-        Vue.nextTick(function() {
+        Vue.nextTick(function () {
           fn.apply(this, vuePath.slice(2));
         });
       }
@@ -667,24 +665,24 @@ OmegaUp.on('ready', function() {
 
   function refreshStudentList() {
     api.Course.listStudents({ course_alias: courseAlias })
-      .then(function(data) {
+      .then(function (data) {
         addStudents.students = data.students;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
     api.Course.requests({ course_alias: courseAlias })
-      .then(function(data) {
+      .then(function (data) {
         addStudents.data = data.users;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function refreshAssignmentsList() {
     api.Course.listAssignments({ course_alias: courseAlias })
-      .then(function(data) {
+      .then(function (data) {
         problemList.assignments = data.assignments;
         assignmentList.assignments = data.assignments;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function refreshProblemList(assignment) {
@@ -692,19 +690,19 @@ OmegaUp.on('ready', function() {
       assignment: assignment.alias,
       course: courseAlias,
     })
-      .then(function(response) {
+      .then(function (response) {
         problemList.assignmentProblems = response.problems;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function refreshCourseAdmins() {
     api.Course.admins({ course_alias: courseAlias })
-      .then(function(data) {
+      .then(function (data) {
         courseAdmins.initialAdmins = data.admins;
         courseGroupAdmins.initialGroups = data.group_admins;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   refreshStudentList();

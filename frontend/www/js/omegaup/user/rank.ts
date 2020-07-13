@@ -17,7 +17,7 @@ OmegaUp.on('ready', () => {
   }));
   const rankTable = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-user-rank', {
         props: {
           page: payload.page,

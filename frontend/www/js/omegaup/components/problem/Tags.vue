@@ -44,57 +44,59 @@
             </tr>
           </tbody>
         </table>
-        <div class="form-group">
-          <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              v-model="newPrivateTag"
-              v-bind:placeholder="T.privateTagsPlaceholder"
-            />
-            <div class="input-group-append">
-              <button
-                class="btn btn-outline-primary"
-                type="button"
-                v-bind:disabled="newPrivateTag === ''"
-                v-on:click.prevent="addPrivateTag"
-              >
-                {{ T.wordsAddTag }}
-              </button>
+        <template v-if="!hidePrivateTags">
+          <div class="form-group">
+            <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                v-model="newPrivateTag"
+                v-bind:placeholder="T.privateTagsPlaceholder"
+              />
+              <div class="input-group-append">
+                <button
+                  class="btn btn-outline-primary"
+                  type="button"
+                  v-bind:disabled="newPrivateTag === ''"
+                  v-on:click.prevent="addPrivateTag"
+                >
+                  {{ T.wordsAddTag }}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th class="text-center" scope="col">
-                {{ T.contestEditTagName }}
-              </th>
-              <th class="text-center" scope="col">
-                {{ T.contestEditTagDelete }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="tag in selectedPrivateTags" v-bind:key="tag">
-              <td class="align-middle">
-                <a v-bind:href="`/problem/?tag[]=${tag}`">
-                  {{ tag }}
-                </a>
-              </td>
-              <td class="text-center">
-                <button
-                  type="button"
-                  class="btn btn-danger"
-                  v-on:click="removeTag(tag, false /* public */)"
-                >
-                  <font-awesome-icon v-bind:icon="['fas', 'trash']" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th class="text-center" scope="col">
+                  {{ T.contestEditTagName }}
+                </th>
+                <th class="text-center" scope="col">
+                  {{ T.contestEditTagDelete }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="tag in selectedPrivateTags" v-bind:key="tag">
+                <td class="align-middle">
+                  <a v-bind:href="`/problem/?tag[]=${tag}`">
+                    {{ tag }}
+                  </a>
+                </td>
+                <td class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    v-on:click="removeTag(tag, false /* public */)"
+                  >
+                    <font-awesome-icon v-bind:icon="['fas', 'trash']" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </template>
         <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
           <select class="form-control" v-model="problemLevelTag">
@@ -252,6 +254,7 @@ export default class ProblemTags extends Vue {
   @Prop({ default: '' }) title!: string;
   @Prop({ default: true }) initialAllowTags!: boolean;
   @Prop({ default: false }) canAddNewTags!: boolean;
+  @Prop({ default: false }) hidePrivateTags!: boolean;
 
   T = T;
   allowTags = this.initialAllowTags;

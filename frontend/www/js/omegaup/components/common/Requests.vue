@@ -31,14 +31,14 @@
           <td v-if="!request.accepted">
             <button
               class="close"
-              style="color:red"
+              style="color: red;"
               v-on:click="onDenyRequest(request.username)"
             >
               ×
             </button>
             <button
               class="close"
-              style="color:green"
+              style="color: green;"
               v-on:click="onAcceptRequest(request.username)"
             >
               ✓
@@ -53,16 +53,16 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 
 @Component
 export default class Requests extends Vue {
-  @Prop() data!: omegaup.IdentityRequest[];
+  @Prop() data!: types.IdentityRequest[];
   @Prop() textAddParticipant!: string;
 
   T = T;
-  requests: omegaup.IdentityRequest[] = this.data;
+  requests: types.IdentityRequest[] = this.data;
 
   onAcceptRequest(username: string): void {
     this.$emit('emit-accept-request', this, username);

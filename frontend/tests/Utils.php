@@ -25,12 +25,13 @@ class Utils {
     /**
      * Given a run guid, set a score for its run
      *
-     * @param ?int    $runID            The ID of the run.
-     * @param ?string $runGuid          The GUID of the submission.
-     * @param float   $points           The score of the run
-     * @param string  $verdict          The verdict of the run.
-     * @param ?int    $submitDelay      The number of minutes worth of penalty.
-     * @param int     $problemsetPoints The max score of the run for the problemset.
+     * @param ?int    $runID              The ID of the run.
+     * @param ?string $runGuid            The GUID of the submission.
+     * @param float   $points             The score of the run
+     * @param string  $verdict            The verdict of the run.
+     * @param ?int    $submitDelay        The number of minutes worth of penalty.
+     * @param int     $problemsetPoints   The max score of the run for the problemset.
+     * @param ?string $outputFileContents The content to compress in files.zip.
      */
     public static function gradeRun(
         ?int $runId = null,
@@ -38,7 +39,8 @@ class Utils {
         float $points = 1,
         string $verdict = 'AC',
         ?int $submitDelay = null,
-        int $problemsetPoints = 100
+        int $problemsetPoints = 100,
+        ?string $outputFileContents = null
     ): void {
         if (!is_null($runId)) {
             $run = \OmegaUp\DAO\Runs::getByPK($runId);
@@ -97,13 +99,41 @@ class Utils {
             "\x1f\x8b\x08\x08\xaa\x31\x34\x5c\x00\x03\x66\x6f" .
             "\x6f\x00\x03\x00\x00\x00\x00\x00\x00\x00\x00\x00"
         );
-        // An empty zip file.
+        // Creating the zip file.
         \OmegaUp\Grader::getInstance()->setGraderResourceForTesting(
             $run,
             'files.zip',
-            "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
-            "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            $outputFileContents ?? (
+                "\x50\x4b\x05\x06\x00\x00\x00\x00\x00\x00\x00\x00" .
+                "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+            )
         );
+    }
+
+    /**
+     * @param array<string, string> $filesContents
+     */
+    public static function zipFileForContents($filesContents): string {
+        $zipFile = tmpfile();
+        $zipPath = stream_get_meta_data($zipFile)['uri'];
+        $zip = new \ZipArchive();
+        if (
+            $zip->open(
+                $zipPath,
+                \ZipArchive::CREATE | \ZipArchive::OVERWRITE
+            ) !== true
+        ) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        foreach ($filesContents as $fileName => $fileContent) {
+            if ($zip->addFromString($fileName, $fileContent) !== true) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
+        }
+        if ($zip->close() !== true) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        return file_get_contents($zipPath);
     }
 
     private static function setUpDefaultDataConfig(): void {
@@ -274,6 +304,8 @@ class Utils {
     }
 
     private static function shellExec(string $command): void {
+        $log = \Logger::getLogger('\\OmegaUp\\Test\\Utils::shellExec()');
+        $log->info("========== Starting {$command}");
         /** @psalm-suppress ForbiddenCode this only runs in tests. */
         $proc = proc_open(
             $command,
@@ -292,6 +324,7 @@ class Utils {
         $stderr = stream_get_contents($pipes[2]);
         fclose($pipes[2]);
         $processStatus = proc_close($proc);
+        $log->info("========== Finished {$command}: {$processStatus}");
         if ($processStatus != 0) {
             throw new \Exception(
                 "Failed to run `{$command}`: status={$processStatus}\nstdout={$stdout}\nstderr={$stderr}"
@@ -323,6 +356,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/update_ranks.py' .
              ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --update-coder-of-the-month ' .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
@@ -341,6 +375,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/aggregate_feedback.py' .
              ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .
@@ -356,6 +391,7 @@ class Utils {
              escapeshellarg(strval(OMEGAUP_ROOT)) .
              '/../stuff/cron/assign_badges.py' .
              ' --verbose ' .
+             ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
              ' --user ' . escapeshellarg(OMEGAUP_DB_USER) .
              ' --database ' . escapeshellarg(OMEGAUP_DB_NAME) .

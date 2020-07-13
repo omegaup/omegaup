@@ -200,10 +200,14 @@ class RequestParamChecker implements
                 continue;
             }
 
-            $parsedDocComment = \Psalm\DocComment::parse($docblock->getText());
-            if (isset($parsedDocComment['specials']['omegaup-request-param'])) {
+            $parsedDocComment = \Psalm\DocComment::parsePreservingLength(
+                new \PhpParser\Comment\Doc(
+                    strval($docblock->getText())
+                )
+            );
+            if (isset($parsedDocComment->tags['omegaup-request-param'])) {
                 foreach (
-                    $parsedDocComment['specials']['omegaup-request-param'] as $requestParam
+                    $parsedDocComment->tags['omegaup-request-param'] as $requestParam
                 ) {
                     if (
                         preg_match(
@@ -395,10 +399,12 @@ class RequestParamChecker implements
             }
 
             $docblock = $methodStmt->getDocComment();
-            $parsedDocComment = \Psalm\DocComment::parse(
-                !is_null($docblock) ?
-                $docblock->getText() :
-                '/** */'
+            $parsedDocComment = \Psalm\DocComment::parsePreservingLength(
+                new \PhpParser\Comment\Doc(
+                    !is_null($docblock) ?
+                    strval($docblock->getText()) :
+                    '/** */'
+                )
             );
             $docblockStart = (
                 !is_null($docblock) ?
@@ -499,9 +505,9 @@ class RequestParamChecker implements
                 continue;
             }
 
-            unset($parsedDocComment['specials']['omegaup-request-param']);
+            unset($parsedDocComment->tags['omegaup-request-param']);
             if (!empty($expected)) {
-                $parsedDocComment['specials'] = $parsedDocComment['specials'] + [
+                $parsedDocComment->tags = $parsedDocComment->tags + [
                     'omegaup-request-param' => array_map(
                         function (RequestParamDescription $description): string {
                             return strval($description);
@@ -515,7 +521,7 @@ class RequestParamChecker implements
                 $fileReplacements[] = new \Psalm\FileManipulation(
                     $docblockStart,
                     $docblockEnd,
-                    \Psalm\DocComment::render($parsedDocComment, $indentation)
+                    $parsedDocComment->render($indentation)
                 );
                 continue;
             }
@@ -525,7 +531,7 @@ class RequestParamChecker implements
                         (
                         'Mismatched dockblock annotations for ' .
                         "{$classLikeStorage->name}::{$methodStmt->name->name}: Wanted:\n\n" .
-                        \Psalm\DocComment::render($parsedDocComment, '')
+                        $parsedDocComment->render('')
                         ),
                         new \Psalm\CodeLocation(
                             $statementsSource,

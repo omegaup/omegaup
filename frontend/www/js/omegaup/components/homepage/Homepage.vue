@@ -3,10 +3,10 @@
     <omegaup-coder-of-the-month-notice
       v-if="
         currentUserInfo &&
-          ((coderOfTheMonth &&
-            coderOfTheMonth.username == currentUserInfo.username) ||
-            (coderOfTheMonthFemale &&
-              coderOfTheMonthFemale.username == currentUserInfo.username))
+        ((coderOfTheMonth &&
+          coderOfTheMonth.username == currentUserInfo.username) ||
+          (coderOfTheMonthFemale &&
+            coderOfTheMonthFemale.username == currentUserInfo.username))
       "
       v-bind:coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
@@ -15,10 +15,10 @@
       class="container-lg py-5"
       v-if="
         coderOfTheMonthFemale ||
-          coderOfTheMonth ||
-          schoolOfTheMonth ||
-          rankTable.resultTotal ||
-          schoolsRank.totalRows
+        coderOfTheMonth ||
+        schoolOfTheMonth ||
+        rankTable.resultTotal ||
+        schoolsRank.totalRows
       "
     >
       <div class="row align-items-stretch justify-content-around">

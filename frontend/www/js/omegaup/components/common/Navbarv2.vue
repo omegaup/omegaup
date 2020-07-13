@@ -73,10 +73,35 @@
               }}</a>
             </li>
             <li
-              class="nav-item nav-courses"
+              class="nav-item dropdown nav-courses"
               v-bind:class="{ active: navbarSection === 'courses' }"
+              v-if="isLoggedIn"
             >
-              <a class="nav-link px-2" href="/schools/">{{ T.navCourses }}</a>
+              <a
+                class="nav-link px-2 dropdown-toggle"
+                href="#"
+                role="button"
+                data-nav-courses
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                {{ T.navCourses }}
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/course/" data-nav-courses-all>
+                  {{ T.navAllCourses }}
+                </a>
+                <template v-if="isMainUserIdentity">
+                  <a
+                    class="dropdown-item"
+                    href="/course/new/"
+                    data-nav-courses-create
+                  >
+                    {{ T.buttonCreateCourse }}
+                  </a>
+                </template>
+              </div>
             </li>
             <li
               class="nav-item dropdown nav-problems"

@@ -606,9 +606,21 @@ class NoOpGrader extends \OmegaUp\Grader {
     public function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $missingOk = false
+        bool $missingOk = false,
+        array $headers = []
     ): ?bool {
-        throw new \OmegaUp\Exceptions\UnimplementedException();
+        $path = "{$run->run_id}/{$filename}";
+        if (!array_key_exists($path, $this->_resources)) {
+            if (!$missingOk) {
+                throw new \Exception("Resource {$path} not found");
+            }
+            return null;
+        }
+
+        $out = fopen('php://output', 'w');
+        fputs($out, $this->_resources[$path]);
+        fclose($out);
+        return true;
     }
 
     public function setGraderResourceForTesting(

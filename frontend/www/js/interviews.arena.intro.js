@@ -1,34 +1,34 @@
-omegaup.OmegaUp.on('ready', function() {
+omegaup.OmegaUp.on('ready', function () {
   var contestAlias = /\/interview\/([^\/]+)\/arena?/.exec(
     window.location.pathname,
   )[1];
   var contestObject = null;
 
-  $('#start-contest-form').on('submit', function(ev) {
+  $('#start-contest-form').on('submit', function (ev) {
     ev.preventDefault();
     $('#request-access-form').hide();
     $('#start-contest-submit').prop('disabled', true);
 
     // Explicitly join the contest.
     omegaup.API.Contest.open(contestAlias)
-      .then(function(result) {
+      .then(function (result) {
         window.location.reload();
       })
-      .catch(function(result) {
+      .catch(function (result) {
         omegaup.UI.error(result.error);
         $('#start-contest-form').show();
       });
   });
 
-  $('#request-access-form').on('submit', function(ev) {
+  $('#request-access-form').on('submit', function (ev) {
     ev.preventDefault();
     $('#request-access-form').hide();
     $('#request-access-submit').prop('disabled', true);
     omegaup.API.Contest.registerForContest({ contest_alias: contestAlias })
-      .then(function(result) {
+      .then(function (result) {
         $('#registration_pending').removeClass('hidden');
       })
-      .catch(function(result) {
+      .catch(function (result) {
         omegaup.UI.error(result.error);
         $('#request-access-form').show();
         $('#start-contest-submit').prop('disabled', false);
@@ -88,7 +88,7 @@ omegaup.OmegaUp.on('ready', function() {
   }
 
   omegaup.API.Contest.publicDetails({ contest_alias: contestAlias })
-    .then(function(contest) {
+    .then(function (contest) {
       $('.contest #title').html(
         omegaup.UI.escape(omegaup.UI.contestTitle(contest)),
       );
@@ -96,7 +96,7 @@ omegaup.OmegaUp.on('ready', function() {
       $('.contest #window_length').val(contest.window_length);
       readyToStart(contest);
     })
-    .catch(function(contest) {
+    .catch(function (contest) {
       $('#contest-details').hide();
       $('#contest-details')
         .parent()

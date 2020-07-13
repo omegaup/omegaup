@@ -3,15 +3,15 @@ var formName = formData.attr('data-name');
 var formPage = formData.attr('data-page');
 var formAlias = formData.attr('data-alias');
 
-$(function() {
+$(function () {
   if (formPage === 'new') {
-    $('.new-group-form').on('submit', function() {
+    $('.new-group-form').on('submit', function () {
       omegaup.API.Group.create({
         alias: $('.new-group-form #alias').val(),
         name: $('.new-group-form #title').val(),
         description: $('.new-group-form #description').val(),
       })
-        .then(function(data) {
+        .then(function (data) {
           window.location.replace(
             '/group/' + $('.new-group-form #alias').val() + '/edit/#members',
           );
@@ -30,21 +30,21 @@ $(function() {
         .tab('show');
     }
 
-    $('#sections').on('click', 'a', function(e) {
+    $('#sections').on('click', 'a', function (e) {
       e.preventDefault();
       // add this line
       window.location.hash = $(this).attr('href');
       $(this).tab('show');
     });
 
-    $('#add-scoreboard-form').on('submit', function() {
+    $('#add-scoreboard-form').on('submit', function () {
       omegaup.API.Group.createScoreboard({
         group_alias: groupAlias,
         alias: $('#alias').val(),
         name: $('#title').val(),
         description: $('#description').val(),
       })
-        .then(function(response) {
+        .then(function (response) {
           omegaup.UI.success(omegaup.T.groupEditScoreboardsAdded);
           $('div.post.footer').show();
           refreshGroupScoreboards();
@@ -56,7 +56,7 @@ $(function() {
 
     function refreshGroupScoreboards() {
       omegaup.API.Group.details({ group_alias: groupAlias })
-        .then(function(group) {
+        .then(function (group) {
           $('#group-scoreboards').empty();
 
           for (var i = 0; i < group.scoreboards.length; i++) {

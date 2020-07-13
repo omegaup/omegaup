@@ -57,7 +57,7 @@
             <label>
               <template v-if="lastLogin != null">
                 {{
-                  UI.formatString(T.userLastLogin, {
+                  ui.formatString(T.userLastLogin, {
                     lastLogin: lastLogin.toLocaleString(T.locale),
                   })
                 }}
@@ -128,7 +128,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class AdminSupport extends Vue {
@@ -138,7 +138,7 @@ export default class AdminSupport extends Vue {
   @Prop() lastLogin!: Date;
 
   T = T;
-  UI = UI;
+  ui = ui;
   email: string = '';
 
   @Emit('search-email')

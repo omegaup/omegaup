@@ -11,7 +11,7 @@ import omegaup_Markdown from '../components/Markdown.vue';
 
   const contestIntro = new Vue({
     el: <HTMLElement>document.querySelector('div.statement'),
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-markdown', {
         props: {
           markdown: problemDetails.statement.markdown,

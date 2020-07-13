@@ -92,7 +92,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 import CountryFlag from '../CountryFlag.vue';
 import GridPaginator from '../common/GridPaginator.vue';
@@ -120,7 +120,7 @@ export default class SchoolProfile extends Vue {
   @Prop() chartOptions!: Chart;
 
   T = T;
-  UI = UI;
+  ui = ui;
   sortBy = 'solved_problems';
   sortOptions = [
     {
@@ -159,7 +159,7 @@ export default class SchoolProfile extends Vue {
   }
 
   updateUsers(newSortBy: string): void {
-    this.users.forEach(user => (user.displayField = newSortBy));
+    this.users.forEach((user) => (user.displayField = newSortBy));
     this.sortBy = newSortBy;
   }
 }

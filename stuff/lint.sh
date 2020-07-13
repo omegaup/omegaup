@@ -13,7 +13,8 @@ else
 	fi
 	REMOTE_HASH="$(/usr/bin/git rev-parse "${REMOTE}/master")"
 	MERGE_BASE="$(/usr/bin/git merge-base "${REMOTE_HASH}" HEAD)"
-	ARGS="fix ${MERGE_BASE}"
+	HEAD="$(/usr/bin/git rev-parse HEAD)"
+	ARGS="fix ${MERGE_BASE} ${HEAD}"
 fi
 
 if [[ -t 0 ]]; then
@@ -33,4 +34,4 @@ exec /usr/bin/docker run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20200412 $ARGS
+	omegaup/hook_tools:20200713 $ARGS

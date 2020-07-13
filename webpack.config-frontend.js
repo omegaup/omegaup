@@ -76,6 +76,8 @@ module.exports = {
     problem_print: './frontend/www/js/omegaup/problem/print.ts',
     problem_statement: './frontend/www/js/omegaup/problem/statement.ts',
     problem_solution: './frontend/www/js/omegaup/problem/solution.ts',
+    problem_settings_summary:
+      './frontend/www/js/omegaup/problem/settings_summary.ts',
     qualitynomination_popup:
       './frontend/www/js/omegaup/arena/qualitynomination_popup.js',
     qualitynomination_list:
@@ -86,7 +88,6 @@ module.exports = {
       './frontend/www/js/omegaup/qualitynomination/details.js',
     qualitynomination_qualityreview:
       './frontend/www/js/omegaup/arena/qualitynomination_qualityreview.js',
-    schools_intro: './frontend/www/js/omegaup/schools/intro.js',
     school_of_the_month:
       './frontend/www/js/omegaup/schools/schoolofthemonth.ts',
     school_profile: './frontend/www/js/omegaup/schools/profile.ts',
@@ -170,12 +171,6 @@ module.exports = {
           chunks: 'initial',
           minChunks: 2,
           minSize: 50 * 1024,
-          priority: 10,
-        },
-        iso_3166_2_js: {
-          name: 'iso-3166-2.js',
-          test: /\/frontend\/www\/third_party\/js\/iso-3166-2.js\//,
-          chunks: 'all',
           priority: 10,
         },
         commons: {
