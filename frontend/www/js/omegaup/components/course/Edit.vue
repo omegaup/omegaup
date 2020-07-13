@@ -357,6 +357,7 @@ export default class CourseEdit extends Vue {
 
   onResetAssignmentForm(): void {
     this.visibilityMode = omegaup.VisibilityMode.Default;
+    window.scrollTo(0, 0);
   }
 
   onSelectAssignmentTab(): void {

@@ -139,6 +139,7 @@ OmegaUp.on('ready', () => {
                   component.visibilityMode = omegaup.VisibilityMode.New;
                   this.invalidParameterName = error.parameter || '';
                 });
+              window.scrollTo(0, 0);
             }
           },
           'delete-assignment': (assignment: types.CourseAssignment) => {

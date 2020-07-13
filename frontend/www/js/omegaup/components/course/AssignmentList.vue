@@ -18,9 +18,12 @@
         <tbody v-sortable="{ onUpdate: sortHomeworks }">
           <tr v-bind:key="assignment.alias" v-for="assignment in homeworks">
             <td>
-              <a v-bind:title="T.courseAssignmentReorder" href="#">
+              <button
+                class="btn btn-link"
+                v-bind:title="T.courseAssignmentReorder"
+              >
                 <font-awesome-icon icon="arrows-alt" />
-              </a>
+              </button>
             </td>
             <td>
               <a v-bind:href="assignmentUrl(assignment)">{{
@@ -28,22 +31,22 @@
               }}</a>
             </td>
             <td class="button-column">
-              <a
-                href="#"
+              <button
+                class="btn btn-link"
                 v-bind:title="T.courseAssignmentEdit"
                 v-on:click="$emit('emit-edit', assignment)"
               >
                 <font-awesome-icon icon="edit" />
-              </a>
+              </button>
             </td>
             <td class="button-column">
-              <a
-                href="#"
+              <button
+                class="btn btn-link"
                 v-bind:title="T.courseAddProblemsAdd"
                 v-on:click="$emit('emit-add-problems', assignment)"
               >
                 <font-awesome-icon icon="list-alt" />
-              </a>
+              </button>
             </td>
             <td class="button-column">
               <font-awesome-icon
@@ -52,21 +55,20 @@
                 v-if="assignment.has_runs"
                 class="disabled"
               />
-              <a
-                href="#"
+              <button
+                class="btn btn-link"
                 v-else=""
                 v-bind:title="T.courseAssignmentDelete"
                 v-on:click="$emit('emit-delete', assignment)"
               >
                 <font-awesome-icon icon="trash" />
-              </a>
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
       <div>
-        <a
-          href="#"
+        <button
           class="btn btn-primary"
           v-if="homeworks.length > 1"
           v-bind:class="{ disabled: !homeworksOrderChanged }"
@@ -74,7 +76,7 @@
           v-on:click="saveNewOrder('homeworks')"
         >
           {{ T.wordsSaveNewOrder }}
-        </a>
+        </button>
       </div>
       <hr />
       <div class="card-body" v-if="tests.length === 0">
@@ -91,9 +93,12 @@
         <tbody v-sortable="{ onUpdate: sortTests }">
           <tr v-bind:key="assignment.alias" v-for="assignment in tests">
             <td>
-              <a v-bind:title="T.courseAssignmentReorder" href="#">
+              <button
+                class="btn btn-link"
+                v-bind:title="T.courseAssignmentReorder"
+              >
                 <font-awesome-icon icon="arrows-alt" />
-              </a>
+              </button>
             </td>
             <td>
               <a v-bind:href="assignmentUrl(assignment)">{{
@@ -101,22 +106,22 @@
               }}</a>
             </td>
             <td class="button-column">
-              <a
-                href="#"
+              <button
+                class="btn btn-link"
                 v-bind:title="T.courseAssignmentEdit"
                 v-on:click="$emit('emit-edit', assignment)"
               >
                 <font-awesome-icon icon="edit" />
-              </a>
+              </button>
             </td>
             <td class="button-column">
-              <a
-                href="#"
+              <button
+                class="btn btn-link"
                 v-bind:title="T.courseAddProblemsAdd"
                 v-on:click="$emit('emit-add-problems', assignment)"
               >
                 <font-awesome-icon icon="list-alt" />
-              </a>
+              </button>
             </td>
             <td class="button-column">
               <font-awesome-icon
@@ -125,21 +130,20 @@
                 v-if="assignment.has_runs"
                 class="disabled"
               />
-              <a
-                href="#"
+              <button
+                class="btn btn-link"
                 v-bind:title="T.courseAssignmentDelete"
                 v-on:click="$emit('emit-delete', assignment)"
                 v-else=""
               >
                 <font-awesome-icon icon="trash" />
-              </a>
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
       <div>
-        <a
-          href="#"
+        <button
           class="btn btn-primary"
           v-if="tests.length > 1"
           v-bind:class="{ disabled: !testsOrderChanged }"
@@ -147,7 +151,7 @@
           v-on:click="saveNewOrder('tests')"
         >
           {{ T.wordsSaveNewOrder }}
-        </a>
+        </button>
       </div>
     </div>
     <div class="card-footer">
