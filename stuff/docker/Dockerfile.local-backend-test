@@ -9,7 +9,7 @@ RUN apt-get update -y && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.26/libinteractive.jar \
+RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar \
         -o /usr/share/java/libinteractive.jar
 
 USER ubuntu

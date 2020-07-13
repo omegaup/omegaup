@@ -33,7 +33,7 @@ jobs:
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
           # omegaup-gitserver depends on libinteractive.
-          DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.26/libinteractive.jar'
+          DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar'
           TARGET='/usr/share/java/libinteractive.jar'
           sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
 
