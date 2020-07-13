@@ -8,6 +8,9 @@ import { types } from '../../api_types';
 
 import course_Edit from './Edit.vue';
 
+const noop = () => {};
+Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
+
 describe('Edit.vue', () => {
   it('Should handle empty assignments', async () => {
     const courseName = 'Test course';
