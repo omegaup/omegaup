@@ -49,7 +49,7 @@ import { Chart } from 'highcharts-vue';
 import * as Highcharts from 'highcharts';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 interface Data {
   runs: omegaup.RunInfo[];
@@ -125,7 +125,7 @@ export default class UserCharts extends Vue {
   @Prop() aggregateStatisticOptions!: Chart;
 
   T = T;
-  UI = UI;
+  ui = ui;
   type = 'delta';
   period: 'day' | 'week' | 'month' | 'year' = 'day';
   updateArgs = [true, true, { duration: 500 }];

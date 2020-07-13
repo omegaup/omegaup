@@ -4,7 +4,7 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemsMineInfoPayload();
@@ -45,10 +45,10 @@ OmegaUp.on('ready', () => {
               ),
             )
               .then(() => {
-                UI.success(T.updateItemsSuccess);
+                ui.success(T.updateItemsSuccess);
               })
               .catch((error) => {
-                UI.error(UI.formatString(T.bulkOperationError, error));
+                ui.error(ui.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
                 showProblems(showAllProblems);
@@ -84,7 +84,7 @@ OmegaUp.on('ready', () => {
         problemsMine.pagerItems = result.pagerItems;
         problemsMine.problems = result.problems;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function normalizeVisibility(

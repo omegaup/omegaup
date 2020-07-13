@@ -3,7 +3,7 @@ import badge_List from '../components/badge/List.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
@@ -33,12 +33,12 @@ OmegaUp.on('ready', function () {
           data['badges'].map((badge) => badge.badge_alias),
         );
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   api.Badge.list({})
     .then(function (data) {
       badgeList.allBadges = new Set(data);
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 });
