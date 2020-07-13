@@ -1,50 +1,50 @@
 import Vue from 'vue';
-import user_Profile from '../components/user/Profile.vue';
 import Highcharts from 'highcharts-vue';
+
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
-import * as api from '../api';
 import * as ui from '../ui';
 import { types } from '../api_types';
 import { Problem, ContestResult } from '../linkable_resource';
 
-OmegaUp.on('ready', function() {
+import user_Profile from '../components/user/Profile.vue';
+
+OmegaUp.on('ready', function () {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
   const viewProfile = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
           profile: payload.profile,
           contests: Object.values(payload.contests)
-            .map(contest => {
+            .map((contest) => {
               const now = new Date();
               if (contest.place === null || now <= contest.data.finish_time) {
                 return null;
               }
               return new ContestResult(contest);
             })
-            .filter(contest => !!contest),
-          solvedProblems: payload.solvedProblems.map(
-            problem => new Problem(problem),
+            .filter((contest) => !!contest),
+          solvedProblems: payload.solvedProblems?.map(
+            (problem) => new Problem(problem),
           ),
-          unsolvedProblems: payload.unsolvedProblems.map(
-            problem => new Problem(problem),
+          unsolvedProblems: payload.unsolvedProblems?.map(
+            (problem) => new Problem(problem),
           ),
-          createdProblems: payload.createdProblems.map(
-            problem => new Problem(problem),
+          createdProblems: payload.createdProblems?.map(
+            (problem) => new Problem(problem),
           ),
           visitorBadges: <Set<string>>new Set(payload.badges),
           profileBadges: <Set<string>>(
-            new Set(payload.ownedBadges.map(badge => badge.badge_alias))
+            new Set(payload.ownedBadges?.map((badge) => badge.badge_alias))
           ),
           rank: this.rank,
-          programmingLanguages: payload.programmingLanguages,
           charts: payload.stats,
           periodStatisticOptions: {
             title: {
               text: ui.formatString(T.profileStatisticsVerdictsOf, {
-                user: payload.profile.username,
+                user: payload.profile?.username,
               }),
             },
             chart: { type: 'column' },
@@ -96,7 +96,7 @@ OmegaUp.on('ready', function() {
           aggregateStatisticOptions: {
             title: {
               text: ui.formatString(T.profileStatisticsVerdictsOf, {
-                user: payload.profile.username,
+                user: payload.profile?.username,
               }),
             },
             chart: {
@@ -135,10 +135,13 @@ OmegaUp.on('ready', function() {
         },
         on: {
           'update-period-statistics': (e, categories, data) => {
+            // console.log(e);
+            // console.log(categories);
+            // console.log(data);
             e.periodStatisticOptions.xAxis.categories = categories;
             e.periodStatisticOptions.series = data;
           },
-          'update-aggregate-statistics': e =>
+          'update-aggregate-statistics': (e) =>
             (e.aggregateStatisticOptions.series[0].data =
               e.normalizedRunCounts),
         },
@@ -146,8 +149,8 @@ OmegaUp.on('ready', function() {
     },
 
     computed: {
-      rank: function() {
-        switch (payload.profile.classname) {
+      rank: function () {
+        switch (payload.profile?.classname) {
           case 'user-rank-unranked':
             return T.profileRankUnrated;
           case 'user-rank-beginner':
