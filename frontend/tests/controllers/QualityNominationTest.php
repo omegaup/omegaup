@@ -756,10 +756,10 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Check that a demotion´s logs is save correct.
+     * Check that a demotion's logs is saved correctly.
      * @dataProvider qualityNominationsDemotionStatusProvider
      */
-    public function testDemotionLogsSaveCorrect(
+    public function testDemotionLogsSavedCorrectly(
         string $status,
         int $visibility
     ) {

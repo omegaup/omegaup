@@ -27,7 +27,7 @@ class QualityNominationLog extends \OmegaUp\DAO\Base\QualityNominationLog {
                 qualitynomination_id = ?;
         ';
 
-        /** @var list<array{qualitynomination_log_id: int, qualitynomination_id: int, to_status: string, from_status: string, time: \OmegaUp\Timestamp, user_id: int, rationale: string}> */
+        /** @var list<array{from_status: string, qualitynomination_id: int, qualitynomination_log_id: int, rationale: null|string, time: \OmegaUp\Timestamp, to_status: string, user_id: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$qualityNominationId]
