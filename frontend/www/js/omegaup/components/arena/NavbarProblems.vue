@@ -77,6 +77,7 @@
   display: block;
   padding: 0.5em;
   width: 100%;
+  cursor: pointer;
 }
 
 .problem-list > div.active {
