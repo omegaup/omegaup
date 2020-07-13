@@ -8,7 +8,7 @@ describe('Mine.vue', () => {
   it('Should display course admin list', () => {
     const wrapper = mount(course_Mine, {
       propsData: {
-        courses: <types.AdminCourses> {
+        courses: <types.AdminCourses>{
           admin: {
             accessMode: 'admin',
             activeTab: 'current',
