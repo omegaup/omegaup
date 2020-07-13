@@ -32,7 +32,7 @@
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type AddedProblem=array{alias: string, points: int}
+ * @psalm-type AddedProblem=array{alias: string, points: float|int}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -141,7 +141,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $addedProblems = [];
         if (!empty($r['problems'])) {
-          /** @var list<array{alias: string, points: int|null}> */
+          /** @var list<array{alias: string, points?: int|float|string}> */
             $problemsData = json_decode(
                 strval(
                     $r['problems']
@@ -167,10 +167,16 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'problemNotFound'
                     );
                 }
-
-                if (!isset($problemData['points'])) {
-                    $problemData['points'] = 100; // Set 100 as default
+                if (!empty($problemData['points'])) {
+                    \OmegaUp\Validators::validateNumber(
+                        $problemData['points'],
+                        'points'
+                    );
+                    $problemData['points'] = intval($problemData['points']);
+                } else {
+                    $problemData['points'] = 100;
                 }
+
                 $addedProblems[] = $problemData;
             }
         }
@@ -703,6 +709,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity,
         array $addedProblems = []
     ): \OmegaUp\DAO\VO\Problemsets {
+        if (is_null($assignment->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
         \OmegaUp\DAO\DAO::transBegin();
         try {
             // Create the backing problemset
@@ -730,16 +741,23 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            foreach ($addedProblems as $i => $addedProblem) {
-                // Create and assign problems to new course
-                self::addProblemToAssignment(
-                    $addedProblem['alias'],
-                    $problemset->problemset_id,
-                    $identity,
-                    /*$validateVisibility=*/false,
-                    /*$points=*/$addedProblem['points'],
-                    /*$commit*/null,
-                    /*$order*/$i + 1
+            if (!empty($addedProblems)) {
+                foreach ($addedProblems as $i => $addedProblem) {
+                    // Create and assign problems to new course
+                    self::addProblemToAssignment(
+                        $addedProblem['alias'],
+                        $problemset->problemset_id,
+                        $identity,
+                        /*$validateVisibility=*/false,
+                        /*$points=*/$addedProblem['points'],
+                        /*$commit*/null,
+                        /*$order*/$i + 1
+                    );
+                }
+
+                \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
+                    $course,
+                    $assignment->alias
                 );
             }
 
@@ -765,7 +783,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @param int $problemsetId
      * @param int $userId
      * @param bool $validateVisibility validations no needed when it is a clone
-     * @param ?int $points = 100
+     * @param float|int|null $points = 100
      * @param ?string $commit
      * @param ?int $order = 1
      */
@@ -774,7 +792,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $validateVisibility,
-        ?float $points = 100,
+        $points = 100,
         ?string $commit = null,
         ?int $order = 1
     ): void {
@@ -789,7 +807,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
-        $assignedPoints = is_null($points) ? 100 : $points;
+        $assignedPoints = is_null($points) ? 100 : floatval($points);
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
@@ -1017,11 +1035,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $points = 100;
-        if (is_numeric($r['points'])) {
-            $points = intval($r['points']);
-        }
-
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
             'commit',
@@ -1034,7 +1047,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id,
             $r->identity,
             true, /* validateVisibility */
-            $points,
+            is_numeric($r['points']) ? intval($r['points']) : 100,
             $r['commit']
         );
 

@@ -210,7 +210,31 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($points, $problems[0]->points);
     }
 
-    private function createSchoolAssignmentWithProblems($usePoints = true) {
+    /**
+     * A PHPUnit data provider for the test with problems in a course.
+     *
+     * @return list<array{0: list<int|null>, 1: int, 2: bool}>
+     */
+    public function assignmentWithProblemsAndPointsValueProvider(): array {
+        return [
+            [[null, null, null], 300, false],
+            [[100, 80, 20], 200, false],
+            [[50, null, 20], 170, false],
+            [[50, null, '80'], 230, false],
+            [['wrong_value', null, '80'], 230, true],
+        ];
+    }
+
+    /**
+     * @param list<int|null>
+     *
+     * @dataProvider assignmentWithProblemsAndPointsValueProvider
+     */
+    public function testCreateSchoolAssignmentWithProblems(
+        array $problemPoints,
+        int $expectedTotalPoints,
+        bool $expectedError
+    ) {
         // Create a test course
         [
             'user' => $user,
@@ -233,43 +257,49 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('ok', $response['status']);
 
         // Create 3 problems
-        $nProblems = 3;
+        $numberOfProblems = count($problemPoints);
         $pointsTotal = 0;
         $problemsData = [];
-        for ($i = 1; $i <= $nProblems; $i++) {
-            $problem = \OmegaUp\Test\Factories\Problem::createProblem(
-                new \OmegaUp\Test\Factories\ProblemParams([
-                    'visibility' => 1,
-                    'user' => $user,
-                ]),
+        foreach ($problemPoints as $i => $points) {
+            $problemRequest = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams(['user' => $user]),
                 $login
-            );
+            )['request'];
 
-            $problemsData[$i]['alias'] = $problem['request']['problem_alias'];
-
-            if ($usePoints) {
-                $problemsData[$i]['points'] = $i;
-                $pointsTotal += $i;
-            } else {
-                $pointsTotal += 100;
+            $problemsData[$i] = ['alias' => $problemRequest['problem_alias']];
+            if (is_null($points)) {
+                continue;
             }
+            $problemsData[$i]['points'] = $points;
         }
 
         // Create the assignment
         $login = self::login($identity);
         $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+        $assignmentRequest = new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'alias' => $assignmentAlias,
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => (\OmegaUp\Time::get() + 60),
+            'finish_time' => (\OmegaUp\Time::get() + 120),
+            'course_alias' => $courseAlias,
+            'assignment_type' => 'homework',
+            'problems' => json_encode($problemsData)
+        ]);
+        if ($expectedError) {
+            try {
+                \OmegaUp\Controllers\Course::apiCreateAssignment(
+                    $assignmentRequest
+                );
+                $this->fail('Should have thrown exception');
+            } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+                $this->assertEquals('parameterNotANumber', $e->getMessage());
+                return;
+            }
+        }
         $response = \OmegaUp\Controllers\Course::apiCreateAssignment(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'name' => \OmegaUp\Test\Utils::createRandomString(),
-                'alias' => $assignmentAlias,
-                'description' => \OmegaUp\Test\Utils::createRandomString(),
-                'start_time' => (\OmegaUp\Time::get() + 60),
-                'finish_time' => (\OmegaUp\Time::get() + 120),
-                'course_alias' => $courseAlias,
-                'assignment_type' => 'homework',
-                'problems' => json_encode($problemsData)
-            ])
+            $assignmentRequest
         );
         $this->assertEquals('ok', $response['status']);
 
@@ -285,15 +315,8 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = \OmegaUp\DAO\ProblemsetProblems::getByProblemset(
             $assignment->problemset_id
         );
-        $this->assertCount($nProblems, $problems);
-    }
-
-    public function testCreateSchoolAssignmentWithProblemsNoPoints() {
-        $this->createSchoolAssignmentWithProblems(false /* usePoints */);
-    }
-
-    public function testCreateSchoolAssignmentWithProblems() {
-        $this->createSchoolAssignmentWithProblems();
+        $this->assertCount($numberOfProblems, $problems);
+        $this->assertEquals($expectedTotalPoints, $assignment->max_points);
     }
 
     /**
