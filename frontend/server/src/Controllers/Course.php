@@ -1544,6 +1544,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
+        // Public courses.
+        $publicCourses = \OmegaUp\DAO\Courses::getPublicCourses();
+
         $response = [
             'admin' => [],
             'student' => [],
@@ -1555,13 +1558,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         foreach ($studentCourses as $course) {
-            $courseAsArray = \OmegaUp\Controllers\Course::convertCourseToArray(
+            $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
-            $response['student'][] = $courseAsArray;
-            if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
-                $response['public'][] = $courseAsArray;
-            }
+        }
+        foreach ($publicCourses as $course) {
+            $response['public'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+                $course
+            );
         }
 
         return $response;
@@ -2601,7 +2605,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
      */
-    public static function getCourseListDetailsForSamrty(\OmegaUp\Request $r): array {
+    public static function getCourseListDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
