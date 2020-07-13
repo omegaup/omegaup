@@ -959,6 +959,10 @@ export namespace types {
     }
   }
 
+  export interface AdminCourses {
+    admin: types.CoursesByAccessMode;
+  }
+
   export interface ArenaProblemDetails {
     alias: string;
     commit: string;
@@ -1271,37 +1275,11 @@ export namespace types {
   }
 
   export interface CourseListMinePayload {
-    courses: {
-      admin: {
-        accessMode: string;
-        activeTab: string;
-        filteredCourses: {
-          current: { courses: types.FilteredCourse[]; timeType: string };
-          past: { courses: types.FilteredCourse[]; timeType: string };
-        };
-      };
-    };
+    courses: types.AdminCourses;
   }
 
   export interface CourseListPayload {
-    courses: {
-      public: {
-        accessMode: string;
-        activeTab: string;
-        filteredCourses: {
-          current: { courses: types.FilteredCourse[]; timeType: string };
-          past: { courses: types.FilteredCourse[]; timeType: string };
-        };
-      };
-      student: {
-        accessMode: string;
-        activeTab: string;
-        filteredCourses: {
-          current: { courses: types.FilteredCourse[]; timeType: string };
-          past: { courses: types.FilteredCourse[]; timeType: string };
-        };
-      };
-    };
+    courses: types.StudentCourses;
   }
 
   export interface CourseProblem {
@@ -1349,6 +1327,20 @@ export namespace types {
   export interface CourseSubmissionsListPayload {
     solvedProblems: { [key: string]: types.CourseProblemTried[] };
     unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
+  }
+
+  export interface CoursesByAccessMode {
+    accessMode: string;
+    activeTab: string;
+    filteredCourses: {
+      current: types.CoursesByTimeType;
+      past: types.CoursesByTimeType;
+    };
+  }
+
+  export interface CoursesByTimeType {
+    courses: types.FilteredCourse[];
+    timeType: string;
   }
 
   export interface CoursesList {
@@ -2097,6 +2089,11 @@ export namespace types {
     total_points?: number;
     total_runs: number;
     verdict_counts: { [key: string]: number };
+  }
+
+  export interface StudentCourses {
+    public: types.CoursesByAccessMode;
+    student: types.CoursesByAccessMode;
   }
 
   export interface StudentProgressPayload {

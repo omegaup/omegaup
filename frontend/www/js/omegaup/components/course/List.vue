@@ -32,6 +32,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import { types } from '../../api_types';
 import * as ui from '../../ui';
 import course_FilteredList from './FilteredList.vue';
 
@@ -41,7 +42,7 @@ import course_FilteredList from './FilteredList.vue';
   },
 })
 export default class CourseList extends Vue {
-  @Prop() courses!: omegaup.Course[];
+  @Prop() courses!: types.StudentCourses;
   @Prop() isMainUserIdentity!: boolean;
 
   T = T;
