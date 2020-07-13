@@ -1,15 +1,12 @@
 <template>
-  <div class="container-fluid p-0 mt-0">
+  <div class="container-fluid p-0 mt-0" data-user-profile-root>
     <div class="row">
       <div class="col-md-2">
         <div class="card">
-          <img
+          <omegaup-countryflag
             class="m-1"
-            height="20"
-            v-bind:src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
-            v-bind:title="profile.country_id"
+            v-bind:country="profile.country_id"
             v-if="profile.country_id"
-            width="25"
           />
           <div class="card-body">
             <div class="img-thumbnail rounded-circle bottom-margin">
@@ -25,8 +22,9 @@
             </div>
             <div class="mb-3">
               <h4 class="m-0">
-                {{ profile.rankinfo.rank &gt; 0 ? `#${profile.rankinfo.rank}`:
-                    '' }}
+                {{
+                  profile.rankinfo.rank > 0 ? `#${profile.rankinfo.rank}` : ''
+                }}
               </h4>
               <p>
                 <small>
@@ -45,7 +43,7 @@
             <div class="mb-3">
               <h5 class="m-0">
                 {{
-                  this.programmingLanguages[
+                  this.profile.programming_languages[
                     this.profile.preferred_language
                   ].split(' ')[0]
                 }}
@@ -65,41 +63,46 @@
       <div class="col-md-10">
         <div class="card">
           <div class="card-header">
-            <!--<nav>-->
-            <ul class="nav nav-tabs" role="tablist">
-              <li v-on:click="selectedTab = 'badges'">
-                <a class="nav-item nav-link active" data-toggle="tab">
-                  {{ T.wordsBadgesObtained }}
-                  <span class="badge badge-secondary">
-                    {{ this.profileBadges.size }}
-                  </span>
-                </a>
-              </li>
-              <li v-on:click="selectedTab = 'problems'">
-                <a class="nav-item nav-link" data-toggle="tab">{{
-                  T.wordsProblems
-                }}</a>
-              </li>
-              <li v-on:click="selectedTab = 'contests'">
-                <a class="nav-item nav-link" data-toggle="tab">
-                  {{ T.profileContests }}
-                  <span class="badge badge-secondary">
-                    {{ Object.keys(contests).length }}
-                  </span>
-                </a>
-              </li>
-              <li v-on:click="selectedTab = 'data'">
-                <a class="nav-item nav-link" data-toggle="tab">{{
-                  T.wordsPersonalData
-                }}</a>
-              </li>
-              <li v-on:click="selectedTab = 'charts'">
-                <a class="nav-item nav-link" data-toggle="tab">{{
-                  T.wordsStatistics
-                }}</a>
-              </li>
-            </ul>
-            <!--</nav>-->
+            <nav class="nav nav-tabs" role="tablist">
+              <a
+                class="nav-item nav-link active"
+                data-toggle="tab"
+                v-on:click="selectedTab = 'badges'"
+              >
+                {{ T.wordsBadgesObtained }}
+                <span class="badge badge-secondary">
+                  {{ this.profileBadges.size }}
+                </span>
+              </a>
+              <a
+                class="nav-item nav-link"
+                data-toggle="tab"
+                v-on:click="selectedTab = 'problems'"
+                >{{ T.wordsProblems }}</a
+              >
+              <a
+                class="nav-item nav-link"
+                data-toggle="tab"
+                v-on:click="selectedTab = 'contests'"
+              >
+                {{ T.profileContests }}
+                <span class="badge badge-secondary">
+                  {{ Object.keys(contests).length }}
+                </span>
+              </a>
+              <a
+                class="nav-item nav-link"
+                data-toggle="tab"
+                v-on:click="selectedTab = 'data'"
+                >{{ T.wordsPersonalData }}</a
+              >
+              <a
+                class="nav-item nav-link"
+                data-toggle="tab"
+                v-on:click="selectedTab = 'charts'"
+                >{{ T.wordsStatistics }}</a
+              >
+            </nav>
             <div class="tab-content">
               <div
                 class="tab-pane fade show active"
@@ -198,7 +201,7 @@
                     this.aggregateStatisticOptions
                   "
                   v-on:emit-update-aggregate-statistics="
-                    profileComponent =>
+                    (profileComponent) =>
                       $emit('update-aggregate-statistics', profileComponent)
                   "
                   v-if="charts"
@@ -212,17 +215,14 @@
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
 a:hover {
   cursor: pointer;
-}
-.card-header {
-  font-size: 1rem !important;
 }
 th.numericColumn {
   text-align: right;
 }
-* {
+[data-user-profile-root] {
   font-size: 1rem;
 }
 </style>
@@ -232,11 +232,12 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { Chart } from 'highcharts-vue';
+import country_Flag from '../CountryFlag.vue';
 import user_BasicInfo from './BasicInfov2.vue';
 import user_Username from './Username.vue';
 import user_Charts from './Chartsv2.vue';
 import badge_List from '../badge/List.vue';
-import gridPaginator from '../common/GridPaginator.vue';
+import common_GridPaginator from '../common/GridPaginator.vue';
 import { Problem, ContestResult } from '../../linkable_resource';
 
 @Component({
@@ -245,7 +246,8 @@ import { Problem, ContestResult } from '../../linkable_resource';
     'omegaup-user-username': user_Username,
     'omegaup-user-charts': user_Charts,
     'omegaup-badge-list': badge_List,
-    'omegaup-grid-paginator': gridPaginator,
+    'omegaup-grid-paginator': common_GridPaginator,
+    'omegaup-countryflag': country_Flag,
   },
 })
 export default class UserProfile extends Vue {
