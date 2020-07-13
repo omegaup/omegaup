@@ -2612,7 +2612,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
 
         $courses = self::getCoursesList($r->identity, $page, $pageSize);
-        $filteredCourses = [];
         $filteredCourses = [
             'admin' => [
                 'filteredCourses' => [
