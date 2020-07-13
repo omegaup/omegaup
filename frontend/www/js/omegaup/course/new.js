@@ -1,11 +1,11 @@
 import course_Form from '../components/course/Form.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   var defaultStartTime = new Date();
   defaultStartTime.setSeconds(0);
   var defaultFinishTime = new Date(defaultStartTime);
@@ -13,7 +13,7 @@ OmegaUp.on('ready', function() {
 
   var details = new Vue({
     el: '#course-details',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-course-form', {
         props: {
           course: {
@@ -29,21 +29,21 @@ OmegaUp.on('ready', function() {
           },
         },
         on: {
-          submit: function(ev) {
+          submit: function (ev) {
             new Promise((accept, reject) => {
               if (ev.school_id) {
                 accept(ev.school_id);
               } else if (ev.school_name) {
                 api.School.create({ name: ev.school_name })
-                  .then(data => {
+                  .then((data) => {
                     accept(data.school_id);
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               } else {
                 accept(null);
               }
             })
-              .then(function(school_id) {
+              .then(function (school_id) {
                 const params = {
                   alias: ev.alias,
                   name: ev.name,
@@ -67,11 +67,11 @@ OmegaUp.on('ready', function() {
                       '/course/' + ev.alias + '/edit/#assignments',
                     );
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
-          cancel: function() {
+          cancel: function () {
             window.location = '/course/';
           },
         },

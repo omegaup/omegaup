@@ -52,27 +52,7 @@
 					</table>
 				</div>
 				<div id="problem" class="main">
-					<h1 class="title"></h1>
-					<table class="data">
-						<tr>
-							<td>{#wordsPoints#}</td>
-							<td class="points"></td>
-							<td>{#arenaCommonMemoryLimit#}</td>
-							<td class="memory_limit"></td>
-						</tr>
-						<tr>
-							<td>{#arenaCommonTimeLimit#}</td>
-							<td class="time_limit"></td>
-							<td>{#arenaCommonOverallWallTimeLimit#}</td>
-							<td class="overall_wall_time_limit"></td>
-						</tr>
-						<tr>
-							<td>{#wordsInOut#}</td>
-							<td>{#wordsConsole#}</td>
-							<td>{#problemEditFormInputLimit#}</td>
-							<td class="input_limit"></td>
-						</tr>
-					</table>
+					<div id="problem-settings-summary"></div>
 {if $admin}
 					<form enctype="multipart/form-data" action="/api/problem/update" method="post" id="update-problem">
 						<fieldset>

@@ -3,14 +3,14 @@ import common_NavbarV2 from '../components/common/Navbarv2.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import { types } from '../api_types';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
   const commonNavbar = new Vue({
     el: '#common-navbar',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
           omegaUpLockDown: this.omegaUpLockDown,
@@ -33,14 +33,14 @@ OmegaUp.on('ready', () => {
           'read-notifications': (notifications: types.Notification[]) => {
             api.Notification.readNotifications({
               notifications: notifications.map(
-                notification => notification.notification_id,
+                (notification) => notification.notification_id,
               ),
             })
               .then(() => api.Notification.myList())
-              .then(data => {
+              .then((data) => {
                 commonNavbar.notifications = data.notifications;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -71,16 +71,16 @@ OmegaUp.on('ready', () => {
 
   if (payload.isLoggedIn) {
     api.Notification.myList()
-      .then(data => {
+      .then((data) => {
         commonNavbar.notifications = data.notifications;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   if (payload.isAdmin) {
     const updateGraderStatus = () => {
       api.Grader.status()
-        .then(stats => {
+        .then((stats) => {
           commonNavbar.graderInfo = stats.grader;
           if (stats.grader.queue) {
             commonNavbar.graderQueueLength =
@@ -89,7 +89,7 @@ OmegaUp.on('ready', () => {
           }
           commonNavbar.errorMessage = null;
         })
-        .catch(stats => {
+        .catch((stats) => {
           commonNavbar.errorMessage = stats.error;
         });
     };

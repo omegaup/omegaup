@@ -2,7 +2,7 @@ import submissions_List from '../components/submissions/List.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
 
   const submissionsList = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-submissions-list', {
         props: {
           page: payload.page,

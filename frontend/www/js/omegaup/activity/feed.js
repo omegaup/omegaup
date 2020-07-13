@@ -2,9 +2,9 @@ import Vue from 'vue';
 import activity_Feed from '../components/activity/Feed.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let match = /\/([^\/]+)\/([^\/]+)\/activity\/?.*/.exec(
     window.location.pathname,
   );
@@ -13,22 +13,22 @@ OmegaUp.on('ready', function() {
 
   if (problemsetType == 'contest') {
     api.Contest.activityReport({ contest_alias: problemsetAlias })
-      .then(function(report) {
+      .then(function (report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   } else if (problemsetType == 'course') {
     api.Course.activityReport({ course_alias: problemsetAlias })
-      .then(function(report) {
+      .then(function (report) {
         createComponent(problemsetType, problemsetAlias, report.events);
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function createComponent(problemsetType, problemsetAlias, report) {
     let activityFeed = new Vue({
       el: '#' + problemsetType + '-activity',
-      render: function(createElement) {
+      render: function (createElement) {
         return createElement('omegaup-activity-feed', {
           props: { type: this.type, alias: this.alias, report: this.report },
         });

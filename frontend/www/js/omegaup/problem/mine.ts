@@ -4,14 +4,14 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemsMineInfoPayload();
   let showAllProblems = false;
   const problemsMine = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-mine', {
         props: {
           problems: this.problems,
@@ -45,10 +45,10 @@ OmegaUp.on('ready', () => {
               ),
             )
               .then(() => {
-                UI.success(T.updateItemsSuccess);
+                ui.success(T.updateItemsSuccess);
               })
-              .catch(error => {
-                UI.error(UI.formatString(T.bulkOperationError, error));
+              .catch((error) => {
+                ui.error(ui.formatString(T.bulkOperationError, error));
               })
               .finally(() => {
                 showProblems(showAllProblems);
@@ -80,11 +80,11 @@ OmegaUp.on('ready', () => {
           page: pageNumber,
         })
     )
-      .then(result => {
+      .then((result) => {
         problemsMine.pagerItems = result.pagerItems;
         problemsMine.problems = result.problems;
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   function normalizeVisibility(

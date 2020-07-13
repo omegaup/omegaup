@@ -185,7 +185,7 @@ export default {
     store: Object,
     storeMapping: Object,
   },
-  data: function() {
+  data: function () {
     return {
       title: 'settings',
     };

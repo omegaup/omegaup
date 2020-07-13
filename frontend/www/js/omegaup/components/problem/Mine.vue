@@ -79,8 +79,7 @@
                     v-if="
                       problem.visibility ==
                         visibilityStatuses['publicWarning'] ||
-                        problem.visibility ==
-                          visibilityStatuses['privateWarning']
+                      problem.visibility == visibilityStatuses['privateWarning']
                     "
                     v-bind:icon="['fas', 'exclamation-triangle']"
                   />
@@ -89,8 +88,7 @@
                     v-else-if="
                       problem.visibility ==
                         visibilityStatuses['publicBanned'] ||
-                        problem.visibility ==
-                          visibilityStatuses['privateBanned']
+                      problem.visibility == visibilityStatuses['privateBanned']
                     "
                     v-bind:icon="['fas', 'ban']"
                   />
@@ -107,15 +105,13 @@
                         problem.visibility ==
                           visibilityStatuses['privateWarning'] ||
                         problem.visibility == visibilityStatuses['private']) &&
-                        problem.visibility > visibilityStatuses['deleted']
+                      problem.visibility > visibilityStatuses['deleted']
                     "
                     v-bind:icon="['fas', 'eye-slash']"
                   />
                   <div class="tags-badges" v-if="problem.tags.length">
                     <a
-                      v-bind:class="
-                        `badge custom-badge custom-badge-${tag.source} m-1 p-2`
-                      "
+                      v-bind:class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
                       v-bind:href="`/problem/?tag[]=${tag.name}`"
                       v-for="tag in problem.tags"
                       >{{
@@ -142,7 +138,7 @@
       <div class="card-footer">
         <omegaup-common-paginator
           v-bind:pagerItems="pagerItems"
-          v-on:page-changed="page => $emit('go-to-page', page)"
+          v-on:page-changed="(page) => $emit('go-to-page', page)"
         ></omegaup-common-paginator>
       </div>
     </div>

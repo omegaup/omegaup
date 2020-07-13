@@ -181,13 +181,20 @@ class Grader {
         );
     }
 
+    /**
+     * @param list<string> $fileHeaders
+     */
     public function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $missingOk = false
+        bool $missingOk = false,
+        array $fileHeaders = []
     ): ?bool {
         if (self::$OMEGAUP_GRADER_FAKE) {
             return null;
+        }
+        foreach ($fileHeaders as $header) {
+            header($header);
         }
         /** @var null|bool */
         return $this->curlRequest(

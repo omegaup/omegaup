@@ -192,7 +192,7 @@ export default class Clarifications extends Vue {
   onCloseClicked(clarification: types.Clarification): void {
     const id = `clarification-${clarification.clarification_id}`;
     this.clarifications = this.clarifications.filter(
-      element => element.clarification_id !== clarification.clarification_id,
+      (element) => element.clarification_id !== clarification.clarification_id,
     );
     localStorage.setItem(id, Date.now().toString());
   }

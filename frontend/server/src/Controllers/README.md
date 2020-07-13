@@ -265,10 +265,10 @@ AuthorizationController
 
 | Name         | Type      |
 | ------------ | --------- |
+| `can_edit`   | `boolean` |
+| `can_view`   | `boolean` |
 | `has_solved` | `boolean` |
 | `is_admin`   | `boolean` |
-| `can_view`   | `boolean` |
-| `can_edit`   | `boolean` |
 
 # Badge
 
@@ -395,11 +395,11 @@ API for getting a clarification
 
 | Name            | Type     |
 | --------------- | -------- |
-| `message`       | `string` |
 | `answer`        | `string` |
-| `time`          | `number` |
+| `message`       | `string` |
 | `problem_id`    | `number` |
 | `problemset_id` | `number` |
+| `time`          | `number` |
 
 ## `/api/clarification/update/`
 
@@ -441,7 +441,7 @@ Returns a report with all user activity for a contest.
 
 | Name     | Type                                                                                  |
 | -------- | ------------------------------------------------------------------------------------- |
-| `events` | `{ username: string; ip: number; time: Date; classname?: string; alias?: string; }[]` |
+| `events` | `{ alias?: string; classname?: string; ip: number; time: Date; username: string; }[]` |
 
 ## `/api/contest/addAdmin/`
 
@@ -562,15 +562,15 @@ remaining time from the contest, or register the opened time.
 | `finish_time`               | `Date`                       |
 | `languages`                 | `string[]`                   |
 | `needs_basic_information`   | `boolean`                    |
-| `partial_score`             | `boolean`                    |
 | `opened`                    | `boolean`                    |
 | `original_contest_alias`    | `string`                     |
 | `original_problemset_id`    | `number`                     |
+| `partial_score`             | `boolean`                    |
 | `penalty`                   | `number`                     |
 | `penalty_calc_policy`       | `string`                     |
 | `penalty_type`              | `string`                     |
-| `problems`                  | `types.ProblemsetProblem[]`  |
 | `points_decay_factor`       | `number`                     |
+| `problems`                  | `types.ProblemsetProblem[]`  |
 | `problemset_id`             | `number`                     |
 | `requests_user_information` | `string`                     |
 | `rerun_id`                  | `number`                     |
@@ -701,7 +701,7 @@ previously agreed to share their information.
 
 | Name          | Type                                                                                                   |
 | ------------- | ------------------------------------------------------------------------------------------------------ |
-| `contestants` | `{ name: string; username: string; email: string; state: string; country: string; school: string; }[]` |
+| `contestants` | `{ country: string; email: string; name: string; school: string; state: string; username: string; }[]` |
 
 ## `/api/contest/create/`
 
@@ -715,11 +715,11 @@ Creates a new contest
 | --------------------------- | ----------- | ----------- |
 | `admission_mode`            | `mixed`     |             |
 | `alias`                     | `mixed`     |             |
-| `needs_basic_information`   | `bool|null` |             |
 | `description`               | `mixed`     |             |
 | `feedback`                  | `mixed`     |             |
 | `finish_time`               | `mixed`     |             |
 | `languages`                 | `mixed`     |             |
+| `needs_basic_information`   | `bool|null` |             |
 | `partial_score`             | `bool|null` |             |
 | `penalty`                   | `mixed`     |             |
 | `penalty_calc_policy`       | `mixed`     |             |
@@ -784,22 +784,22 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 | `languages`                 | `string[]`                  |
 | `needs_basic_information`   | `boolean`                   |
 | `opened`                    | `boolean`                   |
-| `partial_score`             | `boolean`                   |
 | `original_contest_alias`    | `string`                    |
 | `original_problemset_id`    | `number`                    |
+| `partial_score`             | `boolean`                   |
 | `penalty`                   | `number`                    |
 | `penalty_calc_policy`       | `string`                    |
 | `penalty_type`              | `string`                    |
-| `problems`                  | `types.ProblemsetProblem[]` |
 | `points_decay_factor`       | `number`                    |
+| `problems`                  | `types.ProblemsetProblem[]` |
 | `problemset_id`             | `number`                    |
 | `requests_user_information` | `string`                    |
 | `scoreboard`                | `number`                    |
 | `show_penalty`              | `boolean`                   |
 | `show_scoreboard_after`     | `boolean`                   |
 | `start_time`                | `Date`                      |
-| `submissions_gap`           | `number`                    |
 | `submission_deadline`       | `Date`                      |
+| `submissions_gap`           | `number`                    |
 | `title`                     | `string`                    |
 | `window_length`             | `number`                    |
 
@@ -1060,8 +1060,8 @@ Returns a detailed report of the contest
 
 | Name            | Type                                                                                                                                 |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `users`         | `{ accepted: boolean; admin?: { username?: string; }; country: string; last_update: Date; request_time: Date; username: string; }[]` |
 | `contest_alias` | `string`                                                                                                                             |
+| `users`         | `{ accepted: boolean; admin?: { username?: string; }; country: string; last_update: Date; request_time: Date; username: string; }[]` |
 
 ## `/api/contest/role/`
 
@@ -1184,7 +1184,7 @@ Gets the accomulative scoreboard for an array of contests
 
 | Name      | Type                                                                                                                                                     |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ranking` | `{ name: string; username: string; contests: { [key: string]: { points: number; penalty: number; }; }; total: { points: number; penalty: number; }; }[]` |
+| `ranking` | `{ contests: { [key: string]: { penalty: number; points: number; }; }; name: string; total: { penalty: number; points: number; }; username: string; }[]` |
 
 ## `/api/contest/searchUsers/`
 
@@ -1196,8 +1196,8 @@ Search users in contest
 
 | Name            | Type    | Description |
 | --------------- | ------- | ----------- |
-| `query`         | `mixed` |             |
 | `contest_alias` | `mixed` |             |
+| `query`         | `mixed` |             |
 
 ### Returns
 
@@ -1243,14 +1243,14 @@ Stats of a contest
 
 | Name                 | Type                         |
 | -------------------- | ---------------------------- |
-| `total_runs`         | `number`                     |
-| `pending_runs`       | `string[]`                   |
+| `distribution`       | `{ [key: number]: number; }` |
 | `max_wait_time`      | `Date`                       |
 | `max_wait_time_guid` | `string`                     |
-| `verdict_counts`     | `{ [key: string]: number; }` |
-| `distribution`       | `{ [key: number]: number; }` |
+| `pending_runs`       | `string[]`                   |
 | `size_of_bucket`     | `number`                     |
 | `total_points`       | `number`                     |
+| `total_runs`         | `number`                     |
+| `verdict_counts`     | `{ [key: string]: number; }` |
 
 ## `/api/contest/update/`
 
@@ -1264,12 +1264,12 @@ Update a Contest
 | --------------------------- | ------------------------ | ----------- |
 | `admission_mode`            | `mixed`                  |             |
 | `alias`                     | `mixed`                  |             |
-| `needs_basic_information`   | `bool|null`              |             |
 | `contest_alias`             | `mixed`                  |             |
 | `description`               | `mixed`                  |             |
 | `feedback`                  | `mixed`                  |             |
 | `finish_time`               | `int`                    |             |
 | `languages`                 | `mixed`                  |             |
+| `needs_basic_information`   | `bool|null`              |             |
 | `partial_score`             | `bool|null`              |             |
 | `penalty_calc_policy`       | `mixed`                  |             |
 | `penalty_type`              | `mixed`                  |             |
@@ -1322,8 +1322,8 @@ Returns ALL identities participating in a contest
 
 | Name     | Type                                                                                               |
 | -------- | -------------------------------------------------------------------------------------------------- |
-| `users`  | `{ access_time: Date; country_id: string; end_time: Date; is_owner: number; username: string; }[]` |
 | `groups` | `{ alias: string; name: string; }[]`                                                               |
+| `users`  | `{ access_time: Date; country_id: string; end_time: Date; is_owner: number; username: string; }[]` |
 
 # Course
 
@@ -1345,7 +1345,7 @@ Returns a report with all user activity for a course.
 
 | Name     | Type                                                                                  |
 | -------- | ------------------------------------------------------------------------------------- |
-| `events` | `{ username: string; ip: number; time: Date; classname?: string; alias?: string; }[]` |
+| `events` | `{ alias?: string; classname?: string; ip: number; time: Date; username: string; }[]` |
 
 ## `/api/course/addAdmin/`
 
@@ -1674,16 +1674,16 @@ Show course intro only on public courses when user is not yet registered
 
 | Name                      | Type                                                                                                                                                                |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `name`                    | `string`                                                                                                                                                            |
-| `description`             | `string`                                                                                                                                                            |
 | `alias`                   | `string`                                                                                                                                                            |
 | `currentUsername`         | `string`                                                                                                                                                            |
+| `description`             | `string`                                                                                                                                                            |
+| `isFirstTimeAccess`       | `boolean`                                                                                                                                                           |
+| `name`                    | `string`                                                                                                                                                            |
 | `needsBasicInformation`   | `boolean`                                                                                                                                                           |
 | `requestsUserInformation` | `string`                                                                                                                                                            |
 | `shouldShowAcceptTeacher` | `boolean`                                                                                                                                                           |
-| `statements`              | `{ privacy: { markdown: string; gitObjectId: string; statementType: string; }; acceptTeacher: { gitObjectId: string; markdown: string; statementType: string; }; }` |
-| `isFirstTimeAccess`       | `boolean`                                                                                                                                                           |
 | `shouldShowResults`       | `boolean`                                                                                                                                                           |
+| `statements`              | `{ acceptTeacher: { gitObjectId: string; markdown: string; statementType: string; }; privacy: { gitObjectId: string; markdown: string; statementType: string; }; }` |
 
 ## `/api/course/listAssignments/`
 
@@ -1699,9 +1699,9 @@ List course assignments
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                            |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `assignments` | `{ alias: string; assignment_type: string; description: string; finish_time: Date; has_runs: boolean; name: string; order: number; scoreboard_url: string; scoreboard_url_admin: string; start_time: Date; }[]` |
+| Name          | Type                       |
+| ------------- | -------------------------- |
+| `assignments` | `types.CourseAssignment[]` |
 
 ## `/api/course/listCourses/`
 
@@ -2128,7 +2128,7 @@ Details of a group (scoreboards)
 
 | Name          | Type                                                                           |
 | ------------- | ------------------------------------------------------------------------------ |
-| `group`       | `{ create_time: number; alias: string; name: string; description: string; }`   |
+| `group`       | `{ alias: string; create_time: number; description: string; name: string; }`   |
 | `scoreboards` | `{ alias: string; create_time: string; description: string; name: string; }[]` |
 
 ## `/api/group/list/`
@@ -2243,9 +2243,9 @@ the given scoreboard_alias
 
 | Name         | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ranking`    | `{ name: string; username: string; contests: { [key: string]: { points: number; penalty: number; }; }; total: { points: number; penalty: number; }; }[]`                                                                                                                                                                                                                                                                                                                                                                                          |
-| `scoreboard` | `{ group_scoreboard_id: number; group_id: number; create_time: number; alias: string; name: string; description: string; }`                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `contests`   | `{ contest_id: number; problemset_id: number; acl_id: number; title: string; description: string; start_time: Date; finish_time: Date; last_updated: number; window_length: number; rerun_id: number; admission_mode: string; alias: string; scoreboard: number; points_decay_factor: number; partial_score: boolean; submissions_gap: number; feedback: string; penalty: string; penalty_calc_policy: string; show_scoreboard_after: boolean; urgent: boolean; languages: string; recommended: boolean; only_ac?: boolean; weight?: number; }[]` |
+| `contests`   | `{ acl_id: number; admission_mode: string; alias: string; contest_id: number; description: string; feedback: string; finish_time: Date; languages: string; last_updated: number; only_ac?: boolean; partial_score: boolean; penalty: string; penalty_calc_policy: string; points_decay_factor: number; problemset_id: number; recommended: boolean; rerun_id: number; scoreboard: number; show_scoreboard_after: boolean; start_time: Date; submissions_gap: number; title: string; urgent: boolean; weight?: number; window_length: number; }[]` |
+| `ranking`    | `{ contests: { [key: string]: { penalty: number; points: number; }; }; name: string; total: { penalty: number; points: number; }; username: string; }[]`                                                                                                                                                                                                                                                                                                                                                                                          |
+| `scoreboard` | `{ alias: string; create_time: number; description: string; group_id: number; group_scoreboard_id: number; name: string; }`                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 ## `/api/groupScoreboard/list/`
 
@@ -2263,7 +2263,7 @@ Details of a scoreboard
 
 | Name          | Type                                                                                                                          |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `scoreboards` | `{ group_scoreboard_id: number; group_id: number; create_time: number; alias: string; name: string; description: string; }[]` |
+| `scoreboards` | `{ alias: string; create_time: number; description: string; group_id: number; group_scoreboard_id: number; name: string; }[]` |
 
 ## `/api/groupScoreboard/removeContest/`
 
@@ -2424,10 +2424,10 @@ _Nothing_
 
 | Name            | Type                                                                                                                     |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `description`   | `string`                                                                                                                 |
 | `contest_alias` | `string`                                                                                                                 |
+| `description`   | `string`                                                                                                                 |
 | `problemset_id` | `number`                                                                                                                 |
-| `users`         | `{ user_id: number; username: string; access_time: Date; email: string; opened_interview: boolean; country: string; }[]` |
+| `users`         | `{ access_time: Date; country: string; email: string; opened_interview: boolean; user_id: number; username: string; }[]` |
 
 ## `/api/interview/list/`
 
@@ -2699,7 +2699,6 @@ List of public and user's private problems
 | `max_difficulty`        | `mixed` |             |
 | `min_difficulty`        | `mixed` |             |
 | `min_visibility`        | `mixed` |             |
-| `sort_order`            | `mixed` |             |
 | `offset`                | `mixed` |             |
 | `only_karel`            | `mixed` |             |
 | `order_by`              | `mixed` |             |
@@ -2709,6 +2708,7 @@ List of public and user's private problems
 | `require_all_tags`      | `mixed` |             |
 | `rowcount`              | `mixed` |             |
 | `some_tags`             | `mixed` |             |
+| `sort_order`            | `mixed` |             |
 
 ### Returns
 
@@ -2978,8 +2978,8 @@ Updates the problem level of a problem
 
 | Name            | Type    | Description |
 | --------------- | ------- | ----------- |
-| `problem_alias` | `mixed` |             |
 | `level_tag`     | `mixed` |             |
+| `problem_alias` | `mixed` |             |
 
 ### Returns
 
@@ -3073,8 +3073,8 @@ Entry point for Problem Versions API
 
 | Name        | Type                     |
 | ----------- | ------------------------ |
-| `published` | `string`                 |
 | `log`       | `types.ProblemVersion[]` |
+| `published` | `string`                 |
 
 # ProblemForfeited
 
@@ -3270,7 +3270,7 @@ nominator or a member of the reviewer group.
 | `nomination`           | `string`                                                                                                                                                         |
 | `nomination_status`    | `string`                                                                                                                                                         |
 | `nominator`            | `{ name: string; username: string; }`                                                                                                                            |
-| `original_contents`    | `{ source: string; statements: { [key: string]: types.ProblemStatement; }; tags?: { source: string; name: string; }[]; }`                                        |
+| `original_contents`    | `{ source: string; statements: { [key: string]: types.ProblemStatement; }; tags?: { name: string; source: string; }[]; }`                                        |
 | `problem`              | `{ alias: string; title: string; }`                                                                                                                              |
 | `qualitynomination_id` | `number`                                                                                                                                                         |
 | `reviewer`             | `boolean`                                                                                                                                                        |
@@ -3285,11 +3285,11 @@ nominator or a member of the reviewer group.
 
 | Name       | Type    | Description |
 | ---------- | ------- | ----------- |
+| `column`   | `mixed` |             |
 | `offset`   | `int`   |             |
+| `query`    | `mixed` |             |
 | `rowcount` | `int`   |             |
 | `status`   | `mixed` |             |
-| `query`    | `mixed` |             |
-| `column`   | `mixed` |             |
 
 ### Returns
 
@@ -3345,11 +3345,11 @@ Marks a problem of a nomination (only the demotion type supported for now) as (r
 
 | Name                   | Type        | Description |
 | ---------------------- | ----------- | ----------- |
+| `all`                  | `bool|null` |             |
 | `problem_alias`        | `mixed`     |             |
 | `qualitynomination_id` | `mixed`     |             |
 | `rationale`            | `mixed`     |             |
 | `status`               | `mixed`     |             |
-| `all`                  | `bool|null` |             |
 
 ### Returns
 
@@ -3435,8 +3435,8 @@ Get total of last 6 months
 
 | Name    | Type                         |
 | ------- | ---------------------------- |
-| `total` | `{ [key: string]: number; }` |
 | `ac`    | `{ [key: string]: number; }` |
+| `total` | `{ [key: string]: number; }` |
 
 ## `/api/run/create/`
 
@@ -3459,9 +3459,9 @@ Create a new run
 | Name                      | Type     |
 | ------------------------- | -------- |
 | `guid`                    | `string` |
-| `submit_delay`            | `number` |
-| `submission_deadline`     | `Date`   |
 | `nextSubmissionTimestamp` | `Date`   |
+| `submission_deadline`     | `Date`   |
+| `submit_delay`            | `number` |
 
 ## `/api/run/details/`
 
@@ -3477,17 +3477,9 @@ Gets the details of a run. Includes admin details if admin.
 
 ### Returns
 
-| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `admin`         | `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `alias`         | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `details`       | `{ compile_meta?: { [key: string]: types.RunMetadata; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; verdict?: string; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
-| `guid`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `judged_by`     | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `language`      | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `logs`          | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+```typescript
+types.RunDetails;
+```
 
 ## `/api/run/disqualify/`
 
@@ -3694,7 +3686,7 @@ contestant's machine and the server.
 
 | Name      | Type                                                                                                                                      |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `session` | `{ valid: boolean; email: string; user: dao.Users; identity: dao.Identities; classname: string; auth_token: string; is_admin: boolean; }` |
+| `session` | `{ auth_token: string; classname: string; email: string; identity: dao.Identities; is_admin: boolean; user: dao.Users; valid: boolean; }` |
 | `time`    | `number`                                                                                                                                  |
 
 ## `/api/session/googleLogin/`
@@ -3922,7 +3914,7 @@ Get Contests which a certain user has participated in
 
 | Name       | Type                                                                                                                                       |
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `contests` | `{ [key: string]: { data: { alias: string; title: string; start_time: Date; finish_time: Date; last_updated: Date; }; place: number; }; }` |
+| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place: number; }; }` |
 
 ## `/api/user/create/`
 
@@ -3955,10 +3947,10 @@ Gets extra information of the identity:
 
 | Name              | Type      |
 | ----------------- | --------- |
-| `within_last_day` | `boolean` |
-| `verified`        | `boolean` |
-| `username`        | `string`  |
 | `last_login`      | `Date`    |
+| `username`        | `string`  |
+| `verified`        | `boolean` |
+| `within_last_day` | `boolean` |
 
 ## `/api/user/generateGitToken/`
 
@@ -4015,11 +4007,11 @@ Get the results for this user in a given interview
 
 | Name               | Type      |
 | ------------------ | --------- |
-| `user_verified`    | `boolean` |
+| `finished`         | `boolean` |
 | `interview_url`    | `string`  |
 | `name_or_username` | `string`  |
 | `opened_interview` | `boolean` |
-| `finished`         | `boolean` |
+| `user_verified`    | `boolean` |
 
 ## `/api/user/lastPrivacyPolicyAccepted/`
 
@@ -4069,7 +4061,7 @@ Get the identities that have been associated to the logged user
 
 | Name         | Type                                        |
 | ------------ | ------------------------------------------- |
-| `identities` | `{ username: string; default: boolean; }[]` |
+| `identities` | `{ default: boolean; username: string; }[]` |
 
 ## `/api/user/listUnsolvedProblems/`
 
@@ -4375,11 +4367,11 @@ contest updates with an access token.
 
 | Name               | Type       |
 | ------------------ | ---------- |
-| `user`             | `string`   |
 | `admin`            | `boolean`  |
-| `problem_admin`    | `string[]` |
 | `contest_admin`    | `string[]` |
+| `problem_admin`    | `string[]` |
 | `problemset_admin` | `number[]` |
+| `user`             | `string`   |
 
 ## `/api/user/verifyEmail/`
 

@@ -14,7 +14,7 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="/"
-          ><img alt="omegaUp" src="/media/omegaup_curves.png"/>
+          ><img alt="omegaUp" src="/media/omegaup_curves.png" />
           <img
             alt="lockdown"
             title="lockdown"
@@ -61,10 +61,28 @@
             <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
           </li>
           <li
-            class="nav-courses"
+            class="dropdown nav-courses"
             v-bind:class="{ active: navbarSection === 'courses' }"
+            v-if="isLoggedIn"
           >
-            <a href="/schools/">{{ T.navCourses }}</a>
+            <a class="dropdown-toogle" data-toggle="dropdown" data-nav-courses
+              ><span>{{ T.navCourses }}</span
+              ><span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="/course/" data-nav-courses-all>
+                  {{ T.navAllCourses }}
+                </a>
+              </li>
+              <template v-if="isMainUserIdentity">
+                <li>
+                  <a href="/course/new/" data-nav-courses-create>
+                    {{ T.buttonCreateCourse }}
+                  </a>
+                </li>
+              </template>
+            </ul>
           </li>
           <li
             class="dropdown nav-problems"
@@ -172,7 +190,7 @@
               data-toggle="dropdown"
               data-nav-user
               href="#"
-              ><img v-bind:src="gravatarURL51"/>
+              ><img v-bind:src="gravatarURL51" />
               <span class="username" v-bind:title="currentUsername">{{
                 currentUsername
               }}</span>

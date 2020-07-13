@@ -68,6 +68,13 @@ export namespace omegaup {
     selected: boolean;
   }
 
+  export enum VisibilityMode {
+    Default,
+    New,
+    Edit,
+    AddProblem,
+  }
+
   export enum AdmissionMode {
     Private = 'private',
     Registration = 'registration',
@@ -319,15 +326,6 @@ export namespace omegaup {
     country_id?: string;
   }
 
-  export interface IdentityRequest {
-    username: string;
-    country: string;
-    request_time: Date;
-    last_update: Date;
-    accepted: boolean;
-    admin?: UserRole;
-  }
-
   export interface Languages {
     [language: string]: string;
   }
@@ -372,6 +370,7 @@ export namespace omegaup {
     alias: string;
     commit?: string;
     difficulty?: number;
+    input_limit: number;
     languages?: string;
     letter?: string;
     order: number;

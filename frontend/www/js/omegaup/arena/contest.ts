@@ -13,9 +13,7 @@ OmegaUp.on('ready', () => {
     arenaInstance.renderProblem(problem);
 
     for (const solver of problem.solvers ?? []) {
-      const prob = $('.solver-list .template')
-        .clone()
-        .removeClass('template');
+      const prob = $('.solver-list .template').clone().removeClass('template');
       $('.user', prob)
         .attr('href', '/profile/' + solver.username)
         .text(solver.username);
@@ -28,7 +26,7 @@ OmegaUp.on('ready', () => {
 
     if (problem.user.logged_in) {
       api.Problem.runs({ problem_alias: problem.alias })
-        .then(result => {
+        .then((result) => {
           onlyProblemUpdateRuns(result.runs, 'score', 100);
         })
         .catch(ui.apiError);
@@ -109,8 +107,8 @@ OmegaUp.on('ready', () => {
     api.Contest.details({
       contest_alias: arenaInstance.options.contestAlias,
     })
-      .then(result => arenaInstance.problemsetLoaded(result))
-      .catch(e => arenaInstance.problemsetLoadedError(e));
+      .then((result) => arenaInstance.problemsetLoaded(result))
+      .catch((e) => arenaInstance.problemsetLoadedError(e));
 
     $('.clarifpager .clarifpagerprev').on('click', () => {
       if (arenaInstance.clarificationsOffset > 0) {
@@ -137,18 +135,18 @@ OmegaUp.on('ready', () => {
     });
   }
 
-  $('#clarification').on('submit', e => {
+  $('#clarification').on('submit', (e) => {
     $('#clarification input').attr('disabled', 'disabled');
     api.Clarification.create({
       contest_alias: arenaInstance.options.contestAlias,
       problem_alias: $('#clarification select[name="problem"]').val(),
       message: $('#clarification textarea[name="message"]').val(),
     })
-      .then(response => {
+      .then((response) => {
         arenaInstance.hideOverlay();
         arenaInstance.refreshClarifications();
       })
-      .catch(e => {
+      .catch((e) => {
         alert(e.error);
       })
       .finally(() => {

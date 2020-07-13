@@ -14,7 +14,7 @@
             ></span>
             <omegaup-autocomplete
               class="form-control"
-              v-bind:init="el => typeahead.userTypeahead(el)"
+              v-bind:init="(el) => typeahead.userTypeahead(el)"
               v-model="username"
             ></omegaup-autocomplete>
           </label>

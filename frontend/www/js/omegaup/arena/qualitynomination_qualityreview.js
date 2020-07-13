@@ -1,10 +1,10 @@
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import qualitynomination_ReviewerPopup from '../components/qualitynomination/ReviewerPopup.vue';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const nominationPayload = JSON.parse(
     document.getElementById('qualitynomination-reportproblem-payload')
       .innerText,
@@ -12,10 +12,10 @@ OmegaUp.on('ready', function() {
   if (nominationPayload.reviewer && !nominationPayload.already_reviewed) {
     const qualityNominationForm = new Vue({
       el: '#qualitynomination-qualityreview',
-      render: function(createElement) {
+      render: function (createElement) {
         return createElement('qualitynomination-reviewerpopup', {
           on: {
-            submit: function(tag, qualitySeal) {
+            submit: function (tag, qualitySeal) {
               const contents = {};
               if (tag) {
                 contents.tag = tag;
@@ -25,7 +25,7 @@ OmegaUp.on('ready', function() {
                 problem_alias: nominationPayload.problem_alias,
                 nomination: 'quality_tag',
                 contents: JSON.stringify(contents),
-              }).catch(UI.apiError);
+              }).catch(ui.apiError);
             },
           },
         });
