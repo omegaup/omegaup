@@ -529,7 +529,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ';';
         }
 
-        /** @var list<array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}> */
         $result = [];
         /** @var array{classname: string, country_id: string, identity_id: int, is_invited: int, name: null|string, username: string} $row */
         foreach (
