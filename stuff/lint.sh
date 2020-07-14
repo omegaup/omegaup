@@ -46,4 +46,4 @@ exec "${DOCKER_PATH}" run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20200713 $ARGS
+	omegaup/hook_tools:20200714 --command-name="./stuff/lint.sh" $ARGS
