@@ -65,7 +65,7 @@
                   {{ problem_case.max_score ? problem_case.max_score : '' }}
                 </td>
               </tr>
-              <template v-if="data.show_diff !== 'none'">
+              <template v-if="shouldShowDiffs(problem_case.name)">
                 <tr>
                   <td colspan="6">{{ T.wordsInput }}</td>
                 </tr>
@@ -342,6 +342,13 @@ export default class ArenaRunDetails extends Vue {
     caseType: 'in' | 'out' | 'contestantOutput',
   ): string {
     return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
+  }
+
+  shouldShowDiffs(caseName: string): boolean {
+    return (
+      this.data.show_diff === 'all' ||
+      (caseName === 'sample' && this.data.show_diff === 'examples')
+    );
   }
 
   getContestantOutput(cases: types.ProblemCasesContents, name: string): string {

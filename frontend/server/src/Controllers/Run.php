@@ -1136,6 +1136,9 @@ class Run extends \OmegaUp\Controllers\Controller {
         ) {
             return $contest->feedback;
         }
+        if ($problem->show_diff !== 'none') {
+            return 'detailed';
+        }
         return $isProblemSolved ? 'detailed' : 'none';
     }
 
