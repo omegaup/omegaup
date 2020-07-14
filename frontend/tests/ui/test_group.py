@@ -66,6 +66,21 @@ def test_create_group_with_identities_and_restrictions(driver):
                 'a[href="%s"]' % absent_href), (
                     '%s item is visible!' % absent_href)
 
+        navbar.find_element_by_css_selector(
+            'li.nav-contests a.dropdown-toggle').click()
+        contests_dropdown = driver.wait.until(
+            EC.visibility_of(
+                navbar.find_element_by_css_selector(
+                    'li.nav-contests .dropdown-menu')))
+        for present_href in ['/arena/']:
+            assert contests_dropdown.find_elements_by_css_selector(
+                'a[href="%s"]' % present_href), (
+                    '%s item is not present!' % present_href)
+        for absent_href in ['/contest/new/', '/scoreboardmerge/']:
+            assert not contests_dropdown.find_elements_by_css_selector(
+                'a[href="%s"]' % absent_href), (
+                    '%s item is visible!' % absent_href)
+
         # Courses list
         driver.wait.until(
             EC.element_to_be_clickable(
