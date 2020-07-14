@@ -422,7 +422,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         (
                             SELECT
                                 raw_identities.identity_id,
-                                MAX(raw_identities.is_invited) AS is_invited
+                                CAST(MAX(raw_identities.is_invited) AS UNSIGNED) AS is_invited
                             FROM
                                 (
                                     SELECT
