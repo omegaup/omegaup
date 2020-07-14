@@ -18,6 +18,10 @@ from ui import conftest  # pylint: disable=no-name-in-module
 def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
                   assignment_alias: str, problem_alias: str) -> None:
     with driver.login_admin():
+        util.create_problem(
+            driver,
+            problem_alias,
+            resource_path='frontend/tests/resources/testproblem.zip')
         create_course(driver, course_alias, school_name)
         add_students_course(driver, [driver.user_username])
         add_assignment(driver, assignment_alias)
@@ -27,10 +31,11 @@ def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
 def _click_on_problem(driver: conftest.Driver, problem_alias: str) -> None:
     for _ in range(10):
         driver.wait.until(
-            EC.element_to_be_clickable((
-                By.XPATH,
-                f'//a[contains(text(), "{problem_alias.title()}")]/parent::div'
-            ))).click()
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 (f'//div[@data-navbar-problem]'
+                  f'//a[contains(text(), "{problem_alias}")]/parent::div'
+                  )))).click()
         if driver.browser.current_url.endswith(f'#problems/{problem_alias}'):
             break
     else:
@@ -47,7 +52,7 @@ def test_user_ranking_course(driver):
     course_alias = f'ut_rank_course_{run_id}'
     school_name = f'ut_rank_school_{run_id}'
     assignment_alias = f'ut_rank_hw_{run_id}'
-    problem = 'sumas'
+    problem = 'ut_rc_problem_%s' % driver.generate_id()
 
     _setup_course(driver, course_alias, school_name, assignment_alias, problem)
 
@@ -75,11 +80,7 @@ def test_user_ranking_course(driver):
                     (By.CSS_SELECTOR,
                      '.popup button.close')))
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(text(), "%s")]/parent::div' %
-                  problem.title())))).click()
+        _click_on_problem(driver, problem)
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
