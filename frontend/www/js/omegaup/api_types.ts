@@ -948,7 +948,7 @@ export namespace types {
 
   export interface AddedProblem {
     alias: string;
-    points: number | number;
+    points: number;
   }
 
   export interface ArenaProblemDetails {

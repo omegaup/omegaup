@@ -32,7 +32,7 @@
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type AddedProblem=array{alias: string, points: float|int}
+ * @psalm-type AddedProblem=array{alias: string, points: float}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -172,9 +172,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $problemData['points'],
                         'points'
                     );
-                    $problemData['points'] = intval($problemData['points']);
+                    $problemData['points'] = floatval($problemData['points']);
                 } else {
-                    $problemData['points'] = 100;
+                    $problemData['points'] = 100.0;
                 }
 
                 $addedProblems[] = $problemData;
@@ -807,7 +807,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
-        $assignedPoints = is_null($points) ? 100 : floatval($points);
+        $assignedPoints = $points ?? 100.0;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
@@ -1047,7 +1047,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id,
             $r->identity,
             true, /* validateVisibility */
-            is_numeric($r['points']) ? intval($r['points']) : 100,
+            is_numeric($r['points']) ? floatval($r['points']) : 100.0,
             $r['commit']
         );
 

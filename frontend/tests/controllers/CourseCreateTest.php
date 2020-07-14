@@ -213,15 +213,15 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with problems in a course.
      *
-     * @return list<array{0: list<int|null>, 1: int, 2: bool}>
+     * @return list<array{0: list<int|null>, 1: float|null}>
      */
     public function assignmentWithProblemsAndPointsValueProvider(): array {
         return [
-            [[null, null, null], 300, false],
-            [[100, 80, 20], 200, false],
-            [[50, null, 20], 170, false],
-            [[50, null, '80'], 230, false],
-            [['wrong_value', null, '80'], 230, true],
+            [[null, null, null], 300.0],
+            [[100, 80, 20], 200.0],
+            [[50, null, 20], 170.0],
+            [[50, null, '80'], 230.0],
+            [['wrong_value', null, '80'], null],
         ];
     }
 
@@ -232,8 +232,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreateSchoolAssignmentWithProblems(
         array $problemPoints,
-        int $expectedTotalPoints,
-        bool $expectedError
+        ?float $expectedTotalPoints
     ) {
         // Create a test course
         [
@@ -256,21 +255,20 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
         $this->assertEquals('ok', $response['status']);
 
-        // Create 3 problems
+        // Create problems
         $numberOfProblems = count($problemPoints);
         $pointsTotal = 0;
         $problemsData = [];
-        foreach ($problemPoints as $i => $points) {
+        foreach ($problemPoints as $points) {
             $problemRequest = \OmegaUp\Test\Factories\Problem::createProblem(
                 new \OmegaUp\Test\Factories\ProblemParams(['user' => $user]),
                 $login
             )['request'];
-
-            $problemsData[$i] = ['alias' => $problemRequest['problem_alias']];
-            if (is_null($points)) {
-                continue;
+            $currentProblemData = ['alias' => $problemRequest['problem_alias']];
+            if (!is_null($points)) {
+                $currentProblemData['points'] = $points;
             }
-            $problemsData[$i]['points'] = $points;
+            $problemsData[] = $currentProblemData;
         }
 
         // Create the assignment
@@ -287,7 +285,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_type' => 'homework',
             'problems' => json_encode($problemsData)
         ]);
-        if ($expectedError) {
+        if (!$expectedTotalPoints) {
             try {
                 \OmegaUp\Controllers\Course::apiCreateAssignment(
                     $assignmentRequest
