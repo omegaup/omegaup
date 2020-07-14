@@ -215,19 +215,19 @@ library.add(faEdit, faLink, faTachometerAlt);
   },
 })
 export default class CourseDetails extends Vue {
-  @Prop() course!: omegaup.Course;
+  @Prop() course!: types.CourseDetails;
   @Prop() progress!: types.AssignmentProgress[];
 
   T = T;
   ui = ui;
 
-  get filteredHomeworks(): omegaup.Assignment[] {
+  get filteredHomeworks(): types.CourseAssignment[] {
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'homework',
     );
   }
 
-  get filteredExams(): omegaup.Assignment[] {
+  get filteredExams(): types.CourseAssignment[] {
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'test',
     );

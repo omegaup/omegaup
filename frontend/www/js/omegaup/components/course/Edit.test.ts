@@ -17,13 +17,13 @@ describe('Edit.vue', () => {
     const wrapper = shallowMount(course_Edit, {
       propsData: {
         data: {
-          course: <omegaup.Course>{
+          course: <types.CourseDetails>{
             admission_mode: 'registration',
             alias: 'test-course',
-            assignments: <omegaup.Assignment[]>[],
-            basic_information_required: false,
+            assignments: [],
+            needs_basic_information: false,
             description: '# Test',
-            finish_time: null,
+            finish_time: new Date(),
             is_curator: true,
             is_admin: true,
             name: courseName,

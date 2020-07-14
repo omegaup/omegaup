@@ -4,7 +4,7 @@
       <h3 class="card-title">{{ T.courseNew }}</h3>
     </div>
     <div class="card-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" data-course-form v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
             <label class="faux-label"
@@ -14,6 +14,7 @@
                 data-course-new-name
                 type="text"
                 v-model="name"
+                required="required"
             /></label>
           </div>
           <div class="form-group col-md-4">
@@ -32,6 +33,7 @@
                 data-course-new-alias
                 v-bind:disabled="update"
                 v-model="alias"
+                required="required"
             /></label>
           </div>
           <div class="form-group col-md-4">
@@ -155,14 +157,14 @@
                 ><input
                   type="radio"
                   v-bind:value="true"
-                  v-model="basic_information_required"
+                  v-model="needs_basic_information"
                 />{{ T.wordsYes }}</label
               >
               <label class="radio-inline"
                 ><input
                   type="radio"
                   v-bind:value="false"
-                  v-model="basic_information_required"
+                  v-model="needs_basic_information"
                 />{{ T.wordsNo }}</label
               >
             </div>
@@ -198,6 +200,7 @@
                 cols="30"
                 rows="5"
                 v-model="description"
+                required="required"
               ></textarea>
             </label>
           </div>
@@ -262,7 +265,7 @@ export default class CourseDetails extends Vue {
   name = this.course.name;
   school_name = this.course.school_name;
   school_id = this.course.school_id;
-  basic_information_required = this.course.basic_information_required;
+  needs_basic_information = this.course.needs_basic_information;
   requests_user_information = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
 
@@ -291,7 +294,7 @@ export default class CourseDetails extends Vue {
     this.name = this.course.name;
     this.school_name = this.course.school_name;
     this.school_id = this.course.school_id;
-    this.basic_information_required = this.course.basic_information_required;
+    this.needs_basic_information = this.course.needs_basic_information;
     this.requests_user_information = this.course.requests_user_information;
     this.unlimitedDuration = this.course.finish_time === null;
   }

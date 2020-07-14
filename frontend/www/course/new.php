@@ -10,8 +10,10 @@ if (OMEGAUP_LOCKDOWN) {
     function (\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
         return [
-            'smartyProperties' => [],
-            'template' => 'course.new.tpl',
+            'smartyProperties' => [
+                'title' => 'omegaupTitleCourseNew',
+            ],
+            'entrypoint' => 'course_new',
         ];
     }
 );

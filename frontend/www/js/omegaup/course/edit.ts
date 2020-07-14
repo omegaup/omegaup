@@ -52,7 +52,7 @@ OmegaUp.on('ready', () => {
                   start_time: source.startTime.getTime() / 1000,
                   alias: source.alias,
                   show_scoreboard: source.showScoreboard,
-                  needs_basic_information: source.basic_information_required,
+                  needs_basic_information: source.needs_basic_information,
                   requests_user_information: source.requests_user_information,
                   school_id: schoolId,
                 };

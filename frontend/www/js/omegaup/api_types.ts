@@ -1221,18 +1221,19 @@ export namespace types {
     admission_mode: string;
     alias: string;
     assignments: types.CourseAssignment[];
-    basic_information_required: boolean;
     description: string;
     finish_time?: Date;
-    is_admin: boolean;
-    is_curator: boolean;
+    is_admin?: boolean;
+    is_curator?: boolean;
     name: string;
+    needs_basic_information: boolean;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
     show_scoreboard: boolean;
     start_time: Date;
     student_count?: number;
+    unlimited_duration?: boolean;
   }
 
   export interface CourseDetailsPayload {

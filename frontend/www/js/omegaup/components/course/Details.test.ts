@@ -3,7 +3,6 @@ import expect from 'expect';
 import Vue from 'vue';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 
 import course_Details from './Details.vue';
@@ -13,13 +12,13 @@ describe('Details.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Details, {
       propsData: {
-        course: <omegaup.Course>{
+        course: <types.CourseDetails>{
           admission_mode: 'registration',
           alias: 'test-course',
-          assignments: <omegaup.Assignment[]>[],
-          basic_information_required: false,
+          assignments: [],
+          needs_basic_information: false,
           description: '# Test',
-          finish_time: null,
+          finish_time: new Date(),
           is_curator: true,
           is_admin: true,
           name: courseName,
@@ -45,13 +44,13 @@ describe('Details.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Details, {
       propsData: {
-        course: <omegaup.Course>{
+        course: <types.CourseDetails>{
           admission_mode: 'registration',
           alias: 'test-course',
-          assignments: <omegaup.Assignment[]>[],
-          basic_information_required: false,
+          assignments: [],
+          needs_basic_information: false,
           description: '# Test',
-          finish_time: null,
+          finish_time: new Date(),
           is_curator: false,
           is_admin: false,
           name: courseName,
@@ -74,25 +73,28 @@ describe('Details.vue', () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Details, {
       propsData: {
-        course: <omegaup.Course>{
+        course: <types.CourseDetails>{
           admission_mode: 'registration',
           alias: 'test-course',
-          assignments: <omegaup.Assignment[]>[
-            <omegaup.Assignment>{
+          assignments: [
+            {
               alias: 'test-assignment',
               assignment_type: 'homework',
               description: '',
-              finish_time: null,
+              finish_time: new Date(),
               name: 'Test',
               order: 1,
               scoreboard_url: '',
               scoreboard_url_admin: '',
               start_time: new Date(0),
+              has_runs: false,
+              max_points: 0,
+              problemset_id: 0,
             },
           ],
-          basic_information_required: false,
+          needs_basic_information: false,
           description: '# Test',
-          finish_time: null,
+          finish_time: new Date(),
           is_curator: true,
           is_admin: true,
           name: courseName,
