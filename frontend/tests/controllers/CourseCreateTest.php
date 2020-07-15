@@ -213,7 +213,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for the test with problems in a course.
      *
-     * @return list<array{0: list<int|null>, 1: float|null}>
+     * @return list<array{0: list<int|null|string>, 1: float|null}>
      */
     public function assignmentWithProblemsAndPointsValueProvider(): array {
         return [
@@ -285,7 +285,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'assignment_type' => 'homework',
             'problems' => json_encode($problemsData)
         ]);
-        if (!$expectedTotalPoints) {
+        if (is_null($expectedTotalPoints)) {
             try {
                 \OmegaUp\Controllers\Course::apiCreateAssignment(
                     $assignmentRequest

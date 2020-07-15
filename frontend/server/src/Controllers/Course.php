@@ -783,7 +783,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @param int $problemsetId
      * @param int $userId
      * @param bool $validateVisibility validations no needed when it is a clone
-     * @param float|int|null $points = 100
      * @param ?string $commit
      * @param ?int $order = 1
      */
@@ -792,7 +791,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         int $problemsetId,
         \OmegaUp\DAO\VO\Identities $identity,
         bool $validateVisibility,
-        $points = 100,
+        ?float $points = 100,
         ?string $commit = null,
         ?int $order = 1
     ): void {
