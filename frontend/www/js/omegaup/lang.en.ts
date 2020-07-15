@@ -1291,7 +1291,7 @@ const translations: { [key: string]: string; } = {
   wordsAddMember: "Add member",
   wordsAddPrivileges: "Agregar privileges",
   wordsAddProblem: "Add problem",
-  wordsAddStudent: "Add student",
+  wordsAddStudent: "Manage Students",
   wordsAddStudents: "Add students",
   wordsAddTag: "Add Tag",
   wordsAdmin: "Admin",
