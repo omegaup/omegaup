@@ -3,13 +3,12 @@ import expect from 'expect';
 import Vue from 'vue';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 
 import course_List from './List.vue';
 
 const coursesListProps = {
-  courses: {
+  courses: <types.AllCourses>{
     admin: {
       accessMode: 'admin',
       activeTab: '',

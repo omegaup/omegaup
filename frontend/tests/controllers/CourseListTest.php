@@ -94,7 +94,6 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // User joins to one of the public courses
         \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
-            //'accept_teacher' => true,
             'auth_token' => $userLogin->auth_token,
             'usernameOrEmail' => $this->identity->username,
             'course_alias' => $this->courseAliases[0],
