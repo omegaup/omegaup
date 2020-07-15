@@ -48,12 +48,13 @@ describe('AssignmentList.vue', () => {
           },
         ],
         courseAlias: 'course_alias',
+        visibilityMode: omegaup.VisibilityMode.Default,
       },
     });
     await wrapper
       .find('.omegaup-course-assignmentlist button[type="submit"]')
       .trigger('click');
 
-    expect(wrapper.text()).not.toContain(T.courseAssignmentEmpty);
+    expect(wrapper.text()).not.toContain(T.courseExamEmpty);
   });
 });

@@ -6,7 +6,8 @@ if [[ $# != 0 ]]; then
 	# The caller has given us the explicit arguments.
 	ARGS="$@"
 else
-	# Try to guess the set of changed files.
+	# Try to guess the set of changed files. Only specifying one commit so it
+	# diffs against the current working tree.
 	REMOTE="origin"
 	if [ -d "${OMEGAUP_ROOT}/.git/refs/remotes/upstream" ]; then
 		REMOTE="upstream"
@@ -23,7 +24,19 @@ else
 	TTY_ARGS=""
 fi
 
-exec /usr/bin/docker run $TTY_ARGS --rm \
+if grep -q pids:/docker /proc/1/cgroup; then
+	echo "Running ./stuff/lint.sh inside a container is not supported." 1>&2
+	echo "Please run this command outside the container" 1>&2
+	exit 1
+fi
+DOCKER_PATH="$(which docker)"
+if [[ -z "${DOCKER_PATH}" ]]; then
+	echo "Docker binary not found." 1>&2
+	echo "Please install docker or run this command outside the container." 1>&2
+	exit 1
+fi
+
+exec "${DOCKER_PATH}" run $TTY_ARGS --rm \
 	--user "$(id -u):$(id -g)" \
 	--env "GIT_AUTHOR_NAME=$(git config user.name)" \
 	--env "GIT_AUTHOR_EMAIL=$(git config user.email)" \
@@ -33,4 +46,4 @@ exec /usr/bin/docker run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20200702 $ARGS
+	omegaup/hook_tools:20200715 --command-name="./stuff/lint.sh" $ARGS
