@@ -1223,8 +1223,8 @@ export namespace types {
     assignments: types.CourseAssignment[];
     description: string;
     finish_time?: Date;
-    is_admin?: boolean;
-    is_curator?: boolean;
+    is_admin: boolean;
+    is_curator: boolean;
     name: string;
     needs_basic_information: boolean;
     requests_user_information: string;
@@ -1233,7 +1233,7 @@ export namespace types {
     show_scoreboard: boolean;
     start_time: Date;
     student_count?: number;
-    unlimited_duration?: boolean;
+    unlimited_duration: boolean;
   }
 
   export interface CourseDetailsPayload {

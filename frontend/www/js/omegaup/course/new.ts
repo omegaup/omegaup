@@ -30,12 +30,12 @@ OmegaUp.on('ready', () => {
           },
         },
         on: {
-          submit: (ev: course_Form) => {
-            new Promise((accept, reject) => {
-              if (ev.school_id) {
-                accept(ev.school_id);
-              } else if (ev.school_name) {
-                api.School.create({ name: ev.school_name })
+          submit: (source: course_Form) => {
+            new Promise<number | null>((accept, reject) => {
+              if (source.school_id) {
+                accept(source.school_id);
+              } else if (source.school_name) {
+                api.School.create({ name: source.school_name })
                   .then((data) => {
                     accept(data.school_id);
                   })
@@ -44,30 +44,30 @@ OmegaUp.on('ready', () => {
                 accept(null);
               }
             })
-              .then((schoolId: any) => {
+              .then((schoolId) => {
                 const params: types.CourseDetails = {
-                  alias: ev.alias,
-                  name: ev.name,
-                  description: ev.description,
-                  start_time: ev.startTime,
-                  show_scoreboard: ev.showScoreboard,
-                  needs_basic_information: ev.needs_basic_information,
-                  requests_user_information: ev.requests_user_information,
+                  alias: source.alias,
+                  name: source.name,
+                  description: source.description,
+                  start_time: source.startTime,
+                  show_scoreboard: source.showScoreboard,
+                  needs_basic_information: source.needs_basic_information,
+                  requests_user_information: source.requests_user_information,
                   admission_mode: omegaup.AdmissionMode.Private,
                   assignments: [],
                   school_id: schoolId,
                 };
 
-                if (ev.unlimitedDuration) {
+                if (source.unlimitedDuration) {
                   params.unlimited_duration = true;
                 } else {
-                  params.finish_time = ev.finishTime;
+                  params.finish_time = source.finishTime;
                 }
 
                 api.Course.create(params)
                   .then(() => {
                     window.location.replace(
-                      '/course/' + ev.alias + '/edit/#assignments',
+                      `/course/${source.alias}/edit/#assignments'`,
                     );
                   })
                   .catch(ui.apiError);

@@ -24,6 +24,7 @@ const baseCourseFormProps = {
     show_scoreboard: false,
     start_time: new Date(),
     student_count: 3,
+    unlimited_duration: false,
   },
   update: true,
 };
