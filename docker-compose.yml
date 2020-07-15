@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20200708
+    image: omegaup/dev-php:20200712
     restart: always
     volumes:
       - type: bind
@@ -29,7 +29,7 @@ services:
     build:
       dockerfile: ./Dockerfile.gitserver
       context: ./stuff/docker/
-    image: omegaup/dev-gitserver:20200702
+    image: omegaup/dev-gitserver:20200712
     restart: always
     depends_on:
       - mysql
@@ -57,7 +57,7 @@ services:
     build:
       dockerfile: ./Dockerfile.grader
       context: ./stuff/docker/
-    image: omegaup/dev-grader:20200530
+    image: omegaup/dev-grader:20200712
     restart: always
     depends_on:
       - mysql

@@ -76,6 +76,7 @@ OmegaUp.on('ready', () => {
                     );
                     this.data.course.name = source.name;
                     window.scrollTo(0, 0);
+                    this.refreshCourseAdminDetails();
                   })
                   .catch(ui.apiError);
               })
@@ -105,6 +106,7 @@ OmegaUp.on('ready', () => {
               api.Course.updateAssignment(params)
                 .then(() => {
                   ui.success(T.courseAssignmentUpdated);
+                  this.invalidParameterName = '';
                   this.refreshAssignmentsList();
                 })
                 .catch((error) => {
@@ -129,6 +131,7 @@ OmegaUp.on('ready', () => {
               api.Course.createAssignment(params)
                 .then(() => {
                   ui.success(T.courseAssignmentAdded);
+                  this.invalidParameterName = '';
                   this.refreshAssignmentsList();
                 })
                 .catch((error) => {
@@ -136,6 +139,7 @@ OmegaUp.on('ready', () => {
                   component.visibilityMode = omegaup.VisibilityMode.New;
                   this.invalidParameterName = error.parameter || '';
                 });
+              window.scrollTo(0, 0);
             }
           },
           'delete-assignment': (assignment: types.CourseAssignment) => {
@@ -193,7 +197,7 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 ui.success(T.courseAssignmentProblemAdded);
                 this.refreshProblemList(assignment);
-                component.visibilityMode = omegaup.VisibilityMode.AddProblem;
+                component.visibilityMode = omegaup.VisibilityMode.Default;
               })
               .catch(ui.apiError);
           },
@@ -375,6 +379,11 @@ OmegaUp.on('ready', () => {
       });
     },
     methods: {
+      refreshCourseAdminDetails: (): void => {
+        api.Course.adminDetails({ alias: courseAlias }).then((course) => {
+          courseEdit.data.course = course;
+        });
+      },
       refreshStudentList: (): void => {
         api.Course.listStudents({ course_alias: courseAlias })
           .then((response) => {
@@ -430,8 +439,8 @@ OmegaUp.on('ready', () => {
     data: {
       data: payload,
       initialTab: window.location.hash
-        ? window.location.hash.substr(1).split('/')[0]
-        : '',
+        ? window.location.hash.substr(1)
+        : 'course',
       invalidParameterName: '',
     },
     components: {

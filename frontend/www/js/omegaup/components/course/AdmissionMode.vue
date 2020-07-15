@@ -1,6 +1,6 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
+  <div class="card">
+    <div class="card-body">
       <form class="publish-form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
@@ -19,22 +19,31 @@
               {{ T.admissionModePublic }}
             </option>
           </select>
-          <div
-            class="form-group form-inline"
-            v-show="admissionMode === 'registration'"
-          >
+          <div class="form-group" v-show="admissionMode === 'registration'">
             <input
-              class="form-control"
+              class="form-control mb-2 mt-2"
               type="text"
               readonly
               v-bind:value="courseURL"
             />
-            <a
-              class="btn btn-primary btn-sm"
-              role="button"
-              v-clipboard="courseURL"
-              >{{ T.wordsCopyToClipboard }}</a
-            >
+            <div class="form-inline">
+              <a
+                href="#"
+                class="btn btn-primary"
+                role="button"
+                v-on:click="copiedToClipboard = true"
+                v-clipboard="courseURL"
+                >{{ T.wordsCopyToClipboard }}</a
+              >
+              <span class="ml-3" v-if="copiedToClipboard === true">
+                <font-awesome-icon
+                  icon="check-circle"
+                  size="2x"
+                  v-bind:style="{ color: 'green' }"
+                />
+                {{ T.passwordResetLinkCopiedToClipboard }}
+              </span>
+            </div>
           </div>
           <p class="help-block">
             <span v-html="admissionModeDescription"></span>
@@ -53,7 +62,22 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
-@Component
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+})
 export default class CourseAdmissionMode extends Vue {
   @Prop() initialAdmissionMode!: string;
   @Prop() admissionModeDescription!: string;
@@ -62,9 +86,15 @@ export default class CourseAdmissionMode extends Vue {
 
   T = T;
   admissionMode = this.initialAdmissionMode;
+  copiedToClipboard = false;
 
   onSubmit(): void {
     this.$emit('emit-update-admission-mode', this.admissionMode);
+  }
+
+  @Watch('copiedToClipboard')
+  onPropertyChanged(newValue: boolean): void {
+    setTimeout(() => (this.copiedToClipboard = false), 5000);
   }
 
   @Watch('initialAdmissionMode')

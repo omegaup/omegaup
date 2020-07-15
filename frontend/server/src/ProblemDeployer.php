@@ -286,6 +286,7 @@ class ProblemDeployer {
     }
 
     /**
+     * @param list<string> $args
      * @return array{output: null|string, retval: int}
      */
     private function executeRaw(array $args, string $cwd) {
