@@ -12,7 +12,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
- * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
+ * @psalm-type Problem=array{title: string, alias: string, submissions?: int, accepted?: int, difficulty?: float}
  * @psalm-type UserProfile=array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, country_id: null|string, email: null|string, gender: null|string, graduation_date: \OmegaUp\Timestamp|null, gravatar_92: string, hide_problem_tags: bool, is_private: bool, locale: string, name: null|string, preferred_language: null|string, scholar_degree: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: null|string, verified: bool}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserRankTablePayload=array{availableFilters: array{country?: null|string, school?: null|string, state?: null|string}, filter: string, isIndex: false, isLogged: bool, length: int, page: int, ranking: UserRank, pagerItems: list<PageItem>}
@@ -1862,7 +1862,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $contests[$contest['alias']] = [
                 'data' => $contest,
-                'place' => null,
+                'place' => 0,
             ];
 
             // Grab the place of the current identity in the given contest
@@ -3675,7 +3675,6 @@ class User extends \OmegaUp\Controllers\Controller {
                                 $r->user
                             )
                         ),
-                        'programmingLanguages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                     ],
                     'title' => 'omegaupTitleProfile',
                 ],
