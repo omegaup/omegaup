@@ -52,7 +52,7 @@ module.exports = {
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
     course_details: './frontend/www/js/omegaup/course/details.ts',
-    course_edit: './frontend/www/js/omegaup/course/edit.js',
+    course_edit: './frontend/www/js/omegaup/course/edit.ts',
     course_intro: './frontend/www/js/omegaup/course/intro.js',
     course_list: './frontend/www/js/omegaup/course/list.ts',
     course_new: './frontend/www/js/omegaup/course/new.js',
@@ -171,12 +171,6 @@ module.exports = {
           chunks: 'initial',
           minChunks: 2,
           minSize: 50 * 1024,
-          priority: 10,
-        },
-        iso_3166_2_js: {
-          name: 'iso-3166-2.js',
-          test: /\/frontend\/www\/third_party\/js\/iso-3166-2.js\//,
-          chunks: 'all',
           priority: 10,
         },
         commons: {

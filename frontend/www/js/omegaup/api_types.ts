@@ -1495,7 +1495,7 @@ export namespace types {
   }
 
   export interface ProblemCasesContents {
-    [key: string]: { in: string; out: string };
+    [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
   export interface ProblemDetails {
@@ -1519,6 +1519,7 @@ export namespace types {
     runs?: types.Run[];
     score: number;
     settings: types.ProblemSettings;
+    show_diff: string;
     solvers?: {
       language: string;
       memory: number;
@@ -1607,6 +1608,7 @@ export namespace types {
     publishedRevision?: types.ProblemVersion;
     selectedPrivateTags: string[];
     selectedPublicTags: string[];
+    showDiff: string;
     solution?: types.ProblemStatement;
     source: string;
     statement: types.ProblemStatement;
@@ -1636,6 +1638,7 @@ export namespace types {
     overallWallTimeLimit: number | string;
     publicTags: string[];
     selectedTags?: types.SelectedTag[];
+    showDiff: string;
     source: string;
     statusError: string;
     tags: { name?: string }[];
@@ -1873,7 +1876,7 @@ export namespace types {
   export interface RunDetails {
     admin: boolean;
     alias: string;
-    cases?: types.ProblemCasesContents;
+    cases: types.ProblemCasesContents;
     compile_error?: string;
     details?: {
       compile_meta?: { [key: string]: types.RunMetadata };
@@ -1901,12 +1904,16 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
+    feedback?: string;
     guid: string;
     judged_by?: string;
     language: string;
     logs?: string;
     show_diff: string;
     source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
   }
 
   export interface RunMetadata {
@@ -2185,6 +2192,7 @@ export namespace types {
     locale?: string;
     name?: string;
     preferred_language?: string;
+    programming_languages: { [key: string]: string };
     rankinfo: {
       author_ranking?: number;
       name?: string;

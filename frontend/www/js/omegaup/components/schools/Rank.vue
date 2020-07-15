@@ -3,10 +3,10 @@
     <h5 class="card-header">
       {{
         showHeader
-          ? UI.formatString(T.schoolRankOfTheMonthHeader, {
+          ? ui.formatString(T.schoolRankOfTheMonthHeader, {
               count: rank ? rank.length : 0,
             })
-          : UI.formatString(T.schoolRankRangeHeader, {
+          : ui.formatString(T.schoolRankRangeHeader, {
               lowCount: (page - 1) * length + 1,
               highCount: page * length,
             })
@@ -66,7 +66,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import CountryFlag from '../CountryFlag.vue';
 import common_Paginator from '../common/Paginatorv2.vue';
 
@@ -85,6 +85,6 @@ export default class SchoolRank extends Vue {
   @Prop() pagerItems!: types.PageItem[];
 
   T = T;
-  UI = UI;
+  ui = ui;
 }
 </script>

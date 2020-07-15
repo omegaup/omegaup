@@ -3,7 +3,7 @@
     <div class="card">
       <h5 class="card-header">
         {{
-          UI.formatString(T.authorRankRangeHeader, {
+          ui.formatString(T.authorRankRangeHeader, {
             lowCount: (page - 1) * length + 1,
             highCount: page * length,
           })
@@ -53,7 +53,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { OmegaUp } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import user_Username from '../user/Username.vue';
 import { types } from '../../api_types';
 import CountryFlag from '../CountryFlag.vue';
@@ -73,6 +73,6 @@ export default class AuthorsRank extends Vue {
   @Prop() pagerItems!: types.PageItem[];
 
   T = T;
-  UI = UI;
+  ui = ui;
 }
 </script>

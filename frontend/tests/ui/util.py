@@ -275,6 +275,67 @@ def assert_no_js_errors(
                      unexpected_errors='\n'.join(unexpected_errors)))
 
 
+@annotate
+@no_javascript_errors()
+def create_problem(
+        driver,
+        problem_alias: str,
+        resource_path: str = 'frontend/tests/resources/triangulos.zip'
+) -> None:
+    '''Create a problem.'''
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-problems]'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 'a[data-nav-problems-create]'))).click()
+
+    with assert_js_errors(
+            driver,
+            expected_messages=('/api/problem/details/',)
+    ):
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "alias"]'))).send_keys(problem_alias)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "title"]'))).send_keys(problem_alias)
+    input_limit = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[@name = "input_limit"]')))
+    input_limit.clear()
+    input_limit.send_keys('1024')
+    Select(
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    'select[name="problem-level"]'
+                )
+            )
+        )
+    ).select_by_value('problemLevelBasicKarel')
+    # Alias should be set automatically
+    driver.browser.find_element_by_name('source').send_keys('test')
+    # Make the problem public
+    driver.browser.find_element_by_xpath(
+        '//input[@type = "radio" and @name = "visibility" and @value = '
+        '"true"]').click()
+    contents_element = driver.browser.find_element_by_name(
+        'problem_contents')
+    contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
+    with driver.page_transition(wait_for_ajax=False):
+        contents_element.submit()
+    assert (('/problem/%s/edit/' % problem_alias) in
+            driver.browser.current_url), driver.browser.current_url
+
+
 def path_matches(message: str, path_list: Sequence[str]) -> bool:
     '''Checks whether URL in message matches the expected list.'''
 

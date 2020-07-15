@@ -97,7 +97,11 @@
         </table>
         <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
-          <select class="form-control" v-model="problemLevelTag">
+          <select
+            class="form-control"
+            name="problem-level"
+            v-model="problemLevelTag"
+          >
             <option v-for="levelTag in levelTags" v-bind:value="levelTag">
               {{ T[levelTag] }}
             </option>

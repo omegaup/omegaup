@@ -128,12 +128,12 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class QualityNominationDemotionPopup extends Vue {
   T = T;
-  UI = UI;
+  ui = ui;
   rationale = '';
   original = '';
   currentView = 'question';

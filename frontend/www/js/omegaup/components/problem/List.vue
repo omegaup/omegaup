@@ -190,7 +190,7 @@
               >
                 <span
                   v-tooltip="
-                    `${UI.formatString(T.wordsOutOf4, {
+                    `${ui.formatString(T.wordsOutOf4, {
                       Score: problem.quality.toFixed(1),
                     })}`
                   "
@@ -202,7 +202,7 @@
               <td class="text-center" v-if="problem.difficulty !== null">
                 <span
                   v-tooltip="
-                    `${UI.formatString(T.wordsOutOf4, {
+                    `${ui.formatString(T.wordsOutOf4, {
                       Score: problem.difficulty.toFixed(1),
                     })}`
                   "
@@ -236,7 +236,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import { types } from '../../api_types';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 import common_Paginator from '../common/Paginatorv2.vue';
 import common_SortControls from '../common/SortControls.vue';
@@ -286,7 +286,7 @@ export default class ProblemList extends Vue {
   @Prop() columnName!: string;
 
   T = T;
-  UI = UI;
+  ui = ui;
   omegaup = omegaup;
   showFinderWizard = false;
   QUALITY_TAGS = [
