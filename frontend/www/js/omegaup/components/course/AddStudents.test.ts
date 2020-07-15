@@ -14,7 +14,7 @@ describe('AddStudents.vue', () => {
       propsData: {
         courseAlias: 'course_alias',
         students: <omegaup.CourseStudent[]>[],
-        data: <types.IdentityRequest[]>[],
+        identityRequests: <types.IdentityRequest[]>[],
       },
     });
 
@@ -32,7 +32,7 @@ describe('AddStudents.vue', () => {
             username: 'user',
           },
         ],
-        data: <types.IdentityRequest[]>[
+        identityRequests: <types.IdentityRequest[]>[
           {
             accepted: false,
             country: 'mx',
