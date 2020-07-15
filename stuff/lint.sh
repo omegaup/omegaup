@@ -6,15 +6,15 @@ if [[ $# != 0 ]]; then
 	# The caller has given us the explicit arguments.
 	ARGS="$@"
 else
-	# Try to guess the set of changed files.
+	# Try to guess the set of changed files. Only specifying one commit so it
+	# diffs against the current working tree.
 	REMOTE="origin"
 	if [ -d "${OMEGAUP_ROOT}/.git/refs/remotes/upstream" ]; then
 		REMOTE="upstream"
 	fi
 	REMOTE_HASH="$(/usr/bin/git rev-parse "${REMOTE}/master")"
 	MERGE_BASE="$(/usr/bin/git merge-base "${REMOTE_HASH}" HEAD)"
-	HEAD="$(/usr/bin/git rev-parse HEAD)"
-	ARGS="fix ${MERGE_BASE} ${HEAD}"
+	ARGS="fix ${MERGE_BASE}"
 fi
 
 if [[ -t 0 ]]; then
@@ -46,4 +46,4 @@ exec "${DOCKER_PATH}" run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20200714 --command-name="./stuff/lint.sh" $ARGS
+	omegaup/hook_tools:20200715 --command-name="./stuff/lint.sh" $ARGS
