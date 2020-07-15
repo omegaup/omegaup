@@ -7,13 +7,9 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
-        return [
-            'smartyProperties' => [
-                'title' => 'omegaupTitleCourseNew',
-            ],
-            'entrypoint' => 'course_new',
-        ];
+    function (\OmegaUp\Request $r): array {
+        return \OmegaUp\Controllers\Course::getCourseNewDetailsForSmarty(
+            $r
+        );
     }
 );

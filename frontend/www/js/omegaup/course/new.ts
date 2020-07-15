@@ -12,6 +12,7 @@ OmegaUp.on('ready', () => {
   finishTime.setDate(finishTime.getDate() + 30);
   const defaultStartTime = now;
   const defaultFinishTime = finishTime;
+  const payload = types.payloadParsers.CourseNewPayload();
   const details = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -27,12 +28,15 @@ OmegaUp.on('ready', () => {
             school_name: '',
             needs_basic_information: false,
             requests_user_information: 'no',
+            is_curator: payload.is_curator,
+            is_admin: payload.is_admin,
           },
+          invalidParameterName: this.invalidParameterName,
         },
         on: {
           submit: (source: course_Form) => {
             new Promise<number | null>((accept, reject) => {
-              if (source.school_id) {
+              if (source.school_id !== undefined) {
                 accept(source.school_id);
               } else if (source.school_name) {
                 api.School.create({ name: source.school_name })
@@ -55,22 +59,30 @@ OmegaUp.on('ready', () => {
                   requests_user_information: source.requests_user_information,
                   admission_mode: omegaup.AdmissionMode.Private,
                   assignments: [],
-                  school_id: schoolId,
+                  school_id: schoolId ?? undefined,
+                  unlimited_duration: false,
+                  is_curator: true,
+                  is_admin: true,
                 };
 
                 if (source.unlimitedDuration) {
-                  params.unlimited_duration = true;
+                  Object.assign(params, { unlimited_duration: true });
                 } else {
                   params.finish_time = source.finishTime;
+                  Object.assign(params, { finish_time: source.finishTime });
                 }
 
                 api.Course.create(params)
                   .then(() => {
+                    this.invalidParameterName = '';
                     window.location.replace(
-                      `/course/${source.alias}/edit/#assignments'`,
+                      `/course/${source.alias}/edit/#assignments`,
                     );
                   })
-                  .catch(ui.apiError);
+                  .catch((error) => {
+                    ui.apiError(error);
+                    this.invalidParameterName = error.parameter || '';
+                  });
               })
               .catch(ui.apiError);
           },
@@ -80,6 +92,7 @@ OmegaUp.on('ready', () => {
         },
       });
     },
+    data: { invalidParameterName: '' },
     components: {
       'omegaup-course-form': course_Form,
     },

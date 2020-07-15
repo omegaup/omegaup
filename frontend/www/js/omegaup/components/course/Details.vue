@@ -222,12 +222,14 @@ export default class CourseDetails extends Vue {
   ui = ui;
 
   get filteredHomeworks(): types.CourseAssignment[] {
+    if (!this.course.assignments) return [];
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'homework',
     );
   }
 
   get filteredExams(): types.CourseAssignment[] {
+    if (!this.course.assignments) return [];
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'test',
     );
@@ -240,7 +242,7 @@ export default class CourseDetails extends Vue {
   }
 
   getFormattedTime(date: Date | null | undefined): string {
-    if (date === null || typeof date === 'undefined') {
+    if (!date) {
       return '—';
     }
     return time.formatDateTime(date);

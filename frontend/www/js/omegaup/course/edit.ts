@@ -31,7 +31,7 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'submit-edit-course': (source: course_Form) => {
-            new Promise((accept, reject) => {
+            new Promise<number | null>((accept, reject) => {
               if (source.school_id !== undefined) {
                 accept(source.school_id);
               } else if (source.school_name) {
@@ -45,16 +45,18 @@ OmegaUp.on('ready', () => {
               }
             })
               .then((schoolId) => {
-                const params = {
-                  course_alias: courseAlias,
+                const params: types.CourseDetails = {
                   name: source.name,
                   description: source.description,
-                  start_time: source.startTime.getTime() / 1000,
+                  start_time: source.startTime,
                   alias: source.alias,
                   show_scoreboard: source.showScoreboard,
                   needs_basic_information: source.needs_basic_information,
                   requests_user_information: source.requests_user_information,
-                  school_id: schoolId,
+                  school_id: schoolId ?? undefined,
+                  unlimited_duration: false,
+                  is_curator: payload.course.is_curator,
+                  is_admin: payload.course.is_admin,
                 };
 
                 if (source.unlimitedDuration) {
