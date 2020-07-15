@@ -16,6 +16,7 @@
     </div>
     <div
       v-bind:class="{ active: problem.alias === activeProblem }"
+      data-navbar-problem
       v-for="problem in problems"
     >
       <div class="row">
