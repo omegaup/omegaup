@@ -23,7 +23,10 @@
  * @psalm-type FilteredCourse=array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CoursesList=array{admin: list<FilteredCourse>, student: list<FilteredCourse>, public: list<FilteredCourse>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress: AssignmentProgress}
- * @psalm-type CourseListPayload=array{courses: array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, student: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, public: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}}}
+ * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
+ * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
+ * @psalm-type AllCourses=array{admin: CoursesByAccessMode, public: CoursesByAccessMode, student: CoursesByAccessMode}
+ * @psalm-type CourseListPayload=array{courses: AllCourses}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
@@ -1633,6 +1636,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
+        // Public courses.
+        $publicCourses = \OmegaUp\DAO\Courses::getPublicCourses();
+
         $response = [
             'admin' => [],
             'student' => [],
@@ -1644,13 +1650,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         foreach ($studentCourses as $course) {
-            $courseAsArray = \OmegaUp\Controllers\Course::convertCourseToArray(
+            $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
-            $response['student'][] = $courseAsArray;
-            if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
-                $response['public'][] = $courseAsArray;
-            }
+        }
+        foreach ($publicCourses as $course) {
+            $response['public'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+                $course
+            );
         }
 
         return $response;
@@ -2690,7 +2697,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
      */
-    public static function getCourseListDetailsForSamrty(\OmegaUp\Request $r): array {
+    public static function getCourseListDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');
