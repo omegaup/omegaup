@@ -644,7 +644,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 /**
                 * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
                 */
-                $contents = json_decode($nomination->contents ?? '', true);
+                $contents = json_decode($nomination->contents ?? '{}', true);
                 $contents['rationale'] = $r['rationale'];
                 $nomination->contents = json_encode($contents);
                 $nomination->status = strval($r['status']);
