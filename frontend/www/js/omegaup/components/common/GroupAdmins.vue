@@ -5,13 +5,10 @@
         <div class="form-group">
           <label class="font-weight-bold"
             >{{ T.wordsGroupAdmin }}
-            <span
-              aria-hidden="true"
-              class="glyphicon glyphicon-info-sign"
-              data-placement="top"
-              data-toggle="tooltip"
+            <font-awesome-icon
               v-bind:title="T.courseEditAddGroupAdminsTooltip"
-            ></span>
+              icon="info-circle"
+            />
             <omegaup-autocomplete
               class="form-control"
               v-bind:init="(el) => typeahead.groupTypeahead(el)"
@@ -72,9 +69,21 @@ import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class GroupAdmin extends Vue {

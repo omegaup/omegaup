@@ -422,7 +422,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                         (
                             SELECT
                                 raw_identities.identity_id,
-                                MAX(raw_identities.is_invited) AS is_invited
+                                CAST(MAX(raw_identities.is_invited) AS UNSIGNED) AS is_invited
                             FROM
                                 (
                                     SELECT
@@ -529,7 +529,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ';';
         }
 
-        /** @var list<array{identity_id: int, username: string, name: null|string, country_id: string, is_invited: bool, classname: string}> */
         $result = [];
         /** @var array{classname: string, country_id: string, identity_id: int, is_invited: int, name: null|string, username: string} $row */
         foreach (

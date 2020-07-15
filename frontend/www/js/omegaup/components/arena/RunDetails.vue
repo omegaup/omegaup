@@ -1,5 +1,5 @@
 <template>
-  <form class="run-details-view">
+  <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
       <div class="cases" v-if="data.groups">
@@ -11,9 +11,7 @@
               <th>{{ T.wordsGroup }}</th>
               <th v-if="data.feedback !== 'summary'">{{ T.wordsCase }}</th>
               <th>{{ T.wordsVerdict }}</th>
-              <th colspan="3">
-                {{ T.rankScore }}
-              </th>
+              <th colspan="3">{{ T.rankScore }}</th>
               <th width="1"></th>
             </tr>
           </thead>
@@ -45,23 +43,57 @@
               </th>
               <th>{{ element.max_score ? element.max_score : '' }}</th>
             </tr>
-            <tr
-              v-for="problem in element.cases"
+            <template
+              v-for="problem_case in element.cases"
               v-if="groupVisible[element.group]"
             >
-              <td></td>
-              <td class="text-center">{{ problem.name }}</td>
-              <td class="text-center">{{ problem.verdict }}</td>
-              <td class="score">
-                {{
-                  problem.contest_score ? problem.contest_score : problem.score
-                }}
-              </td>
-              <td class="center" width="10">
-                {{ problem.max_score ? '/' : '' }}
-              </td>
-              <td>{{ problem.max_score ? problem.max_score : '' }}</td>
-            </tr>
+              <tr>
+                <td></td>
+                <td class="text-center">{{ problem_case.name }}</td>
+                <td class="text-center">{{ problem_case.verdict }}</td>
+                <td class="score">
+                  {{
+                    problem_case.contest_score
+                      ? problem_case.contest_score
+                      : problem_case.score
+                  }}
+                </td>
+                <td class="center" width="10">
+                  {{ problem_case.max_score ? '/' : '' }}
+                </td>
+                <td>
+                  {{ problem_case.max_score ? problem_case.max_score : '' }}
+                </td>
+              </tr>
+              <template v-if="shouldShowDiffs(problem_case.name)">
+                <tr>
+                  <td colspan="6">{{ T.wordsInput }}</td>
+                </tr>
+                <tr>
+                  <td colspan="6">
+                    <pre>{{
+                      showDataCase(data.cases, problem_case.name, 'in')
+                    }}</pre>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="6">{{ T.wordsDifference }}</td>
+                </tr>
+                <tr>
+                  <td colspan="6" v-if="data.cases">
+                    <omegaup-arena-diff-view
+                      v-bind:left="data.cases[problem_case.name].out"
+                      v-bind:right="
+                        getContestantOutput(data.cases, problem_case.name)
+                      "
+                    ></omegaup-arena-diff-view>
+                  </td>
+                  <td colspan="6" v-else="" class="empty-table-message">
+                    {{ EMPTY_FIELD }}
+                  </td>
+                </tr>
+              </template>
+            </template>
           </tbody>
         </table>
       </div>
@@ -101,7 +133,7 @@
             <a
               class="output"
               v-bind:href="`/api/run/download/run_alias/${data.guid}/`"
-              v-if="data.problem_admin"
+              v-if="data.admin"
               >{{ T.wordsDownloadOutput }}</a
             >
           </li>
@@ -109,7 +141,7 @@
             <a
               class="details"
               v-bind:href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
-              v-if="data.problem_admin"
+              v-if="data.admin"
               >{{ T.wordsDownloadDetails }}</a
             >
           </li>
@@ -264,9 +296,11 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
+import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
+import arena_DiffView from './DiffView.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -281,21 +315,44 @@ interface GroupVisibility {
   [name: string]: boolean;
 }
 
+const EMPTY_FIELD = '∅';
+
 @Component({
   components: {
     FontAwesomeIcon,
     'omegaup-arena-code-view': arena_CodeView,
+    'omegaup-arena-diff-view': arena_DiffView,
   },
 })
 export default class ArenaRunDetails extends Vue {
-  @Prop() data!: omegaup.RunDetails;
+  @Prop() data!: types.RunDetails;
 
+  EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
     this.$set(this.groupVisible, group, !visible);
+  }
+
+  showDataCase(
+    cases: types.ProblemCasesContents,
+    caseName: string,
+    caseType: 'in' | 'out' | 'contestantOutput',
+  ): string {
+    return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
+  }
+
+  shouldShowDiffs(caseName: string): boolean {
+    return (
+      this.data.show_diff === 'all' ||
+      (caseName === 'sample' && this.data.show_diff === 'examples')
+    );
+  }
+
+  getContestantOutput(cases: types.ProblemCasesContents, name: string): string {
+    return cases[name]?.contestantOutput ?? '';
   }
 }
 </script>

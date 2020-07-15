@@ -946,6 +946,11 @@ export namespace types {
     }
   }
 
+  export interface AddedProblem {
+    alias: string;
+    points: number;
+  }
+
   export interface AllCourses {
     admin: types.CoursesByAccessMode;
     public: types.CoursesByAccessMode;
@@ -1490,7 +1495,7 @@ export namespace types {
   }
 
   export interface ProblemCasesContents {
-    [key: string]: { in: string; out: string };
+    [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
   export interface ProblemDetails {
@@ -1871,7 +1876,7 @@ export namespace types {
   export interface RunDetails {
     admin: boolean;
     alias: string;
-    cases?: types.ProblemCasesContents;
+    cases: types.ProblemCasesContents;
     compile_error?: string;
     details?: {
       compile_meta?: { [key: string]: types.RunMetadata };
@@ -1899,12 +1904,16 @@ export namespace types {
       verdict: string;
       wall_time?: number;
     };
+    feedback?: string;
     guid: string;
     judged_by?: string;
     language: string;
     logs?: string;
     show_diff: string;
     source?: string;
+    source_link?: boolean;
+    source_name?: string;
+    source_url?: string;
   }
 
   export interface RunMetadata {
