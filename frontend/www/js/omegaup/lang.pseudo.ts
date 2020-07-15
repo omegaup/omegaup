@@ -1291,7 +1291,7 @@ const translations: { [key: string]: string; } = {
   wordsAddMember: "(Add m3mb3r)",
   wordsAddPrivileges: "(Agr3gar privi13g35)",
   wordsAddProblem: "(Add pr0b13m)",
-  wordsAddStudent: "(Add 57ud3n7)",
+  wordsAddStudent: "(Manag3 S7ud3n75)",
   wordsAddStudents: "(Add 57ud3n75)",
   wordsAddTag: "(Add Tag)",
   wordsAdmin: "(Admin)",
