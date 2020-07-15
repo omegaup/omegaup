@@ -9,6 +9,7 @@ import { types, messages } from '../api_types';
 import * as time from '../time';
 import * as typeahead from '../typeahead';
 import * as ui from '../ui';
+import JSZip from 'jszip';
 import * as markdown from '../markdown';
 
 import arena_ContestSummary from '../components/arena/ContestSummary.vue';
@@ -311,7 +312,7 @@ export class Arena {
 
   runDetailsView:
     | (Vue & {
-        data: omegaup.RunDetails;
+        data: types.RunDetails;
       })
     | null = null;
 
@@ -338,6 +339,7 @@ export class Arena {
   rankingChart: Highcharts.Chart | null = null;
 
   constructor(options: ArenaOptions) {
+    const self = this;
     this.options = options;
 
     // All runs in this contest/problem.
@@ -452,7 +454,6 @@ export class Arena {
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
-      const self = this;
       this.navbarProblems = new Vue({
         el: '#arena-navbar-problems',
         render: function (createElement) {
@@ -559,7 +560,6 @@ export class Arena {
 
     // Setup run submit view, if it is available.
     if (document.getElementById('run-submit') !== null) {
-      const self = this;
       self.runSubmitView = new Vue({
         el: '#run-submit',
         render: function (createElement) {
@@ -628,6 +628,11 @@ export class Arena {
             markdown: this.markdown,
             imageMapping: this.imageMapping,
             problemSettings: this.problemSettings,
+          },
+          on: {
+            rendered: () => {
+              self.onProblemRendered();
+            },
           },
         });
       },
@@ -1858,7 +1863,9 @@ export class Arena {
         date: time.formatDate(problem.problemsetter.creation_date),
       });
     }
+  }
 
+  onProblemRendered(): void {
     ui.renderSampleToClipboardButton();
 
     const libinteractiveInterfaceNameElement = <HTMLElement>(
@@ -1866,18 +1873,18 @@ export class Arena {
     );
     if (
       libinteractiveInterfaceNameElement &&
-      problem.settings?.interactive?.module_name
+      this.currentProblem.settings?.interactive?.module_name
     ) {
-      libinteractiveInterfaceNameElement.innerText = problem.settings.interactive.module_name.replace(
+      libinteractiveInterfaceNameElement.innerText = this.currentProblem.settings.interactive.module_name.replace(
         /\.idl$/,
         '',
       );
     }
     this.installLibinteractiveHooks();
 
-    this.updateAllowedLanguages(problem.languages);
+    this.updateAllowedLanguages(this.currentProblem.languages);
 
-    this.ephemeralGrader.send('setSettings', problem.settings);
+    this.ephemeralGrader.send('setSettings', this.currentProblem.settings);
   }
 
   detectShowRun(): void {
@@ -1888,10 +1895,60 @@ export class Arena {
     }
     $('#overlay form:not([data-run-submit])').hide();
     $('#overlay').show();
-    api.Run.details({ run_alias: showRunMatch[1] })
+    const guid = showRunMatch[1];
+    api.Run.details({ run_alias: guid })
       .then(time.remoteTimeAdapter)
       .then((data) => {
-        this.displayRunDetails(showRunMatch[1], data);
+        if (
+          data.show_diff === 'none' ||
+          (this.options.contestAlias && this.options.contestAlias !== 'admin')
+        ) {
+          this.displayRunDetails(guid, data);
+          return;
+        }
+        fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
+          .then((response) => {
+            if (!response.ok) {
+              return Promise.reject(new Error(response.statusText));
+            }
+            return Promise.resolve(response.blob());
+          })
+          .then(JSZip.loadAsync)
+          .then((zip: JSZip) => {
+            const result: {
+              cases: string[];
+              promises: Promise<string>[];
+            } = { cases: [], promises: [] };
+            zip.forEach(async (relativePath, zipEntry) => {
+              const pos = relativePath.lastIndexOf('.');
+              const basename = relativePath.substring(0, pos);
+              const extension = relativePath.substring(pos + 1);
+              if (extension !== 'out' || relativePath.indexOf('/') !== -1) {
+                return;
+              }
+              if (
+                data.show_diff === 'examples' &&
+                relativePath.indexOf('sample/') === 0
+              ) {
+                return;
+              }
+              result.cases.push(basename);
+              result.promises.push(zip.file(zipEntry.name).async('text'));
+            });
+            return result;
+          })
+          .then((response) => {
+            Promise.allSettled(response.promises).then((results) => {
+              results.forEach((result: any, index: number) => {
+                if (data.cases[response.cases[index]]) {
+                  data.cases[response.cases[index]].contestantOutput =
+                    result.value;
+                }
+              });
+            });
+            this.displayRunDetails(guid, data);
+          })
+          .catch(ui.apiError);
       })
       .catch((error) => {
         ui.apiError(error);
@@ -2080,8 +2137,7 @@ export class Arena {
       groups = detailsGroups;
     }
     if (this.runDetailsView) {
-      this.runDetailsView.data = {
-        compile_error: data.compile_error,
+      this.runDetailsView.data = Object.assign({}, data, {
         logs: data.logs || '',
         judged_by: data.judged_by || '',
         source: sourceHTML,
@@ -2090,18 +2146,20 @@ export class Arena {
           new Blob([data.source || ''], { type: 'text/plain' }),
         ),
         source_name: `Main.${data.language}`,
-        problem_admin: data.admin,
-        guid: data.guid,
         groups: groups,
-        language: data.language,
+        show_diff:
+          !this.options.contestAlias || this.options.contestAlias === 'admin'
+            ? data.show_diff
+            : 'none',
         feedback: <omegaup.SubmissionFeedback>(
           ((this.options.contestAlias && this.currentProblemset?.feedback) ||
             'detailed')
         ),
-      };
+      });
     }
-    (<HTMLElement>document.querySelector('.run-details-view')).style.display =
-      'block';
+    (<HTMLElement>(
+      document.querySelector('[data-run-details-view]')
+    )).style.display = 'block';
   }
 
   trackRun(run: types.Run): void {

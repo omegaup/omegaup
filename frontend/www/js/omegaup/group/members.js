@@ -2,7 +2,7 @@ import group_Members from '../components/group/Members.vue';
 import { OmegaUp } from '../omegaup';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function () {
@@ -30,10 +30,10 @@ OmegaUp.on('ready', function () {
             })
               .then(function (data) {
                 refreshMemberList();
-                UI.success(T.groupEditMemberAdded);
+                ui.success(T.groupEditMemberAdded);
                 groupMembersInstance.reset();
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'edit-identity': function (groupMembersInstance, identity) {
             groupMembersInstance.showEditForm = true;
@@ -58,11 +58,11 @@ OmegaUp.on('ready', function () {
               original_username: identityEditInstance.username,
             })
               .then(function (data) {
-                UI.success(T.groupEditMemberUpdated);
+                ui.success(T.groupEditMemberUpdated);
                 groupMembersInstance.showEditForm = false;
                 refreshMemberList();
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'change-password-identity': function (
             groupMembersInstance,
@@ -87,7 +87,7 @@ OmegaUp.on('ready', function () {
             newPasswordRepeat,
           ) {
             if (newPassword !== newPasswordRepeat) {
-              UI.error(T.userPasswordMustBeSame);
+              ui.error(T.userPasswordMustBeSame);
               return;
             }
 
@@ -98,11 +98,11 @@ OmegaUp.on('ready', function () {
             })
               .then(function (data) {
                 refreshMemberList();
-                UI.success(T.groupEditMemberPasswordUpdated);
+                ui.success(T.groupEditMemberPasswordUpdated);
                 groupMembersInstance.showChangePasswordForm = false;
                 groupMembersInstance.reset();
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           remove: function (username) {
             api.Group.removeUser({
@@ -111,9 +111,9 @@ OmegaUp.on('ready', function () {
             })
               .then(function (data) {
                 refreshMemberList();
-                UI.success(T.groupEditMemberRemoved);
+                ui.success(T.groupEditMemberRemoved);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           cancel: function (groupMembersInstance) {
             refreshMemberList();
@@ -150,7 +150,7 @@ OmegaUp.on('ready', function () {
           }
         }
       })
-      .catch(UI.apiError);
+      .catch(ui.apiError);
   }
 
   refreshMemberList();

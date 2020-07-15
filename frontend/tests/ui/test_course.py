@@ -10,7 +10,6 @@ import urllib
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
-from selenium.common.exceptions import StaleElementReferenceException
 
 from ui import util  # pylint: disable=no-name-in-module
 from ui import conftest  # pylint: disable=no-name-in-module
@@ -19,6 +18,10 @@ from ui import conftest  # pylint: disable=no-name-in-module
 def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
                   assignment_alias: str, problem_alias: str) -> None:
     with driver.login_admin():
+        util.create_problem(
+            driver,
+            problem_alias,
+            resource_path='frontend/tests/resources/testproblem.zip')
         create_course(driver, course_alias, school_name)
         add_students_course(driver, [driver.user_username])
         add_assignment(driver, assignment_alias)
@@ -28,10 +31,11 @@ def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
 def _click_on_problem(driver: conftest.Driver, problem_alias: str) -> None:
     for _ in range(10):
         driver.wait.until(
-            EC.element_to_be_clickable((
-                By.XPATH,
-                f'//a[contains(text(), "{problem_alias.title()}")]/parent::div'
-            ))).click()
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 (f'//div[@data-navbar-problem]'
+                  f'//a[contains(text(), "{problem_alias}")]/parent::div'
+                  )))).click()
         if driver.browser.current_url.endswith(f'#problems/{problem_alias}'):
             break
     else:
@@ -48,7 +52,7 @@ def test_user_ranking_course(driver):
     course_alias = f'ut_rank_course_{run_id}'
     school_name = f'ut_rank_school_{run_id}'
     assignment_alias = f'ut_rank_hw_{run_id}'
-    problem = 'sumas'
+    problem = 'ut_rc_problem_%s' % driver.generate_id()
 
     _setup_course(driver, course_alias, school_name, assignment_alias, problem)
 
@@ -76,11 +80,7 @@ def test_user_ranking_course(driver):
                     (By.CSS_SELECTOR,
                      '.popup button.close')))
 
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.XPATH,
-                 ('//a[contains(text(), "%s")]/parent::div' %
-                  problem.title())))).click()
+        _click_on_problem(driver, problem)
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
@@ -246,16 +246,13 @@ def test_create_identities_for_course(driver):
 def enter_course_assignments_page(driver, course_alias):
     '''Steps to enter into scoreboard page'''
 
-    schools_link_element = driver.wait.until(
-        EC.element_to_be_clickable((By.CSS_SELECTOR, 'a[href="/course/"]')))
-    with driver.page_transition(target_url=driver.url('/course/')):
-        for _ in range(10):
-            try:
-                schools_link_element.click()
-            except StaleElementReferenceException:
-                break
-        else:
-            logging.error('Failed to click on the Schools link')
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'a[data-nav-courses-all]'))).click()
 
     course_url = f'/course/{course_alias}/'
     with driver.page_transition(target_url=driver.url(course_url)):
@@ -267,17 +264,13 @@ def enter_course_assignments_page(driver, course_alias):
 @util.annotate
 def create_course(driver, course_alias: str, school_name: str) -> None:
     '''Creates one course with a new school.'''
-
-    with driver.page_transition(target_url=driver.url('/course/')):
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
+    with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[href="/course/"]'))).click()
-
-    with driver.page_transition(target_url=driver.url('/course/new/')):
-        driver.wait.until(
-            EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, ('a[href="/course/new/"]')))).click()
-
+                (By.CSS_SELECTOR, 'a[data-nav-courses-create]'))).click()
     driver.send_keys(
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -312,11 +305,13 @@ def add_assignment(driver, assignment_alias):
             (By.XPATH, (
                 '//a[contains(@href, "#assignments")]')))).click()
     driver.wait.until(
-        EC.visibility_of_element_located((By.CSS_SELECTOR, '#assignments')))
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, 'div[data-assignments-tab]')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, ('#assignments .new button')))).click()
+            (By.CSS_SELECTOR,
+             'div[data-assignments-tab] .new button'))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(
@@ -362,23 +357,23 @@ def add_problem_to_assignment(driver, assignment_alias, problem):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '#problems .problemlist button'))).click()
+             'div[data-problems-tab] .problemlist button'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer')))
+             '.omegaup-course-problemlist .card-footer')))
 
     driver.typeahead_helper(
-        '*[contains(@class, "panel-footer")]', problem)
+        '*[contains(@class, "card-footer")]', problem)
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer '
+             '.omegaup-course-problemlist .card-footer '
              'button[type=submit]'))).click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .panel-footer')))
+             '.omegaup-course-problemlist .card-footer')))
 
 
 @util.annotate
@@ -402,7 +397,7 @@ def add_students_course(driver, users):
 
     util.add_students(
         driver, users, tab_xpath='//a[contains(@href, "#students")]',
-        container_xpath='//*[@id="students"]',
+        container_xpath='//div[@data-students-tab]',
         parent_xpath='*[contains(@class, "omegaup-course-addstudent")]',
         submit_locator=(By.CSS_SELECTOR,
                         '.omegaup-course-addstudent form button[type=submit]'))
@@ -411,12 +406,13 @@ def add_students_course(driver, users):
 @util.annotate
 def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
     '''Enter to course previously created.'''
-
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.XPATH, '//a[@href = "/course/"]'))).click()
-
+                (By.CSS_SELECTOR, 'a[data-nav-courses-all]'))).click()
     course_url = '/course/%s' % course_alias
     with driver.page_transition():
         driver.wait.until(

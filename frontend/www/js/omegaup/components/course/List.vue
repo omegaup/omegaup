@@ -32,7 +32,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import course_FilteredList from './FilteredList.vue';
 
 @Component({
@@ -45,7 +45,7 @@ export default class CourseList extends Vue {
   @Prop() isMainUserIdentity!: boolean;
 
   T = T;
-  UI = UI;
+  ui = ui;
 
   getDescription(admissionMode: string): string {
     if (admissionMode === 'public') return T.courseListPublicCourses;

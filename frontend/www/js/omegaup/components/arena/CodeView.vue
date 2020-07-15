@@ -11,7 +11,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import { codemirror } from 'vue-codemirror-lite';
 
 const languageModeMap: {
@@ -66,7 +66,7 @@ interface EditorOptions {
     'codemirror-editor': codemirror,
   },
 })
-export default class ArenaCodeView extends Vue {
+export default class CodeView extends Vue {
   @Prop() language!: string;
   @Prop({ default: false }) readonly!: boolean;
   @Prop() value!: string;
