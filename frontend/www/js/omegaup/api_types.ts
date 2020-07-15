@@ -946,6 +946,11 @@ export namespace types {
     }
   }
 
+  export interface AddedProblem {
+    alias: string;
+    points: number;
+  }
+
   export interface ArenaProblemDetails {
     alias: string;
     commit: string;
