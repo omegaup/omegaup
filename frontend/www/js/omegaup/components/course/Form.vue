@@ -211,7 +211,7 @@
   </div>
 </template>
 
-<style>
+<style lang="scss">
 .omegaup-course-details .form-group > label {
   width: 100%;
 }
@@ -221,6 +221,12 @@
 
 .twitter-typeahead {
   width: 100%;
+}
+
+.tt-dataset {
+  background: white;
+  padding: 10px;
+  border: 1px solid gray;
 }
 </style>
 

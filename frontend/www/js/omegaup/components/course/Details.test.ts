@@ -106,7 +106,7 @@ describe('Details.vue', () => {
           show_scoreboard: false,
           start_time: new Date(),
           student_count: 1,
-          unlimited_duration: false,
+          unlimited_duration: true,
         },
         progress: <types.AssignmentProgress>{
           'test-assignment': <types.Progress>{

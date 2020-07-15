@@ -1,5 +1,5 @@
 import { omegaup, OmegaUp } from '../omegaup';
-import { types } from '../api_types';
+import { messages, types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
               }
             })
               .then((schoolId) => {
-                const params: types.CourseDetails = {
+                const params: messages.CourseUpdateRequest = {
                   name: source.name,
                   description: source.description,
                   start_time: source.startTime,
@@ -54,20 +54,12 @@ OmegaUp.on('ready', () => {
                   needs_basic_information: source.needs_basic_information,
                   requests_user_information: source.requests_user_information,
                   school_id: schoolId ?? undefined,
-                  unlimited_duration: false,
-                  is_curator: payload.course.is_curator,
-                  is_admin: payload.course.is_admin,
+                  unlimited_duration: source.unlimitedDuration,
+                  finish_time: !source.unlimitedDuration
+                    ? new Date(source.finishTime).setHours(23, 59, 59, 999) /
+                      1000
+                    : null,
                 };
-
-                if (source.unlimitedDuration) {
-                  Object.assign(params, { unlimited_duration: true });
-                } else {
-                  Object.assign(params, {
-                    finish_time:
-                      new Date(source.finishTime).setHours(23, 59, 59, 999) /
-                      1000,
-                  });
-                }
 
                 api.Course.update(params)
                   .then(() => {

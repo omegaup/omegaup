@@ -1,6 +1,6 @@
 import course_Form from '../components/course/Form.vue';
 import { omegaup, OmegaUp } from '../omegaup';
-import { types } from '../api_types';
+import { messages, types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
@@ -49,7 +49,7 @@ OmegaUp.on('ready', () => {
               }
             })
               .then((schoolId) => {
-                const params: types.CourseDetails = {
+                const params: messages.CourseCreateRequest = {
                   alias: source.alias,
                   name: source.name,
                   description: source.description,
@@ -57,20 +57,12 @@ OmegaUp.on('ready', () => {
                   show_scoreboard: source.showScoreboard,
                   needs_basic_information: source.needs_basic_information,
                   requests_user_information: source.requests_user_information,
-                  admission_mode: omegaup.AdmissionMode.Private,
-                  assignments: [],
                   school_id: schoolId ?? undefined,
-                  unlimited_duration: false,
-                  is_curator: true,
-                  is_admin: true,
+                  unlimited_duration: source.unlimitedDuration,
+                  finish_time: !source.unlimitedDuration
+                    ? source.finishTime
+                    : null,
                 };
-
-                if (source.unlimitedDuration) {
-                  Object.assign(params, { unlimited_duration: true });
-                } else {
-                  params.finish_time = source.finishTime;
-                  Object.assign(params, { finish_time: source.finishTime });
-                }
 
                 api.Course.create(params)
                   .then(() => {
