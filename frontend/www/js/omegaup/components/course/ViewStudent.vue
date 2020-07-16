@@ -99,7 +99,7 @@ import * as time from '../../time';
 @Component
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
-  @Prop() course!: omegaup.Course;
+  @Prop() course!: types.CourseDetails;
   @Prop() initialStudent!: types.CourseStudent;
   @Prop() problems!: omegaup.CourseProblem[];
   @Prop() students!: types.CourseStudent[];

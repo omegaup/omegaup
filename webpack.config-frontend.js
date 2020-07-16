@@ -52,11 +52,11 @@ module.exports = {
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
     course_details: './frontend/www/js/omegaup/course/details.ts',
-    course_edit: './frontend/www/js/omegaup/course/edit.js',
+    course_edit: './frontend/www/js/omegaup/course/edit.ts',
     course_intro: './frontend/www/js/omegaup/course/intro.js',
     course_list: './frontend/www/js/omegaup/course/list.ts',
     course_mine: './frontend/www/js/omegaup/course/mine.ts',
-    course_new: './frontend/www/js/omegaup/course/new.js',
+    course_new: './frontend/www/js/omegaup/course/new.ts',
     course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
     course_student: './frontend/www/js/omegaup/course/student.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
