@@ -11,6 +11,6 @@
 		"AllowDirectPushToMaster": true,
 		"SecretToken": "secret",
 		"AllowSecretTokenAuthentication": true,
-		"FrontendAuthorizationProblemRequestURL": "http://frontend:8000/api/authorization/problem/"
+		"FrontendAuthorizationProblemRequestURL": "http://frontend:8001/api/authorization/problem/"
 	}
 }
