@@ -189,12 +189,20 @@
                   v-bind:username="profile.username"
                   v-bind:periodStatisticOptions="this.periodStatisticOptions"
                   v-on:emit-update-period-statistics="
-                    (profileComponent, categories, data) => onUpdatePeriodStatistics(profileComponent,categories,data)"
+                    (profileComponent, categories, data) =>
+                      onUpdatePeriodStatistics(
+                        profileComponent,
+                        categories,
+                        data,
+                      )
+                  "
                   v-bind:aggregateStatisticOptions="
                     this.aggregateStatisticOptions
                   "
                   v-on:emit-update-aggregate-statistics="
-                    (profileComponent) => onAggregateStatistics(profileComponent)"
+                    (profileComponent) =>
+                      onAggregateStatistics(profileComponent)
+                  "
                   v-if="charts"
                 ></omegaup-user-charts>
               </div>
@@ -248,33 +256,32 @@ export default class UserProfile extends Vue {
   @Prop() profileBadges!: Set<string>;
   @Prop() visitorBadges!: Set<string>;
   profile = this.data.profile;
-  contests = this.data.contests ? Object.values(this.data.contests)
-          .map((contest) => {
-            const now = new Date();
-            if (contest.place === null || now <= contest.data.finish_time) {
-              return null;
-            }
-            return new ContestResult(contest);
-          })
-          .filter((contest) => !!contest) : [];
+  contests = this.data.contests
+    ? Object.values(this.data.contests)
+        .map((contest) => {
+          const now = new Date();
+          if (contest.place === null || now <= contest.data.finish_time) {
+            return null;
+          }
+          return new ContestResult(contest);
+        })
+        .filter((contest) => !!contest)
+    : [];
   charts = this.data.stats;
   T = T;
   columns = 3;
   selectedTab = 'badges';
   get createdProblems(): types.Problem[] {
-    if(!this.data.createdProblems) return [];
-    return this.data.createdProblems.map(
-            (problem) => new Problem(problem));
+    if (!this.data.createdProblems) return [];
+    return this.data.createdProblems.map((problem) => new Problem(problem));
   }
   get unsolvedProblems(): types.Problem[] {
-    if(!this.data.unsolvedProblems) return [];
-    return this.data.unsolvedProblems.map(
-            (problem) => new Problem(problem)) ;
+    if (!this.data.unsolvedProblems) return [];
+    return this.data.unsolvedProblems.map((problem) => new Problem(problem));
   }
   get solvedProblems(): types.Problem[] {
-    if(!this.data.solvedProblems) return [];
-    return this.data.solvedProblems.map(
-            (problem) => new Problem(problem)) ;
+    if (!this.data.solvedProblems) return [];
+    return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
   get rank(): string {
     switch (this.data.profile?.classname) {
@@ -293,7 +300,7 @@ export default class UserProfile extends Vue {
     }
   }
 
-  get periodStatisticOptions(): any{
+  get periodStatisticOptions(): any {
     return {
       title: {
         text: ui.formatString(T.profileStatisticsVerdictsOf, {
@@ -332,8 +339,7 @@ export default class UserProfile extends Vue {
       },
       tooltip: {
         headerFormat: '<b>{point.x}</b><br/>',
-        pointFormat:
-          '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
+        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
       },
       plotOptions: {
         column: {
@@ -344,57 +350,59 @@ export default class UserProfile extends Vue {
           },
         },
       },
-      series: [],   
-    }     
+      series: [],
+    };
   }
-  get aggregateStatisticOptions (): any{
+  get aggregateStatisticOptions(): any {
     return {
-        title: {
-          text: ui.formatString(T.profileStatisticsVerdictsOf, {
-            user: this.data.profile?.username,
-          }),
-        },
-        chart: {
-          plotBackgroundColor: null,
-          plotBorderWidth: null,
-          plotShadow: false,
-          type: 'pie',
-        },
-        xAxis: {
-          title: { text: '' },
-        },
-        yAxis: {
-          title: { text: '' },
-        },
-        tooltip: { pointFormat: '{series.name}: {point.y}' },
-        plotOptions: {
-          pie: {
-            allowPointSelect: true,
-            cursor: 'pointer',
-            dataLabels: {
-              enabled: true,
-              color: '#000000',
-              connectorColor: '#000000',
-              format:
-                '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
-            },
+      title: {
+        text: ui.formatString(T.profileStatisticsVerdictsOf, {
+          user: this.data.profile?.username,
+        }),
+      },
+      chart: {
+        plotBackgroundColor: null,
+        plotBorderWidth: null,
+        plotShadow: false,
+        type: 'pie',
+      },
+      xAxis: {
+        title: { text: '' },
+      },
+      yAxis: {
+        title: { text: '' },
+      },
+      tooltip: { pointFormat: '{series.name}: {point.y}' },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: true,
+            color: '#000000',
+            connectorColor: '#000000',
+            format: '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
           },
         },
-        series: [
-          {
-            name: T.profileStatisticsRuns,
-            data: [],
-          },
-        ],
-      }
+      },
+      series: [
+        {
+          name: T.profileStatisticsRuns,
+          data: [],
+        },
+      ],
+    };
   }
-  onUpdatePeriodStatistics (e: user_Charts, categories: string[], data: omegaup.RunData[]) {
+  onUpdatePeriodStatistics(
+    e: user_Charts,
+    categories: string[],
+    data: omegaup.RunData[],
+  ) {
     e.periodStatisticOptions.xAxis.categories = categories;
     e.periodStatisticOptions.series = data;
   }
-  onAggregateStatistics (e: user_Charts) {
-    (e.aggregateStatisticOptions.series[0].data =
-      e.normalizedRunCounts);
+  onAggregateStatistics(e: user_Charts) {
+    e.aggregateStatisticOptions.series[0].data = e.normalizedRunCounts;
   }
 }
 </script>

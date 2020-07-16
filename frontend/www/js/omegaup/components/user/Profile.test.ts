@@ -6,7 +6,7 @@ import user_Profile from './Profile.vue';
 describe('Profile.vue', () => {
   it('Should display Profile', () => {
     const badge_alias = 'contestManager';
-    const badges = ['100SolvedProblems']
+    const badges = ['100SolvedProblems'];
     const wrapper = shallowMount(user_Profile, {
       propsData: {
         data: {
@@ -15,7 +15,8 @@ describe('Profile.vue', () => {
           contests: [],
           createdProblems: [],
           currentUsername: 'omegaup',
-          gravatarURL51: 'https://secure.gravatar.com/avatar/307aeed2f8a75f6fe407411671e3ca87?s=51',
+          gravatarURL51:
+            'https://secure.gravatar.com/avatar/307aeed2f8a75f6fe407411671e3ca87?s=51',
           inContest: false,
           isAdmin: true,
           isLoggedIn: true,
@@ -35,9 +36,6 @@ describe('Profile.vue', () => {
         visitorBadges: new Set(badge_alias),
       },
     });
-    expect(wrapper.find('[data-user-profile-root]').exists()).toBe(
-      true
-    );
+    expect(wrapper.find('[data-user-profile-root]').exists()).toBe(true);
   });
 });
-
