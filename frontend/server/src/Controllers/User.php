@@ -1829,7 +1829,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $username
      *
-     * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int|null}>}
+     * @return array{contests: array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place?: int}>}
      */
     public static function apiContestStats(\OmegaUp\Request $r): array {
         self::authenticateOrAllowUnauthenticatedRequest($r);
@@ -1844,7 +1844,7 @@ class User extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
-        /** @var array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place: int|null}> */
+        /** @var array<string, array{data: array{alias: string, title: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp}, place?: int}> */
         $contests = [];
 
         foreach ($contestsParticipated as &$contest) {
