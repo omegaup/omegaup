@@ -1862,7 +1862,6 @@ class User extends \OmegaUp\Controllers\Controller {
 
             $contests[$contest['alias']] = [
                 'data' => $contest,
-                'place' => 0,
             ];
 
             // Grab the place of the current identity in the given contest
