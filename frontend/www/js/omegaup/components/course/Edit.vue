@@ -34,16 +34,6 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#problems"
-          class="nav-link"
-          data-tab-problems
-          v-on:click="showTab = 'problems'"
-          v-bind:class="{ active: showTab === 'problems' }"
-          >{{ T.wordsProblems }}</a
-        >
-      </li>
-      <li class="nav-item" role="presentation">
-        <a
           href="#admission-mode"
           class="nav-link"
           data-tab-admission-mode
@@ -128,44 +118,26 @@
           v-bind:finish-time-course="data.course.finish_time"
           v-bind:start-time-course="data.course.start_time"
           v-bind:assignment="assignment"
+          v-bind:assignment-problems="data.assignmentProblems"
+          v-bind:tagged-problems="data.taggedProblems"
           v-bind:invalid-parameter-name="invalidParameterName"
+          v-on:add-problem="
+            (assignment, problem) => $emit('add-problem', assignment, problem)
+          "
+          v-on:remove-problem="
+            (assignment, problem) =>
+              $emit('remove-problem', assignment, problem)
+          "
+          v-on:sort-problems="
+            (assignmentAlias, problemsAlias) =>
+              $emit('sort-problems', assignmentAlias, problemsAlias)
+          "
           v-on:emit-cancel="onResetAssignmentForm"
           v-on:emit-submit="
             (assignmentFormComponent) =>
               $emit('submit-new-assignment', assignmentFormComponent)
           "
         ></omegaup-course-assignment-details>
-      </div>
-
-      <div
-        data-problems-tab
-        class="tab-pane active"
-        role="tabpanel"
-        v-if="showTab === 'problems'"
-      >
-        <omegaup-course-problem-list
-          v-bind:assignments="data.course.assignments"
-          v-bind:assignment-problems="data.assignmentProblems"
-          v-bind:tagged-problems="data.taggedProblems"
-          v-bind:visibility-mode.sync="visibilityMode"
-          v-bind:selected-assignment="selectedAssignment"
-          v-on:emit-add-problem="
-            (assignment, problemAlias) =>
-              $emit('add-problem', assignment, problemAlias)
-          "
-          v-on:emit-select-assignment="
-            (assignment) => $emit('select-assignment', assignment)
-          "
-          v-on:emit-remove="
-            (assignment, problem) =>
-              $emit('remove-problem', assignment, problem)
-          "
-          v-on:emit-sort="
-            (assignmentAlias, problemsAlias) =>
-              $emit('sort-problems', assignmentAlias, problemsAlias)
-          "
-          v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
-        ></omegaup-course-problem-list>
       </div>
 
       <div
@@ -262,7 +234,6 @@ import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import course_AssignmentDetails from './AssignmentDetails.vue';
-import course_ProblemList from './ProblemList.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
@@ -272,11 +243,6 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 
-const now = new Date();
-const finishTime = new Date();
-finishTime.setHours(finishTime.getHours() + 5);
-const defaultStartTime = now;
-const defaultFinishTime = finishTime;
 const availableTabs = [
   'course',
   'assignments',
@@ -286,27 +252,12 @@ const availableTabs = [
   'admins',
   'clone',
 ];
-const emptyAssignment: types.CourseAssignment = {
-  problemset_id: 0,
-  alias: '',
-  description: '',
-  name: '',
-  has_runs: false,
-  max_points: 0,
-  start_time: defaultStartTime,
-  finish_time: defaultFinishTime,
-  order: 1,
-  scoreboard_url: '',
-  scoreboard_url_admin: '',
-  assignment_type: 'homework',
-};
 
 @Component({
   components: {
     'omegaup-course-form': course_Form,
     'omegaup-course-assignment-list': course_AssignmentList,
     'omegaup-course-assignment-details': course_AssignmentDetails,
-    'omegaup-course-problem-list': course_ProblemList,
     'omegaup-course-admision-mode': course_AdmissionMode,
     'omegaup-course-add-students': course_AddStudents,
     'omegaup-common-admins': common_Admins,
@@ -318,6 +269,7 @@ export default class CourseEdit extends Vue {
   @Ref('assignment-details') readonly assignmentDetails!: Vue;
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
+  @Prop() emptyAssignment!: types.CourseAssignment;
   @Prop() initialTab!: string;
 
   T = T;
@@ -325,8 +277,7 @@ export default class CourseEdit extends Vue {
 
   visibilityMode: omegaup.VisibilityMode = omegaup.VisibilityMode.Default;
 
-  assignment = emptyAssignment;
-  selectedAssignment = this.data.selectedAssignment;
+  assignment = this.emptyAssignment;
 
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;
@@ -334,21 +285,34 @@ export default class CourseEdit extends Vue {
 
   onNewAssignment(): void {
     this.visibilityMode = omegaup.VisibilityMode.New;
-    this.assignment = emptyAssignment;
-    this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
+    this.assignment = this.emptyAssignment;
+    this.data.assignmentProblems = [];
+    this.$nextTick(() => {
+      this.assignmentDetails.$el.scrollIntoView();
+      window.scrollBy(0, -62); // The size of navbar
+      (<HTMLElement>this.assignmentDetails.$refs.name).focus();
+    });
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
     this.visibilityMode = omegaup.VisibilityMode.Edit;
     this.assignment = assignment;
-    this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
+    this.$emit('select-assignment', this.assignment);
+    this.$nextTick(() => {
+      this.assignmentDetails.$el.scrollIntoView();
+      window.scrollBy(0, -62); // The size of navbar
+      (<HTMLElement>this.assignmentDetails.$refs.name).focus();
+    });
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {
-    this.visibilityMode = omegaup.VisibilityMode.AddProblem;
-    this.selectedAssignment = assignment;
-    this.showTab = 'problems';
+    this.visibilityMode = omegaup.VisibilityMode.Edit;
+    this.assignment = assignment;
     this.$emit('select-assignment', assignment);
+    this.$nextTick(() => {
+      this.assignmentDetails.$el.scrollIntoView();
+      window.scrollBy(0, -62); // The size of navbar
+    });
   }
 
   onCancel(): void {

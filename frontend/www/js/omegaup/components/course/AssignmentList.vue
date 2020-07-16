@@ -5,7 +5,7 @@
     </div>
     <div class="card-body">
       <div class="card-body" v-if="homeworks.length === 0">
-        <div class="empty-category">
+        <div class="empty-table-message">
           {{ T.courseAssignmentEmpty }}
         </div>
       </div>
@@ -80,7 +80,7 @@
       </div>
       <hr />
       <div class="card-body" v-if="tests.length === 0">
-        <div class="empty-category">
+        <div class="empty-table-message">
           {{ T.courseExamEmpty }}
         </div>
       </div>
@@ -175,9 +175,13 @@
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
 .disabled {
   color: lightgrey;
+}
+
+.table td {
+  vertical-align: middle;
 }
 </style>
 

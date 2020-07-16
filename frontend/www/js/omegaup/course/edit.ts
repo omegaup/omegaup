@@ -20,6 +20,28 @@ Vue.use(Clipboard);
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
+
+  const now = new Date();
+  const finishTime = new Date();
+  finishTime.setHours(finishTime.getHours() + 5);
+  const defaultStartTime = now;
+  const defaultFinishTime = finishTime;
+  const emptyAssignment: types.CourseAssignment = {
+    problemset_id: 0,
+    alias: '',
+    description: '',
+    name: '',
+    has_runs: false,
+    max_points: 0,
+    start_time: defaultStartTime,
+    finish_time: defaultFinishTime,
+    order: 1,
+    problems: [],
+    scoreboard_url: '',
+    scoreboard_url_admin: '',
+    assignment_type: 'homework',
+  };
+
   const courseEdit = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -28,6 +50,7 @@ OmegaUp.on('ready', () => {
           data: this.data,
           initialTab: this.initialTab,
           invalidParameterName: this.invalidParameterName,
+          emptyAssignment: emptyAssignment,
         },
         on: {
           'submit-edit-course': (source: course_Form) => {
@@ -118,6 +141,7 @@ OmegaUp.on('ready', () => {
               Object.assign(params, {
                 alias: source.alias,
                 course_alias: courseAlias,
+                problems: JSON.stringify(source.assignment.problems),
               });
 
               if (source.unlimitedDuration) {
@@ -132,6 +156,8 @@ OmegaUp.on('ready', () => {
                 .then(() => {
                   ui.success(T.courseAssignmentAdded);
                   this.invalidParameterName = '';
+                  component.assignment = emptyAssignment;
+                  component.assignment.problems = [];
                   this.refreshAssignmentsList();
                 })
                 .catch((error) => {
@@ -187,17 +213,17 @@ OmegaUp.on('ready', () => {
           },
           'add-problem': (
             assignment: types.CourseAssignment,
-            problemAlias: string,
+            problem: types.AddedProblem,
           ) => {
             api.Course.addProblem({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
-              problem_alias: problemAlias,
+              problem_alias: problem.alias,
+              points: problem.points,
             })
               .then(() => {
                 ui.success(T.courseAssignmentProblemAdded);
                 this.refreshProblemList(assignment);
-                component.visibilityMode = omegaup.VisibilityMode.Default;
               })
               .catch(ui.apiError);
           },

@@ -17,13 +17,13 @@ describe('Edit.vue', () => {
     const wrapper = shallowMount(course_Edit, {
       propsData: {
         data: {
-          course: <omegaup.Course>{
+          course: <types.CourseDetails>{
             admission_mode: 'registration',
             alias: 'test-course',
-            assignments: <omegaup.Assignment[]>[],
+            assignments: <types.CourseAssignment[]>[],
             basic_information_required: false,
             description: '# Test',
-            finish_time: null,
+            finish_time: undefined,
             is_curator: true,
             is_admin: true,
             name: courseName,
@@ -42,6 +42,21 @@ describe('Edit.vue', () => {
           groupsAdmins: [],
         },
         initialTab: 'course',
+        emptyAssignment: <types.CourseAssignment>{
+          problemset_id: 0,
+          alias: '',
+          description: '',
+          name: '',
+          has_runs: false,
+          max_points: 0,
+          start_time: new Date(),
+          finish_time: new Date(),
+          order: 1,
+          problems: [],
+          scoreboard_url: '',
+          scoreboard_url_admin: '',
+          assignment_type: 'test',
+        },
       },
     });
 
@@ -49,7 +64,6 @@ describe('Edit.vue', () => {
 
     // All the links are available
     await wrapper.find('a[data-tab-assignments]').trigger('click');
-    await wrapper.find('a[data-tab-problems]').trigger('click');
     await wrapper.find('a[data-tab-admission-mode]').trigger('click');
     await wrapper.find('a[data-tab-students]').trigger('click');
     await wrapper.find('a[data-tab-admins]').trigger('click');

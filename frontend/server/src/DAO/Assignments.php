@@ -12,7 +12,8 @@ namespace OmegaUp\DAO;
  * @access public
  * @package docs
  *
- * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type AddedProblem=array{alias: string, points: float}
+ * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problems: list<AddedProblem>, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
  */
 class Assignments extends \OmegaUp\DAO\Base\Assignments {
     public static function getProblemset(
@@ -198,6 +199,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         $assignments = [];
         foreach ($rs as $row) {
             $row['has_runs'] = $row['has_runs'] > 0;
+            $row['problems'] = [];
             $assignments[] = $row;
         }
         return $assignments;

@@ -7,6 +7,7 @@
             <label
               >{{ T.wordsTitle }}
               <input
+                ref="name"
                 class="form-control name"
                 v-bind:class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
@@ -139,8 +140,40 @@
             </label>
           </div>
         </div>
-        <div class="form-group text-right">
-          <button class="btn btn-primary submit mr-2" type="submit">
+        <omegaup-course-problem-list
+          v-bind:assignment-problems="assignmentProblems"
+          v-bind:tagged-problems="taggedProblems"
+          v-bind:selected-assignment="assignment"
+          v-bind:visibility-mode="visibilityMode"
+          v-on:emit-save-problem="
+            (assignment, problem) => $emit('add-problem', assignment, problem)
+          "
+          v-on:emit-remove-problem="
+            (assignment, problem) =>
+              $emit('remove-problem', assignment, problem)
+          "
+          v-on:emit-add-problem="
+            (assignment, problem) => onAddProblem(assignment, problem)
+          "
+          v-on:emit-select-assignment="
+            (assignment) => $emit('select-assignment', assignment)
+          "
+          v-on:emit-remove="
+            (assignment, problemAlias) =>
+              onRemoveProblem(assignment, problemAlias)
+          "
+          v-on:emit-sort="
+            (assignmentAlias, problemsAlias) =>
+              $emit('sort-problems', assignmentAlias, problemsAlias)
+          "
+          v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+        ></omegaup-course-problem-list>
+        <div class="form-group text-right mt-3">
+          <button
+            data-schedule-assignment
+            class="btn btn-primary submit mr-2"
+            type="submit"
+          >
             <template v-if="update">
               {{ T.courseAssignmentNewFormUpdate }}
             </template>
@@ -161,7 +194,7 @@
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
 .omegaup-course-assignmentdetails .form-group > label {
   width: 100%;
 }
@@ -170,7 +203,9 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
+import course_ProblemList from './ProblemList.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 
 import {
@@ -184,10 +219,11 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-datetimepicker': DateTimePicker,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-datetimepicker': DateTimePicker,
+    'omegaup-course-problem-list': course_ProblemList,
   },
 })
 export default class CourseAssignmentDetails extends Vue {
@@ -195,9 +231,11 @@ export default class CourseAssignmentDetails extends Vue {
     default: omegaup.VisibilityMode.Default,
   })
   visibilityMode!: omegaup.VisibilityMode;
-  @Prop() assignment!: omegaup.Assignment;
+  @Prop() assignment!: types.CourseAssignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
+  @Prop() assignmentProblems!: types.ProblemsetProblem[];
+  @Prop() taggedProblems!: omegaup.Problem[];
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
 
@@ -252,6 +290,30 @@ export default class CourseAssignmentDetails extends Vue {
   @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
+  }
+
+  onAddProblem(
+    assignment: types.CourseAssignment,
+    problem: types.AddedProblem,
+  ): void {
+    const problemAlias = problem.alias;
+    const currentProblem = assignment.problems.find(
+      (problem) => problem.alias === problemAlias,
+    );
+    if (!currentProblem) {
+      assignment.problems.push(problem);
+      return;
+    }
+    currentProblem.points = problem.points;
+  }
+
+  onRemoveProblem(
+    assignment: types.CourseAssignment,
+    problemAlias: string,
+  ): void {
+    this.assignment.problems = assignment.problems.filter(
+      (problem) => problem.alias !== problemAlias,
+    );
   }
 
   onSubmit(): void {
