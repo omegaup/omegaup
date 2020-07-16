@@ -37,7 +37,7 @@ if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file=/home/ubuntu/.my.cnf e
     -e 'GRANT ALL PRIVILEGES ON `omegaup-test%`.* TO "omegaup"@"%";'
   /opt/omegaup/stuff/bootstrap-environment.py \
     --mysql-config-file=/home/ubuntu/.my.cnf \
-    --purge --verbose --root-url=http://localhost:8000/
+    --purge --verbose --root-url=http://localhost:8001/
 else
   /opt/omegaup/stuff/db-migrate.py \
     --mysql-config-file=/home/ubuntu/.my.cnf migrate

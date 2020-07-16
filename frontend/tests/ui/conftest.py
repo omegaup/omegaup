@@ -535,8 +535,7 @@ def pytest_addoption(parser):
 
     parser.addoption('--browser', action='append', type=str, dest='browsers',
                      help='The browsers that the test will run against')
-    parser.addoption('--url', default=('http://localhost/' if not util.CI else
-                                       'http://localhost:8000/'),
+    parser.addoption('--url', default=('http://localhost/'),
                      help='The URL that the test will be run against')
     parser.addoption('--disable-headless', action='store_false',
                      dest='headless', help='Show the browser window')
