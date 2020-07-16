@@ -211,22 +211,12 @@
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .omegaup-course-details .form-group > label {
   width: 100%;
 }
 .omegaup-course-details .faux-label {
   font-weight: bold;
-}
-
-.twitter-typeahead {
-  width: 100%;
-}
-
-.tt-dataset {
-  background: white;
-  padding: 10px;
-  border: 1px solid gray;
 }
 </style>
 
