@@ -23,7 +23,10 @@
  * @psalm-type FilteredCourse=array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CoursesList=array{admin: list<FilteredCourse>, student: list<FilteredCourse>, public: list<FilteredCourse>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress: AssignmentProgress}
- * @psalm-type CourseListPayload=array{courses: array{admin: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, student: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}, public: array{accessMode: string, activeTab: string, filteredCourses: array{current: array{courses: list<FilteredCourse>, timeType: string}, past: array{courses: list<FilteredCourse>, timeType: string}}}}}
+ * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
+ * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
+ * @psalm-type AllCourses=array{admin: CoursesByAccessMode, public: CoursesByAccessMode, student: CoursesByAccessMode}
+ * @psalm-type CourseListPayload=array{courses: AllCourses}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
@@ -33,6 +36,7 @@
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
+ * @psalm-type AddedProblem=array{alias: string, points: float}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -71,6 +75,8 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates request for creating a new Assignment
      *
+     * @return array{addedProblems: list<AddedProblem>}
+     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
      * @omegaup-request-param mixed $alias
@@ -78,13 +84,14 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $problems
      * @omegaup-request-param OmegaUp\Timestamp $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
     private static function validateCreateAssignment(
         \OmegaUp\Request $r,
         \OmegaUp\DAO\VO\Courses $course
-    ): void {
+    ): array {
         /** @var \OmegaUp\Timestamp */
         $courseStartTime = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
             $course->start_time
@@ -135,6 +142,50 @@ class Course extends \OmegaUp\Controllers\Controller {
             'alias',
             /*$isRequired=*/true
         );
+
+        $addedProblems = [];
+        if (!empty($r['problems'])) {
+          /** @var list<array{alias: string, points?: int|float|string}> */
+            $problemsData = json_decode(
+                strval(
+                    $r['problems']
+                ), /*$assoc=*/
+                true
+            );
+            foreach ($problemsData as $problemData) {
+                if (!isset($problemData['alias'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'problems'
+                    );
+                }
+
+                if (
+                    is_null(
+                        \OmegaUp\DAO\Problems::getByAlias(
+                            $problemData['alias']
+                        )
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\NotFoundException(
+                        'problemNotFound'
+                    );
+                }
+                if (!empty($problemData['points'])) {
+                    \OmegaUp\Validators::validateNumber(
+                        $problemData['points'],
+                        'points'
+                    );
+                    $problemData['points'] = floatval($problemData['points']);
+                } else {
+                    $problemData['points'] = 100.0;
+                }
+
+                $addedProblems[] = $problemData;
+            }
+        }
+
+        return ['addedProblems' => $addedProblems];
     }
 
     /**
@@ -485,29 +536,33 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             foreach ($assignmentsProblems as $assignment => $assignmentProblems) {
                 // Create and assign homeworks and tests to new course
-                $problemset = self::createAssignment($originalCourse, new \OmegaUp\DAO\VO\Assignments([
-                    'course_id' => $course->course_id,
-                    'acl_id' => $course->acl_id,
-                    'name' => $assignmentProblems['name'],
-                    'description' => $assignmentProblems['description'],
-                    'alias' => $assignmentProblems['assignment_alias'],
-                    'publish_time_delay' => $assignmentProblems['publish_time_delay'],
-                    'assignment_type' => $assignmentProblems['assignment_type'],
-                    'start_time' => new \OmegaUp\Timestamp(
-                        $assignmentProblems['start_time']->time +
-                        $offset
-                    ),
-                    'finish_time' => (
-                        is_null($assignmentProblems['finish_time']) ?
-                        null :
-                        new \OmegaUp\Timestamp(
-                            $assignmentProblems['finish_time']->time +
+                $problemset = self::createAssignment(
+                    $originalCourse,
+                    new \OmegaUp\DAO\VO\Assignments([
+                        'course_id' => $course->course_id,
+                        'acl_id' => $course->acl_id,
+                        'name' => $assignmentProblems['name'],
+                        'description' => $assignmentProblems['description'],
+                        'alias' => $assignmentProblems['assignment_alias'],
+                        'publish_time_delay' => $assignmentProblems['publish_time_delay'],
+                        'assignment_type' => $assignmentProblems['assignment_type'],
+                        'start_time' => new \OmegaUp\Timestamp(
+                            $assignmentProblems['start_time']->time +
                             $offset
-                        )
-                    ),
-                    'order' => $assignmentProblems['order'],
-                    'max_points' => $assignmentProblems['max_points'],
-                ]));
+                        ),
+                        'finish_time' => (
+                            is_null($assignmentProblems['finish_time']) ?
+                            null :
+                            new \OmegaUp\Timestamp(
+                                $assignmentProblems['finish_time']->time +
+                                $offset
+                            )
+                        ),
+                        'order' => $assignmentProblems['order'],
+                        'max_points' => $assignmentProblems['max_points'],
+                    ]),
+                    $r->identity
+                );
                 if (is_null($problemset->problemset_id)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
                         'problemsetNotFound'
@@ -652,12 +707,21 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Function to create a new assignment
      *
+     * @param list<AddedProblem> $addedProblems
+     *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      */
     private static function createAssignment(
         \OmegaUp\DAO\VO\Courses $course,
-        \OmegaUp\DAO\VO\Assignments $assignment
+        \OmegaUp\DAO\VO\Assignments $assignment,
+        \OmegaUp\DAO\VO\Identities $identity,
+        array $addedProblems = []
     ): \OmegaUp\DAO\VO\Problemsets {
+        if (is_null($assignment->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'assignmentNotFound'
+            );
+        }
         \OmegaUp\DAO\DAO::transBegin();
         try {
             // Create the backing problemset
@@ -678,6 +742,32 @@ class Course extends \OmegaUp\Controllers\Controller {
             // Update assignment_id in problemset object
             $problemset->assignment_id = $assignment->assignment_id;
             \OmegaUp\DAO\Problemsets::update($problemset);
+
+            if (is_null($problemset->problemset_id)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFound'
+                );
+            }
+
+            if (!empty($addedProblems)) {
+                foreach ($addedProblems as $i => $addedProblem) {
+                    // Create and assign problems to new course
+                    self::addProblemToAssignment(
+                        $addedProblem['alias'],
+                        $problemset->problemset_id,
+                        $identity,
+                        /*$validateVisibility=*/false,
+                        /*$points=*/$addedProblem['points'],
+                        /*$commit*/null,
+                        /*$order*/$i + 1
+                    );
+                }
+
+                \OmegaUp\DAO\Courses::updateAssignmentMaxPoints(
+                    $course,
+                    $assignment->alias
+                );
+            }
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
@@ -701,7 +791,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @param int $problemsetId
      * @param int $userId
      * @param bool $validateVisibility validations no needed when it is a clone
-     * @param ?int $points = 100
      * @param ?string $commit
      * @param ?int $order = 1
      */
@@ -725,7 +814,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $commit
         );
 
-        $assignedPoints = is_null($points) ? 100 : $points;
+        $assignedPoints = $points ?? 100.0;
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
@@ -750,6 +839,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $order
+     * @omegaup-request-param mixed $problems
      * @omegaup-request-param mixed $publish_time_delay
      * @omegaup-request-param mixed $start_time
      * @omegaup-request-param bool|null $unlimited_duration
@@ -769,24 +859,31 @@ class Course extends \OmegaUp\Controllers\Controller {
             'order'
         );
         $course = self::validateCourseExists($r['course_alias']);
-        self::validateCreateAssignment($r, $course);
+        [
+            'addedProblems' => $addedProblems,
+        ] = self::validateCreateAssignment($r, $course);
 
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        self::createAssignment($course, new \OmegaUp\DAO\VO\Assignments([
-            'course_id' => $course->course_id,
-            'acl_id' => $course->acl_id,
-            'name' => $r['name'],
-            'description' => $r['description'],
-            'alias' => $r['alias'],
-            'publish_time_delay' => $r['publish_time_delay'],
-            'assignment_type' => $r['assignment_type'],
-            'start_time' => $r['start_time'],
-            'finish_time' => $r['finish_time'],
-            'order' => intval($r['order']),
-        ]));
+        self::createAssignment(
+            $course,
+            new \OmegaUp\DAO\VO\Assignments([
+                'course_id' => $course->course_id,
+                'acl_id' => $course->acl_id,
+                'name' => $r['name'],
+                'description' => $r['description'],
+                'alias' => $r['alias'],
+                'publish_time_delay' => $r['publish_time_delay'],
+                'assignment_type' => $r['assignment_type'],
+                'start_time' => $r['start_time'],
+                'finish_time' => $r['finish_time'],
+                'order' => intval($r['order']),
+            ]),
+            $r->identity,
+            $addedProblems
+        );
 
         return [
             'status' => 'ok',
@@ -946,11 +1043,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $points = 100;
-        if (is_numeric($r['points'])) {
-            $points = intval($r['points']);
-        }
-
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
             'commit',
@@ -963,7 +1055,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id,
             $r->identity,
             true, /* validateVisibility */
-            $points,
+            is_numeric($r['points']) ? floatval($r['points']) : 100.0,
             $r['commit']
         );
 
@@ -1550,6 +1642,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
 
+        // Public courses.
+        $publicCourses = \OmegaUp\DAO\Courses::getPublicCourses();
+
         $response = [
             'admin' => [],
             'student' => [],
@@ -1561,13 +1656,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         foreach ($studentCourses as $course) {
-            $courseAsArray = \OmegaUp\Controllers\Course::convertCourseToArray(
+            $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
-            $response['student'][] = $courseAsArray;
-            if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
-                $response['public'][] = $courseAsArray;
-            }
+        }
+        foreach ($publicCourses as $course) {
+            $response['public'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+                $course
+            );
         }
 
         return $response;
@@ -2629,7 +2725,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
      */
-    public static function getCourseListDetailsForSamrty(\OmegaUp\Request $r): array {
+    public static function getCourseListDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $r->ensureOptionalInt('page');
         $r->ensureOptionalInt('page_size');

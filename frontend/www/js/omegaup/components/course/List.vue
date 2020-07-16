@@ -41,7 +41,7 @@ import course_FilteredList from './FilteredList.vue';
   },
 })
 export default class CourseList extends Vue {
-  @Prop() courses!: types.CourseDetails[];
+  @Prop() courses!: types.AllCourses;
   @Prop() isMainUserIdentity!: boolean;
 
   T = T;
