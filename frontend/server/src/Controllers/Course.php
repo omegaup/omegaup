@@ -2729,7 +2729,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: string}}
      */
-
     public static function getCourseMineDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
         $page = $r->ensureOptionalInt('page') ?? 1;

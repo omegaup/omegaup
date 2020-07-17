@@ -8,7 +8,6 @@
       <div class="float-right">
         <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
       </div>
-      <h1>&nbsp;</h1>
     </div>
     <template v-if="courses.admin.activeTab !== ''">
       <omegaup-course-filtered-list
