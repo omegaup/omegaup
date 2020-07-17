@@ -1,7 +1,7 @@
 import admin_Support from '../components/admin/Support.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 
@@ -30,28 +30,28 @@ OmegaUp.on('ready', function () {
                     ? null
                     : new Date(data.last_login * 1000);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'verify-user': function (email) {
             api.User.verifyEmail({ usernameOrEmail: email })
               .then(function () {
                 adminSupport.verified = true;
-                UI.success(T.userVerified);
+                ui.success(T.userVerified);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'generate-token': function (email) {
             api.Reset.generateToken({
               email: email,
             })
               .then(function (data) {
-                UI.success(T.passwordResetTokenWasGeneratedSuccessfully);
+                ui.success(T.passwordResetTokenWasGeneratedSuccessfully);
                 adminSupport.link = data.link;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
           'copy-token': function () {
-            UI.success(T.passwordResetLinkCopiedToClipboard);
+            ui.success(T.passwordResetLinkCopiedToClipboard);
           },
           reset: function () {
             adminSupport.username = null;

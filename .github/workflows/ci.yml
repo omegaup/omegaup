@@ -33,7 +33,7 @@ jobs:
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
           # omegaup-gitserver depends on libinteractive.
-          DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.25/libinteractive.jar'
+          DOWNLOAD_URL='https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar'
           TARGET='/usr/share/java/libinteractive.jar'
           sudo curl --location "${DOWNLOAD_URL}" -o "${TARGET}"
 
@@ -156,9 +156,9 @@ jobs:
           MYSQL_DATABASE: omegaup
 
       frontend:
-        image: omegaup/dev-php:20200530
+        image: omegaup/dev-php:20200715
         ports:
-          - 8001:8000
+          - 8001:8001
         volumes:
           - ${{ github.workspace }}:/opt/omegaup
           - omegaupdata:/var/lib/omegaup
@@ -166,15 +166,15 @@ jobs:
           CI: true
 
       gitserver:
-        image: omegaup/dev-gitserver:20200503
+        image: omegaup/dev-gitserver:20200715
         volumes:
           - omegaupdata:/var/lib/omegaup
 
       broadcaster:
-        image: omegaup/dev-broadcaster:20200530
+        image: omegaup/dev-broadcaster:20200715
 
       grader:
-        image: omegaup/dev-grader:20200530
+        image: omegaup/dev-grader:20200715
         volumes:
           - omegaupdata:/var/lib/omegaup
 
@@ -204,6 +204,7 @@ jobs:
           define('OMEGAUP_SSLCERT_URL', '/etc/omegaup/frontend/certificate.pem');
           define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
           define('OMEGAUP_GRADER_URL', 'https://grader:21680');
+          define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
           EOF
 
           cat > ~/.my.cnf << EOF
@@ -235,7 +236,7 @@ jobs:
           mysql \
             -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
           python3 stuff/bootstrap-environment.py \
-          --purge --verbose --root-url=http://localhost:8001
+          --purge --verbose
 
       - name: Install yarn dependencies
         run: yarn install
@@ -247,8 +248,7 @@ jobs:
         run: |
           python3 -m pytest ./frontend/tests/ui/ \
             --verbose --capture=no --log-cli-level=INFO --browser=chrome \
-            --force-flaky --max-runs=2 --min-passes=1 --numprocesses=4 \
-            --url=http://localhost:8001
+            --force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
 
       - name: Collect container logs
         if: ${{ always() }}

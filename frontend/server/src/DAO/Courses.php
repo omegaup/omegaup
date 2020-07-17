@@ -91,7 +91,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * @return \OmegaUp\DAO\VO\Courses[]
+     * @return list<\OmegaUp\DAO\VO\Courses>
      */
     public static function getCoursesForStudent(int $identityId) {
         $sql = 'SELECT c.*
@@ -102,24 +102,37 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     INNER JOIN `Groups_` AS g ON g.group_id = gi.group_id
                     WHERE gi.identity_id = ?
                 ) gg
-                ON c.group_id = gg.group_id
-                UNION(
-                    SELECT cc.*
-                    FROM Courses cc
-                    WHERE cc.admission_mode = ?
-                );
+                ON c.group_id = gg.group_id;
                ';
         /** @var list<array{acl_id: int, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [
-                $identityId,
-                \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
-            ]
+            [$identityId]
         );
         $courses = [];
         foreach ($rs as $row) {
-            array_push($courses, new \OmegaUp\DAO\VO\Courses($row));
+            $courses[] = new \OmegaUp\DAO\VO\Courses($row);
+        }
+        return $courses;
+    }
+
+    /**
+     * @return list<\OmegaUp\DAO\VO\Courses>
+     */
+    public static function getPublicCourses() {
+        $sql = '
+                SELECT cc.*
+                FROM Courses cc
+                WHERE cc.admission_mode = ?;
+               ';
+        /** @var list<array{acl_id: int, admission_mode: string, alias: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, group_id: int, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, show_scoreboard: bool, start_time: \OmegaUp\Timestamp}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [\OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC]
+        );
+        $courses = [];
+        foreach ($rs as $row) {
+            $courses[] = new \OmegaUp\DAO\VO\Courses($row);
         }
         return $courses;
     }
@@ -381,6 +394,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = 'SELECT * FROM Assignments WHERE (alias = ? AND course_id = ?) LIMIT 1;';
         $params = [$assignmentAlias, $course->course_id];
 
+        /** @var array{acl_id: int, alias: string, assignment_id: int, assignment_type: string, course_id: int, description: string, finish_time: \OmegaUp\Timestamp|null, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, start_time: \OmegaUp\Timestamp}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;

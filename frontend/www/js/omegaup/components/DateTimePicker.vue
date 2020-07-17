@@ -1,6 +1,7 @@
 <template>
   <input
     class="form-control"
+    v-bind:class="{ 'is-invalid': isInvalid }"
     required="required"
     size="16"
     type="datetime-local"
@@ -31,6 +32,7 @@ export default class DateTimePicker extends Vue {
   @Prop({ default: null }) start!: Date;
   @Prop({ default: null }) finish!: Date;
   @Prop({ default: false }) readonly!: boolean;
+  @Prop({ default: false }) isInvalid!: boolean;
 
   private usedFallback: boolean = false;
   private stringValue: string = time.formatDateTimeLocal(this.value);

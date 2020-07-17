@@ -151,6 +151,17 @@
         </div>
 
         <template v-if="!isUpdate">
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label>{{ T.wordsShowCasesDiff }}</label>
+              <select name="show_diff" class="form-control" v-model="showDiff">
+                <option value="none">{{ T.problemVersionDiffModeNone }}</option>
+                <option value="examples">{{ T.wordsOnlyExamples }}</option>
+                <option value="all">{{ T.wordsAll }}</option>
+              </select>
+            </div>
+          </div>
+
           <omegaup-problem-tags
             v-bind:public-tags="data.publicTags"
             v-bind:level-tags="data.levelTags"
@@ -169,8 +180,16 @@
         </template>
 
         <div class="row" v-else="">
+          <div class="form-group col-md-6">
+            <label>{{ T.wordsShowCasesDiff }}</label>
+            <select name="show_diff" class="form-control" v-model="showDiff">
+              <option value="none">{{ T.problemVersionDiffModeNone }}</option>
+              <option value="examples">{{ T.wordsOnlyExamples }}</option>
+              <option value="all">{{ T.wordsAll }}</option>
+            </select>
+          </div>
           <div
-            class="form-group col-md-12"
+            class="form-group col-md-6"
             v-bind:class="{ 'has-error': errors.includes('message') }"
           >
             <label class="control-label">{{
@@ -249,6 +268,7 @@ export default class ProblemForm extends Vue {
   validator = this.data.validator;
   languages = this.data.languages;
   tags = this.data.tags;
+  showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
   message = '';
   hasFile = false;

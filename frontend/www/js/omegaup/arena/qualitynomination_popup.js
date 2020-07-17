@@ -1,6 +1,6 @@
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import Vue from 'vue';
@@ -43,7 +43,7 @@ OmegaUp.on('ready', function () {
               problem_alias: qualityPayload.problem_alias,
               nomination: 'suggestion',
               contents: JSON.stringify(contents),
-            }).catch(UI.apiError);
+            }).catch(ui.apiError);
           },
           dismiss: function (ev) {
             let contents = {};
@@ -56,9 +56,9 @@ OmegaUp.on('ready', function () {
               contents: JSON.stringify(contents),
             })
               .then(function (data) {
-                UI.info(T.qualityNominationRateProblemDesc);
+                ui.info(T.qualityNominationRateProblemDesc);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });

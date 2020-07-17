@@ -2,10 +2,11 @@ const util = require('util');
 
 require('jsdom-global')(undefined, {
   pretendToBeVisual: true,
-  url: 'http://localhost',
+  url: 'http://localhost:8001/',
 });
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
+window.jQuery = global.jQuery;
 
 // This is needed for CodeMirror to work.
 global.document.createRange = () => {

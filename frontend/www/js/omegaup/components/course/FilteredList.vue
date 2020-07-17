@@ -99,7 +99,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 
@@ -120,7 +120,7 @@ library.add(fas);
   },
 })
 export default class CourseFilteredList extends Vue {
-  @Prop() courses!: omegaup.Course[];
+  @Prop() courses!: types.CourseDetails[];
   @Prop() activeTab!: string;
 
   T = T;

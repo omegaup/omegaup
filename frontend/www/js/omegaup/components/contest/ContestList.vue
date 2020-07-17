@@ -68,7 +68,7 @@
           <td>
             <strong
               ><a v-bind:href="'/arena/' + contest.alias + '/'">{{
-                UI.contestTitle(contest)
+                ui.contestTitle(contest)
               }}</a></strong
             >
           </td>
@@ -174,7 +174,7 @@
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 @Component
 export default class List extends Vue {
@@ -183,7 +183,7 @@ export default class List extends Vue {
   @Prop() title!: string;
 
   T = T;
-  UI = UI;
+  ui = ui;
   selectedContests = [];
 
   makeWorldClockLink(date: Date): string {

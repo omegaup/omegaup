@@ -30,9 +30,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import course_FilteredList from './FilteredList.vue';
 
 @Component({
@@ -41,11 +41,11 @@ import course_FilteredList from './FilteredList.vue';
   },
 })
 export default class CourseList extends Vue {
-  @Prop() courses!: omegaup.Course[];
+  @Prop() courses!: types.AllCourses;
   @Prop() isMainUserIdentity!: boolean;
 
   T = T;
-  UI = UI;
+  ui = ui;
 
   getDescription(admissionMode: string): string {
     if (admissionMode === 'public') return T.courseListPublicCourses;

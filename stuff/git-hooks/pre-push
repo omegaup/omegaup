@@ -3,6 +3,7 @@
 GIT_PUSH=0
 EMPTY_HASH=0000000000000000000000000000000000000000
 REMOTE_HASH=
+PRE_UPLOAD_ARGS=""
 
 if [ $# = 0 ]; then
 	ARGS="HEAD"
@@ -11,6 +12,7 @@ elif [ $# = 1 ]; then
 else
 	read LOCAL_REF LOCAL_HASH REMOTE_REF REMOTE_HASH
 	ARGS="$REMOTE_HASH $LOCAL_HASH"
+	PRE_UPLOAD_ARGS="--pre-upload"
 	GIT_PUSH=1
 fi
 
@@ -56,4 +58,4 @@ fi
 
 /usr/bin/python3 "${OMEGAUP_ROOT}/stuff/database_schema.py" validate $ARGS
 /usr/bin/python3 "${OMEGAUP_ROOT}/stuff/policy-tool.py" validate
-exec "${OMEGAUP_ROOT}/stuff/lint.sh" validate $ARGS
+exec "${OMEGAUP_ROOT}/stuff/lint.sh" $PRE_UPLOAD_ARGS validate $ARGS

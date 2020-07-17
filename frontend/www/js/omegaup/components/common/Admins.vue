@@ -5,13 +5,10 @@
         <div class="form-group">
           <label class="font-weight-bold"
             >{{ T.wordsAdmin }}
-            <span
-              aria-hidden="true"
-              class="glyphicon glyphicon-info-sign"
-              data-placement="top"
-              data-toggle="tooltip"
+            <font-awesome-icon
               v-bind:title="T.courseEditAddAdminsTooltip"
-            ></span>
+              icon="info-circle"
+            />
             <omegaup-autocomplete
               class="form-control"
               v-bind:init="(el) => typeahead.userTypeahead(el)"
@@ -91,10 +88,22 @@ import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import user_Username from '../user/Username.vue';
 
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
     'omegaup-user-username': user_Username,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class Admins extends Vue {

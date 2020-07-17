@@ -10,4 +10,4 @@ fi
 
 cd /opt/omegaup
 yarn install
-exec yarn run dev-all
+exec yarn run dev-all:watch
