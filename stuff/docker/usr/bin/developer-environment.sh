@@ -30,13 +30,13 @@ define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
 EOF
 fi
 
-if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file=/home/ubuntu/.my.cnf exists ; then
+if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${HOME}/.my.cnf" exists ; then
   mysql --defaults-file=/home/ubuntu/.my.cnf \
     -e "CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
-  mysql --defaults-file=/home/ubuntu/.my.cnf \
+  mysql --defaults-file="${HOME}/.my.cnf" \
     -e 'GRANT ALL PRIVILEGES ON `omegaup-test%`.* TO "omegaup"@"%";'
   /opt/omegaup/stuff/bootstrap-environment.py \
-    --mysql-config-file=/home/ubuntu/.my.cnf \
+    --mysql-config-file="${HOME}/.my.cnf" \
     --purge --verbose --root-url=http://localhost:8001/
 else
   /opt/omegaup/stuff/db-migrate.py \

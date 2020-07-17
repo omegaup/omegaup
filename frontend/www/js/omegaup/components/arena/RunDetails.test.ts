@@ -45,7 +45,7 @@ describe('RunDetails.vue', () => {
           source: 'print(3)',
           source_link: false,
           source_name: 'Main.py3',
-          source_url: 'blob:http://localhost:8080/url',
+          source_url: 'blob:http://localhost:8001/url',
         },
       },
     });
