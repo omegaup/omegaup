@@ -12,16 +12,32 @@ const noop = () => {};
 Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
 
 describe('Edit.vue', () => {
-  it('Should handle empty assignments', async () => {
+  it('Should handle assignments', async () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Edit, {
       propsData: {
-        data: {
-          course: <types.CourseDetails>{
+        data: <types.CourseEditPayload>{
+          course: {
             admission_mode: 'registration',
             alias: 'test-course',
-            assignments: <types.CourseAssignment[]>[],
-            basic_information_required: false,
+            assignments: [
+              {
+                problemset_id: 1,
+                alias: 'alias',
+                description: 'description',
+                name: 'name',
+                has_runs: false,
+                max_points: 0,
+                start_time: new Date(),
+                finish_time: new Date(),
+                order: 1,
+                problems: [{ alias: 'alias', points: 100 }],
+                scoreboard_url: 'sb_url',
+                scoreboard_url_admin: 'sc_url_admin',
+                assignment_type: 'test',
+              },
+            ],
+            needs_basic_information: false,
             description: '# Test',
             finish_time: undefined,
             is_curator: true,
@@ -36,28 +52,14 @@ describe('Edit.vue', () => {
             unlimited_duration: false,
           },
           assignmentProblems: [],
-          selectedAssignment: null,
+          selectedAssignment: undefined,
           students: [],
           identityRequests: [],
           admins: [],
           groupsAdmins: [],
+          tags: [],
         },
         initialTab: 'course',
-        emptyAssignment: <types.CourseAssignment>{
-          problemset_id: 0,
-          alias: '',
-          description: '',
-          name: '',
-          has_runs: false,
-          max_points: 0,
-          start_time: new Date(),
-          finish_time: new Date(),
-          order: 1,
-          problems: [],
-          scoreboard_url: '',
-          scoreboard_url_admin: '',
-          assignment_type: 'test',
-        },
       },
     });
 

@@ -152,13 +152,13 @@
             (assignment, problem) =>
               $emit('remove-problem', assignment, problem)
           "
-          v-on:emit-add-problem="
+          v-on:add-problem="
             (assignment, problem) => onAddProblem(assignment, problem)
           "
           v-on:emit-select-assignment="
             (assignment) => $emit('select-assignment', assignment)
           "
-          v-on:emit-remove="
+          v-on:remove-problem="
             (assignment, problemAlias) =>
               onRemoveProblem(assignment, problemAlias)
           "

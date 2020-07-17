@@ -255,7 +255,7 @@ export default class CourseProblemList extends Vue {
     } else {
       currentProblem.points = problem.points;
     }
-    this.$emit('emit-add-problem', assignment, problem);
+    this.$emit('add-problem', assignment, problem);
   }
 
   onRemoveProblem(
@@ -271,7 +271,7 @@ export default class CourseProblemList extends Vue {
     this.problems = this.problems.filter(
       (problem) => problem.alias !== problemAlias,
     );
-    this.$emit('emit-remove', assignment, problem.alias);
+    this.$emit('remove-problem', assignment, problem.alias);
   }
 
   @Watch('assignmentProblems')

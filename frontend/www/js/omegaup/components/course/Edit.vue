@@ -243,6 +243,11 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 
+const now = new Date();
+const finishTime = new Date();
+finishTime.setHours(finishTime.getHours() + 5);
+const defaultStartTime = now;
+const defaultFinishTime = finishTime;
 const availableTabs = [
   'course',
   'assignments',
@@ -252,6 +257,21 @@ const availableTabs = [
   'admins',
   'clone',
 ];
+const emptyAssignment: types.CourseAssignment = {
+  problemset_id: 0,
+  alias: '',
+  description: '',
+  name: '',
+  has_runs: false,
+  max_points: 0,
+  start_time: defaultStartTime,
+  finish_time: defaultFinishTime,
+  order: 1,
+  problems: [],
+  scoreboard_url: '',
+  scoreboard_url_admin: '',
+  assignment_type: 'homework',
+};
 
 @Component({
   components: {
@@ -269,7 +289,6 @@ export default class CourseEdit extends Vue {
   @Ref('assignment-details') readonly assignmentDetails!: Vue;
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
-  @Prop() emptyAssignment!: types.CourseAssignment;
   @Prop() initialTab!: string;
 
   T = T;
@@ -277,7 +296,7 @@ export default class CourseEdit extends Vue {
 
   visibilityMode: omegaup.VisibilityMode = omegaup.VisibilityMode.Default;
 
-  assignment = this.emptyAssignment;
+  assignment = emptyAssignment;
 
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;
@@ -285,11 +304,10 @@ export default class CourseEdit extends Vue {
 
   onNewAssignment(): void {
     this.visibilityMode = omegaup.VisibilityMode.New;
-    this.assignment = this.emptyAssignment;
+    this.assignment = emptyAssignment;
     this.data.assignmentProblems = [];
     this.$nextTick(() => {
       this.assignmentDetails.$el.scrollIntoView();
-      window.scrollBy(0, -62); // The size of navbar
       (<HTMLElement>this.assignmentDetails.$refs.name).focus();
     });
   }
@@ -300,7 +318,6 @@ export default class CourseEdit extends Vue {
     this.$emit('select-assignment', this.assignment);
     this.$nextTick(() => {
       this.assignmentDetails.$el.scrollIntoView();
-      window.scrollBy(0, -62); // The size of navbar
       (<HTMLElement>this.assignmentDetails.$refs.name).focus();
     });
   }
