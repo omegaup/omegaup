@@ -1,38 +1,15 @@
 <template>
   <div class="omegaup-course-problemlist card">
-    <div class="card-header" v-show="show">
-      <form class="problemlist">
-        <div class="row">
-          <div class="form-group col-md-8">
-            <label
-              >{{ T.wordsAssignments }}
-              <select
-                class="form-control"
-                name="assignments"
-                v-model="assignment"
-              >
-                <option v-bind:value="a" v-for="a in assignments">
-                  {{ a.name }}
-                </option>
-              </select></label
-            >
-          </div>
-          <div
-            class="form-group col-md-4 pull-right"
-            v-show="assignment && assignment.alias"
-          >
-            <label
-              >&nbsp;
-              <button
-                class="form-control btn btn-primary"
-                v-on:click.prevent="onShowForm"
-              >
-                {{ T.courseEditAddProblems }}
-              </button></label
-            >
-          </div>
-        </div>
-      </form>
+    <div class="card-header">
+      <h5>
+        {{ T.courseAddProblemsAdd }}
+      </h5>
+      <span v-if="visibilityMode === VisibilityMode.New">
+        {{ T.courseAddProblemsAddAssignmentDesc }}
+      </span>
+      <span v-else-if="visibilityMode === VisibilityMode.Edit">
+        {{ T.courseAddProblemsEditAssignmentDesc }}
+      </span>
     </div>
     <div class="card-body" v-show="showForm !== VisibilityMode.Default">
       <div class="empty-table-message" v-if="problems.length == 0">
@@ -123,7 +100,7 @@
                   })
                 "
               >
-                {{ T.courseAddProblemsAdd }}
+                {{ T.courseEditAddProblems }}
               </button>
               <button
                 class="btn btn-secondary"
@@ -198,7 +175,6 @@ export default class CourseProblemList extends Vue {
   points = 100;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
-  show = false;
 
   get tags(): string[] {
     let t = this.topics.slice();

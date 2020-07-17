@@ -1,5 +1,13 @@
 <template>
   <div class="omegaup-course-assignmentdetails card" v-show="show">
+    <div class="card-header">
+      <h5 v-if="visibilityMode === VisibilityMode.New">
+        {{ T.courseEditAddAssignment }}
+      </h5>
+      <h5 v-else-if="visibilityMode === VisibilityMode.Edit">
+        {{ T.courseAssignmentEdit }} {{ assignment.name }}
+      </h5>
+    </div>
     <div class="card-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -240,6 +248,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop({ default: '' }) invalidParameterName!: string;
 
   T = T;
+  VisibilityMode = omegaup.VisibilityMode;
   alias = this.assignment.alias || '';
   assignmentType = this.assignment.assignment_type || 'homework';
   description = this.assignment.description || '';
