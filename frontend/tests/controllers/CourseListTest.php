@@ -118,7 +118,6 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload']['courses'];
         $currentStudentCourses = $response['student']['filteredCourses']['current']['courses'];
         $currentPublicCourses = $response['public']['filteredCourses']['current']['courses'];
-        $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
         $this->assertArrayHasKey('public', $response);
 
