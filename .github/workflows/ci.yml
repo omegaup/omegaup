@@ -236,7 +236,7 @@ jobs:
           mysql \
             -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
           python3 stuff/bootstrap-environment.py \
-          --purge --verbose --root-url=http://localhost:8001
+          --purge --verbose
 
       - name: Install yarn dependencies
         run: yarn install
@@ -248,8 +248,7 @@ jobs:
         run: |
           python3 -m pytest ./frontend/tests/ui/ \
             --verbose --capture=no --log-cli-level=INFO --browser=chrome \
-            --force-flaky --max-runs=2 --min-passes=1 --numprocesses=4 \
-            --url=http://localhost:8001
+            --force-flaky --max-runs=2 --min-passes=1 --numprocesses=4
 
       - name: Collect container logs
         if: ${{ always() }}
