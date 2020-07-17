@@ -1690,6 +1690,7 @@ _Nothing_
 | `finish_time`        | `mixed`     |             |
 | `name`               | `mixed`     |             |
 | `order`              | `mixed`     |             |
+| `problems`           | `mixed`     |             |
 | `publish_time_delay` | `mixed`     |             |
 | `start_time`         | `mixed`     |             |
 | `unlimited_duration` | `bool|null` |             |
@@ -2066,7 +2067,6 @@ _Nothing_
 | --------------------------- | ------------------------ | ----------- |
 | `admission_mode`            | `mixed`                  |             |
 | `alias`                     | `mixed`                  |             |
-| `course_alias`              | `mixed`                  |             |
 | `description`               | `mixed`                  |             |
 | `finish_time`               | `OmegaUp\Timestamp|null` |             |
 | `name`                      | `mixed`                  |             |
@@ -2075,7 +2075,7 @@ _Nothing_
 | `school_id`                 | `int`                    |             |
 | `show_scoreboard`           | `bool|null`              |             |
 | `start_time`                | `OmegaUp\Timestamp|null` |             |
-| `unlimited_duration`        | `mixed`                  |             |
+| `unlimited_duration`        | `bool|null`              |             |
 
 ### Returns
 

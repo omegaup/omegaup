@@ -346,14 +346,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testExtractAliasFromArgument() {
         $inputAndExpectedOutput =
-                ['http://localhost:8080/arena/prueba/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/prueba/practice/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/problem/sumas#problems' => 'sumas',
-                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/prueba/#problems/sumas29187' => 'sumas29187',
-                 'http://localhost:8080/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
-                 'http://localhost:8080/arena/problem/_sumas29187-#problems' => '_sumas29187-',
-                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
+                ['http://localhost:8001/arena/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/prueba/practice/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/problem/sumas#problems' => 'sumas',
+                 'http://localhost:8001/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/prueba/#problems/sumas29187' => 'sumas29187',
+                 'http://localhost:8001/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
+                 'http://localhost:8001/arena/problem/_sumas29187-#problems' => '_sumas29187-',
+                 'http://localhost:8001/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
 
         foreach ($inputAndExpectedOutput as $input => $expectedOutput) {
             $actualOutput = \OmegaUp\Controllers\QualityNomination::extractAliasFromArgument(
@@ -753,6 +753,109 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'something else',
             $emailSender->listEmails[0]['body']
         );
+    }
+
+    /**
+     * Check that a demotion's logs is saved correctly.
+     * @dataProvider qualityNominationsDemotionStatusProvider
+     */
+    public function testDemotionLogsSavedCorrectly(
+        string $status,
+        int $visibility
+    ) {
+        ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
+            [
+                'username' => 'user_test_author'
+            ]
+        ));
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams(
+            [
+                'author' => $author,
+                'title' => 'problem_1'
+            ]
+        ));
+        ['identity' => $nominator] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($nominator);
+        $qualitynomination = \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+            'nomination' => 'demotion',
+            'contents' => json_encode([
+                 'statements' => [
+                    'es' => [
+                        'markdown' => 'a + b',
+                    ],
+                 ],
+                 'rationale' => 'ew',
+                 'reason' => 'offensive',
+            ]),
+        ]));
+        // Login as a reviewer and approve ban.
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+
+        $rationale = 'rationale';
+        \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => $status,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => $rationale,
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals($rationale, $details['contents']['rationale']);
+
+        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
+            $qualitynomination['qualitynomination_id']
+        );
+
+        $this->assertCount(1, $logs);
+        $this->assertEquals(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
+            $logs[0]->user_id
+        );
+        $this->assertEquals('open', $logs[0]->from_status);
+        $this->assertEquals($status, $logs[0]->to_status);
+        $this->assertEquals($rationale, $logs[0]->rationale);
+
+        // Revert ban.
+        $rationale = 'problem solved';
+        $response = \OmegaUp\Controllers\QualityNomination::apiResolve(
+            new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'status' => 'resolved',
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+                'rationale' => $rationale
+            ])
+        );
+
+        $details = \OmegaUp\Controllers\QualityNomination::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
+        ]));
+        $this->assertEquals($rationale, $details['contents']['rationale']);
+
+        $logs = \OmegaUp\DAO\QualityNominationLog::getAllLogsForNomination(
+            $qualitynomination['qualitynomination_id']
+        );
+
+        $this->assertCount(2, $logs);
+        $this->assertEquals(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]->user_id,
+            $logs[1]->user_id
+        );
+        $this->assertEquals($status, $logs[1]->from_status);
+        $this->assertEquals('resolved', $logs[1]->to_status);
+        $this->assertEquals($rationale, $logs[1]->rationale);
     }
 
     /**

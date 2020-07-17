@@ -226,23 +226,6 @@ export namespace omegaup {
     name: string;
   }
 
-  export interface Course {
-    alias: string;
-    assignments: Assignment[];
-    basic_information_required: boolean;
-    description: string;
-    finish_time: Date | null;
-    is_admin: boolean;
-    name: string;
-    public: boolean;
-    requests_user_information: omegaup.RequestsUserInformation;
-    school_id?: number;
-    school_name: string;
-    show_scoreboard: boolean;
-    start_time: Date;
-    student_count: number;
-  }
-
   export interface CourseAdmin {
     username: string;
     role: string;
