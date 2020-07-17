@@ -1487,10 +1487,10 @@ export namespace types {
   }
 
   export interface Problem {
-    accepted?: number;
+    accepted: number;
     alias: string;
-    difficulty?: number;
-    submissions?: number;
+    difficulty: number;
+    submissions: number;
     title: string;
   }
 
