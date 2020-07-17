@@ -346,14 +346,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testExtractAliasFromArgument() {
         $inputAndExpectedOutput =
-                ['http://localhost:8080/arena/prueba/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/prueba/practice/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/problem/sumas#problems' => 'sumas',
-                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
-                 'http://localhost:8080/arena/prueba/#problems/sumas29187' => 'sumas29187',
-                 'http://localhost:8080/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
-                 'http://localhost:8080/arena/problem/_sumas29187-#problems' => '_sumas29187-',
-                 'http://localhost:8080/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
+                ['http://localhost:8001/arena/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/prueba/practice/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/problem/sumas#problems' => 'sumas',
+                 'http://localhost:8001/course/prueba/assignment/prueba/#problems/sumas' => 'sumas',
+                 'http://localhost:8001/arena/prueba/#problems/sumas29187' => 'sumas29187',
+                 'http://localhost:8001/arena/prueba/practice/#problems/sumas_29187' => 'sumas_29187',
+                 'http://localhost:8001/arena/problem/_sumas29187-#problems' => '_sumas29187-',
+                 'http://localhost:8001/course/prueba/assignment/prueba/#problems/___asd_-_23-2-_' => '___asd_-_23-2-_'];
 
         foreach ($inputAndExpectedOutput as $input => $expectedOutput) {
             $actualOutput = \OmegaUp\Controllers\QualityNomination::extractAliasFromArgument(

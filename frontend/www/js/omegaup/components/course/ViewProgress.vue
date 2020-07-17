@@ -75,6 +75,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
@@ -149,7 +150,7 @@ function toOds(courseName: string, table: string[][]): string {
 @Component
 export default class CourseViewProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
-  @Prop() course!: omegaup.Course;
+  @Prop() course!: types.CourseDetails;
   @Prop() students!: omegaup.CourseStudent[];
 
   T = T;

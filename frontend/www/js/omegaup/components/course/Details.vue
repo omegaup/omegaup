@@ -215,19 +215,21 @@ library.add(faEdit, faLink, faTachometerAlt);
   },
 })
 export default class CourseDetails extends Vue {
-  @Prop() course!: omegaup.Course;
+  @Prop() course!: types.CourseDetails;
   @Prop() progress!: types.AssignmentProgress[];
 
   T = T;
   ui = ui;
 
-  get filteredHomeworks(): omegaup.Assignment[] {
+  get filteredHomeworks(): types.CourseAssignment[] {
+    if (!this.course.assignments) return [];
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'homework',
     );
   }
 
-  get filteredExams(): omegaup.Assignment[] {
+  get filteredExams(): types.CourseAssignment[] {
+    if (!this.course.assignments) return [];
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'test',
     );
@@ -239,8 +241,8 @@ export default class CourseDetails extends Vue {
     return progress.max_score === 0 ? percentText : `${percentText}%`;
   }
 
-  getFormattedTime(date: Date | null): string {
-    if (date === null) {
+  getFormattedTime(date: Date | null | undefined): string {
+    if (!date) {
       return '—';
     }
     return time.formatDateTime(date);

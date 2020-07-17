@@ -135,7 +135,8 @@ def test_user_ranking_course(driver):
                 (By.XPATH,
                  '//input[@name = "show-scoreboard"][@value="true"]'))).click()
 
-        driver.browser.find_element_by_tag_name('form').submit()
+        driver.browser.find_element_by_css_selector(
+            'form[data-course-form]').submit()
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
@@ -288,7 +289,8 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
         'course description')
 
     with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
+        driver.browser.find_element_by_css_selector(
+            'form[data-course-form]').submit()
     assert (f'/course/{course_alias}/edit/' in driver.browser.current_url
             ), driver.browser.current_url
 

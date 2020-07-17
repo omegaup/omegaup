@@ -20,7 +20,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')

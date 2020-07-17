@@ -33,6 +33,7 @@ describe('Edit.vue', () => {
             show_scoreboard: false,
             start_time: new Date(),
             student_count: 1,
+            unlimited_duration: false,
           },
           assignmentProblems: [],
           selectedAssignment: null,

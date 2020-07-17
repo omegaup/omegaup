@@ -4,47 +4,46 @@
       <h3 class="card-title">{{ T.courseNew }}</h3>
     </div>
     <div class="card-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" data-course-form v-on:submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
             <label class="faux-label"
               >{{ T.wordsName }}
               <input
                 class="form-control"
+                v-bind:class="{ 'is-invalid': invalidParameterName === 'name' }"
                 data-course-new-name
                 type="text"
                 v-model="name"
+                required="required"
             /></label>
           </div>
           <div class="form-group col-md-4">
             <label class="faux-label"
               >{{ T.courseNewFormShortTitle_alias_ }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormShortTitle_alias_Desc"
-              ></span>
+                icon="info-circle" />
               <input
                 class="form-control"
+                v-bind:class="{
+                  'is-invalid': invalidParameterName === 'alias',
+                }"
                 type="text"
                 data-course-new-alias
                 v-bind:disabled="update"
                 v-model="alias"
+                required="required"
             /></label>
           </div>
           <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormShowScoreboard }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormShowScoreboardDesc"
-              ></span
-            ></span>
+                icon="info-circle"
+              />
+            </span>
             <div class="form-control container-fluid">
               <label class="radio-inline"
                 ><input
@@ -69,27 +68,20 @@
           <div class="form-group col-md-4">
             <label class="faux-label"
               >{{ T.courseNewFormStartDate }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormStartDateDesc"
-              ></span>
+                icon="info-circle" />
               <omegaup-datepicker v-model="startTime"></omegaup-datepicker
             ></label>
           </div>
           <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormUnlimitedDuration }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormUnlimitedDurationDesc"
-              ></span
-            ></span>
+                icon="info-circle"
+              />
+            </span>
             <div class="form-control container-fluid">
               <label class="radio-inline"
                 ><input
@@ -110,16 +102,13 @@
           <div class="form-group col-md-4">
             <label class="faux-label"
               >{{ T.courseNewFormEndDate }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormEndDateDesc"
-              ></span>
+                icon="info-circle" />
               <omegaup-datepicker
                 v-bind:enabled="!unlimitedDuration"
                 v-model="finishTime"
+                v-bind:is-invalid="invalidParameterName === 'finish_time'"
               ></omegaup-datepicker
             ></label>
           </div>
@@ -142,27 +131,24 @@
           <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormBasicInformationRequired }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormBasicInformationRequiredDesc"
-              ></span
-            ></span>
+                icon="info-circle"
+              />
+            </span>
             <div class="form-control container-fluid">
               <label class="radio-inline"
                 ><input
                   type="radio"
                   v-bind:value="true"
-                  v-model="basic_information_required"
+                  v-model="needs_basic_information"
                 />{{ T.wordsYes }}</label
               >
               <label class="radio-inline"
                 ><input
                   type="radio"
                   v-bind:value="false"
-                  v-model="basic_information_required"
+                  v-model="needs_basic_information"
                 />{{ T.wordsNo }}</label
               >
             </div>
@@ -170,14 +156,11 @@
           <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormUserInformationRequired }}
-              <span
-                aria-hidden="true"
-                class="glyphicon glyphicon-info-sign"
-                data-placement="top"
-                data-toggle="tooltip"
+              <font-awesome-icon
                 v-bind:title="T.courseNewFormUserInformationRequiredDesc"
-              ></span
-            ></span>
+                icon="info-circle"
+              />
+            </span>
             <select class="form-control" v-model="requests_user_information">
               <option value="no">
                 {{ T.wordsNo }}
@@ -195,9 +178,13 @@
               >{{ T.courseNewFormDescription }}
               <textarea
                 class="form-control"
+                v-bind:class="{
+                  'is-invalid': invalidParameterName === 'description',
+                }"
                 cols="30"
                 rows="5"
                 v-model="description"
+                required="required"
               ></textarea>
             </label>
           </div>
@@ -224,16 +211,12 @@
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
 .omegaup-course-details .form-group > label {
   width: 100%;
 }
 .omegaup-course-details .faux-label {
   font-weight: bold;
-}
-
-.twitter-typeahead {
-  width: 100%;
 }
 </style>
 
@@ -244,14 +227,27 @@ import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
 
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
 @Component({
   components: {
     'omegaup-datepicker': DatePicker,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class CourseDetails extends Vue {
   @Prop({ default: false }) update!: boolean;
   @Prop() course!: types.CourseDetails;
+  @Prop({ default: '' }) invalidParameterName!: string;
 
   T = T;
   alias = this.course.alias;
@@ -262,7 +258,7 @@ export default class CourseDetails extends Vue {
   name = this.course.name;
   school_name = this.course.school_name;
   school_id = this.course.school_id;
-  basic_information_required = this.course.basic_information_required;
+  needs_basic_information = this.course.needs_basic_information;
   requests_user_information = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
 
@@ -291,7 +287,7 @@ export default class CourseDetails extends Vue {
     this.name = this.course.name;
     this.school_name = this.course.school_name;
     this.school_id = this.course.school_id;
-    this.basic_information_required = this.course.basic_information_required;
+    this.needs_basic_information = this.course.needs_basic_information;
     this.requests_user_information = this.course.requests_user_information;
     this.unlimitedDuration = this.course.finish_time === null;
   }
