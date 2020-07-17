@@ -28,8 +28,6 @@
  * @psalm-type AllCourses=array{admin: CoursesByAccessMode, public: CoursesByAccessMode, student: CoursesByAccessMode}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
- * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
- * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
  * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
  * @psalm-type StudentCourses=array{public: CoursesByAccessMode, student: CoursesByAccessMode}
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
