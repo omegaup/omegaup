@@ -1973,7 +1973,6 @@ Edit Course contents
 | --------------------------- | ------------------------ | ----------- |
 | `admission_mode`            | `mixed`                  |             |
 | `alias`                     | `mixed`                  |             |
-| `course_alias`              | `mixed`                  |             |
 | `description`               | `mixed`                  |             |
 | `finish_time`               | `OmegaUp\Timestamp|null` |             |
 | `name`                      | `mixed`                  |             |
@@ -1982,7 +1981,7 @@ Edit Course contents
 | `school_id`                 | `int`                    |             |
 | `show_scoreboard`           | `bool|null`              |             |
 | `start_time`                | `OmegaUp\Timestamp|null` |             |
-| `unlimited_duration`        | `mixed`                  |             |
+| `unlimited_duration`        | `bool|null`              |             |
 
 ### Returns
 

@@ -224,7 +224,9 @@ def main():
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--root-url', type=str, default='http://localhost')
+    parser.add_argument('--root-url',
+                        type=str,
+                        default='http://localhost:8001/')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument(
         '--purge',
