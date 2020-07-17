@@ -68,10 +68,23 @@ describe('SettingsSummary.vue', () => {
   it('Should handle problem settings summary with memory limit as string', () => {
     const wrapper = mount(problem_SettingsSummary, {
       propsData: Object.assign({}, baseSettingsSummaryProps, {
-        problem: { settings: { limits: { MemoryLimit: '32 MiB' } } },
+        problem: {
+          settings: { limits: { MemoryLimit: '32 MiB' } },
+          languages: ['java', 'py'],
+        },
       }),
     });
 
     expect(wrapper.find('td[data-memory-limit]').text()).toContain('32 MiB');
+  });
+
+  it('Should handle empty problem settings summary in lectures', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: Object.assign({}, baseSettingsSummaryProps, {
+        problem: { languages: [] },
+      }),
+    });
+
+    expect(wrapper.find('table').exists()).toBeFalsy();
   });
 });

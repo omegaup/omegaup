@@ -29,7 +29,7 @@
         >)
       </template>
     </h1>
-    <table>
+    <table v-if="tableVisible">
       <tr>
         <th scope="row">{{ T.wordsPoints }}</th>
         <td>{{ problem.points }}</td>
@@ -127,6 +127,10 @@ export default class ProblemSettingsSummary extends Vue {
       return '';
     }
     return `${this.problem.input_limit / 1024} KiB`;
+  }
+
+  get tableVisible(): boolean {
+    return this.problem.languages?.length > 0;
   }
 }
 </script>
