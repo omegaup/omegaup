@@ -26,9 +26,12 @@
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
  * @psalm-type AllCourses=array{admin: CoursesByAccessMode, public: CoursesByAccessMode, student: CoursesByAccessMode}
- * @psalm-type CourseListPayload=array{courses: AllCourses}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
+ * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
+ * @psalm-type StudentCourses=array{public: CoursesByAccessMode, student: CoursesByAccessMode}
+ * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
+ * @psalm-type CourseListPayload=array{courses: StudentCourses}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
@@ -2718,6 +2721,63 @@ class Course extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'course_student'
         ];
     }
+     /**
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: string}}
+     */
+    public static function getCourseMineDetailsForSmarty(\OmegaUp\Request $r): array {
+        $r->ensureIdentity();
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
+
+        $courses = self::getCoursesList($r->identity, $page, $pageSize);
+        $filteredCourses = [
+            'admin' => [
+                'filteredCourses' => [
+                    'current' => [
+                        'courses' => [],
+                        'timeType' => 'current',
+                    ],
+                    'past' => [
+                        'courses' => [],
+                        'timeType' => 'past',
+                    ],
+                ],
+                'accessMode' => 'admin',
+                'activeTab' => '',
+            ]
+        ];
+        foreach ($courses['admin'] as $course) {
+            if (
+                is_null($course['finish_time'])
+                || $course['finish_time']->time > \OmegaUp\Time::get()
+            ) {
+                $filteredCourses['admin']['filteredCourses']['current']['courses'][] = $course;
+                $filteredCourses['admin']['activeTab'] = 'current';
+            } else {
+                $filteredCourses['admin']['filteredCourses']['past']['courses'][] = $course;
+            }
+        }
+        if (
+            $filteredCourses['admin']['activeTab'] === ''
+            && !empty(
+                $filteredCourses['admin']['filteredCourses']['past']['courses']
+            )
+        ) {
+            $filteredCourses['admin']['activeTab'] = 'past';
+        }
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'courses' => $filteredCourses,
+                ],
+                'title' => 'courseList',
+            ],
+            'entrypoint' => 'course_mine',
+        ];
+    }
 
     /**
      * @omegaup-request-param int $page
@@ -2734,7 +2794,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
 
         $courses = self::getCoursesList($r->identity, $page, $pageSize);
-        $coursesTypes = ['public', 'student', 'admin'];
+        $coursesTypes = ['public', 'student'];
 
         $filteredCourses = [];
         foreach ($coursesTypes as $courseType) {
@@ -2772,7 +2832,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $filteredCourses[$courseType]['activeTab'] = 'past';
             }
         }
-
         return [
             'smartyProperties' => [
                 'payload' => [
