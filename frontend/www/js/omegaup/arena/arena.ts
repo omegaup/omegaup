@@ -57,7 +57,7 @@ export interface ArenaOptions {
 }
 
 export interface Problem {
-  accept_submissions: boolean;
+  accepts_submissions: boolean;
   alias: string;
   commit: string;
   input_limit: number;
@@ -174,7 +174,7 @@ export class Arena {
 
   // Currently opened problem.
   currentProblem: Problem = {
-    accept_submissions: true,
+    accepts_submissions: true,
     title: '',
     alias: '',
     commit: '',

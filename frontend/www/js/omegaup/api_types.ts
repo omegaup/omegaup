@@ -981,7 +981,7 @@ export namespace types {
   }
 
   export interface ArenaProblemDetails {
-    accept_submissions: boolean;
+    accepts_submissions: boolean;
     alias: string;
     commit: string;
     input_limit: number;
@@ -1529,8 +1529,8 @@ export namespace types {
   }
 
   export interface ProblemDetails {
-    accept_submissions: boolean;
     accepted: number;
+    accepts_submissions: boolean;
     admin?: boolean;
     alias: string;
     allow_user_add_tags: boolean;
@@ -1568,8 +1568,8 @@ export namespace types {
   }
 
   export interface ProblemDetailsPayload {
-    accept_submissions: boolean;
     accepted: number;
+    accepts_submissions: boolean;
     admin?: boolean;
     alias: string;
     allow_user_add_tags: boolean;
@@ -1855,8 +1855,8 @@ export namespace types {
   }
 
   export interface ProblemsetProblem {
-    accept_submissions: boolean;
     accepted: number;
+    accepts_submissions: boolean;
     alias: string;
     commit: string;
     difficulty: number;

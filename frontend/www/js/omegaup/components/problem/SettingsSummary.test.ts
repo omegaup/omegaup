@@ -11,7 +11,7 @@ const baseSettingsSummaryProps = {
   showVisibilityIndicators: false,
   showEditLink: true,
   problem: {
-    accept_submissions: true,
+    accepts_submissions: true,
     accepted: 0,
     allow_user_add_tags: true,
     creation_date: new Date(),
@@ -72,7 +72,7 @@ describe('SettingsSummary.vue', () => {
         problem: {
           settings: { limits: { MemoryLimit: '32 MiB' } },
           languages: ['java', 'py'],
-          accept_submissions: true,
+          accepts_submissions: true,
         },
       }),
     });
@@ -83,7 +83,7 @@ describe('SettingsSummary.vue', () => {
   it('Should handle empty problem settings summary in lectures', () => {
     const wrapper = mount(problem_SettingsSummary, {
       propsData: Object.assign({}, baseSettingsSummaryProps, {
-        problem: { languages: [], accept_submissions: false },
+        problem: { languages: [], accepts_submissions: false },
       }),
     });
 

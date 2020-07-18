@@ -29,7 +29,7 @@
         >)
       </template>
     </h1>
-    <table v-if="problem.accept_submissions">
+    <table v-if="problem.accepts_submissions">
       <tr>
         <th scope="row">{{ T.wordsPoints }}</th>
         <td>{{ problem.points }}</td>
