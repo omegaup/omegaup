@@ -35,10 +35,6 @@ a.badges-link {
   color: #337ab7;
   font-size: 1rem;
 }
-
-.margin-bottom {
-  margin-bottom: 11rem;
-}
 </style>
 
 <script lang="ts">
