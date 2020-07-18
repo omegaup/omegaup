@@ -230,8 +230,7 @@
 
 ### Description
 
-- Get stats for an overall platform report.
--
+Get stats for an overall platform report.
 
 ### Parameters
 
@@ -248,7 +247,7 @@
 
 # Authorization
 
-- AuthorizationController
+AuthorizationController
 
 ## `/api/authorization/problem/`
 
@@ -273,15 +272,14 @@
 
 # Badge
 
-- BadgesController
+BadgesController
 
 ## `/api/badge/badgeDetails/`
 
 ### Description
 
-- Returns the number of owners and the first
-- assignation timestamp for a certain badge
--
+Returns the number of owners and the first
+assignation timestamp for a certain badge
 
 ### Parameters
 
@@ -299,8 +297,7 @@ types.Badge;
 
 ### Description
 
-- Returns a list of existing badges
--
+Returns a list of existing badges
 
 ### Returns
 
@@ -312,9 +309,8 @@ string[]
 
 ### Description
 
-- Returns a the assignation timestamp of a badge
-- for current user.
--
+Returns a the assignation timestamp of a badge
+for current user.
 
 ### Parameters
 
@@ -332,8 +328,7 @@ string[]
 
 ### Description
 
-- Returns a list of badges owned by current user
--
+Returns a list of badges owned by current user
 
 ### Returns
 
@@ -345,8 +340,7 @@ string[]
 
 ### Description
 
-- Returns a list of badges owned by a certain user
--
+Returns a list of badges owned by a certain user
 
 ### Parameters
 
@@ -362,15 +356,13 @@ string[]
 
 # Clarification
 
-- Description of ClarificationController
--
+Description of ClarificationController
 
 ## `/api/clarification/create/`
 
 ### Description
 
-- Creates a Clarification
--
+Creates a Clarification
 
 ### Parameters
 
@@ -391,8 +383,7 @@ string[]
 
 ### Description
 
-- API for getting a clarification
--
+API for getting a clarification
 
 ### Parameters
 
@@ -414,8 +405,7 @@ string[]
 
 ### Description
 
-- Update a clarification
--
+Update a clarification
 
 ### Parameters
 
@@ -432,15 +422,13 @@ _Nothing_
 
 # Contest
 
-- ContestController
--
+ContestController
 
 ## `/api/contest/activityReport/`
 
 ### Description
 
-- Returns a report with all user activity for a contest.
--
+Returns a report with all user activity for a contest.
 
 ### Parameters
 
@@ -459,8 +447,7 @@ _Nothing_
 
 ### Description
 
-- Adds an admin to a contest
--
+Adds an admin to a contest
 
 ### Parameters
 
@@ -477,8 +464,7 @@ _Nothing_
 
 ### Description
 
-- Adds an group to a contest
--
+Adds an group to a contest
 
 ### Parameters
 
@@ -495,8 +481,7 @@ _Nothing_
 
 ### Description
 
-- Adds an group admin to a contest
--
+Adds an group admin to a contest
 
 ### Parameters
 
@@ -513,8 +498,7 @@ _Nothing_
 
 ### Description
 
-- Adds a problem to a contest
--
+Adds a problem to a contest
 
 ### Parameters
 
@@ -534,10 +518,9 @@ _Nothing_
 
 ### Description
 
-- Adds a user to a contest.
-- By default, any user can view details of public contests.
-- Only users added through this API can view private contests
--
+Adds a user to a contest.
+By default, any user can view details of public contests.
+Only users added through this API can view private contests
 
 ### Parameters
 
@@ -554,10 +537,9 @@ _Nothing_
 
 ### Description
 
-- Returns details of a Contest, for administrators. This differs from
-- apiDetails in the sense that it does not attempt to calculate the
-- remaining time from the contest, or register the opened time.
--
+Returns details of a Contest, for administrators. This differs from
+apiDetails in the sense that it does not attempt to calculate the
+remaining time from the contest, or register the opened time.
 
 ### Parameters
 
@@ -606,11 +588,8 @@ _Nothing_
 
 ### Description
 
-- Returns a list of contests where current user has admin rights (or is
-- the director).
--
-
-\_size
+Returns a list of contests where current user has admin rights (or is
+the director).
 
 ### Parameters
 
@@ -629,8 +608,7 @@ _Nothing_
 
 ### Description
 
-- Returns all contest administrators
--
+Returns all contest administrators
 
 ### Parameters
 
@@ -666,8 +644,7 @@ _Nothing_
 
 ### Description
 
-- Get clarifications of a contest
--
+Get clarifications of a contest
 
 ### Parameters
 
@@ -687,8 +664,7 @@ _Nothing_
 
 ### Description
 
-- Clone a contest
--
+Clone a contest
 
 ### Parameters
 
@@ -711,10 +687,9 @@ _Nothing_
 
 ### Description
 
-- Return users who participate in a contest, as long as contest admin
-- has chosen to ask for users information and contestants have
-- previously agreed to share their information.
--
+Return users who participate in a contest, as long as contest admin
+has chosen to ask for users information and contestants have
+previously agreed to share their information.
 
 ### Parameters
 
@@ -732,11 +707,7 @@ _Nothing_
 
 ### Description
 
-- Creates a new contest
--
-
-\_calc_policy
-\_type
+Creates a new contest
 
 ### Parameters
 
@@ -788,10 +759,9 @@ _Nothing_
 
 ### Description
 
-- Returns details of a Contest. Requesting the details of a contest will
-- not start the current user into that contest. In order to participate
-- in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
--
+Returns details of a Contest. Requesting the details of a contest will
+not start the current user into that contest. In order to participate
+in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 
 ### Parameters
 
@@ -837,10 +807,7 @@ _Nothing_
 
 ### Description
 
-- Returns a list of contests
--
-
-\_size
+Returns a list of contests
 
 ### Parameters
 
@@ -865,10 +832,7 @@ _Nothing_
 
 ### Description
 
-- Returns a list of contests where current user is participating in
--
-
-\_size
+Returns a list of contests where current user is participating in
 
 ### Parameters
 
@@ -888,10 +852,7 @@ _Nothing_
 
 ### Description
 
-- Returns a list of contests where current user is the director
--
-
-\_size
+Returns a list of contests where current user is the director
 
 ### Parameters
 
@@ -911,8 +872,7 @@ _Nothing_
 
 ### Description
 
-- Joins a contest - explicitly adds a identity to a contest.
--
+Joins a contest - explicitly adds a identity to a contest.
 
 ### Parameters
 
@@ -932,8 +892,7 @@ _Nothing_
 
 ### Description
 
-- Gets the problems from a contest
--
+Gets the problems from a contest
 
 ### Parameters
 
@@ -981,8 +940,7 @@ _Nothing_
 
 ### Description
 
-- Removes an admin from a contest
--
+Removes an admin from a contest
 
 ### Parameters
 
@@ -999,8 +957,7 @@ _Nothing_
 
 ### Description
 
-- Removes a group from a contest
--
+Removes a group from a contest
 
 ### Parameters
 
@@ -1017,8 +974,7 @@ _Nothing_
 
 ### Description
 
-- Removes a group admin from a contest
--
+Removes a group admin from a contest
 
 ### Parameters
 
@@ -1035,8 +991,7 @@ _Nothing_
 
 ### Description
 
-- Removes a problem from a contest
--
+Removes a problem from a contest
 
 ### Parameters
 
@@ -1053,8 +1008,7 @@ _Nothing_
 
 ### Description
 
-- Remove a user from a private contest
--
+Remove a user from a private contest
 
 ### Parameters
 
@@ -1071,8 +1025,7 @@ _Nothing_
 
 ### Description
 
-- Returns a detailed report of the contest
--
+Returns a detailed report of the contest
 
 ### Parameters
 
@@ -1114,9 +1067,8 @@ _Nothing_
 
 ### Description
 
-- Given a contest_alias and user_id, returns the role of the user within
-- the context of a contest.
--
+Given a contest_alias and user_id, returns the role of the user within
+the context of a contest.
 
 ### Parameters
 
@@ -1135,8 +1087,7 @@ _Nothing_
 
 ### Description
 
-- Returns all runs for a contest
--
+Returns all runs for a contest
 
 ### Parameters
 
@@ -1161,8 +1112,7 @@ _Nothing_
 
 ### Description
 
-- Return a report of which runs would change due to a version change.
--
+Return a report of which runs would change due to a version change.
 
 ### Parameters
 
@@ -1182,8 +1132,7 @@ _Nothing_
 
 ### Description
 
-- Returns the Scoreboard
--
+Returns the Scoreboard
 
 ### Parameters
 
@@ -1202,8 +1151,7 @@ types.Scoreboard;
 
 ### Description
 
-- Returns the Scoreboard events
--
+Returns the Scoreboard events
 
 ### Parameters
 
@@ -1222,8 +1170,7 @@ types.Scoreboard;
 
 ### Description
 
-- Gets the accomulative scoreboard for an array of contests
--
+Gets the accomulative scoreboard for an array of contests
 
 ### Parameters
 
@@ -1243,8 +1190,7 @@ types.Scoreboard;
 
 ### Description
 
-- Search users in contest
--
+Search users in contest
 
 ### Parameters
 
@@ -1267,9 +1213,8 @@ types.Scoreboard;
 
 ### Description
 
-- Given a contest_alias, sets the recommended flag on/off.
-- Only omegaUp admins can call this API.
--
+Given a contest_alias, sets the recommended flag on/off.
+Only omegaUp admins can call this API.
 
 ### Parameters
 
@@ -1286,8 +1231,7 @@ _Nothing_
 
 ### Description
 
-- Stats of a contest
--
+Stats of a contest
 
 ### Parameters
 
@@ -1312,8 +1256,7 @@ _Nothing_
 
 ### Description
 
-- Update a Contest
--
+Update a Contest
 
 ### Parameters
 
@@ -1348,9 +1291,8 @@ _Nothing_
 
 ### Description
 
-- Update Contest end time for an identity when window_length
-- option is turned on
--
+Update Contest end time for an identity when window_length
+option is turned on
 
 ### Parameters
 
@@ -1368,8 +1310,7 @@ _Nothing_
 
 ### Description
 
-- Returns ALL identities participating in a contest
--
+Returns ALL identities participating in a contest
 
 ### Parameters
 
@@ -1386,15 +1327,13 @@ _Nothing_
 
 # Course
 
-- CourseController
--
+CourseController
 
 ## `/api/course/activityReport/`
 
 ### Description
 
-- Returns a report with all user activity for a course.
--
+Returns a report with all user activity for a course.
 
 ### Parameters
 
@@ -1412,8 +1351,7 @@ _Nothing_
 
 ### Description
 
-- Adds an admin to a course
--
+Adds an admin to a course
 
 ### Parameters
 
@@ -1430,8 +1368,7 @@ _Nothing_
 
 ### Description
 
-- Adds an group admin to a course
--
+Adds an group admin to a course
 
 ### Parameters
 
@@ -1448,8 +1385,7 @@ _Nothing_
 
 ### Description
 
-- Adds a problem to an assignment
--
+Adds a problem to an assignment
 
 ### Parameters
 
@@ -1469,10 +1405,7 @@ _Nothing_
 
 ### Description
 
-- Add Student to Course.
--
-
-\_git_object_id
+Add Student to Course.
 
 ### Parameters
 
@@ -1494,8 +1427,7 @@ _Nothing_
 
 ### Description
 
-- Returns all details of a given Course
--
+Returns all details of a given Course
 
 ### Parameters
 
@@ -1513,8 +1445,7 @@ types.CourseDetails;
 
 ### Description
 
-- Returns all course administrators
--
+Returns all course administrators
 
 ### Parameters
 
@@ -1533,9 +1464,8 @@ types.CourseDetails;
 
 ### Description
 
-- Stores the resolution given to a certain request made by a contestant
-- interested to join the course.
--
+Stores the resolution given to a certain request made by a contestant
+interested to join the course.
 
 ### Parameters
 
@@ -1553,8 +1483,7 @@ _Nothing_
 
 ### Description
 
-- Returns details of a given assignment
--
+Returns details of a given assignment
 
 ### Parameters
 
@@ -1584,8 +1513,7 @@ _Nothing_
 
 ### Description
 
-- Gets Scoreboard for an assignment
--
+Gets Scoreboard for an assignment
 
 ### Parameters
 
@@ -1605,8 +1533,7 @@ types.Scoreboard;
 
 ### Description
 
-- Returns the Scoreboard events
--
+Returns the Scoreboard events
 
 ### Parameters
 
@@ -1626,8 +1553,7 @@ types.Scoreboard;
 
 ### Description
 
-- Clone a course
--
+Clone a course
 
 ### Parameters
 
@@ -1648,8 +1574,7 @@ types.Scoreboard;
 
 ### Description
 
-- Create new course API
--
+Create new course API
 
 ### Parameters
 
@@ -1676,8 +1601,7 @@ _Nothing_
 
 ### Description
 
-- API to Create an assignment
--
+API to Create an assignment
 
 ### Parameters
 
@@ -1703,8 +1627,7 @@ _Nothing_
 
 ### Description
 
-- Returns details of a given course
--
+Returns details of a given course
 
 ### Parameters
 
@@ -1739,8 +1662,7 @@ types.CourseDetails;
 
 ### Description
 
-- Show course intro only on public courses when user is not yet registered
--
+Show course intro only on public courses when user is not yet registered
 
 ### Parameters
 
@@ -1768,8 +1690,7 @@ types.CourseDetails;
 
 ### Description
 
-- List course assignments
--
+List course assignments
 
 ### Parameters
 
@@ -1787,13 +1708,10 @@ types.CourseDetails;
 
 ### Description
 
-- Lists all the courses this user is associated with.
--
-- Returns courses for which the current user is an admin and
-- for in which the user is a student.
--
+Lists all the courses this user is associated with.
 
-\_size
+Returns courses for which the current user is an admin and
+for in which the user is a student.
 
 ### Parameters
 
@@ -1812,8 +1730,7 @@ types.CoursesList;
 
 ### Description
 
-- Get Problems solved by users of a course
--
+Get Problems solved by users of a course
 
 ### Parameters
 
@@ -1831,8 +1748,7 @@ types.CoursesList;
 
 ### Description
 
-- List students in a course
--
+List students in a course
 
 ### Parameters
 
@@ -1850,8 +1766,7 @@ types.CoursesList;
 
 ### Description
 
-- Get Problems unsolved by users of a course
--
+Get Problems unsolved by users of a course
 
 ### Parameters
 
@@ -1869,8 +1784,7 @@ types.CoursesList;
 
 ### Description
 
-- Returns details of a given course
--
+Returns details of a given course
 
 ### Parameters
 
@@ -1902,8 +1816,7 @@ _Nothing_
 
 ### Description
 
-- Removes an admin from a course
--
+Removes an admin from a course
 
 ### Parameters
 
@@ -1920,8 +1833,7 @@ _Nothing_
 
 ### Description
 
-- Remove an assignment from a course
--
+Remove an assignment from a course
 
 ### Parameters
 
@@ -1938,8 +1850,7 @@ _Nothing_
 
 ### Description
 
-- Removes a group admin from a course
--
+Removes a group admin from a course
 
 ### Parameters
 
@@ -1956,8 +1867,7 @@ _Nothing_
 
 ### Description
 
-- Remove a problem from an assignment
--
+Remove a problem from an assignment
 
 ### Parameters
 
@@ -1975,8 +1885,7 @@ _Nothing_
 
 ### Description
 
-- Remove Student from Course
--
+Remove Student from Course
 
 ### Parameters
 
@@ -1993,9 +1902,8 @@ _Nothing_
 
 ### Description
 
-- Returns the list of requests made by participants who are interested to
-- join the course
--
+Returns the list of requests made by participants who are interested to
+join the course
 
 ### Parameters
 
@@ -2013,8 +1921,7 @@ _Nothing_
 
 ### Description
 
-- Returns all runs for a course
--
+Returns all runs for a course
 
 ### Parameters
 
@@ -2058,8 +1965,7 @@ _Nothing_
 
 ### Description
 
-- Edit Course contents
--
+Edit Course contents
 
 ### Parameters
 
@@ -2085,8 +1991,7 @@ _Nothing_
 
 ### Description
 
-- Update an assignment
--
+Update an assignment
 
 ### Parameters
 
@@ -2135,15 +2040,13 @@ _Nothing_
 
 # Grader
 
-- Description of GraderController
--
+Description of GraderController
 
 ## `/api/grader/status/`
 
 ### Description
 
-- Calls to /status grader
--
+Calls to /status grader
 
 ### Returns
 
@@ -2153,15 +2056,13 @@ _Nothing_
 
 # Group
 
-- GroupController
--
+GroupController
 
 ## `/api/group/addUser/`
 
 ### Description
 
-- Add identity to group
--
+Add identity to group
 
 ### Parameters
 
@@ -2178,8 +2079,7 @@ _Nothing_
 
 ### Description
 
-- New group
--
+New group
 
 ### Parameters
 
@@ -2197,8 +2097,7 @@ _Nothing_
 
 ### Description
 
-- Create a scoreboard set to a group
--
+Create a scoreboard set to a group
 
 ### Parameters
 
@@ -2217,8 +2116,7 @@ _Nothing_
 
 ### Description
 
-- Details of a group (scoreboards)
--
+Details of a group (scoreboards)
 
 ### Parameters
 
@@ -2237,9 +2135,8 @@ _Nothing_
 
 ### Description
 
-- Returns a list of groups that match a partial name. This returns an
-- array instead of an object since it is used by typeahead.
--
+Returns a list of groups that match a partial name. This returns an
+array instead of an object since it is used by typeahead.
 
 ### Parameters
 
@@ -2261,8 +2158,7 @@ _Nothing_
 
 ### Description
 
-- Members of a group (usernames only).
--
+Members of a group (usernames only).
 
 ### Parameters
 
@@ -2280,8 +2176,7 @@ _Nothing_
 
 ### Description
 
-- Returns a list of groups by owner
--
+Returns a list of groups by owner
 
 ### Returns
 
@@ -2293,8 +2188,7 @@ _Nothing_
 
 ### Description
 
-- Remove user from group
--
+Remove user from group
 
 ### Parameters
 
@@ -2309,15 +2203,13 @@ _Nothing_
 
 # GroupScoreboard
 
-- GroupScoreboardController
--
+GroupScoreboardController
 
 ## `/api/groupScoreboard/addContest/`
 
 ### Description
 
-- Add contest to a group scoreboard
--
+Add contest to a group scoreboard
 
 ### Parameters
 
@@ -2337,9 +2229,8 @@ _Nothing_
 
 ### Description
 
-- Details of a scoreboard. Returns a list with all contests that belong to
-- the given scoreboard_alias
--
+Details of a scoreboard. Returns a list with all contests that belong to
+the given scoreboard_alias
 
 ### Parameters
 
@@ -2360,8 +2251,7 @@ _Nothing_
 
 ### Description
 
-- Details of a scoreboard
--
+Details of a scoreboard
 
 ### Parameters
 
@@ -2379,8 +2269,7 @@ _Nothing_
 
 ### Description
 
-- Add contest to a group scoreboard
--
+Add contest to a group scoreboard
 
 ### Parameters
 
@@ -2396,15 +2285,13 @@ _Nothing_
 
 # Identity
 
-- IdentityController
--
+IdentityController
 
 ## `/api/identity/bulkCreate/`
 
 ### Description
 
-- Entry point for Create bulk Identities API
--
+Entry point for Create bulk Identities API
 
 ### Parameters
 
@@ -2423,8 +2310,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for change passowrd of an identity
--
+Entry point for change passowrd of an identity
 
 ### Parameters
 
@@ -2444,8 +2330,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for Create an Identity API
--
+Entry point for Create an Identity API
 
 ### Parameters
 
@@ -2471,8 +2356,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for Update an Identity API
--
+Entry point for Update an Identity API
 
 ### Parameters
 
@@ -2557,15 +2441,13 @@ _Nothing_
 
 # Notification
 
-- BadgesController
--
+BadgesController
 
 ## `/api/notification/myList/`
 
 ### Description
 
-- Returns a list of unread notifications for user
--
+Returns a list of unread notifications for user
 
 ### Returns
 
@@ -2577,8 +2459,7 @@ _Nothing_
 
 ### Description
 
-- Updates notifications as read in database
--
+Updates notifications as read in database
 
 ### Parameters
 
@@ -2592,15 +2473,13 @@ _Nothing_
 
 # Problem
 
-- ProblemsController
--
+ProblemsController
 
 ## `/api/problem/addAdmin/`
 
 ### Description
 
-- Adds an admin to a problem
--
+Adds an admin to a problem
 
 ### Parameters
 
@@ -2617,8 +2496,7 @@ _Nothing_
 
 ### Description
 
-- Adds a group admin to a problem
--
+Adds a group admin to a problem
 
 ### Parameters
 
@@ -2635,8 +2513,7 @@ _Nothing_
 
 ### Description
 
-- Adds a tag to a problem
--
+Adds a tag to a problem
 
 ### Parameters
 
@@ -2656,11 +2533,8 @@ _Nothing_
 
 ### Description
 
-- Returns a list of problems where current user has admin rights (or is
-- the owner).
--
-
-\_size
+Returns a list of problems where current user has admin rights (or is
+the owner).
 
 ### Parameters
 
@@ -2680,8 +2554,7 @@ _Nothing_
 
 ### Description
 
-- Returns all problem administrators
--
+Returns all problem administrators
 
 ### Parameters
 
@@ -2700,8 +2573,7 @@ _Nothing_
 
 ### Description
 
-- Returns the best score for a problem
--
+Returns the best score for a problem
 
 ### Parameters
 
@@ -2723,8 +2595,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for Problem clarifications API
--
+Entry point for Problem clarifications API
 
 ### Parameters
 
@@ -2744,10 +2615,7 @@ _Nothing_
 
 ### Description
 
-- Create a new problem
--
-
-\_time_limit
+Create a new problem
 
 ### Parameters
 
@@ -2781,8 +2649,7 @@ _Nothing_
 
 ### Description
 
-- Removes a problem whether user is the creator
--
+Removes a problem whether user is the creator
 
 ### Parameters
 
@@ -2798,8 +2665,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for Problem Details API
--
+Entry point for Problem Details API
 
 ### Parameters
 
@@ -2823,8 +2689,7 @@ types.ProblemDetails;
 
 ### Description
 
-- List of public and user's private problems
--
+List of public and user's private problems
 
 ### Parameters
 
@@ -2857,10 +2722,7 @@ types.ProblemDetails;
 
 ### Description
 
-- Gets a list of problems where current user is the owner
--
-
-\_size
+Gets a list of problems where current user is the owner
 
 ### Parameters
 
@@ -2882,8 +2744,7 @@ types.ProblemDetails;
 
 ### Description
 
-- Rejudge problem
--
+Rejudge problem
 
 ### Parameters
 
@@ -2899,8 +2760,7 @@ _Nothing_
 
 ### Description
 
-- Removes an admin from a problem
--
+Removes an admin from a problem
 
 ### Parameters
 
@@ -2917,8 +2777,7 @@ _Nothing_
 
 ### Description
 
-- Removes a group admin from a problem
--
+Removes a group admin from a problem
 
 ### Parameters
 
@@ -2935,8 +2794,7 @@ _Nothing_
 
 ### Description
 
-- Removes a tag from a contest
--
+Removes a tag from a contest
 
 ### Parameters
 
@@ -2953,8 +2811,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for Problem runs API
--
+Entry point for Problem runs API
 
 ### Parameters
 
@@ -2979,8 +2836,7 @@ _Nothing_
 
 ### Description
 
-- Return a report of which runs would change due to a version change.
--
+Return a report of which runs would change due to a version change.
 
 ### Parameters
 
@@ -2999,8 +2855,7 @@ _Nothing_
 
 ### Description
 
-- Change the version of the problem.
--
+Change the version of the problem.
 
 ### Parameters
 
@@ -3018,8 +2873,7 @@ _Nothing_
 
 ### Description
 
-- Returns the solution for a problem if conditions are satisfied.
--
+Returns the solution for a problem if conditions are satisfied.
 
 ### Parameters
 
@@ -3042,8 +2896,7 @@ _Nothing_
 
 ### Description
 
-- Stats of a problem
--
+Stats of a problem
 
 ### Parameters
 
@@ -3064,8 +2917,7 @@ _Nothing_
 
 ### Description
 
-- Returns every tag associated to a given problem.
--
+Returns every tag associated to a given problem.
 
 ### Parameters
 
@@ -3084,10 +2936,7 @@ _Nothing_
 
 ### Description
 
-- Update problem contents
--
-
-\_time_limit
+Update problem contents
 
 ### Parameters
 
@@ -3125,8 +2974,7 @@ _Nothing_
 
 ### Description
 
-- Updates the problem level of a problem
--
+Updates the problem level of a problem
 
 ### Parameters
 
@@ -3143,12 +2991,7 @@ _Nothing_
 
 ### Description
 
-- Updates problem solution only
--
-
-uages
-
-\_time_limit
+Updates problem solution only
 
 ### Parameters
 
@@ -3185,12 +3028,7 @@ _Nothing_
 
 ### Description
 
-- Updates problem statement only
--
-
-uages
-
-\_time_limit
+Updates problem statement only
 
 ### Parameters
 
@@ -3227,8 +3065,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for Problem Versions API
--
+Entry point for Problem Versions API
 
 ### Parameters
 
@@ -3245,16 +3082,14 @@ _Nothing_
 
 # ProblemForfeited
 
-- ProblemForfeitedController
--
+ProblemForfeitedController
 
 ## `/api/problemForfeited/getCounts/`
 
 ### Description
 
-- Returns the number of solutions allowed
-- and the number of solutions already seen
--
+Returns the number of solutions allowed
+and the number of solutions already seen
 
 ### Returns
 
@@ -3268,8 +3103,6 @@ _Nothing_
 ## `/api/problemset/details/`
 
 ### Description
-
-s
 
 ### Parameters
 
@@ -3294,8 +3127,6 @@ types.Problemset;
 
 ### Description
 
-s
-
 ### Parameters
 
 | Name            | Type    | Description |
@@ -3318,10 +3149,7 @@ types.Scoreboard;
 
 ### Description
 
-- Returns the Scoreboard events
--
-
-s
+Returns the Scoreboard events
 
 ### Parameters
 
@@ -3343,72 +3171,72 @@ s
 
 # QualityNomination
 
-- QualityNominationController
--
+QualityNominationController
 
 ## `/api/qualityNomination/create/`
 
 ### Description
 
-- Creates a new QualityNomination
--
-- There are three ways in which users can interact with this:
--
-- # Suggestion
--
-- A user that has already solved a problem can make suggestions about a
-- problem. This expects the `nomination` field to be `suggestion` and the
-- `contents` field should be a JSON blob with at least one the following fields:
--
-- - `difficulty`: (Optional) A number in the range [0-4] indicating the
--                 difficulty of the problem.
-- - `quality`: (Optional) A number in the range [0-4] indicating the quality
--             of the problem.
-- - `tags`: (Optional) An array of tag names that will be added to the
--           problem upon promotion.
-- - `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
--                before receiving an AC verdict for problem run.
--
-- # Quality tag
--
-- A reviewer could send this type of nomination to make the user marked as
-- a quality problem or not. The reviewer could also specify which category
-- is the one the problem belongs to. The 'contents' field should have the
-- following subfields:
--
-- - tag: The name of the tag corresponding to the category of the problem
-- - quality_seal: A boolean that if activated, means that the problem is a
-- quality problem
--
-- # Promotion
--
-- A user that has already solved a problem can nominate it to be promoted
-- as a Quality Problem. This expects the `nomination` field to be
-- `promotion` and the `contents` field should be a JSON blob with the
-- following fields:
--
-- - `statements`: A dictionary of languages to objects that contain a
--                 `markdown` field, which is the markdown-formatted
--                 problem statement for that language.
-- - `source`: A URL or string clearly documenting the source or full name
--             of original author of the problem.
-- - `tags`: An array of tag names that will be added to the problem upon
--           promotion.
--
-- # Demotion
--
-- A demoted problem is banned, and cannot be un-banned or added to any new
-- problemsets. This expects the `nomination` field to be `demotion` and
-- the `contents` field should be a JSON blob with the following fields:
--
-- - `rationale`: A small text explaining the rationale for demotion.
-- - `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
-- - `original`: If the `reason` is `duplicate`, the alias of the original
--               problem.
-- # Dismissal
-- A user that has already solved a problem can dismiss suggestions. The
-- `contents` field is empty.
--
+Creates a new QualityNomination
+
+There are three ways in which users can interact with this:
+
+# Suggestion
+
+A user that has already solved a problem can make suggestions about a
+problem. This expects the `nomination` field to be `suggestion` and the
+`contents` field should be a JSON blob with at least one the following fields:
+
+- `difficulty`: (Optional) A number in the range [0-4] indicating the
+  difficulty of the problem.
+- `quality`: (Optional) A number in the range [0-4] indicating the quality
+  of the problem.
+- `tags`: (Optional) An array of tag names that will be added to the
+  problem upon promotion.
+- `before_ac`: (Optional) Boolean indicating if the suggestion has been sent
+  before receiving an AC verdict for problem run.
+
+# Quality tag
+
+A reviewer could send this type of nomination to make the user marked as
+a quality problem or not. The reviewer could also specify which category
+is the one the problem belongs to. The 'contents' field should have the
+following subfields:
+
+- tag: The name of the tag corresponding to the category of the problem
+- quality_seal: A boolean that if activated, means that the problem is a
+  quality problem
+
+# Promotion
+
+A user that has already solved a problem can nominate it to be promoted
+as a Quality Problem. This expects the `nomination` field to be
+`promotion` and the `contents` field should be a JSON blob with the
+following fields:
+
+- `statements`: A dictionary of languages to objects that contain a
+  `markdown` field, which is the markdown-formatted
+  problem statement for that language.
+- `source`: A URL or string clearly documenting the source or full name
+  of original author of the problem.
+- `tags`: An array of tag names that will be added to the problem upon
+  promotion.
+
+# Demotion
+
+A demoted problem is banned, and cannot be un-banned or added to any new
+problemsets. This expects the `nomination` field to be `demotion` and
+the `contents` field should be a JSON blob with the following fields:
+
+- `rationale`: A small text explaining the rationale for demotion.
+- `reason`: One of `['duplicate', 'no-problem-statement', 'offensive', 'other', 'spam']`.
+- `original`: If the `reason` is `duplicate`, the alias of the original
+  problem.
+
+# Dismissal
+
+A user that has already solved a problem can dismiss suggestions. The
+`contents` field is empty.
 
 ### Parameters
 
@@ -3428,9 +3256,8 @@ s
 
 ### Description
 
-- Displays the details of a nomination. The user needs to be either the
-- nominator or a member of the reviewer group.
--
+Displays the details of a nomination. The user needs to be either the
+nominator or a member of the reviewer group.
 
 ### Parameters
 
@@ -3458,8 +3285,6 @@ s
 
 ### Description
 
-\*
-
 ### Parameters
 
 | Name       | Type    | Description |
@@ -3481,10 +3306,7 @@ s
 
 ### Description
 
-- Displays the nominations that this user has been assigned.
--
-
-\_size
+Displays the nominations that this user has been assigned.
 
 ### Parameters
 
@@ -3502,8 +3324,6 @@ s
 ## `/api/qualityNomination/myList/`
 
 ### Description
-
-\*
 
 ### Parameters
 
@@ -3523,8 +3343,7 @@ s
 
 ### Description
 
-- Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
--
+Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
 
 ### Parameters
 
@@ -3546,10 +3365,9 @@ _Nothing_
 
 ### Description
 
-- Creates a reset operation, the first of two steps needed to reset a
-- password. The first step consist of sending an email to the user with
-- instructions to reset he's password, if and only if the email is valid.
--
+Creates a reset operation, the first of two steps needed to reset a
+password. The first step consist of sending an email to the user with
+instructions to reset he's password, if and only if the email is valid.
 
 ### Parameters
 
@@ -3568,9 +3386,8 @@ _Nothing_
 
 ### Description
 
-- Creates a reset operation, support team members can generate a valid
-- token and then they can send it to end user
--
+Creates a reset operation, support team members can generate a valid
+token and then they can send it to end user
 
 ### Parameters
 
@@ -3589,12 +3406,9 @@ _Nothing_
 
 ### Description
 
-- Updates the password of a given user, this is the second and last step
-- in order to reset the password. This operation is done if and only if
-- the correct parameters are suplied.
--
-
-\_confirmation
+Updates the password of a given user, this is the second and last step
+in order to reset the password. This operation is done if and only if
+the correct parameters are suplied.
 
 ### Parameters
 
@@ -3613,15 +3427,13 @@ _Nothing_
 
 # Run
 
-- RunController
--
+RunController
 
 ## `/api/run/counts/`
 
 ### Description
 
-- Get total of last 6 months
--
+Get total of last 6 months
 
 ### Returns
 
@@ -3634,8 +3446,7 @@ _Nothing_
 
 ### Description
 
-- Create a new run
--
+Create a new run
 
 ### Parameters
 
@@ -3660,8 +3471,7 @@ _Nothing_
 
 ### Description
 
-- Gets the details of a run. Includes admin details if admin.
--
+Gets the details of a run. Includes admin details if admin.
 
 ### Parameters
 
@@ -3679,8 +3489,7 @@ types.RunDetails;
 
 ### Description
 
-- Disqualify a submission
--
+Disqualify a submission
 
 ### Parameters
 
@@ -3696,8 +3505,7 @@ _Nothing_
 
 ### Description
 
-- Gets a list of latest runs overall
--
+Gets a list of latest runs overall
 
 ### Parameters
 
@@ -3721,8 +3529,7 @@ _Nothing_
 
 ### Description
 
-- Re-sends a problem to Grader.
--
+Re-sends a problem to Grader.
 
 ### Parameters
 
@@ -3739,9 +3546,8 @@ _Nothing_
 
 ### Description
 
-- Given the run alias, returns the source code and any compile errors if any
-- Used in the arena, any contestant can view its own codes and compile errors
--
+Given the run alias, returns the source code and any compile errors if any
+Used in the arena, any contestant can view its own codes and compile errors
 
 ### Parameters
 
@@ -3761,8 +3567,7 @@ _Nothing_
 
 ### Description
 
-- Get basic details of a run
--
+Get basic details of a run
 
 ### Parameters
 
@@ -3778,15 +3583,13 @@ types.Run;
 
 # School
 
-- SchoolController
--
+SchoolController
 
 ## `/api/school/create/`
 
 ### Description
 
-- Api to create new school
--
+Api to create new school
 
 ### Parameters
 
@@ -3806,8 +3609,7 @@ types.Run;
 
 ### Description
 
-- Gets a list of schools
--
+Gets a list of schools
 
 ### Parameters
 
@@ -3831,8 +3633,7 @@ types.Run;
 
 ### Description
 
-- Selects a certain school as school of the month
--
+Selects a certain school as school of the month
 
 ### Parameters
 
@@ -3846,15 +3647,13 @@ _Nothing_
 
 # Scoreboard
 
-- ScoreboardController
--
+ScoreboardController
 
 ## `/api/scoreboard/refresh/`
 
 ### Description
 
-- Returns a list of contests
--
+Returns a list of contests
 
 ### Parameters
 
@@ -3870,17 +3669,16 @@ _Nothing_
 
 # Session
 
-- Session controller handles sessions.
+Session controller handles sessions.
 
 ## `/api/session/currentSession/`
 
 ### Description
 
-- Returns information about current session. In order to avoid one full
-- server roundtrip (about ~100msec on each pageload), it also returns the
-- current time to be able to calculate the time delta between the
-- contestant's machine and the server.
--
+Returns information about current session. In order to avoid one full
+server roundtrip (about ~100msec on each pageload), it also returns the
+current time to be able to calculate the time delta between the
+contestant's machine and the server.
 
 ### Parameters
 
@@ -3913,14 +3711,13 @@ _Nothing_
 
 # Tag
 
-- TagController
+TagController
 
 ## `/api/tag/list/`
 
 ### Description
 
-- Gets a list of tags
--
+Gets a list of tags
 
 ### Parameters
 
@@ -3940,17 +3737,15 @@ _Nothing_
 
 # Time
 
-- TimeController
--
-- Used by arena to sync time between client and server from time to time
--
+TimeController
+
+Used by arena to sync time between client and server from time to time
 
 ## `/api/time/get/`
 
 ### Description
 
-- Entry point for /time API
--
+Entry point for /time API
 
 ### Returns
 
@@ -3960,15 +3755,13 @@ _Nothing_
 
 # User
 
-- UserController
--
+UserController
 
 ## `/api/user/acceptPrivacyPolicy/`
 
 ### Description
 
-- Keeps a record of a user who accepts the privacy policy
--
+Keeps a record of a user who accepts the privacy policy
 
 ### Parameters
 
@@ -3986,8 +3779,7 @@ _Nothing_
 
 ### Description
 
-- Adds the experiment to the user.
--
+Adds the experiment to the user.
 
 ### Parameters
 
@@ -4003,8 +3795,7 @@ _Nothing_
 
 ### Description
 
-- Adds the identity to the group.
--
+Adds the identity to the group.
 
 ### Parameters
 
@@ -4020,8 +3811,7 @@ _Nothing_
 
 ### Description
 
-- Adds the role to the user.
--
+Adds the role to the user.
 
 ### Parameters
 
@@ -4037,8 +3827,7 @@ _Nothing_
 
 ### Description
 
-- Associates an identity to the logged user given the username
--
+Associates an identity to the logged user given the username
 
 ### Parameters
 
@@ -4055,8 +3844,7 @@ _Nothing_
 
 ### Description
 
-- Changes the password of a user
--
+Changes the password of a user
 
 ### Parameters
 
@@ -4075,10 +3863,9 @@ _Nothing_
 
 ### Description
 
-- Get coder of the month by trying to find it in the table using the first
-- day of the current month. If there's no coder of the month for the given
-- date, calculate it and save it.
--
+Get coder of the month by trying to find it in the table using the first
+day of the current month. If there's no coder of the month for the given
+date, calculate it and save it.
 
 ### Parameters
 
@@ -4097,8 +3884,7 @@ _Nothing_
 
 ### Description
 
-- Returns the list of coders of the month
--
+Returns the list of coders of the month
 
 ### Parameters
 
@@ -4117,8 +3903,7 @@ _Nothing_
 
 ### Description
 
-- Get Contests which a certain user has participated in
--
+Get Contests which a certain user has participated in
 
 ### Parameters
 
@@ -4139,8 +3924,7 @@ _Nothing_
 
 ### Description
 
-- Entry point for Create a User API
--
+Entry point for Create a User API
 
 ### Returns
 
@@ -4152,10 +3936,10 @@ _Nothing_
 
 ### Description
 
-- Gets extra information of the identity:
-- - last password change request
-- - verify status
--
+Gets extra information of the identity:
+
+- last password change request
+- verify status
 
 ### Parameters
 
@@ -4176,9 +3960,8 @@ _Nothing_
 
 ### Description
 
-- Generate a new gitserver token. This token can be used to authenticate
-- against the gitserver.
--
+Generate a new gitserver token. This token can be used to authenticate
+against the gitserver.
 
 ### Returns
 
@@ -4189,8 +3972,6 @@ _Nothing_
 ## `/api/user/generateOmiUsers/`
 
 ### Description
-
-OrEmail \*
 
 ### Parameters
 
@@ -4217,8 +3998,7 @@ OrEmail \*
 
 ### Description
 
-- Get the results for this user in a given interview
--
+Get the results for this user in a given interview
 
 ### Parameters
 
@@ -4241,8 +4021,7 @@ OrEmail \*
 
 ### Description
 
-- Gets the last privacy policy accepted by user
--
+Gets the last privacy policy accepted by user
 
 ### Parameters
 
@@ -4260,9 +4039,8 @@ OrEmail \*
 
 ### Description
 
-- Gets a list of users. This returns an array instead of an object since
-- it is used by typeahead.
--
+Gets a list of users. This returns an array instead of an object since
+it is used by typeahead.
 
 ### Parameters
 
@@ -4281,8 +4059,7 @@ types.UserListItem[]
 
 ### Description
 
-- Get the identities that have been associated to the logged user
--
+Get the identities that have been associated to the logged user
 
 ### Returns
 
@@ -4294,8 +4071,7 @@ types.UserListItem[]
 
 ### Description
 
-- Get Problems unsolved by user
--
+Get Problems unsolved by user
 
 ### Parameters
 
@@ -4313,11 +4089,10 @@ types.UserListItem[]
 
 ### Description
 
-- Exposes API /user/login
-- Expects in request:
-- user
-- password
--
+Exposes API /user/login
+Expects in request:
+user
+password
 
 ### Parameters
 
@@ -4336,8 +4111,7 @@ types.UserListItem[]
 
 ### Description
 
-- Registers to the mailing list all users that have not been added before. Admin only
--
+Registers to the mailing list all users that have not been added before. Admin only
 
 ### Returns
 
@@ -4349,8 +4123,7 @@ types.UserListItem[]
 
 ### Description
 
-- Get Problems created by user
--
+Get Problems created by user
 
 ### Parameters
 
@@ -4368,8 +4141,7 @@ types.UserListItem[]
 
 ### Description
 
-- Get Problems solved by user
--
+Get Problems solved by user
 
 ### Parameters
 
@@ -4387,8 +4159,7 @@ types.UserListItem[]
 
 ### Description
 
-- Get general user info
--
+Get general user info
 
 ### Parameters
 
@@ -4408,8 +4179,7 @@ types.UserProfileInfo;
 
 ### Description
 
-- Removes the experiment from the user.
--
+Removes the experiment from the user.
 
 ### Parameters
 
@@ -4425,8 +4195,7 @@ _Nothing_
 
 ### Description
 
-- Removes the user to the group.
--
+Removes the user to the group.
 
 ### Parameters
 
@@ -4442,8 +4211,7 @@ _Nothing_
 
 ### Description
 
-- Removes the role from the user.
--
+Removes the role from the user.
 
 ### Parameters
 
@@ -4459,8 +4227,7 @@ _Nothing_
 
 ### Description
 
-- Selects coder of the month for next month.
--
+Selects coder of the month for next month.
 
 ### Parameters
 
@@ -4477,8 +4244,7 @@ _Nothing_
 
 ### Description
 
-- Get stats
--
+Get stats
 
 ### Parameters
 
@@ -4496,8 +4262,7 @@ _Nothing_
 
 ### Description
 
-- Gets verify status of a user
--
+Gets verify status of a user
 
 ### Parameters
 
@@ -4516,8 +4281,7 @@ _Nothing_
 
 ### Description
 
-- Update user profile
--
+Update user profile
 
 ### Parameters
 
@@ -4546,8 +4310,7 @@ _Nothing_
 
 ### Description
 
-- Update basic user profile info when logged with fb/gool
--
+Update basic user profile info when logged with fb/gool
 
 ### Parameters
 
@@ -4564,8 +4327,7 @@ _Nothing_
 
 ### Description
 
-- Updates the main email of the current user
--
+Updates the main email of the current user
 
 ### Parameters
 
@@ -4581,20 +4343,17 @@ _Nothing_
 
 ### Description
 
-- Parses and validates a filter string to be used for event notification
-- filtering.
--
-- The Request must have a 'filter' key with comma-delimited URI paths
-- representing the resources the caller is interested in receiving events
-- for. If the caller has enough privileges to receive notifications for
-- ALL the requested filters, the request will return successfully,
-- otherwise an exception will be thrown.
--
-- This API does not need authentication to be used. This allows to track
-- contest updates with an access token.
--
+Parses and validates a filter string to be used for event notification
+filtering.
 
-s
+The Request must have a 'filter' key with comma-delimited URI paths
+representing the resources the caller is interested in receiving events
+for. If the caller has enough privileges to receive notifications for
+ALL the requested filters, the request will return successfully,
+otherwise an exception will be thrown.
+
+This API does not need authentication to be used. This allows to track
+contest updates with an access token.
 
 ### Parameters
 
@@ -4622,8 +4381,7 @@ s
 
 ### Description
 
-- Verifies the user given its verification id
--
+Verifies the user given its verification id
 
 ### Parameters
 
