@@ -12,7 +12,6 @@
           <omegaup-badge
             v-bind:badge="badge"
             v-bind:key="idx"
-            v-bind:class="{ 'margin-bottom': showAllBadgesLink }"
             v-for="(badge, idx) in badges"
           ></omegaup-badge>
         </div>
