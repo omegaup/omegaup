@@ -455,9 +455,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         try {
             \OmegaUp\DAO\DAO::transBegin();
 
-            // Commit at the very end
+            $temporaryAlias = (
+                "temp.{$params->problemAlias}." .
+                intval(microtime(/*$get_as_float=*/true) * 1000000)
+            );
+
             $problemDeployer = new \OmegaUp\ProblemDeployer(
-                $params->problemAlias,
+                $temporaryAlias,
                 $acceptsSubmissions
             );
             $problemDeployer->commit(
@@ -510,7 +514,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
+            \OmegaUp\Controllers\Problem::setRestrictedTags(
+                $problem,
+                $temporaryAlias
+            );
+
+            // Once all the checks and validations have been performed, rename
+            // the problem to its final name.
+            $problemDeployer->renameRepository($params->problemAlias);
+
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             self::$log->error("Failed to create problem {$problem->alias}", $e);
@@ -1577,7 +1589,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return $response;
     }
 
-    private static function setRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {
+    private static function setRestrictedTags(
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?string $temporaryAlias = null
+    ): void {
         \OmegaUp\DAO\ProblemsTags::clearRestrictedTags($problem);
         $languages = explode(',', $problem->languages);
         if (in_array('cat', $languages)) {
@@ -1611,7 +1626,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
-            strval($problem->alias)
+            $temporaryAlias ?? strval($problem->alias)
         );
         /** @var ProblemSettings */
         $distribSettings = json_decode(
