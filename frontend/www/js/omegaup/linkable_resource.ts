@@ -33,56 +33,12 @@ export class ContestResult implements LinkableResource {
 }
 
 export class Problem implements LinkableResource {
-  accepted?: number;
   alias: string = '';
-  commit?: string;
-  difficulty?: number;
-  languages?: string;
-  letter?: string;
-  order?: number;
-  penalty?: number;
-  percent?: number;
-  points?: number;
-  quality?: number;
-  ratio?: number;
-  run_details?: omegaup.RunDetails;
-  runs?: omegaup.CourseProblemRun[];
-  score?: number;
-  source?: string;
-  statement?: omegaup.Statement;
-  submissions?: number;
-  templates?: string;
-  tags?: omegaup.Tag[];
   title: string = '';
-  version?: string;
-  visibility?: number;
-  visits?: number;
 
-  constructor(problem: omegaup.Problem) {
-    this.accepted = problem.accepted;
+  constructor(problem: types.Problem) {
     this.alias = problem.alias;
-    this.commit = problem.commit;
-    this.difficulty = problem.difficulty;
-    this.languages = problem.languages;
-    this.letter = problem.letter;
-    this.order = problem.order;
-    this.penalty = problem.penalty;
-    this.percent = problem.percent;
-    this.points = problem.points;
-    this.quality = problem.quality;
-    this.ratio = problem.ratio;
-    this.run_details = problem.run_details;
-    this.runs = problem.runs;
-    this.score = problem.score;
-    this.source = problem.source;
-    this.statement = problem.statement;
-    this.submissions = problem.submissions;
-    this.templates = problem.templates;
-    this.tags = problem.tags;
     this.title = problem.title;
-    this.version = problem.version;
-    this.visibility = problem.visibility;
-    this.visits = problem.visits;
   }
 
   toString(): string {
