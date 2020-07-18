@@ -227,7 +227,7 @@
               v-bind:notifications="notifications"
               v-on:read="readNotifications"
             ></omegaup-notification-list>
-            <li class="nav-item dropdown nav-user">
+            <li class="nav-item dropdown nav-user" data-nav-right>
               <a
                 class="nav-link px-2 dropdown-toggle nav-user-link"
                 href="#"
@@ -275,7 +275,7 @@
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems
                   }}</a>
-                  <a class="dropdown-item" href="/course/mine/">{{
+                  <a class="dropdown-item" href="/course/mine/" data-nav-courses-mine>{{
                     T.navMyCourses
                   }}</a>
                   <a
