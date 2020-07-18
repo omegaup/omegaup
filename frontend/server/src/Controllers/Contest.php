@@ -10,7 +10,7 @@
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
  * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}
- * @psalm-type ProblemsetProblem=array{accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemsetProblem=array{accept_submissions: bool, accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null}
@@ -1214,6 +1214,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     // Add the 'points' value that is stored in the ContestProblem relationship
                     $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
                         $letter++
+                    );
+                    $problem['accept_submissions'] = !empty(
+                        $problem['languages']
                     );
                     if (!empty($result['languages'])) {
                         $problem['languages'] = join(',', array_intersect(
