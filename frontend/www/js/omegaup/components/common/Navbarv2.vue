@@ -275,9 +275,12 @@
                   <a class="dropdown-item" href="/problem/mine/">{{
                     T.navMyProblems
                   }}</a>
-                  <a class="dropdown-item" href="/course/mine/" data-nav-courses-mine>{{
-                    T.navMyCourses
-                  }}</a>
+                  <a
+                    class="dropdown-item"
+                    href="/course/mine/"
+                    data-nav-courses-mine
+                    >{{ T.navMyCourses }}</a
+                  >
                   <a
                     class="dropdown-item"
                     href="/contest/mine/"
