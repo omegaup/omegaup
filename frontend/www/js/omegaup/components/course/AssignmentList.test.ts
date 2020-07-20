@@ -48,7 +48,7 @@ describe('AssignmentList.vue', () => {
           },
         ],
         courseAlias: 'course_alias',
-        visibilityMode: omegaup.VisibilityMode.Default,
+        assignmentFormMode: omegaup.AssignmentFormMode.Default,
       },
     });
     await wrapper

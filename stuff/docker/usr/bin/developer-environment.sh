@@ -53,4 +53,10 @@ else
     --mysql-config-file=/home/ubuntu/.my.cnf migrate
 fi
 
+# If this is a local-backend build, ensure that the built omegaup-gitserver is
+# copied.
+if [[ -x /var/lib/omegaup/omegaup-gitserver ]]; then
+	sudo mv /var/lib/omegaup/omegaup-gitserver /usr/bin/omegaup-gitserver
+fi
+
 exec /usr/bin/composer install
