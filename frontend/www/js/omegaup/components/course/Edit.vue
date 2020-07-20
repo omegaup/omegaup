@@ -105,7 +105,7 @@
         <omegaup-course-assignment-list
           v-bind:assignments="data.course.assignments"
           v-bind:course-alias="data.course.alias"
-          v-bind:visibility-mode="visibilityMode"
+          v-bind:assignment-form-mode="assignmentFormMode"
           v-on:emit-new="onNewAssignment"
           v-on:emit-edit="(assignment) => onEditAssignment(assignment)"
           v-on:emit-add-problems="(assignment) => onAddProblems(assignment)"
@@ -123,7 +123,7 @@
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
           ref="assignment-details"
-          v-bind:visibility-mode="visibilityMode"
+          v-bind:assignment-form-mode="assignmentFormMode"
           v-bind:unlimited-duration-course="!data.course.finish_time"
           v-bind:finish-time-course="data.course.finish_time"
           v-bind:start-time-course="data.course.start_time"
@@ -147,7 +147,7 @@
           v-bind:assignments="data.course.assignments"
           v-bind:assignment-problems="data.assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
-          v-bind:visibility-mode.sync="visibilityMode"
+          v-bind:assignment-form-mode.sync="assignmentFormMode"
           v-bind:selected-assignment="selectedAssignment"
           v-on:emit-add-problem="
             (assignment, problemAlias) =>
@@ -323,7 +323,8 @@ export default class CourseEdit extends Vue {
   T = T;
   showTab = this.initialTab;
 
-  visibilityMode: omegaup.VisibilityMode = omegaup.VisibilityMode.Default;
+  assignmentFormMode: omegaup.AssignmentFormMode =
+    omegaup.AssignmentFormMode.Default;
 
   assignment = emptyAssignment;
   selectedAssignment = this.data.selectedAssignment;
@@ -333,19 +334,19 @@ export default class CourseEdit extends Vue {
   }
 
   onNewAssignment(): void {
-    this.visibilityMode = omegaup.VisibilityMode.New;
+    this.assignmentFormMode = omegaup.AssignmentFormMode.New;
     this.assignment = emptyAssignment;
     this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
-    this.visibilityMode = omegaup.VisibilityMode.Edit;
+    this.assignmentFormMode = omegaup.AssignmentFormMode.Edit;
     this.assignment = assignment;
     this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {
-    this.visibilityMode = omegaup.VisibilityMode.AddProblem;
+    this.assignmentFormMode = omegaup.AssignmentFormMode.AddProblem;
     this.selectedAssignment = assignment;
     this.showTab = 'problems';
     this.$emit('select-assignment', assignment);
@@ -356,7 +357,7 @@ export default class CourseEdit extends Vue {
   }
 
   onResetAssignmentForm(): void {
-    this.visibilityMode = omegaup.VisibilityMode.Default;
+    this.assignmentFormMode = omegaup.AssignmentFormMode.Default;
     window.scrollTo(0, 0);
   }
 

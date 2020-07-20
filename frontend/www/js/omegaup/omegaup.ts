@@ -68,7 +68,7 @@ export namespace omegaup {
     selected: boolean;
   }
 
-  export enum VisibilityMode {
+  export enum AssignmentFormMode {
     Default,
     New,
     Edit,
