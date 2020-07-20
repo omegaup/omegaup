@@ -1,5 +1,5 @@
 <template>
-  <div class="omegaup-course-problemlist card">
+  <div class="card" data-course-problemlist>
     <div class="card-header">
       <h5>
         {{ T.courseAddProblemsAdd }}
@@ -23,7 +23,7 @@
             <tr v-for="problem in problems">
               <td>{{ problem.alias }}</td>
               <td>{{ problem.points }}</td>
-              <td class="button-column">
+              <td class="button-column align-middle">
                 <button
                   class="btn btn-link"
                   v-bind:title="T.courseAssignmentProblemRemove"
@@ -88,12 +88,8 @@
 </template>
 
 <style lang="scss" scoped>
-.omegaup-course-problemlist .form-group > label {
+.form-group > label {
   width: 100%;
-}
-
-.table td {
-  vertical-align: middle;
 }
 </style>
 
@@ -122,38 +118,27 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class CourseTemporaryProblemList extends Vue {
+export default class CourseScheduledProblemList extends Vue {
   @Prop() assignments!: types.CourseAssignment[];
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
-  @Prop() visibilityMode!: omegaup.VisibilityMode;
+  @Prop({ default: omegaup.AssignmentFormMode.New })
+  assignmentFormMode!: omegaup.AssignmentFormMode;
 
   typeahead = typeahead;
   T = T;
-  VisibilityMode = omegaup.VisibilityMode;
+  AssignmentFormMode = omegaup.AssignmentFormMode;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
-  showForm = omegaup.VisibilityMode.New;
-  difficulty = 'intro';
-  topics: string[] = [];
   taggedProblemAlias = '';
   problemAlias = '';
   points = 100;
   showTopicsAndDifficulty = false;
 
-  get tags(): string[] {
-    let t = this.topics.slice();
-    t.push(this.difficulty);
-    return t;
-  }
-
   onShowForm(): void {
-    this.showForm = omegaup.VisibilityMode.AddProblem;
-    this.$emit('update:visibility-mode', this.showForm);
+    this.$emit('update:assignment-form-mode', omegaup.AssignmentFormMode.New);
     this.problemAlias = '';
-    this.difficulty = 'intro';
-    this.topics = [];
 
     Vue.nextTick(() => {
       document.querySelector('.card-footer')?.scrollIntoView();
@@ -201,14 +186,9 @@ export default class CourseTemporaryProblemList extends Vue {
     this.problemAlias = this.taggedProblemAlias;
   }
 
-  @Watch('tags')
-  onTagsChange() {
-    this.$emit('emit-tags', this.tags);
-  }
-
-  @Watch('visibilityMode')
-  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
-    this.showForm = newValue;
+  @Watch('assignmentFormMode')
+  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
+    this.$emit('update:assignment-form-mode', newValue);
   }
 
   reset(): void {

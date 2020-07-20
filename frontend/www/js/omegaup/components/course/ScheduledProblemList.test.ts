@@ -6,14 +6,15 @@ import T from '../../lang';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 
-import course_TemporaryProblemLists from './TemporaryProblemList.vue';
+import course_ScheduledProblemLists from './ScheduledProblemList.vue';
 
-describe('TemporaryProblemLists.vue', () => {
+describe('ScheduledProblemLists.vue', () => {
   it('Should handle empty assignments and problems', () => {
-    const wrapper = shallowMount(course_TemporaryProblemLists, {
+    const wrapper = shallowMount(course_ScheduledProblemLists, {
       propsData: {
+        assignments: <types.CourseAssignment[]>[],
         assignmentProblems: <types.ProblemsetProblem[]>[],
-        selectedAssignment: {
+        selectedAssignment: <types.CourseAssignment>{
           problemset_id: 0,
           alias: '',
           description: '',
@@ -34,7 +35,7 @@ describe('TemporaryProblemLists.vue', () => {
 
     expect(wrapper.text()).toContain(T.courseAddProblemsAddAssignmentDesc);
     expect(
-      wrapper.find('.omegaup-course-problemlist .card-body').text(),
+      wrapper.find('[data-course-problemlist] .card-body').text(),
     ).toContain(T.courseAssignmentProblemsEmpty);
   });
 });
