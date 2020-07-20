@@ -7,7 +7,14 @@ services:
       dockerfile: ./Dockerfile.local-backend
       context: ./stuff/docker/
     image: omegaup/local-backend
-    entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-gitserver"]
+    entrypoint: [
+      "wait-for-it",
+      "mysql:3306",
+      "--",
+      "/bin/bash",
+      "-c",
+      "cp /usr/bin/omegaup-gitserver /var/lib/omegaup/omegaup-gitserver && exec /usr/bin/omegaup-gitserver",
+    ]
 
   grader:
     build:
