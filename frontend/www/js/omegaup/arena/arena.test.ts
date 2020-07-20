@@ -7,7 +7,7 @@ describe('arena', () => {
   describe('GetOptionsFromLocation', () => {
     it('Should detect normal contests', () => {
       const options = arena.GetOptionsFromLocation(
-        new window.URL('http://localhost/arena/test/'),
+        new window.URL('http://localhost:8001/arena/test/'),
       );
       expect(options.contestAlias).toEqual('test');
       expect(options.isPractice).toEqual(false);
@@ -22,7 +22,7 @@ describe('arena', () => {
 
     it('Should detect practice mode', () => {
       const options = arena.GetOptionsFromLocation(
-        new window.URL('http://localhost/arena/test/practice'),
+        new window.URL('http://localhost:8001/arena/test/practice'),
       );
       expect(options.contestAlias).toEqual('test');
       expect(options.isPractice).toEqual(true);
@@ -30,7 +30,7 @@ describe('arena', () => {
 
     it('Should detect only problems', () => {
       const options = arena.GetOptionsFromLocation(
-        new window.URL('http://localhost/arena/problem/test/'),
+        new window.URL('http://localhost:8001/arena/problem/test/'),
       );
       expect(options.contestAlias).toEqual(null);
       expect(options.onlyProblemAlias).toEqual('test');
@@ -39,7 +39,7 @@ describe('arena', () => {
 
     it('Should detect ws=off', () => {
       const options = arena.GetOptionsFromLocation(
-        new window.URL('http://localhost/arena/test/?ws=off'),
+        new window.URL('http://localhost:8001/arena/test/?ws=off'),
       );
       expect(options.disableSockets).toEqual(true);
     });

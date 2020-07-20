@@ -46,7 +46,7 @@ RUN mkdir /opt/omegaup && chown -R ubuntu /opt/omegaup
 USER ubuntu
 WORKDIR /opt/omegaup
 
-EXPOSE 8000
+EXPOSE 8001
 
 ENV CI=false
 

@@ -192,9 +192,9 @@ library.add(fas);
 })
 export default class CourseAssignmentDetails extends Vue {
   @Prop({
-    default: omegaup.VisibilityMode.Default,
+    default: omegaup.AssignmentFormMode.Default,
   })
-  visibilityMode!: omegaup.VisibilityMode;
+  assignmentFormMode!: omegaup.AssignmentFormMode;
   @Prop() assignment!: omegaup.Assignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
@@ -217,19 +217,19 @@ export default class CourseAssignmentDetails extends Vue {
     this.reset();
   }
 
-  @Watch('visibilityMode')
-  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
+  @Watch('assignmentFormMode')
+  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
     switch (newValue) {
-      case omegaup.VisibilityMode.New:
+      case omegaup.AssignmentFormMode.New:
         this.show = true;
         this.update = false;
         this.reset();
         break;
-      case omegaup.VisibilityMode.Edit:
+      case omegaup.AssignmentFormMode.Edit:
         this.show = true;
         this.update = true;
         break;
-      case omegaup.VisibilityMode.Default:
+      case omegaup.AssignmentFormMode.Default:
         this.show = false;
         this.update = true;
         break;

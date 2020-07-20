@@ -12,7 +12,7 @@ const baseCourseFormProps = {
     admission_mode: 'registration',
     alias: 'Newx',
     assignments: [],
-    basic_information_required: false,
+    needs_basic_information: false,
     description: 'New',
     finish_time: new Date(),
     is_admin: true,
@@ -24,6 +24,7 @@ const baseCourseFormProps = {
     show_scoreboard: false,
     start_time: new Date(),
     student_count: 3,
+    unlimited_duration: false,
   },
   update: true,
 };

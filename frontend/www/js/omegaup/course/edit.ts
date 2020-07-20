@@ -1,5 +1,5 @@
 import { omegaup, OmegaUp } from '../omegaup';
-import { types } from '../api_types';
+import { messages, types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
@@ -31,7 +31,7 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'submit-edit-course': (source: course_Form) => {
-            new Promise((accept, reject) => {
+            new Promise<number | null>((accept, reject) => {
               if (source.school_id !== undefined) {
                 accept(source.school_id);
               } else if (source.school_name) {
@@ -45,27 +45,21 @@ OmegaUp.on('ready', () => {
               }
             })
               .then((schoolId) => {
-                const params = {
-                  course_alias: courseAlias,
+                const params: messages.CourseUpdateRequest = {
                   name: source.name,
                   description: source.description,
-                  start_time: source.startTime.getTime() / 1000,
+                  start_time: source.startTime,
                   alias: source.alias,
                   show_scoreboard: source.showScoreboard,
-                  needs_basic_information: source.basic_information_required,
+                  needs_basic_information: source.needs_basic_information,
                   requests_user_information: source.requests_user_information,
-                  school_id: schoolId,
+                  school_id: schoolId ?? undefined,
+                  unlimited_duration: source.unlimitedDuration,
+                  finish_time: !source.unlimitedDuration
+                    ? new Date(source.finishTime).setHours(23, 59, 59, 999) /
+                      1000
+                    : null,
                 };
-
-                if (source.unlimitedDuration) {
-                  Object.assign(params, { unlimited_duration: true });
-                } else {
-                  Object.assign(params, {
-                    finish_time:
-                      new Date(source.finishTime).setHours(23, 59, 59, 999) /
-                      1000,
-                  });
-                }
 
                 api.Course.update(params)
                   .then(() => {
@@ -111,7 +105,8 @@ OmegaUp.on('ready', () => {
                 })
                 .catch((error) => {
                   ui.apiError(error);
-                  component.visibilityMode = omegaup.VisibilityMode.Edit;
+                  component.assignmentFormMode =
+                    omegaup.AssignmentFormMode.Edit;
                   this.invalidParameterName = error.parameter || '';
                 });
             } else {
@@ -136,7 +131,7 @@ OmegaUp.on('ready', () => {
                 })
                 .catch((error) => {
                   ui.apiError(error);
-                  component.visibilityMode = omegaup.VisibilityMode.New;
+                  component.assignmentFormMode = omegaup.AssignmentFormMode.New;
                   this.invalidParameterName = error.parameter || '';
                 });
               window.scrollTo(0, 0);
@@ -197,7 +192,8 @@ OmegaUp.on('ready', () => {
               .then(() => {
                 ui.success(T.courseAssignmentProblemAdded);
                 this.refreshProblemList(assignment);
-                component.visibilityMode = omegaup.VisibilityMode.Default;
+                component.assignmentFormMode =
+                  omegaup.AssignmentFormMode.Default;
               })
               .catch(ui.apiError);
           },

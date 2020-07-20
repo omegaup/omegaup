@@ -137,7 +137,8 @@ def test_user_ranking_course(driver):
                 (By.XPATH,
                  '//input[@name = "show-scoreboard"][@value="true"]'))).click()
 
-        driver.browser.find_element_by_tag_name('form').submit()
+        driver.browser.find_element_by_css_selector(
+            'form[data-course-form]').submit()
         assert (('/course/%s/edit/' % course_alias) in
                 driver.browser.current_url), driver.browser.current_url
 
@@ -248,11 +249,11 @@ def enter_course_assignments_page(driver, course_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
+            (By.CSS_SELECTOR, 'li[data-nav-right]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-courses-all]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-courses-mine]'))).click()
 
     course_url = f'/course/{course_alias}/'
     with driver.page_transition(target_url=driver.url(course_url)):
@@ -291,7 +292,8 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
         'course description')
 
     with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
+        driver.browser.find_element_by_css_selector(
+            'form[data-course-form]').submit()
     assert (f'/course/{course_alias}/edit/' in driver.browser.current_url
             ), driver.browser.current_url
 
