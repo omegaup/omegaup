@@ -5,6 +5,7 @@ import Sortable from 'sortablejs';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 
 import course_AssignmentList from './AssignmentList.vue';
 
@@ -12,12 +13,12 @@ describe('AssignmentList.vue', () => {
   it('Should handle empty assignments list', () => {
     const wrapper = shallowMount(course_AssignmentList, {
       propsData: {
-        assignments: <omegaup.Assignment[]>[],
+        assignments: <types.CourseAssignment[]>[],
         courseAlias: 'course_alias',
       },
     });
 
-    expect(wrapper.text()).toContain(T.courseAssignmentEmpty);
+    expect(wrapper.text()).toContain(T.courseContentEmpty);
   });
 
   const localVue = createLocalVue();

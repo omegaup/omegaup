@@ -99,15 +99,6 @@
           </tbody>
         </table>
       </div>
-      <div class="card-footer">
-        <a
-          data-button-homework
-          class="btn btn-primary float-right"
-          v-if="course.is_admin"
-          v-bind:href="`/course/${course.alias}/edit/#assignments/new/homework/`"
-          >{{ T.wordsNewHomework }}</a
-        >
-      </div>
     </div>
     <div class="card mt-5">
       <h5 class="card-header">{{ T.wordsExams }}</h5>
@@ -175,15 +166,6 @@
             </tr>
           </tbody>
         </table>
-      </div>
-      <div class="card-footer">
-        <a
-          data-button-exam
-          class="btn btn-primary float-right"
-          v-if="course.is_admin"
-          v-bind:href="`/course/${course.alias}/edit/#assignments/new/test/`"
-          >{{ T.wordsNewExam }}</a
-        >
       </div>
     </div>
   </div>
