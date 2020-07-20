@@ -272,6 +272,7 @@ const translations: { [key: string]: string; } = {
   copySampleCaseTooltip: "Copie esta entrada de amostra",
   countryNotFound: "Pa\u00eds / regi\u00e3o n\u00e3o encontrado",
   courseAddProblemsAdd: "Adicionar problemas",
+  courseAddProblemsAddAssignmentDesc: "Adicione todos os problemas que voc\u00ea deseja incluir na tarefa. Esses problemas ser\u00e3o armazenados at\u00e9 voc\u00ea pressionar o bot\u00e3o Agendar atribui\u00e7\u00e3o. Se voc\u00ea ainda n\u00e3o decidir quais problemas usar, poder\u00e1 adicion\u00e1-los mais tarde.",
   courseAddProblemsAssignmentsDesc: "Escreva o nome do problema a ser adicionado na  designa\u00e7\u00e3o selecionada.",
   courseAssignmentAdded: "Designa\u00e7\u00e3o adicionada com sucesso!",
   courseAssignmentConfirmDelete: "Voc\u00ea realmente deseja excluir %(assignment)?",

@@ -272,6 +272,7 @@ const translations: { [key: string]: string; } = {
   copySampleCaseTooltip: "Copy this sample input",
   countryNotFound: "Country / region not found",
   courseAddProblemsAdd: "Add problems",
+  courseAddProblemsAddAssignmentDesc: "Add all the problems that you want include to the assignment. These problems will be stored until you press Schedule assignment button. If you do not want to decide which problems to use right now, you can add them later.",
   courseAddProblemsAssignmentsDesc: "Type the name of the problem to be added to selected assignment.",
   courseAssignmentAdded: "Assignment added successfully!",
   courseAssignmentConfirmDelete: "Do you really want to delete %(assignment)?",
