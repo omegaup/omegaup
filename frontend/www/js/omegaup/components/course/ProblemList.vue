@@ -4,14 +4,17 @@
       <h5>
         {{ T.courseAddProblemsAdd }}
       </h5>
-      <span v-if="visibilityMode === VisibilityMode.New">
+      <span v-if="assignmentFormMode === AssignmentFormMode.New">
         {{ T.courseAddProblemsAddAssignmentDesc }}
       </span>
-      <span v-else-if="visibilityMode === VisibilityMode.Edit">
+      <span v-else-if="assignmentFormMode === AssignmentFormMode.Edit">
         {{ T.courseAddProblemsEditAssignmentDesc }}
       </span>
     </div>
-    <div class="card-body" v-show="showForm !== VisibilityMode.Default">
+    <div
+      class="card-body"
+      v-show="assignmentFormMode !== AssignmentFormMode.Default"
+    >
       <div class="empty-table-message" v-if="problems.length == 0">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
@@ -54,7 +57,7 @@
             class="btn btn-primary"
             v-bind:disabled="!problemsOrderChanged"
             role="button"
-            v-show="showForm !== VisibilityMode.New"
+            v-show="assignmentFormMode !== AssignmentFormMode.New"
             v-on:click="saveNewOrder"
           >
             {{ T.wordsSaveNewOrder }}
@@ -62,7 +65,10 @@
         </div>
       </div>
     </div>
-    <div class="card-footer" v-show="showForm !== VisibilityMode.Default">
+    <div
+      class="card-footer"
+      v-show="assignmentFormMode !== AssignmentFormMode.Default"
+    >
       <form>
         <div class="row">
           <div class="col-md-12">
@@ -105,7 +111,7 @@
               <button
                 class="btn btn-secondary"
                 type="reset"
-                v-show="showForm === VisibilityMode.Edit"
+                v-show="assignmentFormMode === AssignmentFormMode.Edit"
                 v-on:click.prevent="reset"
               >
                 {{ T.wordsCancel }}
@@ -160,14 +166,14 @@ export default class CourseProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
-  @Prop() visibilityMode!: omegaup.VisibilityMode;
+  @Prop({ default: omegaup.AssignmentFormMode.AddProblem })
+  assignmentFormMode!: omegaup.AssignmentFormMode;
 
   typeahead = typeahead;
   T = T;
-  VisibilityMode = omegaup.VisibilityMode;
+  AssignmentFormMode = omegaup.AssignmentFormMode;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
-  showForm = omegaup.VisibilityMode.Default;
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
@@ -183,8 +189,10 @@ export default class CourseProblemList extends Vue {
   }
 
   onShowForm(): void {
-    this.showForm = omegaup.VisibilityMode.AddProblem;
-    this.$emit('update:visibility-mode', this.showForm);
+    this.$emit(
+      'update:assignment-form-mode',
+      omegaup.AssignmentFormMode.AddProblem,
+    );
     this.problemAlias = '';
     this.difficulty = 'intro';
     this.topics = [];
@@ -204,7 +212,7 @@ export default class CourseProblemList extends Vue {
   }
 
   saveNewOrder() {
-    if (this.showForm !== omegaup.VisibilityMode.Edit) return;
+    if (this.assignmentFormMode !== omegaup.AssignmentFormMode.Edit) return;
     this.$emit(
       'emit-sort',
       this.assignment.alias,
@@ -217,7 +225,7 @@ export default class CourseProblemList extends Vue {
     assignment: types.CourseAssignment,
     problem: types.AddedProblem,
   ): void {
-    if (this.showForm === omegaup.VisibilityMode.Edit) {
+    if (this.assignmentFormMode === omegaup.AssignmentFormMode.Edit) {
       this.$emit('emit-save-problem', assignment, problem);
       return;
     }
@@ -238,7 +246,7 @@ export default class CourseProblemList extends Vue {
     assignment: types.CourseAssignment,
     problem: types.AddedProblem,
   ): void {
-    if (this.showForm === omegaup.VisibilityMode.Edit) {
+    if (this.assignmentFormMode === omegaup.AssignmentFormMode.Edit) {
       this.$emit('emit-remove-problem', assignment, problem);
       return;
     }
@@ -280,9 +288,9 @@ export default class CourseProblemList extends Vue {
     this.$emit('emit-tags', this.tags);
   }
 
-  @Watch('visibilityMode')
-  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
-    this.showForm = newValue;
+  @Watch('assignmentFormMode')
+  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
+    this.$emit('update:assignment-form-mode', newValue);
   }
 
   reset(): void {

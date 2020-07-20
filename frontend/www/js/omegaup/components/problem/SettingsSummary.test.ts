@@ -11,6 +11,7 @@ const baseSettingsSummaryProps = {
   showVisibilityIndicators: false,
   showEditLink: true,
   problem: {
+    accepts_submissions: true,
     accepted: 0,
     allow_user_add_tags: true,
     creation_date: new Date(),
@@ -68,10 +69,24 @@ describe('SettingsSummary.vue', () => {
   it('Should handle problem settings summary with memory limit as string', () => {
     const wrapper = mount(problem_SettingsSummary, {
       propsData: Object.assign({}, baseSettingsSummaryProps, {
-        problem: { settings: { limits: { MemoryLimit: '32 MiB' } } },
+        problem: {
+          settings: { limits: { MemoryLimit: '32 MiB' } },
+          languages: ['java', 'py'],
+          accepts_submissions: true,
+        },
       }),
     });
 
     expect(wrapper.find('td[data-memory-limit]').text()).toContain('32 MiB');
+  });
+
+  it('Should handle empty problem settings summary in lectures', () => {
+    const wrapper = mount(problem_SettingsSummary, {
+      propsData: Object.assign({}, baseSettingsSummaryProps, {
+        problem: { languages: [], accepts_submissions: false },
+      }),
+    });
+
+    expect(wrapper.find('table').exists()).toBeFalsy();
   });
 });

@@ -106,7 +106,8 @@ OmegaUp.on('ready', () => {
                 })
                 .catch((error) => {
                   ui.apiError(error);
-                  component.visibilityMode = omegaup.VisibilityMode.Edit;
+                  component.assignmentFormMode =
+                    omegaup.AssignmentFormMode.Edit;
                   this.invalidParameterName = error.parameter || '';
                 });
             } else {
@@ -133,7 +134,7 @@ OmegaUp.on('ready', () => {
                 })
                 .catch((error) => {
                   ui.apiError(error);
-                  component.visibilityMode = omegaup.VisibilityMode.New;
+                  component.assignmentFormMode = omegaup.AssignmentFormMode.New;
                   this.invalidParameterName = error.parameter || '';
                 });
               window.scrollTo(0, 0);

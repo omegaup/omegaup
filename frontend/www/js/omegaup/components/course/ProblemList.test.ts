@@ -16,7 +16,7 @@ describe('ProblemLists.vue', () => {
         assignments: <omegaup.Assignment[]>[],
         selectedAssignment: <omegaup.Assignment>{},
         taggedProblems: <omegaup.Problem[]>[],
-        visibilityMode: omegaup.VisibilityMode.New,
+        assignmentFormMode: omegaup.AssignmentFormMode.New,
       },
     });
 

@@ -1,10 +1,10 @@
 <template>
   <div class="omegaup-course-assignmentdetails card" v-show="show">
     <div class="card-header">
-      <h5 v-if="visibilityMode === VisibilityMode.New">
+      <h5 v-if="assignmentFormMode === AssignmentFormMode.New">
         {{ T.courseEditAddAssignment }}
       </h5>
-      <h5 v-else-if="visibilityMode === VisibilityMode.Edit">
+      <h5 v-else-if="assignmentFormMode === AssignmentFormMode.Edit">
         {{ T.courseAssignmentEdit }} {{ assignment.name }}
       </h5>
     </div>
@@ -152,7 +152,7 @@
           v-bind:assignment-problems="assignmentProblems"
           v-bind:tagged-problems="taggedProblems"
           v-bind:selected-assignment="assignment"
-          v-bind:visibility-mode="visibilityMode"
+          v-bind:assignment-form-mode.sync="assignmentFormMode"
           v-on:emit-save-problem="
             (assignment, problem) => $emit('add-problem', assignment, problem)
           "
@@ -236,9 +236,9 @@ library.add(fas);
 })
 export default class CourseAssignmentDetails extends Vue {
   @Prop({
-    default: omegaup.VisibilityMode.Default,
+    default: omegaup.AssignmentFormMode.Default,
   })
-  visibilityMode!: omegaup.VisibilityMode;
+  assignmentFormMode!: omegaup.AssignmentFormMode;
   @Prop() assignment!: types.CourseAssignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
@@ -248,7 +248,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop({ default: '' }) invalidParameterName!: string;
 
   T = T;
-  VisibilityMode = omegaup.VisibilityMode;
+  AssignmentFormMode = omegaup.AssignmentFormMode;
   alias = this.assignment.alias || '';
   assignmentType = this.assignment.assignment_type || 'homework';
   description = this.assignment.description || '';
@@ -264,19 +264,19 @@ export default class CourseAssignmentDetails extends Vue {
     this.reset();
   }
 
-  @Watch('visibilityMode')
-  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
+  @Watch('assignmentFormMode')
+  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
     switch (newValue) {
-      case omegaup.VisibilityMode.New:
+      case omegaup.AssignmentFormMode.New:
         this.show = true;
         this.update = false;
         this.reset();
         break;
-      case omegaup.VisibilityMode.Edit:
+      case omegaup.AssignmentFormMode.Edit:
         this.show = true;
         this.update = true;
         break;
-      case omegaup.VisibilityMode.Default:
+      case omegaup.AssignmentFormMode.Default:
         this.show = false;
         this.update = true;
         break;

@@ -30,6 +30,16 @@ define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
 EOF
 fi
 
+# Install all the git hooks.
+for hook in /opt/omegaup/stuff/git-hooks/*; do
+	hook_name="$(basename "${hook}")"
+	hook_path="/opt/omegaup/.git/hooks/${hook_name}"
+	if [[ ! -L "${hook_path}" ]]; then
+		ln -sf "../../stuff/git-hooks/${hook_name}" "${hook_path}"
+	fi
+done
+
+# Ensure that the database version is up to date.
 if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${HOME}/.my.cnf" exists ; then
   mysql --defaults-file=/home/ubuntu/.my.cnf \
     -e "CREATE USER IF NOT EXISTS 'omegaup'@'localhost' IDENTIFIED BY 'omegaup';"
@@ -41,6 +51,12 @@ if ! /opt/omegaup/stuff/db-migrate.py --mysql-config-file="${HOME}/.my.cnf" exis
 else
   /opt/omegaup/stuff/db-migrate.py \
     --mysql-config-file=/home/ubuntu/.my.cnf migrate
+fi
+
+# If this is a local-backend build, ensure that the built omegaup-gitserver is
+# copied.
+if [[ -x /var/lib/omegaup/omegaup-gitserver ]]; then
+	sudo mv /var/lib/omegaup/omegaup-gitserver /usr/bin/omegaup-gitserver
 fi
 
 exec /usr/bin/composer install

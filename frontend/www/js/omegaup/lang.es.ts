@@ -551,6 +551,7 @@ const translations: { [key: string]: string; } = {
   navLogIn: "Inicia sesi\u00f3n / Registrarse",
   navLogOut: "Cerrar sesi\u00f3n",
   navMyContests: "Mis concursos",
+  navMyCourses: "Mis cursos",
   navMyGroups: "Mis grupos",
   navMyProblems: "Mis problemas",
   navMyQualityNomination: "Mis nominaciones de calidad",
