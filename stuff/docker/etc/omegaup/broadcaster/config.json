@@ -3,7 +3,7 @@
 		"File": ""
 	},
 	"Broadcaster": {
-		"FrontendURL": "http://frontend:8000",
+		"FrontendURL": "http://frontend:8001",
 		"ScoreboardUpdateSecret": "secret"
 	},
 	"Tracing": {

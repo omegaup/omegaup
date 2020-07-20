@@ -1614,6 +1614,7 @@ API to Create an assignment
 | `finish_time`        | `mixed`     |             |
 | `name`               | `mixed`     |             |
 | `order`              | `mixed`     |             |
+| `problems`           | `mixed`     |             |
 | `publish_time_delay` | `mixed`     |             |
 | `start_time`         | `mixed`     |             |
 | `unlimited_duration` | `bool|null` |             |
@@ -1972,7 +1973,6 @@ Edit Course contents
 | --------------------------- | ------------------------ | ----------- |
 | `admission_mode`            | `mixed`                  |             |
 | `alias`                     | `mixed`                  |             |
-| `course_alias`              | `mixed`                  |             |
 | `description`               | `mixed`                  |             |
 | `finish_time`               | `OmegaUp\Timestamp|null` |             |
 | `name`                      | `mixed`                  |             |
@@ -1981,7 +1981,7 @@ Edit Course contents
 | `school_id`                 | `int`                    |             |
 | `show_scoreboard`           | `bool|null`              |             |
 | `start_time`                | `OmegaUp\Timestamp|null` |             |
-| `unlimited_duration`        | `mixed`                  |             |
+| `unlimited_duration`        | `bool|null`              |             |
 
 ### Returns
 
@@ -3912,9 +3912,9 @@ Get Contests which a certain user has participated in
 
 ### Returns
 
-| Name       | Type                                                                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place: number; }; }` |
+| Name       | Type                                                                                                                                        |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place?: number; }; }` |
 
 ## `/api/user/create/`
 

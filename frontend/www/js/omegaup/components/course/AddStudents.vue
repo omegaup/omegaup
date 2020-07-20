@@ -1,10 +1,10 @@
 <template>
-  <div class="omegaup-course-addstudent panel">
-    <div class="panel-body">
+  <div class="omegaup-course-addstudent card">
+    <div class="card-body">
       <form
         class="form"
         v-on:submit.prevent="
-          $emit('add-student', { participant, participants })
+          $emit('emit-add-student', { participant, participants })
         "
       >
         <div class="form-group">
@@ -65,7 +65,7 @@
               <button
                 class="close"
                 type="button"
-                v-on:click="$emit('remove-student', student)"
+                v-on:click="$emit('emit-remove-student', student)"
               >
                 ×
               </button>
@@ -75,15 +75,13 @@
       </table>
     </div>
     <omegaup-common-requests
-      v-bind:data="data"
+      v-bind:data="identityRequests"
       v-bind:text-add-participant="T.wordsAddStudent"
       v-on:emit-accept-request="
-        (requestsComponent, username) =>
-          $emit('accept-request', requestsComponent, username)
+        (_, username) => $emit('emit-accept-request', username)
       "
       v-on:emit-deny-request="
-        (requestsComponent, username) =>
-          $emit('deny-request', requestsComponent, username)
+        (_, username) => $emit('emit-deny-request', username)
       "
     ></omegaup-common-requests>
   </div>
@@ -113,7 +111,7 @@ import common_Requests from '../common/Requests.vue';
 export default class CourseAddStudents extends Vue {
   @Prop() courseAlias!: string;
   @Prop() students!: omegaup.CourseStudent[];
-  @Prop({ required: false }) data!: types.IdentityRequest[];
+  @Prop({ required: false }) identityRequests!: types.IdentityRequest[];
 
   T = T;
   typeahead = typeahead;
@@ -126,9 +124,9 @@ export default class CourseAddStudents extends Vue {
     return `/course/${this.courseAlias}/student/${student.username}/`;
   }
 
-  @Watch('data')
+  @Watch('identityRequests')
   onDataChange(): void {
-    this.requests = this.data;
+    this.requests = this.identityRequests;
   }
 }
 </script>

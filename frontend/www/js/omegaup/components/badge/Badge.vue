@@ -4,7 +4,7 @@
       ><img
         v-bind:class="{ 'badge-gray': !this.badge.unlocked }"
         v-bind:src="this.iconUrl"
-        class="img-responsive"
+        class="img-fluid"
     /></a>
 
     <figcaption class="badge-name">
@@ -19,13 +19,12 @@
   text-align: center;
 }
 
-figure {
+img {
   max-height: 10rem !important;
 }
 
 .badge-icon {
   display: block;
-  height: 70%;
   width: 100%;
 }
 .badge-icon img {

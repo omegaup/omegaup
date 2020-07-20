@@ -2,7 +2,7 @@ const util = require('util');
 
 require('jsdom-global')(undefined, {
   pretendToBeVisual: true,
-  url: 'http://localhost',
+  url: 'http://localhost:8001/',
 });
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
