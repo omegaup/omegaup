@@ -3,7 +3,6 @@ import { types } from '../../api_types';
 import expect from 'expect';
 import user_Profile from './Profilev2.vue';
 
-
 describe('Profilev2.vue', () => {
   it('Should display profile edit button', () => {
     const badge_alias = 'contestManager';
@@ -23,7 +22,7 @@ describe('Profilev2.vue', () => {
             is_private: false,
             preferred_language: 'py2',
             programming_languages: {
-              'py2': 'python2',
+              py2: 'python2',
             },
             rankinfo: {
               name: 'Test',
@@ -33,16 +32,16 @@ describe('Profilev2.vue', () => {
           },
           badges: badges,
           contests: {
-            'prueba': {
-              data:{
+            prueba: {
+              data: {
                 alias: 'prueba',
                 finish_time: new Date(),
                 last_updated: new Date(),
                 start_time: new Date(),
-                title: 'prueba'
+                title: 'prueba',
               },
-              place: 1
-            }
+              place: 1,
+            },
           },
           createdProblems: [],
           solvedProblems: [],
@@ -61,8 +60,8 @@ describe('Profilev2.vue', () => {
           programmingLanguages: {},
           userClassname: 'user-rank-unranked',
         },
-        profileBadges: <Set<string>>(new Set(badge_alias)),
-        visitorBadges: <Set<string>>(new Set(badge_alias)),
+        profileBadges: <Set<string>>new Set(badge_alias),
+        visitorBadges: <Set<string>>new Set(badge_alias),
       },
     });
     expect(wrapper.find('a[href="/profile/edit/"]').exists()).toBe(true);
