@@ -10,10 +10,10 @@ import { types } from '../../api_types';
 import course_AssignmentList from './AssignmentList.vue';
 
 describe('AssignmentList.vue', () => {
-  it('Should handle empty assignments list', () => {
+  it('Should handle empty content list', () => {
     const wrapper = shallowMount(course_AssignmentList, {
       propsData: {
-        assignments: <types.CourseAssignment[]>[],
+        content: <types.CourseAssignment[]>[],
         courseAlias: 'course_alias',
       },
     });
@@ -28,11 +28,11 @@ describe('AssignmentList.vue', () => {
     },
   });
 
-  it('Should handle assignments list', async () => {
+  it('Should handle content list', async () => {
     const wrapper = shallowMount(course_AssignmentList, {
       localVue,
       propsData: {
-        assignments: <omegaup.Assignment[]>[
+        content: <omegaup.Assignment[]>[
           {
             alias: 'CA',
             assignment_type: 'test',

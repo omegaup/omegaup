@@ -164,10 +164,12 @@ export default class CourseAssignmentList extends Vue {
   }
 
   saveNewOrder(): void {
-    let param: string[] = [];
-    param = this.content.map((assignment) => assignment.alias);
     this.contentOrderChanged = false;
-    this.$emit('emit-sort-content', this.courseAlias, param);
+    this.$emit(
+      'emit-sort-content',
+      this.courseAlias,
+      this.content.map((assignment) => assignment.alias),
+    );
   }
 }
 </script>
