@@ -17,11 +17,13 @@
       }}
       <div class="mt-2">
         <a
+          data-button-progress-students
           class="btn btn-primary"
           v-bind:href="`/course/${course.alias}/students/`"
           >{{ T.courseStudentsProgress }}</a
         >
         <a
+          data-button-manage-students
           class="ml-2 btn btn-primary"
           v-bind:href="`/course/${course.alias}/edit/#students`"
           >{{ T.wordsAddStudent }}</a
