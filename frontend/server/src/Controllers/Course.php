@@ -2538,6 +2538,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: string}}
