@@ -121,8 +121,8 @@ const emptyPeriodRunCount = {
 export default class UserCharts extends Vue {
   @Prop() data!: Data;
   @Prop() username!: string;
-  @Prop() periodStatisticOptions!: Chart;
-  @Prop() aggregateStatisticOptions!: Chart;
+  @Prop() periodStatisticOptions!: any;
+  @Prop() aggregateStatisticOptions!: any;
 
   T = T;
   ui = ui;

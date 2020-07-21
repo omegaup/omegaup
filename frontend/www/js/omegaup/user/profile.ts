@@ -5,7 +5,7 @@ import { types } from '../api_types';
 
 import user_Profile from '../components/user/Profilev2.vue';
 
-OmegaUp.on('ready', function () {
+OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
   const viewProfile = new Vue({
     el: '#main-container',

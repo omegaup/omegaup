@@ -34,7 +34,7 @@
             </div>
             <div class="mb-3">
               <h4 class="m-0">
-                {{ Object.keys(this.solvedProblems).length }}
+                {{ Object.keys(solvedProblems).length }}
               </h4>
               <p>
                 <small>{{ T.profileSolvedProblems }}</small>
@@ -43,8 +43,8 @@
             <div class="mb-3">
               <h5 class="m-0">
                 {{
-                  this.profile.programming_languages[
-                    this.profile.preferred_language
+                  profile.programming_languages[
+                    profile.preferred_language
                   ].split(' ')[0]
                 }}
               </h5>
@@ -71,7 +71,7 @@
               >
                 {{ T.wordsBadgesObtained }}
                 <span class="badge badge-secondary">
-                  {{ this.profileBadges.size }}
+                  {{ profileBadges.size }}
                 </span>
               </a>
               <a
@@ -187,7 +187,7 @@
                 <omegaup-user-charts
                   v-bind:data="charts"
                   v-bind:username="profile.username"
-                  v-bind:periodStatisticOptions="this.periodStatisticOptions"
+                  v-bind:periodStatisticOptions="periodStatisticOptions"
                   v-on:emit-update-period-statistics="
                     (profileComponent, categories, data) =>
                       onUpdatePeriodStatistics(
@@ -196,9 +196,7 @@
                         data,
                       )
                   "
-                  v-bind:aggregateStatisticOptions="
-                    this.aggregateStatisticOptions
-                  "
+                  v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
                   v-on:emit-update-aggregate-statistics="
                     (profileComponent) =>
                       onAggregateStatistics(profileComponent)
@@ -271,15 +269,15 @@ export default class UserProfile extends Vue {
   T = T;
   columns = 3;
   selectedTab = 'badges';
-  get createdProblems(): types.Problem[] {
+  get createdProblems(): Problem[] {
     if (!this.data.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));
   }
-  get unsolvedProblems(): types.Problem[] {
+  get unsolvedProblems(): Problem[] {
     if (!this.data.unsolvedProblems) return [];
     return this.data.unsolvedProblems.map((problem) => new Problem(problem));
   }
-  get solvedProblems(): types.Problem[] {
+  get solvedProblems(): Problem[] {
     if (!this.data.solvedProblems) return [];
     return this.data.solvedProblems.map((problem) => new Problem(problem));
   }
