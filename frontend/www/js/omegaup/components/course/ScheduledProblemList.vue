@@ -150,6 +150,14 @@ export default class CourseScheduledProblemList extends Vue {
     problem: types.AddedProblem,
   ): void {
     const problemAlias = problem.alias;
+    const currentProblem = assignment.problems.find(
+      (problem) => problem.alias === problemAlias,
+    );
+    if (!currentProblem) {
+      this.problems.push(problem);
+    } else {
+      currentProblem.points = problem.points;
+    }
     this.$emit('add-problem', assignment, problem);
   }
 
@@ -158,6 +166,9 @@ export default class CourseScheduledProblemList extends Vue {
     problem: types.AddedProblem,
   ): void {
     const problemAlias = problem.alias;
+    this.problems = this.problems.filter(
+      (problem) => problem.alias !== problemAlias,
+    );
     this.$emit('remove-problem', assignment, problem.alias);
   }
 

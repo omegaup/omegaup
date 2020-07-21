@@ -331,7 +331,7 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .card-footer')))
+             '[data-course-problemlist] .card-footer')))
 
     driver.typeahead_helper(
         '*[contains(@class, "card-footer")]', problem_alias)
@@ -341,7 +341,7 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist table.table-striped')))
+             '[data-course-problemlist] table.table-striped')))
 
     with util.dismiss_status(driver):
         new_assignment_form.find_element_by_css_selector(

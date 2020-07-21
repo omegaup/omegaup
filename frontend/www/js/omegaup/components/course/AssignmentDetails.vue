@@ -148,7 +148,23 @@
             </label>
           </div>
         </div>
+        <omegaup-course-scheduled-problem-list
+          v-if="assignmentFormMode === AssignmentFormMode.New"
+          v-bind:assignment-problems="assignmentProblems"
+          v-bind:tagged-problems="taggedProblems"
+          v-bind:selected-assignment="assignment"
+          v-bind:assignment-form-mode.sync="assignmentFormMode"
+          v-on:add-problem="
+            (assignment, problem) => onAddProblem(assignment, problem)
+          "
+          v-on:remove-problem="
+            (assignment, problemAlias) =>
+              onRemoveProblem(assignment, problemAlias)
+          "
+          v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+        ></omegaup-course-scheduled-problem-list>
         <omegaup-course-problem-list
+          v-else=""
           v-bind:assignment-problems="assignmentProblems"
           v-bind:tagged-problems="taggedProblems"
           v-bind:selected-assignment="assignment"
@@ -160,15 +176,8 @@
             (assignment, problem) =>
               $emit('remove-problem', assignment, problem)
           "
-          v-on:add-problem="
-            (assignment, problem) => onAddProblem(assignment, problem)
-          "
           v-on:emit-select-assignment="
             (assignment) => $emit('select-assignment', assignment)
-          "
-          v-on:remove-problem="
-            (assignment, problemAlias) =>
-              onRemoveProblem(assignment, problemAlias)
           "
           v-on:emit-sort="
             (assignmentAlias, problemsAlias) =>
@@ -214,6 +223,7 @@ import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import course_ProblemList from './ProblemList.vue';
+import course_ScheduledProblemList from './ScheduledProblemList.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 
 import {
@@ -232,6 +242,7 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
     'omegaup-datetimepicker': DateTimePicker,
     'omegaup-course-problem-list': course_ProblemList,
+    'omegaup-course-scheduled-problem-list': course_ScheduledProblemList,
   },
 })
 export default class CourseAssignmentDetails extends Vue {

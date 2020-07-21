@@ -20,36 +20,9 @@ describe('ProblemLists.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.courseAddProblemsAddAssignmentDesc);
+    expect(wrapper.text()).toContain(T.courseAddProblemsEditAssignmentDesc);
     expect(
-      wrapper.find('.omegaup-course-problemlist .card-body').text(),
-    ).toContain(T.courseAssignmentProblemsEmpty);
-  });
-
-  it('Should handle assignment and problems', () => {
-    const wrapper = shallowMount(course_ProblemLists, {
-      propsData: {
-        assignmentProblems: <types.ProblemsetProblem[]>[],
-        selectedAssignment: <omegaup.Assignment>{
-          alias: 'SE',
-          assignment_type: 'test',
-          description: 'Segundo examen',
-          finish_time: new Date(),
-          has_runs: false,
-          max_points: 900,
-          name: 'Segundo examen',
-          order: 0,
-          publish_time_delay: 0,
-          scoreboard_url: 'sb03',
-          scoreboard_url_admin: 'sb04',
-          start_time: new Date(),
-        },
-        taggedProblems: <omegaup.Problem[]>[],
-      },
-    });
-
-    expect(
-      wrapper.find('.omegaup-course-problemlist .card-body').text(),
+      wrapper.find('[data-course-problemlist] .card-body').text(),
     ).toContain(T.courseAssignmentProblemsEmpty);
   });
 });

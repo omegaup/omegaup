@@ -1,20 +1,12 @@
 <template>
-  <div class="omegaup-course-problemlist card">
+  <div class="card" data-course-problemlist>
     <div class="card-header">
       <h5>
         {{ T.courseAddProblemsAdd }}
       </h5>
-      <span v-if="assignmentFormMode === AssignmentFormMode.New">
-        {{ T.courseAddProblemsAddAssignmentDesc }}
-      </span>
-      <span v-else-if="assignmentFormMode === AssignmentFormMode.Edit">
-        {{ T.courseAddProblemsEditAssignmentDesc }}
-      </span>
+      <span>{{ T.courseAddProblemsEditAssignmentDesc }}</span>
     </div>
-    <div
-      class="card-body"
-      v-show="assignmentFormMode !== AssignmentFormMode.Default"
-    >
+    <div class="card-body">
       <div class="empty-table-message" v-if="problems.length == 0">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
@@ -57,7 +49,6 @@
             class="btn btn-primary"
             v-bind:disabled="!problemsOrderChanged"
             role="button"
-            v-show="assignmentFormMode !== AssignmentFormMode.New"
             v-on:click="saveNewOrder"
           >
             {{ T.wordsSaveNewOrder }}
@@ -65,10 +56,7 @@
         </div>
       </div>
     </div>
-    <div
-      class="card-footer"
-      v-show="assignmentFormMode !== AssignmentFormMode.Default"
-    >
+    <div class="card-footer">
       <form>
         <div class="row">
           <div class="col-md-12">
@@ -111,7 +99,6 @@
               <button
                 class="btn btn-secondary"
                 type="reset"
-                v-show="assignmentFormMode === AssignmentFormMode.Edit"
                 v-on:click.prevent="reset"
               >
                 {{ T.wordsCancel }}
@@ -127,12 +114,8 @@
 </template>
 
 <style lang="scss" scoped>
-.omegaup-course-problemlist .form-group > label {
+.form-group > label {
   width: 100%;
-}
-
-.table td {
-  vertical-align: middle;
 }
 </style>
 
@@ -212,7 +195,6 @@ export default class CourseProblemList extends Vue {
   }
 
   saveNewOrder() {
-    if (this.assignmentFormMode !== omegaup.AssignmentFormMode.Edit) return;
     this.$emit(
       'emit-sort',
       this.assignment.alias,
@@ -225,37 +207,14 @@ export default class CourseProblemList extends Vue {
     assignment: types.CourseAssignment,
     problem: types.AddedProblem,
   ): void {
-    if (this.assignmentFormMode === omegaup.AssignmentFormMode.Edit) {
-      this.$emit('emit-save-problem', assignment, problem);
-      return;
-    }
-
-    const problemAlias = problem.alias;
-    const currentProblem = assignment.problems.find(
-      (problem) => problem.alias === problemAlias,
-    );
-    if (!currentProblem) {
-      this.problems.push(problem);
-    } else {
-      currentProblem.points = problem.points;
-    }
-    this.$emit('add-problem', assignment, problem);
+    this.$emit('emit-save-problem', assignment, problem);
   }
 
   onRemoveProblem(
     assignment: types.CourseAssignment,
     problem: types.AddedProblem,
   ): void {
-    if (this.assignmentFormMode === omegaup.AssignmentFormMode.Edit) {
-      this.$emit('emit-remove-problem', assignment, problem);
-      return;
-    }
-
-    const problemAlias = problem.alias;
-    this.problems = this.problems.filter(
-      (problem) => problem.alias !== problemAlias,
-    );
-    this.$emit('remove-problem', assignment, problem.alias);
+    this.$emit('emit-remove-problem', assignment, problem);
   }
 
   @Watch('assignmentProblems')
