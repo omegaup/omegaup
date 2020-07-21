@@ -319,6 +319,7 @@ export default class CourseEdit extends Vue {
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
+  @Prop({ default: null }) assignmentAlias!: string;
 
   T = T;
   showTab = this.initialTab;
@@ -328,6 +329,12 @@ export default class CourseEdit extends Vue {
 
   assignment = emptyAssignment;
   selectedAssignment = this.data.selectedAssignment;
+
+  mounted() {
+    if (this.assignmentAlias && this.data.selectedAssignment) {
+      this.onEditAssignment(this.data.selectedAssignment);
+    }
+  }
 
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;

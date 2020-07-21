@@ -122,10 +122,6 @@ def test_user_ranking_course(driver):
                                      num_elements=1, scoreboard='Public')
 
         enter_course_assignments_page(driver, course_alias)
-        util.check_scoreboard_events(driver, assignment_alias, url,
-                                     num_elements=1, scoreboard='Admin')
-
-        enter_course_assignments_page(driver, course_alias)
         with driver.page_transition():
             driver.wait.until(EC.element_to_be_clickable(
                 (By.XPATH,

@@ -2545,6 +2545,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseEditDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
+        \OmegaUp\Validators::validateOptionalStringNonEmpty(
+            $r['assignment_alias'],
+            'assignment_alias'
+        );
         $course = self::validateCourseExists($r['course']);
         if (is_null($course->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
@@ -2559,7 +2563,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         $selectedAssignment = null;
         $assignmentProblems = [];
         if (!empty($courseDetails['assignments'])) {
-            $selectedAssignment = $courseDetails['assignments'][0];
+            if (!empty($r['assignment_alias'])) {
+                $selectedAssignment = array_filter($courseDetails['assignments'], function (array $assignment) use ($r) {
+                    return $assignment['alias'] === $r['assignment_alias'];
+                });
+                $selectedAssignment = array_shift($selectedAssignment);
+                self::$log->info(print_r($selectedAssignment, true));
+            } else {
+                $selectedAssignment = $courseDetails['assignments'][0];
+            }
             $assignmentProblems = self::getProblemsByAssignment(
                 $selectedAssignment['alias'],
                 $course->alias,

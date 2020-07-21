@@ -20,6 +20,9 @@ Vue.use(Clipboard);
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
+  const path = /\/course\/([^\/]+)\/edit\/([^\/]+)\/([^\/]+)?/.exec(
+    window.location.pathname,
+  );
   const courseEdit = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -27,6 +30,7 @@ OmegaUp.on('ready', () => {
         props: {
           data: this.data,
           initialTab: this.initialTab,
+          assignmentAlias: this.assignmentAlias,
           invalidParameterName: this.invalidParameterName,
         },
         on: {
@@ -437,6 +441,7 @@ OmegaUp.on('ready', () => {
       initialTab: window.location.hash
         ? window.location.hash.substr(1)
         : 'course',
+      assignmentAlias: path && path[2] ? path[2] : null,
       invalidParameterName: '',
     },
     components: {
