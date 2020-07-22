@@ -310,6 +310,12 @@ def create_problem(
              '//input[@name = "input_limit"]')))
     input_limit.clear()
     input_limit.send_keys('1024')
+    # Alias should be set automatically
+    driver.browser.find_element_by_name('source').send_keys('test')
+    # Make the problem public
+    driver.browser.find_element_by_xpath(
+        '//input[@type="radio" and @name="visibility" and @value="true"]'
+    ).click()
     Select(
         driver.wait.until(
             EC.element_to_be_clickable(
@@ -320,11 +326,13 @@ def create_problem(
             )
         )
     ).select_by_value('problemLevelBasicKarel')
-    # Alias should be set automatically
-    driver.browser.find_element_by_name('source').send_keys('test')
-    # Make the problem public
-    driver.browser.find_element_by_xpath(
-        '//input[@type="radio" and @name="visibility" and @value="true"]'
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (
+                By.CSS_SELECTOR,
+                'button[data-level-button]'
+            )
+        )
     ).click()
     contents_element = driver.browser.find_element_by_name(
         'problem_contents')

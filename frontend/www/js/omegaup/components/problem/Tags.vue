@@ -111,6 +111,7 @@
             <button
               type="button"
               class="btn btn-primary"
+              data-level-button
               v-bind:disabled="!problemLevelTag"
               v-on:click.prevent="onSelectProblemLevel"
             >
