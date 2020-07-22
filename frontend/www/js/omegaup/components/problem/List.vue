@@ -47,7 +47,7 @@
                 <span>{{ T.wordsTitle }}</span>
                 <span
                   class="badge custom-badge custom-badge-quality mr-1 ml-1 p-2"
-                  >{{ T.tagSourceQuality }}</span
+                  >{{ T.tagSourceLevel }}</span
                 >
                 <span class="badge custom-badge custom-badge-owner mr-1 p-2">{{
                   T.tagSourceOwner
@@ -178,7 +178,13 @@
                   v-bind:icon="['fas', 'eye-slash']"
                 />
                 <a
-                  v-bind:class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
+                  v-bind:class="`badge custom-badge custom-badge-${
+                    tag.source
+                  } ${
+                    hrefForProblemTag(currentTags, tag.name).includes('Level')
+                      ? 'custom-badge-quality'
+                      : ''
+                  } m-1 p-2`"
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
                   v-for="tag in problem.tags"
                   >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a

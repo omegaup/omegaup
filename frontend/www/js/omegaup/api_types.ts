@@ -388,9 +388,9 @@ export namespace types {
       );
     }
 
-    export function CourseListPayload(
+    export function CourseListMinePayload(
       elementId: string = 'payload',
-    ): types.CourseListPayload {
+    ): types.CourseListMinePayload {
       return ((x) => {
         x.courses = ((x) => {
           x.admin = ((x) => {
@@ -435,6 +435,19 @@ export namespace types {
             })(x.filteredCourses);
             return x;
           })(x.admin);
+          return x;
+        })(x.courses);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CourseListPayload(
+      elementId: string = 'payload',
+    ): types.CourseListPayload {
+      return ((x) => {
+        x.courses = ((x) => {
           x.public = ((x) => {
             x.filteredCourses = ((x) => {
               x.current = ((x) => {
@@ -974,6 +987,10 @@ export namespace types {
     points: number;
   }
 
+  export interface AdminCourses {
+    admin: types.CoursesByAccessMode;
+  }
+
   export interface AllCourses {
     admin: types.CoursesByAccessMode;
     public: types.CoursesByAccessMode;
@@ -1293,8 +1310,12 @@ export namespace types {
     role: string;
   }
 
+  export interface CourseListMinePayload {
+    courses: types.AdminCourses;
+  }
+
   export interface CourseListPayload {
-    courses: types.AllCourses;
+    courses: types.StudentCourses;
   }
 
   export interface CourseNewPayload {
@@ -2116,6 +2137,11 @@ export namespace types {
     total_points?: number;
     total_runs: number;
     verdict_counts: { [key: string]: number };
+  }
+
+  export interface StudentCourses {
+    public: types.CoursesByAccessMode;
+    student: types.CoursesByAccessMode;
   }
 
   export interface StudentProgressPayload {

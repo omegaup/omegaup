@@ -249,11 +249,11 @@ def enter_course_assignments_page(driver, course_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
+            (By.CSS_SELECTOR, 'li[data-nav-right]'))).click()
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.CSS_SELECTOR, 'a[data-nav-courses-all]'))).click()
+                (By.CSS_SELECTOR, 'a[data-nav-courses-mine]'))).click()
 
     course_url = f'/course/{course_alias}/'
     with driver.page_transition(target_url=driver.url(course_url)):
