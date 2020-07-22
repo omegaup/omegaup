@@ -31,7 +31,6 @@ describe('Edit.vue', () => {
                 start_time: new Date(),
                 finish_time: new Date(),
                 order: 1,
-                problems: [{ alias: 'alias', points: 100 }],
                 scoreboard_url: 'sb_url',
                 scoreboard_url_admin: 'sc_url_admin',
                 assignment_type: 'test',

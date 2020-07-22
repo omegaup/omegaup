@@ -30,8 +30,8 @@
                   <font-awesome-icon icon="arrows-alt" />
                 </button>
               </td>
-              <td>{{ problem.alias }}</td>
-              <td>{{ problem.points }}</td>
+              <td class="align-middle">{{ problem.alias }}</td>
+              <td class="align-middle">{{ problem.points }}</td>
               <td class="button-column">
                 <button
                   class="btn btn-link"

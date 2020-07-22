@@ -275,7 +275,6 @@ const emptyAssignment: types.CourseAssignment = {
   start_time: defaultStartTime,
   finish_time: defaultFinishTime,
   order: 1,
-  problems: [],
   scoreboard_url: '',
   scoreboard_url_admin: '',
   assignment_type: 'homework',

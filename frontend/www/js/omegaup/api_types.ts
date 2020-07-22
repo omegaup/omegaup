@@ -1262,7 +1262,6 @@ export namespace types {
     max_points: number;
     name: string;
     order: number;
-    problems: types.AddedProblem[];
     problemset_id: number;
     publish_time_delay?: number;
     scoreboard_url: string;

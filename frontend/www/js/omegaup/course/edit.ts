@@ -132,7 +132,6 @@ OmegaUp.on('ready', () => {
                 .then(() => {
                   ui.success(T.courseAssignmentAdded);
                   this.invalidParameterName = '';
-                  component.assignment.problems = [];
                   this.refreshAssignmentsList();
                 })
                 .catch((error) => {

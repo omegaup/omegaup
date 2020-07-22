@@ -21,13 +21,13 @@
           </thead>
           <tbody>
             <tr v-for="problem in problems">
-              <td>{{ problem.alias }}</td>
-              <td>{{ problem.points }}</td>
+              <td class="align-middle">{{ problem.alias }}</td>
+              <td class="align-middle">{{ problem.points }}</td>
               <td class="button-column align-middle">
                 <button
                   class="btn btn-link"
                   v-bind:title="T.courseAssignmentProblemRemove"
-                  v-on:click.prevent="onRemoveProblem(assignment, problem)"
+                  v-on:click.prevent="onRemoveProblem(problem)"
                 >
                   <font-awesome-icon icon="trash" />
                 </button>
@@ -69,10 +69,7 @@
                 type="submit"
                 v-bind:disabled="problemAlias.length == 0"
                 v-on:click.prevent="
-                  onAddProblem(assignment, {
-                    alias: problemAlias,
-                    points: points,
-                  })
+                  onAddProblem({ alias: problemAlias, points: points })
                 "
               >
                 {{ T.courseEditAddProblems }}
@@ -141,12 +138,9 @@ export default class CourseScheduledProblemList extends Vue {
     });
   }
 
-  onAddProblem(
-    assignment: types.CourseAssignment,
-    problem: types.AddedProblem,
-  ): void {
+  onAddProblem(problem: types.AddedProblem): void {
     const problemAlias = problem.alias;
-    const currentProblem = assignment.problems.find(
+    const currentProblem = this.problems.find(
       (problem) => problem.alias === problemAlias,
     );
     if (!currentProblem) {
@@ -156,10 +150,7 @@ export default class CourseScheduledProblemList extends Vue {
     currentProblem.points = problem.points;
   }
 
-  onRemoveProblem(
-    assignment: types.CourseAssignment,
-    problem: types.AddedProblem,
-  ): void {
+  onRemoveProblem(problem: types.AddedProblem): void {
     const problemAlias = problem.alias;
     this.problems = this.problems.filter(
       (problem) => problem.alias !== problemAlias,
