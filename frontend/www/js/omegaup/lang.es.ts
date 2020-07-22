@@ -683,6 +683,7 @@ const translations: { [key: string]: string; } = {
   problemDeployerMismatchedInputFile: "Hubo al menos un archivo .in sin su .out correspondiente.",
   problemDeployerMissingFromTestplan: "El caso \"%(file)\" en testplan no fue encontrado",
   problemDeployerNoCases: "No se encontraron casos",
+  problemDeployerNoEsStatement: "No se encontr\u00f3 el archivo statement/es.markdown.",
   problemDeployerNoStatements: "No se encontraron redacciones",
   problemDeployerNotAReview: "El merge a la rama 'master' se intent\u00f3 con un commit que no es una revisi\u00f3n.",
   problemDeployerOmegaupUpdateProblemOldVersion: "El problema est\u00e1 siendo migrado a un formato m\u00e1s nuevo. Por favor intenta m\u00e1s tarde.",

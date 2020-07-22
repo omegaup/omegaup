@@ -681,6 +681,7 @@ problemDeployerLibinteractiveValidationError = "Problema interativo é inválido
 problemDeployerMismatchedInputFile = "Houve pelo menos um arquivo .in sem o correspondente .out."
 problemDeployerMissingFromTestplan = "Caso do \"%(file)\" falta na testplan"
 problemDeployerNoCases = "Nenhum caso encontrado"
+problemDeployerNoEsStatement = "Arquivo statement/es.markdown não encontrado."
 problemDeployerNoStatements = "Nenhuma redação encontrada"
 problemDeployerNotAReview = "A fusão com o ramo 'master' foi tentada com um compromisso que não é uma revista."
 problemDeployerOmegaupUpdateProblemOldVersion = "O problema está sendo migrado para uma nova versão. Por favor, tente novamente mais tarde."
