@@ -77,7 +77,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'submit-new-assignment': (source: course_AssignmentDetails) => {
+          'submit-new-assignment': (
+            source: course_AssignmentDetails,
+            problems: types.AddedProblem[],
+          ) => {
             const params = {
               name: source.name,
               description: source.description,
@@ -114,7 +117,7 @@ OmegaUp.on('ready', () => {
               Object.assign(params, {
                 alias: source.alias,
                 course_alias: courseAlias,
-                problems: JSON.stringify(source.assignment.problems),
+                problems: JSON.stringify(problems),
               });
 
               if (source.unlimitedDuration) {

@@ -149,18 +149,11 @@
           </div>
         </div>
         <omegaup-course-scheduled-problem-list
+          ref="scheduled-problem-list"
           v-if="assignmentFormMode === AssignmentFormMode.New"
           v-bind:assignment-problems="assignmentProblems"
           v-bind:tagged-problems="taggedProblems"
           v-bind:selected-assignment="assignment"
-          v-bind:assignment-form-mode.sync="assignmentFormMode"
-          v-on:add-problem="
-            (assignment, problem) => onAddProblem(assignment, problem)
-          "
-          v-on:remove-problem="
-            (assignment, problemAlias) =>
-              onRemoveProblem(assignment, problemAlias)
-          "
           v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
         ></omegaup-course-scheduled-problem-list>
         <omegaup-course-problem-list
@@ -218,7 +211,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Emit, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -246,6 +239,8 @@ library.add(fas);
   },
 })
 export default class CourseAssignmentDetails extends Vue {
+  @Ref('scheduled-problem-list')
+  readonly scheduledProblemList!: course_ScheduledProblemList;
   @Prop({
     default: omegaup.AssignmentFormMode.Default,
   })
@@ -312,32 +307,8 @@ export default class CourseAssignmentDetails extends Vue {
     this.reset();
   }
 
-  onAddProblem(
-    assignment: types.CourseAssignment,
-    problem: types.AddedProblem,
-  ): void {
-    const problemAlias = problem.alias;
-    const currentProblem = assignment.problems.find(
-      (problem) => problem.alias === problemAlias,
-    );
-    if (!currentProblem) {
-      assignment.problems.push(problem);
-      return;
-    }
-    currentProblem.points = problem.points;
-  }
-
-  onRemoveProblem(
-    assignment: types.CourseAssignment,
-    problemAlias: string,
-  ): void {
-    this.assignment.problems = assignment.problems.filter(
-      (problem) => problem.alias !== problemAlias,
-    );
-  }
-
   onSubmit(): void {
-    this.$emit('emit-submit', this);
+    this.$emit('emit-submit', this, this.scheduledProblemList.problems);
   }
 }
 </script>

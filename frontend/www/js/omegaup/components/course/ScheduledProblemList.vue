@@ -123,12 +123,9 @@ export default class CourseScheduledProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
-  @Prop({ default: omegaup.AssignmentFormMode.New })
-  assignmentFormMode!: omegaup.AssignmentFormMode;
 
   typeahead = typeahead;
   T = T;
-  AssignmentFormMode = omegaup.AssignmentFormMode;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   taggedProblemAlias = '';
@@ -137,7 +134,6 @@ export default class CourseScheduledProblemList extends Vue {
   showTopicsAndDifficulty = false;
 
   onShowForm(): void {
-    this.$emit('update:assignment-form-mode', omegaup.AssignmentFormMode.New);
     this.problemAlias = '';
 
     Vue.nextTick(() => {
@@ -155,10 +151,9 @@ export default class CourseScheduledProblemList extends Vue {
     );
     if (!currentProblem) {
       this.problems.push(problem);
-    } else {
-      currentProblem.points = problem.points;
+      return;
     }
-    this.$emit('add-problem', assignment, problem);
+    currentProblem.points = problem.points;
   }
 
   onRemoveProblem(
@@ -169,7 +164,6 @@ export default class CourseScheduledProblemList extends Vue {
     this.problems = this.problems.filter(
       (problem) => problem.alias !== problemAlias,
     );
-    this.$emit('remove-problem', assignment, problem.alias);
   }
 
   @Watch('assignmentProblems')
@@ -195,11 +189,6 @@ export default class CourseScheduledProblemList extends Vue {
   @Watch('taggedProblemAlias')
   onTaggedProblemAliasChange() {
     this.problemAlias = this.taggedProblemAlias;
-  }
-
-  @Watch('assignmentFormMode')
-  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
-    this.$emit('update:assignment-form-mode', newValue);
   }
 
   reset(): void {

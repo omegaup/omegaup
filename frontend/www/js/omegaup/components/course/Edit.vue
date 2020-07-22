@@ -142,8 +142,8 @@
           "
           v-on:emit-cancel="onResetAssignmentForm"
           v-on:emit-submit="
-            (assignmentFormComponent) =>
-              $emit('submit-new-assignment', assignmentFormComponent)
+            (assignmentFormComponent, problems) =>
+              $emit('submit-new-assignment', assignmentFormComponent, problems)
           "
         ></omegaup-course-assignment-details>
       </div>
