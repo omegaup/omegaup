@@ -346,7 +346,7 @@ export default class ProblemForm extends Vue {
 
   onSubmit(e: Event): void {
     this.errors = [];
-    if (this.problemLevel) {
+    if (this.isUpdate || this.problemLevel) {
       return;
     }
     if (!this.problemLevel) {

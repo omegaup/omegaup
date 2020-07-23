@@ -42,13 +42,12 @@ OmegaUp.on('ready', () => {
         ref: 'component',
       });
     },
-    data: { errors: [] },
     components: {
       'omegaup-problem-new': problem_New,
     },
   });
   const component = <problem_New>problemNew.$refs.component;
-  if (payload.statusError) {
+  if (payload.statusError && payload.parameter) {
     component.errors.push(payload.parameter);
     ui.error(payload.statusError);
   }
