@@ -386,10 +386,43 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
+        if (!is_null($r['visibility'])) {
+            switch (strval($r['visibility'])) {
+                case 'deleted':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_DELETED;
+                    break;
+                case 'private_banned':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+                    break;
+                case 'public_banned':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+                    break;
+                case 'private_warning':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
+                    break;
+                case 'private':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+                    break;
+                case 'public_warning':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+                    break;
+                case 'public':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+                    break;
+                case 'promoted':
+                    $r['visibility'] = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
+                    break;
+                default:
+                    throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                        'invalidVisibility'
+                    );
+                    break;
+            }
+        }
 
         self::createProblem(
             $r->user,

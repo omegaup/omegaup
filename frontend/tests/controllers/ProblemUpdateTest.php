@@ -637,7 +637,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a private problem.
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
-            'visibility' => 0
+            'visibility' => 'private'
         ]));
 
         // Normal user shouldn't even be able to see the problem.
@@ -689,7 +689,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddOnlyPrivateTags() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
-            'visibility' => 0
+            'visibility' => 'private'
         ]));
         $login = self::login($problemData['author']);
         \OmegaUp\Controllers\Problem::apiAddTag(new \OmegaUp\Request([

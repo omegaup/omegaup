@@ -2638,7 +2638,7 @@ Create a new problem
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 

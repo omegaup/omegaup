@@ -15,7 +15,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
         $response = \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -62,7 +62,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity,
         ]), $login);
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -105,15 +105,15 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         // Add multiple problems to the assignment
         $problems = [
             \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity
             ]), $login),
             \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity
             ]), $login),
             \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity
             ]), $login)
         ];
@@ -171,7 +171,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
 
@@ -206,7 +206,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
 
@@ -253,7 +253,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -296,7 +296,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
