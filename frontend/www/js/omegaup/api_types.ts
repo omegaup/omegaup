@@ -2144,6 +2144,16 @@ export namespace types {
     student: types.CoursesByAccessMode;
   }
 
+  export interface StudentProgress {
+    name: string;
+    progress: {
+      assignment_alias: string;
+      assignment_score: number;
+      problems: string[];
+    }[];
+    username?: string;
+  }
+
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     student: string;
