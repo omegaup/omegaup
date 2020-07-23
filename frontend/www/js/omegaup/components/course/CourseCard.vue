@@ -20,7 +20,7 @@
       </div>
       <div class="float-left align-middle" v-if="showTopics">
         <details>
-          <summary>{{ T.wordsShowTopics }}</summary>
+          <summary>{{ T.courseCardShowTopics }}</summary>
           <ul>
             <li v-for="assignment in content">{{ assignment.name }}</li>
           </ul>
@@ -52,15 +52,13 @@ export default class CourseCard extends Vue {
 
   get buttonTitle(): string {
     if (this.isOpen) {
-      return T.wordsResume;
+      return T.courseCardCourseResume;
     }
     return T.startCourse;
   }
 
   get dueDate(): string {
-    const now = Date.now();
-
-    return ui.formatString(T.wordsEnds, {
+    return ui.formatString(T.courseCardDueDate, {
       due_date: time.formatFutureDateRelative(this.finishTime),
     });
   }

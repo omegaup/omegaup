@@ -52,7 +52,7 @@ describe('CourseCard.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.startCourse);
-    expect(wrapper.text()).toContain(T.wordsShowTopics);
+    expect(wrapper.text()).toContain(T.courseCardShowTopics);
     expect(wrapper.text()).toContain('Introductorio a la OMI');
     expect(wrapper.text()).toContain('Introducción a omegaUp');
     expect(wrapper.text()).toContain('Estructura de datos');
@@ -75,8 +75,8 @@ describe('CourseCard.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.wordsResume);
-    expect(wrapper.text()).not.toContain(T.wordsShowTopics);
+    expect(wrapper.text()).toContain(T.courseCardCourseResume);
+    expect(wrapper.text()).not.toContain(T.courseCardShowTopics);
     expect(wrapper.text()).toContain(T.wordsProgress);
     expect(wrapper.text()).toContain('Clase 2020 semestre 1');
   });
