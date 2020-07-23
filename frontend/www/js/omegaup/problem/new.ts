@@ -8,9 +8,6 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemFormPayload();
-  if (payload.statusError) {
-    ui.error(payload.statusError);
-  }
   const problemNew = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -22,6 +19,7 @@ OmegaUp.on('ready', () => {
           'alias-changed': (alias: string): void => {
             api.Problem.details({ problem_alias: alias }, { quiet: true })
               .then((data) => {
+                component.errors.push('alias');
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
                     alias: ui.escape(alias),
@@ -31,16 +29,27 @@ OmegaUp.on('ready', () => {
               .catch((error) => {
                 if (error.httpStatusCode == 404) {
                   ui.dismissNotifications();
+                  component.errors = component.errors.filter(
+                    (error) => error !== 'alias',
+                  );
                   return;
                 }
+                component.errors.push(error.parameter);
                 ui.apiError(error);
               });
           },
         },
+        ref: 'component',
       });
     },
+    data: { errors: [] },
     components: {
       'omegaup-problem-new': problem_New,
     },
   });
+  const component = <problem_New>problemNew.$refs.component;
+  if (payload.statusError) {
+    component.errors.push(payload.parameter);
+    ui.error(payload.statusError);
+  }
 });

@@ -1689,6 +1689,7 @@ export namespace types {
     message?: string;
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
+    parameter: string;
     publicTags: string[];
     selectedTags?: types.SelectedTag[];
     showDiff: string;

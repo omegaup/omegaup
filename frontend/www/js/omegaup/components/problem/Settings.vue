@@ -3,7 +3,12 @@
     <div class="row">
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormLanguages }}</label>
-        <select name="languages" class="form-control" v-model="languages">
+        <select
+          name="languages"
+          class="form-control"
+          v-bind:class="{ 'is-invalid': errors.includes('languages') }"
+          v-model="languages"
+        >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
             v-bind:value="languageIndex"
@@ -17,6 +22,7 @@
         <select
           name="validator"
           class="form-control"
+          v-bind:class="{ 'is-invalid': errors.includes('validator') }"
           v-model="validator"
           v-bind:disabled="languages === ''"
         >
@@ -40,6 +46,9 @@
           v-bind:disabled="languages === ''"
           type="text"
           class="form-control"
+          v-bind:class="{
+            'is-invalid': errors.includes('validator_time_limit'),
+          }"
         />
       </div>
 
@@ -51,6 +60,7 @@
           v-bind:disabled="languages === ''"
           type="text"
           class="form-control"
+          v-bind:class="{ 'is-invalid': errors.includes('time_limit') }"
         />
       </div>
     </div>
@@ -62,6 +72,9 @@
         }}</label>
         <input
           name="overall_wall_time_limit"
+          v-bind:class="{
+            'is-invalid': errors.includes('overall_wall_time_limit'),
+          }"
           v-bind:value="overallWallTimeLimit"
           v-bind:disabled="languages === ''"
           type="text"
@@ -77,6 +90,7 @@
           v-bind:disabled="languages === ''"
           type="text"
           class="form-control"
+          v-bind:class="{ 'is-invalid': errors.includes('extra_wall_time') }"
         />
       </div>
     </div>
@@ -90,6 +104,7 @@
           v-bind:disabled="languages === ''"
           type="text"
           class="form-control"
+          v-bind:class="{ 'is-invalid': errors.includes('memory_limit') }"
         />
       </div>
 
@@ -101,6 +116,7 @@
           v-bind:disabled="languages === ''"
           type="text"
           class="form-control"
+          v-bind:class="{ 'is-invalid': errors.includes('output_limit') }"
         />
       </div>
       <div class="form-group col-md-3 col-sm-6">
@@ -111,6 +127,7 @@
           v-bind:disabled="languages === ''"
           type="text"
           class="form-control"
+          v-bind:class="{ 'is-invalid': errors.includes('input_limit') }"
         />
       </div>
     </div>
@@ -134,6 +151,7 @@ export default class ProblemSettings extends Vue {
   @Prop() validLanguages!: Array<string>;
   @Prop() initialValidator!: string;
   @Prop() validatorTypes!: Array<string>;
+  @Prop() errors!: string[];
 
   T = T;
 
