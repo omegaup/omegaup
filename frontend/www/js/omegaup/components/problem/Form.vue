@@ -16,12 +16,7 @@
       </p>
     </div>
     <div class="card-body">
-      <form
-        method="POST"
-        class="form"
-        enctype="multipart/form-data"
-        v-on:submit="onSubmit"
-      >
+      <form method="POST" class="form" enctype="multipart/form-data">
         <div class="row">
           <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsTitle }}</label>
@@ -40,12 +35,12 @@
             <label class="control-label">{{ T.wordsAlias }}</label>
             <input
               required
-              name="alias"
+              name="problem_alias"
               v-model="alias"
               ref="alias"
               type="text"
               class="form-control"
-              v-bind:class="{ 'is-invalid': errors.includes('alias') }"
+              v-bind:class="{ 'is-invalid': errors.includes('problem_alias') }"
               v-bind:disabled="isUpdate"
             />
           </div>
@@ -342,20 +337,6 @@ export default class ProblemForm extends Vue {
       this.data.visibilityStatuses.publicBanned < this.visibility &&
       this.visibility < this.data.visibilityStatuses.promoted
     );
-  }
-
-  onSubmit(e: Event): void {
-    this.errors = [];
-    if (this.isUpdate || this.problemLevel) {
-      return;
-    }
-    if (!this.problemLevel) {
-      this.errors.push('problem_level');
-    }
-    if (this.errors.length !== 0) {
-      ui.error(T.editFieldRequired);
-      e.preventDefault();
-    }
   }
 
   get selectedPublicTags(): string[] {

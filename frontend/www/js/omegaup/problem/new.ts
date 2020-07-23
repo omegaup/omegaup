@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
           'alias-changed': (alias: string): void => {
             api.Problem.details({ problem_alias: alias }, { quiet: true })
               .then((data) => {
-                component.errors.push('alias');
+                component.errors.push('problem_alias');
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
                     alias: ui.escape(alias),
@@ -30,7 +30,7 @@ OmegaUp.on('ready', () => {
                 if (error.httpStatusCode == 404) {
                   ui.dismissNotifications();
                   component.errors = component.errors.filter(
-                    (error) => error !== 'alias',
+                    (error) => error !== 'problem_alias',
                   );
                   return;
                 }
@@ -47,8 +47,10 @@ OmegaUp.on('ready', () => {
     },
   });
   const component = <problem_New>problemNew.$refs.component;
-  if (payload.statusError && payload.parameter) {
-    component.errors.push(payload.parameter);
+  if (payload.statusError) {
     ui.error(payload.statusError);
+  }
+  if (payload.parameter) {
+    component.errors.push(payload.parameter);
   }
 });

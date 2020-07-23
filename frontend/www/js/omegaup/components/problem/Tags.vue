@@ -95,53 +95,69 @@
             </tr>
           </tbody>
         </table>
-        <div class="form-group">
-          <label class="font-weight-bold">{{ T.wordsLevel }}</label>
-          <select
-            required
-            class="form-control"
-            v-bind:class="{ 'is-invalid': errors.includes('problem_level') }"
-            name="problem-level"
-            v-model="problemLevelTag"
-          >
-            <option v-for="levelTag in levelTags" v-bind:value="levelTag">
-              {{ T[levelTag] }}
-            </option>
-          </select>
-          <small class="form-text text-muted mb-2">{{ T.levelTagHelp }}</small>
-          <template v-if="isCreate">
-            <button
-              type="button"
-              class="btn btn-primary"
-              data-level-button
-              v-bind:disabled="!problemLevelTag"
-              v-on:click.prevent="onSelectProblemLevel"
+        <div class="row">
+          <div class="form-group col-md-8">
+            <label class="font-weight-bold">{{ T.wordsLevel }}</label>
+            <select
+              required
+              class="form-control"
+              v-bind:class="{ 'is-invalid': errors.includes('problem_level') }"
+              name="problem-level"
+              v-model="problemLevelTag"
             >
-              {{ T.selectProblemLevel }}
-            </button>
-          </template>
-          <template v-else="">
-            <button
-              type="button"
-              class="btn btn-primary"
-              v-bind:disabled="
-                !problemLevelTag || problemLevel === problemLevelTag
-              "
-              v-on:click.prevent="onUpdateProblemLevel"
-            >
-              {{ T.updateProblemLevel }}
-            </button>
-            <button
-              type="button"
-              class="btn btn-danger ml-1"
-              v-bind:disabled="!problemLevel"
-              v-on:click.prevent="onDeleteProblemLevel"
-            >
-              {{ T.deleteProblemLevel }}
-            </button>
-          </template>
+              <option v-for="levelTag in levelTags" v-bind:value="levelTag">
+                {{ T[levelTag] }}
+              </option>
+            </select>
+            <small class="form-text text-muted mb-2">{{
+              T.levelTagHelp
+            }}</small>
+            <template v-if="isCreate">
+              <button
+                type="button"
+                class="btn btn-primary"
+                data-level-button
+                v-bind:disabled="!problemLevelTag"
+                v-on:click.prevent="onSelectProblemLevel"
+              >
+                {{ T.selectProblemLevel }}
+              </button>
+            </template>
+            <template v-else="">
+              <button
+                type="button"
+                class="btn btn-primary"
+                v-bind:disabled="
+                  !problemLevelTag || problemLevel === problemLevelTag
+                "
+                v-on:click.prevent="onUpdateProblemLevel"
+              >
+                {{ T.updateProblemLevel }}
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger ml-1"
+                v-bind:disabled="!problemLevel"
+                v-on:click.prevent="onDeleteProblemLevel"
+              >
+                {{ T.deleteProblemLevel }}
+              </button>
+            </template>
+          </div>
+          <div class="col-md-4" v-if="!problemLevelSelected">
+            <label class="font-weight-bold">{{
+              T.tagProblemLevelSelected
+            }}</label>
+            <p class="text-warning">{{ T.tagProblemLevelNoSelected }}</p>
+          </div>
+          <div class="col-md-4" v-else="">
+            <label class="font-weight-bold">{{
+              T.tagProblemLevelSelected
+            }}</label>
+            <p class="text-success">{{ T[problemLevelTagSelected] }}</p>
+          </div>
         </div>
-        <!-- TODO: Change this for BS4 version -->
+
         <div class="form-group">
           <label class="switch-container font-weight-bold">
             <div class="switch">
@@ -277,6 +293,8 @@ export default class ProblemTags extends Vue {
   T = T;
   allowTags = this.initialAllowTags;
   problemLevelTag: string | null = this.problemLevel;
+  problemLevelSelected = false;
+  problemLevelTagSelected = '';
   newPrivateTag = '';
 
   addPublicTag(tag: string): void {
@@ -304,6 +322,8 @@ export default class ProblemTags extends Vue {
 
   onSelectProblemLevel(): void {
     if (this.problemLevelTag) {
+      this.problemLevelSelected = true;
+      this.problemLevelTagSelected = this.problemLevelTag;
       this.$emit('select-problem-level', this.problemLevelTag);
     }
   }
