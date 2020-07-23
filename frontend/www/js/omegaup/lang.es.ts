@@ -1112,6 +1112,7 @@ const translations: { [key: string]: string; } = {
   scoreboardmerge: "Unir scorboard",
   searchUser: "Buscar usuario",
   selectAction: "Seleccionar acci\u00f3n",
+  selectProblemLevel: "Seleccionar nivel del problema",
   selectProblemToGetVersions: "Selecciona el problema y presiona la tecla Enter o da clic en el bot\u00f3n Obtener versiones para que se muestren todas las versiones del problema.",
   sendInvitesToCandidates: "Enviar correos",
   showLinks: "Enlaces",

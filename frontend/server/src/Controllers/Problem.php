@@ -101,6 +101,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -152,6 +153,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $params['overall_wall_time_limit'] = intval(
                 $r['overall_wall_time_limit']
             );
+        }
+        if (!is_null($r['problem_level'])) {
+            $params['problem_level'] = strval($r['problem_level']);
         }
         if (!is_null($r['selected_tags'])) {
             $params['selected_tags'] = strval($r['selected_tags']);
@@ -378,6 +382,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -474,6 +479,32 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     self::addTag($tagName, $tag['public'], $problem);
                 }
             }
+
+            // Add problem level tag
+            if (!is_null($params->problemLevel)) {
+                $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
+
+                if (is_null($tag)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException('tag');
+                }
+                if (
+                    !in_array(
+                        $tag->name,
+                        \OmegaUp\Controllers\Tag::getLevelTags()
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'notProblemLevelTag',
+                        'level_tag'
+                    );
+                }
+
+                \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+                    $problem,
+                    $tag
+                );
+            }
+
             \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -1108,6 +1139,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $redirect
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -1660,6 +1692,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -1754,6 +1787,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $solution
@@ -4660,6 +4694,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $redirect
      * @omegaup-request-param mixed $request
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
@@ -4914,6 +4949,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $request
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source

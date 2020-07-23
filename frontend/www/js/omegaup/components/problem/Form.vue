@@ -16,7 +16,12 @@
       </p>
     </div>
     <div class="card-body">
-      <form method="POST" class="form" enctype="multipart/form-data">
+      <form
+        method="POST"
+        class="form"
+        enctype="multipart/form-data"
+        v-on:submit="onSubmit"
+      >
         <div class="row">
           <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsTitle }}</label>
@@ -162,11 +167,14 @@
           </div>
 
           <omegaup-problem-tags
+            v-bind:errors="errors"
             v-bind:public-tags="data.publicTags"
             v-bind:level-tags="data.levelTags"
             v-bind:alias="data.alias"
             v-on:emit-add-tag="addTag"
             v-on:emit-remove-tag="removeTag"
+            v-on:select-problem-level="selectProblemLevel"
+            v-bind:is-create="true"
             v-bind:selected-private-tags="selectedPrivateTags"
             v-bind:selected-public-tags="selectedPublicTags"
             v-bind:can-add-new-tags="true"
@@ -174,6 +182,11 @@
           <input
             name="selected_tags"
             v-bind:value="selectedTagsList"
+            type="hidden"
+          />
+          <input
+            name="problem_level"
+            v-bind:value="problemLevel"
             type="hidden"
           />
         </template>
@@ -271,6 +284,7 @@ export default class ProblemForm extends Vue {
   validator = this.data.validator;
   languages = this.data.languages;
   tags = this.data.tags;
+  problemLevel = '';
   showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
   message = '';
@@ -330,6 +344,20 @@ export default class ProblemForm extends Vue {
     );
   }
 
+  onSubmit(e: Event): void {
+    this.errors = [];
+    if (this.problemLevel) {
+      return;
+    }
+    if (!this.problemLevel) {
+      this.errors.push('problem_level');
+    }
+    if (this.errors.length !== 0) {
+      ui.error(T.editFieldRequired);
+      e.preventDefault();
+    }
+  }
+
   get selectedPublicTags(): string[] {
     return this.selectedTags
       .filter((tag) => tag.public === true)
@@ -353,6 +381,10 @@ export default class ProblemForm extends Vue {
     this.selectedTags = this.selectedTags.filter(
       (tag) => tag.tagname !== tagname,
     );
+  }
+
+  selectProblemLevel(levelTag: string): void {
+    this.problemLevel = levelTag;
   }
 
   onUploadFile(ev: InputEvent): void {
