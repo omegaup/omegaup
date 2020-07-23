@@ -1110,6 +1110,7 @@ scoreboardShowOnlyInvitedIdentities = "Mostre somente os concorrentes convidados
 scoreboardmerge = "Unir painel de avaliação"
 searchUser = "Pesquisar usuário"
 selectAction = "Selecionar ação"
+selectProblemLevel = "Selecionar o nível do problema"
 selectProblemToGetVersions = "Selecione o problema e pressione Enter ou clique no botão Obter versões para mostrar todas as diferentes versões do problema."
 sendInvitesToCandidates = "Enviar correos"
 showLinks = "Vínculos"
