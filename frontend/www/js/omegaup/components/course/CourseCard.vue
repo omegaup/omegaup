@@ -61,7 +61,7 @@ export default class CourseCard extends Vue {
     const now = Date.now();
 
     return ui.formatString(T.wordsEnds, {
-      due_date: time.formatDeltaReadable(this.finishTime.getTime() - now),
+      due_date: time.formatFutureDateRelative(this.finishTime),
     });
   }
 }
