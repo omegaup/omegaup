@@ -481,27 +481,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
 
             // Add problem level tag
-            $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
+            if (!empty($params->problemLevel)) {
+                $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
-            if (is_null($tag)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('tag');
-            }
-            if (
-                !in_array(
-                    $tag->name,
-                    \OmegaUp\Controllers\Tag::getLevelTags()
-                )
-            ) {
-                throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'notProblemLevelTag',
-                    'level_tag'
+                if (is_null($tag)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException('tag');
+                }
+                if (
+                    !in_array(
+                        $tag->name,
+                        \OmegaUp\Controllers\Tag::getLevelTags()
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'notProblemLevelTag',
+                        'level_tag'
+                    );
+                }
+
+                \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+                    $problem,
+                    $tag
                 );
             }
-
-            \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
-                $problem,
-                $tag
-            );
 
             \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
             \OmegaUp\DAO\DAO::transEnd();
@@ -4937,7 +4939,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param bool $allow_user_add_tags
-     * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -4976,10 +4977,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (isset($r['request']) && ($r['request'] === 'submit')) {
             $problemParams = null;
             try {
-                \OmegaUp\Validators::validateStringNonEmpty(
-                    $r['problem_level'],
-                    'problem_level'
-                );
                 $problemParams = self::convertRequestToProblemParams($r);
                 self::createProblem($r->user, $r->identity, $problemParams);
                 header("Location: /problem/{$r['problem_alias']}/edit/");

@@ -157,7 +157,6 @@
             <p class="text-success">{{ T[problemLevelTagSelected] }}</p>
           </div>
         </div>
-
         <div class="form-group">
           <label class="switch-container font-weight-bold">
             <div class="switch">
