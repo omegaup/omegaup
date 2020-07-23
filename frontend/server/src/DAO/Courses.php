@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @package docs
  *
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type StudentProgress=array{name: string, username: string|null, progress: list<array{assignment_alias: string, assignment_score: float, problems: list<string, float>}>}
+ * @psalm-type StudentProgress=array{name: string|null, username: string, progress: list<array{assignment_alias: string, assignment_score: float, problems: list<string, float>}>}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**

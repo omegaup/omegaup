@@ -2145,13 +2145,13 @@ export namespace types {
   }
 
   export interface StudentProgress {
-    name: string;
+    name?: string;
     progress: {
       assignment_alias: string;
       assignment_score: number;
       problems: string[];
     }[];
-    username?: string;
+    username: string;
   }
 
   export interface StudentProgressPayload {
