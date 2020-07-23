@@ -168,6 +168,8 @@
             v-bind:alias="data.alias"
             v-on:emit-add-tag="addTag"
             v-on:emit-remove-tag="removeTag"
+            v-on:select-problem-level="selectProblemLevel"
+            v-bind:is-create="true"
             v-bind:selected-private-tags="selectedPrivateTags"
             v-bind:selected-public-tags="selectedPublicTags"
             v-bind:can-add-new-tags="true"
@@ -175,6 +177,11 @@
           <input
             name="selected_tags"
             v-bind:value="selectedTagsList"
+            type="hidden"
+          />
+          <input
+            name="problem_level"
+            v-bind:value="problemLevel"
             type="hidden"
           />
         </template>
@@ -268,6 +275,7 @@ export default class ProblemForm extends Vue {
   validator = this.data.validator;
   languages = this.data.languages;
   tags = this.data.tags;
+  problemLevel = '';
   showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
   message = '';
@@ -331,10 +339,15 @@ export default class ProblemForm extends Vue {
     if (this.isUpdate && this.message) {
       return;
     }
-    if (this.title && this.alias && this.source && this.hasFile) {
+    if (
+      this.title &&
+      this.alias &&
+      this.source &&
+      this.problemLevel &&
+      this.hasFile
+    ) {
       return;
     }
-    ui.error(T.editFieldRequired);
     if (!this.title) {
       this.errors.push('title');
     }
@@ -344,13 +357,19 @@ export default class ProblemForm extends Vue {
     if (!this.source) {
       this.errors.push('source');
     }
+    if (!this.problemLevel) {
+      this.errors.push('problem_level');
+    }
     if (!this.isUpdate && !this.hasFile) {
       this.errors.push('file');
     }
     if (this.isUpdate && !this.message) {
       this.errors.push('message');
     }
-    e.preventDefault();
+    if (this.errors.length !== 0) {
+      ui.error(T.editFieldRequired);
+      e.preventDefault();
+    }
   }
 
   get selectedPublicTags(): string[] {
@@ -376,6 +395,10 @@ export default class ProblemForm extends Vue {
     this.selectedTags = this.selectedTags.filter(
       (tag) => tag.tagname !== tagname,
     );
+  }
+
+  selectProblemLevel(levelTag: string): void {
+    this.problemLevel = levelTag;
   }
 
   onUploadFile(ev: InputEvent): void {

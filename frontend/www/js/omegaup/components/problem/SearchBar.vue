@@ -4,7 +4,9 @@
       <div class="form-group mr-2" v-if="tags.length !== 0">
         <div class="mr-1" v-for="tag in tags">
           <input type="hidden" name="tag[]" v-bind:value="tag" />
-          <span class="badge badge-secondary m-1 p-2">{{ tag }}</span>
+          <span class="badge badge-secondary m-1 p-2">{{
+            T[tag] ? T[tag] : tag
+          }}</span>
         </div>
         <a class="remove-all-tags" href="/problem/">
           <font-awesome-icon v-bind:icon="['fas', 'times']" />
