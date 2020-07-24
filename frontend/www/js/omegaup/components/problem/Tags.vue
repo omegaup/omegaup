@@ -101,7 +101,6 @@
             <select
               required
               class="form-control"
-              v-bind:class="{ 'is-invalid': errors.includes('problem_level') }"
               name="problem-level"
               v-model="problemLevelTag"
             >
@@ -287,7 +286,6 @@ export default class ProblemTags extends Vue {
   @Prop({ default: true }) initialAllowTags!: boolean;
   @Prop({ default: false }) canAddNewTags!: boolean;
   @Prop({ default: false }) isCreate!: boolean;
-  @Prop() errors!: string[];
 
   T = T;
   allowTags = this.initialAllowTags;

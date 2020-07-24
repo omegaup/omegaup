@@ -201,7 +201,6 @@
 
       <div class="tab-pane active" v-if="showTab === 'tags'">
         <omegaup-problem-tags
-          v-bind:errors="errors"
           v-bind:alias="data.alias"
           v-bind:title="data.title"
           v-bind:initial-allow-tags="data.allowUserAddTags"
@@ -297,7 +296,6 @@ export default class ProblemEdit extends Vue {
   T = T;
   alias = this.data.alias;
   showTab = 'edit';
-  errors: string[] = [];
 
   get activeTab(): string {
     switch (this.showTab) {

@@ -8,6 +8,7 @@
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('languages') }"
           v-model="languages"
+          required
         >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
@@ -25,6 +26,7 @@
           v-bind:class="{ 'is-invalid': errors.includes('validator') }"
           v-model="validator"
           v-bind:disabled="languages === ''"
+          required
         >
           <option
             v-for="(validatorText, validatorIndex) in validatorTypes"
@@ -49,6 +51,7 @@
           v-bind:class="{
             'is-invalid': errors.includes('validator_time_limit'),
           }"
+          required
         />
       </div>
 
@@ -61,6 +64,7 @@
           type="text"
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('time_limit') }"
+          required
         />
       </div>
     </div>
@@ -79,6 +83,7 @@
           v-bind:disabled="languages === ''"
           type="text"
           class="form-control"
+          required
         />
       </div>
 
@@ -91,6 +96,7 @@
           type="text"
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('extra_wall_time') }"
+          required
         />
       </div>
     </div>
@@ -105,6 +111,7 @@
           type="text"
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('memory_limit') }"
+          required
         />
       </div>
 
@@ -117,6 +124,7 @@
           type="text"
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('output_limit') }"
+          required
         />
       </div>
       <div class="form-group col-md-3 col-sm-6">
@@ -128,6 +136,7 @@
           type="text"
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('input_limit') }"
+          required
         />
       </div>
     </div>

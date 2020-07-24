@@ -162,7 +162,6 @@
           </div>
 
           <omegaup-problem-tags
-            v-bind:errors="errors"
             v-bind:public-tags="data.publicTags"
             v-bind:level-tags="data.levelTags"
             v-bind:alias="data.alias"
@@ -293,7 +292,6 @@ export default class ProblemForm extends Vue {
   hasFile = false;
   public = false;
   errors: string[] = [];
-  parameterWithError = '';
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';
