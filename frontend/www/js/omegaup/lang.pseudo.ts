@@ -330,6 +330,7 @@ const translations: { [key: string]: string; } = {
   courseListIStudy: "(C0ur535 I 57udy)",
   courseListPastCourses: "(Pa57 c0ur535)",
   courseListPublicCourses: "(Pub1ic c0ur535)",
+  courseListSeeAll: "(S33 a11)",
   courseListSubmissionsByGroup: "(Submi55i0n5 mad3 by u53r5 0f 7hi5 c0ur53)",
   courseNew: "(N3w c0ur53)",
   courseNewFormBasicInformationRequired: "(Ba5ic inf0rma7i0n i5 r3quir3d)",

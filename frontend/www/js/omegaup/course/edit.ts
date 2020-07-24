@@ -247,7 +247,7 @@ OmegaUp.on('ready', () => {
           },
           'update-admission-mode': (admissionMode: string) => {
             api.Course.update({
-              course_alias: courseAlias,
+              alias: courseAlias,
               admission_mode: admissionMode,
             })
               .then(() => {
