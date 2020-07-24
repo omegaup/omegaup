@@ -20,18 +20,17 @@
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
- * @psalm-type FilteredCourse=array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CoursesList=array{admin: list<FilteredCourse>, student: list<FilteredCourse>, public: list<FilteredCourse>}
+ * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress: AssignmentProgress}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
- * @psalm-type AllCourses=array{admin: CoursesByAccessMode, public: CoursesByAccessMode, student: CoursesByAccessMode}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
- * @psalm-type StudentCourses=array{public: CoursesByAccessMode, student: CoursesByAccessMode}
+ * @psalm-type StudentCourses=array{public?: CoursesByAccessMode, student?: CoursesByAccessMode}
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
- * @psalm-type CourseListPayload=array{courses: StudentCourses}
+ * @psalm-type CourseListPayload=array{courses: StudentCourses, access_mode: null|string}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
@@ -1558,7 +1557,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Converts a Course object into an array
      *
-     * @return array{alias: string, name: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, public: bool, counts: array<string, int>}
+     * @return FilteredCourse
      */
     private static function convertCourseToArray(\OmegaUp\DAO\VO\Courses $course): array {
         if (is_null($course->course_id)) {
@@ -1567,14 +1566,18 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         $relevantColumns = [
+            'admission_mode',
             'alias',
+            'finish_time',
             'name',
             'start_time',
-            'finish_time',
-            'admission_mode',
         ];
-        /** @var array{alias: string, name: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, public: bool} */
+        /** @var array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, finish_time: \OmegaUp\Timestamp, name: string, start_time: \OmegaUp\Timestamp} */
         $arr = $course->asFilteredArray($relevantColumns);
+        $arr['assignments'] = [];
+        $arr['school_name'] = null;
+        $arr['accept_teacher'] = null;
+        $arr['is_open'] = false;
 
         $arr['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
             $course->course_id
@@ -1650,21 +1653,13 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $response = [
             'admin' => [],
-            'student' => [],
-            'public' => [],
+            'student' => \OmegaUp\DAO\Courses::getCoursesForStudent(
+                $identity->identity_id
+            ),
+            'public' => \OmegaUp\DAO\Courses::getPublicCourses(),
         ];
         foreach ($adminCourses as $course) {
             $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
-                $course
-            );
-        }
-        foreach ($studentCourses as $course) {
-            $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
-                $course
-            );
-        }
-        foreach ($publicCourses as $course) {
-            $response['public'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
                 $course
             );
         }
@@ -1989,7 +1984,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Add Student to Course.
      *
-     * @omegaup-request-param mixed $accept_teacher
+     * @omegaup-request-param bool|null $accept_teacher
      * @omegaup-request-param mixed $accept_teacher_git_object_id
      * @omegaup-request-param mixed $course_alias
      * @omegaup-request-param mixed $privacy_git_object_id
@@ -2024,6 +2019,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $r['usernameOrEmail']
         );
+        $acceptTeacher = $r->ensureOptionalBool('accept_teacher');
 
         // Only course admins or users adding themselves when the course is public
         if (
@@ -2040,8 +2036,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'group_id' => $course->group_id,
             'identity_id' => $resolvedIdentity->identity_id,
             'share_user_information' => $r['share_user_information'],
-            'accept_teacher' => $r['accept_teacher'],
         ]);
+
+        if (!is_null($acceptTeacher)) {
+            $groupIdentity->accept_teacher = $acceptTeacher;
+        }
 
         \OmegaUp\DAO\DAO::transBegin();
 
@@ -2780,6 +2779,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $access_mode
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
@@ -2792,12 +2792,24 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $coursesTypes = ['public', 'student'];
+
+        \OmegaUp\Validators::validateOptionalInEnum(
+            $r['access_mode'],
+            'access_mode',
+            $coursesTypes
+        );
 
         $courses = self::getCoursesList($r->identity, $page, $pageSize);
-        $coursesTypes = ['public', 'student'];
 
         $filteredCourses = [];
         foreach ($coursesTypes as $courseType) {
+            if (
+                $r['access_mode'] != $courseType
+                && !is_null($r['access_mode'])
+            ) {
+                continue;
+            }
             $filteredCourses[$courseType] = [
                 'filteredCourses' => [
                     'current' => [
@@ -2836,6 +2848,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'courses' => $filteredCourses,
+                    'access_mode' => $r['access_mode']
                 ],
                 'title' => 'courseList',
             ],
@@ -2872,7 +2885,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $group
         );
         $hasSharedUserInformation = true;
-        $hasAcceptedTeacher = true;
+        $hasAcceptedTeacher = null;
         $registrationResponse = [];
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
             [
@@ -2972,7 +2985,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         if (
             $shouldShowIntro
-            || !$hasAcceptedTeacher
+            || is_null($hasAcceptedTeacher)
             || (!$hasSharedUserInformation
             && $requestUserInformation !== 'no'
             )
@@ -3782,7 +3795,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureIdentity();
-        // Both params are the same
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['alias'],
             'alias'
