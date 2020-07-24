@@ -4817,6 +4817,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $result['smartyProperties']['payload']
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
+                \OmegaUp\ApiCaller::logException($e);
                 /** @var array{error?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
@@ -4990,6 +4991,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\OmegaUp\Exceptions\ExitException $e) {
                 throw $e;
             } catch (\OmegaUp\Exceptions\ApiException $e) {
+                \OmegaUp\ApiCaller::logException($e);
                 /** @var array{error?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
