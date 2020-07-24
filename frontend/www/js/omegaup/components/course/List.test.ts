@@ -8,7 +8,7 @@ import { types } from '../../api_types';
 import course_List from './List.vue';
 
 const coursesListProps = {
-  courses: <types.AllCourses>{
+  courses: <types.StudentCourses>{
     admin: {
       accessMode: 'admin',
       activeTab: '',

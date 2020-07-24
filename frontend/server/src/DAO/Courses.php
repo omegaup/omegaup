@@ -115,7 +115,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 LEFT JOIN
                     Schools s
                 ON c.school_id = s.school_id;';
-        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, name: string, progress: int, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, name: string, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
