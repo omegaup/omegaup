@@ -302,6 +302,7 @@ const translations: { [key: string]: string; } = {
   courseBasicInformationNeeded: "Para unirte al curso debes completar tu informaci\u00f3n b\u00e1sica. Ir a <a href=\"/profile/edit/\">Mi perfil</a>",
   courseCardCourseResume: "Continuar",
   courseCardDueDate: "Finaliza %(due_date)",
+  courseCardImpartedBy: "Impartido por",
   courseCardShowTopics: "Mostrar temario",
   courseDetails: "Detalles del curso",
   courseDetailsScoreboard: "Scoreboard",

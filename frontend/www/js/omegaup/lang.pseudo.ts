@@ -302,6 +302,7 @@ const translations: { [key: string]: string; } = {
   courseBasicInformationNeeded: "(T0 j0in 7h3 c0ur53 y0u mu57 fi11 in y0ur ba5ic inf0rma7i0n. G0 70 <a hr3f=\"/pr0fi13/3di7/\">My pr0fi13</a>)",
   courseCardCourseResume: "(R35um3)",
   courseCardDueDate: "(Du3 %(due_date))",
+  courseCardImpartedBy: "(Impar73d by)",
   courseCardShowTopics: "(Sh0w 70pic5)",
   courseDetails: "(C0ur53 d37ai15)",
   courseDetailsScoreboard: "(Sc0r3b0ard)",

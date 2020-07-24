@@ -5,7 +5,12 @@
       <div class="float-right" v-if="finishTime">{{ dueDate }}</div>
     </div>
     <div class="m-3">
-      <div class="float-left align-middle">{{ schoolName }}</div>
+      <div class="float-left align-middle">
+        <p>
+          {{ T.courseCardImpartedBy }}
+          <span class="font-weight-bold">{{ schoolName }}</span>
+        </p>
+      </div>
       <div class="float-right">
         <a v-bind:href="`/course/${courseAlias}/`" class="btn btn-primary">{{
           buttonTitle
