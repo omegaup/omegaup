@@ -2230,9 +2230,8 @@ export namespace types {
     createdProblems: types.Problem[];
     ownedBadges: types.Badge[];
     profile: types.UserProfileInfo;
-    programmingLanguages: { [key: string]: string };
     solvedProblems: types.Problem[];
-    stats: types.UserProfileStats[];
+    stats: { runs: types.UserProfileStats[] };
     statusError?: string;
     unsolvedProblems: types.Problem[];
   }
