@@ -2,14 +2,11 @@
   <div class="card ml-3 mr-3 mb-3">
     <div class="m-3">
       <div class="font-weight-bold float-left">{{ courseName }}</div>
-      <div class="float-right" v-if="finishTime">{{ dueDate }}</div>
+      <div class="float-right">{{ dueDate }}</div>
     </div>
     <div class="m-3">
       <div class="float-left align-middle">
-        <p>
-          {{ T.courseCardImpartedBy }}
-          <span class="font-weight-bold">{{ schoolName }}</span>
-        </p>
+        <p v-html="impartedBy"></p>
       </div>
       <div class="float-right">
         <a v-bind:href="`/course/${courseAlias}/`" class="btn btn-primary">{{
@@ -63,8 +60,15 @@ export default class CourseCard extends Vue {
   }
 
   get dueDate(): string {
+    if (!this.finishTime) return T.wordsUnlimitedDuration;
     return ui.formatString(T.courseCardDueDate, {
       due_date: time.formatFutureDateRelative(this.finishTime),
+    });
+  }
+
+  get impartedBy(): string {
+    return ui.formatString(T.courseCardImpartedBy, {
+      school_name: ui.escape(this.schoolName),
     });
   }
 }

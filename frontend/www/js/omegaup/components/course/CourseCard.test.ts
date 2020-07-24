@@ -53,6 +53,7 @@ describe('CourseCard.vue', () => {
 
     expect(wrapper.text()).toContain(T.startCourse);
     expect(wrapper.text()).toContain(T.courseCardShowTopics);
+    expect(wrapper.text()).toContain(T.wordsUnlimitedDuration);
     expect(wrapper.text()).toContain('Introductorio a la OMI');
     expect(wrapper.text()).toContain('Introducción a omegaUp');
     expect(wrapper.text()).toContain('Estructura de datos');
