@@ -3680,6 +3680,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'template' => 'user.profile.tpl',
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             return [
                 'smartyProperties' => [
                     'payload' => ['statusError' => $e->getErrorMessage()],
@@ -3716,6 +3717,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             $smartyProperties = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
             ];
@@ -3759,6 +3761,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             $smartyProperties = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
             ];
@@ -3794,6 +3797,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'practice' => false,
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             $smartyProperties = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
             ];
