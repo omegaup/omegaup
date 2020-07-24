@@ -1113,6 +1113,7 @@ const translations: { [key: string]: string; } = {
   searchUser: "Pesquisar usu\u00e1rio",
   selectAction: "Selecionar a\u00e7\u00e3o",
   selectProblemLevel: "Selecionar o n\u00edvel do problema",
+  selectProblemLevelDesc: "Para adicionar o problema, voc\u00ea deve escolher o n\u00edvel correspondente",
   selectProblemToGetVersions: "Selecione o problema e pressione Enter ou clique no bot\u00e3o Obter vers\u00f5es para mostrar todas as diferentes vers\u00f5es do problema.",
   sendInvitesToCandidates: "Enviar correos",
   showLinks: "V\u00ednculos",

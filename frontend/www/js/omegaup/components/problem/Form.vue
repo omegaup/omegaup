@@ -225,7 +225,14 @@
 
         <div class="row">
           <div class="form-group col-md-6 no-bottom-margin">
-            <button type="submit" class="btn btn-primary">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              v-bind:title="
+                !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
+              "
+              v-bind:disabled="!problemLevel && !isUpdate"
+            >
               {{ buttonText }}
             </button>
           </div>
