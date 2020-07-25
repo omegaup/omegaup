@@ -726,7 +726,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create public problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0,
+            'visibility' => 'private',
             'author' => $contestData['director']
         ]));
 

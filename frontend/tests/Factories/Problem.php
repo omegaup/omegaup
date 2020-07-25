@@ -206,30 +206,29 @@ class Problem {
         $visibility = $params->visibility;
 
         if (
-            $visibility === 'public_banned'
-            || $visibility === 'private_banned'
-            || $visibility === 'public_warning'
-            || $visibility === 'private_warning'
-            || $visibility === 'promoted'
+            strval($visibility) === 'public_banned'
+            || strval($visibility) === 'private_banned'
+            || strval($visibility) === 'public_warning'
+            || strval($visibility) === 'private_warning'
+            || strval($visibility) === 'promoted'
         ) {
-            switch ($visibility) {
+            switch (strval($visibility)) {
                 case 'private_banned':
-                    $visibilityInt = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
                     break;
                 case 'public_banned':
-                    $visibilityInt = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
                     break;
                 case 'private_warning':
-                    $visibilityInt = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
                     break;
                 case 'public_warning':
-                    $visibilityInt = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
                     break;
                 case 'promoted':
-                    $visibilityInt = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
                     break;
             }
-            $problem->visibility = intval($visibilityInt);
             \OmegaUp\DAO\Problems::update($problem);
         }
 

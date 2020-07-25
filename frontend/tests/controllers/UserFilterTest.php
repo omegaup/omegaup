@@ -269,7 +269,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
 
     public function testAnonymousProblemAccess() {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private',
         ]))['problem'];
 
         try {
