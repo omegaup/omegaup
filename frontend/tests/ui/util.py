@@ -314,8 +314,26 @@ def create_problem(
     driver.browser.find_element_by_name('source').send_keys('test')
     # Make the problem public
     driver.browser.find_element_by_xpath(
-        '//input[@type = "radio" and @name = "visibility" and @value = '
-        '"true"]').click()
+        '//input[@type="radio" and @name="visibility" and @value="true"]'
+    ).click()
+    Select(
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    'select[name="problem-level"]'
+                )
+            )
+        )
+    ).select_by_value('problemLevelBasicKarel')
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (
+                By.CSS_SELECTOR,
+                'button[data-level-button]'
+            )
+        )
+    ).click()
     contents_element = driver.browser.find_element_by_name(
         'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
