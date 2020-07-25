@@ -29,8 +29,8 @@
               <thead>
                 <tr>
                   <th>{{ T.wordsName }}</th>
-                  <th>{{ T.wordsStartTime }}</th>
-                  <th>{{ T.wordsEndTime }}</th>
+                  <th>{{ T.wordsCompletedPercentage }}</th>
+                  <th>{{ T.wordsDueDate }}</th>
                   <th>{{ T.wordsNumHomeworks }}</th>
                   <th>{{ T.wordsNumTests }}</th>
                   <th colspan="3" v-if="courses.accessMode === 'admin'">
@@ -45,7 +45,12 @@
                       course.name
                     }}</a>
                   </td>
-                  <td>{{ time.formatDate(course.start_time) }}</td>
+                  <td>
+                    <!-- TODO: Get the real progress when PR #4422 be approved
+                               and merged
+                    -->
+                    0%
+                  </td>
                   <td>
                     {{
                       course.finish_time
@@ -53,8 +58,16 @@
                         : T.wordsUnlimitedDuration
                     }}
                   </td>
-                  <td>{{ course.counts.homework }}</td>
-                  <td>{{ course.counts.test }}</td>
+                  <td>
+                    {{
+                      course.counts.homework
+                        ? course.counts.homework
+                        : T.wordsNA
+                    }}
+                  </td>
+                  <td>
+                    {{ course.counts.test ? course.counts.test : T.wordsNA }}
+                  </td>
                   <template v-if="courses.accessMode === 'admin'">
                     <td>
                       <a

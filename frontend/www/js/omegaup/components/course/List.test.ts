@@ -8,27 +8,25 @@ import { types } from '../../api_types';
 import course_List from './List.vue';
 
 const coursesListProps = {
-  courses: <types.AllCourses>{
-    admin: {
-      accessMode: 'admin',
-      activeTab: '',
-      filteredCourses: {
-        current: {
-          courses: [],
-          timeType: 'current',
-        },
-        past: {
-          courses: [],
-          timeType: 'past',
-        },
-      },
-    },
+  courses: <types.StudentCourses>{
     public: {
       accessMode: 'public',
-      activeTab: '',
+      activeTab: 'current',
       filteredCourses: {
         current: {
-          courses: [],
+          courses: [
+            {
+              alias: 'CC',
+              counts: {
+                homework: 2,
+                lesson: 2,
+                test: 1,
+              },
+              finish_time: new Date(),
+              name: 'Curso de introducción',
+              start_time: new Date(),
+            },
+          ],
           timeType: 'current',
         },
         past: {
@@ -39,7 +37,7 @@ const coursesListProps = {
     },
     student: {
       accessMode: 'student',
-      activeTab: '',
+      activeTab: 'current',
       filteredCourses: {
         current: {
           courses: [],
@@ -52,7 +50,6 @@ const coursesListProps = {
       },
     },
   },
-  isMainUserIdentity: true,
 };
 
 describe('List.vue', () => {
@@ -61,18 +58,7 @@ describe('List.vue', () => {
       propsData: coursesListProps,
     });
 
-    expect(wrapper.text()).toContain(T.courseList);
-    expect(wrapper.find('.card a.btn-primary').text()).toContain(T.courseNew);
-  });
-
-  it('Should handle empty courses list for identity', () => {
-    const wrapper = shallowMount(course_List, {
-      propsData: Object.assign({}, coursesListProps, {
-        isMainUserIdentity: false,
-      }),
-    });
-
-    expect(wrapper.text()).toContain(T.courseList);
-    expect(wrapper.find('.card a.btn-primary').exists()).toBeFalsy();
+    expect(wrapper.find('.public').text()).toContain(T.courseListPublicCourses);
+    expect(wrapper.find('.student').text()).toContain(T.courseListIStudy);
   });
 });
