@@ -8,6 +8,9 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemFormPayload();
+  if (payload.statusError) {
+    ui.error(payload.statusError);
+  }
   const problemNew = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -20,7 +23,7 @@ OmegaUp.on('ready', () => {
           'alias-changed': (alias: string): void => {
             api.Problem.details({ problem_alias: alias }, { quiet: true })
               .then((data) => {
-                this.errors.push('problem_alias');
+                problemNew.errors.push('problem_alias');
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
                     alias: ui.escape(alias),
@@ -30,27 +33,21 @@ OmegaUp.on('ready', () => {
               .catch((error) => {
                 if (error.httpStatusCode == 404) {
                   ui.dismissNotifications();
-                  this.errors = this.errors.filter(
+                  problemNew.errors = problemNew.errors.filter(
                     (error) => error !== 'problem_alias',
                   );
                   return;
                 }
-                this.errors.push(error.parameter);
+                problemNew.errors.push(error.parameter);
                 ui.apiError(error);
               });
           },
         },
       });
     },
-    data: { errors: <string[]>[] },
+    data: { errors: payload.parameter ? [payload.parameter] : [] },
     components: {
       'omegaup-problem-new': problem_New,
     },
   });
-  if (payload.statusError) {
-    ui.error(payload.statusError);
-  }
-  if (payload.parameter) {
-    problemNew.errors.push(payload.parameter);
-  }
 });
