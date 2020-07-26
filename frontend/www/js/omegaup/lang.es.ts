@@ -1153,6 +1153,8 @@ const translations: { [key: string]: string; } = {
   successfulOperation: "Operaci\u00f3n exitosa",
   tagAdded: "\u00a1Tag agregado exitosamente!",
   tagPrefixRestricted: "El prefijo 'problemTag' no puede ser usado para las etiquetas agregadas manualmente.",
+  tagProblemLevelNoSelected: "No se ha seleccionado un nivel para el problema",
+  tagProblemLevelSelected: "Nivel seleccionado",
   tagRemoved: "\u00a1Tag eliminado exitosamente!",
   tagRestricted: "La etiqueta no puede ser agregada o eliminada.",
   tagSourceLevel: "Nivel",
