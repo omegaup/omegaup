@@ -223,12 +223,12 @@ export default class CourseProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: omegaup.Assignment;
-  @Prop() visibilityMode!: omegaup.VisibilityMode;
+  @Prop() assignmentFormMode!: omegaup.AssignmentFormMode;
 
   typeahead = typeahead;
   T = T;
   assignment: Partial<omegaup.Assignment> = this.selectedAssignment;
-  showForm = this.visibilityMode === omegaup.VisibilityMode.AddProblem;
+  showForm = this.assignmentFormMode === omegaup.AssignmentFormMode.AddProblem;
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
@@ -244,7 +244,10 @@ export default class CourseProblemList extends Vue {
 
   onShowForm(): void {
     this.showForm = true;
-    this.$emit('update:visibility-mode', omegaup.VisibilityMode.AddProblem);
+    this.$emit(
+      'update:assignment-form-mode',
+      omegaup.AssignmentFormMode.AddProblem,
+    );
     this.problemAlias = '';
     this.difficulty = 'intro';
     this.topics = [];
@@ -292,9 +295,9 @@ export default class CourseProblemList extends Vue {
     this.$emit('emit-tags', this.tags);
   }
 
-  @Watch('visibilityMode')
-  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
-    if (newValue !== omegaup.VisibilityMode.AddProblem) {
+  @Watch('assignmentFormMode')
+  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
+    if (newValue !== omegaup.AssignmentFormMode.AddProblem) {
       this.showForm = false;
       return;
     }

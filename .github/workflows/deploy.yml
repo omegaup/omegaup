@@ -48,4 +48,4 @@ jobs:
           curl --request POST \
             --url https://api.github.com/repos/${{ github.repository }}/deployments \
             --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            --data "{\"ref\":\"${{ github.ref }}\",\"required_contexts\":[],\"environment\":\"${ENVIRONMENT}\"}"
+            --data "{\"ref\":\"${{ github.ref }}\",\"required_contexts\":[],\"environment\":\"${ENVIRONMENT}\",\"auto_merge\":false}"
