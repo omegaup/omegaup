@@ -17,14 +17,13 @@ describe('FilteredList.vue', () => {
     const wrapper = shallowMount(course_FilteredList, {
       propsData: {
         activeTab: 'past',
-        courses: {
+        courses: <types.CoursesByAccessMode>{
           accessMode: 'public',
           activeTab: 'current',
           filteredCourses: {
             current: {
               courses: [
                 {
-                  admission_mode: 'public',
                   alias: 'CC',
                   counts: {
                     homework: 2,
@@ -36,15 +35,14 @@ describe('FilteredList.vue', () => {
                   start_time: new Date(),
                 },
                 {
-                  admission_mode: 'public',
                   alias: 'cpluplus',
-                  counts: [],
+                  counts: {},
                   finish_time: new Date(),
                   name: 'Introducción a C++',
                   start_time: new Date(),
-                  timeType: 'current',
                 },
               ],
+              timeType: 'current',
             },
             past: {
               courses: [],
@@ -56,14 +54,5 @@ describe('FilteredList.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.courseListPastCourses);
-
-    // All the links are available
-    // await wrapper.find('a[data-tab-assignments]').trigger('click');
-    // await wrapper.find('a[data-tab-problems]').trigger('click');
-    // await wrapper.find('a[data-tab-admission-mode]').trigger('click');
-    // await wrapper.find('a[data-tab-students]').trigger('click');
-    // await wrapper.find('a[data-tab-admins]').trigger('click');
-    // await wrapper.find('a[data-tab-clone]').trigger('click');
-    // await wrapper.find('a[data-tab-course]').trigger('click');
   });
 });

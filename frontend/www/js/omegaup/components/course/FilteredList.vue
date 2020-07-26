@@ -133,7 +133,7 @@ library.add(fas);
   },
 })
 export default class CourseFilteredList extends Vue {
-  @Prop() courses!: types.CourseDetails[];
+  @Prop() courses!: types.CoursesByAccessMode;
   @Prop() activeTab!: string;
 
   T = T;
