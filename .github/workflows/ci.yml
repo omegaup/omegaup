@@ -29,7 +29,7 @@ jobs:
 
       - name: Download gitserver
         run: |
-          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.12/omegaup-gitserver.tar.xz'
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.14/omegaup-gitserver.tar.xz'
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
           # omegaup-gitserver depends on libinteractive.
@@ -156,7 +156,7 @@ jobs:
           MYSQL_DATABASE: omegaup
 
       frontend:
-        image: omegaup/dev-php:20200717
+        image: omegaup/dev-php:20200722
         ports:
           - 8001:8001
         volumes:
@@ -166,7 +166,7 @@ jobs:
           CI: true
 
       gitserver:
-        image: omegaup/dev-gitserver:20200715
+        image: omegaup/dev-gitserver:20200722
         volumes:
           - omegaupdata:/var/lib/omegaup
 
@@ -235,8 +235,10 @@ jobs:
         run: |
           mysql \
             -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-          python3 stuff/bootstrap-environment.py \
-          --purge --verbose
+          # Create directory to prevent --purge from failing.
+          sudo mkdir -p /var/lib/omegaup
+          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
+          python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
         run: yarn install
