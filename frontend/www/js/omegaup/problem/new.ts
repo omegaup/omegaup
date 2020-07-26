@@ -21,6 +21,9 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'alias-changed': (alias: string): void => {
+            if (!alias) {
+              return;
+            }
             api.Problem.details({ problem_alias: alias }, { quiet: true })
               .then((data) => {
                 problemNew.errors.push('problem_alias');

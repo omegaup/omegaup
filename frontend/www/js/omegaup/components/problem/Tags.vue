@@ -95,14 +95,14 @@
         </tbody>
       </table>
       <div class="row">
-        <div class="form-group col-md-8">
+        <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
           <select
             required
             class="form-control"
             name="problem-level"
             v-model="problemLevelTag"
-            v-on:click.prevent="onSelectProblemLevel"
+            v-on:change="onSelectProblemLevel"
           >
             <option v-for="levelTag in levelTags" v-bind:value="levelTag">
               {{ T[levelTag] }}
@@ -129,20 +129,6 @@
               {{ T.deleteProblemLevel }}
             </button>
           </template>
-        </div>
-        <div class="col-md-4" v-if="!problemLevelSelected && !problemLevel">
-          <label class="font-weight-bold">{{
-            T.tagProblemLevelSelected
-          }}</label>
-          <p class="text-warning">{{ T.tagProblemLevelNoSelected }}</p>
-        </div>
-        <div class="col-md-4" v-else="">
-          <label class="font-weight-bold">{{
-            T.tagProblemLevelSelected
-          }}</label>
-          <p class="text-success">
-            {{ T[problemLevelTagSelected] || T[problemLevel] }}
-          </p>
         </div>
       </div>
       <div class="form-group">
