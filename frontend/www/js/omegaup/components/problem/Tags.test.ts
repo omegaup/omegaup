@@ -8,7 +8,7 @@ import { omegaup } from '../../omegaup';
 
 import problem_Tags from './Tags.vue';
 
-const problemTagsPropsData = {
+const baseProblemTagsPropsData = {
   alias: '',
   canAddNewTags: true,
   initialAllowTags: true,
@@ -22,7 +22,6 @@ const problemTagsPropsData = {
     'problemLevelIntermediateDataStructuresAndAlgorithms',
     'problemLevelIntermediateMathsInProgramming',
   ],
-  problemLevel: null,
   publicTags: <string[]>['some', 'public', 'tags'],
   selectedPrivateTags: <string[]>[],
   selectedPublicTags: <string[]>[],
@@ -32,7 +31,7 @@ const problemTagsPropsData = {
 describe('Tags.vue', () => {
   it('Should handle problem tags form when problem is created', () => {
     const wrapper = mount(problem_Tags, {
-      propsData: problemTagsPropsData,
+      propsData: baseProblemTagsPropsData,
     });
 
     expect(wrapper.text()).not.toContain(T.updateProblemLevel);
@@ -40,9 +39,11 @@ describe('Tags.vue', () => {
 
   it('Should handle problem tags form when problem is edited', () => {
     const wrapper = mount(problem_Tags, {
-      propsData: problemTagsPropsData,
+      propsData: Object.assign({}, baseProblemTagsPropsData, {
+        isCreate: false,
+      }),
     });
 
-    expect(wrapper.text()).not.toContain(T.updateProblemLevel);
+    expect(wrapper.text()).toContain(T.updateProblemLevel);
   });
 });
