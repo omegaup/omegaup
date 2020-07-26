@@ -1690,6 +1690,7 @@ export namespace types {
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
     parameter?: string;
+    problem_level: string;
     publicTags: string[];
     selectedTags?: types.SelectedTag[];
     showDiff: string;

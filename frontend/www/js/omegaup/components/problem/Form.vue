@@ -169,6 +169,7 @@
             v-on:emit-remove-tag="removeTag"
             v-on:select-problem-level="selectProblemLevel"
             v-bind:is-create="true"
+            v-bind:problem-level="problemLevel"
             v-bind:selected-private-tags="selectedPrivateTags"
             v-bind:selected-public-tags="selectedPublicTags"
             v-bind:can-add-new-tags="true"
@@ -230,7 +231,6 @@
               v-bind:title="
                 !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
               "
-              v-bind:disabled="!problemLevel && !isUpdate"
             >
               {{ buttonText }}
             </button>
@@ -265,6 +265,7 @@ import { types } from '../../api_types';
 })
 export default class ProblemForm extends Vue {
   @Prop() data!: types.ProblemFormPayload;
+  @Prop({ default: () => [] }) errors!: string[];
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
 
@@ -285,13 +286,12 @@ export default class ProblemForm extends Vue {
   validator = this.data.validator;
   languages = this.data.languages;
   tags = this.data.tags;
-  problemLevel = '';
+  problemLevel = this.data.problem_level || '';
   showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
   message = '';
   hasFile = false;
   public = false;
-  errors: string[] = [];
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';

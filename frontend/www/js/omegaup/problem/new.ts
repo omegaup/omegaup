@@ -14,12 +14,13 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-new', {
         props: {
           data: payload,
+          errors: this.errors,
         },
         on: {
           'alias-changed': (alias: string): void => {
             api.Problem.details({ problem_alias: alias }, { quiet: true })
               .then((data) => {
-                component.errors.push('problem_alias');
+                this.errors.push('problem_alias');
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
                     alias: ui.escape(alias),
@@ -29,28 +30,27 @@ OmegaUp.on('ready', () => {
               .catch((error) => {
                 if (error.httpStatusCode == 404) {
                   ui.dismissNotifications();
-                  component.errors = component.errors.filter(
+                  this.errors = this.errors.filter(
                     (error) => error !== 'problem_alias',
                   );
                   return;
                 }
-                component.errors.push(error.parameter);
+                this.errors.push(error.parameter);
                 ui.apiError(error);
               });
           },
         },
-        ref: 'component',
       });
     },
+    data: { errors: <string[]>[] },
     components: {
       'omegaup-problem-new': problem_New,
     },
   });
-  const component = <problem_New>problemNew.$refs.component;
   if (payload.statusError) {
     ui.error(payload.statusError);
   }
   if (payload.parameter) {
-    component.errors.push(payload.parameter);
+    problemNew.errors.push(payload.parameter);
   }
 });
