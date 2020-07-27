@@ -264,8 +264,6 @@ export default class ProblemTags extends Vue {
   T = T;
   allowTags = this.initialAllowTags;
   problemLevelTag: string | null = this.problemLevel;
-  problemLevelSelected = false;
-  problemLevelTagSelected = '';
   newPrivateTag = '';
 
   addPublicTag(tag: string): void {
@@ -293,8 +291,6 @@ export default class ProblemTags extends Vue {
 
   onSelectProblemLevel(): void {
     if (this.problemLevelTag) {
-      this.problemLevelSelected = true;
-      this.problemLevelTagSelected = this.problemLevelTag;
       this.$emit('select-problem-level', this.problemLevelTag);
     }
   }
