@@ -429,9 +429,11 @@ class ProblemDeployer {
         }
 
         if ($result['statusCode'] == 409) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'problemAliasExists'
             );
+            $exception->addCustomMessageToArray('parameter', 'problem_alias');
+            throw $exception;
         }
         if ($result['retval'] != 0) {
             $errorMessage = 'problemDeployerInternalError';

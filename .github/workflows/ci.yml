@@ -235,8 +235,10 @@ jobs:
         run: |
           mysql \
             -e 'CREATE USER "omegaup"@"localhost" IDENTIFIED BY "omegaup";'
-          python3 stuff/bootstrap-environment.py \
-          --purge --verbose
+          # Create directory to prevent --purge from failing.
+          sudo mkdir -p /var/lib/omegaup
+          sudo chown "$(id -u)":"$(id -g)" /var/lib/omegaup
+          python3 stuff/bootstrap-environment.py --purge --verbose
 
       - name: Install yarn dependencies
         run: yarn install

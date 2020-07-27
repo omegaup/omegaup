@@ -35,10 +35,12 @@ describe('Details.vue', () => {
     });
 
     expect(wrapper.text()).toContain(courseName);
-    expect(wrapper.find('a[data-button-homework]').text()).toBe(
-      T.wordsNewHomework,
+    expect(wrapper.find('a[data-button-progress-students]').text()).toBe(
+      T.courseStudentsProgress,
     );
-    expect(wrapper.find('a[data-button-exam]').text()).toBe(T.wordsNewExam);
+    expect(wrapper.find('a[data-button-manage-students]').text()).toBe(
+      T.wordsAddStudent,
+    );
   });
 
   it('Should handle empty assignments and progress as student', () => {
@@ -67,8 +69,10 @@ describe('Details.vue', () => {
       },
     });
 
-    expect(wrapper.find('a[data-button-homework]').exists()).toBe(false);
-    expect(wrapper.find('a[data-button-exam]').exists()).toBe(false);
+    expect(
+      wrapper.find('a[data-button-progress-students]').exists(),
+    ).toBeFalsy();
+    expect(wrapper.find('a[data-button-manage-students]').exists()).toBeFalsy();
   });
 
   it('Should handle assignments without finish_time', () => {
