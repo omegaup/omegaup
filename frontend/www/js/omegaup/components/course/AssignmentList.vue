@@ -124,7 +124,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -177,6 +177,11 @@ export default class CourseAssignmentList extends Vue {
         (assignment: types.CourseAssignment) => assignment.alias,
       ),
     );
+  }
+
+  @Watch('content')
+  onContentChanged(newValue: types.CourseAssignment[]): void {
+    this.currentContent = newValue;
   }
 }
 </script>

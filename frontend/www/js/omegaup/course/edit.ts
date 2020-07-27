@@ -386,7 +386,7 @@ OmegaUp.on('ready', () => {
       refreshAssignmentsList: (): void => {
         api.Course.listAssignments({ course_alias: courseAlias })
           .then((response) => {
-            courseEdit.data.course.assignments = response.assignments;
+            component.assignments = response.assignments;
             component.onResetAssignmentForm();
           })
           .catch(ui.apiError);

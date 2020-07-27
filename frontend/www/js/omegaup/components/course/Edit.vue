@@ -93,7 +93,7 @@
         v-if="showTab === 'content'"
       >
         <omegaup-course-assignment-list
-          v-bind:content="data.course.assignments"
+          v-bind:content="assignments"
           v-bind:course-alias="data.course.alias"
           v-bind:assignment-form-mode="assignmentFormMode"
           v-on:emit-new="onNewAssignment"
@@ -298,9 +298,9 @@ export default class CourseEdit extends Vue {
   showTab = this.initialTab;
 
   assignmentProblems = this.data.assignmentProblems;
+  assignments = this.data.course.assignments;
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
-
   assignment = emptyAssignment;
 
   get courseURL(): string {

@@ -311,7 +311,7 @@ export default class CourseAssignmentDetails extends Vue {
   }
 
   onSubmit(): void {
-    this.$emit('emit-submit', this, this.scheduledProblemList.problems);
+    this.$emit('emit-submit', this, this.scheduledProblemList?.problems ?? []);
   }
 }
 </script>
