@@ -17,11 +17,17 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-new', {
         props: {
           data: payload,
+          errors: this.errors,
         },
         on: {
           'alias-changed': (alias: string): void => {
+            if (!alias) {
+              problemNew.errors.push('problem_alias');
+              return;
+            }
             api.Problem.details({ problem_alias: alias }, { quiet: true })
               .then((data) => {
+                problemNew.errors.push('problem_alias');
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
                     alias: ui.escape(alias),
@@ -31,14 +37,19 @@ OmegaUp.on('ready', () => {
               .catch((error) => {
                 if (error.httpStatusCode == 404) {
                   ui.dismissNotifications();
+                  problemNew.errors = problemNew.errors.filter(
+                    (error) => error !== 'problem_alias',
+                  );
                   return;
                 }
+                problemNew.errors.push(error.parameter);
                 ui.apiError(error);
               });
           },
         },
       });
     },
+    data: { errors: payload.parameter ? [payload.parameter] : [] },
     components: {
       'omegaup-problem-new': problem_New,
     },

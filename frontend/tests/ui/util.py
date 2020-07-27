@@ -299,7 +299,7 @@ def create_problem(
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//input[@name = "alias"]'))).send_keys(problem_alias)
+                 '//input[@name = "problem_alias"]'))).send_keys(problem_alias)
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
@@ -326,14 +326,6 @@ def create_problem(
             )
         )
     ).select_by_value('problemLevelBasicKarel')
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (
-                By.CSS_SELECTOR,
-                'button[data-level-button]'
-            )
-        )
-    ).click()
     contents_element = driver.browser.find_element_by_name(
         'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
