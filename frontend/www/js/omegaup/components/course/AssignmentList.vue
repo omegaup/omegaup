@@ -149,17 +149,17 @@ export default class CourseAssignmentList extends Vue {
   contentOrderChanged = false;
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
-  course_AssignmentList_content: types.CourseAssignment[] = this.content;
+  currentContent: types.CourseAssignment[] = this.content;
 
   assignmentUrl(assignment: omegaup.Assignment): string {
     return `/course/${this.courseAlias}/assignment/${assignment.alias}/`;
   }
 
   sortContent(event: any): void {
-    this.course_AssignmentList_content.splice(
+    this.currentContent.splice(
       event.newIndex,
       0,
-      this.course_AssignmentList_content.splice(event.oldIndex, 1)[0],
+      this.currentContent.splice(event.oldIndex, 1)[0],
     );
     this.contentOrderChanged = true;
   }
@@ -169,7 +169,7 @@ export default class CourseAssignmentList extends Vue {
     this.$emit(
       'emit-sort-content',
       this.courseAlias,
-      this.course_AssignmentList_content.map(
+      this.currentContent.map(
         (assignment: types.CourseAssignment) => assignment.alias,
       ),
     );
