@@ -1,6 +1,41 @@
 <?php
 
 class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
+    public function testAssignmentsWithOriginalOrder() {
+        // Create a course with 5 assignments
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+
+        // Login admin and getting assignments list
+        $adminLogin = self::login($courseData['admin']);
+        foreach (range(1, 5) as $index) {
+            \OmegaUp\Controllers\Course::apiCreateAssignment(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'name' => "AssignmentNo {$index}",
+                    'alias' => \OmegaUp\Test\Utils::createRandomString(),
+                    'description' => \OmegaUp\Test\Utils::createRandomString(),
+                    'start_time' => (\OmegaUp\Time::get() + 60),
+                    'finish_time' => (\OmegaUp\Time::get() + 120),
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_type' => 'homework'
+                ])
+            );
+        }
+
+        [
+            'assignments' => $assignments
+        ] = \OmegaUp\Controllers\Course::apiListAssignments(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias']
+            ])
+        );
+
+        foreach ($assignments as $index => $assignment) {
+            $this->assertEquals($assignment['order'], $index + 1);
+        }
+    }
+
     public function testOrderAssignments() {
         // Create a course with 5 assignments
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(

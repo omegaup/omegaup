@@ -866,6 +866,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'addedProblems' => $addedProblems,
         ] = self::validateCreateAssignment($r, $course);
 
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -882,7 +887,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'assignment_type' => $r['assignment_type'],
                 'start_time' => $r['start_time'],
                 'finish_time' => $r['finish_time'],
-                'order' => intval($r['order']),
+                'order' => !empty($r['order'])
+                  ? intval($r['order'])
+                : \OmegaUp\DAO\Assignments::getNextPositionOrder(
+                    $course->course_id
+                ),
             ]),
             $r->identity,
             $addedProblems
