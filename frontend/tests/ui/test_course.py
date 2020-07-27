@@ -302,15 +302,14 @@ def add_assignment_with_problem(driver, assignment_alias, problem_alias):
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH, (
-                '//a[contains(@href, "#assignments")]')))).click()
+                '//a[contains(@href, "#content")]')))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, 'div[data-assignments-tab]')))
+            (By.CSS_SELECTOR, 'div[data-content-tab]')))
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             'div[data-assignments-tab] .new button'))).click()
+            (By.CSS_SELECTOR, 'div[data-content-tab] .new button'))).click()
 
     driver.wait.until(
         EC.visibility_of_element_located(

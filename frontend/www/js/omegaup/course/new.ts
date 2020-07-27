@@ -68,7 +68,7 @@ OmegaUp.on('ready', () => {
                   .then(() => {
                     this.invalidParameterName = '';
                     window.location.replace(
-                      `/course/${source.alias}/edit/#assignments`,
+                      `/course/${source.alias}/edit/#content`,
                     );
                   })
                   .catch((error) => {

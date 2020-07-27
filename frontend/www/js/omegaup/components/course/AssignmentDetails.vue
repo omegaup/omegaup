@@ -43,9 +43,9 @@
           </div>
           <div class="form-group col-md-4">
             <label
-              >{{ T.courseAssignmentNewFormType }}
+              >{{ T.wordsContentType }}
               <font-awesome-icon
-                v-bind:title="T.courseAssignmentNewFormTypeDesc"
+                v-bind:title="T.courseContentNewFormTypeDesc"
                 icon="info-circle"
               />
               <select
@@ -56,6 +56,9 @@
                 v-model="assignmentType"
                 required
               >
+                <option value="lesson">
+                  {{ T.wordsLesson }}
+                </option>
                 <option value="homework">
                   {{ T.wordsHomework }}
                 </option>

@@ -24,12 +24,12 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#assignments"
+          href="#content"
           class="nav-link"
-          data-tab-assignments
+          data-tab-content
           v-on:click="onSelectAssignmentTab"
-          v-bind:class="{ active: showTab === 'assignments' }"
-          >{{ T.wordsAssignments }}</a
+          v-bind:class="{ active: showTab === 'content' }"
+          >{{ T.wordsContent }}</a
         >
       </li>
       <li class="nav-item" role="presentation">
@@ -87,13 +87,13 @@
       </div>
 
       <div
-        data-assignments-tab
+        data-content-tab
         class="tab-pane active"
         role="tabpanel"
-        v-if="showTab === 'assignments'"
+        v-if="showTab === 'content'"
       >
         <omegaup-course-assignment-list
-          v-bind:assignments="data.course.assignments"
+          v-bind:content="data.course.assignments"
           v-bind:course-alias="data.course.alias"
           v-bind:assignment-form-mode="assignmentFormMode"
           v-on:emit-new="onNewAssignment"
@@ -102,13 +102,9 @@
           v-on:emit-delete="
             (assignment) => $emit('delete-assignment', assignment)
           "
-          v-on:emit-sort-homeworks="
-            (courseAlias, homeworksAliases) =>
-              $emit('sort-homeworks', courseAlias, homeworksAliases)
-          "
-          v-on:emit-sort-tests="
-            (courseAlias, testsAliases) =>
-              $emit('sort-tests', courseAlias, testsAliases)
+          v-on:emit-sort-content="
+            (courseAlias, contentAliases) =>
+              $emit('sort-content', courseAlias, contentAliases)
           "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
@@ -258,7 +254,7 @@ const defaultStartTime = now;
 const defaultFinishTime = finishTime;
 const availableTabs = [
   'course',
-  'assignments',
+  'content',
   'problems',
   'admission-mode',
   'students',
@@ -349,7 +345,7 @@ export default class CourseEdit extends Vue {
   }
 
   onSelectAssignmentTab(): void {
-    this.showTab = 'assignments';
+    this.showTab = 'content';
     this.onResetAssignmentForm();
   }
 

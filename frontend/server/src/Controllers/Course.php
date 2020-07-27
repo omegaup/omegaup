@@ -138,7 +138,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['assignment_type'],
             'assignment_type',
-            ['test', 'homework']
+            ['test', 'lesson', 'homework']
         );
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -538,7 +538,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
 
             foreach ($assignmentsProblems as $assignment => $assignmentProblems) {
-                // Create and assign homeworks and tests to new course
+                // Create and assign homeworks, lessons and tests to new course
                 $problemset = self::createAssignment(
                     $originalCourse,
                     new \OmegaUp\DAO\VO\Assignments([
