@@ -34,9 +34,9 @@
           </div>
           <div class="form-group col-md-4">
             <label
-              >{{ T.courseAssignmentNewFormType }}
+              >{{ T.wordsContentType }}
               <font-awesome-icon
-                v-bind:title="T.courseAssignmentNewFormTypeDesc"
+                v-bind:title="T.courseContentNewFormTypeDesc"
                 icon="info-circle"
               />
               <select
@@ -47,6 +47,9 @@
                 v-model="assignmentType"
                 required
               >
+                <option value="lesson">
+                  {{ T.wordsLesson }}
+                </option>
                 <option value="homework">
                   {{ T.wordsHomework }}
                 </option>
@@ -170,6 +173,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
 
@@ -195,7 +199,7 @@ export default class CourseAssignmentDetails extends Vue {
     default: omegaup.AssignmentFormMode.Default,
   })
   assignmentFormMode!: omegaup.AssignmentFormMode;
-  @Prop() assignment!: omegaup.Assignment;
+  @Prop() assignment!: types.CourseAssignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
