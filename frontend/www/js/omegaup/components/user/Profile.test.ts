@@ -45,9 +45,7 @@ describe('Profilev2.vue', () => {
           },
           createdProblems: [],
           solvedProblems: [],
-          stats: {
-            runs: [],
-          },
+          stats: [],
           unsolvedProblems: [],
           currentUsername: 'omegaup',
           gravatarURL51:
