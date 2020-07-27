@@ -299,7 +299,7 @@ def create_problem(
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//input[@name = "alias"]'))).send_keys(problem_alias)
+                 '//input[@name = "problem_alias"]'))).send_keys(problem_alias)
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
