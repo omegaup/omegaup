@@ -114,7 +114,7 @@
           v-bind:finish-time-course="data.course.finish_time"
           v-bind:start-time-course="data.course.start_time"
           v-bind:assignment="assignment"
-          v-bind:assignment-problems="data.assignmentProblems"
+          v-bind:assignment-problems="assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
           v-bind:invalid-parameter-name="invalidParameterName"
           v-on:add-problem="
@@ -297,6 +297,7 @@ export default class CourseEdit extends Vue {
   T = T;
   showTab = this.initialTab;
 
+  assignmentProblems = this.data.assignmentProblems;
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
 
@@ -309,7 +310,7 @@ export default class CourseEdit extends Vue {
   onNewAssignment(): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.New;
     this.assignment = emptyAssignment;
-    this.data.assignmentProblems = [];
+    this.assignmentProblems = [];
     this.$nextTick(() => {
       this.assignmentDetails.$el.scrollIntoView();
       (<HTMLElement>this.assignmentDetails.$refs.name).focus();

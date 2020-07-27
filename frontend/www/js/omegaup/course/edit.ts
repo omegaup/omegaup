@@ -397,7 +397,7 @@ OmegaUp.on('ready', () => {
           course: courseAlias,
         })
           .then((response) => {
-            courseEdit.data.assignmentProblems = response.problems;
+            component.assignmentProblems = response.problems;
           })
           .catch(ui.apiError);
       },
