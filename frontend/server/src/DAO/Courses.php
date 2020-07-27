@@ -221,9 +221,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $allProgress[$username]['progress'][$assignmentAlias] = [];
             }
 
-            $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = is_null(
+            $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = floatval(
                 $row['problem_score']
-            ) ? 0.0 : $row['problem_score'];
+            );
         }
 
         usort(
