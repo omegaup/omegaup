@@ -183,11 +183,11 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
     public $publish_time_delay = null;
 
     /**
-     * [Campo no documentado]
+     * Almacena el tipo de contenido que se va a dar de alta
      *
-     * @var string|null
+     * @var string
      */
-    public $assignment_type = null;
+    public $assignment_type = 'homework';
 
     /**
      * [Campo no documentado]
