@@ -49,7 +49,7 @@ describe('Edit.vue', () => {
     expect(wrapper.text()).toContain(courseName);
 
     // All the links are available
-    await wrapper.find('a[data-tab-assignments]').trigger('click');
+    await wrapper.find('a[data-tab-content]').trigger('click');
     await wrapper.find('a[data-tab-problems]').trigger('click');
     await wrapper.find('a[data-tab-admission-mode]').trigger('click');
     await wrapper.find('a[data-tab-students]').trigger('click');
