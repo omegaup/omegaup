@@ -30,7 +30,7 @@
  * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
  * @psalm-type StudentCourses=array{public?: CoursesByAccessMode, student?: CoursesByAccessMode}
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
- * @psalm-type CourseListPayload=array{courses: StudentCourses, access_mode: null|string}
+ * @psalm-type CourseListPayload=array{courses: StudentCourses, course_type: null|string}
  * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
@@ -2779,7 +2779,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $access_mode
+     * @omegaup-request-param mixed $course_type
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
@@ -2795,8 +2795,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $coursesTypes = ['public', 'student'];
 
         \OmegaUp\Validators::validateOptionalInEnum(
-            $r['access_mode'],
-            'access_mode',
+            $r['course_type'],
+            'course_type',
             $coursesTypes
         );
 
@@ -2805,8 +2805,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $filteredCourses = [];
         foreach ($coursesTypes as $courseType) {
             if (
-                $r['access_mode'] != $courseType
-                && !is_null($r['access_mode'])
+                !is_null($r['course_type']) &&
+                $r['course_type'] != $courseType
             ) {
                 continue;
             }
@@ -2848,7 +2848,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'courses' => $filteredCourses,
-                    'access_mode' => $r['access_mode']
+                    'course_type' => $r['course_type']
                 ],
                 'title' => 'courseList',
             ],

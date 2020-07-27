@@ -128,44 +128,26 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $identityId
             );
 
-            /** @var float */
             $points = array_reduce(
                 $assignmentsProgress,
                 /**
-                 * @param float|null $accumulator
                  * @param array{score: float, max_score: float} $item
                  */
-                function (
-                    $accumulator,
-                    $item
-                ): float {
-                    if (is_null($accumulator)) {
-                        $accumulator = $item['score'];
-                        return $accumulator;
-                    }
-                    $accumulator += $item['score'];
-                    return $accumulator;
-                }
+                function (float $accumulator, $item): float {
+                    return $accumulator + $item['score'];
+                },
+                0.0
             );
 
-            /** @var float */
             $maxPoints = array_reduce(
                 $assignmentsProgress,
                 /**
-                 * @param float|null $accumulator
                  * @param array{score: float, max_score: float} $item
                  */
-                function (
-                    $accumulator,
-                    $item
-                ): float {
-                    if (is_null($accumulator)) {
-                        $accumulator = $item['score'];
-                        return $accumulator;
-                    }
-                    $accumulator += $item['max_score'];
-                    return $accumulator;
-                }
+                function (float $accumulator, $item): float {
+                    return $accumulator + $item['max_score'];
+                },
+                0.0
             );
 
             $row['assignments'] = [];

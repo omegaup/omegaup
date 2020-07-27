@@ -1401,7 +1401,7 @@ export namespace types {
   }
 
   export interface CourseListPayload {
-    access_mode?: string;
+    course_type?: string;
     courses: types.StudentCourses;
   }
 
