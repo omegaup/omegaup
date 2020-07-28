@@ -16,7 +16,7 @@ class ProblemParams {
     public $title;
 
     /**
-     * @var string
+     * @var 'deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'|null
      */
     public $visibility;
 
@@ -206,11 +206,11 @@ class Problem {
         $visibility = $params->visibility;
 
         if (
-            strval($visibility) === 'public_banned'
-            || strval($visibility) === 'private_banned'
-            || strval($visibility) === 'public_warning'
-            || strval($visibility) === 'private_warning'
-            || strval($visibility) === 'promoted'
+            $visibility === 'public_banned'
+            || $visibility === 'private_banned'
+            || $visibility === 'public_warning'
+            || $visibility === 'private_warning'
+            || $visibility === 'promoted'
         ) {
             switch (strval($visibility)) {
                 case 'private_banned':
