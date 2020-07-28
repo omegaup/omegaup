@@ -125,8 +125,8 @@
           v-bind:start-time-course="data.course.start_time"
           v-bind:assignment="assignment"
           v-bind:invalid-parameter-name="invalidParameterName"
-          v-on:emit-cancel="onResetAssignmentForm"
-          v-on:emit-submit="
+          v-on:cancel="onResetAssignmentForm"
+          v-on:submit="
             (assignmentFormComponent) =>
               $emit('submit-new-assignment', assignmentFormComponent)
           "
@@ -315,7 +315,6 @@ export default class CourseEdit extends Vue {
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
-  @Prop({ default: null }) assignmentAlias!: string;
 
   T = T;
   showTab = this.initialTab;
@@ -325,12 +324,6 @@ export default class CourseEdit extends Vue {
 
   assignment = emptyAssignment;
   selectedAssignment = this.data.selectedAssignment;
-
-  mounted() {
-    if (this.assignmentAlias && this.data.selectedAssignment) {
-      this.onEditAssignment(this.data.selectedAssignment);
-    }
-  }
 
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;

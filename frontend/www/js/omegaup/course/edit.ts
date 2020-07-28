@@ -30,7 +30,6 @@ OmegaUp.on('ready', () => {
         props: {
           data: this.data,
           initialTab: this.initialTab,
-          assignmentAlias: this.assignmentAlias,
           invalidParameterName: this.invalidParameterName,
         },
         on: {
@@ -428,7 +427,6 @@ OmegaUp.on('ready', () => {
       initialTab: window.location.hash
         ? window.location.hash.substr(1)
         : 'course',
-      assignmentAlias: path && path[2] ? path[2] : null,
       invalidParameterName: '',
     },
     components: {

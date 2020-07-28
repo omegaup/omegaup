@@ -1334,6 +1334,7 @@ const translations: { [key: string]: string; } = {
   wordsConfirm: "(C0nfirm)",
   wordsConsole: "(C0n5013)",
   wordsContent: "(C0n73n7)",
+  wordsContentEdit: "(Edi7 c0n73n7)",
   wordsContentType: "(C0n73n7 7yp3)",
   wordsContest: "(C0n7357)",
   wordsContestant: "(C0n7357an7)",

@@ -1334,6 +1334,7 @@ const translations: { [key: string]: string; } = {
   wordsConfirm: "Confirmar",
   wordsConsole: "Consola",
   wordsContent: "Contenido",
+  wordsContentEdit: "Editar contenido",
   wordsContentType: "Tipo de contenido",
   wordsContest: "Concurso",
   wordsContestant: "Concursante",

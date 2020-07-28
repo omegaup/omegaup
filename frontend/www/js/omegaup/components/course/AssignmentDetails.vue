@@ -1,5 +1,8 @@
 <template>
   <div class="omegaup-course-assignmentdetails card" v-show="show">
+    <div class="card-header" v-if="showOnEditSingleAssignment">
+      <h1>{{ T.wordsContentEdit }}</h1>
+    </div>
     <div class="card-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -156,7 +159,7 @@
             type="reset"
             v-on:click.prevent="onCancel"
           >
-            {{ T.wordsCancel }}
+            {{ !showOnEditSingleAssignment ? T.wordsCancel : T.wordsBack }}
           </button>
         </div>
       </form>
@@ -203,6 +206,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
+  @Prop({ default: false }) showOnEditSingleAssignment!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
 
   T = T;
@@ -213,8 +217,8 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
-  show = false;
-  update = false;
+  show = this.showOnEditSingleAssignment;
+  update = this.showOnEditSingleAssignment;
 
   @Watch('assignment')
   onAssignmentChange() {
@@ -253,13 +257,14 @@ export default class CourseAssignmentDetails extends Vue {
     this.unlimitedDuration = !this.assignment.finish_time;
   }
 
-  @Emit('emit-cancel')
+  @Emit('cancel')
   onCancel(): void {
+    if (this.showOnEditSingleAssignment) return;
     this.reset();
   }
 
   onSubmit(): void {
-    this.$emit('emit-submit', this);
+    this.$emit('submit', this);
   }
 }
 </script>

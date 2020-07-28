@@ -155,7 +155,7 @@
                 >
                 <a
                   class="mr-2"
-                  v-bind:href="`/course/${course.alias}/edit/${assignment.alias}/#assignments`"
+                  v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/edit/`"
                 >
                   <font-awesome-icon v-bind:icon="['fas', 'edit']" />
                   {{ T.wordsEdit }}
