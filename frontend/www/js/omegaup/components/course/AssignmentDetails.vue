@@ -1,8 +1,10 @@
 <template>
   <div class="omegaup-course-assignmentdetails card" v-show="show">
-    <div class="card-header" v-if="showOnEditSingleAssignment">
-      <h1>{{ T.wordsContentEdit }}</h1>
-    </div>
+    <slot name="page-header">
+      <div class="card-header">
+        <h1>{{ T.wordsContentEdit }}</h1>
+      </div>
+    </slot>
     <div class="card-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -159,7 +161,7 @@
             type="reset"
             v-on:click.prevent="onCancel"
           >
-            {{ !showOnEditSingleAssignment ? T.wordsCancel : T.wordsBack }}
+            <slot name="cancel-button">{{ T.wordsBack }}</slot>
           </button>
         </div>
       </form>
@@ -206,7 +208,6 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
-  @Prop({ default: false }) showOnEditSingleAssignment!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
 
   T = T;
@@ -217,33 +218,37 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
-  show = this.showOnEditSingleAssignment;
-  update = this.showOnEditSingleAssignment;
 
   @Watch('assignment')
   onAssignmentChange() {
     this.reset();
   }
 
-  @Watch('assignmentFormMode')
-  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
-    switch (newValue) {
+  get show(): boolean {
+    switch (this.assignmentFormMode) {
       case omegaup.AssignmentFormMode.New:
-        this.show = true;
-        this.update = false;
         this.reset();
-        break;
+        return true;
       case omegaup.AssignmentFormMode.Edit:
-        this.show = true;
-        this.update = true;
-        break;
+        return true;
       case omegaup.AssignmentFormMode.Default:
-        this.show = false;
-        this.update = true;
-        break;
+        return false;
       default:
-        this.show = false;
-        this.update = true;
+        return false;
+    }
+  }
+
+  get update(): boolean {
+    switch (this.assignmentFormMode) {
+      case omegaup.AssignmentFormMode.New:
+        this.reset();
+        return false;
+      case omegaup.AssignmentFormMode.Edit:
+        return true;
+      case omegaup.AssignmentFormMode.Default:
+        return true;
+      default:
+        return true;
     }
   }
 
@@ -259,7 +264,6 @@ export default class CourseAssignmentDetails extends Vue {
 
   @Emit('cancel')
   onCancel(): void {
-    if (this.showOnEditSingleAssignment) return;
     this.reset();
   }
 

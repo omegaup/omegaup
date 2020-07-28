@@ -130,7 +130,10 @@
             (assignmentFormComponent) =>
               $emit('submit-new-assignment', assignmentFormComponent)
           "
-        ></omegaup-course-assignment-details>
+        >
+          <template slot="page-header"><div></div></template>
+          <template slot="cancel-button">{{ T.wordsCancel }}</template>
+        </omegaup-course-assignment-details>
       </div>
 
       <div

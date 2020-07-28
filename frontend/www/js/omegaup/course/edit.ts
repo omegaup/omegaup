@@ -20,9 +20,6 @@ Vue.use(Clipboard);
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
-  const path = /\/course\/([^\/]+)\/edit\/([^\/]+)\/([^\/]+)?/.exec(
-    window.location.pathname,
-  );
   const courseEdit = new Vue({
     el: '#main-container',
     render: function (createElement) {
