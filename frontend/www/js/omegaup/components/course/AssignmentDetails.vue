@@ -156,13 +156,15 @@
               {{ T.courseAssignmentNewFormSchedule }}
             </template>
           </button>
-          <button
-            class="btn btn-secondary"
-            type="reset"
-            v-on:click.prevent="onCancel"
-          >
-            <slot name="cancel-button">{{ T.wordsBack }}</slot>
-          </button>
+          <slot name="cancel-button">
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              v-on:click.prevent="onCancel"
+            >
+              {{ T.wordsBack }}
+            </button>
+          </slot>
         </div>
       </form>
     </div>
@@ -241,7 +243,6 @@ export default class CourseAssignmentDetails extends Vue {
   get update(): boolean {
     switch (this.assignmentFormMode) {
       case omegaup.AssignmentFormMode.New:
-        this.reset();
         return false;
       case omegaup.AssignmentFormMode.Edit:
         return true;
@@ -262,9 +263,14 @@ export default class CourseAssignmentDetails extends Vue {
     this.unlimitedDuration = !this.assignment.finish_time;
   }
 
+  @Watch('show')
+  onShowChanged(newValue: boolean): void {
+    this.reset();
+  }
+
   @Emit('cancel')
   onCancel(): void {
-    this.reset();
+    //this.reset();
   }
 
   onSubmit(): void {
