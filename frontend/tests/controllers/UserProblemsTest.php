@@ -87,7 +87,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'author' => $identity
         ]));
         $problemAuthorData[1] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0,
+            'visibility' => 'private',
             'author' => $identity
         ]));
 
