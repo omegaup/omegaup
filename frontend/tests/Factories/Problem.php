@@ -16,7 +16,7 @@ class ProblemParams {
     public $title;
 
     /**
-     * @var 'deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'|null
+     * @var 'deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'
      */
     public $visibility;
 
@@ -51,7 +51,7 @@ class ProblemParams {
     public $allowUserAddTags;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: string, author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string} $params
+     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -169,10 +169,11 @@ class Problem {
         if (is_null($params)) {
             $params = new \OmegaUp\Test\Factories\ProblemParams();
         }
-        if ($params->visibility == 'promoted' || $params->visibility == 'public') {
+
+        $visibility = $params->visibility;
+
+        if ($params->visibility != 'private' && $params->visibility != 'public') {
             $params->visibility = 'public';
-        } else {
-            $params->visibility = 'private';
         }
 
         // Get a user
@@ -203,7 +204,6 @@ class Problem {
                 'problemNotFound'
             );
         }
-        $visibility = $params->visibility;
 
         if (
             $visibility === 'public_banned'

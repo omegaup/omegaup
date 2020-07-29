@@ -341,35 +341,26 @@ class ProblemParams {
     public static function stringVisibilityToNumeric(string $visibility): int {
         switch ($visibility) {
             case 'deleted':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_DELETED;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_DELETED;
             case 'private_banned':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
             case 'public_banned':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
             case 'private_warning':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
             case 'private':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
             case 'public_warning':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
             case 'public':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
             case 'promoted':
-                $intVisibility = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
-                break;
+                return \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
             default:
-                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
-                    'invalidVisibility'
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidVisibility',
+                    'visibility'
                 );
-                break;
         }
-        return $intVisibility;
     }
 }
