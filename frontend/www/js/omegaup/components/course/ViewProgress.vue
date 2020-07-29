@@ -165,7 +165,7 @@ export default class CourseViewProgress extends Vue {
     }
     return parseFloat(score.toString());
   }
-  
+
   //Add problem scores
   get progressTable(): string[][] {
     let table: string[][] = [];

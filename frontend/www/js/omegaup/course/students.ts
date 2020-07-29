@@ -26,6 +26,6 @@ OmegaUp.on('ready', function () {
     },
     components: {
       'omegaup-course-viewprogress': course_ViewProgress,
-    }
+    },
   });
 });
