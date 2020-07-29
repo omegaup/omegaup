@@ -1613,7 +1613,7 @@ API to Create an assignment
 | `description`        | `mixed`     |             |
 | `finish_time`        | `mixed`     |             |
 | `name`               | `mixed`     |             |
-| `order`              | `mixed`     |             |
+| `order`              | `int|null`  |             |
 | `problems`           | `mixed`     |             |
 | `publish_time_delay` | `mixed`     |             |
 | `start_time`         | `mixed`     |             |
