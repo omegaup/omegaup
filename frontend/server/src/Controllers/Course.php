@@ -841,7 +841,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $order
+     * @omegaup-request-param int|null $order
      * @omegaup-request-param mixed $problems
      * @omegaup-request-param mixed $publish_time_delay
      * @omegaup-request-param mixed $start_time
@@ -857,10 +857,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['course_alias'],
             'course_alias'
         );
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['order'],
-            'order'
-        );
+        $order = $r->ensureOptionalInt('order');
         $course = self::validateCourseExists($r['course_alias']);
         [
             'addedProblems' => $addedProblems,
@@ -887,9 +884,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'assignment_type' => $r['assignment_type'],
                 'start_time' => $r['start_time'],
                 'finish_time' => $r['finish_time'],
-                'order' => !empty($r['order'])
-                  ? intval($r['order'])
-                : \OmegaUp\DAO\Assignments::getNextPositionOrder(
+                'order' => $order ?? \OmegaUp\DAO\Assignments::getNextPositionOrder(
                     $course->course_id
                 ),
             ]),

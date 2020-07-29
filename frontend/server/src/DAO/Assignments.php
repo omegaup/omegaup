@@ -240,6 +240,6 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             $sql,
             [$courseId]
         );
-        return is_null($numberOfAssignments) ? 1 : $numberOfAssignments + 1;
+        return intval($numberOfAssignments) + 1;
     }
 }

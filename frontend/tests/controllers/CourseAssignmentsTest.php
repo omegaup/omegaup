@@ -5,7 +5,6 @@ class CourseAssignmentsTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a course with 5 assignments
         $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
 
-        // Login admin and getting assignments list
         $adminLogin = self::login($courseData['admin']);
         foreach (range(1, 5) as $index) {
             \OmegaUp\Controllers\Course::apiCreateAssignment(
