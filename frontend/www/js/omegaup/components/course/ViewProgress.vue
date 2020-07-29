@@ -151,19 +151,25 @@ function toOds(courseName: string, table: string[][]): string {
 export default class CourseViewProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
-  @Prop() students!: omegaup.CourseStudent[];
+  @Prop() students!: types.StudentProgress[];
 
   T = T;
 
   score(
-    student: omegaup.CourseStudent,
+    student: types.StudentProgress,
     assignment: omegaup.Assignment,
   ): number {
-    let score = student.progress[assignment.alias] || 0;
-    return parseFloat(String(score));
+    if (!student.progress.hasOwnProperty(assignment.alias)) {
+      return 0;
+    }
+
+    return Object.values(student.progress[assignment.alias]).reduce(
+      (accumulator: number, currentValue: number) => accumulator + currentValue,
+      0,
+    );
   }
 
-  studentProgressUrl(student: omegaup.CourseStudent): string {
+  studentProgressUrl(student: types.StudentProgress): string {
     return `/course/${this.course.alias}/student/${student.username}/`;
   }
 
@@ -179,10 +185,12 @@ export default class CourseViewProgress extends Vue {
     }
     table.push(header);
     for (let student of this.students) {
-      let row: string[] = [student.username, student.name];
+      let row: string[] = [student.username, student.name || ''];
+
       for (let assignment of this.assignments) {
         row.push(String(this.score(student, assignment)));
       }
+
       table.push(row);
     }
     return table;

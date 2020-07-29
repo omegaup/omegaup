@@ -100,15 +100,15 @@ import * as time from '../../time';
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
-  @Prop() initialStudent!: types.CourseStudent;
+  @Prop() initialStudent!: types.StudentProgress;
   @Prop() problems!: omegaup.CourseProblem[];
-  @Prop() students!: types.CourseStudent[];
+  @Prop() students!: types.StudentProgress[];
 
   T = T;
   time = time;
   selectedAssignment: Partial<omegaup.Assignment> = {};
   selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
-  selectedStudent: Partial<types.CourseStudent> = this.initialStudent || {};
+  selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
 
   data(): { [name: string]: any } {
     return {
@@ -154,8 +154,8 @@ export default class CourseViewStudent extends Vue {
 
   @Watch('selectedStudent')
   onSelectedStudentChange(
-    newVal?: types.CourseStudent,
-    oldVal?: types.CourseStudent,
+    newVal?: types.StudentProgress,
+    oldVal?: types.StudentProgress,
   ) {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
     if (!newVal || newVal?.username === oldVal?.username) {
