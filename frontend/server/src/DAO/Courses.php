@@ -12,7 +12,7 @@ namespace OmegaUp\DAO;
  * @package docs
  *
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}z
+ * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  */
 class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
@@ -98,12 +98,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = 'SELECT
                     admission_mode,
                     alias,
-                    course_id,
+                    c.course_id,
                     finish_time,
                     c.name AS name,
                     s.name AS school_name,
                     start_time,
-                    accept_teacher
+                    accept_teacher,
+	                pr.progress,
+	                pr.last_submission_time
                 FROM Courses c
                 INNER JOIN (
                     SELECT g.group_id, gi.accept_teacher
@@ -112,55 +114,70 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id
+	            LEFT JOIN (
+	                -- we want a score even if there are no submissions yet
+	                SELECT
+	                    cbpr.course_id,
+	                    ROUND(SUM(cbpr.total_assignment_score) / SUM(cbpr.max_points) * 100, 2) AS progress,
+	                    MAX(cbpr.last_submission_time) AS last_submission_time
+	                FROM (
+		                -- aggregate all runs per assignment
+		                SELECT
+		                    bpr.alias,
+		                    bpr.course_id,
+		                    bpr.assignment_id,
+		                    SUM(best_score_of_problem) AS total_assignment_score,
+		                    bpr.max_points,
+		                    MAX(bpr.last_submission_time) AS last_submission_time
+		                FROM (
+		                    -- get all runs belonging to an identity and get the best score
+		                    SELECT
+		                        a.alias,
+		                        a.course_id,
+		                        a.assignment_id,
+		                        psp.problem_id,
+		                        s.identity_id,
+		                        MAX(r.contest_score) AS best_score_of_problem,
+		                        a.max_points,
+				        		MAX(r.time) AS last_submission_time
+		                    FROM Assignments a
+		                    INNER JOIN Problemset_Problems psp
+		                        ON a.problemset_id = psp.problemset_id
+		                    INNER JOIN Submissions s
+		                        ON s.problem_id = psp.problem_id
+		                        AND s.problemset_id = a.problemset_id
+		                    INNER JOIN Runs r
+		                        ON r.run_id = s.current_run_id
+		                    WHERE s.identity_id = ?
+		                    GROUP BY a.assignment_id, psp.problem_id, s.identity_id
+		                ) bpr
+		                GROUP BY bpr.assignment_id
+		            ) cbpr
+		            GROUP BY cbpr.course_id
+	            ) pr
+	            ON c.course_id = pr.course_id
                 LEFT JOIN
                     Schools s
-                ON c.school_id = s.school_id;';
-        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, name: string, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+                ON c.school_id = s.school_id
+                ORDER BY
+                    pr.last_submission_time DESC;';
+        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, last_submission_time: \OmegaUp\Timestamp|null, name: string, progress: float|null, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$identityId]
+            [$identityId, $identityId]
         );
 
         $courses = [];
         foreach ($rs as $row) {
-            $assignmentsProgress = \OmegaUp\DAO\Courses::getAssignmentsProgress(
-                $row['course_id'],
-                $identityId
-            );
-
-            $points = array_reduce(
-                $assignmentsProgress,
-                /**
-                 * @param array{score: float, max_score: float} $item
-                 */
-                function (float $accumulator, $item): float {
-                    return $accumulator + $item['score'];
-                },
-                0.0
-            );
-
-            $maxPoints = array_reduce(
-                $assignmentsProgress,
-                /**
-                 * @param array{score: float, max_score: float} $item
-                 */
-                function (float $accumulator, $item): float {
-                    return $accumulator + $item['max_score'];
-                },
-                0.0
-            );
-
             $row['assignments'] = [];
-            $row['progress'] = !empty(
-                $maxPoints
-            ) ? round(
-                ($points / $maxPoints * 100),
-                2
-            ) : 0.0;
             $row['is_open'] = !is_null($row['accept_teacher']);
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
             );
+            if (is_null($row['progress'])) {
+                unset($row['progress']);
+            }
+            unset($row['last_submission_time']);
             unset($row['course_id']);
             $courses[] = $row;
         }
@@ -179,7 +196,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 finish_time,
                 c.name AS name,
                 s.name AS school_name,
-                start_time
+                start_time,
+                0.0 AS progress,
+                0 AS is_open,
+                \'\' AS accept_teacher
             FROM
                 Courses c
             LEFT JOIN
@@ -188,7 +208,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE c.admission_mode = ?;
            ';
 
-        /** @var list<array{admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, name: string, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{accept_teacher: null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC]
@@ -199,12 +219,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $row['alias'],
                 /*$isAdmin=*/false
             );
-            $row['progress'] = 0;
-            $row['is_open'] = false;
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
             );
-            $row['accept_teacher'] = null;
             unset($row['course_id']);
             $courses[] = $row;
         }

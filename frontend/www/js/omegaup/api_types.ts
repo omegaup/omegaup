@@ -478,20 +478,30 @@ export namespace types {
     ): types.CourseListPayload {
       return ((x) => {
         x.courses = ((x) => {
-          if (x.public)
-            x.public = ((x) => {
-              x.filteredCourses = ((x) => {
-                x.current = ((x) => {
-                  x.courses = ((x) => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map((x) => {
-                      x.assignments = ((x) => {
+          if (x instanceof Object) {
+            Object.keys(x).forEach(
+              (y) =>
+                (x[y] = ((x) => {
+                  x.filteredCourses = ((x) => {
+                    x.current = ((x) => {
+                      x.courses = ((x) => {
                         if (!Array.isArray(x)) {
                           return x;
                         }
                         return x.map((x) => {
+                          x.assignments = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              if (x.finish_time)
+                                x.finish_time = ((x: number) =>
+                                  new Date(x * 1000))(x.finish_time);
+                              x.start_time = ((x: number) =>
+                                new Date(x * 1000))(x.start_time);
+                              return x;
+                            });
+                          })(x.assignments);
                           if (x.finish_time)
                             x.finish_time = ((x: number) => new Date(x * 1000))(
                               x.finish_time,
@@ -501,30 +511,28 @@ export namespace types {
                           );
                           return x;
                         });
-                      })(x.assignments);
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
-                      );
+                      })(x.courses);
                       return x;
-                    });
-                  })(x.courses);
-                  return x;
-                })(x.current);
-                x.past = ((x) => {
-                  x.courses = ((x) => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map((x) => {
-                      x.assignments = ((x) => {
+                    })(x.current);
+                    x.past = ((x) => {
+                      x.courses = ((x) => {
                         if (!Array.isArray(x)) {
                           return x;
                         }
                         return x.map((x) => {
+                          x.assignments = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              if (x.finish_time)
+                                x.finish_time = ((x: number) =>
+                                  new Date(x * 1000))(x.finish_time);
+                              x.start_time = ((x: number) =>
+                                new Date(x * 1000))(x.start_time);
+                              return x;
+                            });
+                          })(x.assignments);
                           if (x.finish_time)
                             x.finish_time = ((x: number) => new Date(x * 1000))(
                               x.finish_time,
@@ -534,96 +542,15 @@ export namespace types {
                           );
                           return x;
                         });
-                      })(x.assignments);
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
-                      );
+                      })(x.courses);
                       return x;
-                    });
-                  })(x.courses);
+                    })(x.past);
+                    return x;
+                  })(x.filteredCourses);
                   return x;
-                })(x.past);
-                return x;
-              })(x.filteredCourses);
-              return x;
-            })(x.public);
-          if (x.student)
-            x.student = ((x) => {
-              x.filteredCourses = ((x) => {
-                x.current = ((x) => {
-                  x.courses = ((x) => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map((x) => {
-                      x.assignments = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.assignments);
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
-                      );
-                      return x;
-                    });
-                  })(x.courses);
-                  return x;
-                })(x.current);
-                x.past = ((x) => {
-                  x.courses = ((x) => {
-                    if (!Array.isArray(x)) {
-                      return x;
-                    }
-                    return x.map((x) => {
-                      x.assignments = ((x) => {
-                        if (!Array.isArray(x)) {
-                          return x;
-                        }
-                        return x.map((x) => {
-                          if (x.finish_time)
-                            x.finish_time = ((x: number) => new Date(x * 1000))(
-                              x.finish_time,
-                            );
-                          x.start_time = ((x: number) => new Date(x * 1000))(
-                            x.start_time,
-                          );
-                          return x;
-                        });
-                      })(x.assignments);
-                      if (x.finish_time)
-                        x.finish_time = ((x: number) => new Date(x * 1000))(
-                          x.finish_time,
-                        );
-                      x.start_time = ((x: number) => new Date(x * 1000))(
-                        x.start_time,
-                      );
-                      return x;
-                    });
-                  })(x.courses);
-                  return x;
-                })(x.past);
-                return x;
-              })(x.filteredCourses);
-              return x;
-            })(x.student);
+                })(x[y])),
+            );
+          }
           return x;
         })(x.courses);
         return x;
@@ -2233,8 +2160,7 @@ export namespace types {
   }
 
   export interface StudentCourses {
-    public?: types.CoursesByAccessMode;
-    student?: types.CoursesByAccessMode;
+    [key: string]: types.CoursesByAccessMode;
   }
 
   export interface StudentProgressPayload {
