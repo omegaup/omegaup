@@ -305,19 +305,22 @@ export namespace types {
     ): types.CourseDetailsPayload {
       return ((x) => {
         x.details = ((x) => {
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
+                return x;
+              });
+            })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -334,19 +337,22 @@ export namespace types {
     ): types.CourseEditPayload {
       return ((x) => {
         x.course = ((x) => {
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
+                return x;
+              });
+            })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -382,9 +388,9 @@ export namespace types {
       );
     }
 
-    export function CourseListPayload(
+    export function CourseListMinePayload(
       elementId: string = 'payload',
-    ): types.CourseListPayload {
+    ): types.CourseListMinePayload {
       return ((x) => {
         x.courses = ((x) => {
           x.admin = ((x) => {
@@ -429,6 +435,19 @@ export namespace types {
             })(x.filteredCourses);
             return x;
           })(x.admin);
+          return x;
+        })(x.courses);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CourseListPayload(
+      elementId: string = 'payload',
+    ): types.CourseListPayload {
+      return ((x) => {
+        x.courses = ((x) => {
           x.public = ((x) => {
             x.filteredCourses = ((x) => {
               x.current = ((x) => {
@@ -521,6 +540,14 @@ export namespace types {
       );
     }
 
+    export function CourseNewPayload(
+      elementId: string = 'payload',
+    ): types.CourseNewPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CourseSubmissionsListPayload(
       elementId: string = 'payload',
     ): types.CourseSubmissionsListPayload {
@@ -571,19 +598,22 @@ export namespace types {
     ): types.IntroDetailsPayload {
       return ((x) => {
         x.details = ((x) => {
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
+                return x;
+              });
+            })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -807,19 +837,22 @@ export namespace types {
     ): types.StudentProgressPayload {
       return ((x) => {
         x.course = ((x) => {
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
+                return x;
+              });
+            })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -836,19 +869,22 @@ export namespace types {
     ): types.StudentsProgressPayload {
       return ((x) => {
         x.course = ((x) => {
-          x.assignments = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              if (x.finish_time)
-                x.finish_time = ((x: number) => new Date(x * 1000))(
-                  x.finish_time,
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
                 );
-              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-              return x;
-            });
-          })(x.assignments);
+                return x;
+              });
+            })(x.assignments);
           if (x.finish_time)
             x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
@@ -949,6 +985,16 @@ export namespace types {
   export interface AddedProblem {
     alias: string;
     points: number;
+  }
+
+  export interface AdminCourses {
+    admin: types.CoursesByAccessMode;
+  }
+
+  export interface AllCourses {
+    admin: types.CoursesByAccessMode;
+    public: types.CoursesByAccessMode;
+    student: types.CoursesByAccessMode;
   }
 
   export interface ArenaProblemDetails {
@@ -1223,21 +1269,22 @@ export namespace types {
   }
 
   export interface CourseDetails {
-    admission_mode: string;
+    admission_mode?: string;
     alias: string;
-    assignments: types.CourseAssignment[];
-    basic_information_required: boolean;
+    assignments?: types.CourseAssignment[];
     description: string;
     finish_time?: Date;
     is_admin: boolean;
     is_curator: boolean;
     name: string;
+    needs_basic_information: boolean;
     requests_user_information: string;
     school_id?: number;
     school_name?: string;
     show_scoreboard: boolean;
     start_time: Date;
     student_count?: number;
+    unlimited_duration: boolean;
   }
 
   export interface CourseDetailsPayload {
@@ -1252,7 +1299,7 @@ export namespace types {
     groupsAdmins: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
     selectedAssignment?: types.CourseAssignment;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
     tags: string[];
   }
 
@@ -1262,33 +1309,17 @@ export namespace types {
     role: string;
   }
 
+  export interface CourseListMinePayload {
+    courses: types.AdminCourses;
+  }
+
   export interface CourseListPayload {
-    courses: {
-      admin: {
-        accessMode: string;
-        activeTab: string;
-        filteredCourses: {
-          current: { courses: types.FilteredCourse[]; timeType: string };
-          past: { courses: types.FilteredCourse[]; timeType: string };
-        };
-      };
-      public: {
-        accessMode: string;
-        activeTab: string;
-        filteredCourses: {
-          current: { courses: types.FilteredCourse[]; timeType: string };
-          past: { courses: types.FilteredCourse[]; timeType: string };
-        };
-      };
-      student: {
-        accessMode: string;
-        activeTab: string;
-        filteredCourses: {
-          current: { courses: types.FilteredCourse[]; timeType: string };
-          past: { courses: types.FilteredCourse[]; timeType: string };
-        };
-      };
-    };
+    courses: types.StudentCourses;
+  }
+
+  export interface CourseNewPayload {
+    is_admin: boolean;
+    is_curator: boolean;
   }
 
   export interface CourseProblem {
@@ -1327,15 +1358,23 @@ export namespace types {
     username: string;
   }
 
-  export interface CourseStudent {
-    name?: string;
-    progress: { [key: string]: number };
-    username: string;
-  }
-
   export interface CourseSubmissionsListPayload {
     solvedProblems: { [key: string]: types.CourseProblemTried[] };
     unsolvedProblems: { [key: string]: types.CourseProblemTried[] };
+  }
+
+  export interface CoursesByAccessMode {
+    accessMode: string;
+    activeTab: string;
+    filteredCourses: {
+      current: types.CoursesByTimeType;
+      past: types.CoursesByTimeType;
+    };
+  }
+
+  export interface CoursesByTimeType {
+    courses: types.FilteredCourse[];
+    timeType: string;
   }
 
   export interface CoursesList {
@@ -1829,6 +1868,7 @@ export namespace types {
 
   export interface ProblemsetProblem {
     accepted: number;
+    accepts_submissions: boolean;
     alias: string;
     commit: string;
     difficulty: number;
@@ -2090,15 +2130,26 @@ export namespace types {
     verdict_counts: { [key: string]: number };
   }
 
+  export interface StudentCourses {
+    public: types.CoursesByAccessMode;
+    student: types.CoursesByAccessMode;
+  }
+
+  export interface StudentProgress {
+    name?: string;
+    progress: { [key: string]: { [key: string]: number } };
+    username: string;
+  }
+
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     student: string;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
   }
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
   }
 
   export interface Submission {
@@ -2711,7 +2762,9 @@ export namespace messages {
     };
   };
   export type CourseListStudentsRequest = { [key: string]: any };
-  export type CourseListStudentsResponse = { students: types.CourseStudent[] };
+  export type CourseListStudentsResponse = {
+    students: types.StudentProgress[];
+  };
   export type CourseListUnsolvedProblemsRequest = { [key: string]: any };
   export type CourseListUnsolvedProblemsResponse = {
     user_problems: {

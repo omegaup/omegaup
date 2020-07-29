@@ -34,9 +34,9 @@
           </div>
           <div class="form-group col-md-4">
             <label
-              >{{ T.courseAssignmentNewFormType }}
+              >{{ T.wordsContentType }}
               <font-awesome-icon
-                v-bind:title="T.courseAssignmentNewFormTypeDesc"
+                v-bind:title="T.courseContentNewFormTypeDesc"
                 icon="info-circle"
               />
               <select
@@ -47,6 +47,9 @@
                 v-model="assignmentType"
                 required
               >
+                <option value="lesson">
+                  {{ T.wordsLesson }}
+                </option>
                 <option value="homework">
                   {{ T.wordsHomework }}
                 </option>
@@ -170,9 +173,9 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
-
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -181,7 +184,6 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
-
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
@@ -192,15 +194,14 @@ library.add(fas);
 })
 export default class CourseAssignmentDetails extends Vue {
   @Prop({
-    default: omegaup.VisibilityMode.Default,
+    default: omegaup.AssignmentFormMode.Default,
   })
-  visibilityMode!: omegaup.VisibilityMode;
-  @Prop() assignment!: omegaup.Assignment;
+  assignmentFormMode!: omegaup.AssignmentFormMode;
+  @Prop() assignment!: types.CourseAssignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
-
   T = T;
   alias = this.assignment.alias || '';
   assignmentType = this.assignment.assignment_type || 'homework';
@@ -211,25 +212,23 @@ export default class CourseAssignmentDetails extends Vue {
   unlimitedDuration = !this.assignment.finish_time;
   show = false;
   update = false;
-
   @Watch('assignment')
   onAssignmentChange() {
     this.reset();
   }
-
-  @Watch('visibilityMode')
-  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
+  @Watch('assignmentFormMode')
+  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
     switch (newValue) {
-      case omegaup.VisibilityMode.New:
+      case omegaup.AssignmentFormMode.New:
         this.show = true;
         this.update = false;
         this.reset();
         break;
-      case omegaup.VisibilityMode.Edit:
+      case omegaup.AssignmentFormMode.Edit:
         this.show = true;
         this.update = true;
         break;
-      case omegaup.VisibilityMode.Default:
+      case omegaup.AssignmentFormMode.Default:
         this.show = false;
         this.update = true;
         break;
@@ -238,7 +237,6 @@ export default class CourseAssignmentDetails extends Vue {
         this.update = true;
     }
   }
-
   reset(): void {
     this.alias = this.assignment.alias;
     this.assignmentType = this.assignment.assignment_type || 'homework';
@@ -248,12 +246,10 @@ export default class CourseAssignmentDetails extends Vue {
     this.startTime = this.assignment.start_time || new Date();
     this.unlimitedDuration = !this.assignment.finish_time;
   }
-
   @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
   }
-
   onSubmit(): void {
     this.$emit('emit-submit', this);
   }

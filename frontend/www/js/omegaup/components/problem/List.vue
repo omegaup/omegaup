@@ -254,6 +254,7 @@ import {
   faExclamationTriangle,
   faBan,
 } from '@fortawesome/free-solid-svg-icons';
+import StudentProgress from '../course/StudentProgress.vue';
 library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
 
 @Component({

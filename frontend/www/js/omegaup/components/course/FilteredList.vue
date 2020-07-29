@@ -99,10 +99,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
-
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -111,7 +110,6 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
-
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -120,13 +118,11 @@ library.add(fas);
   },
 })
 export default class CourseFilteredList extends Vue {
-  @Prop() courses!: omegaup.Course[];
+  @Prop() courses!: types.CourseDetails[];
   @Prop() activeTab!: string;
-
   T = T;
   time = time;
   showTab = this.activeTab;
-
   getTabName(timeType: string): string {
     if (timeType === 'current') return T.courseListCurrentCourses;
     if (timeType === 'past') return T.courseListPastCourses;

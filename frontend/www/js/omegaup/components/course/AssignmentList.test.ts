@@ -5,19 +5,20 @@ import Sortable from 'sortablejs';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 
 import course_AssignmentList from './AssignmentList.vue';
 
 describe('AssignmentList.vue', () => {
-  it('Should handle empty assignments list', () => {
+  it('Should handle empty content list', () => {
     const wrapper = shallowMount(course_AssignmentList, {
       propsData: {
-        assignments: <omegaup.Assignment[]>[],
+        content: <types.CourseAssignment[]>[],
         courseAlias: 'course_alias',
       },
     });
 
-    expect(wrapper.text()).toContain(T.courseAssignmentEmpty);
+    expect(wrapper.text()).toContain(T.courseContentEmpty);
   });
 
   const localVue = createLocalVue();
@@ -27,11 +28,11 @@ describe('AssignmentList.vue', () => {
     },
   });
 
-  it('Should handle assignments list', async () => {
+  it('Should handle content list', async () => {
     const wrapper = shallowMount(course_AssignmentList, {
       localVue,
       propsData: {
-        assignments: <omegaup.Assignment[]>[
+        content: <omegaup.Assignment[]>[
           {
             alias: 'CA',
             assignment_type: 'test',
@@ -48,7 +49,7 @@ describe('AssignmentList.vue', () => {
           },
         ],
         courseAlias: 'course_alias',
-        visibilityMode: omegaup.VisibilityMode.Default,
+        assignmentFormMode: omegaup.AssignmentFormMode.Default,
       },
     });
     await wrapper

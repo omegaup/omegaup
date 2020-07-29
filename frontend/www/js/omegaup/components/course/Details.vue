@@ -17,11 +17,13 @@
       }}
       <div class="mt-2">
         <a
+          data-button-progress-students
           class="btn btn-primary"
           v-bind:href="`/course/${course.alias}/students/`"
           >{{ T.courseStudentsProgress }}</a
         >
         <a
+          data-button-manage-students
           class="ml-2 btn btn-primary"
           v-bind:href="`/course/${course.alias}/edit/#students`"
           >{{ T.wordsAddStudent }}</a
@@ -99,15 +101,6 @@
           </tbody>
         </table>
       </div>
-      <div class="card-footer">
-        <a
-          data-button-homework
-          class="btn btn-primary float-right"
-          v-if="course.is_admin"
-          v-bind:href="`/course/${course.alias}/edit/#assignments/new/homework/`"
-          >{{ T.wordsNewHomework }}</a
-        >
-      </div>
     </div>
     <div class="card mt-5">
       <h5 class="card-header">{{ T.wordsExams }}</h5>
@@ -176,15 +169,6 @@
           </tbody>
         </table>
       </div>
-      <div class="card-footer">
-        <a
-          data-button-exam
-          class="btn btn-primary float-right"
-          v-if="course.is_admin"
-          v-bind:href="`/course/${course.alias}/edit/#assignments/new/test/`"
-          >{{ T.wordsNewExam }}</a
-        >
-      </div>
     </div>
   </div>
 </template>
@@ -196,9 +180,7 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
-
 import omegaup_Markdown from '../Markdown.vue';
-
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -207,7 +189,6 @@ import {
   faTachometerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faLink, faTachometerAlt);
-
 @Component({
   components: {
     FontAwesomeIcon,
@@ -215,32 +196,29 @@ library.add(faEdit, faLink, faTachometerAlt);
   },
 })
 export default class CourseDetails extends Vue {
-  @Prop() course!: omegaup.Course;
+  @Prop() course!: types.CourseDetails;
   @Prop() progress!: types.AssignmentProgress[];
-
   T = T;
   ui = ui;
-
-  get filteredHomeworks(): omegaup.Assignment[] {
+  get filteredHomeworks(): types.CourseAssignment[] {
+    if (!this.course.assignments) return [];
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'homework',
     );
   }
-
-  get filteredExams(): omegaup.Assignment[] {
+  get filteredExams(): types.CourseAssignment[] {
+    if (!this.course.assignments) return [];
     return this.course.assignments.filter(
       (assignment) => assignment.assignment_type === 'test',
     );
   }
-
   getAssignmentProgress(progress: types.Progress): string {
     const percent = (progress.score / progress.max_score) * 100;
     const percentText = progress.max_score === 0 ? '--:--' : percent.toFixed(2);
     return progress.max_score === 0 ? percentText : `${percentText}%`;
   }
-
-  getFormattedTime(date: Date | null): string {
-    if (date === null) {
+  getFormattedTime(date: Date | null | undefined): string {
+    if (!date) {
       return '—';
     }
     return time.formatDateTime(date);

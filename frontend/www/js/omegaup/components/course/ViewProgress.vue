@@ -19,16 +19,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="student in students">
-                  <td>
-                    <a v-bind:href="studentProgressUrl(student)">{{
-                      student.name || student.username
-                    }}</a>
-                  </td>
-                  <td class="score" v-for="assignment in assignments">
-                    {{ Math.round(score(student, assignment)) }}
-                  </td>
-                </tr>
+                <div v-for "currStudent in students">
+                  <omegaup-student-progress student="currStudent"></omegaup-student-progress>
+                </div>
               </tbody>
             </table>
           </div>
@@ -74,11 +67,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
+import StudentProgress from './StudentProgress.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -145,31 +139,34 @@ function toOds(courseName: string, table: string[][]): string {
   result += '</table:table>';
   return result;
 }
-
-@Component
+@Component({
+  components: {'omegaup-student-progress': StudentProgress,}
+})
 export default class CourseViewProgress extends Vue {
-  @Prop() assignments!: omegaup.Assignment[];
-  @Prop() course!: omegaup.Course;
-  @Prop() students!: omegaup.CourseStudent[];
-
+  @Prop() course!: types.CourseDetails;
+  @Prop() students!: types.StudentProgress[];
+  @Prop() assignments!: types.CourseAssignment[];
   T = T;
-
-  score(
-    student: omegaup.CourseStudent,
-    assignment: omegaup.Assignment,
-  ): number {
-    let score = student.progress[assignment.alias] || 0;
-    return parseFloat(String(score));
-  }
-
-  studentProgressUrl(student: omegaup.CourseStudent): string {
-    return `/course/${this.course.alias}/student/${student.username}/`;
-  }
 
   get courseUrl(): string {
     return `/course/${this.course.alias}/`;
   }
 
+  score(
+    student: types.StudentProgress,
+    assignment: types.CourseAssignment,
+  ): number {
+    if (!student.progress.hasOwnProperty(assignment.alias)) {
+      return 0;
+    }
+    let score = 0;
+    for (let problem in student.progress[assignment.alias]) {
+      score += student.progress[assignment.alias][problem];
+    }
+    return parseFloat(score.toString());
+  }
+  
+  //Add problem scores
   get progressTable(): string[][] {
     let table: string[][] = [];
     let header = [T.profileUsername, T.wordsName];
@@ -178,7 +175,8 @@ export default class CourseViewProgress extends Vue {
     }
     table.push(header);
     for (let student of this.students) {
-      let row: string[] = [student.username, student.name];
+      let row: string[] = [student.username];
+      row.push(student.name || '');
       for (let assignment of this.assignments) {
         row.push(String(this.score(student, assignment)));
       }

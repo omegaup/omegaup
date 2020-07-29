@@ -200,7 +200,6 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
-
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -209,7 +208,6 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
-
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
@@ -223,37 +221,35 @@ export default class CourseProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: omegaup.Assignment;
-  @Prop() visibilityMode!: omegaup.VisibilityMode;
-
+  @Prop() assignmentFormMode!: omegaup.AssignmentFormMode;
   typeahead = typeahead;
   T = T;
   assignment: Partial<omegaup.Assignment> = this.selectedAssignment;
-  showForm = this.visibilityMode === omegaup.VisibilityMode.AddProblem;
+  showForm = this.assignmentFormMode === omegaup.AssignmentFormMode.AddProblem;
   difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
   problemAlias = '';
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
-
   get tags(): string[] {
     let t = this.topics.slice();
     t.push(this.difficulty);
     return t;
   }
-
   onShowForm(): void {
     this.showForm = true;
-    this.$emit('update:visibility-mode', omegaup.VisibilityMode.AddProblem);
+    this.$emit(
+      'update:assignment-form-mode',
+      omegaup.AssignmentFormMode.AddProblem,
+    );
     this.problemAlias = '';
     this.difficulty = 'intro';
     this.topics = [];
-
     Vue.nextTick(() => {
       document.querySelector('.card-footer')?.scrollIntoView();
     });
   }
-
   sort(event: any) {
     this.assignmentProblems.splice(
       event.newIndex,
@@ -262,7 +258,6 @@ export default class CourseProblemList extends Vue {
     );
     this.problemsOrderChanged = true;
   }
-
   saveNewOrder() {
     this.$emit(
       'emit-sort',
@@ -271,30 +266,25 @@ export default class CourseProblemList extends Vue {
     );
     this.problemsOrderChanged = false;
   }
-
   @Watch('assignment')
   onAssignmentChange(newVal: omegaup.Assignment): void {
     this.$emit('emit-select-assignment', newVal);
   }
-
   @Watch('selectedAssignment')
   onSelectedAssignmentChange(newVal: omegaup.Assignment): void {
     this.assignment = newVal;
   }
-
   @Watch('taggedProblemAlias')
   onTaggedProblemAliasChange() {
     this.problemAlias = this.taggedProblemAlias;
   }
-
   @Watch('tags')
   onTagsChange() {
     this.$emit('emit-tags', this.tags);
   }
-
-  @Watch('visibilityMode')
-  onVisibilityModeChange(newValue: omegaup.VisibilityMode) {
-    if (newValue !== omegaup.VisibilityMode.AddProblem) {
+  @Watch('assignmentFormMode')
+  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
+    if (newValue !== omegaup.AssignmentFormMode.AddProblem) {
       this.showForm = false;
       return;
     }

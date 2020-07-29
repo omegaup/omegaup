@@ -9,7 +9,7 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.StudentProgressPayload();
 
-  let initialStudent: types.CourseStudent | null = null;
+  let initialStudent: types.StudentProgress | null = null;
   if (payload.students && payload.students.length > 0) {
     initialStudent = payload.students[0];
     for (const student of payload.students) {
@@ -33,7 +33,7 @@ OmegaUp.on('ready', () => {
         },
         on: {
           update: (
-            student: types.CourseStudent,
+            student: types.StudentProgress,
             assignment: types.CourseAssignment,
           ) => {
             if (assignment == null) return;

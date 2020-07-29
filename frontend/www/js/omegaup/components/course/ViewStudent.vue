@@ -95,27 +95,23 @@ import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
-
 @Component
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
-  @Prop() course!: omegaup.Course;
-  @Prop() initialStudent!: types.CourseStudent;
+  @Prop() course!: types.CourseDetails;
+  @Prop() initialStudent!: types.StudentProgress;
   @Prop() problems!: omegaup.CourseProblem[];
-  @Prop() students!: types.CourseStudent[];
-
+  @Prop() students!: types.StudentProgress[];
   T = T;
   time = time;
   selectedAssignment: Partial<omegaup.Assignment> = {};
   selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
-  selectedStudent: Partial<types.CourseStudent> = this.initialStudent || {};
-
+  selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
   data(): { [name: string]: any } {
     return {
       selectedProblem: undefined,
     };
   }
-
   mounted(): void {
     let self = this;
     window.addEventListener('popstate', function (ev: PopStateEvent): void {
@@ -123,7 +119,6 @@ export default class CourseViewStudent extends Vue {
         (ev.state && ev.state.student) || self.initialStudent;
     });
   }
-
   bestRun(problem: omegaup.CourseProblem): omegaup.CourseProblemRun | null {
     let best = null;
     for (let run of problem.runs) {
@@ -137,25 +132,21 @@ export default class CourseViewStudent extends Vue {
     }
     return best;
   }
-
   bestRunSource(problem: omegaup.CourseProblem): string {
     const best = this.bestRun(problem);
     return (best && best.source) || '';
   }
-
   bestScore(problem: omegaup.CourseProblem): number {
     const best = this.bestRun(problem);
     return (best && best.score) || 0.0;
   }
-
   get courseUrl(): string {
     return `/course/${this.course.alias}/`;
   }
-
   @Watch('selectedStudent')
   onSelectedStudentChange(
-    newVal?: types.CourseStudent,
-    oldVal?: types.CourseStudent,
+    newVal?: types.StudentProgress,
+    oldVal?: types.StudentProgress,
   ) {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
     if (!newVal || newVal?.username === oldVal?.username) {
@@ -167,12 +158,10 @@ export default class CourseViewStudent extends Vue {
       `/course/${this.course.alias}/student/${newVal.username}/`,
     );
   }
-
   @Watch('selectedAssignment')
   onSelectedAssignmentChange(newVal: omegaup.Assignment) {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
   }
-
   @Watch('problems')
   onProblemsChange(newVal: omegaup.CourseProblem[]) {
     if (newVal.length === 0) {
