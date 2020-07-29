@@ -157,26 +157,13 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'sort-homeworks': (
-            courseAlias: string,
-            homeworksAliases: string[],
-          ) => {
+          'sort-content': (courseAlias: string, contentAliases: string[]) => {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: JSON.stringify(homeworksAliases),
+              assignments: JSON.stringify(contentAliases),
             })
               .then(() => {
-                ui.success(T.homeworksOrderUpdated);
-              })
-              .catch(ui.apiError);
-          },
-          'sort-tests': (courseAlias: string, testsAliases: string[]) => {
-            api.Course.updateAssignmentsOrder({
-              course_alias: courseAlias,
-              assignments: JSON.stringify(testsAliases),
-            })
-              .then(() => {
-                ui.success(T.testsOrderUpdated);
+                ui.success(T.contentOrderUpdated);
               })
               .catch(ui.apiError);
           },
@@ -295,7 +282,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.ignoreError);
           },
-          'remove-student': (student: types.CourseStudent) => {
+          'remove-student': (student: types.StudentProgress) => {
             api.Course.removeStudent({
               course_alias: courseAlias,
               usernameOrEmail: student.username,

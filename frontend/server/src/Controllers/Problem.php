@@ -30,7 +30,7 @@
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemDetailsPayload=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
  * @psalm-type ProblemDetailsv2Payload=array{nominationStatus?: NominationStatus, problem: ProblemInfo, user: UserInfoForProblem}
- * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
@@ -481,7 +481,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
 
             // Add problem level tag
-            if (!is_null($params->problemLevel)) {
+            if (!empty($params->problemLevel)) {
                 $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
                 if (is_null($tag)) {
@@ -4817,6 +4817,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $result['smartyProperties']['payload']
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
+                \OmegaUp\ApiCaller::logException($e);
                 /** @var array{error?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
@@ -4939,7 +4940,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param bool $allow_user_add_tags
-     * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -4976,8 +4976,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $tags[] = ['name' => $tag->name];
         }
         if (isset($r['request']) && ($r['request'] === 'submit')) {
-            // HACK to prevent fails in validateCreateOrUpdate
-            $r['problem_alias'] = strval($r['alias']);
             $problemParams = null;
             try {
                 $problemParams = self::convertRequestToProblemParams($r);
@@ -4990,7 +4988,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\OmegaUp\Exceptions\ExitException $e) {
                 throw $e;
             } catch (\OmegaUp\Exceptions\ApiException $e) {
-                /** @var array{error?: string} */
+                \OmegaUp\ApiCaller::logException($e);
+                /** @var array{error?: string, parameter?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
                     $statusError = '{error}';
@@ -5019,6 +5018,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'source' => strval($r['source']),
                                 'visibility' => intval($r['visibility']),
                                 'statusError' => $statusError,
+                                'parameter' => !empty($response['parameter'])
+                                  ? strval($response['parameter'])
+                                  : null,
                                 'selectedTags' => $selectedTags,
                                 'allowUserAddTags' => true,
                                 'showDiff' => strval($r['show_diff']),
@@ -5038,6 +5040,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'languages' => strval($r['languages']),
                                 'validator' => strval($r['validator']),
                                 'tags' => $tags,
+                                'problem_level' => strval($r['problem_level']),
                                 'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                                 'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                             ],
@@ -5062,6 +5065,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'source' => '',
                         'visibility' => 0,
                         'statusError' => '',
+                        'parameter' => null,
                         'selectedTags' => null,
                         'allowUserAddTags' => true,
                         'showDiff' => 'none',
@@ -5077,6 +5081,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             $sortedLanguages
                         ),
                         'tags' => $tags,
+                        'problem_level' => '',
                         'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     ],
