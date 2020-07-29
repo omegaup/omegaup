@@ -163,7 +163,6 @@ export default class CourseViewProgress extends Vue {
       return 0;
     }
 
-    let score = 0;
     return Object.values(student.progress[assignment.alias]).reduce(
       (accumulator: number, currentValue: number) => accumulator + currentValue,
       0,
