@@ -19,9 +19,10 @@
                 </tr>
               </thead>
               <tbody>
+                <!-- was causing errors 
                 <div v-for "currStudent in students">
                   <omegaup-student-progress student="currStudent"></omegaup-student-progress>
-                </div>
+                </div> -->
               </tbody>
             </table>
           </div>
