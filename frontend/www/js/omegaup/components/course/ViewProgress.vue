@@ -164,10 +164,10 @@ export default class CourseViewProgress extends Vue {
     }
 
     let score = 0;
-    for (let problem in student.progress[assignment.alias]) {
-      score += student.progress[assignment.alias][problem];
-    }
-    return parseFloat(score.toString());
+    return Object.values(student.progress[assignment.alias]).reduce(
+      (accumulator: number, currentValue: number) => accumulator + currentValue,
+      0,
+    );
   }
 
   studentProgressUrl(student: types.StudentProgress): string {
@@ -186,9 +186,7 @@ export default class CourseViewProgress extends Vue {
     }
     table.push(header);
     for (let student of this.students) {
-      let row: string[] = [student.username];
-
-      row.push(student.name || '');
+      let row: string[] = [student.username, student.name || ''];
 
       for (let assignment of this.assignments) {
         row.push(String(this.score(student, assignment)));
