@@ -19,7 +19,7 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- was causing errors 
+                <!-- was causing errors
                 <div v-for "currStudent in students">
                   <omegaup-student-progress student="currStudent"></omegaup-student-progress>
                 </div> -->
@@ -141,7 +141,7 @@ function toOds(courseName: string, table: string[][]): string {
   return result;
 }
 @Component({
-  components: {'omegaup-student-progress': StudentProgress,}
+  components: { 'omegaup-student-progress': StudentProgress },
 })
 export default class CourseViewProgress extends Vue {
   @Prop() course!: types.CourseDetails;
