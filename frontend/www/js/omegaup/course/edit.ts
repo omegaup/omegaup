@@ -282,7 +282,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.ignoreError);
           },
-          'remove-student': (student: types.CourseStudent) => {
+          'remove-student': (student: types.StudentProgress) => {
             api.Course.removeStudent({
               course_alias: courseAlias,
               usernameOrEmail: student.username,

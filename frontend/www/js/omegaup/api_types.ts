@@ -1300,7 +1300,7 @@ export namespace types {
     groupsAdmins: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
     selectedAssignment?: types.CourseAssignment;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
     tags: string[];
   }
 
@@ -1356,12 +1356,6 @@ export namespace types {
   export interface CourseProblemTried {
     alias: string;
     title: string;
-    username: string;
-  }
-
-  export interface CourseStudent {
-    name?: string;
-    progress: { [key: string]: number };
     username: string;
   }
 
@@ -2146,15 +2140,21 @@ export namespace types {
     student: types.CoursesByAccessMode;
   }
 
+  export interface StudentProgress {
+    name?: string;
+    progress: { [key: string]: { [key: string]: number } };
+    username: string;
+  }
+
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     student: string;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
   }
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
   }
 
   export interface Submission {
@@ -2767,7 +2767,9 @@ export namespace messages {
     };
   };
   export type CourseListStudentsRequest = { [key: string]: any };
-  export type CourseListStudentsResponse = { students: types.CourseStudent[] };
+  export type CourseListStudentsResponse = {
+    students: types.StudentProgress[];
+  };
   export type CourseListUnsolvedProblemsRequest = { [key: string]: any };
   export type CourseListUnsolvedProblemsResponse = {
     user_problems: {
