@@ -1,25 +1,21 @@
 <template>
-  <div>
-    <tr>
-      <td>
-        <a v-bind:href="studentProgressUrl()" class="text-center align-middle">
-          {{ student.name || student.username }}
-        </a>
-      </td>
-      <td
-        class="score d-flex flex-column justify-content-center align-items-center"
-        v-for="assignment in assignments"
-      >
-        <p class="mb-1">{{ Math.round(score(student, assignment)) }}</p>
-        <div
-          class="d-flex justify-content-center"
-          v-for="problem in student.progress[assignment.alias]"
-        >
-          <div v:bind:class="getProblemColor(problem)"></div>
-        </div>
-      </td>
-    </tr>
-  </div>
+  <tr>
+    <td>
+      <a v-bind:href="studentProgressUrl()" class="text-center align-middle">
+        {{ student.name || student.username }}
+      </a>
+    </td>
+    <td
+      class="score d-flex flex-column justify-content-center align-items-center"
+      v-for="assignment in assignments"
+    >
+      <p class="mb-1">{{ Math.round(score(assignment)) }}</p>
+      <div class="d-flex justify-content-center">
+        why
+        <div v-for="problem in student.progress[assignment.alias]" class="box bg-green">hey</div>
+      </div>
+    </td>
+  </tr>
 </template>
 
 <style>
@@ -57,20 +53,19 @@ import T from '../../lang';
 export default class StudentProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() student!: types.StudentProgress;
-  @Prop() assignments!: types.CourseAssignment;
+  @Prop() assignments!: types.CourseAssignment[];
 
   T = T;
 
   score(
-    student: types.StudentProgress,
     assignment: types.CourseAssignment,
   ): number {
-    if (!student.progress.hasOwnProperty(assignment.alias)) {
-      return 0;
+    if (!this.student.progress.hasOwnProperty(assignment.alias)) {
+      return -1;
     }
     let score = 0;
-    for (let problem in student.progress[assignment.alias]) {
-      score += student.progress[assignment.alias][problem];
+    for (let problem in this.student.progress[assignment.alias]) {
+      score += this.student.progress[assignment.alias][problem];
     }
     return parseFloat(score.toString());
   }
