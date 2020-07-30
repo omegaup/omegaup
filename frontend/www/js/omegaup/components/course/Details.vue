@@ -220,15 +220,19 @@ export default class CourseDetails extends Vue {
 
   get overallCompletedPercentage(): string {
     let score = 0;
-    let max_score = 0;
+    let maxScore = 0;
     for (const [assignment, progress] of Object.entries(this.progress)) {
       score += progress.score;
-      max_score += progress.max_score;
+      maxScore += progress.max_score;
     }
-    const percent = (score / max_score) * 100;
+    if (maxScore === 0) {
+      return (0).toFixed(2);
+    }
+    const percent = (score / maxScore) * 100;
 
     return percent.toFixed(2);
   }
+
   getAssignmentProgress(progress: types.Progress): string {
     const percent = (progress.score / progress.max_score) * 100;
     const percentText = progress.max_score === 0 ? '--:--' : percent.toFixed(2);

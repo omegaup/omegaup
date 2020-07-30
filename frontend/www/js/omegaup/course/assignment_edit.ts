@@ -23,15 +23,13 @@ OmegaUp.on('ready', () => {
         on: {
           submit: (source: course_AssignmentDetails) => {
             const params = {
+              assignment: source.alias,
+              course: courseAlias,
               name: source.name,
               description: source.description,
               start_time: source.startTime.getTime() / 1000,
               assignment_type: source.assignmentType,
             };
-            Object.assign(params, {
-              assignment: source.alias,
-              course: courseAlias,
-            });
 
             if (source.unlimitedDuration) {
               Object.assign(params, { unlimited_duration: true });
@@ -52,13 +50,13 @@ OmegaUp.on('ready', () => {
               });
           },
           cancel: () => {
-            window.location.href = `/course/${courseAlias}`;
+            window.location.href = `/course/${courseAlias}/`;
           },
         },
       });
     },
     data: {
-      invalidParameterName: '',
+      invalidParameterName: <string | null>null,
     },
     components: {
       'omegaup-course-edit': course_AssignmentDetails,

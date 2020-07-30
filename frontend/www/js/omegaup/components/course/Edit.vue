@@ -265,7 +265,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Ref, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import course_AssignmentDetails from './AssignmentDetails.vue';
@@ -357,6 +357,10 @@ export default class CourseEdit extends Vue {
     this.selectedAssignment = assignment;
     this.showTab = 'problems';
     this.$emit('select-assignment', assignment);
+  }
+
+  onCancel(): void {
+    this.$emit('cancel', this.courseURL);
   }
 
   onResetAssignmentForm(): void {

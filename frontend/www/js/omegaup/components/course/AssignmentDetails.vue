@@ -229,7 +229,6 @@ export default class CourseAssignmentDetails extends Vue {
   get show(): boolean {
     switch (this.assignmentFormMode) {
       case omegaup.AssignmentFormMode.New:
-        this.reset();
         return true;
       case omegaup.AssignmentFormMode.Edit:
         return true;
@@ -270,7 +269,7 @@ export default class CourseAssignmentDetails extends Vue {
 
   @Emit('cancel')
   onCancel(): void {
-    //this.reset();
+    this.reset();
   }
 
   onSubmit(): void {
