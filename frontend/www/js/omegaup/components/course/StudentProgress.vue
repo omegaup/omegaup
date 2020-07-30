@@ -53,21 +53,21 @@ import T from '../../lang';
 export default class StudentProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() student!: types.StudentProgress;
-  @Prop() assignments!: types.CourseAssignment[];
+  @Prop() assignments!: omegaup.Assignment[];
 
   T = T;
 
-  score(
-    assignment: types.CourseAssignment,
+   score(
+    assignment: omegaup.Assignment,
   ): number {
     if (!this.student.progress.hasOwnProperty(assignment.alias)) {
       return -1;
     }
-    let score = 0;
-    for (let problem in this.student.progress[assignment.alias]) {
-      score += this.student.progress[assignment.alias][problem];
-    }
-    return parseFloat(score.toString());
+
+    return Object.values(this.student.progress[assignment.alias]).reduce(
+      (accumulator: number, currentValue: number) => accumulator + currentValue,
+      0,
+    );
   }
 
   getProblemColor(problemScore: number): String {
