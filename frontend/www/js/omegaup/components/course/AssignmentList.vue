@@ -147,9 +147,11 @@ export default class CourseAssignmentList extends Vue {
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
   currentContent: types.CourseAssignment[] = this.content;
+
   assignmentUrl(assignment: omegaup.Assignment): string {
     return `/course/${this.courseAlias}/assignment/${assignment.alias}/`;
   }
+
   sortContent(event: any): void {
     this.currentContent.splice(
       event.newIndex,

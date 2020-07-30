@@ -20,7 +20,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
@@ -300,7 +299,7 @@ def create_problem(
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//input[@name = "alias"]'))).send_keys(problem_alias)
+                 '//input[@name = "problem_alias"]'))).send_keys(problem_alias)
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
@@ -315,8 +314,18 @@ def create_problem(
     driver.browser.find_element_by_name('source').send_keys('test')
     # Make the problem public
     driver.browser.find_element_by_xpath(
-        '//input[@type = "radio" and @name = "visibility" and @value = '
-        '"true"]').click()
+        '//input[@type="radio" and @name="visibility" and @value="true"]'
+    ).click()
+    Select(
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    'select[name="problem-level"]'
+                )
+            )
+        )
+    ).select_by_value('problemLevelBasicKarel')
     contents_element = driver.browser.find_element_by_name(
         'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))

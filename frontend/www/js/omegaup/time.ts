@@ -5,17 +5,19 @@ import T from './lang';
 let momentInitialized: boolean = false;
 let remoteDeltaTime: number = 0;
 
-export function formatDelta(delta: number): string {
+export function formatFutureDateRelative(futureDate: Date): string {
   if (!momentInitialized) {
     moment.locale(T.locale);
     momentInitialized = true;
   }
 
+  return moment(futureDate).endOf().fromNow();
+}
+
+export function formatDelta(delta: number): string {
   let months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
-    return moment(delta + Date.now())
-      .endOf()
-      .fromNow();
+    return formatFutureDateRelative(new Date(delta + Date.now()));
   }
 
   let days = Math.floor(delta / (24 * 60 * 60 * 1000));

@@ -19,8 +19,8 @@
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
- * @psalm-type ArenaProblemDetails=array{alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettings, source?: string, statement?: ProblemStatement, title: string, visibility: int}
- * @psalm-type ProblemDetails=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, show_diff: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettings, source?: string, statement?: ProblemStatement, title: string, visibility: int}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, show_diff: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ProblemSettingsSummaryPayload=array{problem: ArenaProblemDetails, problem_admin: bool}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
@@ -28,9 +28,9 @@
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
- * @psalm-type ProblemDetailsPayload=array{accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetailsPayload=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
  * @psalm-type ProblemDetailsv2Payload=array{nominationStatus?: NominationStatus, problem: ProblemInfo, user: UserInfoForProblem}
- * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
@@ -101,6 +101,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -152,6 +153,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $params['overall_wall_time_limit'] = intval(
                 $r['overall_wall_time_limit']
             );
+        }
+        if (!is_null($r['problem_level'])) {
+            $params['problem_level'] = strval($r['problem_level']);
         }
         if (!is_null($r['selected_tags'])) {
             $params['selected_tags'] = strval($r['selected_tags']);
@@ -378,6 +382,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -474,6 +479,32 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     self::addTag($tagName, $tag['public'], $problem);
                 }
             }
+
+            // Add problem level tag
+            if (!empty($params->problemLevel)) {
+                $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
+
+                if (is_null($tag)) {
+                    throw new \OmegaUp\Exceptions\NotFoundException('tag');
+                }
+                if (
+                    !in_array(
+                        $tag->name,
+                        \OmegaUp\Controllers\Tag::getLevelTags()
+                    )
+                ) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'notProblemLevelTag',
+                        'level_tag'
+                    );
+                }
+
+                \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+                    $problem,
+                    $tag
+                );
+            }
+
             \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -1108,6 +1139,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $redirect
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -1660,6 +1692,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -1754,6 +1787,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $output_limit
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $solution
@@ -2589,6 +2623,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response['languages'] = array_filter(
             explode(',', $problem->languages)
         );
+        $response['accepts_submissions'] = !empty($response['languages']);
 
         $response['points'] = round(
             100.0 / (log(
@@ -4178,6 +4213,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'commit' => $details['commit'],
                     'input_limit' => $details['input_limit'],
                     'languages' => $details['languages'],
+                    'accepts_submissions' => !empty($details['languages']),
                     'points' => $details['points'],
                     'problem_id' => $details['problem_id'],
                     'quality_seal' => $details['quality_seal'],
@@ -4658,6 +4694,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $redirect
      * @omegaup-request-param mixed $request
      * @omegaup-request-param mixed $selected_tags
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
      * @omegaup-request-param mixed $time_limit
@@ -4780,6 +4817,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $result['smartyProperties']['payload']
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
+                \OmegaUp\ApiCaller::logException($e);
                 /** @var array{error?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
@@ -4902,7 +4940,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param bool $allow_user_add_tags
-     * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
@@ -4912,6 +4949,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $overall_wall_time_limit
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $request
+     * @omegaup-request-param mixed $problem_level
      * @omegaup-request-param mixed $selected_tags
      * @omegaup-request-param string $show_diff
      * @omegaup-request-param mixed $source
@@ -4938,8 +4976,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $tags[] = ['name' => $tag->name];
         }
         if (isset($r['request']) && ($r['request'] === 'submit')) {
-            // HACK to prevent fails in validateCreateOrUpdate
-            $r['problem_alias'] = strval($r['alias']);
             $problemParams = null;
             try {
                 $problemParams = self::convertRequestToProblemParams($r);
@@ -4952,7 +4988,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             } catch (\OmegaUp\Exceptions\ExitException $e) {
                 throw $e;
             } catch (\OmegaUp\Exceptions\ApiException $e) {
-                /** @var array{error?: string} */
+                \OmegaUp\ApiCaller::logException($e);
+                /** @var array{error?: string, parameter?: string} */
                 $response = $e->asResponseArray();
                 if (empty($response['error'])) {
                     $statusError = '{error}';
@@ -4981,6 +5018,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'source' => strval($r['source']),
                                 'visibility' => intval($r['visibility']),
                                 'statusError' => $statusError,
+                                'parameter' => !empty($response['parameter'])
+                                  ? strval($response['parameter'])
+                                  : null,
                                 'selectedTags' => $selectedTags,
                                 'allowUserAddTags' => true,
                                 'showDiff' => strval($r['show_diff']),
@@ -5000,6 +5040,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'languages' => strval($r['languages']),
                                 'validator' => strval($r['validator']),
                                 'tags' => $tags,
+                                'problem_level' => strval($r['problem_level']),
                                 'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                                 'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                             ],
@@ -5024,6 +5065,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'source' => '',
                         'visibility' => 0,
                         'statusError' => '',
+                        'parameter' => null,
                         'selectedTags' => null,
                         'allowUserAddTags' => true,
                         'showDiff' => 'none',
@@ -5039,6 +5081,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             $sortedLanguages
                         ),
                         'tags' => $tags,
+                        'problem_level' => '',
                         'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     ],

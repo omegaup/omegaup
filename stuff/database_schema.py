@@ -68,12 +68,6 @@ def main():
             git_tools.Argument(
                 '--password', default='omegaup', help='MySQL password')])
 
-    # If running in an automated environment, we can close stdin.
-    # This will disable all prompts.
-    if (args.continuous_integration
-            or os.environ.get('CONTINUOUS_INTEGRATION') == 'true'):
-        sys.stdin.close()
-
     validate_only = args.tool == 'validate'
 
     filtered_files = list(filename for filename in args.files if

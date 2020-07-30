@@ -1215,6 +1215,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     $problem['letter'] = \OmegaUp\Controllers\Contest::columnName(
                         $letter++
                     );
+                    $problem['accepts_submissions'] = !empty(
+                        $problem['languages']
+                    );
                     if (!empty($result['languages'])) {
                         $problem['languages'] = join(',', array_intersect(
                             explode(',', $result['languages']),

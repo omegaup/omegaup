@@ -998,6 +998,7 @@ export namespace types {
   }
 
   export interface ArenaProblemDetails {
+    accepts_submissions: boolean;
     alias: string;
     commit: string;
     input_limit: number;
@@ -1544,6 +1545,7 @@ export namespace types {
 
   export interface ProblemDetails {
     accepted: number;
+    accepts_submissions: boolean;
     admin?: boolean;
     alias: string;
     allow_user_add_tags: boolean;
@@ -1582,6 +1584,7 @@ export namespace types {
 
   export interface ProblemDetailsPayload {
     accepted: number;
+    accepts_submissions: boolean;
     admin?: boolean;
     alias: string;
     allow_user_add_tags: boolean;
@@ -1680,6 +1683,8 @@ export namespace types {
     message?: string;
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
+    parameter?: string;
+    problem_level: string;
     publicTags: string[];
     selectedTags?: types.SelectedTag[];
     showDiff: string;

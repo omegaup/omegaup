@@ -234,6 +234,7 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
+
 @Component({
   components: {
     'omegaup-datepicker': DatePicker,
@@ -246,6 +247,7 @@ export default class CourseDetails extends Vue {
   @Prop({ default: false }) update!: boolean;
   @Prop() course!: types.CourseDetails;
   @Prop({ default: '' }) invalidParameterName!: string;
+  
   T = T;
   alias = this.course.alias;
   description = this.course.description;

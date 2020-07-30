@@ -315,8 +315,10 @@ export default class CourseEdit extends Vue {
   @Prop() initialTab!: string;
   T = T;
   showTab = this.initialTab;
+
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
+
   assignment = emptyAssignment;
   selectedAssignment = this.data.selectedAssignment;
   get courseURL(): string {

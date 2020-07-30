@@ -57,6 +57,7 @@ export interface ArenaOptions {
 }
 
 export interface Problem {
+  accepts_submissions: boolean;
   alias: string;
   commit: string;
   input_limit: number;
@@ -173,6 +174,7 @@ export class Arena {
 
   // Currently opened problem.
   currentProblem: Problem = {
+    accepts_submissions: true,
     title: '',
     alias: '',
     commit: '',
@@ -263,6 +265,8 @@ export class Arena {
     ranking: JQuery;
     socketStatus: JQuery;
   };
+
+  initialClarifications: types.Clarification[] = [];
 
   navbarAssignments: Vue | null = null;
 
@@ -1398,17 +1402,18 @@ export class Arena {
   updateClarification(clarification: types.Clarification): void {
     let r: JQuery | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
-    if (this.commonNavbar === null) {
-      return;
-    }
-    const clarifications = this.commonNavbar.initialClarifications;
+    const clarifications =
+      this.commonNavbar?.initialClarifications ?? this.initialClarifications;
     if (this.clarifications[clarification.clarification_id]) {
       r = this.clarifications[clarification.clarification_id];
       if (this.problemsetAdmin) {
-        this.commonNavbar.initialClarifications = clarifications.filter(
+        this.initialClarifications = clarifications.filter(
           (notification) =>
             notification.clarification_id !== clarification.clarification_id,
         );
+        if (this.commonNavbar !== null) {
+          this.commonNavbar.initialClarifications = this.initialClarifications;
+        }
       } else {
         clarifications.push(clarification);
       }
@@ -1534,6 +1539,19 @@ export class Arena {
 
     if (this.commonNavbar !== null) {
       this.commonNavbar.initialClarifications = clarifications
+        .filter((clarification) =>
+          // Removing all unsolved clarifications.
+          this.problemsetAdmin
+            ? clarification.answer === null
+            : clarification.answer !== null &&
+              // Removing all unanswered clarifications.
+              localStorage.getItem(
+                `clarification-${clarification.clarification_id}`,
+              ) === null,
+        )
+        .reverse();
+    } else {
+      this.initialClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin

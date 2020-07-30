@@ -222,6 +222,7 @@ export default class CourseProblemList extends Vue {
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: omegaup.Assignment;
   @Prop() assignmentFormMode!: omegaup.AssignmentFormMode;
+  
   typeahead = typeahead;
   T = T;
   assignment: Partial<omegaup.Assignment> = this.selectedAssignment;
@@ -282,6 +283,7 @@ export default class CourseProblemList extends Vue {
   onTagsChange() {
     this.$emit('emit-tags', this.tags);
   }
+  
   @Watch('assignmentFormMode')
   onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
     if (newValue !== omegaup.AssignmentFormMode.AddProblem) {

@@ -1613,7 +1613,7 @@ API to Create an assignment
 | `description`        | `mixed`     |             |
 | `finish_time`        | `mixed`     |             |
 | `name`               | `mixed`     |             |
-| `order`              | `mixed`     |             |
+| `order`              | `int|null`  |             |
 | `problems`           | `mixed`     |             |
 | `publish_time_delay` | `mixed`     |             |
 | `start_time`         | `mixed`     |             |
@@ -2630,6 +2630,7 @@ Create a new problem
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
 | `source`                  | `mixed`     |             |
@@ -2951,6 +2952,7 @@ Update problem contents
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `redirect`                | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
@@ -3006,6 +3008,7 @@ Updates problem solution only
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
 | `solution`                | `mixed`     |             |
@@ -3042,6 +3045,7 @@ Updates problem statement only
 | `output_limit`            | `mixed`     |             |
 | `overall_wall_time_limit` | `mixed`     |             |
 | `problem_alias`           | `mixed`     |             |
+| `problem_level`           | `mixed`     |             |
 | `selected_tags`           | `mixed`     |             |
 | `show_diff`               | `string`    |             |
 | `source`                  | `mixed`     |             |
@@ -3912,9 +3916,9 @@ Get Contests which a certain user has participated in
 
 ### Returns
 
-| Name       | Type                                                                                                                                       |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place: number; }; }` |
+| Name       | Type                                                                                                                                        |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contests` | `{ [key: string]: { data: { alias: string; finish_time: Date; last_updated: Date; start_time: Date; title: string; }; place?: number; }; }` |
 
 ## `/api/user/create/`
 

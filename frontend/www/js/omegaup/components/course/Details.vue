@@ -200,6 +200,7 @@ export default class CourseDetails extends Vue {
   @Prop() progress!: types.AssignmentProgress[];
   T = T;
   ui = ui;
+  
   get filteredHomeworks(): types.CourseAssignment[] {
     if (!this.course.assignments) return [];
     return this.course.assignments.filter(

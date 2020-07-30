@@ -67,6 +67,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import AsyncComputedPlugin from 'vue-async-computed';
@@ -143,27 +144,32 @@ function toOds(courseName: string, table: string[][]): string {
   components: { 'omegaup-student-progress': StudentProgress },
 })
 export default class CourseViewProgress extends Vue {
+  @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
   @Prop() students!: types.StudentProgress[];
-  @Prop() assignments!: types.CourseAssignment[];
-  T = T;
 
-  get courseUrl(): string {
-    return `/course/${this.course.alias}/`;
-  }
+  T = T;
 
   score(
     student: types.StudentProgress,
-    assignment: types.CourseAssignment,
+    assignment: omegaup.Assignment,
   ): number {
     if (!student.progress.hasOwnProperty(assignment.alias)) {
       return 0;
     }
-    let score = 0;
-    for (let problem in student.progress[assignment.alias]) {
-      score += student.progress[assignment.alias][problem];
-    }
-    return parseFloat(score.toString());
+
+    return Object.values(student.progress[assignment.alias]).reduce(
+      (accumulator: number, currentValue: number) => accumulator + currentValue,
+      0,
+    );
+  }
+
+  studentProgressUrl(student: types.StudentProgress): string {
+    return `/course/${this.course.alias}/student/${student.username}/`;
+  }
+
+  get courseUrl(): string {
+    return `/course/${this.course.alias}/`;
   }
 
   //Add problem scores
@@ -175,11 +181,12 @@ export default class CourseViewProgress extends Vue {
     }
     table.push(header);
     for (let student of this.students) {
-      let row: string[] = [student.username];
-      row.push(student.name || '');
+      let row: string[] = [student.username, student.name || ''];
+
       for (let assignment of this.assignments) {
         row.push(String(this.score(student, assignment)));
       }
+
       table.push(row);
     }
     return table;

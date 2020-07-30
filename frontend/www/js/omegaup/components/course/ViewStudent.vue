@@ -102,11 +102,13 @@ export default class CourseViewStudent extends Vue {
   @Prop() initialStudent!: types.StudentProgress;
   @Prop() problems!: omegaup.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
+  
   T = T;
   time = time;
   selectedAssignment: Partial<omegaup.Assignment> = {};
   selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
   selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
+
   data(): { [name: string]: any } {
     return {
       selectedProblem: undefined,
