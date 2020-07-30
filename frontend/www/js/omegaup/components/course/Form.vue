@@ -247,7 +247,7 @@ export default class CourseDetails extends Vue {
   @Prop({ default: false }) update!: boolean;
   @Prop() course!: types.CourseDetails;
   @Prop({ default: '' }) invalidParameterName!: string;
-  
+
   T = T;
   alias = this.course.alias;
   description = this.course.description;

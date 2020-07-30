@@ -19,8 +19,13 @@
                 </tr>
               </thead>
               <tbody>
-                <omegaup-student-progress v-for="currStudent in students" v-bind:key="currStudent.name" 
-                v-bind:student="currStudent" v-bind:assignments="assignments" v-bind:course="course">
+                <omegaup-student-progress
+                  v-for="currStudent in students"
+                  v-bind:key="currStudent.name"
+                  v-bind:student="currStudent"
+                  v-bind:assignments="assignments"
+                  v-bind:course="course"
+                >
                 </omegaup-student-progress>
               </tbody>
             </table>

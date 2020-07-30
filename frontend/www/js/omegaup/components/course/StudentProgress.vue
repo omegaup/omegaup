@@ -12,7 +12,12 @@
       <p class="mb-1">{{ Math.round(score(assignment)) }}</p>
       <div class="d-flex justify-content-center">
         why
-        <div v-for="problem in student.progress[assignment.alias]" class="box bg-green">hey</div>
+        <div
+          v-for="problem in student.progress[assignment.alias]"
+          class="box bg-green"
+        >
+          hey
+        </div>
       </div>
     </td>
   </tr>
@@ -57,9 +62,7 @@ export default class StudentProgress extends Vue {
 
   T = T;
 
-   score(
-    assignment: omegaup.Assignment,
-  ): number {
+  score(assignment: omegaup.Assignment): number {
     if (!this.student.progress.hasOwnProperty(assignment.alias)) {
       return -1;
     }
