@@ -234,7 +234,7 @@ WHERE
 INSERT IGNORE INTO `Problems_Tags` (`problem_id`, `tag_id`, `public`, `source`)
 SELECT `pt`.`problem_id`, `tm`.`new_tag_id`, '1', 'owner'
   FROM `Problems_Tags` AS `pt`
-  INNER JOIN `_TagMapping` AS `tm` 
+  INNER JOIN `_TagMapping` AS `tm`
   ON `pt`.`tag_id` = `tm`.`old_tag_id`;
 
 -- Delete old relations tag-problem
