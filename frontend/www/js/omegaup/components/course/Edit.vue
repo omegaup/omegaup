@@ -136,12 +136,23 @@
             (assignmentAlias, problemsAlias) =>
               $emit('sort-problems', assignmentAlias, problemsAlias)
           "
-          v-on:emit-cancel="onResetAssignmentForm"
-          v-on:emit-submit="
+          v-on:cancel="onResetAssignmentForm"
+          v-on:submit="
             (assignmentFormComponent, problems) =>
               $emit('submit-new-assignment', assignmentFormComponent, problems)
           "
-        ></omegaup-course-assignment-details>
+        >
+          <template slot="page-header"><span></span></template>
+          <template slot="cancel-button">
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              v-on:click.prevent="onResetAssignmentForm"
+            >
+              {{ T.wordsCancel }}
+            </button></template
+          ></omegaup-course-assignment-details
+        >
       </div>
 
       <div

@@ -34,6 +34,7 @@
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<StudentProgress>, tags: list<string>}
+ * @psalm-type CourseAssignmentEditPayload=array{course: CourseDetails, assignment: CourseAssignment|null}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
@@ -2545,57 +2546,119 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: string}}
      */
-    public static function getCourseEditDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getCourseEditDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
-        $course = self::validateCourseExists($r['course']);
+
+        $courseEditDetails = self::getCourseEditDetails(
+            $r['course'],
+            $r->identity
+        );
+
+        if (!empty($courseEditDetails['course']['assignments'])) {
+            $courseEditDetails['selectedAssignment'] = $courseEditDetails['course']['assignments'][0];
+            $courseEditDetails['assignmentProblems'] = self::getProblemsByAssignment(
+                $courseEditDetails['selectedAssignment']['alias'],
+                $r['course'],
+                $r->identity,
+                $r->user
+            );
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => $courseEditDetails,
+                'title' => 'courseEdit',
+            ],
+            'entrypoint' => 'course_edit',
+        ];
+    }
+
+    /**
+     * @omegaup-request-param mixed $assignment_alias
+     * @omegaup-request-param mixed $course
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: string}}
+     */
+    public static function getCourseEditDetailsWithSelectedAssignmentForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
+        \OmegaUp\Validators::validateValidAlias(
+            $r['assignment_alias'],
+            'assignment_alias'
+        );
+
+        [
+            'course' => $courseEditDetails,
+        ] = self::getCourseEditDetails(
+            $r['course'],
+            $r->identity
+        );
+
+        $assignment = null;
+        if (!empty($courseEditDetails['assignments'])) {
+            $assignment = array_filter(
+                $courseEditDetails['assignments'],
+                function (array $assignment) use ($r) {
+                    return $assignment['alias'] === $r['assignment_alias'];
+                }
+            );
+            $assignment = array_shift($assignment);
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => $courseEditDetails,
+                    'assignment' => $assignment,
+                ],
+                'title' => 'courseAssignmentEdit',
+            ],
+            'entrypoint' => 'course_assignment_edit',
+        ];
+    }
+
+    /**
+     * @return CourseEditPayload
+     */
+    private static function getCourseEditDetails(
+        string $courseAlias,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
+        $course = self::validateCourseExists($courseAlias);
         if (is_null($course->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         self::resolveGroup($course);
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        $courseDetails = self::getCommonCourseDetails($course, $r->identity);
-        $selectedAssignment = null;
-        $assignmentProblems = [];
-        if (!empty($courseDetails['assignments'])) {
-            $selectedAssignment = $courseDetails['assignments'][0];
-            $assignmentProblems = self::getProblemsByAssignment(
-                $selectedAssignment['alias'],
-                $course->alias,
-                $r->identity,
-                $r->user
-            );
         }
         $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
         foreach ($admins as &$admin) {
             unset($admin['user_id']);
         }
+
         return [
-            'smartyProperties' => [
-                'payload' => [
-                    'course' => $courseDetails,
-                    'assignmentProblems' => $assignmentProblems,
-                    'selectedAssignment' => $selectedAssignment,
-                    'tags' => [],
-                    'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-                        intval($course->course_id),
-                        intval($course->group_id)
-                    ),
-                    'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
-                        intval($course->course_id)
-                    ),
-                    'admins' => $admins,
-                    'groupsAdmins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins(
-                        $course
-                    ),
-                ],
-                'title' => 'courseEdit',
-            ],
-            'entrypoint' => 'course_edit',
+            'course' => self::getCommonCourseDetails($course, $identity),
+            'assignmentProblems' => [],
+            'selectedAssignment' => null,
+            'tags' => [],
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                intval($course->course_id),
+                intval($course->group_id)
+            ),
+            'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
+                intval($course->course_id)
+            ),
+            'admins' => $admins,
+            'groupsAdmins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins(
+                $course
+            ),
         ];
     }
 
