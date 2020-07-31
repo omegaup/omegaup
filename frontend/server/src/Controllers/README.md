@@ -1409,15 +1409,15 @@ Add Student to Course.
 
 ### Parameters
 
-| Name                           | Type    | Description |
-| ------------------------------ | ------- | ----------- |
-| `accept_teacher`               | `mixed` |             |
-| `accept_teacher_git_object_id` | `mixed` |             |
-| `course_alias`                 | `mixed` |             |
-| `privacy_git_object_id`        | `mixed` |             |
-| `share_user_information`       | `mixed` |             |
-| `statement_type`               | `mixed` |             |
-| `usernameOrEmail`              | `mixed` |             |
+| Name                           | Type        | Description |
+| ------------------------------ | ----------- | ----------- |
+| `accept_teacher`               | `bool|null` |             |
+| `accept_teacher_git_object_id` | `mixed`     |             |
+| `course_alias`                 | `mixed`     |             |
+| `privacy_git_object_id`        | `mixed`     |             |
+| `share_user_information`       | `mixed`     |             |
+| `statement_type`               | `mixed`     |             |
+| `usernameOrEmail`              | `mixed`     |             |
 
 ### Returns
 

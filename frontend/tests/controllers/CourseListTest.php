@@ -111,7 +111,7 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
         int $numberOfStudentCourses,
         int $numberOfPublicCourses
     ) {
-        $response = \OmegaUp\Controllers\Course::getCourseListDetailsForSmarty(
+        $response = \OmegaUp\Controllers\Course::getCourseSummaryListDetailsForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $userLogin->auth_token,
             ])
