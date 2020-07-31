@@ -24,7 +24,7 @@
         </div>
         <div class="col-lg-7 text-right align-middle">
           <span
-            ><a v-bind:href="`/courses/${accessMode}/`">{{
+            ><a v-bind:href="`/course/list/${accessMode}/`">{{
               T.courseListSeeAll
             }}</a></span
           >
@@ -37,11 +37,6 @@
               v-for="course in filteredCourses.courses"
               v-if="timeType !== 'past'"
             >
-              <a
-                v-bind:href="`/course/${course.alias}/`"
-                class="btn btn-primary mb-3"
-                >{{ course.name }}</a
-              >
               <omegaup-course-card
                 v-bind:course-name="course.name"
                 v-bind:course-alias="course.alias"
