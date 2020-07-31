@@ -37,7 +37,7 @@ CREATE TABLE `Assignments` (
   `description` tinytext NOT NULL,
   `alias` varchar(32) NOT NULL,
   `publish_time_delay` int DEFAULT NULL,
-  `assignment_type` enum('homework','test') NOT NULL,
+  `assignment_type` enum('homework','lesson','test') NOT NULL DEFAULT 'homework' COMMENT 'Almacena el tipo de contenido que se va a dar de alta',
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `finish_time` timestamp NULL DEFAULT NULL,
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',

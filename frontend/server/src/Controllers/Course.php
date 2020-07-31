@@ -32,11 +32,11 @@
  * @psalm-type StudentCourses=array{public: CoursesByAccessMode, student: CoursesByAccessMode}
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{courses: StudentCourses}
- * @psalm-type CourseStudent=array{name: null|string, progress: array<string, float>, username: string}
+ * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
- * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<CourseStudent>, student: string}
- * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<CourseStudent>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<StudentProgress>, tags: list<string>}
+ * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
+ * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type AddedProblem=array{alias: string, points: float}
@@ -138,7 +138,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateInEnum(
             $r['assignment_type'],
             'assignment_type',
-            ['test', 'homework']
+            ['test', 'lesson', 'homework']
         );
         \OmegaUp\Validators::validateValidAlias(
             $r['alias'],
@@ -538,7 +538,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
 
             foreach ($assignmentsProblems as $assignment => $assignmentProblems) {
-                // Create and assign homeworks and tests to new course
+                // Create and assign homeworks, lessons and tests to new course
                 $problemset = self::createAssignment(
                     $originalCourse,
                     new \OmegaUp\DAO\VO\Assignments([
@@ -841,7 +841,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $order
+     * @omegaup-request-param int|null $order
      * @omegaup-request-param mixed $problems
      * @omegaup-request-param mixed $publish_time_delay
      * @omegaup-request-param mixed $start_time
@@ -857,15 +857,17 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['course_alias'],
             'course_alias'
         );
-        \OmegaUp\Validators::validateOptionalNumber(
-            $r['order'],
-            'order'
-        );
+        $order = $r->ensureOptionalInt('order');
         $course = self::validateCourseExists($r['course_alias']);
         [
             'addedProblems' => $addedProblems,
         ] = self::validateCreateAssignment($r, $course);
 
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'courseNotFound'
+            );
+        }
         if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -882,7 +884,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'assignment_type' => $r['assignment_type'],
                 'start_time' => $r['start_time'],
                 'finish_time' => $r['finish_time'],
-                'order' => intval($r['order']),
+                'order' => $order ?? \OmegaUp\DAO\Assignments::getNextPositionOrder(
+                    $course->course_id
+                ),
             ]),
             $r->identity,
             $addedProblems
@@ -1815,7 +1819,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{students: list<CourseStudent>}
+     * @return array{students: list<StudentProgress>}
      */
     public static function apiListStudents(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
