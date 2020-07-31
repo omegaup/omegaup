@@ -19,6 +19,7 @@ OmegaUp.on('ready', () => {
           startTimeCourse: payload.course.start_time,
           assignment: payload.assignment,
           invalidParameterName: this.invalidParameterName,
+          shouldAddProblems: false,
         },
         on: {
           submit: (source: course_AssignmentDetails) => {

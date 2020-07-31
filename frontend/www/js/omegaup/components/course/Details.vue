@@ -68,7 +68,7 @@
               <a
                 data-button-manage-content
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/edit/#assignments`"
+                v-bind:href="`/course/${course.alias}/edit/#content`"
                 >{{ T.courseAddContent }}</a
               >
             </div>
