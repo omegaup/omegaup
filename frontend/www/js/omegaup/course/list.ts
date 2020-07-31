@@ -1,5 +1,5 @@
 // TODO: Replace List.vue with CardsList.vue when PR #4422 is merged
-import course_CardsList from '../components/course/CardsList.vue';
+import course_CardsList from '../components/course/List.vue';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
