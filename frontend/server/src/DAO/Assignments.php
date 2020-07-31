@@ -224,4 +224,22 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             [$problemset->problemset_id]
         );
     }
+
+    public static function getNextPositionOrder(int $courseId): int {
+        $sql = '
+            SELECT
+                COUNT(a.assignment_id)
+            FROM
+                Assignments a
+            WHERE
+                a.course_id = ?;
+            ';
+
+        /** @var int|null */
+        $numberOfAssignments = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$courseId]
+        );
+        return intval($numberOfAssignments) + 1;
+    }
 }

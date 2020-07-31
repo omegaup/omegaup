@@ -13,7 +13,7 @@ describe('AddStudents.vue', () => {
     const wrapper = shallowMount(course_AddStudents, {
       propsData: {
         courseAlias: 'course_alias',
-        students: <omegaup.CourseStudent[]>[],
+        students: <types.StudentProgress[]>[],
         identityRequests: <types.IdentityRequest[]>[],
       },
     });
@@ -25,7 +25,7 @@ describe('AddStudents.vue', () => {
     const wrapper = shallowMount(course_AddStudents, {
       propsData: {
         courseAlias: 'course_alias',
-        students: <omegaup.CourseStudent[]>[
+        students: <types.StudentProgress[]>[
           {
             name: 'omegaUp user',
             progress: {},
