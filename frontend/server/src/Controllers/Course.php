@@ -2853,7 +2853,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $courses['student'] = array_filter($courses['student'], function ($course) {
-            return is_null($course['finish_time']) || $course['finish_time']->time > \OmegaUp\Time::get();
+            return is_null($course['finish_time'])
+                || $course['finish_time']->time > \OmegaUp\Time::get();
         });
         $courses['student'] = array_slice($courses['student'], 0, 5);
 

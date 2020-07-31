@@ -2,56 +2,44 @@
   <div>
     <h1 class="card-title">{{ T.navAllCourses }}</h1>
 
-    <div class="m-3" v-if="false">
-      <div class="float-right">
-        <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
-      </div>
-      <h1>&nbsp;</h1>
-    </div>
     <div class="container">
       <div
         class="row"
         v-for="(typeCourses, accessMode) in courses"
         v-if="typeCourses.activeTab !== ''"
       >
-        <div class="col-lg-5 p-3" v-bind:class="accessMode">
-          <div class="float-left">
-            <h3>{{ getDescription(accessMode) }}</h3>
-          </div>
-          <div class="float-right">
+        <div class="col-lg-5 p-3 d-flex" v-bind:class="accessMode">
+          <h3 class="flex-grow-1">{{ getDescription(accessMode) }}</h3>
+          <div class="d-none">
             <font-awesome-icon icon="info-circle" />
           </div>
         </div>
         <div class="col-lg-7 text-right align-middle">
-          <span
-            ><a v-bind:href="`/course/list/${accessMode}/`">{{
-              T.courseListSeeAll
-            }}</a></span
-          >
+          <a v-bind:href="`/course/list/${accessMode}/`">{{
+            T.courseListSeeAllCourses
+          }}</a>
         </div>
         <div class="card col-lg-12 pt-3 mb-3">
           <template
             v-for="(filteredCourses, timeType) in typeCourses.filteredCourses"
           >
-            <template
+            <omegaup-course-card
               v-for="course in filteredCourses.courses"
               v-if="timeType !== 'past'"
-            >
-              <omegaup-course-card
-                v-bind:course-name="course.name"
-                v-bind:course-alias="course.alias"
-                v-bind:school-name="course.school_name"
-                v-bind:finish-time="course.finish_time"
-                v-bind:progress="course.progress"
-                v-bind:content="
-                  course.admission_mode !== 'public' ? [] : course.assignments
-                "
-                v-bind:is-open="course.is_open"
-                v-bind:show-topics="
-                  course.admission_mode === 'public' && accessMode !== 'student'
-                "
-              ></omegaup-course-card>
-            </template>
+              v-bind:key="course.alias"
+              v-bind:course-name="course.name"
+              v-bind:course-alias="course.alias"
+              v-bind:school-name="course.school_name"
+              v-bind:finish-time="course.finish_time"
+              v-bind:progress="course.progress"
+              v-bind:content="
+                course.admission_mode !== 'public' ? [] : course.assignments
+              "
+              v-bind:is-open="course.is_open"
+              v-bind:show-topics="
+                course.admission_mode === 'public' && accessMode !== 'student'
+              "
+            ></omegaup-course-card>
           </template>
         </div>
       </div>
