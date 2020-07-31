@@ -13,7 +13,10 @@
               <thead>
                 <tr>
                   <th class="text-center">{{ T.wordsName }}</th>
-                  <th class="score text-center" v-for="assignment in assignments">
+                  <th
+                    class="score text-center"
+                    v-for="assignment in assignments"
+                  >
                     {{ assignment.name }}
                   </th>
                 </tr>

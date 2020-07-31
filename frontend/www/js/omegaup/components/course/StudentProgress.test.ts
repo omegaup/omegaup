@@ -31,14 +31,14 @@ describe('StudentProgress.vue', () => {
           name: 'student',
           progress: [
             {
-            Assignment: {
-              problem: 44,
-              problem2: 55,
-            }
-          },
+              Assignment: {
+                problem: 44,
+                problem2: 55,
+              },
+            },
           ],
-          username: 'student'
-        }
+          username: 'student',
+        },
       },
     });
     expect(wrapper.find('div.bg-red'));

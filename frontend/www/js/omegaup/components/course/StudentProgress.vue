@@ -11,10 +11,15 @@
     >
       <p class="mb-1 text-center">{{ Math.round(score(assignment)) }}%</p>
       <div class="d-flex justify-content-center">
-        <div v-if="student.progress.hasOwnProperty(assignment.alias) == false">{{ T.wordsProblemsUnsolved }}</div>
+        <div v-if="student.progress.hasOwnProperty(assignment.alias) == false">
+          {{ T.wordsProblemsUnsolved }}
+        </div>
         <div
           v-for="problem in student.progress[assignment.alias]"
-          v-bind:class="getProblemColor(Math.round(problem))" data-toggle="tooltip" data-placement="bottom" v-bind:title="problemScore(problem)"
+          v-bind:class="getProblemColor(Math.round(problem))"
+          data-toggle="tooltip"
+          data-placement="bottom"
+          v-bind:title="problemScore(problem)"
         ></div>
       </div>
     </td>
@@ -45,6 +50,7 @@
   background: rgb(53, 53, 53);
 }
 </style>
+
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -58,7 +64,7 @@ export default class StudentProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
 
   T = T;
-  
+
   problemScore(problem: number): string {
     return Math.round(problem) + '%';
   }
@@ -67,9 +73,15 @@ export default class StudentProgress extends Vue {
     if (!this.student.progress.hasOwnProperty(assignment.alias)) {
       return 0;
     }
-    return (Object.values(this.student.progress[assignment.alias]).reduce(
-      (accumulator: number, currentValue: number) => accumulator + currentValue,
-      0,) / (Object.values(this.student.progress[assignment.alias]).length * 100)) * 100;
+    return (
+      (Object.values(this.student.progress[assignment.alias]).reduce(
+        (accumulator: number, currentValue: number) =>
+          accumulator + currentValue,
+        0,
+      ) /
+        (Object.values(this.student.progress[assignment.alias]).length * 100)) *
+      100
+    );
   }
 
   getProblemColor(problemScore: number): String {
