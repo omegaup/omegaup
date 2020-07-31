@@ -12,8 +12,8 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>{{ T.wordsName }}</th>
-                  <th class="score" v-for="assignment in assignments">
+                  <th class="text-center">{{ T.wordsName }}</th>
+                  <th class="score text-center" v-for="assignment in assignments">
                     {{ assignment.name }}
                   </th>
                 </tr>
@@ -21,7 +21,7 @@
               <tbody>
                 <omegaup-student-progress
                   v-for="currStudent in students"
-                  v-bind:key="currStudent.name"
+                  v-bind:key="currStudent.username"
                   v-bind:student="currStudent"
                   v-bind:assignments="assignments"
                   v-bind:course="course"
@@ -177,7 +177,6 @@ export default class CourseViewProgress extends Vue {
     return `/course/${this.course.alias}/`;
   }
 
-  //Add problem scores
   get progressTable(): string[][] {
     let table: string[][] = [];
     let header = [T.profileUsername, T.wordsName];

@@ -1,23 +1,21 @@
 <template>
   <tr>
-    <td>
-      <a v-bind:href="studentProgressUrl()" class="text-center align-middle">
+    <td class="text-center align-middle">
+      <a v-bind:href="studentProgressUrl()">
         {{ student.name || student.username }}
       </a>
     </td>
     <td
-      class="score d-flex flex-column justify-content-center align-items-center"
+      class="score flex-column justify-content-center align-items-center"
       v-for="assignment in assignments"
     >
-      <p class="mb-1">{{ Math.round(score(assignment)) }}</p>
+      <p class="mb-1 text-center">{{ Math.round(score(assignment)) }}%</p>
       <div class="d-flex justify-content-center">
-        why
+        <div v-if="student.progress.hasOwnProperty(assignment.alias) == false">{{ T.wordsProblemsUnsolved }}</div>
         <div
           v-for="problem in student.progress[assignment.alias]"
-          class="box bg-green"
-        >
-          hey
-        </div>
+          v-bind:class="getProblemColor(Math.round(problem))" data-toggle="tooltip" data-placement="bottom" v-bind:title="problemScore(problem)"
+        ></div>
       </div>
     </td>
   </tr>
@@ -32,7 +30,7 @@
 }
 
 .bg-green {
-  background: green;
+  background: rgb(53, 184, 53);
 }
 
 .bg-yellow {
@@ -44,10 +42,9 @@
 }
 
 .bg-black {
-  background: black;
+  background: rgb(53, 53, 53);
 }
 </style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -61,16 +58,18 @@ export default class StudentProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
 
   T = T;
+  
+  problemScore(problem: number): string {
+    return Math.round(problem) + '%';
+  }
 
   score(assignment: omegaup.Assignment): number {
     if (!this.student.progress.hasOwnProperty(assignment.alias)) {
-      return -1;
+      return 0;
     }
-
-    return Object.values(this.student.progress[assignment.alias]).reduce(
+    return (Object.values(this.student.progress[assignment.alias]).reduce(
       (accumulator: number, currentValue: number) => accumulator + currentValue,
-      0,
-    );
+      0,) / (Object.values(this.student.progress[assignment.alias]).length * 100)) * 100;
   }
 
   getProblemColor(problemScore: number): String {
