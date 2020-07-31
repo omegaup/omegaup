@@ -136,8 +136,8 @@
             (assignmentAlias, problemsAlias) =>
               $emit('sort-problems', assignmentAlias, problemsAlias)
           "
-          v-on:emit-cancel="onResetAssignmentForm"
-          v-on:emit-submit="
+          v-on:cancel="onResetAssignmentForm"
+          v-on:submit="
             (assignmentFormComponent, problems) =>
               $emit('submit-new-assignment', assignmentFormComponent, problems)
           "
