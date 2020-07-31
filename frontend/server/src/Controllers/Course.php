@@ -2852,12 +2852,24 @@ class Course extends \OmegaUp\Controllers\Controller {
             $coursesTypes
         );
 
-        // TODO: Filter the last 5 active courses that student has had activity
-        // in PR #4424
-        // $courses['student'] = array_filter($courses['student'], function ($course) {
-        //     return is_null($course['finish_time']) || $course['finish_time']->time > \OmegaUp\Time::get();
-        // });
-        // $courses['student'] = array_slice($courses['student'], 0, 5);
+        $courses['student'] = array_filter($courses['student'], function ($course) {
+            return is_null($course['finish_time']) || $course['finish_time']->time > \OmegaUp\Time::get();
+        });
+        $courses['student'] = array_slice($courses['student'], 0, 5);
+
+        // Checks whether a public course has been open already by user
+        foreach ($courses['public'] as &$publicCourse) {
+            $matchedCourses = array_filter(
+                $courses['student'],
+                function ($course) use ($publicCourse) {
+                    return $course['alias'] === $publicCourse['alias'];
+                }
+            );
+            if ($matchedCourses) {
+                $matchedCourse = array_slice($matchedCourses, 0, 1);
+                $publicCourse['is_open'] = $matchedCourse[0]['is_open'];
+            }
+        }
 
         $filteredCourses = self::getFilteredCourses($courses, $coursesTypes);
 
