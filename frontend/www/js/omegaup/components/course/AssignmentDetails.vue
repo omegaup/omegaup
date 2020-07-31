@@ -1,5 +1,10 @@
 <template>
   <div class="omegaup-course-assignmentdetails card" v-show="show">
+    <slot name="page-header">
+      <div class="card-header">
+        <h1>{{ T.wordsContentEdit }} {{ assignment.name }}</h1>
+      </div>
+    </slot>
     <div class="card-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -7,6 +12,7 @@
             <label
               >{{ T.wordsTitle }}
               <input
+                ref="name"
                 class="form-control name"
                 v-bind:class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
@@ -142,8 +148,44 @@
             </label>
           </div>
         </div>
-        <div class="form-group text-right">
-          <button class="btn btn-primary submit mr-2" type="submit">
+        <template v-if="shouldAddProblems">
+          <omegaup-course-scheduled-problem-list
+            ref="scheduled-problem-list"
+            v-if="assignmentFormMode === AssignmentFormMode.New"
+            v-bind:assignment-problems="assignmentProblems"
+            v-bind:tagged-problems="taggedProblems"
+            v-bind:selected-assignment="assignment"
+            v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+          ></omegaup-course-scheduled-problem-list>
+          <omegaup-course-problem-list
+            v-else=""
+            v-bind:assignment-problems="assignmentProblems"
+            v-bind:tagged-problems="taggedProblems"
+            v-bind:selected-assignment="assignment"
+            v-bind:assignment-form-mode.sync="assignmentFormMode"
+            v-on:emit-save-problem="
+              (assignment, problem) => $emit('add-problem', assignment, problem)
+            "
+            v-on:emit-remove-problem="
+              (assignment, problem) =>
+                $emit('remove-problem', assignment, problem)
+            "
+            v-on:emit-select-assignment="
+              (assignment) => $emit('select-assignment', assignment)
+            "
+            v-on:emit-sort="
+              (assignmentAlias, problemsAlias) =>
+                $emit('sort-problems', assignmentAlias, problemsAlias)
+            "
+            v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+          ></omegaup-course-problem-list>
+        </template>
+        <div class="form-group text-right mt-3">
+          <button
+            data-schedule-assignment
+            class="btn btn-primary submit mr-2"
+            type="submit"
+          >
             <template v-if="update">
               {{ T.courseAssignmentNewFormUpdate }}
             </template>
@@ -151,30 +193,34 @@
               {{ T.courseAssignmentNewFormSchedule }}
             </template>
           </button>
-          <button
-            class="btn btn-secondary"
-            type="reset"
-            v-on:click.prevent="onCancel"
-          >
-            {{ T.wordsCancel }}
-          </button>
+          <slot name="cancel-button">
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              v-on:click.prevent="onCancel"
+            >
+              {{ T.wordsBack }}
+            </button>
+          </slot>
         </div>
       </form>
     </div>
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
 .omegaup-course-assignmentdetails .form-group > label {
   width: 100%;
 }
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch, Emit, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
+import course_ProblemList from './ProblemList.vue';
+import course_ScheduledProblemList from './ScheduledProblemList.vue';
 import DateTimePicker from '../DateTimePicker.vue';
 import {
   FontAwesomeIcon,
@@ -186,13 +232,17 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 @Component({
   components: {
-    'omegaup-datetimepicker': DateTimePicker,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-datetimepicker': DateTimePicker,
+    'omegaup-course-problem-list': course_ProblemList,
+    'omegaup-course-scheduled-problem-list': course_ScheduledProblemList,
   },
 })
 export default class CourseAssignmentDetails extends Vue {
+  @Ref('scheduled-problem-list')
+  readonly scheduledProblemList!: course_ScheduledProblemList;
   @Prop({
     default: omegaup.AssignmentFormMode.Default,
   })
@@ -200,9 +250,13 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() assignment!: types.CourseAssignment;
   @Prop() finishTimeCourse!: Date;
   @Prop() startTimeCourse!: Date;
+  @Prop() assignmentProblems!: types.ProblemsetProblem[];
+  @Prop() taggedProblems!: omegaup.Problem[];
+  @Prop({ default: true }) shouldAddProblems!: boolean;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
   T = T;
+  AssignmentFormMode = omegaup.AssignmentFormMode;
   alias = this.assignment.alias || '';
   assignmentType = this.assignment.assignment_type || 'homework';
   description = this.assignment.description || '';
@@ -210,31 +264,34 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
-  show = false;
-  update = false;
   @Watch('assignment')
   onAssignmentChange() {
     this.reset();
   }
-  @Watch('assignmentFormMode')
-  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
-    switch (newValue) {
+
+  get show(): boolean {
+    switch (this.assignmentFormMode) {
       case omegaup.AssignmentFormMode.New:
-        this.show = true;
-        this.update = false;
-        this.reset();
-        break;
+        return true;
       case omegaup.AssignmentFormMode.Edit:
-        this.show = true;
-        this.update = true;
-        break;
+        return true;
       case omegaup.AssignmentFormMode.Default:
-        this.show = false;
-        this.update = true;
-        break;
+        return false;
       default:
-        this.show = false;
-        this.update = true;
+        return false;
+    }
+  }
+
+  get update(): boolean {
+    switch (this.assignmentFormMode) {
+      case omegaup.AssignmentFormMode.New:
+        return false;
+      case omegaup.AssignmentFormMode.Edit:
+        return true;
+      case omegaup.AssignmentFormMode.Default:
+        return true;
+      default:
+        return true;
     }
   }
   reset(): void {
@@ -246,12 +303,18 @@ export default class CourseAssignmentDetails extends Vue {
     this.startTime = this.assignment.start_time || new Date();
     this.unlimitedDuration = !this.assignment.finish_time;
   }
-  @Emit('emit-cancel')
+
+  @Watch('show')
+  onShowChanged(newValue: boolean): void {
+    this.reset();
+  }
+
+  @Emit('cancel')
   onCancel(): void {
     this.reset();
   }
   onSubmit(): void {
-    this.$emit('emit-submit', this);
+    this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
   }
 }
 </script>

@@ -13,12 +13,11 @@ describe('AssignmentDetails.vue', () => {
     const wrapper = shallowMount(course_AssignmentDetails, {
       propsData: {
         assignment: <omegaup.Assignment>{},
-        update: false,
-        show: true,
+        assignmentFormMode: omegaup.AssignmentFormMode.New,
         finishTimeCourse: new Date(),
         startTimeCourse: new Date(),
         unlimitedDurationCourse: false,
-        columnError: '',
+        invalidParameterName: '',
       },
     });
 

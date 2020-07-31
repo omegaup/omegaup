@@ -21,13 +21,13 @@
           </thead>
           <tbody>
             <tr v-for="problem in problems">
-              <td>{{ problem.alias }}</td>
-              <td>{{ problem.points }}</td>
+              <td class="align-middle">{{ problem.alias }}</td>
+              <td class="align-middle">{{ problem.points }}</td>
               <td class="button-column align-middle">
                 <button
                   class="btn btn-link"
                   v-bind:title="T.courseAssignmentProblemRemove"
-                  v-on:click.prevent="onRemoveProblem(assignment, problem)"
+                  v-on:click.prevent="onRemoveProblem(problem)"
                 >
                   <font-awesome-icon icon="trash" />
                 </button>
@@ -69,10 +69,7 @@
                 type="submit"
                 v-bind:disabled="problemAlias.length == 0"
                 v-on:click.prevent="
-                  onAddProblem(assignment, {
-                    alias: problemAlias,
-                    points: points,
-                  })
+                  onAddProblem({ alias: problemAlias, points: points })
                 "
               >
                 {{ T.courseEditAddProblems }}
@@ -123,12 +120,9 @@ export default class CourseScheduledProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
-  @Prop({ default: omegaup.AssignmentFormMode.New })
-  assignmentFormMode!: omegaup.AssignmentFormMode;
 
   typeahead = typeahead;
   T = T;
-  AssignmentFormMode = omegaup.AssignmentFormMode;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   taggedProblemAlias = '';
@@ -136,29 +130,23 @@ export default class CourseScheduledProblemList extends Vue {
   points = 100;
   showTopicsAndDifficulty = false;
 
-  onShowForm(): void {
-    this.$emit('update:assignment-form-mode', omegaup.AssignmentFormMode.New);
-    this.problemAlias = '';
-
-    Vue.nextTick(() => {
-      document.querySelector('.card-footer')?.scrollIntoView();
-    });
+  onAddProblem(problem: types.AddedProblem): void {
+    const problemAlias = problem.alias;
+    const currentProblem = this.problems.find(
+      (problem) => problem.alias === problemAlias,
+    );
+    if (!currentProblem) {
+      this.problems.push(problem);
+      return;
+    }
+    currentProblem.points = problem.points;
   }
 
-  onAddProblem(
-    assignment: types.CourseAssignment,
-    problem: types.AddedProblem,
-  ): void {
+  onRemoveProblem(problem: types.AddedProblem): void {
     const problemAlias = problem.alias;
-    this.$emit('add-problem', assignment, problem);
-  }
-
-  onRemoveProblem(
-    assignment: types.CourseAssignment,
-    problem: types.AddedProblem,
-  ): void {
-    const problemAlias = problem.alias;
-    this.$emit('remove-problem', assignment, problem.alias);
+    this.problems = this.problems.filter(
+      (problem) => problem.alias !== problemAlias,
+    );
   }
 
   @Watch('assignmentProblems')
@@ -184,11 +172,6 @@ export default class CourseScheduledProblemList extends Vue {
   @Watch('taggedProblemAlias')
   onTaggedProblemAliasChange() {
     this.problemAlias = this.taggedProblemAlias;
-  }
-
-  @Watch('assignmentFormMode')
-  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
-    this.$emit('update:assignment-form-mode', newValue);
   }
 
   reset(): void {

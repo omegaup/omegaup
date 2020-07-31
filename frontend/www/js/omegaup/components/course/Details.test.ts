@@ -122,7 +122,7 @@ describe('Details.vue', () => {
     });
 
     expect(
-      wrapper.find('[data-homework-alias="test-assignment"]').text(),
+      wrapper.find('[data-content-alias="test-assignment"]').text(),
     ).toContain('—');
   });
 });
