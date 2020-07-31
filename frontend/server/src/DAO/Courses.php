@@ -209,7 +209,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE c.admission_mode = ?;
            ';
 
-        /** @var list<array{accept_teacher: null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, is_open: int, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{accept_teacher: int|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, is_open: int, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [\OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC]
@@ -224,6 +224,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $row['course_id']
             );
             $row['is_open'] = boolval($row['is_open']);
+            $row['accept_teacher'] = !is_null($row['accept_teacher'])
+              ? boolval($row['accept_teacher'])
+              : null;
             unset($row['course_id']);
             $courses[] = $row;
         }
