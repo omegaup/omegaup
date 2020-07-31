@@ -276,6 +276,7 @@ const translations: { [key: string]: string; } = {
   courseAddProblemsAdd: "Add problems",
   courseAddProblemsAddAssignmentDesc: "Add all the problems that you want include to the assignment. These problems will be stored until you press Schedule assignment button. If you do not want to decide which problems to use right now, you can add them later.",
   courseAddProblemsAssignmentsDesc: "Type the name of the problem to be added to selected assignment.",
+  courseAddProblemsEditAssignmentDesc: "Add all the problems what you want include to the assignment. These problems will be stored by pressing Add problem button.",
   courseAssignmentAdded: "Assignment added successfully!",
   courseAssignmentConfirmDelete: "Do you really want to delete %(assignment)?",
   courseAssignmentDelete: "Delete assignment",
