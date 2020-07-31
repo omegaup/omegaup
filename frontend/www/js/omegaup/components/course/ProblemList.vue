@@ -25,6 +25,7 @@
               <td>
                 <button
                   class="btn btn-link"
+                  type="button"
                   v-bind:title="T.courseAssignmentProblemReorder"
                 >
                   <font-awesome-icon icon="arrows-alt" />
@@ -149,12 +150,9 @@ export default class CourseProblemList extends Vue {
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
   @Prop() selectedAssignment!: types.CourseAssignment;
-  @Prop({ default: omegaup.AssignmentFormMode.AddProblem })
-  assignmentFormMode!: omegaup.AssignmentFormMode;
 
   typeahead = typeahead;
   T = T;
-  AssignmentFormMode = omegaup.AssignmentFormMode;
   assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
   problems: types.AddedProblem[] = this.assignmentProblems;
   difficulty = 'intro';
@@ -169,20 +167,6 @@ export default class CourseProblemList extends Vue {
     let t = this.topics.slice();
     t.push(this.difficulty);
     return t;
-  }
-
-  onShowForm(): void {
-    this.$emit(
-      'update:assignment-form-mode',
-      omegaup.AssignmentFormMode.AddProblem,
-    );
-    this.problemAlias = '';
-    this.difficulty = 'intro';
-    this.topics = [];
-
-    Vue.nextTick(() => {
-      document.querySelector('.card-footer')?.scrollIntoView();
-    });
   }
 
   sort(event: any) {
@@ -245,11 +229,6 @@ export default class CourseProblemList extends Vue {
   @Watch('tags')
   onTagsChange() {
     this.$emit('emit-tags', this.tags);
-  }
-
-  @Watch('assignmentFormMode')
-  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
-    this.$emit('update:assignment-form-mode', newValue);
   }
 
   reset(): void {

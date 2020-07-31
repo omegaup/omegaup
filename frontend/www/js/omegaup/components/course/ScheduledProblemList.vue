@@ -130,14 +130,6 @@ export default class CourseScheduledProblemList extends Vue {
   points = 100;
   showTopicsAndDifficulty = false;
 
-  onShowForm(): void {
-    this.problemAlias = '';
-
-    Vue.nextTick(() => {
-      document.querySelector('.card-footer')?.scrollIntoView();
-    });
-  }
-
   onAddProblem(problem: types.AddedProblem): void {
     const problemAlias = problem.alias;
     const currentProblem = this.problems.find(
