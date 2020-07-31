@@ -30,20 +30,19 @@
           >
         </div>
         <div class="card col-lg-12 pt-3 mb-3">
-          <div
+          <template
             v-for="(filteredCourses, timeType) in typeCourses.filteredCourses"
           >
-            <div
+            <template
               v-for="course in filteredCourses.courses"
               v-if="timeType !== 'past'"
             >
-              <!-- TODO: Put here component CourseCard when it's avaliable-->
               <a
                 v-bind:href="`/course/${course.alias}/`"
                 class="btn btn-primary mb-3"
                 >{{ course.name }}</a
               >
-              <!--<omegaup-course-card
+              <omegaup-course-card
                 v-bind:course-name="course.name"
                 v-bind:course-alias="course.alias"
                 v-bind:school-name="course.school_name"
@@ -56,9 +55,9 @@
                 v-bind:show-topics="
                   course.admission_mode === 'public' && accessMode !== 'student'
                 "
-              ></omegaup-course-card>-->
-            </div>
-          </div>
+              ></omegaup-course-card>
+            </template>
+          </template>
         </div>
       </div>
     </div>
@@ -66,17 +65,19 @@
 </template>
 
 <style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
 .student,
 .public {
-  color: #fff;
+  color: $omegaup-white;
 }
 
 .public {
-  background: #dd5588;
+  background: $omegaup-pink;
 }
 
 .student {
-  background: #5588dd;
+  background: $omegaup-blue;
 }
 </style>
 
@@ -84,7 +85,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-//import course_CourseCard from './CourseCard.vue';
+import course_CourseCard from './CourseCard.vue';
 
 import {
   FontAwesomeIcon,
@@ -97,7 +98,7 @@ library.add(fas);
 
 @Component({
   components: {
-    //'omegaup-course-card': course_CourseCard,
+    'omegaup-course-card': course_CourseCard,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
