@@ -105,8 +105,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     s.name AS school_name,
                     start_time,
                     accept_teacher,
-	                pr.progress,
-	                pr.last_submission_time
+                    pr.progress,
+                    pr.last_submission_time
                 FROM Courses c
                 INNER JOIN (
                     SELECT g.group_id, gi.accept_teacher
@@ -115,48 +115,48 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     WHERE gi.identity_id = ?
                 ) gg
                 ON c.group_id = gg.group_id
-	            LEFT JOIN (
-	                -- we want a score even if there are no submissions yet
-	                SELECT
-	                    cbpr.course_id,
-	                    ROUND(SUM(cbpr.total_assignment_score) / SUM(cbpr.max_points) * 100, 2) AS progress,
-	                    MAX(cbpr.last_submission_time) AS last_submission_time
-	                FROM (
-		                -- aggregate all runs per assignment
-		                SELECT
-		                    bpr.alias,
-		                    bpr.course_id,
-		                    bpr.assignment_id,
-		                    SUM(best_score_of_problem) AS total_assignment_score,
-		                    bpr.max_points,
-		                    MAX(bpr.last_submission_time) AS last_submission_time
-		                FROM (
-		                    -- get all runs belonging to an identity and get the best score
-		                    SELECT
-		                        a.alias,
-		                        a.course_id,
-		                        a.assignment_id,
-		                        psp.problem_id,
-		                        s.identity_id,
-		                        MAX(r.contest_score) AS best_score_of_problem,
-		                        a.max_points,
-				        		MAX(r.time) AS last_submission_time
-		                    FROM Assignments a
-		                    INNER JOIN Problemset_Problems psp
-		                        ON a.problemset_id = psp.problemset_id
-		                    INNER JOIN Submissions s
-		                        ON s.problem_id = psp.problem_id
-		                        AND s.problemset_id = a.problemset_id
-		                    INNER JOIN Runs r
-		                        ON r.run_id = s.current_run_id
-		                    WHERE s.identity_id = ?
-		                    GROUP BY a.assignment_id, psp.problem_id, s.identity_id
-		                ) bpr
-		                GROUP BY bpr.assignment_id
-		            ) cbpr
-		            GROUP BY cbpr.course_id
-	            ) pr
-	            ON c.course_id = pr.course_id
+                LEFT JOIN (
+                    -- we want a score even if there are no submissions yet
+                    SELECT
+                        cbpr.course_id,
+                        ROUND(SUM(cbpr.total_assignment_score) / SUM(cbpr.max_points) * 100, 2) AS progress,
+                        MAX(cbpr.last_submission_time) AS last_submission_time
+                    FROM (
+                        -- aggregate all runs per assignment
+                        SELECT
+                            bpr.alias,
+                            bpr.course_id,
+                            bpr.assignment_id,
+                            SUM(best_score_of_problem) AS total_assignment_score,
+                            bpr.max_points,
+                            MAX(bpr.last_submission_time) AS last_submission_time
+                        FROM (
+                            -- get all runs belonging to an identity and get the best score
+                            SELECT
+                                a.alias,
+                                a.course_id,
+                                a.assignment_id,
+                                psp.problem_id,
+                                s.identity_id,
+                                MAX(r.contest_score) AS best_score_of_problem,
+                                a.max_points,
+                                MAX(r.time) AS last_submission_time
+                            FROM Assignments a
+                            INNER JOIN Problemset_Problems psp
+                                ON a.problemset_id = psp.problemset_id
+                            INNER JOIN Submissions s
+                                ON s.problem_id = psp.problem_id
+                                AND s.problemset_id = a.problemset_id
+                            INNER JOIN Runs r
+                                ON r.run_id = s.current_run_id
+                            WHERE s.identity_id = ?
+                            GROUP BY a.assignment_id, psp.problem_id, s.identity_id
+                        ) bpr
+                        GROUP BY bpr.assignment_id
+                    ) cbpr
+                    GROUP BY cbpr.course_id
+                ) pr
+                ON c.course_id = pr.course_id
                 LEFT JOIN
                     Schools s
                 ON c.school_id = s.school_id
@@ -200,7 +200,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 start_time,
                 0.0 AS progress,
                 0 AS is_open,
-                \'\' AS accept_teacher
+                CAST(NULL AS UNSIGNED) AS accept_teacher
             FROM
                 Courses c
             LEFT JOIN

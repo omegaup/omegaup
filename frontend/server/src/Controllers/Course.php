@@ -1616,21 +1616,21 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param list<string> $neededTypes
+     * @param list<string> $courseTypes
      * @return CoursesList
      */
     private static function getCoursesList(
         \OmegaUp\DAO\VO\Identities $identity,
         int $page,
         int $pageSize,
-        array $neededTypes = ['admin', 'student', 'public']
+        array $courseTypes = ['admin', 'student', 'public']
     ) {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
         $response = ['admin' => [], 'student' => [], 'public' => []];
 
-        if (in_array('admin', $neededTypes)) {
+        if (in_array('admin', $courseTypes)) {
             // TODO(pablo): Cache
             // Courses the user is an admin for.
             if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
@@ -1654,13 +1654,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        if (in_array('student', $neededTypes)) {
+        if (in_array('student', $courseTypes)) {
             $response['student'] = \OmegaUp\DAO\Courses::getCoursesForStudent(
                 $identity->identity_id
             );
         }
 
-        if (in_array('public', $neededTypes)) {
+        if (in_array('public', $courseTypes)) {
             $response['public'] = \OmegaUp\DAO\Courses::getPublicCourses();
         }
 
@@ -2735,7 +2735,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $page,
             $pageSize,
-            /*$neededTypes=*/['admin']
+            /*$courseTypes=*/['admin']
         );
         $filteredCourses = [
             'admin' => [
@@ -2810,7 +2810,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $page,
             $pageSize,
-            /*$neededTypes=*/[$courseType]
+            [$courseType]
         );
 
         $filteredCourses = self::getFilteredCourses($courses, [$courseType]);
@@ -2837,18 +2837,15 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Request $r
     ): array {
         $r->ensureIdentity();
-        $r->ensureOptionalInt('page');
-        $r->ensureOptionalInt('page_size');
-
-        $page = (isset($r['page']) ? intval($r['page']) : 1);
-        $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
         $coursesTypes = ['student', 'public'];
 
         $courses = self::getCoursesList(
             $r->identity,
             $page,
             $pageSize,
-            /*$neededTypes=*/$coursesTypes
+            $coursesTypes
         );
 
         // TODO: Filter the last 5 active courses that student has had activity
