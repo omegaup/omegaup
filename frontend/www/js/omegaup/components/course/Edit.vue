@@ -257,6 +257,7 @@ import course_Clone from './Clone.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
+
 const now = new Date();
 const finishTime = new Date();
 finishTime.setHours(finishTime.getHours() + 5);
@@ -285,6 +286,7 @@ const emptyAssignment: types.CourseAssignment = {
   scoreboard_url_admin: '',
   assignment_type: 'homework',
 };
+
 @Component({
   components: {
     'omegaup-course-form': course_Form,
@@ -302,6 +304,7 @@ export default class CourseEdit extends Vue {
   @Prop() data!: types.CourseEditPayload;
   @Prop() invalidParameterName!: string;
   @Prop() initialTab!: string;
+
   T = T;
   showTab = this.initialTab;
 
@@ -310,9 +313,11 @@ export default class CourseEdit extends Vue {
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
   assignment = emptyAssignment;
+
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;
   }
+
   onNewAssignment(): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.New;
     this.assignment = emptyAssignment;
@@ -322,6 +327,7 @@ export default class CourseEdit extends Vue {
       (<HTMLElement>this.assignmentDetails.$refs.name).focus();
     });
   }
+
   onEditAssignment(assignment: types.CourseAssignment): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.Edit;
     this.assignment = assignment;
@@ -331,6 +337,7 @@ export default class CourseEdit extends Vue {
       (<HTMLElement>this.assignmentDetails.$refs.name).focus();
     });
   }
+
   onAddProblems(assignment: types.CourseAssignment): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.Edit;
     this.assignment = assignment;
@@ -339,17 +346,21 @@ export default class CourseEdit extends Vue {
       this.assignmentDetails.$el.scrollIntoView();
     });
   }
+
   onCancel(): void {
     this.$emit('cancel', this.courseURL);
   }
+
   onResetAssignmentForm(): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.Default;
     window.scrollTo(0, 0);
   }
+
   onSelectAssignmentTab(): void {
     this.showTab = 'content';
     this.onResetAssignmentForm();
   }
+
   @Watch('initialTab')
   onInitialTabChanged(newValue: string): void {
     if (!availableTabs.includes(this.initialTab)) {

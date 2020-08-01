@@ -128,6 +128,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
+
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -136,6 +137,7 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -147,6 +149,7 @@ export default class CourseAssignmentList extends Vue {
   @Prop() content!: types.CourseAssignment[];
   @Prop() courseAlias!: string;
   @Prop() assignmentFormMode!: omegaup.AssignmentFormMode;
+
   contentOrderChanged = false;
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
@@ -164,6 +167,7 @@ export default class CourseAssignmentList extends Vue {
     );
     this.contentOrderChanged = true;
   }
+
   saveNewOrder(): void {
     this.contentOrderChanged = false;
     this.$emit(

@@ -34,6 +34,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import course_FilteredList from './FilteredList.vue';
+
 @Component({
   components: {
     'omegaup-course-filtered-list': course_FilteredList,
@@ -42,8 +43,10 @@ import course_FilteredList from './FilteredList.vue';
 export default class CourseList extends Vue {
   @Prop() courses!: types.StudentCourses;
   @Prop() isMainUserIdentity!: boolean;
+
   T = T;
   ui = ui;
+
   getDescription(admissionMode: string): string {
     if (admissionMode === 'public') return T.courseListPublicCourses;
     if (admissionMode === 'student') return T.courseListIStudy;

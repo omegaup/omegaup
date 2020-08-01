@@ -226,6 +226,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
+
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -260,11 +261,13 @@ export default class CourseDetails extends Vue {
   needs_basic_information = this.course.needs_basic_information;
   requests_user_information = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
+
   data(): { [name: string]: any } {
     return {
       school_id: this.course.school_id,
     };
   }
+
   mounted(): void {
     typeahead.schoolTypeahead(
       $('input.typeahead', this.$el),
@@ -274,6 +277,7 @@ export default class CourseDetails extends Vue {
       },
     );
   }
+
   reset(): void {
     this.alias = this.course.alias;
     this.description = this.course.description;
@@ -287,13 +291,16 @@ export default class CourseDetails extends Vue {
     this.requests_user_information = this.course.requests_user_information;
     this.unlimitedDuration = this.course.finish_time === null;
   }
+
   onSubmit(): void {
     this.$emit('submit', this);
   }
+
   @Emit('emit-cancel')
   onCancel(): void {
     this.reset();
   }
+
   onChange(): void {
     if (this.course.school_id === this.school_id) {
       this.school_id = undefined;

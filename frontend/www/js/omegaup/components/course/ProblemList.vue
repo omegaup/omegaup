@@ -127,6 +127,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
+
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -135,6 +136,7 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
+
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
@@ -160,11 +162,13 @@ export default class CourseProblemList extends Vue {
   points = 100;
   showTopicsAndDifficulty = false;
   problemsOrderChanged = false;
+
   get tags(): string[] {
     let t = this.topics.slice();
     t.push(this.difficulty);
     return t;
   }
+
   sort(event: any) {
     this.problems.splice(
       event.newIndex,
@@ -173,6 +177,7 @@ export default class CourseProblemList extends Vue {
     );
     this.problemsOrderChanged = true;
   }
+
   saveNewOrder() {
     this.$emit(
       'emit-sort',
@@ -210,14 +215,17 @@ export default class CourseProblemList extends Vue {
   onAssignmentChange(newVal: types.CourseAssignment): void {
     this.$emit('emit-select-assignment', newVal);
   }
+
   @Watch('selectedAssignment')
   onSelectedAssignmentChange(newVal: types.CourseAssignment): void {
     this.assignment = newVal;
   }
+
   @Watch('taggedProblemAlias')
   onTaggedProblemAliasChange() {
     this.problemAlias = this.taggedProblemAlias;
   }
+
   @Watch('tags')
   onTagsChange() {
     this.$emit('emit-tags', this.tags);

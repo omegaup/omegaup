@@ -5,16 +5,16 @@ import T from '../../lang';
 import { omegaup } from '../../omegaup';
 
 import course_StudentProgress from './StudentProgress.vue';
+import { types } from '../../api_types';
 
 describe('StudentProgress.vue', () => {
   it('Should handle scores', async () => {
-    const expectedDate = new Date('1/1/2020, 12:00:00 AM');
     const wrapper = shallowMount(course_StudentProgress, {
       propsData: {
         course: {
           alias: 'hello',
         },
-        assignment: [
+        assignment: <omegaup.Assignment[]>[
           {
             alias: 'assignment',
             assignment_type: 'homework',
@@ -27,20 +27,21 @@ describe('StudentProgress.vue', () => {
             scoreboard_url_admin: '',
           } as omegaup.Assignment,
         ],
-        student: {
+        student: <types.StudentProgress>{
           name: 'student',
-          progress: [
-            {
-              Assignment: {
-                problem: 44,
-                problem2: 55,
-              },
+          progress: {
+            ['assignment']: {
+              ['problem1']: 55,
+              ['problem2']: 44,
             },
-          ],
+          },
           username: 'student',
         },
       },
     });
+    expect(wrapper.find('div.bg-yellow'));
     expect(wrapper.find('div.bg-red'));
+    expect(wrapper.find('div[title="55%"]'));
+    expect(wrapper.find('div[title="44%"]'));
   });
 });

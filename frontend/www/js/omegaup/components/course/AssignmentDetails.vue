@@ -222,6 +222,7 @@ import T from '../../lang';
 import course_ProblemList from './ProblemList.vue';
 import course_ScheduledProblemList from './ScheduledProblemList.vue';
 import DateTimePicker from '../DateTimePicker.vue';
+
 import {
   FontAwesomeIcon,
   FontAwesomeLayers,
@@ -230,6 +231,7 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
+
 @Component({
   components: {
     'font-awesome-icon': FontAwesomeIcon,
@@ -255,6 +257,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop({ default: true }) shouldAddProblems!: boolean;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
+
   T = T;
   AssignmentFormMode = omegaup.AssignmentFormMode;
   alias = this.assignment.alias || '';
@@ -264,6 +267,7 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
+
   @Watch('assignment')
   onAssignmentChange() {
     this.reset();
@@ -294,6 +298,7 @@ export default class CourseAssignmentDetails extends Vue {
         return true;
     }
   }
+
   reset(): void {
     this.alias = this.assignment.alias;
     this.assignmentType = this.assignment.assignment_type || 'homework';
@@ -313,6 +318,7 @@ export default class CourseAssignmentDetails extends Vue {
   onCancel(): void {
     this.reset();
   }
+
   onSubmit(): void {
     this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
   }

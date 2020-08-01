@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td class="text-center align-middle">
-      <a v-bind:href="studentProgressUrl()">
+      <a v-bind:href="studentProgressUrl">
         {{ student.name || student.username }}
       </a>
     </td>
@@ -14,28 +14,31 @@
         <div v-if="student.progress.hasOwnProperty(assignment.alias) == false">
           {{ T.wordsProblemsUnsolved }}
         </div>
-        <div
-          v-for="problem in student.progress[assignment.alias]"
-          v-bind:class="getProblemColor(Math.round(problem))"
-          data-toggle="tooltip"
-          data-placement="bottom"
-          v-bind:title="problemScore(problem)"
-        ></div>
+        <div v-else class="d-flex border border-dark">
+          <div
+            v-for="problemScore in student.progress[assignment.alias]"
+            v-bind:class="getProblemColor(Math.round(problemScore))"
+            data-toggle="tooltip"
+            data-placement="bottom"
+            v-bind:title="Math.round(problemScore) + '%'"
+          ></div>
+        </div>
       </div>
     </td>
   </tr>
 </template>
 
-<style>
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
 .box {
   width: 20px;
   height: 20px;
-  border: 1px solid black;
-  margin: -0.5px;
+  border: 1px solid $omegaup-dark-grey;
 }
 
 .bg-green {
-  background: rgb(53, 184, 53);
+  background: $omegaup-green;
 }
 
 .bg-yellow {
@@ -47,7 +50,7 @@
 }
 
 .bg-black {
-  background: rgb(53, 53, 53);
+  background: $omegaup-grey;
 }
 </style>
 
@@ -65,10 +68,6 @@ export default class StudentProgress extends Vue {
 
   T = T;
 
-  problemScore(problem: number): string {
-    return Math.round(problem) + '%';
-  }
-
   score(assignment: omegaup.Assignment): number {
     if (!this.student.progress.hasOwnProperty(assignment.alias)) {
       return 0;
@@ -85,19 +84,14 @@ export default class StudentProgress extends Vue {
   }
 
   getProblemColor(problemScore: number): String {
-    if (problemScore > 70) {
-      return 'box bg-green';
-    } else if (problemScore >= 50) {
-      return 'box bg-yellow';
-    } else if (problemScore > 0) {
-      return 'box bg-red';
-    } else {
-      return 'box bg-black';
-    }
+    if (problemScore > 70) return 'box bg-green';
+    if (problemScore >= 50) return 'box bg-yellow';
+    if (problemScore > 0) return 'box bg-red';
+    return 'box bg-black';
   }
 
-  studentProgressUrl(): string {
-    return `/course/${this.course.alias}/student/${this.student.name}/`;
+  get studentProgressUrl(): string {
+    return `/course/${this.course.alias}/student/${this.student.username}/`;
   }
 }
 </script>

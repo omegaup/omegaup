@@ -183,7 +183,9 @@ import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
+
 import omegaup_Markdown from '../Markdown.vue';
+
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import {
@@ -230,11 +232,13 @@ export default class CourseDetails extends Vue {
 
     return percent.toFixed(2);
   }
+
   getAssignmentProgress(progress: types.Progress): string {
     const percent = (progress.score / progress.max_score) * 100;
     const percentText = progress.max_score === 0 ? '--:--' : percent.toFixed(2);
     return progress.max_score === 0 ? percentText : `${percentText}%`;
   }
+
   getFormattedTime(date: Date | null | undefined): string {
     if (!date) {
       return '—';
