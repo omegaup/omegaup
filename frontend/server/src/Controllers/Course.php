@@ -2860,15 +2860,16 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Checks whether a public course has been open already by user
         foreach ($courses['public'] as &$publicCourse) {
-            $matchedCourses = array_filter(
-                $courses['student'],
-                function ($course) use ($publicCourse) {
-                    return $course['alias'] === $publicCourse['alias'];
-                }
+            $matchedCourses = array_values(
+                array_filter(
+                    $courses['student'],
+                    function ($course) use ($publicCourse) {
+                        return $course['alias'] === $publicCourse['alias'];
+                    }
+                )
             );
-            if ($matchedCourses) {
-                $matchedCourse = array_slice($matchedCourses, 0, 1);
-                $publicCourse['is_open'] = $matchedCourse[0]['is_open'];
+            if (!empty($matchedCourses)) {
+                $publicCourse['is_open'] = $matchedCourses[0]['is_open'];
             }
         }
 
