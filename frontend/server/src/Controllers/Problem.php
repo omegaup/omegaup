@@ -4940,7 +4940,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param bool $allow_user_add_tags
-     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param bool|null $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
      * @omegaup-request-param mixed $languages
@@ -5012,9 +5012,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             [
                                 'title' => strval($r['title']),
                                 'alias' => strval($r['problem_alias']),
-                                'emailClarifications' => boolval(
-                                    $r['email_clarifications']
-                                ),
+                                'emailClarifications' => $r->ensureOptionalBool(
+                                    'email_clarifications'
+                                ) ?? false,
                                 'source' => strval($r['source']),
                                 'visibility' => intval($r['visibility']),
                                 'statusError' => $statusError,

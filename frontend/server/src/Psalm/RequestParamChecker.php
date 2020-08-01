@@ -30,7 +30,10 @@ class RequestParamChecker implements
         'OmegaUp\\Request::ensureoptionalbool' => 'bool|null',
         'OmegaUp\\Request::ensureint' => 'int',
         'OmegaUp\\Request::ensureoptionalint' => 'int|null',
-        'OmegaUp\\Request::ensurefloat' => 'float|null',
+        'OmegaUp\\Request::ensurefloat' => 'float',
+        'OmegaUp\\Request::ensureoptionalfloat' => 'float|null',
+        'OmegaUp\\Request::ensurestring' => 'string',
+        'OmegaUp\\Request::ensureoptionalstring' => 'string|null',
         'OmegaUp\\Request::ensuretimestamp' => '\\OmegaUp\\Timestamp',
         'OmegaUp\\Request::ensureoptionaltimestamp' => '\\OmegaUp\\Timestamp|null',
     ];
