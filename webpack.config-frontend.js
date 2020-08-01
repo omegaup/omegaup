@@ -60,6 +60,7 @@ module.exports = {
     course_mine: './frontend/www/js/omegaup/course/mine.ts',
     course_new: './frontend/www/js/omegaup/course/new.ts',
     course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
+    course_single_list: './frontend/www/js/omegaup/course/single_list.ts',
     course_student: './frontend/www/js/omegaup/course/student.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
     group_identities: './frontend/www/js/omegaup/group/identities.js',

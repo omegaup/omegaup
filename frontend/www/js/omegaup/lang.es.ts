@@ -337,6 +337,7 @@ const translations: { [key: string]: string; } = {
   courseListIStudy: "Cursos que estudio",
   courseListPastCourses: "Cursos pasados",
   courseListPublicCourses: "Cursos p\u00fablicos",
+  courseListSeeAllCourses: "Ver todos los cursos",
   courseListSubmissionsByGroup: "Env\u00edos realizados por usuarios de este curso",
   courseNew: "Nuevo curso",
   courseNewFormBasicInformationRequired: "La informaci\u00f3n b\u00e1sica es requerida",

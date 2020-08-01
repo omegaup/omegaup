@@ -337,6 +337,7 @@ const translations: { [key: string]: string; } = {
   courseListIStudy: "Courses I study",
   courseListPastCourses: "Past courses",
   courseListPublicCourses: "Public courses",
+  courseListSeeAllCourses: "See all courses",
   courseListSubmissionsByGroup: "Submissions made by users of this course",
   courseNew: "New course",
   courseNewFormBasicInformationRequired: "Basic information is required",
