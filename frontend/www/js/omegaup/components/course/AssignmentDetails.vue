@@ -1,13 +1,10 @@
 <template>
   <div class="omegaup-course-assignmentdetails card" v-show="show">
-    <div class="card-header">
-      <h5 v-if="assignmentFormMode === AssignmentFormMode.New">
-        {{ T.courseEditAddAssignment }}
-      </h5>
-      <h5 v-else-if="assignmentFormMode === AssignmentFormMode.Edit">
-        {{ T.courseAssignmentEdit }} {{ assignment.name }}
-      </h5>
-    </div>
+    <slot name="page-header">
+      <div class="card-header">
+        <h1>{{ T.wordsContentEdit }} {{ assignment.name }}</h1>
+      </div>
+    </slot>
     <div class="card-body">
       <form class="form schedule" v-on:submit.prevent="onSubmit">
         <div class="row">
@@ -151,36 +148,38 @@
             </label>
           </div>
         </div>
-        <omegaup-course-scheduled-problem-list
-          ref="scheduled-problem-list"
-          v-if="assignmentFormMode === AssignmentFormMode.New"
-          v-bind:assignment-problems="assignmentProblems"
-          v-bind:tagged-problems="taggedProblems"
-          v-bind:selected-assignment="assignment"
-          v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
-        ></omegaup-course-scheduled-problem-list>
-        <omegaup-course-problem-list
-          v-else=""
-          v-bind:assignment-problems="assignmentProblems"
-          v-bind:tagged-problems="taggedProblems"
-          v-bind:selected-assignment="assignment"
-          v-bind:assignment-form-mode.sync="assignmentFormMode"
-          v-on:emit-save-problem="
-            (assignment, problem) => $emit('add-problem', assignment, problem)
-          "
-          v-on:emit-remove-problem="
-            (assignment, problem) =>
-              $emit('remove-problem', assignment, problem)
-          "
-          v-on:emit-select-assignment="
-            (assignment) => $emit('select-assignment', assignment)
-          "
-          v-on:emit-sort="
-            (assignmentAlias, problemsAlias) =>
-              $emit('sort-problems', assignmentAlias, problemsAlias)
-          "
-          v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
-        ></omegaup-course-problem-list>
+        <template v-if="shouldAddProblems">
+          <omegaup-course-scheduled-problem-list
+            ref="scheduled-problem-list"
+            v-if="assignmentFormMode === AssignmentFormMode.New"
+            v-bind:assignment-problems="assignmentProblems"
+            v-bind:tagged-problems="taggedProblems"
+            v-bind:selected-assignment="assignment"
+            v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+          ></omegaup-course-scheduled-problem-list>
+          <omegaup-course-problem-list
+            v-else=""
+            v-bind:assignment-problems="assignmentProblems"
+            v-bind:tagged-problems="taggedProblems"
+            v-bind:selected-assignment="assignment"
+            v-bind:assignment-form-mode.sync="assignmentFormMode"
+            v-on:emit-save-problem="
+              (assignment, problem) => $emit('add-problem', assignment, problem)
+            "
+            v-on:emit-remove-problem="
+              (assignment, problem) =>
+                $emit('remove-problem', assignment, problem)
+            "
+            v-on:emit-select-assignment="
+              (assignment) => $emit('select-assignment', assignment)
+            "
+            v-on:emit-sort="
+              (assignmentAlias, problemsAlias) =>
+                $emit('sort-problems', assignmentAlias, problemsAlias)
+            "
+            v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+          ></omegaup-course-problem-list>
+        </template>
         <div class="form-group text-right mt-3">
           <button
             data-schedule-assignment
@@ -194,13 +193,15 @@
               {{ T.courseAssignmentNewFormSchedule }}
             </template>
           </button>
-          <button
-            class="btn btn-secondary"
-            type="reset"
-            v-on:click.prevent="onCancel"
-          >
-            {{ T.wordsCancel }}
-          </button>
+          <slot name="cancel-button">
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              v-on:click.prevent="onCancel"
+            >
+              {{ T.wordsBack }}
+            </button>
+          </slot>
         </div>
       </form>
     </div>
@@ -253,6 +254,7 @@ export default class CourseAssignmentDetails extends Vue {
   @Prop() startTimeCourse!: Date;
   @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
+  @Prop({ default: true }) shouldAddProblems!: boolean;
   @Prop({ default: false }) unlimitedDurationCourse!: boolean;
   @Prop({ default: '' }) invalidParameterName!: string;
 
@@ -265,33 +267,35 @@ export default class CourseAssignmentDetails extends Vue {
   startTime = this.assignment.start_time || new Date();
   finishTime = this.assignment.finish_time || new Date();
   unlimitedDuration = !this.assignment.finish_time;
-  show = false;
-  update = false;
 
   @Watch('assignment')
   onAssignmentChange() {
     this.reset();
   }
 
-  @Watch('assignmentFormMode')
-  onAssignmentFormModeChange(newValue: omegaup.AssignmentFormMode) {
-    switch (newValue) {
+  get show(): boolean {
+    switch (this.assignmentFormMode) {
       case omegaup.AssignmentFormMode.New:
-        this.show = true;
-        this.update = false;
-        this.reset();
-        break;
+        return true;
       case omegaup.AssignmentFormMode.Edit:
-        this.show = true;
-        this.update = true;
-        break;
+        return true;
       case omegaup.AssignmentFormMode.Default:
-        this.show = false;
-        this.update = true;
-        break;
+        return false;
       default:
-        this.show = false;
-        this.update = true;
+        return false;
+    }
+  }
+
+  get update(): boolean {
+    switch (this.assignmentFormMode) {
+      case omegaup.AssignmentFormMode.New:
+        return false;
+      case omegaup.AssignmentFormMode.Edit:
+        return true;
+      case omegaup.AssignmentFormMode.Default:
+        return true;
+      default:
+        return true;
     }
   }
 
@@ -305,13 +309,18 @@ export default class CourseAssignmentDetails extends Vue {
     this.unlimitedDuration = !this.assignment.finish_time;
   }
 
-  @Emit('emit-cancel')
+  @Watch('show')
+  onShowChanged(newValue: boolean): void {
+    this.reset();
+  }
+
+  @Emit('cancel')
   onCancel(): void {
     this.reset();
   }
 
   onSubmit(): void {
-    this.$emit('emit-submit', this, this.scheduledProblemList?.problems ?? []);
+    this.$emit('submit', this, this.scheduledProblemList?.problems ?? []);
   }
 }
 </script>
