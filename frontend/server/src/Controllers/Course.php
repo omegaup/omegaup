@@ -83,7 +83,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $assignment_type
+     * @omegaup-request-param 'homework'|'lesson'|'test' $assignment_type
      * @omegaup-request-param mixed $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param mixed $name
@@ -135,8 +135,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Validators::validateInEnum(
-            $r['assignment_type'],
+        $r->ensureEnum(
             'assignment_type',
             ['test', 'lesson', 'homework']
         );
@@ -273,13 +272,13 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
      * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param mixed $requests_user_information
+     * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
      * @omegaup-request-param mixed $start_time
@@ -307,13 +306,13 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param mixed $name
      * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param mixed $requests_user_information
+     * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
      * @omegaup-request-param OmegaUp\Timestamp|null $start_time
@@ -360,13 +359,13 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param int|null $finish_time
      * @omegaup-request-param mixed $name
      * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param mixed $requests_user_information
+     * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
      * @omegaup-request-param int $start_time
@@ -410,12 +409,10 @@ class Course extends \OmegaUp\Controllers\Controller {
         // Show scoreboard, needs basic information and request user information are always optional
         $r->ensureOptionalBool('needs_basic_information');
         $r->ensureOptionalBool('show_scoreboard');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['requests_user_information'],
+        $r->ensureOptionalEnum(
             'requests_user_information',
             ['no', 'optional', 'required']
         );
-
         $r->ensureOptionalInt('school_id');
 
         if (is_null($r['school_id'])) {
@@ -429,8 +426,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['admission_mode'],
+        $r->ensureOptionalEnum(
             'admission_mode',
             [
                 self::ADMISSION_MODE_PUBLIC,
@@ -2859,7 +2855,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $course_type
+     * @omegaup-request-param 'student'|'public' $course_type
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
@@ -2872,14 +2868,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
-        $coursesTypes = ['student', 'public'];
 
-        \OmegaUp\Validators::validateInEnum(
-            $r['course_type'],
+        $courseType = $r->ensureEnum(
             'course_type',
-            $coursesTypes
+            ['student', 'public']
         );
-        $courseType = strval($r['course_type']);
 
         $courses = self::getCoursesList(
             $r->identity,
@@ -3761,13 +3754,13 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $rowcount
-     * @omegaup-request-param mixed $status
+     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param mixed $username
-     * @omegaup-request-param mixed $verdict
+     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      *
      * @return array{runs: list<Run>}
      */
@@ -3780,15 +3773,18 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment' => $assignment,
             'problem' => $problem,
             'identity' => $identity,
+            'language' => $language,
+            'status' => $status,
+            'verdict' => $verdict,
         ] = self::validateRuns($r);
 
         // Get our runs
         $runs = \OmegaUp\DAO\Runs::getAllRuns(
             $assignment->problemset_id,
-            !is_null($r['status']) ? strval($r['status']) : null,
-            !is_null($r['verdict']) ? strval($r['verdict']) : null,
+            $status,
+            $verdict,
             !is_null($problem) ? $problem->problem_id : null,
-            !is_null($r['language']) ? strval($r['language']) : null,
+            $language,
             !is_null($identity) ? $identity->identity_id : null,
             !is_null($r['offset']) ? intval($r['offset']) : null,
             !is_null($r['rowcount']) ? intval($r['rowcount']) : null
@@ -3809,20 +3805,20 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates runs API
      *
-     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, problem: \OmegaUp\DAO\VO\Problems|null, identity: \OmegaUp\DAO\VO\Identities|null}
+     * @return array{assignment: \OmegaUp\DAO\VO\Assignments, identity: \OmegaUp\DAO\VO\Identities|null, language: 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null, problem: \OmegaUp\DAO\VO\Problems|null, status:'compiling'|'new'|'ready'|'running'|'waiting'|null, verdict:'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null}
      *
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $language
+     * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param int $offset
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param int $rowcount
-     * @omegaup-request-param mixed $status
+     * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param mixed $username
-     * @omegaup-request-param mixed $verdict
+     * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      */
     private static function validateRuns(
         \OmegaUp\Request $r
@@ -3868,13 +3864,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $r->ensureOptionalInt('offset');
         $r->ensureOptionalInt('rowcount');
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['status'],
+        $status = $r->ensureOptionalEnum(
             'status',
             ['new', 'waiting', 'compiling', 'running', 'ready']
         );
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['verdict'],
+        $verdict = $r->ensureOptionalEnum(
             'verdict',
             \OmegaUp\Controllers\Run::VERDICTS
         );
@@ -3893,8 +3887,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        \OmegaUp\Validators::validateOptionalInEnum(
-            $r['language'],
+        $language = $r->ensureOptionalEnum(
             'language',
             array_keys(\OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES)
         );
@@ -3911,6 +3904,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignment' => $assignment,
             'problem' => $problem,
             'identity' => $identity,
+            'language' => $language,
+            'status' => $status,
+            'verdict' => $verdict,
         ];
     }
 
@@ -3953,13 +3949,13 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $admission_mode
+     * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param mixed $name
      * @omegaup-request-param bool|null $needs_basic_information
-     * @omegaup-request-param mixed $requests_user_information
+     * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
      * @omegaup-request-param bool|null $show_scoreboard
      * @omegaup-request-param OmegaUp\Timestamp|null $start_time
