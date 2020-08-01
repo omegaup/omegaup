@@ -1005,7 +1005,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $commit
      * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $points
+     * @omegaup-request-param float $points
      * @omegaup-request-param mixed $problem_alias
      *
      * @return array{status: 'ok'}
@@ -1062,7 +1062,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id,
             $r->identity,
             true, /* validateVisibility */
-            is_numeric($r['points']) ? floatval($r['points']) : 100.0,
+            $r->ensureOptionalFloat('points') ?? 100.0,
             $r['commit']
         );
 

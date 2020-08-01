@@ -502,13 +502,13 @@ Adds a problem to a contest
 
 ### Parameters
 
-| Name               | Type         | Description |
-| ------------------ | ------------ | ----------- |
-| `commit`           | `mixed`      |             |
-| `contest_alias`    | `mixed`      |             |
-| `order_in_contest` | `int`        |             |
-| `points`           | `float|null` |             |
-| `problem_alias`    | `mixed`      |             |
+| Name               | Type    | Description |
+| ------------------ | ------- | ----------- |
+| `commit`           | `mixed` |             |
+| `contest_alias`    | `mixed` |             |
+| `order_in_contest` | `int`   |             |
+| `points`           | `float` |             |
+| `problem_alias`    | `mixed` |             |
 
 ### Returns
 
@@ -1394,7 +1394,7 @@ Adds a problem to an assignment
 | `assignment_alias` | `mixed` |             |
 | `commit`           | `mixed` |             |
 | `course_alias`     | `mixed` |             |
-| `points`           | `mixed` |             |
+| `points`           | `float` |             |
 | `problem_alias`    | `mixed` |             |
 
 ### Returns
@@ -2213,13 +2213,13 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type         | Description |
-| ------------------ | ------------ | ----------- |
-| `contest_alias`    | `mixed`      |             |
-| `group_alias`      | `mixed`      |             |
-| `only_ac`          | `bool|null`  |             |
-| `scoreboard_alias` | `mixed`      |             |
-| `weight`           | `float|null` |             |
+| Name               | Type        | Description |
+| ------------------ | ----------- | ----------- |
+| `contest_alias`    | `mixed`     |             |
+| `group_alias`      | `mixed`     |             |
+| `only_ac`          | `bool|null` |             |
+| `scoreboard_alias` | `mixed`     |             |
+| `weight`           | `float`     |             |
 
 ### Returns
 
