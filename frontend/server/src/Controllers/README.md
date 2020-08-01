@@ -1409,15 +1409,15 @@ Add Student to Course.
 
 ### Parameters
 
-| Name                           | Type    | Description |
-| ------------------------------ | ------- | ----------- |
-| `accept_teacher`               | `mixed` |             |
-| `accept_teacher_git_object_id` | `mixed` |             |
-| `course_alias`                 | `mixed` |             |
-| `privacy_git_object_id`        | `mixed` |             |
-| `share_user_information`       | `mixed` |             |
-| `statement_type`               | `mixed` |             |
-| `usernameOrEmail`              | `mixed` |             |
+| Name                           | Type        | Description |
+| ------------------------------ | ----------- | ----------- |
+| `accept_teacher`               | `bool|null` |             |
+| `accept_teacher_git_object_id` | `mixed`     |             |
+| `course_alias`                 | `mixed`     |             |
+| `privacy_git_object_id`        | `mixed`     |             |
+| `share_user_information`       | `mixed`     |             |
+| `statement_type`               | `mixed`     |             |
+| `usernameOrEmail`              | `mixed`     |             |
 
 ### Returns
 
@@ -1613,7 +1613,7 @@ API to Create an assignment
 | `description`        | `mixed`     |             |
 | `finish_time`        | `mixed`     |             |
 | `name`               | `mixed`     |             |
-| `order`              | `mixed`     |             |
+| `order`              | `int|null`  |             |
 | `problems`           | `mixed`     |             |
 | `publish_time_delay` | `mixed`     |             |
 | `start_time`         | `mixed`     |             |
@@ -1758,9 +1758,9 @@ List students in a course
 
 ### Returns
 
-| Name       | Type                    |
-| ---------- | ----------------------- |
-| `students` | `types.CourseStudent[]` |
+| Name       | Type                      |
+| ---------- | ------------------------- |
+| `students` | `types.StudentProgress[]` |
 
 ## `/api/course/listUnsolvedProblems/`
 

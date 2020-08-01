@@ -16,44 +16,38 @@
       </p>
     </div>
     <div class="card-body">
-      <form
-        method="POST"
-        class="form"
-        enctype="multipart/form-data"
-        v-on:submit="onSubmit"
-      >
+      <form method="POST" class="form" enctype="multipart/form-data">
         <div class="row">
-          <div
-            class="form-group col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('title') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsTitle }}</label>
             <input
+              required
               name="title"
               v-model="title"
               type="text"
               class="form-control"
+              v-bind:class="{ 'is-invalid': errors.includes('title') }"
               v-on:blur="onGenerateAlias"
             />
           </div>
 
-          <div
-            class="form-group col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('alias') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsAlias }}</label>
             <input
-              name="alias"
+              required
+              name="problem_alias"
               v-model="alias"
               ref="alias"
               type="text"
               class="form-control"
+              v-bind:class="{ 'is-invalid': errors.includes('problem_alias') }"
               v-bind:disabled="isUpdate"
             />
           </div>
         </div>
 
         <omegaup-problem-settings
+          v-bind:errors="errors"
           v-bind:timeLimit="timeLimit"
           v-bind:extraWallTime="extraWallTime"
           v-bind:memoryLimit="memoryLimit"
@@ -120,31 +114,31 @@
         </div>
 
         <div class="row">
-          <div
-            class="form-group col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('source') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.problemEditSource }}</label>
             <input
+              required
               name="source"
               v-model="source"
               type="text"
               class="form-control"
+              v-bind:class="{ 'is-invalid': errors.includes('source') }"
             />
           </div>
 
-          <div
-            class="form-group col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('file') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.problemEditFormFile }}</label>
             <a v-bind:href="howToWriteProblemLink" target="_blank">
               <span>{{ T.problemEditFormHowToWriteProblems }}</span>
             </a>
             <input
+              v-bind:required="!isUpdate"
               name="problem_contents"
               type="file"
               class="form-control"
+              v-bind:class="{
+                'is-invalid': errors.includes('problem_contents'),
+              }"
               v-on:change="onUploadFile"
             />
           </div>
@@ -154,7 +148,12 @@
           <div class="row">
             <div class="form-group col-md-12">
               <label>{{ T.wordsShowCasesDiff }}</label>
-              <select name="show_diff" class="form-control" v-model="showDiff">
+              <select
+                name="show_diff"
+                class="form-control"
+                v-bind:class="{ 'is-invalid': errors.includes('show_diff') }"
+                v-model="showDiff"
+              >
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
                 <option value="all">{{ T.wordsAll }}</option>
@@ -170,6 +169,7 @@
             v-on:emit-remove-tag="removeTag"
             v-on:select-problem-level="selectProblemLevel"
             v-bind:is-create="true"
+            v-bind:problem-level="problemLevel"
             v-bind:selected-private-tags="selectedPrivateTags"
             v-bind:selected-public-tags="selectedPublicTags"
             v-bind:can-add-new-tags="true"
@@ -189,21 +189,25 @@
         <div class="row" v-else="">
           <div class="form-group col-md-6">
             <label>{{ T.wordsShowCasesDiff }}</label>
-            <select name="show_diff" class="form-control" v-model="showDiff">
+            <select
+              name="show_diff"
+              class="form-control"
+              v-bind:class="{ 'is-invalid': errors.includes('show_diff') }"
+              v-model="showDiff"
+            >
               <option value="none">{{ T.problemVersionDiffModeNone }}</option>
               <option value="examples">{{ T.wordsOnlyExamples }}</option>
               <option value="all">{{ T.wordsAll }}</option>
             </select>
           </div>
-          <div
-            class="form-group col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('message') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{
               T.problemEditCommitMessage
             }}</label>
             <input
+              required
               class="form-control"
+              v-bind:class="{ 'is-invalid': errors.includes('message') }"
               name="message"
               v-model="message"
               type="text"
@@ -221,7 +225,13 @@
 
         <div class="row">
           <div class="form-group col-md-6 no-bottom-margin">
-            <button type="submit" class="btn btn-primary">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              v-bind:title="
+                !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
+              "
+            >
               {{ buttonText }}
             </button>
           </div>
@@ -255,6 +265,7 @@ import { types } from '../../api_types';
 })
 export default class ProblemForm extends Vue {
   @Prop() data!: types.ProblemFormPayload;
+  @Prop({ default: () => [] }) errors!: string[];
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
 
@@ -275,13 +286,12 @@ export default class ProblemForm extends Vue {
   validator = this.data.validator;
   languages = this.data.languages;
   tags = this.data.tags;
-  problemLevel = '';
+  problemLevel = this.data.problem_level || '';
   showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
   message = '';
   hasFile = false;
   public = false;
-  errors: string[] = [];
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';
@@ -332,44 +342,6 @@ export default class ProblemForm extends Vue {
       this.data.visibilityStatuses.publicBanned < this.visibility &&
       this.visibility < this.data.visibilityStatuses.promoted
     );
-  }
-
-  onSubmit(e: Event): void {
-    this.errors = [];
-    if (this.isUpdate && this.message) {
-      return;
-    }
-    if (
-      this.title &&
-      this.alias &&
-      this.source &&
-      this.problemLevel &&
-      this.hasFile
-    ) {
-      return;
-    }
-    if (!this.title) {
-      this.errors.push('title');
-    }
-    if (!this.alias) {
-      this.errors.push('alias');
-    }
-    if (!this.source) {
-      this.errors.push('source');
-    }
-    if (!this.problemLevel) {
-      this.errors.push('problem_level');
-    }
-    if (!this.isUpdate && !this.hasFile) {
-      this.errors.push('file');
-    }
-    if (this.isUpdate && !this.message) {
-      this.errors.push('message');
-    }
-    if (this.errors.length !== 0) {
-      ui.error(T.editFieldRequired);
-      e.preventDefault();
-    }
   }
 
   get selectedPublicTags(): string[] {
