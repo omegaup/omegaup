@@ -166,20 +166,20 @@ jobs:
           CI: true
 
       gitserver:
-        image: omegaup/dev-gitserver:20200722
+        image: omegaup/dev-gitserver:20200731
         volumes:
           - omegaupdata:/var/lib/omegaup
 
       broadcaster:
-        image: omegaup/dev-broadcaster:20200715
+        image: omegaup/dev-broadcaster:20200731
 
       grader:
-        image: omegaup/dev-grader:20200715
+        image: omegaup/dev-grader:20200731
         volumes:
           - omegaupdata:/var/lib/omegaup
 
       runner:
-        image: omegaup/dev-runner:20200530
+        image: omegaup/dev-runner:20200731
 
     steps:
       - uses: actions/checkout@v2
