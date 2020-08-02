@@ -12,23 +12,24 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>{{ T.wordsName }}</th>
-                  <th class="score" v-for="assignment in assignments">
+                  <th class="text-center">{{ T.wordsName }}</th>
+                  <th
+                    class="score text-center"
+                    v-for="assignment in assignments"
+                  >
                     {{ assignment.name }}
                   </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="student in students">
-                  <td>
-                    <a v-bind:href="studentProgressUrl(student)">{{
-                      student.name || student.username
-                    }}</a>
-                  </td>
-                  <td class="score" v-for="assignment in assignments">
-                    {{ Math.round(score(student, assignment)) }}
-                  </td>
-                </tr>
+                <omegaup-student-progress
+                  v-for="student in students"
+                  v-bind:key="student.username"
+                  v-bind:student="student"
+                  v-bind:assignments="assignments"
+                  v-bind:course="course"
+                >
+                </omegaup-student-progress>
               </tbody>
             </table>
           </div>
@@ -80,6 +81,7 @@ import T from '../../lang';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
+import StudentProgress from './StudentProgress.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -146,8 +148,9 @@ function toOds(courseName: string, table: string[][]): string {
   result += '</table:table>';
   return result;
 }
-
-@Component
+@Component({
+  components: { 'omegaup-student-progress': StudentProgress },
+})
 export default class CourseViewProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;

@@ -83,7 +83,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $group_alias
      * @omegaup-request-param bool|null $only_ac
      * @omegaup-request-param mixed $scoreboard_alias
-     * @omegaup-request-param float|null $weight
+     * @omegaup-request-param float $weight
      */
     public static function apiAddContest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -106,13 +106,11 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             $r['contest_alias']
         );
 
-        $r->ensureFloat('weight');
-
         \OmegaUp\DAO\GroupsScoreboardsProblemsets::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
             'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
             'problemset_id' => $contestScoreboard['contest']->problemset_id,
             'only_ac' => $r->ensureBool('only_ac'),
-            'weight' => $r['weight'],
+            'weight' => $r->ensureFloat('weight'),
         ]));
 
         self::$log->info(
