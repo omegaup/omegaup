@@ -11,7 +11,7 @@
     >
       <p class="mb-1 text-center">{{ Math.round(score(assignment)) }}%</p>
       <div class="d-flex justify-content-center">
-        <div v-if="student.progress.hasOwnProperty(assignment.alias) == false">
+        <div v-if="!student.progress.hasOwnProperty(assignment.alias)">
           {{ T.wordsProblemsUnsolved }}
         </div>
         <div v-else class="d-flex border border-dark">
