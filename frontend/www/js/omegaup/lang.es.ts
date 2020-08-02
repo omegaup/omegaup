@@ -1489,6 +1489,7 @@ const translations: { [key: string]: string; } = {
   wordsProblem: "Problema",
   wordsProblemOrSolutionNotExist: "El problema o soluci\u00f3n no existen.",
   wordsProblems: "Problemas",
+  wordsProblemsUnsolved: "No hay problemas resueltos",
   wordsProblemsetter: "Subido por",
   wordsProgrammingLanguage: "Lenguaje de programaci\u00f3n",
   wordsProgress: "Progreso",
