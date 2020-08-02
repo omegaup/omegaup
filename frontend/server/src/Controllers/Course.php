@@ -20,21 +20,21 @@
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
- * @psalm-type FilteredCourse=array{alias: string, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp}
- * @psalm-type CoursesList=array{admin: list<FilteredCourse>, student: list<FilteredCourse>, public: list<FilteredCourse>}
+ * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
+ * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress: AssignmentProgress}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
- * @psalm-type AllCourses=array{admin: CoursesByAccessMode, public: CoursesByAccessMode, student: CoursesByAccessMode}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
  * @psalm-type CourseSubmissionsListPayload=array{solvedProblems: array<string, list<CourseProblemTried>>, unsolvedProblems: array<string, list<CourseProblemTried>>}
  * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
- * @psalm-type StudentCourses=array{public: CoursesByAccessMode, student: CoursesByAccessMode}
+ * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
- * @psalm-type CourseListPayload=array{courses: StudentCourses}
+ * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<StudentProgress>, tags: list<string>}
+ * @psalm-type CourseAssignmentEditPayload=array{course: CourseDetails, assignment: CourseAssignment|null}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
@@ -1005,7 +1005,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $commit
      * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $points
+     * @omegaup-request-param float $points
      * @omegaup-request-param mixed $problem_alias
      *
      * @return array{status: 'ok'}
@@ -1062,7 +1062,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id,
             $r->identity,
             true, /* validateVisibility */
-            is_numeric($r['points']) ? floatval($r['points']) : 100.0,
+            $r->ensureOptionalFloat('points') ?? 100.0,
             $r['commit']
         );
 
@@ -1562,7 +1562,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Converts a Course object into an array
      *
-     * @return array{alias: string, name: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp|null, public: bool, counts: array<string, int>}
+     * @return FilteredCourse
      */
     private static function convertCourseToArray(\OmegaUp\DAO\VO\Courses $course): array {
         if (is_null($course->course_id)) {
@@ -1571,14 +1571,19 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
         $relevantColumns = [
+            'admission_mode',
             'alias',
+            'finish_time',
             'name',
             'start_time',
-            'finish_time',
-            'admission_mode',
         ];
-        /** @var array{alias: string, name: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, public: bool} */
+        /** @var array{admission_mode: string, alias: string, assignments: list<CourseAssignment>, finish_time: \OmegaUp\Timestamp|null, name: string, start_time: \OmegaUp\Timestamp} */
         $arr = $course->asFilteredArray($relevantColumns);
+        $arr['assignments'] = [];
+        $arr['school_name'] = null;
+        $arr['accept_teacher'] = null;
+        $arr['is_open'] = false;
+        $arr['finish_time'] = $course->finish_time;
 
         $arr['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
             $course->course_id
@@ -1616,61 +1621,52 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @param list<string> $courseTypes
      * @return CoursesList
      */
     private static function getCoursesList(
         \OmegaUp\DAO\VO\Identities $identity,
         int $page,
-        int $pageSize
+        int $pageSize,
+        array $courseTypes = ['admin', 'student', 'public']
     ) {
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
-        // TODO(pablo): Cache
-        // Courses the user is an admin for.
-        $adminCourses = [];
-        if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
-            $adminCourses = \OmegaUp\DAO\Courses::getAll(
-                $page,
-                $pageSize,
-                'course_id',
-                'DESC'
-            );
-        } else {
-            $adminCourses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
-                $identity->identity_id,
-                $page,
-                $pageSize
+        $response = ['admin' => [], 'student' => [], 'public' => []];
+
+        if (in_array('admin', $courseTypes)) {
+            // TODO(pablo): Cache
+            // Courses the user is an admin for.
+            if (\OmegaUp\Authorization::isSystemAdmin($identity)) {
+                $adminCourses = \OmegaUp\DAO\Courses::getAll(
+                    $page,
+                    $pageSize,
+                    'course_id',
+                    'DESC'
+                );
+            } else {
+                $adminCourses = \OmegaUp\DAO\Courses::getAllCoursesAdminedByIdentity(
+                    $identity->identity_id,
+                    $page,
+                    $pageSize
+                );
+            }
+            foreach ($adminCourses as $course) {
+                $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
+                    $course
+                );
+            }
+        }
+
+        if (in_array('student', $courseTypes)) {
+            $response['student'] = \OmegaUp\DAO\Courses::getCoursesForStudent(
+                $identity->identity_id
             );
         }
 
-        // Courses the user is a student in.
-        $studentCourses = \OmegaUp\DAO\Courses::getCoursesForStudent(
-            $identity->identity_id
-        );
-
-        // Public courses.
-        $publicCourses = \OmegaUp\DAO\Courses::getPublicCourses();
-
-        $response = [
-            'admin' => [],
-            'student' => [],
-            'public' => [],
-        ];
-        foreach ($adminCourses as $course) {
-            $response['admin'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
-                $course
-            );
-        }
-        foreach ($studentCourses as $course) {
-            $response['student'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
-                $course
-            );
-        }
-        foreach ($publicCourses as $course) {
-            $response['public'][] = \OmegaUp\Controllers\Course::convertCourseToArray(
-                $course
-            );
+        if (in_array('public', $courseTypes)) {
+            $response['public'] = \OmegaUp\DAO\Courses::getPublicCourses();
         }
 
         return $response;
@@ -1993,7 +1989,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Add Student to Course.
      *
-     * @omegaup-request-param mixed $accept_teacher
+     * @omegaup-request-param bool|null $accept_teacher
      * @omegaup-request-param mixed $accept_teacher_git_object_id
      * @omegaup-request-param mixed $course_alias
      * @omegaup-request-param mixed $privacy_git_object_id
@@ -2028,6 +2024,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $r['usernameOrEmail']
         );
+        $acceptTeacher = $r->ensureOptionalBool('accept_teacher');
 
         // Only course admins or users adding themselves when the course is public
         if (
@@ -2044,8 +2041,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'group_id' => $course->group_id,
             'identity_id' => $resolvedIdentity->identity_id,
             'share_user_information' => $r['share_user_information'],
-            'accept_teacher' => $r['accept_teacher'],
         ]);
+
+        if (!is_null($acceptTeacher)) {
+            $groupIdentity->accept_teacher = $acceptTeacher;
+        }
 
         \OmegaUp\DAO\DAO::transBegin();
 
@@ -2546,57 +2546,119 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: string}}
      */
-    public static function getCourseEditDetailsForSmarty(\OmegaUp\Request $r): array {
+    public static function getCourseEditDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
-        $course = self::validateCourseExists($r['course']);
+
+        $courseEditDetails = self::getCourseEditDetails(
+            $r['course'],
+            $r->identity
+        );
+
+        if (!empty($courseEditDetails['course']['assignments'])) {
+            $courseEditDetails['selectedAssignment'] = $courseEditDetails['course']['assignments'][0];
+            $courseEditDetails['assignmentProblems'] = self::getProblemsByAssignment(
+                $courseEditDetails['selectedAssignment']['alias'],
+                $r['course'],
+                $r->identity,
+                $r->user
+            );
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => $courseEditDetails,
+                'title' => 'courseEdit',
+            ],
+            'entrypoint' => 'course_edit',
+        ];
+    }
+
+    /**
+     * @omegaup-request-param mixed $assignment_alias
+     * @omegaup-request-param mixed $course
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: string}}
+     */
+    public static function getCourseEditDetailsWithSelectedAssignmentForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
+        \OmegaUp\Validators::validateValidAlias(
+            $r['assignment_alias'],
+            'assignment_alias'
+        );
+
+        [
+            'course' => $courseEditDetails,
+        ] = self::getCourseEditDetails(
+            $r['course'],
+            $r->identity
+        );
+
+        $assignment = null;
+        if (!empty($courseEditDetails['assignments'])) {
+            $assignment = array_filter(
+                $courseEditDetails['assignments'],
+                function (array $assignment) use ($r) {
+                    return $assignment['alias'] === $r['assignment_alias'];
+                }
+            );
+            $assignment = array_shift($assignment);
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => $courseEditDetails,
+                    'assignment' => $assignment,
+                ],
+                'title' => 'courseAssignmentEdit',
+            ],
+            'entrypoint' => 'course_assignment_edit',
+        ];
+    }
+
+    /**
+     * @return CourseEditPayload
+     */
+    private static function getCourseEditDetails(
+        string $courseAlias,
+        \OmegaUp\DAO\VO\Identities $identity
+    ) {
+        $course = self::validateCourseExists($courseAlias);
         if (is_null($course->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         self::resolveGroup($course);
 
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        $courseDetails = self::getCommonCourseDetails($course, $r->identity);
-        $selectedAssignment = null;
-        $assignmentProblems = [];
-        if (!empty($courseDetails['assignments'])) {
-            $selectedAssignment = $courseDetails['assignments'][0];
-            $assignmentProblems = self::getProblemsByAssignment(
-                $selectedAssignment['alias'],
-                $course->alias,
-                $r->identity,
-                $r->user
-            );
         }
         $admins = \OmegaUp\DAO\UserRoles::getCourseAdmins($course);
         foreach ($admins as &$admin) {
             unset($admin['user_id']);
         }
+
         return [
-            'smartyProperties' => [
-                'payload' => [
-                    'course' => $courseDetails,
-                    'assignmentProblems' => $assignmentProblems,
-                    'selectedAssignment' => $selectedAssignment,
-                    'tags' => [],
-                    'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
-                        intval($course->course_id),
-                        intval($course->group_id)
-                    ),
-                    'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
-                        intval($course->course_id)
-                    ),
-                    'admins' => $admins,
-                    'groupsAdmins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins(
-                        $course
-                    ),
-                ],
-                'title' => 'courseEdit',
-            ],
-            'entrypoint' => 'course_edit',
+            'course' => self::getCommonCourseDetails($course, $identity),
+            'assignmentProblems' => [],
+            'selectedAssignment' => null,
+            'tags' => [],
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+                intval($course->course_id),
+                intval($course->group_id)
+            ),
+            'identityRequests' => \OmegaUp\DAO\CourseIdentityRequest::getRequestsForCourseWithFirstAdmin(
+                intval($course->course_id)
+            ),
+            'admins' => $admins,
+            'groupsAdmins' => \OmegaUp\DAO\GroupRoles::getCourseAdmins(
+                $course
+            ),
         ];
     }
 
@@ -2736,7 +2798,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
 
-        $courses = self::getCoursesList($r->identity, $page, $pageSize);
+        $courses = self::getCoursesList(
+            $r->identity,
+            $page,
+            $pageSize,
+            /*$courseTypes=*/['admin']
+        );
         $filteredCourses = [
             'admin' => [
                 'filteredCourses' => [
@@ -2784,6 +2851,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $course_type
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
@@ -2796,10 +2864,99 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $page = (isset($r['page']) ? intval($r['page']) : 1);
         $pageSize = (isset($r['page_size']) ? intval($r['page_size']) : 1000);
+        $coursesTypes = ['student', 'public'];
 
-        $courses = self::getCoursesList($r->identity, $page, $pageSize);
-        $coursesTypes = ['public', 'student'];
+        \OmegaUp\Validators::validateInEnum(
+            $r['course_type'],
+            'course_type',
+            $coursesTypes
+        );
+        $courseType = strval($r['course_type']);
 
+        $courses = self::getCoursesList(
+            $r->identity,
+            $page,
+            $pageSize,
+            [$courseType]
+        );
+
+        $filteredCourses = self::getFilteredCourses($courses, [$courseType]);
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'courses' => $filteredCourses,
+                    'course_type' => $courseType
+                ],
+                'title' => 'courseList',
+            ],
+            'entrypoint' => 'course_single_list',
+        ];
+    }
+
+    /**
+     * @omegaup-request-param int $page
+     * @omegaup-request-param int $page_size
+     *
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
+     */
+    public static function getCourseSummaryListDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+        $page = $r->ensureOptionalInt('page') ?? 1;
+        $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
+        $coursesTypes = ['student', 'public'];
+
+        $courses = self::getCoursesList(
+            $r->identity,
+            $page,
+            $pageSize,
+            $coursesTypes
+        );
+
+        $courses['student'] = array_filter($courses['student'], function ($course) {
+            return is_null($course['finish_time'])
+                || $course['finish_time']->time > \OmegaUp\Time::get();
+        });
+        $courses['student'] = array_slice($courses['student'], 0, 5);
+
+        // Checks whether a public course has been open already by user
+        foreach ($courses['public'] as &$publicCourse) {
+            $matchedCourses = array_values(
+                array_filter(
+                    $courses['student'],
+                    function ($course) use ($publicCourse) {
+                        return $course['alias'] === $publicCourse['alias'];
+                    }
+                )
+            );
+            if (!empty($matchedCourses)) {
+                $publicCourse['is_open'] = $matchedCourses[0]['is_open'];
+            }
+        }
+
+        $filteredCourses = self::getFilteredCourses($courses, $coursesTypes);
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'courses' => $filteredCourses,
+                    'course_type' => null,
+                ],
+                'title' => 'courseList',
+            ],
+            'entrypoint' => 'course_list',
+        ];
+    }
+
+    /**
+     * @param CoursesList $courses
+     * @param list<string> $coursesTypes
+     *
+     * @return StudentCourses
+     */
+    private static function getFilteredCourses($courses, $coursesTypes) {
         $filteredCourses = [];
         foreach ($coursesTypes as $courseType) {
             $filteredCourses[$courseType] = [
@@ -2836,15 +2993,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $filteredCourses[$courseType]['activeTab'] = 'past';
             }
         }
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'courses' => $filteredCourses,
-                ],
-                'title' => 'courseList',
-            ],
-            'entrypoint' => 'course_list',
-        ];
+
+        return $filteredCourses;
     }
 
     /**
@@ -2876,7 +3026,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $group
         );
         $hasSharedUserInformation = true;
-        $hasAcceptedTeacher = true;
+        $hasAcceptedTeacher = null;
         $registrationResponse = [];
         if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
             [
@@ -2976,7 +3126,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         if (
             $shouldShowIntro
-            || !$hasAcceptedTeacher
+            || is_null($hasAcceptedTeacher)
             || (!$hasSharedUserInformation
             && $requestUserInformation !== 'no'
             )
@@ -3786,7 +3936,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureIdentity();
-        // Both params are the same
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['alias'],
             'alias'
