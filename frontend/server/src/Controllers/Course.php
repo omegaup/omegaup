@@ -1005,7 +1005,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param mixed $commit
      * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $points
+     * @omegaup-request-param float $points
      * @omegaup-request-param mixed $problem_alias
      *
      * @return array{status: 'ok'}
@@ -1062,7 +1062,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $problemset->problemset_id,
             $r->identity,
             true, /* validateVisibility */
-            is_numeric($r['points']) ? floatval($r['points']) : 100.0,
+            $r->ensureOptionalFloat('points') ?? 100.0,
             $r['commit']
         );
 
@@ -2915,12 +2915,26 @@ class Course extends \OmegaUp\Controllers\Controller {
             $coursesTypes
         );
 
-        // TODO: Filter the last 5 active courses that student has had activity
-        // in PR #4424
-        // $courses['student'] = array_filter($courses['student'], function ($course) {
-        //     return is_null($course['finish_time']) || $course['finish_time']->time > \OmegaUp\Time::get();
-        // });
-        // $courses['student'] = array_slice($courses['student'], 0, 5);
+        $courses['student'] = array_filter($courses['student'], function ($course) {
+            return is_null($course['finish_time'])
+                || $course['finish_time']->time > \OmegaUp\Time::get();
+        });
+        $courses['student'] = array_slice($courses['student'], 0, 5);
+
+        // Checks whether a public course has been open already by user
+        foreach ($courses['public'] as &$publicCourse) {
+            $matchedCourses = array_values(
+                array_filter(
+                    $courses['student'],
+                    function ($course) use ($publicCourse) {
+                        return $course['alias'] === $publicCourse['alias'];
+                    }
+                )
+            );
+            if (!empty($matchedCourses)) {
+                $publicCourse['is_open'] = $matchedCourses[0]['is_open'];
+            }
+        }
 
         $filteredCourses = self::getFilteredCourses($courses, $coursesTypes);
 
