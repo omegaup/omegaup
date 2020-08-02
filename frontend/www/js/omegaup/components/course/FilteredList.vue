@@ -46,10 +46,7 @@
                     }}</a>
                   </td>
                   <td>
-                    <!-- TODO: Get the real progress when PR #4422 be approved
-                               and merged
-                    -->
-                    0%
+                    {{ `${course.progress}%` }}
                   </td>
                   <td>
                     {{

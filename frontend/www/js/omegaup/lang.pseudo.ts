@@ -1150,7 +1150,7 @@ const translations: { [key: string]: string; } = {
   statementLanguagePt: "(P0r7ugu353)",
   statementNotFound: "(Pr0b13m 57a73m3n7 n07 f0und.)",
   status: "(Upda73 y0ur 3mai1 h3r3.)",
-  studentCourseInformationDescription: "(H3r3 y0u wi11 find th3 1i57 0f c0ur535 7ha7 y0u ar3 3nr0113d in.)",
+  studentCourseInformationDescription: "(H3r3 y0u wi11 find 7h3 1i57 0f c0ur535 7ha7 y0u ar3 3nr0113d in.)",
   submissionMemoryInMegabytes: "(%(value) MiB)",
   submissionRunTimeInSeconds: "(%(value) 5)",
   submissionsListTitle: "(Submi55i0n5 0n 7h3 1a57 24 h0ur5)",
