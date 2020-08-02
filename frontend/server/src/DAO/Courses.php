@@ -233,7 +233,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return $courses;
     }
 
-    //FIXME: Use type list<StudentProgress> instead
     /**
      * Returns a list of students within a course
      * @return list<array{name: string|null, progress: array<string, array<string, float>>, username: string}>
