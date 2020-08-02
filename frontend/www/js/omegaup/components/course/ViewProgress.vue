@@ -23,9 +23,9 @@
               </thead>
               <tbody>
                 <omegaup-student-progress
-                  v-for="currStudent in students"
-                  v-bind:key="currStudent.username"
-                  v-bind:student="currStudent"
+                  v-for="student in students"
+                  v-bind:key="student.username"
+                  v-bind:student="student"
                   v-bind:assignments="assignments"
                   v-bind:course="course"
                 >

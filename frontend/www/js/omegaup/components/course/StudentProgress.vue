@@ -20,7 +20,7 @@
             v-bind:class="getProblemColor(Math.round(problemScore))"
             data-toggle="tooltip"
             data-placement="bottom"
-            v-bind:title="Math.round(problemScore) + '%'"
+            v-bind:title="`${Math.round(problemScore)}%`"
           ></div>
         </div>
       </div>
