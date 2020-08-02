@@ -1441,7 +1441,7 @@ const translations: { [key: string]: string; } = {
   wordsMultipleUser: "Multiples usuarios (Separados por comas)",
   wordsMyContests: "Mis Concursos",
   wordsMyScore: "Mi puntaje",
-  wordsNA: "NA",
+  wordsNA: "N/A",
   wordsName: "Nombre",
   wordsNewClarification: "Nueva clarificaci\u00f3n",
   wordsNewExam: "Nuevo examen",
