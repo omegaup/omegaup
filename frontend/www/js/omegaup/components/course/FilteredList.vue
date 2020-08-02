@@ -59,11 +59,15 @@
                     {{
                       course.counts.homework
                         ? course.counts.homework
-                        : T.wordsNA
+                        : T.wordsNotApplicable
                     }}
                   </td>
                   <td>
-                    {{ course.counts.test ? course.counts.test : T.wordsNA }}
+                    {{
+                      course.counts.test
+                        ? course.counts.test
+                        : T.wordsNotApplicable
+                    }}
                   </td>
                   <template v-if="courses.accessMode === 'admin'">
                     <td>
