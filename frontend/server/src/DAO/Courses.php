@@ -175,9 +175,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
             );
-            if (is_null($row['progress'])) {
-                unset($row['progress']);
-            }
+            $row['progress'] = $row['progress'] ?: 0.0;
             unset($row['last_submission_time']);
             unset($row['course_id']);
             $courses[] = $row;
