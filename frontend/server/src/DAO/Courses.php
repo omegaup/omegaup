@@ -105,7 +105,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     s.name AS school_name,
                     start_time,
                     accept_teacher,
-                    pr.progress,
+                    IFNULL(pr.progress, 0.0) AS progress,
                     pr.last_submission_time
                 FROM Courses c
                 INNER JOIN (
@@ -162,7 +162,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ON c.school_id = s.school_id
                 ORDER BY
                     pr.last_submission_time DESC;';
-        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, last_submission_time: \OmegaUp\Timestamp|null, name: string, progress: float|null, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{accept_teacher: bool|null, admission_mode: string, alias: string, course_id: int, finish_time: \OmegaUp\Timestamp|null, last_submission_time: \OmegaUp\Timestamp|null, name: string, progress: float, school_name: null|string, start_time: \OmegaUp\Timestamp}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId, $identityId]
@@ -175,7 +175,6 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $row['counts'] = \OmegaUp\DAO\Assignments::getAssignmentCountsForCourse(
                 $row['course_id']
             );
-            $row['progress'] = $row['progress'] ?: 0.0;
             unset($row['last_submission_time']);
             unset($row['course_id']);
             $courses[] = $row;
