@@ -179,6 +179,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['visibility'])) {
             $params['visibility'] = intval($r['visibility']);
         }
+        if (!is_null($r['intVisibility'])) {
+            $params['visibility'] = intval($r['intVisibility']);
+        }
         if (!is_null($r['show_diff'])) {
             $params['show_diff'] = strval($r['show_diff']);
         }
@@ -391,7 +394,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
         if (!is_null($r['visibility'])) {
-            $r['visibility'] = \OmegaUp\ProblemParams::stringVisibilityToNumeric(
+            $r['intVisibility'] = \OmegaUp\ProblemParams::stringVisibilityToNumeric(
                 strval(
                     $r['visibility']
                 )
