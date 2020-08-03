@@ -46,7 +46,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
      *
      * @return list<array{alias: string, variance: float}>
      */
-    public static function getAssignmentProblemsVariance(
+    public static function getAssignmentProblemsStatistics(
         int $courseId,
         string $assignmentAlias
     ): array {

@@ -353,7 +353,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testAssignmentMetrics() {
+    public function testAssignmentProblemsVariance() {
         $problemsData = [];
         for ($i = 0; $i < 3; $i++) {
             $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -428,7 +428,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
 
-        $results = \OmegaUp\DAO\Assignments::getAssignmentProblemsVariance(
+        $results = \OmegaUp\DAO\Assignments::getAssignmentProblemsStatistics(
             $courseData['course']->course_id,
             $assignmentAlias,
         );
