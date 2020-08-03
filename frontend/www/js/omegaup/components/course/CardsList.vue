@@ -10,7 +10,12 @@
       >
         <div class="col-lg-5 p-3 d-flex" v-bind:class="accessMode">
           <h3 class="flex-grow-1">{{ getDescription(accessMode) }}</h3>
-          <div class="d-none">
+          <div
+            class="d-inline-block"
+            tabindex="0"
+            data-toggle="tooltip"
+            v-bind:title="T[`${accessMode}CourseInformationDescription`]"
+          >
             <font-awesome-icon icon="info-circle" />
           </div>
         </div>
