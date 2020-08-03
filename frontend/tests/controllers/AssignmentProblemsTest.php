@@ -428,11 +428,11 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
 
-        $results = \OmegaUp\DAO\Assignments::getAssignmentProblemsStatistics(
+        $results = \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
             $courseData['course']->course_id,
-            $assignmentAlias,
         );
 
+        $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);
         // Variance of the first problem must be greater than 0
         // Variance of the second one should be 0, all users solved it
         // Variance of the third problem should be 0, no user did anything

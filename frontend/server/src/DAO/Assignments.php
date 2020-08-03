@@ -44,15 +44,15 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the variance of the runs submmited by the students
      *
-     * @return list<array{alias: string, variance: float}>
+     * @return list<array{assignment_alias: string, problem_alias: string, variance: float}>
      */
-    public static function getAssignmentProblemsStatistics(
-        int $courseId,
-        string $assignmentAlias
+    public static function getAssignmentsProblemsStatistics(
+        int $courseId
     ): array {
         $sql = '
             SELECT
-                `p`.`alias`,
+                `a`.`alias` as assignment_alias,
+                `p`.`alias` as problem_alias,
                 COALESCE(
                     VARIANCE(`r`.`contest_score`),
                     0
@@ -70,17 +70,17 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             INNER JOIN
                 `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
             WHERE
-                `a`.`course_id` = ? AND `a`.`alias` = ?
+                `a`.`course_id` = ?
             GROUP BY
-                `p`.`problem_id`
+                `a`.`assignment_id`, `p`.`problem_id`
             ORDER BY
                 `psp`.`order`;
         ';
 
-        /** @var list<array{alias: string, variance: float}> */
+        /** @var list<array{assignment_alias: string, problem_alias: string, variance: float}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$courseId, $assignmentAlias]
+            [ $courseId ]
         );
         return $results;
     }
