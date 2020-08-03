@@ -1625,13 +1625,18 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return CoursesList
      */
     private static function getCoursesList(
-        \OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Identities $identity,
         int $page,
         int $pageSize,
         array $courseTypes = ['admin', 'student', 'public']
     ) {
-        if (is_null($identity->identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            // Show only public courses for no-logged users
+            return [
+                'admin' => [],
+                'student' => [],
+                'public' => \OmegaUp\DAO\Courses::getPublicCourses(),
+            ];
         }
         $response = ['admin' => [], 'student' => [], 'public' => []];
 
@@ -2903,7 +2908,14 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseSummaryListDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        $r->ensureIdentity();
+        // Check who is visiting, but a not logged user can still view
+        // the list of courses
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Do nothing.
+            /** @var null $r->identity */
+        }
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
         $coursesTypes = ['student', 'public'];
