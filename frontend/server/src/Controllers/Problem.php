@@ -177,10 +177,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         if (!is_null($r['visibility'])) {
-            $params['visibility'] = intval($r['visibility']);
-        }
-        if (!is_null($r['intVisibility'])) {
-            $params['visibility'] = intval($r['intVisibility']);
+            $params['visibility'] = \OmegaUp\ProblemParams::stringVisibilityToNumeric(
+                strval(
+                    $r['visibility']
+                )
+            );
         }
         if (!is_null($r['show_diff'])) {
             $params['show_diff'] = strval($r['show_diff']);
@@ -393,13 +394,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        if (!is_null($r['visibility'])) {
-            $r['intVisibility'] = \OmegaUp\ProblemParams::stringVisibilityToNumeric(
-                strval(
-                    $r['visibility']
-                )
-            );
-        }
 
         self::createProblem(
             $r->user,
@@ -1126,7 +1120,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -1679,7 +1673,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdateStatement(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -1773,7 +1767,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdateSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -4932,7 +4926,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      *
      * @return array{smartyProperties: array{payload: ProblemFormPayload}, entrypoint: string}
      */
