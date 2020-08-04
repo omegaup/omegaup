@@ -4671,8 +4671,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
-     * @omegaup-request-param string $contents
+     * @omegaup-request-param string $visibility
+     * @omegaup-request-param mixed $contents
      *
      */
     public static function getProblemEditDetailsForSmarty(
