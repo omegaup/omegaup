@@ -1857,7 +1857,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemAlias,
-            'visibility' => 'public',
+            'visibility' => 'public_warning',
             'time_limit' => $newTimeLimit,
             'extra_wall_time' => $newExtraWallTime,
             'memory_limit' => $newMemoryLimit,
