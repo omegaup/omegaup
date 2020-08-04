@@ -255,8 +255,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureInt('start_time');
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
         if (
-            !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
-            && $course->admission_mode !== self::ADMISSION_MODE_PUBLIC
+            is_null($r->identity)
+            || (
+                !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
+                && $course->admission_mode !== self::ADMISSION_MODE_PUBLIC
+            )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -597,7 +600,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'alias' => $r['alias']
+            'alias' => strval($r['alias'])
         ];
     }
 
