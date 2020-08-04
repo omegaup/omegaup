@@ -1625,18 +1625,13 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return CoursesList
      */
     private static function getCoursesList(
-        ?\OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Identities $identity,
         int $page,
         int $pageSize,
         array $courseTypes = ['admin', 'student', 'public']
     ) {
-        if (is_null($identity) || is_null($identity->identity_id)) {
-            // Show only public courses for no-logged users
-            return [
-                'admin' => [],
-                'student' => [],
-                'public' => \OmegaUp\DAO\Courses::getPublicCourses(),
-            ];
+        if (is_null($identity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
         }
         $response = ['admin' => [], 'student' => [], 'public' => []];
 
@@ -2908,17 +2903,37 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseSummaryListDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
+        $coursesTypes = ['student', 'public'];
         // Check who is visiting, but a not logged user can still view
         // the list of courses
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
-            // Do nothing.
-            /** @var null $r->identity */
+            // Show only public courses for no-logged users
+            $courses = [
+                'admin' => [],
+                'student' => [],
+                'public' => \OmegaUp\DAO\Courses::getPublicCourses(),
+            ];
+
+            $filteredCourses = self::getFilteredCourses(
+                $courses,
+                $coursesTypes
+            );
+
+            return [
+                'smartyProperties' => [
+                    'payload' => [
+                        'courses' => $filteredCourses,
+                        'course_type' => null,
+                    ],
+                    'title' => 'courseList',
+                ],
+                'entrypoint' => 'course_list',
+            ];
         }
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
-        $coursesTypes = ['student', 'public'];
 
         $courses = self::getCoursesList(
             $r->identity,
