@@ -173,7 +173,10 @@
           </tbody>
         </table>
       </div>
-      <div class="card-footer text-sm-right">
+      <div
+        class="card-footer text-sm-right"
+        v-if="course.admission_mode === 'public'"
+      >
         <button class="btn btn-link" v-on:click="showCloneForm = true">
           {{ T.wordsCloneThisCourse }}
         </button>
