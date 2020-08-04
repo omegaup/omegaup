@@ -111,6 +111,7 @@
             </tr>
             <tr
               v-else=""
+              v-bind:key="assignment.alias"
               v-for="assignment in course.assignments"
               v-bind:data-content-alias="assignment.alias"
             >
@@ -172,6 +173,19 @@
           </tbody>
         </table>
       </div>
+      <div class="card-footer text-sm-right">
+        <button class="btn btn-link" v-on:click="showCloneForm = true">
+          {{ T.wordsCloneThisCourse }}
+        </button>
+        <omegaup-course-clone
+          v-if="showCloneForm"
+          v-bind:initial-alias="course.alias"
+          v-bind:initial-name="course.name"
+          v-on:emit-clone="
+            (alias, name, startTime) => $emit('clone', alias, name, startTime)
+          "
+        ></omegaup-course-clone>
+      </div>
     </div>
   </div>
 </template>
@@ -184,6 +198,7 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
 
+import course_Clone from './Clone.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -209,6 +224,7 @@ library.add(
   components: {
     FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-course-clone': course_Clone,
   },
 })
 export default class CourseDetails extends Vue {
@@ -217,6 +233,7 @@ export default class CourseDetails extends Vue {
 
   T = T;
   ui = ui;
+  showCloneForm = false;
 
   get overallCompletedPercentage(): string {
     let score = 0;

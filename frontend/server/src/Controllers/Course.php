@@ -247,10 +247,19 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $name
      * @omegaup-request-param int $start_time
      */
-    private static function validateClone(\OmegaUp\Request $r): void {
+    private static function validateClone(
+        \OmegaUp\Request $r,
+        \OmegaUp\DAO\VO\Courses $course
+    ): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         $r->ensureInt('start_time');
         \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias', true);
+        if (
+            !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
+            && $course->admission_mode !== self::ADMISSION_MODE_PUBLIC
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
     }
 
     /**
@@ -495,16 +504,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureMainUserIdentity();
-        self::validateClone($r);
-        \OmegaUp\Validators::validateValidAlias(
-            $r['alias'],
-            'alias'
-        );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
             'course_alias'
         );
         $originalCourse = self::validateCourseExists($r['course_alias']);
+        self::validateClone($r, $originalCourse);
 
         $startTime = $r->ensureTimestamp('start_time');
         $offset = $startTime->time - $originalCourse->start_time->time;

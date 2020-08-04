@@ -1332,6 +1332,7 @@ const translations: { [key: string]: string; } = {
   wordsClarifications: "Clarificaciones",
   wordsCloneContest: "Clonar concurso",
   wordsCloneCourse: "Clonar curso",
+  wordsCloneThisCourse: "Clonar este curso",
   wordsClose: "Cerrar",
   wordsCompilerOutput: "Salida del compilador",
   wordsCompletedPercentage: "Porcentaje completado",
