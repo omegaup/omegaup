@@ -2911,10 +2911,37 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseSummaryListDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        $r->ensureIdentity();
+        $coursesTypes = ['student', 'public'];
+        // Check who is visiting, but a not logged user can still view
+        // the list of courses
+        try {
+            $r->ensureIdentity();
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            // Show only public courses for no-logged users
+            $courses = [
+                'admin' => [],
+                'student' => [],
+                'public' => \OmegaUp\DAO\Courses::getPublicCourses(),
+            ];
+
+            $filteredCourses = self::getFilteredCourses(
+                $courses,
+                $coursesTypes
+            );
+
+            return [
+                'smartyProperties' => [
+                    'payload' => [
+                        'courses' => $filteredCourses,
+                        'course_type' => null,
+                    ],
+                    'title' => 'courseList',
+                ],
+                'entrypoint' => 'course_list',
+            ];
+        }
         $page = $r->ensureOptionalInt('page') ?? 1;
         $pageSize = $r->ensureOptionalInt('page_size') ?? 1000;
-        $coursesTypes = ['student', 'public'];
 
         $courses = self::getCoursesList(
             $r->identity,
