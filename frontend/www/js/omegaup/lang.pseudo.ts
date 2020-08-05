@@ -1332,6 +1332,7 @@ const translations: { [key: string]: string; } = {
   wordsClarifications: "(C1arifica7i0n)",
   wordsCloneContest: "(C10n3 c0n7357)",
   wordsCloneCourse: "(C10n3 c0ur53)",
+  wordsCloneThisCourse: "(C10n3 7hi5 c0ur53)",
   wordsClose: "(C1053)",
   wordsCompilerOutput: "(C0mpi13r 0u7pu7)",
   wordsCompletedPercentage: "(P3rc3n7ag3 c0mp1373d)",
