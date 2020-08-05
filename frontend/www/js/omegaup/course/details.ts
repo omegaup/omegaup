@@ -30,17 +30,14 @@ OmegaUp.on('ready', () => {
                     course_alias: alias,
                   }),
                 );
-                component.showCloneForm = false;
               })
               .catch(ui.apiError);
           },
         },
-        ref: 'component',
       });
     },
     components: {
       'omegaup-course-details': course_Details,
     },
   });
-  const component = <course_Details>courseDetails.$refs.component;
 });

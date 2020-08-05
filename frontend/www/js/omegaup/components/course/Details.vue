@@ -173,21 +173,42 @@
           </tbody>
         </table>
       </div>
-      <div
-        class="card-footer text-sm-right"
-        v-if="course.admission_mode === 'public'"
-      >
-        <button class="btn btn-link" v-on:click="showCloneForm = true">
-          {{ T.wordsCloneThisCourse }}
-        </button>
-        <omegaup-course-clone
-          v-if="showCloneForm"
-          v-bind:initial-alias="course.alias"
-          v-bind:initial-name="course.name"
-          v-on:emit-clone="
-            (alias, name, startTime) => $emit('clone', alias, name, startTime)
-          "
-        ></omegaup-course-clone>
+    </div>
+
+    <div class="accordion" data-accordion-clone>
+      <div class="card">
+        <div class="card-header" data-heading-clone>
+          <h2 class="mb-0">
+            <button
+              class="btn btn-link btn-block text-right"
+              type="button"
+              data-toggle="collapse"
+              data-target="[data-accordion-collapse]"
+              aria-expanded="false"
+              aria-controls="data-accordion-collapse"
+            >
+              {{ T.wordsCloneThisCourse }}
+            </button>
+          </h2>
+        </div>
+
+        <div
+          data-accordion-collapse
+          class="collapse hide"
+          aria-labelledby="[data-heading-clone]"
+          data-parent="[data-accordion-clone]"
+        >
+          <div class="card-body">
+            <omegaup-course-clone
+              v-bind:initial-alias="course.alias"
+              v-bind:initial-name="course.name"
+              v-on:emit-clone="
+                (alias, name, startTime) =>
+                  $emit('clone', alias, name, startTime)
+              "
+            ></omegaup-course-clone>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -236,7 +257,6 @@ export default class CourseDetails extends Vue {
 
   T = T;
   ui = ui;
-  showCloneForm = false;
 
   get overallCompletedPercentage(): string {
     let score = 0;
