@@ -31,9 +31,10 @@
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
+ * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<StudentProgress>, tags: list<string>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type CourseAssignmentEditPayload=array{course: CourseDetails, assignment: CourseAssignment|null}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
@@ -1815,7 +1816,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{students: list<StudentProgress>}
+     * @return array{students: list<CourseStudent>}
      */
     public static function apiListStudents(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -1839,7 +1840,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourse(
                 $course->course_id,
                 $course->group_id
             ),
@@ -2648,7 +2649,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignmentProblems' => [],
             'selectedAssignment' => null,
             'tags' => [],
-            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourse(
                 intval($course->course_id),
                 intval($course->group_id)
             ),

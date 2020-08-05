@@ -110,7 +110,7 @@ import common_Requests from '../common/Requests.vue';
 })
 export default class CourseAddStudents extends Vue {
   @Prop() courseAlias!: string;
-  @Prop() students!: omegaup.CourseStudent[];
+  @Prop() students!: types.CourseStudent[];
   @Prop({ required: false }) identityRequests!: types.IdentityRequest[];
 
   T = T;

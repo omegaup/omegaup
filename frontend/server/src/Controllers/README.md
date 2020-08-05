@@ -1758,9 +1758,9 @@ List students in a course
 
 ### Returns
 
-| Name       | Type                      |
-| ---------- | ------------------------- |
-| `students` | `types.StudentProgress[]` |
+| Name       | Type                    |
+| ---------- | ----------------------- |
+| `students` | `types.CourseStudent[]` |
 
 ## `/api/course/listUnsolvedProblems/`
 
