@@ -42,7 +42,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     }
 
     /**
-     * Returns each problem with the variance of the runs submmited by the students
+     * Returns each problem with the statistics of the runs submmited by the students
      *
      * @return list<array{assignment_alias: string, problem_alias: string, variance: float}>
      */
