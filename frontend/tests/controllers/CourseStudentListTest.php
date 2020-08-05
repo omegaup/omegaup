@@ -27,6 +27,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
+        print_r($response);
 
         foreach ($students as $s) {
             $this->assertArrayContainsWithPredicate($response['students'], function ($value) use ($s) {
@@ -170,6 +171,7 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData['course']->course_id,
             $courseData['course']->group_id,
         );
+        print_r($results);
 
         $this->assertEquals($participants[0]->name, $results[0]['name']);
         $this->assertArrayHasKey($assignment, $results[0]['progress']);
