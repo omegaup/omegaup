@@ -84,6 +84,9 @@
               </template>
             </ul>
           </li>
+          <li v-bind:class="{ active: navbarSection === 'courses' }" v-else="">
+            <a href="/course/">{{ T.navCourses }}</a>
+          </li>
           <li
             class="dropdown nav-problems"
             v-bind:class="{ active: navbarSection === 'problems' }"
