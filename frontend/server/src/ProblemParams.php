@@ -339,6 +339,10 @@ class ProblemParams {
     * Convert string visibility to numeric visibility
     */
     public static function stringVisibilityToNumeric(string $visibility): int {
+        // TODO(#4144): Remove this when the migration is complete.
+        if (is_numeric($visibility)) {
+            return intval($visibility);
+        }
         switch ($visibility) {
             case 'deleted':
                 return \OmegaUp\ProblemParams::VISIBILITY_DELETED;
