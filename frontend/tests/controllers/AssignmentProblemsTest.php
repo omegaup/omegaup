@@ -15,7 +15,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
         $response = \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -62,7 +62,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity,
         ]), $login);
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -105,15 +105,15 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         // Add multiple problems to the assignment
         $problems = [
             \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity
             ]), $login),
             \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity
             ]), $login),
             \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity
             ]), $login)
         ];
@@ -171,7 +171,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
 
@@ -206,7 +206,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
 
@@ -253,7 +253,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -296,7 +296,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Add one problem to the assignment
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 1,
+            'visibility' => 'public',
             'author' => $identity
         ]), $login);
         \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
@@ -351,5 +351,93 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
             $this->assertEquals('problemNotFound', $e->getMessage());
         }
+    }
+
+    public function testAssignmentProblemsVariance() {
+        $problemsData = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemsData[0], $problemsData[1], $problemsData[2]]
+        );
+
+        $identities = [];
+        [
+            'user' => $user,
+            'identity' => $identities[]
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[0]
+        );
+
+        [
+            'user' => $user,
+            'identity' => $identities[]
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[1]
+        );
+
+        // First student will solve problem0 and problem1, and won't try problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[2],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+
+        // Second student will solve problem1, fail on problem0 and won't try problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+
+        $results = \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
+            $courseData['course']->course_id,
+        );
+
+        $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);
+        // Variance of the first problem must be greater than 0
+        // Variance of the second one should be 0, all users solved it
+        // Variance of the third problem should be 0, no user did anything
+        $this->assertGreaterThan(0, $results[0]['variance']);
+        $this->assertEquals(0, $results[1]['variance']);
+        $this->assertEquals(0, $results[2]['variance']);
     }
 }

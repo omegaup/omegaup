@@ -111,6 +111,7 @@
             </tr>
             <tr
               v-else=""
+              v-bind:key="assignment.alias"
               v-for="assignment in course.assignments"
               v-bind:data-content-alias="assignment.alias"
             >
@@ -173,6 +174,43 @@
         </table>
       </div>
     </div>
+
+    <div class="accordion" data-accordion-clone>
+      <div class="card">
+        <div class="card-header" data-heading-clone>
+          <h2 class="mb-0">
+            <button
+              class="btn btn-link btn-block text-right"
+              type="button"
+              data-toggle="collapse"
+              data-target="[data-accordion-collapse]"
+              aria-expanded="false"
+              aria-controls="data-accordion-collapse"
+            >
+              {{ T.wordsCloneThisCourse }}
+            </button>
+          </h2>
+        </div>
+
+        <div
+          data-accordion-collapse
+          class="collapse hide"
+          aria-labelledby="[data-heading-clone]"
+          data-parent="[data-accordion-clone]"
+        >
+          <div class="card-body">
+            <omegaup-course-clone
+              v-bind:initial-alias="course.alias"
+              v-bind:initial-name="course.name"
+              v-on:emit-clone="
+                (alias, name, startTime) =>
+                  $emit('clone', alias, name, startTime)
+              "
+            ></omegaup-course-clone>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -184,6 +222,7 @@ import * as ui from '../../ui';
 import * as time from '../../time';
 import { types } from '../../api_types';
 
+import course_Clone from './Clone.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -209,6 +248,7 @@ library.add(
   components: {
     FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-course-clone': course_Clone,
   },
 })
 export default class CourseDetails extends Vue {

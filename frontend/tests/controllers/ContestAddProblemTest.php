@@ -204,7 +204,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
     public function testAddBannedProblemToContest() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            'visibility' => 'public',
             'author' => $contestData['director']
         ]));
         $problem = $problemData['problem'];
