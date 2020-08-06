@@ -12,18 +12,33 @@ const noop = () => {};
 Object.defineProperty(window, 'scrollTo', { value: noop, writable: true });
 
 describe('Edit.vue', () => {
-  it('Should handle empty assignments', async () => {
+  it('Should handle assignments', async () => {
     const courseName = 'Test course';
     const wrapper = shallowMount(course_Edit, {
       propsData: {
-        data: {
-          course: <types.CourseDetails>{
+        data: <types.CourseEditPayload>{
+          course: {
             admission_mode: 'registration',
             alias: 'test-course',
-            assignments: [],
+            assignments: [
+              {
+                problemset_id: 1,
+                alias: 'alias',
+                description: 'description',
+                name: 'name',
+                has_runs: false,
+                max_points: 0,
+                start_time: new Date(),
+                finish_time: new Date(),
+                order: 1,
+                scoreboard_url: 'sb_url',
+                scoreboard_url_admin: 'sc_url_admin',
+                assignment_type: 'test',
+              },
+            ],
             needs_basic_information: false,
             description: '# Test',
-            finish_time: new Date(),
+            finish_time: undefined,
             is_curator: true,
             is_admin: true,
             name: courseName,
@@ -36,11 +51,12 @@ describe('Edit.vue', () => {
             unlimited_duration: false,
           },
           assignmentProblems: [],
-          selectedAssignment: null,
+          selectedAssignment: undefined,
           students: [],
           identityRequests: [],
           admins: [],
           groupsAdmins: [],
+          tags: [],
         },
         initialTab: 'course',
       },
@@ -49,8 +65,7 @@ describe('Edit.vue', () => {
     expect(wrapper.text()).toContain(courseName);
 
     // All the links are available
-    await wrapper.find('a[data-tab-assignments]').trigger('click');
-    await wrapper.find('a[data-tab-problems]').trigger('click');
+    await wrapper.find('a[data-tab-content]').trigger('click');
     await wrapper.find('a[data-tab-admission-mode]').trigger('click');
     await wrapper.find('a[data-tab-students]').trigger('click');
     await wrapper.find('a[data-tab-admins]').trigger('click');
