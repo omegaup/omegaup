@@ -488,6 +488,7 @@ const translations: { [key: string]: string; } = {
   invalidScoreboardUrl: "Invalid scoreboard url.",
   invalidStatementType: "Invalid statement type.",
   invalidUser: "Invalid user.",
+  invalidVisibility: "The visibility parameter can be one of the following values: deleted, private_banned, public_banned, private_warning, private, public_warning, public and promoted",
   inviteToInterview: "Invite to interview",
   lastUpdate: "Last update",
   levelTagHelp: "The levels must coincide with educational stages and go hand in hand with the courses that students usually take.",

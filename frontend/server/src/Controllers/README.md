@@ -2639,7 +2639,7 @@ Create a new problem
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 
@@ -2962,7 +2962,7 @@ Update problem contents
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 
@@ -3018,7 +3018,7 @@ Updates problem solution only
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 
@@ -3055,7 +3055,7 @@ Updates problem statement only
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 
