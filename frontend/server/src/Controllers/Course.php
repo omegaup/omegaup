@@ -762,9 +762,6 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             if (!empty($addedProblems)) {
                 foreach ($addedProblems as $i => $addedProblem) {
-                    $commit = isset(
-                        $addedProblem['commit']
-                    ) ? $addedProblem['commit'] : null;
                     // Create and assign problems to new course
                     self::addProblemToAssignment(
                         $addedProblem['alias'],
@@ -772,7 +769,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $identity,
                         /*$validateVisibility=*/false,
                         /*$points=*/$addedProblem['points'],
-                        $commit,
+                        $addedProblem['commit'] ?? null,
                         /*$order*/$i + 1
                     );
                 }
@@ -823,7 +820,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        list($masterCommit, $currentVersion) = \OmegaUp\Controllers\Problem::resolveCommit(
+        [$masterCommit, $currentVersion] = \OmegaUp\Controllers\Problem::resolveCommit(
             $problem,
             $commit
         );

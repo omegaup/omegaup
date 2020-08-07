@@ -178,18 +178,14 @@ OmegaUp.on('ready', () => {
             source: course_ProblemList,
           ) => {
             api.Problem.versions({ problem_alias: problemAlias })
-              .then(function (result) {
+              .then((result) => {
                 source.versionLog = result.log;
-                let currentProblem = null;
+                let publishedCommitHash = result.published;
                 for (const problem of source.problems) {
                   if (problem.alias === problemAlias) {
-                    currentProblem = problem;
+                    publishedCommitHash = problem.commit;
                     break;
                   }
-                }
-                let publishedCommitHash = result.published;
-                if (currentProblem != null) {
-                  publishedCommitHash = currentProblem.commit;
                 }
                 for (const revision of result.log) {
                   if (publishedCommitHash === revision.commit) {
@@ -204,14 +200,14 @@ OmegaUp.on('ready', () => {
             assignment: types.CourseAssignment,
             problem: types.AddedProblem,
           ) => {
-            const problemParams = {
+            const problemParams: messages.CourseAddProblemRequest = {
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
               problem_alias: problem.alias,
               points: problem.points,
             };
             if (problem.commit) {
-              Object.assign(problemParams, { commit: problem.commit });
+              problemParams.commit = problem.commit;
             }
             api.Course.addProblem(problemParams)
               .then(() => {
