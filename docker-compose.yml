@@ -57,7 +57,7 @@ services:
     build:
       dockerfile: ./Dockerfile.grader
       context: ./stuff/docker/
-    image: omegaup/dev-grader:20200731
+    image: omegaup/dev-grader:20200806
     restart: always
     depends_on:
       - mysql
