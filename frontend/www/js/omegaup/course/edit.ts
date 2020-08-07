@@ -5,6 +5,7 @@ import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
+import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Edit from '../components/course/Edit.vue';
 import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
@@ -172,16 +173,47 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'get-versions': (
+            problemAlias: string,
+            source: course_ProblemList,
+          ) => {
+            api.Problem.versions({ problem_alias: problemAlias })
+              .then(function (result) {
+                source.versionLog = result.log;
+                let currentProblem = null;
+                for (const problem of source.problems) {
+                  if (problem.alias === problemAlias) {
+                    currentProblem = problem;
+                    break;
+                  }
+                }
+                let publishedCommitHash = result.published;
+                if (currentProblem != null) {
+                  publishedCommitHash = currentProblem.commit;
+                }
+                for (const revision of result.log) {
+                  if (publishedCommitHash === revision.commit) {
+                    source.selectedRevision = source.publishedRevision = revision;
+                    break;
+                  }
+                }
+              })
+              .catch(ui.apiError);
+          },
           'add-problem': (
             assignment: types.CourseAssignment,
             problem: types.AddedProblem,
           ) => {
-            api.Course.addProblem({
+            const problemParams = {
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
               problem_alias: problem.alias,
               points: problem.points,
-            })
+            };
+            if (problem.commit) {
+              Object.assign(problemParams, { commit: problem.commit });
+            }
+            api.Course.addProblem(problemParams)
               .then(() => {
                 ui.success(T.courseAssignmentProblemAdded);
                 this.refreshProblemList(assignment);

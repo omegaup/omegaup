@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card w-100 mb-4">
     <div class="card-body controls">
       <label
         >{{ T.problemVersionDiffMode }}

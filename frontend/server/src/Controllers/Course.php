@@ -39,7 +39,7 @@
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type AddedProblem=array{alias: string, points: float}
+ * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -148,7 +148,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $addedProblems = [];
         if (!empty($r['problems'])) {
-          /** @var list<array{alias: string, points?: int|float|string}> */
+          /** @var list<array{alias: string, commit?: string, points?: int|float|string}> */
             $problemsData = json_decode(
                 strval(
                     $r['problems']
@@ -762,6 +762,9 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             if (!empty($addedProblems)) {
                 foreach ($addedProblems as $i => $addedProblem) {
+                    $commit = isset(
+                        $addedProblem['commit']
+                    ) ? $addedProblem['commit'] : null;
                     // Create and assign problems to new course
                     self::addProblemToAssignment(
                         $addedProblem['alias'],
@@ -769,7 +772,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $identity,
                         /*$validateVisibility=*/false,
                         /*$points=*/$addedProblem['points'],
-                        /*$commit*/null,
+                        $commit,
                         /*$order*/$i + 1
                     );
                 }
@@ -820,7 +823,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        [$masterCommit, $currentVersion] = \OmegaUp\Controllers\Problem::resolveCommit(
+        list($masterCommit, $currentVersion) = \OmegaUp\Controllers\Problem::resolveCommit(
             $problem,
             $commit
         );
@@ -829,7 +832,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
-            $masterCommit,
+            $commit ?? $masterCommit,
             $currentVersion,
             $identity,
             $problem->languages === '' ? 0 : $assignedPoints,
