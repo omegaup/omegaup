@@ -93,7 +93,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a user and sumbit a run with him
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private',
         ]));
         $runDataPrivate = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataPrivate,
