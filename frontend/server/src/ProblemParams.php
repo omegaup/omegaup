@@ -341,4 +341,37 @@ class ProblemParams {
         }
         return $importantChange;
     }
+
+    /**
+    * Convert string visibility to numeric visibility
+    */
+    public static function stringVisibilityToNumeric(string $visibility): int {
+        switch ($visibility) {
+            case 'deleted':
+                return \OmegaUp\ProblemParams::VISIBILITY_DELETED;
+            case 'private_banned':
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+            case 'public_banned':
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+            case 'private_warning':
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
+            case 'private':
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+            case 'public_warning':
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+            case 'public':
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+            case 'promoted':
+                return \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
+            default:
+                // TODO(#4144): Remove this when the migration is complete.
+                if (is_numeric($visibility)) {
+                    return intval($visibility);
+                }
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidVisibility',
+                    'visibility'
+                );
+        }
+    }
 }

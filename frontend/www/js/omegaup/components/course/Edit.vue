@@ -34,16 +34,6 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#problems"
-          class="nav-link"
-          data-tab-problems
-          v-on:click="showTab = 'problems'"
-          v-bind:class="{ active: showTab === 'problems' }"
-          >{{ T.wordsProblems }}</a
-        >
-      </li>
-      <li class="nav-item" role="presentation">
-        <a
           href="#admission-mode"
           class="nav-link"
           data-tab-admission-mode
@@ -103,7 +93,7 @@
         v-if="showTab === 'content'"
       >
         <omegaup-course-assignment-list
-          v-bind:content="data.course.assignments"
+          v-bind:content="assignments"
           v-bind:course-alias="data.course.alias"
           v-bind:assignment-form-mode="assignmentFormMode"
           v-on:emit-new="onNewAssignment"
@@ -124,27 +114,13 @@
           v-bind:finish-time-course="data.course.finish_time"
           v-bind:start-time-course="data.course.start_time"
           v-bind:assignment="assignment"
-          v-bind:invalid-parameter-name="invalidParameterName"
-          v-on:emit-cancel="onResetAssignmentForm"
-          v-on:emit-submit="
-            (assignmentFormComponent) =>
-              $emit('submit-new-assignment', assignmentFormComponent)
-          "
-        ></omegaup-course-assignment-details>
-      </div>
-
-      <div
-        data-problems-tab
-        class="tab-pane active"
-        role="tabpanel"
-        v-if="showTab === 'problems'"
-      >
-        <omegaup-course-problem-list
-          v-bind:assignments="data.course.assignments"
-          v-bind:assignment-problems="data.assignmentProblems"
+          v-bind:assignment-problems="assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
+          v-bind:invalid-parameter-name="invalidParameterName"
+          v-on:add-problem="
+            (assignment, problem) => $emit('add-problem', assignment, problem)
+          "
           v-bind:assignment-form-mode.sync="assignmentFormMode"
-          v-bind:selected-assignment="selectedAssignment"
           v-on:emit-add-problem="
             (assignment, problemAlias) =>
               $emit('add-problem', assignment, problemAlias)
@@ -152,16 +128,31 @@
           v-on:emit-select-assignment="
             (assignment) => $emit('select-assignment', assignment)
           "
-          v-on:emit-remove="
+          v-on:remove-problem="
             (assignment, problem) =>
               $emit('remove-problem', assignment, problem)
           "
-          v-on:emit-sort="
+          v-on:sort-problems="
             (assignmentAlias, problemsAlias) =>
               $emit('sort-problems', assignmentAlias, problemsAlias)
           "
-          v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
-        ></omegaup-course-problem-list>
+          v-on:cancel="onResetAssignmentForm"
+          v-on:submit="
+            (assignmentFormComponent, problems) =>
+              $emit('submit-new-assignment', assignmentFormComponent, problems)
+          "
+        >
+          <template slot="page-header"><span></span></template>
+          <template slot="cancel-button">
+            <button
+              class="btn btn-secondary"
+              type="reset"
+              v-on:click.prevent="onResetAssignmentForm"
+            >
+              {{ T.wordsCancel }}
+            </button></template
+          ></omegaup-course-assignment-details
+        >
       </div>
 
       <div
@@ -258,7 +249,6 @@ import { Vue, Component, Prop, Watch, Ref } from 'vue-property-decorator';
 import course_Form from './Form.vue';
 import course_AssignmentList from './AssignmentList.vue';
 import course_AssignmentDetails from './AssignmentDetails.vue';
-import course_ProblemList from './ProblemList.vue';
 import course_AdmissionMode from './AdmissionMode.vue';
 import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
@@ -302,7 +292,6 @@ const emptyAssignment: types.CourseAssignment = {
     'omegaup-course-form': course_Form,
     'omegaup-course-assignment-list': course_AssignmentList,
     'omegaup-course-assignment-details': course_AssignmentDetails,
-    'omegaup-course-problem-list': course_ProblemList,
     'omegaup-course-admision-mode': course_AdmissionMode,
     'omegaup-course-add-students': course_AddStudents,
     'omegaup-common-admins': common_Admins,
@@ -319,11 +308,11 @@ export default class CourseEdit extends Vue {
   T = T;
   showTab = this.initialTab;
 
+  assignmentProblems = this.data.assignmentProblems;
+  assignments = this.data.course.assignments;
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
-
   assignment = emptyAssignment;
-  selectedAssignment = this.data.selectedAssignment;
 
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;
@@ -332,20 +321,30 @@ export default class CourseEdit extends Vue {
   onNewAssignment(): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.New;
     this.assignment = emptyAssignment;
-    this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
+    this.assignmentProblems = [];
+    this.$nextTick(() => {
+      this.assignmentDetails.$el.scrollIntoView();
+      (<HTMLElement>this.assignmentDetails.$refs.name).focus();
+    });
   }
 
   onEditAssignment(assignment: types.CourseAssignment): void {
     this.assignmentFormMode = omegaup.AssignmentFormMode.Edit;
     this.assignment = assignment;
-    this.$nextTick(() => this.assignmentDetails.$el.scrollIntoView());
+    this.$emit('select-assignment', this.assignment);
+    this.$nextTick(() => {
+      this.assignmentDetails.$el.scrollIntoView();
+      (<HTMLElement>this.assignmentDetails.$refs.name).focus();
+    });
   }
 
   onAddProblems(assignment: types.CourseAssignment): void {
-    this.assignmentFormMode = omegaup.AssignmentFormMode.AddProblem;
-    this.selectedAssignment = assignment;
-    this.showTab = 'problems';
+    this.assignmentFormMode = omegaup.AssignmentFormMode.Edit;
+    this.assignment = assignment;
     this.$emit('select-assignment', assignment);
+    this.$nextTick(() => {
+      this.assignmentDetails.$el.scrollIntoView();
+    });
   }
 
   onCancel(): void {

@@ -1065,14 +1065,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureOptionalBool('share_user_information');
         \OmegaUp\DAO\DAO::transBegin();
         try {
             \OmegaUp\DAO\ProblemsetIdentities::checkAndSaveFirstTimeAccess(
                 $r->identity,
                 $response['contest'],
                 /*$grantAccess=*/true,
-                boolval($r['share_user_information'])
+                $r->ensureOptionalBool('share_user_information') ?? false
             );
 
             // Insert into PrivacyStatement_Consent_Log whether request
@@ -1729,11 +1728,10 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $r->ensureOptionalBool('needs_basic_information');
-        $r->ensureOptionalBool('partial_score');
-
         $problemset = new \OmegaUp\DAO\VO\Problemsets([
-            'needs_basic_information' => boolval($r['needs_basic_information']),
+            'needs_basic_information' => $r->ensureOptionalBool(
+                'needs_basic_information'
+            ) ?? false,
             'requests_user_information' => $r['requests_user_information'],
         ]);
 
@@ -1752,7 +1750,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'alias' => $r['alias'],
             'scoreboard' => $r['scoreboard'],
             'points_decay_factor' => $r['points_decay_factor'],
-            'partial_score' => $r['partial_score'] ?? true,
+            'partial_score' => $r->ensureOptionalBool('partial_score') ?? true,
             'submissions_gap' => $r['submissions_gap'],
             'feedback' => $r['feedback'],
             'penalty_calc_policy' => $r['penalty_calc_policy'],
@@ -1878,8 +1876,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'alias',
             $isRequired
         );
-        $r->ensureFloat('scoreboard', 0, 100, $isRequired);
-        $r->ensureFloat('points_decay_factor', 0, 1, $isRequired);
+        $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
+        $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureOptionalBool('partial_score');
         $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
         // Validate the submission_gap in minutes so that the error message
@@ -2169,7 +2167,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $commit
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param int $order_in_contest
-     * @omegaup-request-param float|null $points
+     * @omegaup-request-param float $points
      * @omegaup-request-param mixed $problem_alias
      */
     public static function apiAddProblem(\OmegaUp\Request $r): array {
@@ -2200,8 +2198,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             /*$upperBound=*/ null,
             /*$required=*/ false
         );
-        $r->ensureFloat('points', 0, INF);
-        $r->ensureOptionalInt('order_in_contest', 0, null);
+        $points = $r->ensureFloat('points', 0, INF);
+        $orderInContest = $r->ensureOptionalInt(
+            'order_in_contest',
+            0,
+            null
+        ) ?? 1;
 
         // Validate the request and get the problem and the contest in an array
         $params = self::validateAddToContestRequest(
@@ -2251,8 +2253,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $masterCommit,
             $currentVersion,
             $r->identity,
-            floatval($r['points']),
-            !empty($r['order_in_contest']) ? intval($r['order_in_contest']) : 1
+            $points,
+            $orderInContest
         );
 
         // Invalidar cache
@@ -3653,7 +3655,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'required',
             ]
         );
-        $r->ensureOptionalBool('needs_basic_information');
 
         self::forbiddenInVirtual($contest);
 
@@ -3745,9 +3746,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         'problemsetNotFound'
                     );
                 }
-                $problemset->needs_basic_information = boolval(
-                    $r['needs_basic_information']
-                );
+                $problemset->needs_basic_information = $r->ensureOptionalBool(
+                    'needs_basic_information'
+                ) ?? false;
                 $problemset->requests_user_information = $r['requests_user_information'] ?? 'no';
                 \OmegaUp\DAO\Problemsets::update($problemset);
             }

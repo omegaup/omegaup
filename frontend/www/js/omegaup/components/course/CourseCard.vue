@@ -18,7 +18,11 @@
     <div class="m-3">
       <div class="float-right" v-if="progress > 0">
         {{ T.wordsProgress }}:
-        <progress v-bind:value="progress" max="100"></progress>
+        <progress
+          v-bind:title="`${progress}%`"
+          v-bind:value="progress"
+          max="100"
+        ></progress>
       </div>
       <div class="float-left align-middle" v-if="showTopics">
         <details>

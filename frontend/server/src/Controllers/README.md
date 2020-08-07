@@ -502,13 +502,13 @@ Adds a problem to a contest
 
 ### Parameters
 
-| Name               | Type         | Description |
-| ------------------ | ------------ | ----------- |
-| `commit`           | `mixed`      |             |
-| `contest_alias`    | `mixed`      |             |
-| `order_in_contest` | `int`        |             |
-| `points`           | `float|null` |             |
-| `problem_alias`    | `mixed`      |             |
+| Name               | Type    | Description |
+| ------------------ | ------- | ----------- |
+| `commit`           | `mixed` |             |
+| `contest_alias`    | `mixed` |             |
+| `order_in_contest` | `int`   |             |
+| `points`           | `float` |             |
+| `problem_alias`    | `mixed` |             |
 
 ### Returns
 
@@ -1394,7 +1394,7 @@ Adds a problem to an assignment
 | `assignment_alias` | `mixed` |             |
 | `commit`           | `mixed` |             |
 | `course_alias`     | `mixed` |             |
-| `points`           | `mixed` |             |
+| `points`           | `float` |             |
 | `problem_alias`    | `mixed` |             |
 
 ### Returns
@@ -1409,15 +1409,15 @@ Add Student to Course.
 
 ### Parameters
 
-| Name                           | Type    | Description |
-| ------------------------------ | ------- | ----------- |
-| `accept_teacher`               | `mixed` |             |
-| `accept_teacher_git_object_id` | `mixed` |             |
-| `course_alias`                 | `mixed` |             |
-| `privacy_git_object_id`        | `mixed` |             |
-| `share_user_information`       | `mixed` |             |
-| `statement_type`               | `mixed` |             |
-| `usernameOrEmail`              | `mixed` |             |
+| Name                           | Type        | Description |
+| ------------------------------ | ----------- | ----------- |
+| `accept_teacher`               | `bool|null` |             |
+| `accept_teacher_git_object_id` | `mixed`     |             |
+| `course_alias`                 | `mixed`     |             |
+| `privacy_git_object_id`        | `mixed`     |             |
+| `share_user_information`       | `mixed`     |             |
+| `statement_type`               | `mixed`     |             |
+| `usernameOrEmail`              | `mixed`     |             |
 
 ### Returns
 
@@ -1925,17 +1925,17 @@ Returns all runs for a course
 
 ### Parameters
 
-| Name               | Type    | Description |
-| ------------------ | ------- | ----------- |
-| `assignment_alias` | `mixed` |             |
-| `course_alias`     | `mixed` |             |
-| `language`         | `mixed` |             |
-| `offset`           | `mixed` |             |
-| `problem_alias`    | `mixed` |             |
-| `rowcount`         | `mixed` |             |
-| `status`           | `mixed` |             |
-| `username`         | `mixed` |             |
-| `verdict`          | `mixed` |             |
+| Name               | Type                                                                                                                                           | Description |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `assignment_alias` | `mixed`                                                                                                                                        |             |
+| `course_alias`     | `mixed`                                                                                                                                        |             |
+| `language`         | `'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null` |             |
+| `offset`           | `mixed`                                                                                                                                        |             |
+| `problem_alias`    | `mixed`                                                                                                                                        |             |
+| `rowcount`         | `mixed`                                                                                                                                        |             |
+| `status`           | `'compiling'|'new'|'ready'|'running'|'waiting'|null`                                                                                           |             |
+| `username`         | `mixed`                                                                                                                                        |             |
+| `verdict`          | `'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null`                                                                     |             |
 
 ### Returns
 
@@ -1969,19 +1969,19 @@ Edit Course contents
 
 ### Parameters
 
-| Name                        | Type                     | Description |
-| --------------------------- | ------------------------ | ----------- |
-| `admission_mode`            | `mixed`                  |             |
-| `alias`                     | `mixed`                  |             |
-| `description`               | `mixed`                  |             |
-| `finish_time`               | `OmegaUp\Timestamp|null` |             |
-| `name`                      | `mixed`                  |             |
-| `needs_basic_information`   | `bool|null`              |             |
-| `requests_user_information` | `mixed`                  |             |
-| `school_id`                 | `int`                    |             |
-| `show_scoreboard`           | `bool|null`              |             |
-| `start_time`                | `OmegaUp\Timestamp|null` |             |
-| `unlimited_duration`        | `bool|null`              |             |
+| Name                        | Type                                     | Description |
+| --------------------------- | ---------------------------------------- | ----------- |
+| `admission_mode`            | `'private'|'public'|'registration'|null` |             |
+| `alias`                     | `mixed`                                  |             |
+| `description`               | `mixed`                                  |             |
+| `finish_time`               | `OmegaUp\Timestamp|null`                 |             |
+| `name`                      | `mixed`                                  |             |
+| `needs_basic_information`   | `bool|null`                              |             |
+| `requests_user_information` | `'no'|'optional'|'required'|null`        |             |
+| `school_id`                 | `int`                                    |             |
+| `show_scoreboard`           | `bool|null`                              |             |
+| `start_time`                | `OmegaUp\Timestamp|null`                 |             |
+| `unlimited_duration`        | `bool|null`                              |             |
 
 ### Returns
 
@@ -2213,13 +2213,13 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type         | Description |
-| ------------------ | ------------ | ----------- |
-| `contest_alias`    | `mixed`      |             |
-| `group_alias`      | `mixed`      |             |
-| `only_ac`          | `bool|null`  |             |
-| `scoreboard_alias` | `mixed`      |             |
-| `weight`           | `float|null` |             |
+| Name               | Type        | Description |
+| ------------------ | ----------- | ----------- |
+| `contest_alias`    | `mixed`     |             |
+| `group_alias`      | `mixed`     |             |
+| `only_ac`          | `bool|null` |             |
+| `scoreboard_alias` | `mixed`     |             |
+| `weight`           | `float`     |             |
 
 ### Returns
 
@@ -2639,7 +2639,7 @@ Create a new problem
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 
@@ -2962,7 +2962,7 @@ Update problem contents
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 
@@ -3018,7 +3018,7 @@ Updates problem solution only
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 
@@ -3055,7 +3055,7 @@ Updates problem statement only
 | `update_published`        | `mixed`     |             |
 | `validator`               | `mixed`     |             |
 | `validator_time_limit`    | `mixed`     |             |
-| `visibility`              | `mixed`     |             |
+| `visibility`              | `string`    |             |
 
 ### Returns
 

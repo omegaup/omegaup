@@ -5,31 +5,30 @@ import Vue from 'vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
-import course_List from './List.vue';
+import course_CardsList from './CardsList.vue';
 
 const coursesListProps = {
   courses: <types.StudentCourses>{
-    public: {
-      accessMode: 'public',
-      activeTab: 'current',
+    admin: {
+      accessMode: 'admin',
+      activeTab: '',
       filteredCourses: {
         current: {
-          courses: [
-            {
-              alias: 'CC',
-              counts: {
-                homework: 2,
-                lesson: 2,
-                test: 1,
-              },
-              finish_time: new Date(),
-              name: 'Curso de introducción',
-              start_time: new Date(),
-              admission_mode: 'public',
-              assignments: [],
-              is_open: true,
-            },
-          ],
+          courses: [],
+          timeType: 'current',
+        },
+        past: {
+          courses: [],
+          timeType: 'past',
+        },
+      },
+    },
+    public: {
+      accessMode: 'public',
+      activeTab: '',
+      filteredCourses: {
+        current: {
+          courses: [],
           timeType: 'current',
         },
         past: {
@@ -40,7 +39,7 @@ const coursesListProps = {
     },
     student: {
       accessMode: 'student',
-      activeTab: 'current',
+      activeTab: '',
       filteredCourses: {
         current: {
           courses: [],
@@ -55,13 +54,12 @@ const coursesListProps = {
   },
 };
 
-describe('List.vue', () => {
+describe('CardsList.vue', () => {
   it('Should handle empty courses list for user', () => {
-    const wrapper = shallowMount(course_List, {
+    const wrapper = shallowMount(course_CardsList, {
       propsData: coursesListProps,
     });
 
-    expect(wrapper.find('.public').text()).toContain(T.courseListPublicCourses);
-    expect(wrapper.find('.student').text()).toContain(T.courseListIStudy);
+    expect(wrapper.text()).toContain(T.navAllCourses);
   });
 });

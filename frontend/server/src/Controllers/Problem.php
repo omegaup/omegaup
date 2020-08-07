@@ -181,7 +181,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         if (!is_null($r['visibility'])) {
-            $params['visibility'] = intval($r['visibility']);
+            $params['visibility'] = \OmegaUp\ProblemParams::stringVisibilityToNumeric(
+                strval(
+                    $r['visibility']
+                )
+            );
         }
         if (!is_null($r['show_diff'])) {
             $params['show_diff'] = strval($r['show_diff']);
@@ -391,7 +395,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -1147,7 +1151,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -1701,7 +1705,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdateStatement(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -1796,7 +1800,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdateSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -4701,8 +4705,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
-     * @omegaup-request-param string $contents
+     * @omegaup-request-param string $visibility
+     * @omegaup-request-param mixed $contents
      *
      */
     public static function getProblemEditDetailsForSmarty(
@@ -4939,7 +4943,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param bool $allow_user_add_tags
-     * @omegaup-request-param mixed $email_clarifications
+     * @omegaup-request-param bool|null $email_clarifications
      * @omegaup-request-param mixed $extra_wall_time
      * @omegaup-request-param mixed $input_limit
      * @omegaup-request-param mixed $languages
@@ -4957,7 +4961,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      *
      * @return array{smartyProperties: array{payload: ProblemFormPayload}, entrypoint: string}
      */
@@ -5011,9 +5015,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             [
                                 'title' => strval($r['title']),
                                 'alias' => strval($r['problem_alias']),
-                                'emailClarifications' => boolval(
-                                    $r['email_clarifications']
-                                ),
+                                'emailClarifications' => $r->ensureOptionalBool(
+                                    'email_clarifications'
+                                ) ?? false,
                                 'source' => strval($r['source']),
                                 'visibility' => intval($r['visibility']),
                                 'statusError' => $statusError,
