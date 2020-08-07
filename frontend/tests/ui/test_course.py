@@ -9,7 +9,6 @@ import urllib
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.select import Select
 
 from ui import util  # pylint: disable=no-name-in-module
 from ui import conftest  # pylint: disable=no-name-in-module
@@ -24,8 +23,7 @@ def _setup_course(driver: conftest.Driver, course_alias: str, school_name: str,
             resource_path='frontend/tests/resources/testproblem.zip')
         create_course(driver, course_alias, school_name)
         add_students_course(driver, [driver.user_username])
-        add_assignment(driver, assignment_alias)
-        add_problem_to_assignment(driver, assignment_alias, problem_alias)
+        add_assignment_with_problem(driver, assignment_alias, problem_alias)
 
 
 def _click_on_problem(driver: conftest.Driver, problem_alias: str) -> None:
@@ -122,10 +120,6 @@ def test_user_ranking_course(driver):
                                      num_elements=1, scoreboard='Public')
 
         enter_course_assignments_page(driver, course_alias)
-        util.check_scoreboard_events(driver, assignment_alias, url,
-                                     num_elements=1, scoreboard='Admin')
-
-        enter_course_assignments_page(driver, course_alias)
         with driver.page_transition():
             driver.wait.until(EC.element_to_be_clickable(
                 (By.XPATH,
@@ -173,8 +167,7 @@ def test_create_identities_for_course(driver):
     # creates some identities associated with the course group
     with driver.login_admin():
         create_course(driver, course_alias, school_name)
-        add_assignment(driver, assignment_alias)
-        add_problem_to_assignment(driver, assignment_alias, problem)
+        add_assignment_with_problem(driver, assignment_alias, problem)
         # The function require the group alias. We are assuming that it is the
         # same as the course alias, since that is the default
         unassociated, associated = util.add_identities_group(driver,
@@ -299,7 +292,7 @@ def create_course(driver, course_alias: str, school_name: str) -> None:
 
 
 @util.annotate
-def add_assignment(driver, assignment_alias):
+def add_assignment_with_problem(driver, assignment_alias, problem_alias):
     '''Add assignments to a recently created course.'''
 
     driver.wait.until(
@@ -330,9 +323,24 @@ def add_assignment(driver, assignment_alias):
     new_assignment_form.find_element_by_css_selector('textarea').send_keys(
         'homework description')
 
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '[data-course-problemlist] .card-footer')))
+
+    driver.typeahead_helper(
+        '*[contains(@class, "card-footer")]', problem_alias)
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'button[data-add-problem]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR,
+             '[data-course-problemlist] table.table-striped')))
+
     with util.dismiss_status(driver):
         new_assignment_form.find_element_by_css_selector(
-            'button[type=submit]').click()
+            'button[data-schedule-assignment]').click()
     driver.wait.until(
         EC.invisibility_of_element_located(
             (By.CSS_SELECTOR, '.omegaup-course-assignmentdetails')))
@@ -341,40 +349,6 @@ def add_assignment(driver, assignment_alias):
             (By.XPATH,
              '//*[contains(@class, "omegaup-course-assignmentlist")]'
              '//a[text()="%s"]' % assignment_alias)))
-
-
-@util.annotate
-def add_problem_to_assignment(driver, assignment_alias, problem):
-    '''Add problems to an assignment given.'''
-
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//a[@href = "#problems"]'))).click()
-    Select(driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//select[@name = "assignments"]')))).select_by_visible_text(
-                 assignment_alias)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             'div[data-problems-tab] .problemlist button'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .card-footer')))
-
-    driver.typeahead_helper(
-        '*[contains(@class, "card-footer")]', problem)
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .card-footer '
-             'button[type=submit]'))).click()
-    driver.wait.until(
-        EC.invisibility_of_element_located(
-            (By.CSS_SELECTOR,
-             '.omegaup-course-problemlist .card-footer')))
 
 
 @util.annotate

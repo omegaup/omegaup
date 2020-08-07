@@ -42,6 +42,50 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     }
 
     /**
+     * Returns each problem with the statistics of the runs submmited by the students
+     *
+     * @return list<array{assignment_alias: string, problem_alias: string, variance: float}>
+     */
+    public static function getAssignmentsProblemsStatistics(
+        int $courseId
+    ): array {
+        $sql = '
+            SELECT
+                `a`.`alias` as assignment_alias,
+                `p`.`alias` as problem_alias,
+                COALESCE(
+                    VARIANCE(`r`.`contest_score`),
+                    0
+                ) AS variance
+            FROM
+                `Assignments` AS `a`
+            INNER JOIN
+                `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
+            INNER JOIN
+                `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+            INNER JOIN
+                `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
+            INNER JOIN
+                `Submissions` AS `s` ON `s`.`problem_id` = `p`.`problem_id` AND `s`.`problemset_id` = `a`.`problemset_id`
+            INNER JOIN
+                `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+            WHERE
+                `a`.`course_id` = ?
+            GROUP BY
+                `a`.`assignment_id`, `p`.`problem_id`
+            ORDER BY
+                `psp`.`order`;
+        ';
+
+        /** @var list<array{assignment_alias: string, problem_alias: string, variance: float}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ $courseId ]
+        );
+        return $results;
+    }
+
+    /**
      * @return array<string, int>
      */
     public static function getAssignmentCountsForCourse(int $courseId): array {

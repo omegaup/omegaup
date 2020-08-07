@@ -351,7 +351,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problems[0]['problem']->alias,
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
+            'visibility' => 'private',
             'message' => 'public -> private',
         ]));
         $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
@@ -449,12 +449,12 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all the tests that can accept a status.
      *
-     * @return list<array{0: string, 1: int}>
+     * @return list<array{0: string, 1: string}>
      */
     public function qualityNominationsDemotionStatusProvider(): array {
         return [
-            ['banned', \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED],
-            ['warning', \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING],
+            ['banned', 'private_banned'],
+            ['warning', 'private_warning'],
         ];
     }
 
@@ -464,7 +464,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreatedProblemWithDemotionNomination(
         string $status,
-        int $visibilityPrivate
+        string $visibilityPrivate
     ) {
         ['identity' => $author] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams(
             [

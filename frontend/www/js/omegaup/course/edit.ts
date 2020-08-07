@@ -20,6 +20,7 @@ Vue.use(Clipboard);
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
+
   const courseEdit = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -76,7 +77,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'submit-new-assignment': (source: course_AssignmentDetails) => {
+          'submit-new-assignment': (
+            source: course_AssignmentDetails,
+            problems: types.AddedProblem[],
+          ) => {
             const params = {
               name: source.name,
               description: source.description,
@@ -113,6 +117,7 @@ OmegaUp.on('ready', () => {
               Object.assign(params, {
                 alias: source.alias,
                 course_alias: courseAlias,
+                problems: JSON.stringify(problems),
               });
 
               if (source.unlimitedDuration) {
@@ -169,18 +174,17 @@ OmegaUp.on('ready', () => {
           },
           'add-problem': (
             assignment: types.CourseAssignment,
-            problemAlias: string,
+            problem: types.AddedProblem,
           ) => {
             api.Course.addProblem({
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
-              problem_alias: problemAlias,
+              problem_alias: problem.alias,
+              points: problem.points,
             })
               .then(() => {
                 ui.success(T.courseAssignmentProblemAdded);
                 this.refreshProblemList(assignment);
-                component.assignmentFormMode =
-                  omegaup.AssignmentFormMode.Default;
               })
               .catch(ui.apiError);
           },
@@ -234,7 +238,7 @@ OmegaUp.on('ready', () => {
           },
           'update-admission-mode': (admissionMode: string) => {
             api.Course.update({
-              course_alias: courseAlias,
+              alias: courseAlias,
               admission_mode: admissionMode,
             })
               .then(() => {
@@ -382,7 +386,7 @@ OmegaUp.on('ready', () => {
       refreshAssignmentsList: (): void => {
         api.Course.listAssignments({ course_alias: courseAlias })
           .then((response) => {
-            courseEdit.data.course.assignments = response.assignments;
+            component.assignments = response.assignments;
             component.onResetAssignmentForm();
           })
           .catch(ui.apiError);
@@ -393,7 +397,7 @@ OmegaUp.on('ready', () => {
           course: courseAlias,
         })
           .then((response) => {
-            courseEdit.data.assignmentProblems = response.problems;
+            component.assignmentProblems = response.problems;
           })
           .catch(ui.apiError);
       },
