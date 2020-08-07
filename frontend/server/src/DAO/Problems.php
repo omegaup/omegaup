@@ -410,7 +410,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         WHERE
             pt.problem_id = ?';
         if ($public) {
-            $sql .= ' AND pt.public = 1';
+            $sql .= ' AND t.public = 1';
         }
         if (!$showUserTags) {
             $sql .= ' AND pt.source <> \'voted\'';
