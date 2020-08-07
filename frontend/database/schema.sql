@@ -565,7 +565,6 @@ CREATE TABLE `Problems_Languages` (
 CREATE TABLE `Problems_Tags` (
   `problem_id` int NOT NULL,
   `tag_id` int NOT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '0',
   `source` enum('owner','voted','quality') NOT NULL DEFAULT 'owner' COMMENT 'El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.',
   PRIMARY KEY (`problem_id`,`tag_id`),
   KEY `problem_id` (`problem_id`),

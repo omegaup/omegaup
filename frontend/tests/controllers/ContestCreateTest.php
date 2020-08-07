@@ -198,7 +198,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreatePublicContestWithPrivateProblems() {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private'
         ]));
 
         // Create a valid contest Request object

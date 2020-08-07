@@ -34,13 +34,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN (
                 SELECT
                     pt.problem_id,
-                    BIT_AND(pt.public) as public
+                    BIT_AND(t.public) as public
                 FROM
                     Problems_Tags pt
                 INNER JOIN
                     Problems pp
                 ON
                     pp.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    pt.tag_id = t.tag_id
                 WHERE pt.tag_id IN (
                     SELECT t.tag_id
                     FROM Tags t
@@ -406,7 +410,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         WHERE
             pt.problem_id = ?';
         if ($public) {
-            $sql .= ' AND pt.public = 1';
+            $sql .= ' AND t.public = 1';
         }
         if (!$showUserTags) {
             $sql .= ' AND pt.source <> \'voted\'';

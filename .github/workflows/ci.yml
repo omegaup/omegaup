@@ -174,7 +174,7 @@ jobs:
         image: omegaup/dev-broadcaster:20200731
 
       grader:
-        image: omegaup/dev-grader:20200731
+        image: omegaup/dev-grader:20200806
         volumes:
           - omegaupdata:/var/lib/omegaup
 

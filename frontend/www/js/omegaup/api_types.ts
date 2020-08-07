@@ -1044,6 +1044,7 @@ export namespace types {
 
   export interface AddedProblem {
     alias: string;
+    commit?: string;
     points: number;
   }
 

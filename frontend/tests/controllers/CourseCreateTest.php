@@ -189,7 +189,7 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Add a problem to the assignment.
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'user' => $user
             ]),
             $login
