@@ -158,12 +158,12 @@
             v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
           ></omegaup-course-scheduled-problem-list>
           <omegaup-course-problem-list
-            v-else=""
+            v-else
             v-bind:assignment-problems="assignmentProblems"
             v-bind:tagged-problems="taggedProblems"
             v-bind:selected-assignment="assignment"
             v-bind:assignment-form-mode.sync="assignmentFormMode"
-            v-on:emit-save-problem="
+            v-on:save-problem="
               (assignment, problem) => $emit('add-problem', assignment, problem)
             "
             v-on:emit-remove-problem="
@@ -178,6 +178,10 @@
                 $emit('sort-problems', assignmentAlias, problemsAlias)
             "
             v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+            v-on:change-alias="
+              (addProblemComponent, newProblemAlias) =>
+                $emit('get-versions', newProblemAlias, addProblemComponent)
+            "
           ></omegaup-course-problem-list>
         </template>
         <div class="form-group text-right mt-3">
