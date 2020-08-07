@@ -69,7 +69,7 @@ describe('ViewStudent.vue', () => {
             progress: {
               problem: 1,
             },
-          } as types.CourseStudent
+          } as types.CourseStudent,
         ],
         initialStudent: {
           name: 'student',
@@ -77,7 +77,7 @@ describe('ViewStudent.vue', () => {
           progress: {
             problem: 1,
           },
-        } as types.CourseStudent
+        } as types.CourseStudent,
       },
     });
     await wrapper.find('a[data-problem-alias="problem"]').trigger('click');
