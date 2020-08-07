@@ -274,11 +274,10 @@ def replace_voted_tags(dbconn: MySQLdb.connections.Connection,
                         (problem_id,))
             cur.execute("""INSERT IGNORE INTO
                                `Problems_Tags`(`problem_id`, `tag_id`,
-                                               `public`, `source`)
+                                               `source`)
                            SELECT
                                %%s AS `problem_id`,
                                `t`.`tag_id` AS `tag_id`,
-                               1 AS `public`,
                                'voted' AS `source`
                            FROM
                                `Tags` AS `t`
@@ -433,11 +432,10 @@ def aggregate_reviewers_feedback_for_problem(
 
         cur.execute("""INSERT INTO
                                `Problems_Tags`(`problem_id`, `tag_id`,
-                                               `public`, `source`)
+                                               `source`)
                            SELECT
                                %s AS `problem_id`,
                                `t`.`tag_id` AS `tag_id`,
-                               1 AS `public`,
                                'quality' AS `source`
                            FROM
                                `Tags` AS `t`
