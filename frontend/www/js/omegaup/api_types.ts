@@ -1360,7 +1360,7 @@ export namespace types {
     groupsAdmins: types.CourseGroupAdmin[];
     identityRequests: types.IdentityRequest[];
     selectedAssignment?: types.CourseAssignment;
-    students: types.StudentProgress[];
+    students: types.CourseStudent[];
     tags: string[];
   }
 
@@ -1417,6 +1417,11 @@ export namespace types {
   export interface CourseProblemTried {
     alias: string;
     title: string;
+    username: string;
+  }
+
+  export interface CourseStudent {
+    name?: string;
     username: string;
   }
 
@@ -2833,9 +2838,7 @@ export namespace messages {
     };
   };
   export type CourseListStudentsRequest = { [key: string]: any };
-  export type CourseListStudentsResponse = {
-    students: types.StudentProgress[];
-  };
+  export type CourseListStudentsResponse = { students: types.CourseStudent[] };
   export type CourseListUnsolvedProblemsRequest = { [key: string]: any };
   export type CourseListUnsolvedProblemsResponse = {
     user_problems: {

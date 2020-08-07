@@ -258,12 +258,6 @@ export namespace omegaup {
     [assignment: string]: number;
   }
 
-  export interface CourseStudent {
-    name: string;
-    username: string;
-    progress: CourseProgress;
-  }
-
   export interface DetailsGroup {
     cases: omegaup.Case[];
     contest_score: number;
