@@ -18,7 +18,10 @@
           <h4>{{ T.frontPageFooterSite }}</h4>
           <ul>
             <li class="mt-1">
-              <a href="/arena/">{{ T.navArena }}</a>
+              <a href="/arena/">{{ T.navContests }}</a>
+            </li>
+            <li class="mt-1">
+              <a href="/course/">{{ T.navCourses }} </a>
             </li>
             <li class="mt-1">
               <a href="/problem/">{{ T.navProblems }}</a>
@@ -31,9 +34,6 @@
             </li>
             <li class="mt-1">
               <a href="https://blog.omegaup.com">{{ T.navBlog }}</a>
-            </li>
-            <li class="mt-1">
-              <a href="https://omegaup.com/preguntas/">{{ T.navQuestions }}</a>
             </li>
           </ul>
         </div>
