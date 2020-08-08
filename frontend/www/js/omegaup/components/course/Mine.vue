@@ -13,6 +13,7 @@
       <omegaup-course-filtered-list
         v-bind:courses="courses.admin"
         v-bind:activeTab="courses.admin.activeTab"
+        v-bind:showPercentage="false"
       ></omegaup-course-filtered-list>
     </template>
   </div>

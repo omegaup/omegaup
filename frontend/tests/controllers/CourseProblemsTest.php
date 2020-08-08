@@ -19,7 +19,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $numberOfProblems = 3;
         for ($i = 0; $i < $numberOfProblems; $i++) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity,
             ]), $login);
         }
@@ -113,7 +113,7 @@ class CourseProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $problemData = [];
         for ($i = 0; $i < 3; $i++) {
             $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => 1,
+                'visibility' => 'public',
                 'author' => $identity,
             ]), $adminLogin);
         }

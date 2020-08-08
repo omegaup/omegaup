@@ -2174,10 +2174,11 @@ export class Arena {
             'detailed')
         ),
       });
+      const runDetailsView = <HTMLElement | null>(
+        document.querySelector('[data-run-details-view]')
+      );
+      if (runDetailsView) runDetailsView.style.display = 'block';
     }
-    (<HTMLElement>(
-      document.querySelector('[data-run-details-view]')
-    )).style.display = 'block';
   }
 
   trackRun(run: types.Run): void {

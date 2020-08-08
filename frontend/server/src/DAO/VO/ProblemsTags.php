@@ -18,7 +18,6 @@ class ProblemsTags extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'problem_id' => true,
         'tag_id' => true,
-        'public' => true,
         'source' => true,
     ];
 
@@ -40,11 +39,6 @@ class ProblemsTags extends \OmegaUp\DAO\VO\VO {
         if (isset($data['tag_id'])) {
             $this->tag_id = intval(
                 $data['tag_id']
-            );
-        }
-        if (isset($data['public'])) {
-            $this->public = boolval(
-                $data['public']
             );
         }
         if (isset($data['source'])) {
@@ -69,13 +63,6 @@ class ProblemsTags extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $tag_id = null;
-
-    /**
-     * [Campo no documentado]
-     *
-     * @var bool
-     */
-    public $public = false;
 
     /**
      * El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.

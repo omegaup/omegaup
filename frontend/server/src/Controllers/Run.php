@@ -719,7 +719,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        self::$log->info('Run being rejudged!!');
+        if ($run->status == 'new' || $run->status == 'waiting') {
+            self::$log->info('Run already in the rejudge queue. Ignoring');
+            return ['status' => 'ok'];
+        }
+
+        self::$log->info("Run {$run->run_id} being rejudged");
 
         // Reset fields.
         try {
@@ -741,15 +746,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             self::$log->error('Call to \OmegaUp\Grader::rejudge() failed', $e);
         }
 
-        $response = [];
-        $response['status'] = 'ok';
-
         self::invalidateCacheOnRejudge($run);
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
-        return $response;
+        return ['status' => 'ok'];
     }
 
     /**

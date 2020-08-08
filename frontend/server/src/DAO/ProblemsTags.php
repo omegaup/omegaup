@@ -24,7 +24,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
     ): array {
         $sql = '
             SELECT
-                t.name, pt.public
+                t.name, t.public
             FROM
                 Problems_Tags pt
             INNER JOIN
@@ -33,7 +33,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
                 pt.problem_id = ?';
         $params = [$problem->problem_id];
         if ($publicOnly) {
-            $sql .= ' AND pt.public = 1';
+            $sql .= ' AND t.public = 1';
         }
         if (!$includeVoted) {
             $sql .= ' AND pt.source != "voted"';
@@ -162,11 +162,10 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
                     INSERT INTO
                         `Problems_Tags` (
                             `tag_id`,
-                            `problem_id`,
-                            `public`
+                            `problem_id`
                         )
                     VALUES
-                        (?,?,1);';
+                        (?,?);';
 
                 \OmegaUp\MySQLConnection::getInstance()->Execute(
                     $sql,
