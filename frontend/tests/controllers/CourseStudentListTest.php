@@ -27,7 +27,6 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'course_alias' => $courseData['course_alias']
         ]));
-        print_r($response);
 
         foreach ($students as $s) {
             $this->assertArrayContainsWithPredicate($response['students'], function ($value) use ($s) {

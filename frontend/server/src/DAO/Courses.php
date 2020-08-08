@@ -306,12 +306,11 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 GROUP BY
                     i.identity_id, pr.assignment_id, pr.problem_id;';
 
-        /** @var list<array{assignment_alias: null|string, name: null|string, problem_alias: null|string, problem_score: float|null, username: string}> */
+        /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $groupId]
         );
-        print_r($rs);
 
         $allProgress = [];
         foreach ($rs as $row) {
@@ -327,17 +326,13 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $assignmentAlias = $row['assignment_alias'];
             $problemAlias = $row['problem_alias'];
 
-            if (is_null($assignmentAlias) || is_null($problemAlias)) {
-                continue;
-            }
-
             if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
                 $allProgress[$username]['progress'][$assignmentAlias] = [];
             }
 
             $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = floatval(
                 $row['problem_score']
-            );
+            ) / $row['problem_points'] * 100;
         }
 
         usort(
