@@ -170,7 +170,6 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData['course']->course_id,
             $courseData['course']->group_id,
         );
-        print_r($results);
 
         $this->assertEquals($participants[0]->name, $results[0]['name']);
         $this->assertArrayHasKey($assignment, $results[0]['progress']);
@@ -197,9 +196,21 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             100,
             $results[1]['progress'][$assignment][$problemsData[1]['problem']->alias]
         );
+        $this->assertEquals(
+            0,
+            $results[1]['progress'][$assignment][$problemsData[2]['problem']->alias]
+        );
 
         $this->assertEquals($participants[2]->name, $results[2]['name']);
         $this->assertArrayHasKey($assignment, $results[2]['progress']);
+        $this->assertEquals(
+            0,
+            $results[2]['progress'][$assignment][$problemsData[0]['problem']->alias]
+        );
+        $this->assertEquals(
+            0,
+            $results[2]['progress'][$assignment][$problemsData[1]['problem']->alias]
+        );
         $this->assertEquals(
             100,
             $results[2]['progress'][$assignment][$problemsData[2]['problem']->alias]
