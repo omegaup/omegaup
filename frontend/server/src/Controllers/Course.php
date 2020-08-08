@@ -31,6 +31,7 @@
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
+ * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemVariance: list<array{assignment_alias: string, problem_alias: string, variance: float}>}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<StudentProgress>, tags: list<string>}
@@ -2975,6 +2976,46 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => 'courseList',
             ],
             'entrypoint' => 'course_list',
+        ];
+    }
+
+    /**
+     * @omegaup-request-param mixed $course
+     *
+     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: string}, entrypoint: string}
+     */
+    public static function getCourseStatisticsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
+
+        $course = self::validateCourseExists($r['course']);
+
+        if (is_null($course->course_id) || is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        $variance = \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
+            $course->course_id
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                    'problemVariance' => $variance,
+                ],
+                'title' => 'omegaupTitleStatistics',
+            ],
+            'entrypoint' => 'course_statistics'
         ];
     }
 
