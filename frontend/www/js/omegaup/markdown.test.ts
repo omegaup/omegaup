@@ -28,6 +28,16 @@ describe('markdown', () => {
          </figure></p>`);
     });
 
+    it('Should handle valid iframe tag with extra attributes', () => {
+      expect(
+        converter.makeHtml(`<figure class="video_container">
+           <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
+        </figure>`),
+      ).toEqual(`<p><figure class="video_container">
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
+        </figure></p>`);
+    });
+
     it('Should handle sample I/O tables', () => {
       expect(
         converter.makeHtml(`# Ejemplo
