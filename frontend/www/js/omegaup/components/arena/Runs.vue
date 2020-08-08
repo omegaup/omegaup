@@ -286,7 +286,7 @@
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
 caption {
   caption-side: top;
 }

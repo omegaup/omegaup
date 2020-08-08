@@ -31,16 +31,16 @@
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
- * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemVariance: list<array{assignment_alias: string, problem_alias: string, variance: float}>}
+ * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<StudentProgress>, tags: list<string>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type CourseAssignmentEditPayload=array{course: CourseDetails, assignment: CourseAssignment|null}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type AddedProblem=array{alias: string, points: float}
+ * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -148,7 +148,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         $addedProblems = [];
         if (!empty($r['problems'])) {
-          /** @var list<array{alias: string, points?: int|float|string}> */
+          /** @var list<array{alias: string, commit?: string, points?: int|float|string}> */
             $problemsData = json_decode(
                 strval(
                     $r['problems']
@@ -766,7 +766,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $identity,
                         /*$validateVisibility=*/false,
                         /*$points=*/$addedProblem['points'],
-                        /*$commit*/null,
+                        $addedProblem['commit'] ?? null,
                         /*$order*/$i + 1
                     );
                 }
@@ -826,7 +826,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Problemset::addProblem(
             $problemsetId,
             $problem,
-            $masterCommit,
+            $commit ?? $masterCommit,
             $currentVersion,
             $identity,
             $problem->languages === '' ? 0 : $assignedPoints,
@@ -1820,7 +1820,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{students: list<StudentProgress>}
+     * @return array{students: list<CourseStudent>}
      */
     public static function apiListStudents(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -1844,7 +1844,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourse(
                 $course->course_id,
                 $course->group_id
             ),
@@ -2653,7 +2653,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignmentProblems' => [],
             'selectedAssignment' => null,
             'tags' => [],
-            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourse(
                 intval($course->course_id),
                 intval($course->group_id)
             ),
@@ -2976,46 +2976,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => 'courseList',
             ],
             'entrypoint' => 'course_list',
-        ];
-    }
-
-    /**
-     * @omegaup-request-param mixed $course
-     *
-     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: string}, entrypoint: string}
-     */
-    public static function getCourseStatisticsForSmarty(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
-
-        $course = self::validateCourseExists($r['course']);
-
-        if (is_null($course->course_id) || is_null($course->group_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
-        }
-
-        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        $variance = \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
-            $course->course_id
-        );
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'course' => self::getCommonCourseDetails(
-                        $course,
-                        $r->identity
-                    ),
-                    'problemVariance' => $variance,
-                ],
-                'title' => 'omegaupTitleStatistics',
-            ],
-            'entrypoint' => 'course_statistics'
         ];
     }
 

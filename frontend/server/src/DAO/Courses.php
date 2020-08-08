@@ -231,7 +231,34 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * Returns a list of students within a course
+     * Returns the list of students in a course
+     *
+     * @return list<array{name: null|string, username: string}>
+     */
+    public static function getStudentsInCourse(
+        int $courseId,
+        int $groupId
+    ): array {
+        $sql = '
+            SELECT
+                i.username,
+                i.name
+            FROM
+                Groups_Identities gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?';
+
+        /** @var list<array{name: null|string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$groupId]
+        );
+    }
+
+    /**
+     * Returns a list of students within a course with their progress
      * @return list<array{name: string|null, progress: array<string, array<string, float>>, username: string}>
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
