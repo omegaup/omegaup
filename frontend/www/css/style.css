@@ -342,28 +342,26 @@ input[type=button]:hover,
 	color: #333;
 }
 
-.openid_large_btn {
-	width: auto;
-	min-width: 95px;
-	height: 38px;
-	border: 1px solid #DDD;
-	border-right: 2px solid #CCC;
-	border-bottom: 2px solid #CCC;
-	margin: 1px;
-	float: left;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	box-shadow: 2px 2px 4px #DDD;
-	-moz-box-shadow: 2px 2px 4px #ddd;
-	-webkit-box-shadow: 2px 2px 4px #DDD;
-	padding: 2px;
+.oauth-provider-div {
+    text-align: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
 }
 
-.facebook {
-	background: #fff url(/css/openid-logos.png);
-	background-position: -5px -474px;
-	background-repeat: no-repeat;
+.login-btn-ct {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+    margin-top: 12px;
+    width: 70px;
+    height: 47px;
+    margin: 10px;
+}
+
+.oauth-provider-div .btn-oauth img {
+    height: 45px;
+    width: 45px;
+    padding: 0px;
 }
 
 .clearfix::after {

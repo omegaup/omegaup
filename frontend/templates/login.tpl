@@ -11,6 +11,7 @@
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
 
+				<div class="oauth-provider-div">			
 {if $GOOGLECLIENTID != ""}
 				<div
 					id="google-signin"
@@ -18,16 +19,18 @@
 				</div>
 {/if}
 
-				<a href="{$FB_URL}"
-					title="{#loginWithFacebook#}"
-					class="facebook openid_large_btn"></a>
-				<a style="float:right"></a>
+					<div class="col-xs-12 col-md-4 login-btn-ct">
+						<a href="{$FB_URL}" title="{#loginWithFacebook#}" class="btn-oauth">
+						<img src="/css/fb-oauth.png">
+						</a>
+					</div>
 
-				<a href="{$LINKEDIN_URL}"
-					 title="{#loginWithLinkedIn#}"
-					 class="openid_large_btn">
-					<img src="/media/third_party/LinkedIn-Sign-in-Small---Default.png" />
-				</a>
+					<div class="col-xs-12 col-md-4 login-btn-ct">
+						<a href="{$LINKEDIN_URL}" title="{#loginWithLinkedIn#}" class="btn-oauth">
+							<img src="/css/ln-oauth.png">
+						</a>
+					</div>
+				</div>
 			</div>
 
 			<div class="col-md-4">
