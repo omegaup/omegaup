@@ -16,14 +16,38 @@ namespace OmegaUp\DAO;
 class Runs extends \OmegaUp\DAO\Base\Runs {
     /**
      * Gets an array of the guids of the pending runs
-     * @return list<array{username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
+     * @return list<array{classname: string, username: string, language: string, runtime: float, memory: float, time: \OmegaUp\Timestamp}>
      */
     final public static function getBestSolvingRunsForProblem(
         int $problemId
     ): array {
         $sql = '
             SELECT
-                i.username, s.language, r.runtime, r.memory, s.`time`
+                i.username,
+                s.language,
+                r.runtime,
+                r.memory,
+                s.`time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.`classname` FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.`user_id` = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`
             FROM
                 (SELECT
                     MIN(s.submission_id) submission_id, s.identity_id, r.runtime
@@ -63,7 +87,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Runs r ON r.run_id = s.current_run_id;';
         $val = [$problemId, $problemId];
 
-        /** @var list<array{language: string, memory: int, runtime: int, time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{classname: string, language: string, memory: int, runtime: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 

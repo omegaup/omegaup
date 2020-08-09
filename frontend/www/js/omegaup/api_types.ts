@@ -739,6 +739,26 @@ export namespace types {
             })(x.problemsetter);
           return x;
         })(x.problem);
+        if (x.runs)
+          x.runs = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.runs);
+        if (x.solvers)
+          x.solvers = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.solvers);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1109,6 +1129,15 @@ export namespace types {
   export interface BadgeListPayload {
     badges: string[];
     ownedBadges: types.Badge[];
+  }
+
+  export interface BestSolvers {
+    classname: string;
+    language: string;
+    memory: number;
+    runtime: number;
+    time: Date;
+    username: string;
   }
 
   export interface Clarification {
@@ -1638,13 +1667,7 @@ export namespace types {
     score: number;
     settings: types.ProblemSettings;
     show_diff: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1684,13 +1707,7 @@ export namespace types {
     settings: types.ProblemSettings;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     solution_status?: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1704,6 +1721,8 @@ export namespace types {
   export interface ProblemDetailsv2Payload {
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
+    runs?: types.Run[];
+    solvers?: types.BestSolvers[];
     user: types.UserInfoForProblem;
   }
 
@@ -1780,8 +1799,11 @@ export namespace types {
   }
 
   export interface ProblemInfo {
+    accepts_submissions: boolean;
     alias: string;
+    input_limit: number;
     karel_problem: boolean;
+    letter?: string;
     limits: {
       input_limit: string;
       memory_limit: string;
