@@ -1,7 +1,7 @@
 <template>
   <div>
     <ul class="nav justify-content-center nav-tabs" role="tablist">
-      <li class="nav-item" v-for="tab in availableTabs">
+      <li class="nav-item" v-for="tab in availableTabs" v-bind:key="tab.name">
         <a
           href="#"
           class="nav-link"
@@ -21,53 +21,11 @@
         class="tab-pane fade p-4"
         v-bind:class="{ 'show active': selectedTab === 'problems' }"
       >
-        <h3 class="text-center mb-4">
-          {{ problem.title }}
-          <img
-            src="/media/quality-badge-sm.png"
-            v-bind:title="T.wordsHighQualityProblem"
-            v-if="problem.quality_seal || problem.visibility === 3"
-          />
-          <font-awesome-icon
-            v-if="problem.visibility === 1 || problem.visibility === -1"
-            v-bind:icon="['fas', 'exclamation-triangle']"
-            v-bind:tiitle="T.wordsWarningProblem"
-          />
-          <font-awesome-icon
-            v-if="problem.visibility === 0 || problem.visibility === -1"
-            v-bind:icon="['fas', 'eye-slash']"
-            v-bind:title="T.wordsPrivate"
-          />
-          <font-awesome-icon
-            v-if="problem.visibility <= -2"
-            v-bind:icon="['fas', 'ban']"
-            v-bind:title="T.wordsBannedProblem"
-            color="darkred"
-          />
-          <a v-if="user.admin" v-bind:href="`/problem/${problem.alias}/edit/`">
-            <font-awesome-icon v-bind:icon="['fas', 'edit']" />
-          </a>
-        </h3>
-        <table class="table table-bordered mx-auto w-75 mb-0">
-          <tr>
-            <td class="align-middle">{{ T.wordsPoints }}</td>
-            <td class="align-middle">{{ problem.points }}</td>
-            <td class="align-middle">{{ T.wordsMemoryLimit }}</td>
-            <td class="align-middle">{{ problem.limits.memory_limit }}</td>
-          </tr>
-          <tr>
-            <td class="align-middle">{{ T.wordsTimeLimit }}</td>
-            <td class="align-middle">{{ problem.limits.time_limit }}</td>
-            <td class="align-middle">{{ T.wordsOverallWallTimeLimit }}</td>
-            <td class="align-middle">
-              {{ problem.limits.overall_wall_time_limit }}
-            </td>
-          </tr>
-          <tr>
-            <td class="align-middle">{{ T.problemEditFormInputLimit }}</td>
-            <td class="align-middle">{{ problem.limits.input_limit }}</td>
-          </tr>
-        </table>
+        <omegaup-problem-settings-summary
+          v-bind:problem="problem"
+          v-bind:showVisibilityIndicators="true"
+          v-bind:showEditLink="this.user.admin"
+        ></omegaup-problem-settings-summary>
 
         <div class="karel-js-link my-3" v-if="problem.karel_problem">
           <a
@@ -99,6 +57,7 @@
             <omegaup-username
               v-bind:classname="problem.problemsetter.classname"
               v-bind:username="problem.problemsetter.username"
+              v-bind:name="problem.problemsetter.name"
               v-bind:linkify="true"
             ></omegaup-username>
           </div>
@@ -110,6 +69,34 @@
             }}
           </div>
         </template>
+        <omegaup-quality-nomination-review
+          v-if="user.reviewer && !nominationStatus.already_reviewed"
+        ></omegaup-quality-nomination-review>
+        <omegaup-quality-nomination-demotion></omegaup-quality-nomination-demotion>
+        <omegaup-arena-runs
+          v-bind:problem-alias="problem.alias"
+          v-bind:runs="runs"
+          v-bind:showDetails="true"
+        ></omegaup-arena-runs>
+        <omegaup-arena-solvers v-bind:solvers="solvers"></omegaup-arena-solvers>
+      </div>
+      <div
+        class="tab-pane fade p-4"
+        v-bind:class="{ 'show active': selectedTab === 'solution' }"
+      >
+        <!-- Solutions stuff -->
+      </div>
+      <div
+        class="tab-pane fade p-4"
+        v-bind:class="{ 'show active': selectedTab === 'runs' }"
+      >
+        <!-- Admin Runs stuff -->
+      </div>
+      <div
+        class="tab-pane fade p-4"
+        v-bind:class="{ 'show active': selectedTab === 'clarifications' }"
+      >
+        <!-- Clarifications stuff -->
       </div>
     </div>
   </div>
@@ -140,7 +127,11 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
-
+import arena_Runs from '../arena/Runs.vue';
+import arena_Solvers from '../arena/Solvers.vue';
+import problem_SettingsSummary from './SettingsSummaryV2.vue';
+import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
+import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 
@@ -169,14 +160,21 @@ interface Tab {
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-username': user_Username,
+    'omegaup-problem-settings-summary': problem_SettingsSummary,
+    'omegaup-quality-nomination-review': qualitynomination_QualityReview,
+    'omegaup-quality-nomination-demotion': qualitynomination_Demotion,
   },
 })
 export default class ProblemDetails extends Vue {
   @Prop() problem!: types.ProblemInfo;
+  @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
+  @Prop() runs!: types.Run[];
 
   T = T;
   ui = ui;
@@ -184,13 +182,33 @@ export default class ProblemDetails extends Vue {
   selectedTab = 'problems';
 
   get availableTabs(): Tab[] {
-    let tabs = [
+    const tabs = [
       {
         name: 'problems',
         text: T.wordsProblem,
+        visible: true,
+      },
+      {
+        name: 'solution',
+        text: T.wordsSolution,
+        visible: this.user.loggedIn,
+      },
+      {
+        name: 'runs',
+        text: T.wordsRuns,
+        visible: this.user.admin,
+      },
+      {
+        name: 'clarifications',
+        text: T.wordsClarifications,
+        visible: this.user.admin,
       },
     ];
-    return tabs;
+    return tabs.filter((tab) => tab.visible);
+  }
+
+  get problemTitleWithId(): string {
+    return `${this.problem.problem_id}. ${this.problem.title}`;
   }
 }
 </script>

@@ -1,13 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
-
-import T from '../../lang';
-import { omegaup } from '../../omegaup';
+import * as time from '../../time';
 
 import problem_Details from './Details.vue';
 
 describe('Details.vue', () => {
+  const date = new Date();
   const sampleProblem = {
     alias: 'triangulos',
     karel_problem: false,
@@ -20,7 +18,7 @@ describe('Details.vue', () => {
     points: 100,
     problemsetter: {
       classname: 'user-rank-unranked',
-      creation_date: new Date(),
+      creation_date: date,
       name: 'omegaUp admin',
       username: 'omegaup',
     },
@@ -70,6 +68,6 @@ describe('Details.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(sampleProblem.points);
+    expect(wrapper.text()).toContain(time.formatDate(date));
   });
 });

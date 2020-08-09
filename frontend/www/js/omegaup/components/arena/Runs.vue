@@ -1,5 +1,5 @@
 <template>
-  <div class="card mt-5">
+  <div class="mt-5">
     <template v-if="globalRuns">
       <!-- TODO: This code should be removed when we stop using jquery and the
         migration to vue was over -->
@@ -183,7 +183,7 @@
           </tr>
         </tfoot>
         <tbody>
-          <tr v-for="run in filteredRuns">
+          <tr v-for="run in filteredRuns" v-bind:key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
               <acronym v-bind:title="run.guid">
@@ -289,6 +289,37 @@
 <style lang="scss" scoped>
 caption {
   caption-side: top;
+}
+
+.runs {
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-top: 2em;
+}
+
+.runs caption {
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+.runs td,
+.runs th {
+  border: 1px solid #ccc;
+  border-width: 1px 0;
+  text-align: center;
+}
+
+.runs tfoot td a {
+  display: block;
+  padding: 0.5em;
+  text-decoration: none;
+  color: #000;
+  background: #ccc;
+  text-align: center;
+}
+.runs tfoot td a:hover {
+  background: #fff;
 }
 </style>
 
