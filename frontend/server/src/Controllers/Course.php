@@ -664,7 +664,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         if (is_null($creator->user_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         if (!is_null(\OmegaUp\DAO\Courses::getByAlias($course->alias))) {
                 $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
@@ -1636,7 +1636,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         array $courseTypes = ['admin', 'student', 'public']
     ) {
         if (is_null($identity->identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $response = ['admin' => [], 'student' => [], 'public' => []];
 
@@ -1748,7 +1748,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($targetIdentity) || is_null($targetIdentity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
 
@@ -3642,7 +3642,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             )
         );
         if (is_null($director)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         // Log the operation only when there is not a token in request

@@ -366,7 +366,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     ): void {
         if (is_null($identity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
@@ -735,7 +735,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $identity->identity_id
         );
         if (is_null($extendedProfile)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $schoolId = null;
         if (!is_null($identity->current_identity_school_id)) {
