@@ -10,6 +10,34 @@ describe('markdown', () => {
       expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');
     });
 
+    it('Should handle invalid iframe tag', () => {
+      expect(
+        converter.makeHtml(
+          '<iframe src="https://www.facebook.com/embed/enMumwvLAug" frameborder="0" allowfullscreen="true"></iframe>',
+        ),
+      ).toEqual('');
+    });
+
+    it('Should handle valid iframe tag', () => {
+      expect(
+        converter.makeHtml(`<figure class="video_container">
+           <iframe src="https://www.youtube.com/embed/enMumwvLAug" frameborder="0" allowfullscreen="true"> </iframe>
+         </figure>`),
+      ).toEqual(`<p><figure class="video_container">
+           <iframe src="https://www.youtube.com/embed/enMumwvLAug" frameborder="0" allowfullscreen="true"> </iframe>
+         </figure></p>`);
+    });
+
+    it('Should handle valid iframe tag with extra attributes', () => {
+      expect(
+        converter.makeHtml(`<figure class="video_container">
+           <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
+        </figure>`),
+      ).toEqual(`<p><figure class="video_container">
+           <iframe width="560" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen> </iframe>
+        </figure></p>`);
+    });
+
     it('Should handle sample I/O tables', () => {
       expect(
         converter.makeHtml(`# Ejemplo
