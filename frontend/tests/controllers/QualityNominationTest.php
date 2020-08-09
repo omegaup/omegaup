@@ -273,7 +273,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\Omegaup\Exceptions\PreconditionFailedException $e) {
             $this->assertEquals(
-                'reviewerHasAlreadySentNominationForProblem',
+                'qualityNominationReviewerHasAlreadySentNominationForProblem',
                 $e->getMessage()
             );
         }

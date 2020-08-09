@@ -250,7 +250,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                 );
                 if (is_null($identity)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
-                        'userNotFound'
+                        'userNotExist'
                     );
                 }
             }

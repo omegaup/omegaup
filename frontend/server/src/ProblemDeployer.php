@@ -35,6 +35,30 @@ class ProblemDeployer {
     /** @var bool */
     private $updatePublished = true;
 
+    /** The mapping of gitserver errors to translation strings. */
+    const ERROR_MAPPING = [
+        'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
+        'config-bad-layout' => 'problemDeployerConfigBadLayout',
+        'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',
+        'config-repository-not-absolute-url' => 'problemDeployerConfigRepositoryNotAbsoluteUrl',
+        'config-subdirectory-missing-target' => 'problemDeployerConfigSubdirectoryMissingTarget',
+        'interactive-bad-layout' => 'problemDeployerInteractiveBadLayout',
+        'internal-error' => 'problemDeployerInternalError',
+        'internal-git-error' => 'problemDeployerInternalGitError',
+        'invalid-zip-filename' => 'problemDeployerInvalidZipFilename',
+        'json-parse-error' => 'problemDeployerJsonParseError',
+        'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
+        'no-statements' => 'problemDeployerNoStatements',
+        'not-a-review' => 'problemDeployerNotAReview',
+        'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
+        'problem-bad-layout' => 'problemDeployerProblemBadLayout',
+        'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
+        'review-bad-layout' => 'problemDeployerReviewBadLayout',
+        'slow-rejected' => 'problemDeployerSlowRejected',
+        'tests-bad-layout' => 'problemDeployerTestsBadLayout',
+        'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
+    ];
+
     public function __construct(
         string $alias,
         bool $acceptsSubmissions = true,
@@ -444,31 +468,9 @@ class ProblemDeployer {
                 if (is_null($output)) {
                     $context = $result['output'];
                 } else {
-                    $errorMapping = [
-                        'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
-                        'config-bad-layout' => 'problemDeployerConfigBadLayout',
-                        'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',
-                        'config-repository-not-absolute-url' => 'problemDeployerConfigRepositoryNotAbsoluteUrl',
-                        'config-subdirectory-missing-target' => 'problemDeployerConfigSubdirectoryMissingTarget',
-                        'interactive-bad-layout' => 'problemDeployerInteractiveBadLayout',
-                        'internal-error' => 'problemDeployerInternalError',
-                        'internal-git-error' => 'problemDeployerInternalGitError',
-                        'invalid-zip-filename' => 'problemDeployerInvalidZipFilename',
-                        'json-parse-error' => 'problemDeployerJsonParseError',
-                        'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
-                        'no-statements' => 'problemDeployerNoStatements',
-                        'not-a-review' => 'problemDeployerNotAReview',
-                        'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
-                        'problem-bad-layout' => 'problemDeployerProblemBadLayout',
-                        'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
-                        'review-bad-layout' => 'problemDeployerReviewBadLayout',
-                        'slow-rejected' => 'problemDeployerSlowRejected',
-                        'tests-bad-layout' => 'problemDeployerTestsBadLayout',
-                        'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
-                    ];
                     $tokens = explode(': ', $output['error'], 2);
-                    if (array_key_exists($tokens[0], $errorMapping)) {
-                        $errorMessage = $errorMapping[$tokens[0]];
+                    if (array_key_exists($tokens[0], self::ERROR_MAPPING)) {
+                        $errorMessage = self::ERROR_MAPPING[$tokens[0]];
                         if (count($tokens) == 2) {
                             $context = $tokens[1];
                         }
@@ -477,6 +479,7 @@ class ProblemDeployer {
                     }
                 }
             }
+            /** @psalm-suppress TranslationStringNotALiteralString This is handled in TranslationStringChecker */
             $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                 $errorMessage,
                 $context

@@ -401,7 +401,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                             // welp, the user is submitting a run before even
                             // opening the problem!
                             throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                                'runEvenOpened'
+                                'runNotEvenOpened'
                             );
                         }
 

@@ -183,7 +183,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
             );
             $user = \OmegaUp\DAO\Users::findByUsername($username);
             if (is_null($user)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
 
             // Email to new OmegaUp users

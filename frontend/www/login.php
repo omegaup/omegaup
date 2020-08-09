@@ -19,6 +19,7 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
     } catch (\Exception $e) {
         \Logger::getLogger('login')->error($e);
         $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+            'generalError',
             $e
         );
         /** @var array<string, mixed> */

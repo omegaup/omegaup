@@ -89,6 +89,7 @@ class SecurityTools {
         }
         if ($hashedString === false || is_null($hashedString)) {
             throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                'generalError',
                 new \Exception('Hash function returned false')
             );
         }
