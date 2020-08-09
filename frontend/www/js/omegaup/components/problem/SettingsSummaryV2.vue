@@ -127,10 +127,16 @@ export default class ProblemSettingsSummary extends Vue {
   }
 
   get timeLimit(): string {
+    if (!this.problem.settings?.limits.TimeLimit) {
+      return '';
+    }
     return `${this.problem.settings?.limits.TimeLimit}`;
   }
 
   get overallWallTimeLimit(): string {
+    if (!this.problem.settings?.limits.OverallWallTimeLimit) {
+      return '';
+    }
     return `${this.problem.settings?.limits.OverallWallTimeLimit}`;
   }
 
