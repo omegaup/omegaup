@@ -156,7 +156,7 @@ jobs:
           MYSQL_DATABASE: omegaup
 
       frontend:
-        image: omegaup/dev-php:20200807
+        image: omegaup/dev-php:20200808
         ports:
           - 8001:8001
         volumes:
@@ -166,20 +166,20 @@ jobs:
           CI: true
 
       gitserver:
-        image: omegaup/dev-gitserver:20200807
+        image: omegaup/dev-gitserver:20200808
         volumes:
           - omegaupdata:/var/lib/omegaup
 
       broadcaster:
-        image: omegaup/dev-broadcaster:20200731
+        image: omegaup/dev-broadcaster:20200808
 
       grader:
-        image: omegaup/dev-grader:20200806
+        image: omegaup/dev-grader:20200808
         volumes:
           - omegaupdata:/var/lib/omegaup
 
       runner:
-        image: omegaup/dev-runner:20200731
+        image: omegaup/dev-runner:20200808
 
     steps:
       - uses: actions/checkout@v2
