@@ -109,7 +109,6 @@
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
           ref="assignment-details"
-          v-bind:assignment-form-mode="assignmentFormMode"
           v-bind:unlimited-duration-course="!data.course.finish_time"
           v-bind:finish-time-course="data.course.finish_time"
           v-bind:start-time-course="data.course.start_time"
@@ -140,6 +139,10 @@
           v-on:submit="
             (assignmentFormComponent, problems) =>
               $emit('submit-new-assignment', assignmentFormComponent, problems)
+          "
+          v-on:get-versions="
+            (newProblemAlias, addProblemComponent) =>
+              $emit('get-versions', newProblemAlias, addProblemComponent)
           "
         >
           <template slot="page-header"><span></span></template>

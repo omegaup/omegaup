@@ -11,12 +11,12 @@ import time
 from typing import List, Optional
 
 DOWNLOAD_FILES = [
-    ('https://s3.amazonaws.com/omegaup-omegajail/'
-     'omegajail-bionic-rootfs-x86_64.tar.xz'),
-    ('https://github.com/omegaup/omegajail/releases/download/v1.0.0/'
-     'omegajail-bionic-distrib-x86_64.tar.xz'),
+    ('https://github.com/omegaup/omegajail/releases/download/v3.0.0/'
+     'omegajail-focal-rootfs-x86_64.tar.xz'),
+    ('https://github.com/omegaup/omegajail/releases/download/v3.0.1/'
+     'omegajail-focal-distrib-x86_64.tar.xz'),
     'https://s3.amazonaws.com/omegaup-dist/omegaup-runner-config.tar.xz',
-    ('https://github.com/omegaup/quark/releases/download/v1.1.29/'
+    ('https://github.com/omegaup/quark/releases/download/v1.1.40/'
      'omegaup-runner.tar.xz'),
     ('https://github.com/omegaup/logslurp/releases/download/v0.0.4/'
      'omegaup-logslurp.tar.xz'),
