@@ -156,7 +156,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
         \OmegaUp\Validators::validateStringNonEmpty(

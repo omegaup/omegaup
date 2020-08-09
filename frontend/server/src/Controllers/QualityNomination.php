@@ -356,7 +356,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 )
             ) {
                 throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                    'reviewerHasAlreadySentNominationForProblem'
+                    'qualityNominationReviewerHasAlreadySentNominationForProblem'
                 );
             }
         }
@@ -545,7 +545,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($qualitynomination)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'qualitynominationNotFound'
+                'qualityNominationNotFound'
             );
         }
         if ($qualitynomination->nomination !== 'demotion') {
@@ -563,7 +563,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($qualitynomination->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemIdNotFound'
+                'problemNotFound'
             );
         }
         $problem = \OmegaUp\DAO\Problems::getByPK(
@@ -689,7 +689,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
 
         if (is_null($adminUser)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         [
             'email' => $email,

@@ -42,6 +42,7 @@ class ApiCaller {
             $apiException = $e;
         } catch (\Exception $e) {
             $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                'generalError',
                 $e
             );
         }
@@ -282,6 +283,7 @@ class ApiCaller {
             $apiException = $e;
         } else {
             $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                'generalError',
                 $e
             );
         }
