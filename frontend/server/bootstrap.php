@@ -68,6 +68,7 @@ $contentSecurityPolicy = [
         '\'self\'',
         'https://www.facebook.com',
         'https://web.facebook.com',
+        'https://www.youtube.com',
         'https://platform.twitter.com',
         'https://www.google.com',
         'https://apis.google.com',
