@@ -230,9 +230,35 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return $courses;
     }
 
-    //FIXME: Use type list<StudentProgress> instead
     /**
-     * Returns a list of students within a course
+     * Returns the list of students in a course
+     *
+     * @return list<array{name: null|string, username: string}>
+     */
+    public static function getStudentsInCourse(
+        int $courseId,
+        int $groupId
+    ): array {
+        $sql = '
+            SELECT
+                i.username,
+                i.name
+            FROM
+                Groups_Identities gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?';
+
+        /** @var list<array{name: null|string, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$groupId]
+        );
+    }
+
+    /**
+     * Returns a list of students within a course with their progress
      * @return list<array{name: string|null, progress: array<string, array<string, float>>, username: string}>
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
@@ -242,53 +268,48 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         $sql = 'SELECT
                     i.username,
                     i.name,
-                    pr.alias as assignment_alias,
+                    pr.assignment_alias,
                     pr.problem_alias,
-                    pr.best_score_of_problem as problem_score
+                    problem_points,
+                    MAX(r.contest_score) AS problem_score
                 FROM
-                    `Groups_` AS g
-                INNER JOIN Groups_Identities gi
-                    ON g.group_id = ? AND g.group_id = gi.group_id
-                INNER JOIN Identities i
-                    ON i.identity_id = gi.identity_id
-                LEFT JOIN (
-                    SELECT
-                        bpr.alias,
-                        bpr.identity_id,
-                        bpr.problem_alias,
-                        bpr.best_score_of_problem
-                    FROM (
+                    Groups_Identities AS gi
+                CROSS JOIN
+                    (
                         SELECT
-                            a.alias,
                             a.assignment_id,
+                            a.alias AS assignment_alias,
+                            a.problemset_id,
                             p.problem_id,
-                            p.alias as problem_alias,
-                            s.identity_id,
-                            MAX(r.contest_score) as best_score_of_problem
+                            p.alias AS problem_alias,
+                            psp.points AS problem_points
                         FROM Assignments a
                         INNER JOIN Problemsets ps
-                            ON a.problemset_id = ps.problemset_id
+                        ON a.problemset_id = ps.problemset_id
                         INNER JOIN Problemset_Problems psp
-                            ON psp.problemset_id = ps.problemset_id
+                        ON psp.problemset_id = ps.problemset_id
                         INNER JOIN Problems p
-                            ON p.problem_id = psp.problem_id
-                        INNER JOIN Submissions s
-                            ON s.problem_id = p.problem_id
-                            AND s.problemset_id = a.problemset_id
-                        INNER JOIN Runs r
-                            ON r.run_id = s.current_run_id
+                        ON p.problem_id = psp.problem_id
                         WHERE a.course_id = ?
-                        GROUP BY a.assignment_id, p.problem_id, s.identity_id
-                        ORDER BY p.alias
-                    ) bpr
-                    GROUP BY bpr.assignment_id, bpr.problem_id, bpr.identity_id
-                ) pr
-                ON pr.identity_id = i.identity_id';
+                        GROUP BY a.assignment_id, p.problem_id
+                    ) AS pr
+                INNER JOIN Identities i
+                    ON i.identity_id = gi.identity_id
+                LEFT JOIN Submissions s
+                    ON s.problem_id = pr.problem_id
+                    AND s.identity_id = i.identity_id
+                    AND s.problemset_id = pr.problemset_id
+                LEFT JOIN Runs r
+                    ON r.run_id = s.current_run_id
+                WHERE
+                    gi.group_id = ?
+                GROUP BY
+                    i.identity_id, pr.assignment_id, pr.problem_id;';
 
-        /** @var list<array{assignment_alias: null|string, name: null|string, problem_alias: null|string, problem_score: float|null, username: string}> */
+        /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$groupId, $courseId]
+            [$courseId, $groupId]
         );
 
         $allProgress = [];
@@ -305,17 +326,16 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $assignmentAlias = $row['assignment_alias'];
             $problemAlias = $row['problem_alias'];
 
-            if (is_null($assignmentAlias) || is_null($problemAlias)) {
-                continue;
-            }
-
             if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
                 $allProgress[$username]['progress'][$assignmentAlias] = [];
             }
 
-            $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = floatval(
+            $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = (
+                $row['problem_score'] == 0
+            ) ? 0 :
+            floatval(
                 $row['problem_score']
-            );
+            ) / $row['problem_points'] * 100;
         }
 
         usort(

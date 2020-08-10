@@ -11,7 +11,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas",
                 "problem_alias": "sumas",
                 "validator": "token-numeric",
@@ -33,7 +33,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_2",
                 "problem_alias": "sumas_2",
                 "validator": "token-numeric",
@@ -55,7 +55,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_3",
                 "problem_alias": "sumas_3",
                 "validator": "token-numeric",
@@ -77,7 +77,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_4",
                 "problem_alias": "sumas_4",
                 "validator": "token-numeric",
@@ -99,7 +99,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_5",
                 "problem_alias": "sumas_5",
                 "validator": "token-numeric",

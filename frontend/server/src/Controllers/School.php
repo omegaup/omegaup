@@ -500,7 +500,7 @@ class School extends \OmegaUp\Controllers\Controller {
         );
 
         if (empty($schools)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('noSchools');
+            throw new \OmegaUp\Exceptions\NotFoundException('schoolNotFound');
         }
 
         try {

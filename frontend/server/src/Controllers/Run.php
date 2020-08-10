@@ -15,29 +15,29 @@ class Run extends \OmegaUp\Controllers\Controller {
     public const SUPPORTED_LANGUAGES = [
         'kp' => 'Karel (Pascal)',
         'kj' => 'Karel (Java)',
-        'c11-gcc' => 'C11 (gcc 7.4)',
-        'c11-clang' => 'C11 (clang 6.0)',
-        'cpp11-gcc' => 'C++11 (g++ 7.4)',
-        'cpp11-clang' => 'C++11 (clang++ 6.0)',
-        'cpp17-gcc' => 'C++17 (g++ 7.4)',
-        'cpp17-clang' => 'C++17 (clang++ 6.0)',
-        'java' => 'Java (openjdk 11.0)',
+        'c11-gcc' => 'C11 (gcc 9.3)',
+        'c11-clang' => 'C11 (clang 10.0)',
+        'cpp11-gcc' => 'C++11 (g++ 9.3)',
+        'cpp11-clang' => 'C++11 (clang++ 10.0)',
+        'cpp17-gcc' => 'C++17 (g++ 9.3)',
+        'cpp17-clang' => 'C++17 (clang++ 10.0)',
+        'java' => 'Java (openjdk 14.0)',
         'py2' => 'Python 2.7',
-        'py3' => 'Python 3.6',
-        'rb' => 'Ruby (2.5)',
-        'cs' => 'C# (dotnet 2.2)',
+        'py3' => 'Python 3.8',
+        'rb' => 'Ruby (2.7)',
+        'cs' => 'C# (8.0, dotnet 3.1)',
         'pas' => 'Pascal (fpc 3.0)',
         'cat' => 'Output Only',
-        'hs' => 'Haskell (ghc 8.0)',
-        'lua' => 'Lua (5.2)',
+        'hs' => 'Haskell (ghc 8.6)',
+        'lua' => 'Lua (5.3)',
     ];
 
     // These languages are aliases. They can be shown to the user, but should
     // not appear as selectable mostly anywhere.
     public const LANGUAGE_ALIASES = [
-        'c' => 'C11 (gcc 7.4)',
-        'cpp' => 'C++03 (gcc 7.4)',
-        'cpp11' => 'C++11 (gcc 7.4)',
+        'c' => 'C11 (gcc 9.3)',
+        'cpp' => 'C++03 (gcc 9.3)',
+        'cpp11' => 'C++11 (gcc 9.3)',
         'py' => 'Python 2.7',
     ];
 
@@ -401,7 +401,7 @@ class Run extends \OmegaUp\Controllers\Controller {
                             // welp, the user is submitting a run before even
                             // opening the problem!
                             throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                                'runEvenOpened'
+                                'runNotEvenOpened'
                             );
                         }
 
@@ -719,7 +719,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        self::$log->info('Run being rejudged!!');
+        if ($run->status == 'new' || $run->status == 'waiting') {
+            self::$log->info('Run already in the rejudge queue. Ignoring');
+            return ['status' => 'ok'];
+        }
+
+        self::$log->info("Run {$run->run_id} being rejudged");
 
         // Reset fields.
         try {
@@ -741,15 +746,12 @@ class Run extends \OmegaUp\Controllers\Controller {
             self::$log->error('Call to \OmegaUp\Grader::rejudge() failed', $e);
         }
 
-        $response = [];
-        $response['status'] = 'ok';
-
         self::invalidateCacheOnRejudge($run);
 
         // Expire ranks
         \OmegaUp\Controllers\User::deleteProblemsSolvedRankCacheList();
 
-        return $response;
+        return ['status' => 'ok'];
     }
 
     /**

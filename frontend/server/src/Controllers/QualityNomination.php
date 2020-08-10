@@ -356,7 +356,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 )
             ) {
                 throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                    'reviewerHasAlreadySentNominationForProblem'
+                    'qualityNominationReviewerHasAlreadySentNominationForProblem'
                 );
             }
         }
@@ -545,7 +545,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($qualitynomination)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'qualitynominationNotFound'
+                'qualityNominationNotFound'
             );
         }
         if ($qualitynomination->nomination !== 'demotion') {
@@ -563,7 +563,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($qualitynomination->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemIdNotFound'
+                'problemNotFound'
             );
         }
         $problem = \OmegaUp\DAO\Problems::getByPK(
@@ -606,7 +606,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $message = ($r['status'] === 'banned') ?
+            \OmegaUp\Translations::getInstance()->get(
+                'banningProblemDueToReport'
+            ) :
+            \OmegaUp\Translations::getInstance()->get(
+                'banningDeclinedByReviewer'
+            );
 
         if ($r->ensureOptionalBool('all') ?? false) {
             $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionsForProblem(
@@ -689,7 +695,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
 
         if (is_null($adminUser)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         [
             'email' => $email,
@@ -707,44 +713,38 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationBanned'
-                )
-                    ?: 'demotionProblemNotificationBanned',
+                ),
                 ['problem_name' => strval($problem->title)]
             );
             $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailBannedSubject'
-                )
-                    ?: 'demotionProblemEmailBannedSubject',
+                ),
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailBannedBody'
-                )
-                    ?: 'demotionProblemEmailBannedBody',
+                ),
                 $emailParams
             );
         } else {
             $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationWarning'
-                )
-                    ?: 'demotionProblemNotificationWarning',
+                ),
                 ['problem_name' => strval($problem->title)]
             );
             $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailWarningSubject'
-                )
-                    ?: 'demotionProblemEmailWarningSubject',
+                ),
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailWarningBody'
-                )
-                    ?: 'demotionProblemEmailWarningBody',
+                ),
                 $emailParams
             );
         }
