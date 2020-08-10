@@ -10,13 +10,11 @@
 		<div class="row">
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
-
 				<div class="row">
 
 {if $GOOGLECLIENTID != ""}
-					<div class="col-xs-12 col-md-4 text-center py-2"
-						id="google-signin"
-						title="{#loginWithGoogle#}">
+					<div class="col-xs-12 col-md-4 text-center py-2">
+						<div id="google-signin" title="{#loginWithGoogle#}"></div>
 					</div>
 {/if}
 
