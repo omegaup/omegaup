@@ -342,28 +342,6 @@ input[type=button]:hover,
 	color: #333;
 }
 
-.oauth-provider-div {
-    text-align: center;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-}
-
-.login-btn-ct {
-    padding-left: 2px !important;
-    padding-right: 2px !important;
-    margin-top: 12px;
-    width: 70px;
-    height: 47px;
-    margin: 10px;
-}
-
-.oauth-provider-div .btn-oauth img {
-    height: 45px;
-    width: 45px;
-    padding: 0px;
-}
-
 .clearfix::after {
 	clear: both;
 	content: ".";
