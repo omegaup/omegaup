@@ -606,7 +606,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $message = ($r['status'] === 'banned') ?
+            \OmegaUp\Translations::getInstance()->get(
+                'banningProblemDueToReport'
+            ) :
+            \OmegaUp\Translations::getInstance()->get(
+                'banningDeclinedByReviewer'
+            );
 
         if ($r->ensureOptionalBool('all') ?? false) {
             $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionsForProblem(
@@ -707,44 +713,38 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationBanned'
-                )
-                    ?: 'demotionProblemNotificationBanned',
+                ),
                 ['problem_name' => strval($problem->title)]
             );
             $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailBannedSubject'
-                )
-                    ?: 'demotionProblemEmailBannedSubject',
+                ),
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailBannedBody'
-                )
-                    ?: 'demotionProblemEmailBannedBody',
+                ),
                 $emailParams
             );
         } else {
             $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationWarning'
-                )
-                    ?: 'demotionProblemNotificationWarning',
+                ),
                 ['problem_name' => strval($problem->title)]
             );
             $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailWarningSubject'
-                )
-                    ?: 'demotionProblemEmailWarningSubject',
+                ),
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailWarningBody'
-                )
-                    ?: 'demotionProblemEmailWarningBody',
+                ),
                 $emailParams
             );
         }
