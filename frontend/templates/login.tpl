@@ -11,21 +11,22 @@
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
 
-				<div>
+				<div class="row">
+
 {if $GOOGLECLIENTID != ""}
-				<div
-					id="google-signin"
-					title="{#loginWithGoogle#}">
-				</div>
+					<div class="col-xs-12 col-md-4 text-center py-2"
+						id="google-signin"
+						title="{#loginWithGoogle#}">
+					</div>
 {/if}
 
-					<div class="col-xs-12 col-md-4">
+					<div class="col-xs-12 col-md-4 text-center py-2">
 						<a href="{$FB_URL}" title="{#loginWithFacebook#}">
 							<img src="/css/fb-oauth.png" height="45px" width="45px">
 						</a>
 					</div>
 
-					<div class="col-xs-12 col-md-4">
+					<div class="col-xs-12 col-md-4 text-center py-2">
 						<a href="{$LINKEDIN_URL}" title="{#loginWithLinkedIn#}">
 							<img src="/css/ln-oauth.png" height="45px" width="45px">
 						</a>
