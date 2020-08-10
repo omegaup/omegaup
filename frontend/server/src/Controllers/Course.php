@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  *  CourseController
@@ -1793,8 +1793,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                             'body' => [
                                 'localizationString' => (
                                     $request->accepted ?
-                                    'notificationCourseRegistrationAccepted' :
-                                    'notificationCourseRegistrationRejected'
+                                    new \OmegaUp\TranslationString(
+                                        'notificationCourseRegistrationAccepted'
+                                    ) :
+                                    new \OmegaUp\TranslationString(
+                                        'notificationCourseRegistrationRejected'
+                                    )
                                 ),
                                 'localizationParams' => [
                                     'courseName' => $course->name,
@@ -2540,7 +2544,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'is_admin' => true,
                 ],
-                'title' => 'omegaupTitleCourseNew',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseNew'
+                ),
             ],
             'entrypoint' => 'course_new',
         ];
@@ -2575,7 +2581,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => $courseEditDetails,
-                'title' => 'courseEdit',
+                'title' => new \OmegaUp\TranslationString('courseEdit'),
             ],
             'entrypoint' => 'course_edit',
         ];
@@ -2621,7 +2627,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'course' => $courseEditDetails,
                     'assignment' => $assignment,
                 ],
-                'title' => 'courseAssignmentEdit',
+                'title' => new \OmegaUp\TranslationString(
+                    'courseAssignmentEdit'
+                ),
             ],
             'entrypoint' => 'course_assignment_edit',
         ];
@@ -2705,7 +2713,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'solvedProblems' => $userSolvedProblems,
                     'unsolvedProblems' => $userUnsolvedProblems,
                 ],
-                'title' => 'courseSubmissionsList',
+                'title' => new \OmegaUp\TranslationString(
+                    'courseSubmissionsList'
+                ),
             ],
             'entrypoint' => 'course_submissions_list',
         ];
@@ -2744,7 +2754,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course->group_id
                     ),
                 ],
-                'title' => 'omegaupTitleStudentsProgress',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleStudentsProgress'
+                ),
             ],
             'entrypoint' => 'course_students'
         ];
@@ -2787,7 +2799,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'student' => $r['student']
                 ],
-                'title' => 'omegaupTitleStudentsProgress',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleStudentsProgress'
+                ),
             ],
             'entrypoint' => 'course_student'
         ];
@@ -2849,7 +2863,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'courses' => $filteredCourses,
                 ],
-                'title' => 'courseList',
+                'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_mine',
         ];
@@ -2890,7 +2904,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'courses' => $filteredCourses,
                     'course_type' => $courseType
                 ],
-                'title' => 'courseList',
+                'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_single_list',
         ];
@@ -2929,7 +2943,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'courses' => $filteredCourses,
                         'course_type' => null,
                     ],
-                    'title' => 'courseList',
+                    'title' => new \OmegaUp\TranslationString('courseList'),
                 ],
                 'entrypoint' => 'course_list',
             ];
@@ -2973,7 +2987,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'courses' => $filteredCourses,
                     'course_type' => null,
                 ],
-                'title' => 'courseList',
+                'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_list',
         ];
@@ -3107,7 +3121,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity->identity_id
                     ),
                 ],
-                'title' => 'omegaupTitleCourseDetails',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseDetails'
+                ),
             ],
             'entrypoint' => 'course_details',
         ];
@@ -3285,7 +3301,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         [
                             'type' => \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
                             'body' => [
-                                'localizationString' => 'notificationCourseRegistrationRequest',
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseRegistrationRequest'
+                                ),
                                 'localizationParams' => [
                                     'username' => $r->identity->username,
                                     'courseName' => $course->name,
