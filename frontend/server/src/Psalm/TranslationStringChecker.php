@@ -41,6 +41,29 @@ class TranslationStringChecker implements
     }
 
     /**
+     * Returns whether the provided class name is a class that receives a
+     * translation string name as first parameter.
+     */
+    private static function isSupportedConstructor(
+        string $constructorClassName
+    ): bool {
+        if ($constructorClassName === 'omegaup\\translationstring') {
+            // This is the class that indicates that this is a translation
+            // string.
+            return true;
+        }
+        if (strpos($constructorClassName, 'omegaup\\exceptions\\') !== 0) {
+            // Not the constructor of an exception.
+            return false;
+        }
+        if ($constructorClassName == 'omegaup\\exceptions\\databaseoperationexception') {
+            // This one class does not use translation strings.
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Called after a statement has been checked
      *
      * @param \Psalm\FileManipulation[] $fileReplacements
@@ -61,13 +84,7 @@ class TranslationStringChecker implements
             // Not something we can reason about.
             return;
         }
-        $constructorClassName = $expr->class->toLowerString();
-        if (strpos($constructorClassName, 'omegaup\\exceptions\\') !== 0) {
-            // Not the constructor of an exception.
-            return;
-        }
-        if ($constructorClassName == 'omegaup\\exceptions\\databaseoperationexception') {
-            // This one class does not use translation strings.
+        if (!self::isSupportedConstructor($expr->class->toLowerString())) {
             return;
         }
         if (empty($expr->args)) {

@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  * ProblemsController
@@ -3324,7 +3324,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     ],
                     self::getStats($problem, $r->identity)
                 ),
-                'title' => 'omegaupTitleProblemStats',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblemStats'
+                ),
             ],
             'entrypoint' => 'common_stats',
         ];
@@ -4129,7 +4131,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'privateProblemsAlert' => $privateProblemsAlert,
                     'visibilityStatuses' => $visibilityStatuses,
                 ],
-                'title' => 'omegaupTitleMyProblemsList',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleMyProblemsList'
+                ),
             ],
             'entrypoint' => 'problem_mine',
         ];
@@ -4432,7 +4436,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'reviewer' => false,
                     ],
                 ],
-                'title' => 'omegaupTitleProblem',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblem'
+                ),
             ],
             'entrypoint' => 'problem_details',
         ];
@@ -4607,7 +4613,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'tags' => $tags,
                     'tagData' => $tagData,
                 ],
-                'title' => 'omegaupTitleProblems',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblems'
+                ),
             ],
             'entrypoint' => 'problem_list',
         ];
@@ -4788,7 +4796,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     self::getCommonPayloadForSmarty(),
                     $extraInfo
                 ),
-                'title' => 'problemEditEditProblem',
+                'title' => new \OmegaUp\TranslationString(
+                    'problemEditEditProblem'
+                ),
             ],
             'entrypoint' => 'problem_edit',
         ];
