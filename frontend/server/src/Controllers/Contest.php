@@ -2617,7 +2617,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $time = \OmegaUp\Time::get();
         $note = \OmegaUp\Translations::getInstance()->get(
             'wordsAutoAccepted'
-        ) ?: 'wordsAutoAccepted';
+        );
         foreach ($identitiesIDs as $identityID) {
             if (
                 \OmegaUp\DAO\ProblemsetIdentityRequest::replace(

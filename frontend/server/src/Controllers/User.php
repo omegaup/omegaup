@@ -338,11 +338,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $subject = \OmegaUp\Translations::getInstance()->get(
             'verificationEmailSubject'
-        )
-            ?: 'verificationEmailSubject';
+        );
         $body = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get('verificationEmailBody')
-                ?: 'verificationEmailBody',
+            \OmegaUp\Translations::getInstance()->get('verificationEmailBody'),
             [
                 'verification_id' => strval($user->verification_id),
             ]

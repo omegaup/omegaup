@@ -82,15 +82,13 @@ class Broadcaster {
             $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'clarificationEmailSubject'
-                )
-                    ?: 'clarificationEmailSubject',
+                ),
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'clarificationEmailBody'
-                )
-                    ?: 'clarificationEmailBody',
+                ),
                 $emailParams
             );
 

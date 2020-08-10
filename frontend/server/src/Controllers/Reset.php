@@ -40,14 +40,12 @@ class Reset extends \OmegaUp\Controllers\Controller {
             return ['token' => $token];
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset')
-            ?: 'wordsReset';
+        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset');
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
         $message = \OmegaUp\Translations::getInstance()->get(
             'wordsResetMessage'
-        )
-            ?: 'wordsResetMessage';
+        );
         $body = str_replace('[link]', $link, $message);
 
         try {
@@ -64,7 +62,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         return [
             'message' => \OmegaUp\Translations::getInstance()->get(
                 'passwordResetRequestSuccess'
-            ) ?? 'passwordResetRequestSuccess'
+            )
         ];
     }
 
@@ -226,7 +224,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
                 'message' :
                     \OmegaUp\Translations::getInstance()->get(
                         'passwordResetResetSuccess'
-                    ) ?? 'passwordResetResetSuccess'
+                    )
         ];
     }
 

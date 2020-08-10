@@ -5381,7 +5381,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'smartyProperties' => [
                     'error' => \OmegaUp\Translations::getInstance()->get(
                         'parameterInvalid'
-                    ) ?? 'parameterInvalid',
+                    ),
                     'error_field' => strval($e->parameter),
                 ],
                 'template' => 'libinteractive.gen.tpl',

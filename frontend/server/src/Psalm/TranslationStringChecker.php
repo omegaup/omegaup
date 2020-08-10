@@ -4,7 +4,8 @@ namespace OmegaUp\Psalm;
 
 class TranslationStringChecker implements
     \Psalm\Plugin\Hook\AfterAnalysisInterface,
-    \Psalm\Plugin\Hook\AfterExpressionAnalysisInterface {
+    \Psalm\Plugin\Hook\AfterExpressionAnalysisInterface,
+    \Psalm\Plugin\Hook\AfterMethodCallAnalysisInterface {
     /**
      * A list of messages that are present in the base exception classes.
      */
@@ -103,6 +104,57 @@ class TranslationStringChecker implements
             return null;
         }
         return null;
+    }
+
+    /**
+     * @param  \PhpParser\Node\Expr\MethodCall|\PhpParser\Node\Expr\StaticCall $expr
+     * @param  \Psalm\FileManipulation[] $fileReplacements
+     *
+     * @return void
+     */
+    public static function afterMethodCallAnalysis(
+        $expr,
+        string $methodId,
+        string $appearingMethodId,
+        string $declaringMethodId,
+        \Psalm\Context $context,
+        \Psalm\StatementsSource $statementsSource,
+        \Psalm\Codebase $codebase,
+        array &$fileReplacements = [],
+        \Psalm\Type\Union &$returnTypeCandidate = null
+    ) {
+        if ($methodId !== 'OmegaUp\\Translations::get') {
+            return;
+        }
+        if (!($expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_)) {
+            if (
+                \Psalm\IssueBuffer::accepts(
+                    new TranslationStringNotALiteralString(
+                        'First argument to an Exception constructor not a literal string',
+                        new \Psalm\CodeLocation($statementsSource, $expr)
+                    ),
+                    $statementsSource->getSuppressedIssues()
+                )
+            ) {
+                // do nothing
+            }
+            return;
+        }
+        $translationString = $expr->args[0]->value->value;
+        if (!in_array($translationString, self::getAllTranslationStrings())) {
+            if (
+                \Psalm\IssueBuffer::accepts(
+                    new TranslationStringNotFound(
+                        "Translation string '$translationString' not found",
+                        new \Psalm\CodeLocation($statementsSource, $expr)
+                    ),
+                    $statementsSource->getSuppressedIssues()
+                )
+            ) {
+                // do nothing
+            }
+            return;
+        }
     }
 
     /**
