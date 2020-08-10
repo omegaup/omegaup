@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  * ContestController
@@ -549,7 +549,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'shouldShowFirstAssociatedIdentityRunWarning' => false,
                     'contest' => self::getPublicDetails($contest, $r->identity),
                 ],
-                'title' => 'enterContest',
+                'title' => new \OmegaUp\TranslationString('enterContest'),
             ],
             'entrypoint' => 'contest_intro',
         ];
@@ -711,7 +711,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'isLogged' => !is_null($r->identity),
                     'contests' => $contests,
                 ],
-                'title' => 'wordsContests',
+                'title' => new \OmegaUp\TranslationString('wordsContests'),
             ],
             'entrypoint' => 'arena_contest_list',
         ];
@@ -766,7 +766,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'contests' => $contestsList['contests'],
                     'privateContestsAlert' => $privateContestsAlert,
                 ],
-                'title' => 'omegaupTitleMyContests',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleMyContests'
+                ),
             ],
             'entrypoint' => 'contest_mine',
         ];
@@ -1195,7 +1197,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 if (is_null($director)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
-                        'userNotFound'
+                        'userNotExist'
                     );
                 }
                 $result['director'] = $director->username;
@@ -2082,8 +2084,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function validateContestAdmin(
         string $contestAlias,
-        \OmegaUp\DAO\VO\Identities $identity,
-        string $message = 'userNotAllowed'
+        \OmegaUp\DAO\VO\Identities $identity
     ): \OmegaUp\DAO\VO\Contests {
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
@@ -2091,7 +2092,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException($message);
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
         }
         return $contest;
     }
@@ -2130,8 +2133,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Only director is allowed to create problems in contest
         $contest = self::validateContestAdmin(
             $r['contest_alias'],
-            $r->identity,
-            'cannotAddProb'
+            $r->identity
         );
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2565,7 +2567,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
 
@@ -2617,7 +2619,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $time = \OmegaUp\Time::get();
         $note = \OmegaUp\Translations::getInstance()->get(
             'wordsAutoAccepted'
-        ) ?: 'wordsAutoAccepted';
+        );
         foreach ($identitiesIDs as $identityID) {
             if (
                 \OmegaUp\DAO\ProblemsetIdentityRequest::replace(
@@ -3437,7 +3439,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($targetIdentity) || is_null($targetIdentity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
 
@@ -4135,7 +4137,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ],
                     self::getStats($contest, $r->identity)
                 ),
-                'title' => 'omegaupTitleContestStats',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestStats'
+                ),
             ],
             'entrypoint' => 'common_stats',
         ];

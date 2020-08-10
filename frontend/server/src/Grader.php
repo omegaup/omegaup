@@ -240,6 +240,7 @@ class Grader {
             $curl = curl_init();
             if ($curl === false) {
                 throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                    'generalError',
                     new \RuntimeException('curl_init failed')
                 );
             }

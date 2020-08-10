@@ -158,8 +158,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
 
         $subject = \OmegaUp\Translations::getInstance()->get(
             'interviewInvitationEmailSubject'
-        )
-            ?: 'interviewInvitationEmailSubject';
+        );
 
         if (is_null($user)) {
             // create a new user
@@ -183,36 +182,33 @@ class Interview extends \OmegaUp\Controllers\Controller {
             );
             $user = \OmegaUp\DAO\Users::findByUsername($username);
             if (is_null($user)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
 
             // Email to new OmegaUp users
             $body = \OmegaUp\Translations::getInstance()->get(
                 'interviewInvitationEmailBodyIntro'
-            ) ?: 'interviewInvitationEmailBodyIntro'
-               . '<br>'
+            )  . '<br>'
                . " <a href=\"https://omegaup.com/user/verifyemail/{$user->verification_id}/redirecttointerview/{$interview->alias}/\">"
                . " https://omegaup.com/user/verifyemail/{$user->verification_id}/redirecttointerview/{$interview->alias}/</a>"
                . '<br>';
 
             $body .= \OmegaUp\Translations::getInstance()->get(
                 'interviewEmailDraft'
-            ) ?: 'interviewEmailDraft'
-                . '<br>'
-                . (\OmegaUp\Translations::getInstance()->get(
+            )   . '<br>'
+                . \OmegaUp\Translations::getInstance()->get(
                     'profileUsername'
-                ) ?: 'profileUsername')
+                )
                 . " : {$username}<br>"
-                . (\OmegaUp\Translations::getInstance()->get(
+                . \OmegaUp\Translations::getInstance()->get(
                     'loginPassword'
-                ) ?: 'loginPassword')
+                )
                 . " : {$password}<br>";
         } else {
             // Email to current OmegaUp user
             $body = \OmegaUp\Translations::getInstance()->get(
                 'interviewInvitationEmailBodyIntro'
-            ) ?: 'interviewInvitationEmailBodyIntro'
-               . " <a href=\"https://omegaup.com/interview/{$interview->alias}/arena/\">"
+            )  . " <a href=\"https://omegaup.com/interview/{$interview->alias}/arena/\">"
                . "https://omegaup.com/interview/{$interview->alias}/arena/</a>";
         }
 

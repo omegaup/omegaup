@@ -459,7 +459,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 intval($user->main_identity_id)
             );
             if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $problemsets = array_filter(
                 $problemsets,

@@ -319,13 +319,13 @@ class User extends \OmegaUp\Controllers\Controller {
     private static function sendVerificationEmail(\OmegaUp\DAO\VO\Users $user): void {
         if (is_null($user->main_email_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userOrMailNotfound'
+                'userOrMailNotFound'
             );
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
         if (is_null($email) || is_null($email->email)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userOrMailNotfound'
+                'userOrMailNotFound'
             );
         }
 
@@ -338,11 +338,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $subject = \OmegaUp\Translations::getInstance()->get(
             'verificationEmailSubject'
-        )
-            ?: 'verificationEmailSubject';
+        );
         $body = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get('verificationEmailBody')
-                ?: 'verificationEmailBody',
+            \OmegaUp\Translations::getInstance()->get('verificationEmailBody'),
             [
                 'verification_id' => strval($user->verification_id),
             ]
@@ -2584,7 +2582,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         /*$params=*/[]
                     ),
                 ],
-                'title' => 'omegaupTitleAuthorsRank',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAuthorsRank'
+                ),
             ],
             'entrypoint' => 'authors_rank',
         ];
@@ -3622,8 +3622,12 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => $response,
                 'title' => (
                     (strval($category) === 'female') ?
-                    'omegaupTitleCodersofthemonthFemale' :
-                    'omegaupTitleCodersofthemonth'
+                    new \OmegaUp\TranslationString(
+                        'omegaupTitleCodersofthemonthFemale'
+                    ) :
+                    new \OmegaUp\TranslationString(
+                        'omegaupTitleCodersofthemonth'
+                    )
                 ),
             ],
             'entrypoint' => 'coder_of_the_month',
@@ -3675,7 +3679,9 @@ class User extends \OmegaUp\Controllers\Controller {
                             )
                         ),
                     ],
-                    'title' => 'omegaupTitleProfile',
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleProfile'
+                    ),
                 ],
                 'template' => 'user.profile.tpl',
             ];
@@ -3684,7 +3690,9 @@ class User extends \OmegaUp\Controllers\Controller {
             return [
                 'smartyProperties' => [
                     'payload' => ['statusError' => $e->getErrorMessage()],
-                    'title' => 'omegaupTitleProfile'
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleProfile'
+                    )
                 ],
                 'template' => 'user.profile.tpl',
             ];
@@ -3840,7 +3848,7 @@ class User extends \OmegaUp\Controllers\Controller {
         foreach ($coders as $coder) {
             $userInfo = \OmegaUp\DAO\Users::FindByUsername($coder['username']);
             if (is_null($userInfo)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $classname = \OmegaUp\DAO\Users::getRankingClassName(
                 $userInfo->user_id
@@ -3865,7 +3873,7 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity
     ): bool {
         if (is_null($identity->username)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return strpos($identity->username, ':') !== false;
     }
