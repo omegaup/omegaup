@@ -29,7 +29,9 @@
               <thead>
                 <tr>
                   <th>{{ T.wordsName }}</th>
-                  <th>{{ T.wordsCompletedPercentage }}</th>
+                  <th v-if="showPercentage">
+                    {{ T.wordsCompletedPercentage }}
+                  </th>
                   <th>{{ T.wordsDueDate }}</th>
                   <th>{{ T.wordsNumHomeworks }}</th>
                   <th>{{ T.wordsNumTests }}</th>
@@ -45,7 +47,7 @@
                       course.name
                     }}</a>
                   </td>
-                  <td>
+                  <td v-if="showPercentage">
                     {{ `${course.progress}%` }}
                   </td>
                   <td>
@@ -136,6 +138,7 @@ library.add(fas);
 export default class CourseFilteredList extends Vue {
   @Prop() courses!: types.CoursesByAccessMode;
   @Prop() activeTab!: string;
+  @Prop({ default: true }) showPercentage!: boolean;
 
   T = T;
   time = time;

@@ -1195,7 +1195,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 );
                 if (is_null($director)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
-                        'userNotFound'
+                        'userNotExist'
                     );
                 }
                 $result['director'] = $director->username;
@@ -2082,8 +2082,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      */
     private static function validateContestAdmin(
         string $contestAlias,
-        \OmegaUp\DAO\VO\Identities $identity,
-        string $message = 'userNotAllowed'
+        \OmegaUp\DAO\VO\Identities $identity
     ): \OmegaUp\DAO\VO\Contests {
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
@@ -2091,7 +2090,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         if (!\OmegaUp\Authorization::isContestAdmin($identity, $contest)) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException($message);
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'userNotAllowed'
+            );
         }
         return $contest;
     }
@@ -2130,8 +2131,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Only director is allowed to create problems in contest
         $contest = self::validateContestAdmin(
             $r['contest_alias'],
-            $r->identity,
-            'cannotAddProb'
+            $r->identity
         );
         if (is_null($contest->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -2565,7 +2565,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($identity->identity_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
 
@@ -2617,7 +2617,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $time = \OmegaUp\Time::get();
         $note = \OmegaUp\Translations::getInstance()->get(
             'wordsAutoAccepted'
-        ) ?: 'wordsAutoAccepted';
+        );
         foreach ($identitiesIDs as $identityID) {
             if (
                 \OmegaUp\DAO\ProblemsetIdentityRequest::replace(
@@ -3437,7 +3437,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($targetIdentity) || is_null($targetIdentity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
 

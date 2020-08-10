@@ -3,25 +3,50 @@
 // Multi-purpose refactor script.
 // Currently it only enforces that all Promise objects have a .fail().
 
-const babylon = require('babylon');
 const fs = require('fs');
 const process = require('process');
+
+const babelParser = require('@babel/parser');
 const t = require('@babel/types');
 const traverse = require('@babel/traverse').default;
 
 if (process.argv.length != 4) {
   console.error(
-    'Usage: ' + process.argv[1] + ' <filename> <original filename>',
+    `Usage: ${process.argv[1]} <filename> <original filename>`,
   );
   process.exit(1);
 }
 
 const filename = process.argv[2];
+const sourceFilename = process.argv[3];
 const buf = fs.readFileSync(filename, 'utf8');
-const isModule = process.argv[3].indexOf('/js/omegaup/') != -1;
-const ast = babylon.parse(buf, {
-  sourceType: isModule ? 'module' : 'script',
-});
+const isModule = sourceFilename.indexOf('/js/omegaup/') != -1;
+const ast = (() => {
+  try {
+    return babelParser.parse(buf, {
+      sourceType: isModule ? 'module' : 'script',
+      sourceFilename: sourceFilename,
+      plugins: ['typescript'],
+    });
+  } catch (e) {
+    if (e instanceof SyntaxError) {
+      const lines = buf.split('\n');
+      // Do a best-effort attempt at getting the token involved in the error.
+      // Just grab the non-whitespace characters at the point in which the error
+      // occurred.
+      const token = buf.slice(e.pos).match(/^(\S+)/)[1];
+      console.error(
+          `Syntax error in ${sourceFilename}:${e.loc.line}: ${e.message}\n`);
+      console.error(`\t${lines[e.loc.line - 1]}`);
+      console.error(
+          `\t${''.padEnd(e.loc.column)}${''.padEnd(token.length, '^')}`);
+    } else {
+      console.log(e);
+    }
+    process.exit(1);
+  }
+})();
+
 
 function hasRefactorLintDisableComment(path) {
   const comments = path.getStatementParent().node.trailingComments;
@@ -191,9 +216,7 @@ const jQueryDeprecatedFunctionVisitor = {
 };
 traverse(ast, jQueryDeprecatedFunctionVisitor);
 
-fixes.sort(function(a, b) {
-  return a.start - b.start;
-});
+fixes.sort((a, b) => a.start - b.start);
 
 // Manually write the results instead of relying on babel-generator.
 // babel-generator moves stuff around too much :/

@@ -49,10 +49,8 @@ abstract class ProblemsTags {
                 Problems_Tags (
                     `problem_id`,
                     `tag_id`,
-                    `public`,
                     `source`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?
@@ -60,7 +58,6 @@ abstract class ProblemsTags {
         $params = [
             $Problems_Tags->problem_id,
             $Problems_Tags->tag_id,
-            intval($Problems_Tags->public),
             $Problems_Tags->source,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
@@ -81,7 +78,6 @@ abstract class ProblemsTags {
             UPDATE
                 `Problems_Tags`
             SET
-                `public` = ?,
                 `source` = ?
             WHERE
                 (
@@ -89,7 +85,6 @@ abstract class ProblemsTags {
                     `tag_id` = ?
                 );';
         $params = [
-            intval($Problems_Tags->public),
             $Problems_Tags->source,
             (
                 is_null($Problems_Tags->problem_id) ?
@@ -124,7 +119,6 @@ abstract class ProblemsTags {
             SELECT
                 `Problems_Tags`.`problem_id`,
                 `Problems_Tags`.`tag_id`,
-                `Problems_Tags`.`public`,
                 `Problems_Tags`.`source`
             FROM
                 `Problems_Tags`
@@ -212,7 +206,6 @@ abstract class ProblemsTags {
             SELECT
                 `Problems_Tags`.`problem_id`,
                 `Problems_Tags`.`tag_id`,
-                `Problems_Tags`.`public`,
                 `Problems_Tags`.`source`
             FROM
                 `Problems_Tags`
@@ -266,10 +259,8 @@ abstract class ProblemsTags {
                 `Problems_Tags` (
                     `problem_id`,
                     `tag_id`,
-                    `public`,
                     `source`
                 ) VALUES (
-                    ?,
                     ?,
                     ?,
                     ?
@@ -285,7 +276,6 @@ abstract class ProblemsTags {
                 null :
                 intval($Problems_Tags->tag_id)
             ),
-            intval($Problems_Tags->public),
             $Problems_Tags->source,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);

@@ -37,6 +37,7 @@
 
     <plugins>
         <plugin filename="frontend/server/src/Psalm/RequestParamChecker.php" />
+        <plugin filename="frontend/server/src/Psalm/TranslationStringChecker.php" />
     </plugins>
 
     <issueHandlers>

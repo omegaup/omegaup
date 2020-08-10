@@ -150,7 +150,7 @@ class ContestDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get some problems into the contest
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 2,
+            'visibility' => 'public',
             'languages' => 'cpp17-gcc,java,py3'
         ]));
         \OmegaUp\Test\Factories\Contest::addProblemToContest(

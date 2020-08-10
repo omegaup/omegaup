@@ -311,7 +311,7 @@ class Course {
         foreach ($students as $s => $student) {
             if (is_null($student->username)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
-                    'userNotFound'
+                    'userNotExist'
                 );
             }
             $studentUsername = $student->username;

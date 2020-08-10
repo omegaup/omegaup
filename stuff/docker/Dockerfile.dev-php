@@ -2,7 +2,7 @@ FROM ubuntu:focal
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y openjdk-11-jre-headless curl \
+    apt-get install --no-install-recommends -y openjdk-14-jre-headless curl \
         ca-certificates gnupg2 xz-utils && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
@@ -23,7 +23,7 @@ RUN apt-get update -y && \
 RUN curl -sL https://getcomposer.org/download/1.10.1/composer.phar -o /usr/bin/composer
 RUN chmod +x /usr/bin/composer
 
-RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.14/omegaup-gitserver.tar.xz | tar xJ -C /
+RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.15/omegaup-gitserver.tar.xz | tar xJ -C /
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar -o /usr/share/java/libinteractive.jar
 
 RUN useradd --create-home --shell=/bin/bash ubuntu

@@ -20,7 +20,7 @@
         </div>
         <div class="badge-text">
           <span class="badge-text-icon">👥</span>
-          {{ T['badgeOwnersMessage'] }}
+          {{ T.badgeOwnersMessage }}
         </div>
       </div>
       <div class="col-sm-6 col-md-4 mt-3 mt-md-0">
@@ -29,7 +29,7 @@
         </div>
         <div class="badge-text">
           <span class="badge-text-icon">📅</span>
-          {{ T['badgeFirstAssignationMessage'] }}
+          {{ T.badgeFirstAssignationMessage }}
         </div>
       </div>
       <div class="col-sm-6 col-md-4 mt-3 mt-md-0">
@@ -97,8 +97,8 @@ export default class BadgeDetails extends Vue {
 
   get ownedMessage(): string {
     return !!this.badge.assignation_time
-      ? `<span class="badge-text-icon">😁</span> ${T['badgeAssignationTimeMessage']}`
-      : `<span class="badge-text-icon">😞</span> ${T['badgeNotAssignedMessage']}`;
+      ? `<span class="badge-text-icon">😁</span> ${T.badgeAssignationTimeMessage}`
+      : `<span class="badge-text-icon">😞</span> ${T.badgeNotAssignedMessage}`;
   }
 
   get firstAssignationDate(): string {

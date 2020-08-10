@@ -181,7 +181,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
         if (!is_null($r['visibility'])) {
-            $params['visibility'] = intval($r['visibility']);
+            $params['visibility'] = \OmegaUp\ProblemParams::stringVisibilityToNumeric(
+                strval(
+                    $r['visibility']
+                )
+            );
         }
         if (!is_null($r['show_diff'])) {
             $params['show_diff'] = strval($r['show_diff']);
@@ -391,7 +395,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -484,10 +488,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (!empty($params->problemLevel)) {
                 $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
-                if (is_null($tag)) {
-                    throw new \OmegaUp\Exceptions\NotFoundException('tag');
-                }
                 if (
+                    is_null($tag) ||
                     !in_array(
                         $tag->name,
                         \OmegaUp\Controllers\Tag::getLevelTags()
@@ -560,7 +562,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $user = \OmegaUp\Controllers\User::resolveUser($r['usernameOrEmail']);
         if (is_null($user->user_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
@@ -662,11 +664,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!empty($r['level_tag'])) {
             $tag = \OmegaUp\DAO\Tags::getByName($r['level_tag']);
 
-            if (is_null($tag)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('tag');
-            }
-
             if (
+                is_null($tag) ||
                 !in_array(
                     $tag->name,
                     \OmegaUp\Controllers\Tag::getLevelTags()
@@ -754,7 +753,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             if (in_array($tagName, self::RESTRICTED_TAG_NAMES)) {
                 $tag = new \OmegaUp\DAO\VO\Tags([
                     'name' => $tagName,
-                    'public' => false,
+                    'public' => true,
                 ]);
             } else {
                 if ($isPublic) {
@@ -783,7 +782,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\ProblemsTags::replace(new \OmegaUp\DAO\VO\ProblemsTags([
             'problem_id' => $problem->problem_id,
             'tag_id' => $tag->tag_id,
-            'public' => filter_var($isPublic, FILTER_VALIDATE_BOOLEAN),
             'source' => 'owner',
         ]));
     }
@@ -816,7 +814,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail']
         );
         if (is_null($identity->user_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
@@ -915,12 +913,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problem');
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         $tag = \OmegaUp\DAO\Tags::getByName($r['name']);
         if (is_null($tag)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('tag');
+            throw new \OmegaUp\Exceptions\NotFoundException('tagNotFound');
         }
 
         if (!\OmegaUp\Authorization::canEditProblem($r->identity, $problem)) {
@@ -1148,7 +1146,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -1702,7 +1700,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdateStatement(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -1797,7 +1795,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      */
     public static function apiUpdateSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -1929,7 +1927,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         if (!is_null($problemset) && isset($problemset['problemset'])) {
             if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             if (
                 !\OmegaUp\Authorization::isAdmin(
@@ -2259,7 +2257,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?int $problemsetId,
         ?string $contestAlias = null
     ) {
-        $problemNotFound = null;
         $response = [];
         if (!empty($contestAlias)) {
             // Is it a valid contest_alias?
@@ -2281,7 +2278,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'contestNotFound'
                 );
             }
-            $problemNotFound = 'problemNotFoundInContest';
+            // Is the problem actually in the problemset?
+            if (
+                is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK(
+                    $response['problemset']->problemset_id,
+                    $problem->problem_id
+                ))
+            ) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFoundInContest'
+                );
+            }
         } elseif (!is_null($problemsetId)) {
             // Is it a valid problemset_id?
             $response['problemset'] = \OmegaUp\DAO\Problemsets::getByPK(
@@ -2292,20 +2299,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'problemsetNotFound'
                 );
             }
-            $problemNotFound = 'problemNotFoundInProblemset';
+            // Is the problem actually in the problemset?
+            if (
+                is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK(
+                    $response['problemset']->problemset_id,
+                    $problem->problem_id
+                ))
+            ) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'problemNotFoundInProblemset'
+                );
+            }
         } else {
             // Nothing to see here, move along.
             return null;
-        }
-
-        // Is the problem actually in the problemset?
-        if (
-            is_null(\OmegaUp\DAO\ProblemsetProblems::getByPK(
-                $response['problemset']->problemset_id,
-                $problem->problem_id
-            ))
-        ) {
-            throw new \OmegaUp\Exceptions\NotFoundException($problemNotFound);
         }
 
         return $response;
@@ -2513,13 +2520,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $acl = \OmegaUp\DAO\ACLs::getByPK($problem->acl_id);
             if (is_null($acl) || is_null($acl->owner_id)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $problemsetter = \OmegaUp\DAO\Identities::findByUserId(
                 $acl->owner_id
             );
             if (is_null($problemsetter) || is_null($problemsetter->username)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $response['problemsetter'] = [
                 'username' => $problemsetter->username,
@@ -3181,7 +3188,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 } catch (\Exception $e) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
-                        'userNotFound'
+                        'userNotExist'
                     );
                 }
             }
@@ -4702,8 +4709,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
-     * @omegaup-request-param string $contents
+     * @omegaup-request-param string $visibility
+     * @omegaup-request-param mixed $contents
      *
      */
     public static function getProblemEditDetailsForSmarty(
@@ -4958,7 +4965,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $update_published
      * @omegaup-request-param mixed $validator
      * @omegaup-request-param mixed $validator_time_limit
-     * @omegaup-request-param mixed $visibility
+     * @omegaup-request-param string $visibility
      *
      * @return array{smartyProperties: array{payload: ProblemFormPayload}, entrypoint: string}
      */
@@ -5374,7 +5381,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'smartyProperties' => [
                     'error' => \OmegaUp\Translations::getInstance()->get(
                         'parameterInvalid'
-                    ) ?? 'parameterInvalid',
+                    ),
                     'error_field' => strval($e->parameter),
                 ],
                 'template' => 'libinteractive.gen.tpl',
