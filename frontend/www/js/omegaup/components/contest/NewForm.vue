@@ -311,7 +311,7 @@ export default class NewForm extends Vue {
   description = this.initialDescription;
   feedback = this.initialFeedback;
   finishTime = this.initialFinishTime;
-  languages = this.initialLanguages;
+  languages = Object.keys(this.allLanguages);
   needsBasicInformation = this.initialNeedsBasicInformation;
   penalty = this.initialPenalty;
   penaltyType = this.initialPenaltyType;
