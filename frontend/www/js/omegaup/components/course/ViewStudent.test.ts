@@ -4,6 +4,7 @@ import Vue from 'vue';
 
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 
 import course_ViewStudent from './ViewStudent.vue';
 
@@ -68,7 +69,7 @@ describe('ViewStudent.vue', () => {
             progress: {
               problem: 1,
             },
-          } as omegaup.CourseStudent,
+          } as types.CourseStudent,
         ],
         initialStudent: {
           name: 'student',
@@ -76,7 +77,7 @@ describe('ViewStudent.vue', () => {
           progress: {
             problem: 1,
           },
-        } as omegaup.CourseStudent,
+        } as types.CourseStudent,
       },
     });
     await wrapper.find('a[data-problem-alias="problem"]').trigger('click');

@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  * SubmissionController
@@ -51,7 +51,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
                         []
                     ),
                 ],
-                'title' => 'omegaupTitleLatestSubmissions',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleLatestSubmissions'
+                ),
             ],
             'entrypoint' => 'submissions_list',
         ];
@@ -120,7 +122,9 @@ class Submission extends \OmegaUp\Controllers\Controller {
                         []
                     ),
                 ],
-                'title' => 'omegaupTitleLatestSubmissions',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleLatestSubmissions'
+                ),
             ],
             'entrypoint' => 'submissions_list',
         ];

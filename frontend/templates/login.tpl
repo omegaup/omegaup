@@ -10,24 +10,26 @@
 		<div class="row">
 			<div class="col-md-4 col-md-offset-2">
 				<h4>{#loginFederated#}</h4>
+				<div class="row">
 
 {if $GOOGLECLIENTID != ""}
-				<div
-					id="google-signin"
-					title="{#loginWithGoogle#}">
-				</div>
+					<div class="col-xs-12 col-md-4 text-center py-2">
+						<div id="google-signin" title="{#loginWithGoogle#}"></div>
+					</div>
 {/if}
 
-				<a href="{$FB_URL}"
-					title="{#loginWithFacebook#}"
-					class="facebook openid_large_btn"></a>
-				<a style="float:right"></a>
+					<div class="col-xs-12 col-md-4 text-center py-2">
+						<a href="{$FB_URL}" title="{#loginWithFacebook#}">
+							<img src="/css/fb-oauth.png" height="45px" width="45px">
+						</a>
+					</div>
 
-				<a href="{$LINKEDIN_URL}"
-					 title="{#loginWithLinkedIn#}"
-					 class="openid_large_btn">
-					<img src="/media/third_party/LinkedIn-Sign-in-Small---Default.png" />
-				</a>
+					<div class="col-xs-12 col-md-4 text-center py-2">
+						<a href="{$LINKEDIN_URL}" title="{#loginWithLinkedIn#}">
+							<img src="/css/ln-oauth.png" height="45px" width="45px">
+						</a>
+					</div>
+				</div>
 			</div>
 
 			<div class="col-md-4">

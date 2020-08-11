@@ -29,6 +29,10 @@ class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
     }
 
     public function getErrorMessage(): string {
+        /**
+         * @psalm-suppress TranslationStringNotALiteralString this is being
+         * checked from the constructor of the exception
+         */
         $localizedText = \OmegaUp\Translations::getInstance()->get(
             $this->message
         );

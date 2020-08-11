@@ -62,11 +62,14 @@ class Translations {
      *
      * @param string $key the translation string to look up.
      *
-     * @return null|string the translated string.
+     * @return string the translated string.
      */
-    public function get(string $key): ?string {
+    public function get(string $key): string {
         if (!array_key_exists($key, $this->_translations)) {
-            return null;
+            \Logger::getLogger('Translations')->error(
+                "Untranslated error message: {$key}"
+            );
+            return "{untranslated:{$key}}";
         }
         return $this->_translations[$key];
     }

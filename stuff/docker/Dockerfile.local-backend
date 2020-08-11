@@ -4,7 +4,7 @@ RUN apt update && \
     apt install -y --no-install-recommends \
         pkg-config cmake curl ca-certificates git gcc libc-dev zlib1g-dev && \
     /usr/sbin/update-ca-certificates && \
-    curl --location https://dl.google.com/go/go1.13.11.linux-amd64.tar.gz | \
+    curl --location https://dl.google.com/go/go1.14.7.linux-amd64.tar.gz | \
         tar -xz -C /usr/local && \
     apt autoremove -y && \
     apt clean
@@ -67,7 +67,7 @@ FROM ubuntu:focal
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-      curl ca-certificates openjdk-11-jre-headless wait-for-it && \
+      curl ca-certificates openjdk-14-jre-headless wait-for-it && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean

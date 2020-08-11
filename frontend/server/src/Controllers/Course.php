@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  *  CourseController
@@ -31,9 +31,10 @@
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
+ * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
- * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<StudentProgress>, tags: list<string>}
+ * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type CourseAssignmentEditPayload=array{course: CourseDetails, assignment: CourseAssignment|null}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
@@ -663,7 +664,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         if (is_null($creator->user_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         if (!is_null(\OmegaUp\DAO\Courses::getByAlias($course->alias))) {
                 $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
@@ -1635,7 +1636,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         array $courseTypes = ['admin', 'student', 'public']
     ) {
         if (is_null($identity->identity_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $response = ['admin' => [], 'student' => [], 'public' => []];
 
@@ -1747,7 +1748,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($targetIdentity) || is_null($targetIdentity->username)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
 
@@ -1792,8 +1793,12 @@ class Course extends \OmegaUp\Controllers\Controller {
                             'body' => [
                                 'localizationString' => (
                                     $request->accepted ?
-                                    'notificationCourseRegistrationAccepted' :
-                                    'notificationCourseRegistrationRejected'
+                                    new \OmegaUp\TranslationString(
+                                        'notificationCourseRegistrationAccepted'
+                                    ) :
+                                    new \OmegaUp\TranslationString(
+                                        'notificationCourseRegistrationRejected'
+                                    )
                                 ),
                                 'localizationParams' => [
                                     'courseName' => $course->name,
@@ -1819,7 +1824,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $course_alias
      *
-     * @return array{students: list<StudentProgress>}
+     * @return array{students: list<CourseStudent>}
      */
     public static function apiListStudents(\OmegaUp\Request $r): array {
         if (OMEGAUP_LOCKDOWN) {
@@ -1843,7 +1848,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourse(
                 $course->course_id,
                 $course->group_id
             ),
@@ -2539,7 +2544,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'is_admin' => true,
                 ],
-                'title' => 'omegaupTitleCourseNew',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseNew'
+                ),
             ],
             'entrypoint' => 'course_new',
         ];
@@ -2574,7 +2581,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => $courseEditDetails,
-                'title' => 'courseEdit',
+                'title' => new \OmegaUp\TranslationString('courseEdit'),
             ],
             'entrypoint' => 'course_edit',
         ];
@@ -2620,7 +2627,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'course' => $courseEditDetails,
                     'assignment' => $assignment,
                 ],
-                'title' => 'courseAssignmentEdit',
+                'title' => new \OmegaUp\TranslationString(
+                    'courseAssignmentEdit'
+                ),
             ],
             'entrypoint' => 'course_assignment_edit',
         ];
@@ -2652,7 +2661,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             'assignmentProblems' => [],
             'selectedAssignment' => null,
             'tags' => [],
-            'students' => \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            'students' => \OmegaUp\DAO\Courses::getStudentsInCourse(
                 intval($course->course_id),
                 intval($course->group_id)
             ),
@@ -2704,7 +2713,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'solvedProblems' => $userSolvedProblems,
                     'unsolvedProblems' => $userUnsolvedProblems,
                 ],
-                'title' => 'courseSubmissionsList',
+                'title' => new \OmegaUp\TranslationString(
+                    'courseSubmissionsList'
+                ),
             ],
             'entrypoint' => 'course_submissions_list',
         ];
@@ -2743,7 +2754,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course->group_id
                     ),
                 ],
-                'title' => 'omegaupTitleStudentsProgress',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleStudentsProgress'
+                ),
             ],
             'entrypoint' => 'course_students'
         ];
@@ -2786,7 +2799,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ),
                     'student' => $r['student']
                 ],
-                'title' => 'omegaupTitleStudentsProgress',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleStudentsProgress'
+                ),
             ],
             'entrypoint' => 'course_student'
         ];
@@ -2848,7 +2863,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'courses' => $filteredCourses,
                 ],
-                'title' => 'courseList',
+                'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_mine',
         ];
@@ -2889,7 +2904,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'courses' => $filteredCourses,
                     'course_type' => $courseType
                 ],
-                'title' => 'courseList',
+                'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_single_list',
         ];
@@ -2928,7 +2943,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'courses' => $filteredCourses,
                         'course_type' => null,
                     ],
-                    'title' => 'courseList',
+                    'title' => new \OmegaUp\TranslationString('courseList'),
                 ],
                 'entrypoint' => 'course_list',
             ];
@@ -2972,7 +2987,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'courses' => $filteredCourses,
                     'course_type' => null,
                 ],
-                'title' => 'courseList',
+                'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_list',
         ];
@@ -3106,7 +3121,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity->identity_id
                     ),
                 ],
-                'title' => 'omegaupTitleCourseDetails',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseDetails'
+                ),
             ],
             'entrypoint' => 'course_details',
         ];
@@ -3284,7 +3301,9 @@ class Course extends \OmegaUp\Controllers\Controller {
                         [
                             'type' => \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_REQUEST,
                             'body' => [
-                                'localizationString' => 'notificationCourseRegistrationRequest',
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseRegistrationRequest'
+                                ),
                                 'localizationParams' => [
                                     'username' => $r->identity->username,
                                     'courseName' => $course->name,
@@ -3641,7 +3660,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             )
         );
         if (is_null($director)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         // Log the operation only when there is not a token in request

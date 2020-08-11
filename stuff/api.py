@@ -4,6 +4,7 @@
 
 import os
 import subprocess
+import sys
 from typing import (Any, Callable, Dict, Mapping, Optional, Sequence, Text,
                     Tuple)
 
@@ -29,8 +30,15 @@ def _generate_typescript(filename: str) -> str:
         os.path.join(_ROOT, 'frontend/server/cmd/APITool.php'),
         f'--file={filename}',
     ]
-    result = subprocess.check_output(
-        command, universal_newlines=True, cwd=_ROOT)
+    result = subprocess.run(command,
+                            text=True,
+                            cwd=_ROOT,
+                            stdout=subprocess.PIPE,
+                            check=False)
+    if result.returncode:
+        # Log what happened, for debugging purposes.
+        print(result, file=sys.stderr)
+        result.check_returncode()
     command = [
         _which('prettier'),
         '--single-quote',
@@ -39,11 +47,12 @@ def _generate_typescript(filename: str) -> str:
         '--stdin-filepath',
         filename,
     ]
-    # pylint: disable=unexpected-keyword-arg
-    result = subprocess.check_output(
-        command, universal_newlines=True, cwd=_ROOT,
-        input=result)
-    return result
+    return subprocess.run(command,
+                          text=True,
+                          cwd=_ROOT,
+                          input=result.stdout,
+                          stdout=subprocess.PIPE,
+                          check=True).stdout
 
 
 def _generate_content_entry(new_contents: Dict[str, bytes],

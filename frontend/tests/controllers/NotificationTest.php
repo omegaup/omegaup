@@ -98,8 +98,9 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
                 'notifications' => [],
             ]));
             $this->fail('Should have thrown NotFoundException');
-        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals($e->getMessage(), 'notificationIdsNotProvided');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterEmpty');
+            $this->assertEquals($e->parameter, 'notifications');
         }
         try {
             \OmegaUp\Controllers\Notification::apiReadNotifications(new \OmegaUp\Request([
@@ -109,7 +110,7 @@ class NotificationTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have thrown NotFoundException');
         } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            $this->assertEquals($e->getMessage(), 'notificationDoesntExist');
+            $this->assertEquals($e->getMessage(), 'notificationNotFound');
         }
     }
 

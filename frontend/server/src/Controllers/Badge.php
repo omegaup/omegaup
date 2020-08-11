@@ -160,7 +160,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
                     'badges' => $badges,
                     'ownedBadges' => $ownedBadges['badges']
                 ],
-                'title' => 'omegaupTitleBadges'
+                'title' => new \OmegaUp\TranslationString('omegaupTitleBadges')
             ],
             'entrypoint' => 'badge_list',
         ];
@@ -197,7 +197,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
                         ]
                     ),
                 ],
-                'title' => 'omegaupTitleBadges'
+                'title' => new \OmegaUp\TranslationString('omegaupTitleBadges')
             ],
             'entrypoint' => 'badge_details',
         ];
