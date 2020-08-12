@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-5">
+  <div class="mt-2">
     <template v-if="globalRuns">
       <!-- TODO: This code should be removed when we stop using jquery and the
         migration to vue was over -->
@@ -172,7 +172,7 @@
                     ? `#problems/${problemAlias}/new-run`
                     : `/arena/${contestAlias}/`
                 "
-                v-else=""
+                v-else
                 >{{
                   isProblemsetOpened
                     ? T.wordsNewSubmissions

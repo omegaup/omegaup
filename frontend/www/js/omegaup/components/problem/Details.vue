@@ -23,8 +23,8 @@
       >
         <omegaup-problem-settings-summary
           v-bind:problem="problem"
-          v-bind:showVisibilityIndicators="true"
-          v-bind:showEditLink="this.user.admin"
+          v-bind:show-visibility-indicators="true"
+          v-bind:show-edit-link="this.user.admin"
         ></omegaup-problem-settings-summary>
 
         <div class="karel-js-link my-3" v-if="problem.karel_problem">
@@ -76,7 +76,7 @@
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
           v-bind:runs="runs"
-          v-bind:showDetails="true"
+          v-bind:show-details="true"
         ></omegaup-arena-runs>
         <omegaup-arena-solvers v-bind:solvers="solvers"></omegaup-arena-solvers>
       </div>
@@ -84,19 +84,35 @@
         class="tab-pane fade p-4"
         v-bind:class="{ 'show active': selectedTab === 'solution' }"
       >
-        <!-- Solutions stuff -->
+        <omegaup-problem-solution
+          v-bind:status="solutionStatus"
+          v-bind:solution="null"
+          v-bind:available-tokens="0"
+          v-bind:all-tokens="0"
+        ></omegaup-problem-solution>
       </div>
       <div
         class="tab-pane fade p-4"
         v-bind:class="{ 'show active': selectedTab === 'runs' }"
       >
-        <!-- Admin Runs stuff -->
+        <omegaup-arena-runs
+          v-bind:runs="allRuns"
+          v-bind:show-details="true"
+          v-bind:show-user="true"
+          v-bind:show-rejudge="true"
+          v-bind:show-pager="true"
+          v-bind:show-disqualify="true"
+          v-bind:problemset-problems="[]"
+        ></omegaup-arena-runs>
       </div>
       <div
         class="tab-pane fade p-4"
         v-bind:class="{ 'show active': selectedTab === 'clarifications' }"
       >
-        <!-- Clarifications stuff -->
+        <omegaup-arena-clarification-list
+          v-bind:clarifications="clarifications"
+          v-bind:in-contest="false"
+        ></omegaup-arena-clarification-list>
       </div>
     </div>
   </div>
@@ -127,9 +143,11 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
+import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
+import problem_Solution from './Solution.vue';
 import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
 import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
@@ -160,21 +178,26 @@ interface Tab {
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-username': user_Username,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
+    'omegaup-problem-solution': problem_Solution,
     'omegaup-quality-nomination-review': qualitynomination_QualityReview,
     'omegaup-quality-nomination-demotion': qualitynomination_Demotion,
   },
 })
 export default class ProblemDetails extends Vue {
+  @Prop() allRuns!: types.Run[];
+  @Prop() clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
   @Prop() runs!: types.Run[];
+  @Prop() solutionStatus!: string;
 
   T = T;
   ui = ui;
