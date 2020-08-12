@@ -846,7 +846,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     }
 
     /**
-     * @return list<array{classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
+     * @return list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}>
      */
     final public static function getForProblemDetails(
         int $problemId,
@@ -855,6 +855,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
     ): array {
         $sql = '
             SELECT
+                p.alias,
                 s.guid,
                 s.language,
                 r.status,
@@ -905,6 +906,10 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
                 Identities i
             ON
                 i.identity_id = s.identity_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
             LEFT JOIN
                 Problemsets ps
             ON
@@ -921,7 +926,7 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
             $sql .= ' AND s.problemset_id = ?';
             $params[] = $problemsetId;
         }
-        /** @var list<array{classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
+        /** @var list<array{alias: string, classname: string, contest_alias: null|string, contest_score: float|null, country: string, guid: string, language: string, memory: int, penalty: int, runtime: int, score: float, status: string, submit_delay: int, time: \OmegaUp\Timestamp, type: string, username: string, verdict: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 

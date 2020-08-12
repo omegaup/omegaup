@@ -4496,24 +4496,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $runsArray = \OmegaUp\DAO\Runs::getForProblemDetails(
-            intval($problem->problem_id),
-            /*$problemsetId=*/null,
-            intval($r->identity->identity_id)
-        );
-
-        // Add each filtered run to an array
-        $runs = [];
-        foreach ($runsArray as $run) {
-            $run['alias'] = strval($problem->alias);
-            $run['country'] = 'xx';
-            $runs[] = $run;
-        }
-
-        $response['smartyProperties']['payload']['nominationStatus'] = $nominationPayload;
-        $response['smartyProperties']['payload']['runs'] = $runs;
-        $response['smartyProperties']['payload']['solvers'] = \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
-            intval($problem->problem_id)
+        $response['smartyProperties']['payload'] = array_merge(
+            $response['smartyProperties']['payload'],
+            [
+                'nominationStatus' => $nominationPayload,
+                'runs' => \OmegaUp\DAO\Runs::getForProblemDetails(
+                    intval($problem->problem_id),
+                    /*$problemsetId=*/null,
+                    intval($r->identity->identity_id)
+                ),
+                'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
+                    intval($problem->problem_id)
+                ),
+            ]
         );
 
         return $response;
