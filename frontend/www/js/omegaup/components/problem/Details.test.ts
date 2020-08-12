@@ -79,6 +79,9 @@ describe('Details.vue', () => {
         problem: sampleProblem,
         user: user,
         nominationStatus: nominationStatus,
+        runs: <types.Run[]>[],
+        allRuns: <types.Run[]>[],
+        clarifications: <types.Clarification[]>[],
       },
     });
 

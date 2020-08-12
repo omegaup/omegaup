@@ -77,6 +77,7 @@
           v-bind:problem-alias="problem.alias"
           v-bind:runs="runs"
           v-bind:show-details="true"
+          v-bind:problemset-problems="[]"
         ></omegaup-arena-runs>
         <omegaup-arena-solvers v-bind:solvers="solvers"></omegaup-arena-solvers>
       </div>
