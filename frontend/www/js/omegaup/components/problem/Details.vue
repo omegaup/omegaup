@@ -206,9 +206,5 @@ export default class ProblemDetails extends Vue {
     ];
     return tabs.filter((tab) => tab.visible);
   }
-
-  get problemTitleWithId(): string {
-    return `${this.problem.problem_id}. ${this.problem.title}`;
-  }
 }
 </script>

@@ -2315,10 +2315,7 @@ export function GetOptionsFromLocation(
     options.isPractice = true;
   }
 
-  if (
-    arenaLocation.pathname.indexOf('/arena/problem/') !== -1 ||
-    arenaLocation.pathname.indexOf('/arena/problemv2/') !== -1
-  ) {
+  if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
     options.isOnlyProblem = true;
     const match = /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {

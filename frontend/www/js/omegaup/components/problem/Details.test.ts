@@ -1,13 +1,15 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import expect from 'expect';
+import { types } from '../../api_types';
 import * as time from '../../time';
 
 import problem_Details from './Details.vue';
 
 describe('Details.vue', () => {
   const date = new Date();
-  const sampleProblem = {
+  const sampleProblem = <types.ProblemInfo>{
     alias: 'triangulos',
+    accepts_submissions: true,
     karel_problem: false,
     limits: {
       input_limit: '10 KiB',
@@ -16,6 +18,7 @@ describe('Details.vue', () => {
       time_limit: '1s',
     },
     points: 100,
+    problem_id: 1,
     problemsetter: {
       classname: 'user-rank-unranked',
       creation_date: date,
@@ -23,7 +26,7 @@ describe('Details.vue', () => {
       username: 'omegaup',
     },
     quality_seal: false,
-    sample_input: null,
+    sample_input: undefined,
     settings: {
       cases: {
         statement_001: {
@@ -46,7 +49,7 @@ describe('Details.vue', () => {
     },
     source: 'omegaUp classics',
     statement: {
-      images: [],
+      images: {},
       language: 'es',
       markdown: '# test',
     },
@@ -54,20 +57,32 @@ describe('Details.vue', () => {
     visibility: 2,
   };
 
-  const user = {
+  const user = <types.UserInfoForProblem>{
     admin: true,
     loggedIn: true,
     reviewer: true,
   };
 
-  it('Should handle no nomination payload', async () => {
-    const wrapper = shallowMount(problem_Details, {
+  const nominationStatus = <types.NominationStatus>{
+    alreadyReviewed: false,
+    dismissed: false,
+    dismissedBeforeAC: false,
+    nominated: false,
+    nominatedBeforeAC: false,
+    solved: false,
+    tried: false,
+  };
+
+  it('Should handle no nomination payload', () => {
+    const wrapper = mount(problem_Details, {
       propsData: {
         problem: sampleProblem,
-        user,
+        user: user,
+        nominationStatus: nominationStatus,
       },
     });
 
+    expect(wrapper.text()).toContain(sampleProblem.points);
     expect(wrapper.text()).toContain(time.formatDate(date));
   });
 });
