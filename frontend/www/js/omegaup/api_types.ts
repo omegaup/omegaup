@@ -1111,6 +1111,15 @@ export namespace types {
     ownedBadges: types.Badge[];
   }
 
+  export interface BestSolvers {
+    classname: string;
+    language: string;
+    memory: number;
+    runtime: number;
+    time: Date;
+    username: string;
+  }
+
   export interface Clarification {
     answer?: string;
     author?: string;

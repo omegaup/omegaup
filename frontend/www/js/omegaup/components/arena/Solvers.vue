@@ -1,5 +1,5 @@
 <template>
-  <table data-best-solvers>
+  <table>
     <caption>
       {{
         T.wordsBestSolvers
@@ -33,24 +33,21 @@
 </template>
 
 <style lang="scss" scoped>
-caption {
-  caption-side: top;
-}
-
-[data-best-solvers] {
+table {
   width: 100%;
   border: 1px solid #ccc;
   margin-top: 2em;
 }
 
-[data-best-solvers] caption {
+caption {
+  caption-side: top;
   font-weight: bold;
   font-size: 1em;
   margin-bottom: 1em;
 }
 
-[data-best-solvers] td,
-[data-best-solvers] th {
+td,
+th {
   border: 1px solid #ccc;
   border-width: 1px 0;
   text-align: center;
