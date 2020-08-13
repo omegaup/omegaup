@@ -213,6 +213,7 @@
               v-bind:multiple="true"
               v-bind:placeholder="T.contestNewFormLanguages"
               v-bind:close-on-select="false"
+              v-bind:allow-empty="false"
             >
             </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
@@ -292,7 +293,6 @@ export default class NewForm extends Vue {
   @Prop({ default: '' }) initialDescription!: string;
   @Prop({ default: 'none' }) initialFeedback!: string;
   @Prop() initialFinishTime!: Date;
-  @Prop({ default: () => [] }) initialLanguages!: Array<string>;
   @Prop({ default: false }) initialNeedsBasicInformation!: boolean;
   @Prop({ default: 0 }) initialPenalty!: number;
   @Prop({ default: 'none' }) initialPenaltyType!: string;
@@ -311,7 +311,7 @@ export default class NewForm extends Vue {
   description = this.initialDescription;
   feedback = this.initialFeedback;
   finishTime = this.initialFinishTime;
-  languages = this.initialLanguages;
+  languages = Object.keys(this.allLanguages);
   needsBasicInformation = this.initialNeedsBasicInformation;
   penalty = this.initialPenalty;
   penaltyType = this.initialPenaltyType;
@@ -337,7 +337,7 @@ export default class NewForm extends Vue {
   }
 
   fillOmi(): void {
-    this.languages = [];
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;
@@ -351,7 +351,7 @@ export default class NewForm extends Vue {
   }
 
   fillPreIoi(): void {
-    this.languages = [];
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
     this.windowLengthEnabled = true;
     this.windowLength = 180;
@@ -365,7 +365,7 @@ export default class NewForm extends Vue {
   }
 
   fillConacup(): void {
-    this.languages = [];
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;
