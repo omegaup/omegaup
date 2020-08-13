@@ -55,6 +55,7 @@ describe('Details.vue', () => {
     },
     title: 'Triangulos',
     visibility: 2,
+    input_limit: 1000,
   };
 
   const user = <types.UserInfoForProblem>{
