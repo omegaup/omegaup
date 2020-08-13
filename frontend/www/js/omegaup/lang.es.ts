@@ -78,6 +78,8 @@ const translations: { [key: string]: string; } = {
   badge_pascalExpert_name: "Usuario Experto en Pascal",
   badge_problemSetter_description: "El usuario ha creado al menos un problema.",
   badge_problemSetter_name: "Creador de Problemas",
+  badge_pythonCourseGraduate_description: "El usuario ha resuelto m\u00e1s del 90% del curso de Introducci\u00f3n a Python.",
+  badge_pythonCourseGraduate_name: "Graduado del Curso de Introducci\u00f3n a Python",
   badge_pythonExpert_description: "El usuario ha resuelto m\u00e1s de 10 problemas en Python.",
   badge_pythonExpert_name: "Usuario Experto en Python",
   badge_updatedUser_description: "El usuario ha completado la informaci\u00f3n en su perfil.",
