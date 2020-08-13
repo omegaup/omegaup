@@ -1687,13 +1687,7 @@ export namespace types {
     score: number;
     settings: types.ProblemSettings;
     show_diff: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1733,13 +1727,7 @@ export namespace types {
     settings: types.ProblemSettings;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     solution_status?: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1834,8 +1822,11 @@ export namespace types {
   }
 
   export interface ProblemInfo {
+    accepts_submissions: boolean;
     alias: string;
+    input_limit: number;
     karel_problem: boolean;
+    letter?: string;
     limits: {
       input_limit: string;
       memory_limit: string;
