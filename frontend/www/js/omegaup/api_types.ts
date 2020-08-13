@@ -728,6 +728,26 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemDetailsv2Payload {
       return ((x) => {
+        if (x.allRuns)
+          x.allRuns = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.allRuns);
+        if (x.clarifications)
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
         x.problem = ((x) => {
           if (x.problemsetter)
             x.problemsetter = ((x) => {
@@ -739,6 +759,26 @@ export namespace types {
             })(x.problemsetter);
           return x;
         })(x.problem);
+        if (x.runs)
+          x.runs = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.runs);
+        if (x.solvers)
+          x.solvers = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.solvers);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1647,13 +1687,7 @@ export namespace types {
     score: number;
     settings: types.ProblemSettings;
     show_diff: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1693,13 +1727,7 @@ export namespace types {
     settings: types.ProblemSettings;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     solution_status?: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1711,8 +1739,13 @@ export namespace types {
   }
 
   export interface ProblemDetailsv2Payload {
+    allRuns?: types.Run[];
+    clarifications?: types.Clarification[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
+    runs?: types.Run[];
+    solutionStatus?: string;
+    solvers?: types.BestSolvers[];
     user: types.UserInfoForProblem;
   }
 
@@ -1789,8 +1822,11 @@ export namespace types {
   }
 
   export interface ProblemInfo {
+    accepts_submissions: boolean;
     alias: string;
+    input_limit: number;
     karel_problem: boolean;
+    letter?: string;
     limits: {
       input_limit: string;
       memory_limit: string;
