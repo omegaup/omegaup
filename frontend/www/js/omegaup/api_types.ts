@@ -728,6 +728,26 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemDetailsv2Payload {
       return ((x) => {
+        if (x.allRuns)
+          x.allRuns = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.allRuns);
+        if (x.clarifications)
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
         x.problem = ((x) => {
           if (x.problemsetter)
             x.problemsetter = ((x) => {
@@ -1719,9 +1739,12 @@ export namespace types {
   }
 
   export interface ProblemDetailsv2Payload {
+    allRuns?: types.Run[];
+    clarifications?: types.Clarification[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
     runs?: types.Run[];
+    solutionStatus?: string;
     solvers?: types.BestSolvers[];
     user: types.UserInfoForProblem;
   }
