@@ -19,20 +19,26 @@ OmegaUp.on('ready', () => {
           update: false,
           initialStartTime: startTime,
           initialFinishTime: finishTime,
+          invalidParameterName: this.invalidParameterName,
         },
         on: {
           'create-contest': (contest: omegaup.Contest): void => {
             api.Contest.create(contest)
               .then((data) => {
+                this.invalidParameterName = '';
                 window.location.replace(
                   `/contest/${contest.alias}/edit/#problems`,
                 );
               })
-              .catch(ui.apiError);
+              .catch((error) => {
+                ui.apiError(error);
+                this.invalidParameterName = error.parameter || '';
+              });
           },
         },
       });
     },
+    data: { invalidParameterName: '' },
     components: {
       'omegaup-contest-new': contest_NewForm,
     },
