@@ -307,7 +307,7 @@ class User extends \OmegaUp\Controllers\Controller {
             self::$log->info('Failure adding user to Sendy.');
             return false;
         }
-
+        
         return true;
     }
 
