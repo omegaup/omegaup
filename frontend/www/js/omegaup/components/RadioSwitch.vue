@@ -1,10 +1,5 @@
 <template>
-  <div
-    v-bind:class="{
-      'form-control': inFormControl,
-      'container-fluid': inContainerFluid,
-    }"
-  >
+  <div class="form-control container-fluid">
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
@@ -33,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import T from '../lang';
 
 @Component
@@ -44,14 +39,13 @@ export default class RadioSwitch extends Vue {
   @Prop({ default: false }) valueForFalse!: any;
   @Prop({ default: T.wordsYes }) textForTrue!: string;
   @Prop({ default: T.wordsNo }) textForFalse!: string;
-  @Prop({ default: true }) inFormControl!: boolean;
-  @Prop({ default: true }) inContainerFluid!: boolean;
 
   radioValue = this.selectedValue ?? false;
 
-  @Emit('input')
-  onUpdateInput(): void {
-    this.$emit('update:value', this.radioValue);
+  @Watch('radioValue')
+  @Emit('update:value')
+  onUpdateInput(newValue: any): any {
+    return newValue;
   }
 }
 </script>

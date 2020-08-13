@@ -189,7 +189,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
-import RadioSwitch from '../RadioSwitch.vue';
+import omegaup_RadioSwitch from '../RadioSwitch.vue';
 
 import {
   FontAwesomeIcon,
@@ -203,7 +203,7 @@ library.add(fas);
 @Component({
   components: {
     'omegaup-datepicker': DatePicker,
-    'omegaup-radio-switch': RadioSwitch,
+    'omegaup-radio-switch': omegaup_RadioSwitch,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
