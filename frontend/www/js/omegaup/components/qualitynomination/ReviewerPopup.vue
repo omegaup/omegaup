@@ -32,6 +32,7 @@
             <li
               class="tag-select"
               v-for="problemTopic in slotProps.sortedProblemTags"
+              v-bind:key="problemTopic.value"
             >
               <label class="tag-select"
                 ><input
@@ -45,10 +46,9 @@
           </ul></label
         >
       </div>
-      <div class="button-row">
-        <div class="col-md-4"></div>
+      <div class="button-row text-right">
         <button
-          class="col-md-4 btn btn-primary"
+          class="col-md-4 mr-2 btn btn-primary"
           type="submit"
           v-bind:disabled="qualitySeal && !tag"
           v-on:click="slotProps.onSubmit"
@@ -56,7 +56,7 @@
           {{ T.wordsSend }}
         </button>
         <button
-          class="col-md-4 btn btn-default"
+          class="col-md-4 btn btn-secondary"
           type="button"
           v-on:click="slotProps.onHide(true)"
         >

@@ -71,14 +71,46 @@
         </template>
         <omegaup-quality-nomination-review
           v-if="user.reviewer && !nominationStatus.already_reviewed"
+          v-on:submit="
+            (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+          "
         ></omegaup-quality-nomination-review>
-        <omegaup-quality-nomination-demotion></omegaup-quality-nomination-demotion>
+        <omegaup-quality-nomination-demotion
+          v-on:submit="
+            (qualityDemotionComponent) =>
+              $emit('submit-demotion', qualityDemotionComponent)
+          "
+        ></omegaup-quality-nomination-demotion>
+        <omegaup-quality-nomination-promotion
+          v-bind:can-nominate-problem="nominationStatus.canNoominateProblem"
+          v-bind:dismissed="nominationStatus.dismissed"
+          v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
+          v-bind:nominated="nominationStatus.nominated"
+          v-bind:nomination-before-a-c="nominationStatus.nominationBeforeAC"
+          v-bind:solved="nominationStatus.solved"
+          v-bind:tried="nominationStatus.tried"
+          v-bind:problem-alias="problem.alias"
+          v-on:submit="
+            (qualityPromotionComponent) =>
+              $emit('submit-promotion', qualityPromotionComponent)
+          "
+          v-on:dismiss="
+            (qualityPromotionComponent) =>
+              $emit('dismiss-promotion', qualityPromotionComponent)
+          "
+        ></omegaup-quality-nomination-promotion>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
           v-bind:runs="runs"
           v-bind:show-details="true"
           v-bind:problemset-problems="[]"
         ></omegaup-arena-runs>
+        <omegaup-problem-feedback
+          v-bind:quality-histogram="histogram.qualityHistogram"
+          v-bind:difficulty-histogram="histogram.difficultyHistogram"
+          v-bind:quality-score="histogram.quality"
+          v-bind:difficulty-score="histogram.difficulty"
+        ></omegaup-problem-feedback>
         <omegaup-arena-solvers v-bind:solvers="solvers"></omegaup-arena-solvers>
       </div>
       <div
@@ -86,10 +118,13 @@
         v-bind:class="{ 'show active': selectedTab === 'solution' }"
       >
         <omegaup-problem-solution
-          v-bind:status="solutionStatus"
-          v-bind:solution="null"
-          v-bind:available-tokens="0"
-          v-bind:all-tokens="0"
+          v-bind:status="status"
+          v-bind:solution="solution"
+          v-bind:available-tokens="availableTokens"
+          v-bind:all-tokens="allTokens"
+          v-on:get-solution="$emit('get-solution')"
+          v-on:get-tokens="$emit('get-tokens')"
+          v-on:unlock-solution="$emit('unlock-solution')"
         ></omegaup-problem-solution>
       </div>
       <div
@@ -113,6 +148,10 @@
         <omegaup-arena-clarification-list
           v-bind:clarifications="clarifications"
           v-bind:in-contest="false"
+          v-on:clarification-response="
+            (id, responseText, isPublic) =>
+              $emit('clarification-response', id, responseText, isPublic)
+          "
         ></omegaup-arena-clarification-list>
       </div>
     </div>
@@ -121,6 +160,10 @@
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
+
+.nav-tabs .nav-item {
+  margin-bottom: -2px;
+}
 
 table td {
   padding: 0.5rem;
@@ -147,9 +190,11 @@ import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_Solvers from '../arena/Solvers.vue';
+import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
 import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
+import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
 import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
@@ -184,26 +229,39 @@ interface Tab {
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-username': user_Username,
+    'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
     'omegaup-problem-solution': problem_Solution,
     'omegaup-quality-nomination-review': qualitynomination_QualityReview,
     'omegaup-quality-nomination-demotion': qualitynomination_Demotion,
+    'omegaup-quality-nomination-promotion': qualitynomination_Promotion,
   },
 })
 export default class ProblemDetails extends Vue {
-  @Prop() allRuns!: types.Run[];
-  @Prop() clarifications!: types.Clarification[];
+  @Prop({
+    default: () => {
+      return [];
+    },
+  })
+  allRuns!: types.Run[];
+  @Prop() initialClarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
   @Prop() runs!: types.Run[];
   @Prop() solutionStatus!: string;
+  @Prop() histogram!: types.Histogram;
 
   T = T;
   ui = ui;
   time = time;
   selectedTab = 'problems';
+  clarifications = this.initialClarifications || [];
+  availableTokens = 0;
+  allTokens = 0;
+  status = this.solutionStatus;
+  solution: types.ProblemStatement | null = null;
 
   get availableTabs(): Tab[] {
     const tabs = [

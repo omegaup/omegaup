@@ -1321,6 +1321,7 @@ const translations: { [key: string]: string; } = {
   wordsAlias: "Alias",
   wordsAll: "Todos",
   wordsAnswer: "Respuesta",
+  wordsAnswerAgain: "Responde nuevamente",
   wordsAnyLanguage: "Cualquier Lenguaje",
   wordsAssignment: "Trabajo",
   wordsAssignments: "Tareas",

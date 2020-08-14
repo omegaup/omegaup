@@ -91,6 +91,10 @@
             v-bind:in-contest="inContest"
             v-bind:key="clarification.clarification_id"
             v-bind:clarification="clarification"
+            v-on:clarification-response="
+              (id, responseText, isPublic) =>
+                $emit('clarification-response', id, responseText, isPublic)
+            "
           ></omegaup-clarification>
         </tbody>
       </table>

@@ -55,7 +55,7 @@
             v-model="rationale"
           ></textarea>
         </div>
-        <div>
+        <div class="text-right">
           <button
             class="col-md-4 btn btn-primary"
             type="submit"
@@ -156,7 +156,7 @@ export default class QualityNominationDemotionPopup extends Vue {
   onSubmit(): void {
     this.$emit('submit', this);
     this.currentView = 'thanks';
-    setTimeout(() => this.onHide(), 1000);
+    setTimeout(() => this.onHide(), 2000);
   }
 }
 </script>

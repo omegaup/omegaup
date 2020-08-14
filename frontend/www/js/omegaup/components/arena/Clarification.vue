@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr v-bind:class="{ resolved: clarification.answer }">
     <td class="text-center align-middle">
       {{
         inContest ? clarification.contest_alias : clarification.problem_alias
@@ -13,8 +13,23 @@
       <pre>{{ clarification.message }}</pre>
     </td>
     <td class="align-middle">
-      <pre v-if="clarification.answer">{{ clarification.answer }}</pre>
-      <form class="form-inline justify-content-between">
+      <template v-if="clarification.answer">
+        <pre>{{ clarification.answer }}</pre>
+        <div v-if="!anotherAnswer" class="form-check mt-2 mt-xl-0">
+          <label class="form-check-label">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              v-model="anotherAnswer"
+            />
+            {{ T.wordsAnswerAgain }}
+          </label>
+        </div>
+      </template>
+      <form
+        v-if="!clarification.answer || anotherAnswer"
+        class="form-inline justify-content-between"
+      >
         <div class="form-group">
           <select class="form-control" v-model="selectedResponse">
             <option
@@ -55,6 +70,26 @@
   </tr>
 </template>
 
+<style lang="scss" scoped>
+.resolved {
+  color: rgb(70, 136, 71);
+  background-image: linear-gradient(
+    rgb(223, 240, 216) 0px,
+    rgb(200, 229, 188) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+
+.direct-message {
+  color: rgb(125, 117, 18);
+  background-image: linear-gradient(
+    rgb(253, 245, 154) 0px,
+    rgba(255, 249, 181, 0.5) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+</style>
+
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -72,6 +107,7 @@ export default class ArenaClarificationForm extends Vue {
   isPublic = this.clarification.public;
   message = '';
   selectedResponse = 'yes';
+  anotherAnswer = false;
   responses = [
     {
       value: 'yes',
@@ -95,8 +131,21 @@ export default class ArenaClarificationForm extends Vue {
     },
   ];
 
+  get responseText(): string {
+    const [response] = this.responses.filter(
+      (response) => response.value === this.selectedResponse,
+    );
+    return this.selectedResponse === 'other' ? this.message : response.text;
+  }
+
   sendClarificationResponse(): void {
-    //TODO: Emit an event to parent with the response to clarification
+    this.$emit(
+      'clarification-response',
+      this.clarification.clarification_id,
+      this.responseText,
+      this.isPublic,
+    );
+    this.anotherAnswer = false;
   }
 }
 </script>
