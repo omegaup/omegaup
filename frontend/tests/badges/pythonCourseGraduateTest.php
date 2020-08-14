@@ -34,7 +34,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
                 'languages' => '',
             ])
         );
-        print_r($this->problems);
+
         foreach (array_slice($this->problems, 0, 2) as $problemData) {
             \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
@@ -60,7 +60,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             );
         }
 
-        $this->submissionSource = 'print(3)';
+        $this->submissionSource = "print(3)";
     }
 
     public function testCoursePythonUserEarnBadge() {
