@@ -1271,6 +1271,7 @@ Update a Contest
 | `languages`                 | `mixed`                  |             |
 | `needs_basic_information`   | `bool|null`              |             |
 | `partial_score`             | `bool|null`              |             |
+| `penalty`                   | `int|null`               |             |
 | `penalty_calc_policy`       | `mixed`                  |             |
 | `penalty_type`              | `mixed`                  |             |
 | `points_decay_factor`       | `float|null`             |             |

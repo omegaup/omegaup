@@ -1618,14 +1618,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $currentUserId;
 
-        if (!is_null(\OmegaUp\DAO\Contests::getByAlias($contest->alias))) {
-            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'aliasInUse'
-            );
-            $exception->addCustomMessageToArray('parameter', 'alias');
-            throw $exception;
-        }
-
         // Push changes
         try {
             // Begin a new transaction
@@ -1674,7 +1666,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'titleInUse',
+                    'aliasInUse',
                     $e
                 );
             }
@@ -1790,6 +1782,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -1889,6 +1882,21 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'alias',
             $isRequired
         );
+        if (
+            !empty(
+                $r['alias']
+            ) && !is_null(
+                \OmegaUp\DAO\Contests::getByAlias(
+                    $r['alias']
+                )
+            )
+        ) {
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'aliasInUse'
+            );
+            $exception->addCustomMessageToArray('parameter', 'alias');
+            throw $exception;
+        }
         $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureOptionalBool('partial_score');
@@ -2002,6 +2010,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -2036,6 +2045,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -3627,13 +3637,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
+     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
