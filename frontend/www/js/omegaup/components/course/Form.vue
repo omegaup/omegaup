@@ -160,13 +160,6 @@
                 {{ T.courseNewFormScheduleCourse }}
               </template>
             </button>
-            <button
-              class="btn btn-secondary"
-              type="reset"
-              v-on:click.prevent="onCancel"
-            >
-              {{ T.wordsCancel }}
-            </button>
           </div>
         </div>
       </form>
