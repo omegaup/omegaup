@@ -44,24 +44,11 @@
                 icon="info-circle"
               />
             </span>
-            <div class="form-control container-fluid">
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  name="show-scoreboard"
-                  v-bind:value="true"
-                  v-model="showScoreboard"
-                />{{ T.wordsYes }}</label
-              >
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  name="show-scoreboard"
-                  v-bind:value="false"
-                  v-model="showScoreboard"
-                />{{ T.wordsNo }}</label
-              >
-            </div>
+            <omegaup-radio-switch
+              v-bind:value.sync="showScoreboard"
+              v-bind:selected-value="showScoreboard"
+              name="show-scoreboard"
+            ></omegaup-radio-switch>
           </div>
         </div>
         <div class="row">
@@ -82,22 +69,10 @@
                 icon="info-circle"
               />
             </span>
-            <div class="form-control container-fluid">
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  v-bind:value="true"
-                  v-model="unlimitedDuration"
-                />{{ T.wordsYes }}</label
-              >
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  v-bind:value="false"
-                  v-model="unlimitedDuration"
-                />{{ T.wordsNo }}</label
-              >
-            </div>
+            <omegaup-radio-switch
+              v-bind:value.sync="unlimitedDuration"
+              v-bind:selected-value="unlimitedDuration"
+            ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
             <label class="faux-label"
@@ -136,22 +111,10 @@
                 icon="info-circle"
               />
             </span>
-            <div class="form-control container-fluid">
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  v-bind:value="true"
-                  v-model="needs_basic_information"
-                />{{ T.wordsYes }}</label
-              >
-              <label class="radio-inline"
-                ><input
-                  type="radio"
-                  v-bind:value="false"
-                  v-model="needs_basic_information"
-                />{{ T.wordsNo }}</label
-              >
-            </div>
+            <omegaup-radio-switch
+              v-bind:value.sync="needsBasicInformation"
+              v-bind:selected-value="needsBasicInformation"
+            ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
             <span class="faux-label"
@@ -193,7 +156,7 @@
               <template v-if="update">
                 {{ T.courseNewFormUpdateCourse }}
               </template>
-              <template v-else="">
+              <template v-else>
                 {{ T.courseNewFormScheduleCourse }}
               </template>
             </button>
@@ -226,6 +189,7 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import DatePicker from '../DatePicker.vue';
+import omegaup_RadioSwitch from '../RadioSwitch.vue';
 
 import {
   FontAwesomeIcon,
@@ -239,6 +203,7 @@ library.add(fas);
 @Component({
   components: {
     'omegaup-datepicker': DatePicker,
+    'omegaup-radio-switch': omegaup_RadioSwitch,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
@@ -258,7 +223,7 @@ export default class CourseDetails extends Vue {
   name = this.course.name;
   school_name = this.course.school_name;
   school_id = this.course.school_id;
-  needs_basic_information = this.course.needs_basic_information;
+  needsBasicInformation = this.course.needs_basic_information;
   requests_user_information = this.course.requests_user_information;
   unlimitedDuration = this.course.finish_time === null;
 
@@ -287,7 +252,7 @@ export default class CourseDetails extends Vue {
     this.name = this.course.name;
     this.school_name = this.course.school_name;
     this.school_id = this.course.school_id;
-    this.needs_basic_information = this.course.needs_basic_information;
+    this.needsBasicInformation = this.course.needs_basic_information;
     this.requests_user_information = this.course.requests_user_information;
     this.unlimitedDuration = this.course.finish_time === null;
   }
