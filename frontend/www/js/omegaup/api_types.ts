@@ -1397,6 +1397,21 @@ export namespace types {
 
   export interface ContestEditPayload {
     details: types.ContestAdminDetails;
+    problems: {
+      accepted: number;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      languages: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
   }
 
   export interface ContestIntroPayload {
