@@ -73,6 +73,7 @@ describe('Details.vue', () => {
       wrapper.find('a[data-button-progress-students]').exists(),
     ).toBeFalsy();
     expect(wrapper.find('a[data-button-manage-students]').exists()).toBeFalsy();
+    expect(wrapper.text()).not.toContain(T.wordsCloneThisCourse);
   });
 
   it('Should handle assignments without finish_time', () => {
@@ -80,7 +81,7 @@ describe('Details.vue', () => {
     const wrapper = shallowMount(course_Details, {
       propsData: {
         course: <types.CourseDetails>{
-          admission_mode: 'registration',
+          admission_mode: 'public',
           alias: 'test-course',
           assignments: [
             {
@@ -124,5 +125,6 @@ describe('Details.vue', () => {
     expect(
       wrapper.find('[data-content-alias="test-assignment"]').text(),
     ).toContain('—');
+    expect(wrapper.text()).toContain(T.wordsCloneThisCourse);
   });
 });
