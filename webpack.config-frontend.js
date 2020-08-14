@@ -119,23 +119,25 @@ module.exports = {
   },
 
   plugins: [
-    new CopyWebpackPlugin([
-      {
-        from: './frontend/badges/**/query.sql',
-        to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
-        transform(content, filepath) {
-          const iconPath = `${path.dirname(filepath)}/icon.svg`;
-          return fs.existsSync(iconPath)
-            ? fs.readFileSync(iconPath)
-            : defaultBadgeIcon;
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './frontend/badges/**/query.sql',
+          to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
+          transform(content, filepath) {
+            const iconPath = `${path.dirname(filepath)}/icon.svg`;
+            return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) :
+                                             defaultBadgeIcon;
+          },
+          transformPath(targetPath, absolutePath) {
+            return `media/dist/badges/${
+                path.basename(
+                    path.dirname(absolutePath),
+                    )}.svg`;
+          },
         },
-        transformPath(targetPath, absolutePath) {
-          return `media/dist/badges/${path.basename(
-            path.dirname(absolutePath),
-          )}.svg`;
-        },
-      },
-    ]),
+      ],
+    }),
     new VueLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin({
       vue: true,

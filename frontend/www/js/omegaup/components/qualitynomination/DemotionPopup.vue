@@ -3,7 +3,7 @@
     <a href="#" v-on:click="onReportInappropriateProblem">{{
       T.wordsReportProblem
     }}</a>
-    <form class="panel panel-default popup" v-show="showReportDialog">
+    <form class="popup" v-show="showReportDialog">
       <template v-if="currentView == 'question'">
         <button class="close" type="button" v-on:click="onHide">×</button>
         <div class="form-group">
@@ -55,7 +55,7 @@
             v-model="rationale"
           ></textarea>
         </div>
-        <div class="button-row">
+        <div>
           <button
             class="col-md-4 btn btn-primary"
             type="submit"
@@ -87,6 +87,7 @@
   border: 2px solid #ccc;
   padding: 1em;
   overflow: auto;
+  background: #fff;
 }
 
 .qualitynomination-demotionpopup .question-text {

@@ -76,7 +76,7 @@
         </div>
       </div>
     </div>
-    <div class="text-center align-middle" v-else="">
+    <div class="text-center align-middle" v-else>
       <span>
         {{ T.overallCompletedPercentage }}:
         <progress
@@ -110,7 +110,7 @@
               </td>
             </tr>
             <tr
-              v-else=""
+              v-else
               v-bind:key="assignment.alias"
               v-for="assignment in course.assignments"
               v-bind:data-content-alias="assignment.alias"
@@ -124,7 +124,7 @@
                   <font-awesome-icon icon="chalkboard-teacher" />
                   <span class="ml-2">{{ T.wordsLesson }}</span>
                 </template>
-                <template v-else="">
+                <template v-else>
                   <font-awesome-icon icon="list-alt" />
                   <span class="ml-2">{{ T.wordsExam }}</span>
                 </template>
@@ -175,7 +175,11 @@
       </div>
     </div>
 
-    <div class="accordion" data-accordion-clone>
+    <div
+      class="accordion"
+      data-accordion-clone
+      v-if="course.admission_mode === 'public'"
+    >
       <div class="card">
         <div class="card-header" data-heading-clone>
           <h2 class="mb-0">
