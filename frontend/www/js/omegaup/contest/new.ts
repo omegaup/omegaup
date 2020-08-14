@@ -25,14 +25,14 @@ OmegaUp.on('ready', () => {
           'create-contest': (contest: omegaup.Contest): void => {
             api.Contest.create(contest)
               .then((data) => {
-                this.invalidParameterName = '';
+                this.invalidParameterName = null;
                 window.location.replace(
                   `/contest/${contest.alias}/edit/#problems`,
                 );
               })
               .catch((error) => {
                 ui.apiError(error);
-                this.invalidParameterName = error.parameter || '';
+                this.invalidParameterName = error.parameter || null;
               });
           },
         },
