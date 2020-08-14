@@ -191,8 +191,8 @@ interface Tab {
   },
 })
 export default class ProblemDetails extends Vue {
+  @Prop() initialClarifications!: types.Clarification[];
   @Prop() allRuns!: types.Run[];
-  @Prop() clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
@@ -204,6 +204,11 @@ export default class ProblemDetails extends Vue {
   ui = ui;
   time = time;
   selectedTab = 'problems';
+  clarifications = this.initialClarifications || [];
+  availableTokens = 0;
+  allTokens = 0;
+  status = this.solutionStatus;
+  solution: types.ProblemStatement | null = null;
 
   get availableTabs(): Tab[] {
     const tabs = [
