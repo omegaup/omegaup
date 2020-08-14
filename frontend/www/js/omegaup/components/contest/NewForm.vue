@@ -66,6 +66,7 @@
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
               v-model="finishTime"
+              v-bind:is-invalid="invalidParameterName === 'finish_time'"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
           </div>
@@ -164,6 +165,9 @@
             <label>{{ T.wordsPenalty }}</label>
             <input
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'penalty',
+              }"
               size="2"
               type="text"
               v-model="penalty"
@@ -333,7 +337,7 @@ export default class NewForm extends Vue {
   @Prop() initialSubmissionsGap!: number;
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
-  @Prop({ default: '' }) invalidParameterName!: string;
+  @Prop({ default: null }) invalidParameterName!: null | string;
 
   T = T;
   alias = this.initialAlias;

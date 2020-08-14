@@ -1617,6 +1617,15 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): void {
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $currentUserId;
+
+        if (!is_null(\OmegaUp\DAO\Contests::getByAlias($contest->alias))) {
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'aliasInUse'
+            );
+            $exception->addCustomMessageToArray('parameter', 'alias');
+            throw $exception;
+        }
+
         // Push changes
         try {
             // Begin a new transaction
@@ -1842,7 +1851,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Validate start & finish time
             if ($startTime->time > $finishTime->time) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'contestNewInvalidStartTime'
+                    'contestNewInvalidStartTime',
+                    'finish_time'
                 );
             }
             $contestLength = $finishTime->time - $startTime->time;
@@ -1851,7 +1861,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Validate max contest length
         if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'contestLengthTooLong'
+                'contestLengthTooLong',
+                'finish_time'
             );
         }
 
@@ -1882,6 +1893,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureOptionalBool('partial_score');
         $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
+        $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
         \OmegaUp\Validators::validateNumberInRange(
