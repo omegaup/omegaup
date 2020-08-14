@@ -60,7 +60,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             );
         }
 
-        $this->submissionSource = "print(3)";
+        $this->submissionSource = 'print(3)';
     }
 
     public function testCoursePythonUserEarnBadge() {
