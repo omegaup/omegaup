@@ -117,6 +117,35 @@ export namespace types {
           x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
           return x;
         })(x.details);
+        x.requests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.last_update)
+              x.last_update = ((x: number) => new Date(x * 1000))(
+                x.last_update,
+              );
+            x.request_time = ((x: number) => new Date(x * 1000))(
+              x.request_time,
+            );
+            return x;
+          });
+        })(x.requests);
+        x.users = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.access_time)
+              x.access_time = ((x: number) => new Date(x * 1000))(
+                x.access_time,
+              );
+            if (x.end_time)
+              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+            return x;
+          });
+        })(x.users);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1396,7 +1425,10 @@ export namespace types {
   }
 
   export interface ContestEditPayload {
+    admins: { role: string; username: string }[];
     details: types.ContestAdminDetails;
+    group_admins: { alias: string; name: string; role: string }[];
+    groups: { alias: string; name: string }[];
     problems: {
       accepted: number;
       alias: string;
@@ -1411,6 +1443,21 @@ export namespace types {
       version: string;
       visibility: number;
       visits: number;
+    }[];
+    requests: {
+      accepted?: boolean;
+      admin?: { username?: string };
+      country?: string;
+      last_update?: Date;
+      request_time: Date;
+      username: string;
+    }[];
+    users: {
+      access_time?: Date;
+      country_id?: string;
+      end_time?: Date;
+      is_owner?: number;
+      username: string;
     }[];
   }
 

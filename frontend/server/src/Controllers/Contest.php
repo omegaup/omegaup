@@ -16,7 +16,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ContestListMinePayload=array{contests: list<Contest>, privateContestsAlert: bool}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ContestPublicDetails=array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null, user_registration_requested?: bool, user_registration_answered?: bool, user_registration_accepted?: bool|null}
- * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>}
+ * @psalm-type ContestEditPayload=array{details: ContestAdminDetails, problems: list<array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, order: int, points: float, problem_id: int, submissions: int, title: string, version: string, visibility: int, visits: int}>, users: list<array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, end_time: \OmegaUp\Timestamp|null, is_owner: int|null, username: string}>, groups: list<array{alias: string, name: string}>, requests: list<array{accepted: bool|null, admin?: array{username?: null|string}, country: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}>, admins: list<array{role: string, username: string}>, group_admins: list<array{alias: string, name: string, role: string}>}
  * @psalm-type ContestIntroPayload=array{contest: ContestPublicDetails, needsBasicInformation?: bool, privacyStatement?: PrivacyStatement, requestsUserInformation?: string, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
  * @psalm-type ContestListPayload=array{contests: array{current: list<ContestListItem>, future: list<ContestListItem>, participating?: list<ContestListItem>, past: list<ContestListItem>, public: list<ContestListItem>, recommended_current: list<ContestListItem>, recommended_past: list<ContestListItem>}, isLogged: bool, query: string}
@@ -846,6 +846,38 @@ class Contest extends \OmegaUp\Controllers\Controller {
             unset($problem['problem_id']);
         }
 
+        // Requests
+        $resultAdmins = \OmegaUp\DAO\ProblemsetIdentityRequest::getFirstAdminForProblemsetRequest(
+            $contest->problemset_id
+        );
+        $resultRequests = \OmegaUp\DAO\ProblemsetIdentityRequest::getRequestsForProblemset(
+            $contest->problemset_id
+        );
+
+        $admins = [];
+        $requestsAdmins = [];
+        foreach ($resultAdmins as $result) {
+            $adminId = $result['admin_id'];
+            if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
+                $admin = [];
+                $data = \OmegaUp\DAO\Identities::findByUserId($adminId);
+                if (!is_null($data)) {
+                    $admin = [
+                        'username' => $data->username,
+                    ];
+                }
+                $requestsAdmins[$result['identity_id']] = $admin;
+            }
+        }
+
+        $usersRequests = array_map(function ($request) use ($requestsAdmins) {
+            if (isset($requestsAdmins[$request['identity_id']])) {
+                $request['admin'] = $requestsAdmins[$request['identity_id']];
+            }
+            unset($request['identity_id']);
+            return $request;
+        }, $resultRequests);
+
         return [
             'smartyProperties' => [
                 'payload' => [
@@ -854,6 +886,19 @@ class Contest extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     'problems' => $problems,
+                    'users' => \OmegaUp\DAO\ProblemsetIdentities::getWithExtraInformation(
+                        intval($contest->problemset_id)
+                    ),
+                    'groups' => \OmegaUp\DAO\GroupRoles::getContestantGroups(
+                        intval($contest->problemset_id)
+                    ),
+                    'requests' => $usersRequests,
+                    'admins' => \OmegaUp\DAO\UserRoles::getContestAdmins(
+                        $contest
+                    ),
+                    'group_admins' => \OmegaUp\DAO\GroupRoles::getContestAdmins(
+                        $contest
+                    )
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleContestEdit'
