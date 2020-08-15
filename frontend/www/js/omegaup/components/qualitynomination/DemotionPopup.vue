@@ -3,7 +3,7 @@
     <a href="#" v-on:click="onReportInappropriateProblem">{{
       T.wordsReportProblem
     }}</a>
-    <form class="popup" v-show="showReportDialog">
+    <form class="popup h-auto w-auto" v-show="showReportDialog">
       <template v-if="currentView == 'question'">
         <button class="close" type="button" v-on:click="onHide">×</button>
         <div class="form-group">
@@ -81,8 +81,6 @@
   bottom: 10px;
   right: 4%;
   z-index: 9999999 !important;
-  width: 420px;
-  height: 370px;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;

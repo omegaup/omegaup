@@ -161,10 +161,6 @@
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-.nav-tabs .nav-item {
-  margin-bottom: -2px;
-}
-
 table td {
   padding: 0.5rem;
 }

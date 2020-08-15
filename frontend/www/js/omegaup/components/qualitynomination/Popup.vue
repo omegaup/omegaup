@@ -10,7 +10,11 @@
       </slot>
     </a>
     <transition name="fade">
-      <form class="popup" v-on:submit.prevent="" v-show="showForm">
+      <form
+        class="popup h-auto w-auto"
+        v-on:submit.prevent=""
+        v-show="showForm"
+      >
         <button class="close" type="button" v-on:click="onHide(true)">×</button>
         <div class="container-fluid">
           <template v-if="currentView === 'content'">
@@ -136,8 +140,6 @@
   bottom: 10px;
   right: 4%;
   z-index: 9999999 !important;
-  width: 550px;
-  height: 494px;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;

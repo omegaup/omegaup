@@ -15,19 +15,19 @@
     <td class="align-middle">
       <template v-if="clarification.answer">
         <pre>{{ clarification.answer }}</pre>
-        <div v-if="!anotherAnswer" class="form-check mt-2 mt-xl-0">
+        <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
               class="form-check-input"
               type="checkbox"
-              v-model="anotherAnswer"
+              v-model="showUpdateAnswer"
             />
-            {{ T.wordsAnswerAgain }}
+            {{ T.clarificationUpdateAnswer }}
           </label>
         </div>
       </template>
       <form
-        v-if="!clarification.answer || anotherAnswer"
+        v-if="!clarification.answer || showUpdateAnswer"
         class="form-inline justify-content-between"
       >
         <div class="form-group">
@@ -107,7 +107,7 @@ export default class ArenaClarificationForm extends Vue {
   isPublic = this.clarification.public;
   message = '';
   selectedResponse = 'yes';
-  anotherAnswer = false;
+  showUpdateAnswer = false;
   responses = [
     {
       value: 'yes',
@@ -132,9 +132,12 @@ export default class ArenaClarificationForm extends Vue {
   ];
 
   get responseText(): string {
-    const [response] = this.responses.filter(
+    const response = this.responses.find(
       (response) => response.value === this.selectedResponse,
     );
+    if (!response) {
+      return this.selectedResponse;
+    }
     return this.selectedResponse === 'other' ? this.message : response.text;
   }
 
@@ -145,7 +148,7 @@ export default class ArenaClarificationForm extends Vue {
       this.responseText,
       this.isPublic,
     );
-    this.anotherAnswer = false;
+    this.showUpdateAnswer = false;
   }
 }
 </script>
