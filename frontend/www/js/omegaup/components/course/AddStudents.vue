@@ -8,7 +8,10 @@
         "
       >
         <div class="form-group">
-          <label>{{ T.wordsStudent }}</label>
+          <label>{{ T.wordsUserName }}</label>
+          <p class="help-block">
+            {{ T.courseEditAddStudents_user_desc }}
+          </p>
           <span
             aria-hidden="true"
             class="glyphicon glyphicon-info-sign"
@@ -23,7 +26,7 @@
         </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary" type="submit">
-            {{ T.wordsAddStudent }}
+            {{ T.wordsAddStudents }}
           </button>
         </div>
         <div class="form-group">
