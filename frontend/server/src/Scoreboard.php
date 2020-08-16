@@ -643,9 +643,7 @@ class Scoreboard {
              * @param array{order: int, alias: string} $a
              * @param array{order: int, alias: string} $b
              */
-            function (array $a, array $b): int {
-                return $a['order'] - $b['order'];
-            }
+            fn (array $a, array $b) => $a['order'] - $b['order']
         );
 
         return [
@@ -692,9 +690,10 @@ class Scoreboard {
                  * @param ScoreboardRankingEntry $a
                  * @param ScoreboardRankingEntry $b
                  */
-                function (array $a, array $b): int {
-                    return strcasecmp($a['username'], $b['username']);
-                }
+                fn (array $a, array $b) => strcasecmp(
+                    $a['username'],
+                    $b['username']
+                )
             );
         }
 
