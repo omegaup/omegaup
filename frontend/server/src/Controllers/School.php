@@ -255,14 +255,9 @@ class School extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOLS_OF_THE_MONTH,
             "{$date}-{$rowcount}",
-            /** @return list<array{name: string, ranking: int, school_id: int, school_of_the_month_id: int, score: float}> */
-            function () use (
+            fn () => \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
                 $rowcount
-            ): array {
-                return \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(
-                    $rowcount
-                );
-            },
+            ),
             60 * 60 * 12 // 12 hours
         );
     }
@@ -285,13 +280,7 @@ class School extends \OmegaUp\Controllers\Controller {
         $schoolRank = \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::SCHOOL_RANK,
             "{$page}-{$length}",
-            /** @return array{rank: list<School>, totalRows: int} */
-            function () use (
-                $page,
-                $length
-            ): array {
-                return \OmegaUp\DAO\Schools::getRank($page, $length);
-            },
+            fn () => \OmegaUp\DAO\Schools::getRank($page, $length),
             3600 // 1 hour
         );
 

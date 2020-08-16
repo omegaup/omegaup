@@ -344,12 +344,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
              * @param array{name: string|null, progress: array<string, array<string, float>>, username: string} $a
              * @param array{name: string|null, progress: array<string, array<string, float>>, username: string} $b
              */
-            function (array $a, array $b): int {
-                return strcasecmp(
-                    !empty($a['name']) ? $a['name'] : $a['username'],
-                    !empty($b['name']) ? $b['name'] : $b['username']
-                );
-            }
+            fn (array $a, array $b) => strcasecmp(
+                !empty($a['name']) ? $a['name'] : $a['username'],
+                !empty($b['name']) ? $b['name'] : $b['username']
+            )
         );
         return $allProgress;
     }

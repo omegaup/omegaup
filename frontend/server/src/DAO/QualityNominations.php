@@ -319,11 +319,9 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 ' qn.nomination in ("' . implode(
                     '", "',
                     array_map(
-                        function (string $type): string {
-                            return \OmegaUp\MySQLConnection::getInstance()->escape(
-                                $type
-                            );
-                        },
+                        fn (string $type) => \OmegaUp\MySQLConnection::getInstance()->escape(
+                            $type
+                        ),
                         $types
                     )
                 ) . '")';

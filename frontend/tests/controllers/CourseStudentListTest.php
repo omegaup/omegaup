@@ -29,9 +29,10 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         foreach ($students as $s) {
-            $this->assertArrayContainsWithPredicate($response['students'], function ($value) use ($s) {
-                return $value['username'] == $s->username;
-            });
+            $this->assertArrayContainsWithPredicate(
+                $response['students'],
+                fn ($value) => $value['username'] == $s->username
+            );
         }
     }
 
@@ -113,12 +114,10 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         // Sort participants for tests asserts
         usort(
             $participants,
-            function ($a, $b): int {
-                return strcasecmp(
-                    !empty($a->name) ? $a->name : $a->username,
-                    !empty($b->name) ? $b->name : $b->username
-                );
-            }
+            fn ($a, $b) => strcasecmp(
+                !empty($a->name) ? $a->name : $a->username,
+                !empty($b->name) ? $b->name : $b->username
+            )
         );
 
         // First student will solve problem0 and problem1, and fail on problem2
