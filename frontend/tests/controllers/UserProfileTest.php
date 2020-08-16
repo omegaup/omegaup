@@ -439,9 +439,10 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         foreach (['CE', 'PA', 'AC'] as $verdict) {
             $this->assertEquals(
                 1,
-                $this->findByPredicate($response['runs'], function ($run) use ($verdict) {
-                    return $run['verdict'] == $verdict;
-                })['runs']
+                $this->findByPredicate(
+                    $response['runs'],
+                    fn ($run) => $run['verdict'] == $verdict
+                )['runs']
             );
         }
     }

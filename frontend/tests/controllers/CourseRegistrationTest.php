@@ -83,9 +83,7 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertArrayNotContainsWithPredicate(
             $coursesList['student'],
-            function ($studentCourse) use ($course): bool {
-                return $studentCourse['alias'] === $course->alias;
-            }
+            fn ($studentCourse) => $studentCourse['alias'] === $course->alias
         );
     }
 

@@ -77,9 +77,10 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/grade/',
             self::REQUEST_MODE_JSON,
             [
-                'run_ids' => array_map(function (\OmegaUp\DAO\VO\Runs $r) {
-                    return intval($r->run_id);
-                }, $runs),
+                'run_ids' => array_map(
+                    fn (\OmegaUp\DAO\VO\Runs $r) => intval($r->run_id),
+                    $runs
+                ),
                 'rejudge' => true,
                 'debug' => false, // TODO(lhchavez): Reenable with ACLs.
             ]

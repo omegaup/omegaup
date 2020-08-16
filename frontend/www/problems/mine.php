@@ -7,9 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r) {
-        return \OmegaUp\Controllers\Problem::getProblemsMineInfoForSmarty(
-            $r
-        );
-    }
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Problem::getProblemsMineInfoForSmarty(
+        $r
+    )
 );

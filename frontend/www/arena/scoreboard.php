@@ -3,10 +3,8 @@ namespace OmegaUp;
 require_once(dirname(__DIR__, 2) . '/server/bootstrap.php');
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r): array {
-        return [
-            'smartyProperties' => [],
-            'template' => 'contest.scoreboard.tpl',
-        ];
-    }
+    fn (\OmegaUp\Request $r) => [
+        'smartyProperties' => [],
+        'template' => 'contest.scoreboard.tpl',
+    ]
 );
