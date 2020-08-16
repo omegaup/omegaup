@@ -17,7 +17,11 @@
       <form class="form-inline justify-content-between">
         <div class="form-group">
           <select class="form-control" v-model="selectedResponse">
-            <option v-for="response in responses" v-bind:value="response.value">
+            <option
+              v-for="response in responses"
+              v-bind:value="response.value"
+              v-bind:key="response.value"
+            >
               {{ response.text }}</option
             >
           </select>

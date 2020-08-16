@@ -2582,7 +2582,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         /*$params=*/[]
                     ),
                 ],
-                'title' => 'omegaupTitleAuthorsRank',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAuthorsRank'
+                ),
             ],
             'entrypoint' => 'authors_rank',
         ];
@@ -3620,8 +3622,12 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => $response,
                 'title' => (
                     (strval($category) === 'female') ?
-                    'omegaupTitleCodersofthemonthFemale' :
-                    'omegaupTitleCodersofthemonth'
+                    new \OmegaUp\TranslationString(
+                        'omegaupTitleCodersofthemonthFemale'
+                    ) :
+                    new \OmegaUp\TranslationString(
+                        'omegaupTitleCodersofthemonth'
+                    )
                 ),
             ],
             'entrypoint' => 'coder_of_the_month',
@@ -3673,7 +3679,9 @@ class User extends \OmegaUp\Controllers\Controller {
                             )
                         ),
                     ],
-                    'title' => 'omegaupTitleProfile',
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleProfile'
+                    ),
                 ],
                 'template' => 'user.profile.tpl',
             ];
@@ -3682,7 +3690,9 @@ class User extends \OmegaUp\Controllers\Controller {
             return [
                 'smartyProperties' => [
                     'payload' => ['statusError' => $e->getErrorMessage()],
-                    'title' => 'omegaupTitleProfile'
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleProfile'
+                    )
                 ],
                 'template' => 'user.profile.tpl',
             ];

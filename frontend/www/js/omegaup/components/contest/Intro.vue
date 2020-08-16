@@ -143,10 +143,12 @@ import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
 import omegaup_Countdown from '../Countdown.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
     'omegaup-countdown': omegaup_Countdown,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class ContestIntro extends Vue {

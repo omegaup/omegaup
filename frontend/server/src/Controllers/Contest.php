@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 /**
  * ContestController
@@ -549,7 +549,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'shouldShowFirstAssociatedIdentityRunWarning' => false,
                     'contest' => self::getPublicDetails($contest, $r->identity),
                 ],
-                'title' => 'enterContest',
+                'title' => new \OmegaUp\TranslationString('enterContest'),
             ],
             'entrypoint' => 'contest_intro',
         ];
@@ -711,7 +711,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'isLogged' => !is_null($r->identity),
                     'contests' => $contests,
                 ],
-                'title' => 'wordsContests',
+                'title' => new \OmegaUp\TranslationString('wordsContests'),
             ],
             'entrypoint' => 'arena_contest_list',
         ];
@@ -766,7 +766,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'contests' => $contestsList['contests'],
                     'privateContestsAlert' => $privateContestsAlert,
                 ],
-                'title' => 'omegaupTitleMyContests',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleMyContests'
+                ),
             ],
             'entrypoint' => 'contest_mine',
         ];
@@ -4135,7 +4137,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     ],
                     self::getStats($contest, $r->identity)
                 ),
-                'title' => 'omegaupTitleContestStats',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestStats'
+                ),
             ],
             'entrypoint' => 'common_stats',
         ];
