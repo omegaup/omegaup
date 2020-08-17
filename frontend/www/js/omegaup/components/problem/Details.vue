@@ -87,9 +87,9 @@
       >
         <omegaup-problem-solution
           v-bind:status="solutionStatus"
-          v-bind:solution="null"
-          v-bind:available-tokens="0"
-          v-bind:all-tokens="0"
+          v-bind:solution="solution"
+          v-bind:available-tokens="availableTokens"
+          v-bind:all-tokens="allTokens"
         ></omegaup-problem-solution>
       </div>
       <div
@@ -191,24 +191,22 @@ interface Tab {
   },
 })
 export default class ProblemDetails extends Vue {
-  @Prop() initialClarifications!: types.Clarification[];
   @Prop() allRuns!: types.Run[];
+  @Prop() clarifications!: types.Clarification[];
   @Prop() problem!: types.ProblemInfo;
   @Prop() solvers!: types.BestSolvers[];
   @Prop() user!: types.UserInfoForProblem;
   @Prop() nominationStatus!: types.NominationStatus;
   @Prop() runs!: types.Run[];
   @Prop() solutionStatus!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
+  @Prop({ default: 0 }) availableTokens!: number;
+  @Prop({ default: 0 }) allTokens!: number;
 
   T = T;
   ui = ui;
   time = time;
   selectedTab = 'problems';
-  clarifications = this.initialClarifications || [];
-  availableTokens = 0;
-  allTokens = 0;
-  status = this.solutionStatus;
-  solution: types.ProblemStatement | null = null;
 
   get availableTabs(): Tab[] {
     const tabs = [

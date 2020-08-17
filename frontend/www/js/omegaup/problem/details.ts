@@ -16,13 +16,16 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-details', {
         props: {
           allRuns: payload.allRuns,
-          initialClarifications: payload.clarifications,
           problem: payload.problem,
           runs: payload.runs,
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: payload.nominationStatus,
-          solutionStatus: payload.solutionStatus,
+          clarifications: this.clarifications,
+          solutionStatus: this.solutionStatus,
+          solution: this.solution,
+          availableTokens: this.availableTokens,
+          allTokens: this.allTokens,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -101,12 +104,12 @@ OmegaUp.on('ready', () => {
                   ui.error(T.wordsProblemOrSolutionNotExist);
                   return;
                 }
-                component.status = 'unlocked';
-                component.solution = data.solution;
+                this.solutionStatus = 'unlocked';
+                this.solution = data.solution;
                 ui.info(
                   ui.formatString(T.solutionTokens, {
-                    available: component.availableTokens - 1,
-                    total: component.allTokens,
+                    available: this.availableTokens - 1,
+                    total: this.allTokens,
                   }),
                 );
               })
@@ -121,9 +124,9 @@ OmegaUp.on('ready', () => {
           'get-tokens': () => {
             api.ProblemForfeited.getCounts()
               .then((data) => {
-                component.allTokens = data.allowed;
-                component.availableTokens = data.allowed - data.seen;
-                if (component.availableTokens <= 0) {
+                this.allTokens = data.allowed;
+                this.availableTokens = data.allowed - data.seen;
+                if (this.availableTokens <= 0) {
                   ui.warning(T.solutionNoTokens);
                 }
               })
@@ -140,7 +143,7 @@ OmegaUp.on('ready', () => {
                     ui.error(T.wordsProblemOrSolutionNotExist);
                     return;
                   }
-                  component.solution = data.solution;
+                  this.solution = data.solution;
                 })
                 .catch((error) => {
                   if (error.httpStatusCode == 404) {
@@ -167,19 +170,24 @@ OmegaUp.on('ready', () => {
                 })
                   .then(
                     (response) =>
-                      (component.clarifications = response.clarifications),
+                      (this.clarifications = response.clarifications),
                   )
                   .catch(ui.apiError);
               })
               .catch(ui.apiError);
           },
         },
-        ref: 'component',
       });
+    },
+    data: {
+      clarifications: payload.clarifications,
+      solutionStatus: payload.solutionStatus,
+      solution: <types.ProblemStatement | null>null,
+      availableTokens: 0,
+      allTokens: 0,
     },
     components: {
       'omegaup-problem-details': problem_Details,
     },
   });
-  const component = <problem_Details>problemDetails.$refs.component;
 });
