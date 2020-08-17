@@ -6,7 +6,7 @@ namespace OmegaUp\Controllers;
  * ProblemsController
  *
  * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
- * @psalm-type NominationStatus=array{alreadyReviewed: bool, dismissed: bool, dismissedBeforeAC: bool, nominated: bool, nominatedBeforeAC: bool, solved: bool, tried: bool}
+ * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language: string, nominated: bool, nominatedBeforeAC: bool, solved: bool, tried: bool}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
@@ -29,8 +29,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
+ * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
  * @psalm-type ProblemDetailsPayload=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
- * @psalm-type ProblemDetailsv2Payload=array{allRuns?: list<Run>, clarifications?: list<Clarification>, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers?: list<BestSolvers>, user: UserInfoForProblem}
+ * @psalm-type ProblemDetailsv2Payload=array{allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers?: list<BestSolvers>, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -1408,12 +1409,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order',
             'languages' => [
                 'transform' =>
-                /**
-                 * @param list<string>|string $value
-                 */
-                function ($value): string {
-                    return is_array($value) ? join(',', $value) : $value;
-                }
+                /** @param list<string>|string $value */
+                fn ($value): string => is_array($value) ? join(',', $value) : $value
             ],
         ];
         $params->updateValueParams($problem, $valueProperties);
@@ -2089,15 +2086,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$alias}-{$commit}-{$language}-markdown",
-            /** @return ProblemStatement|null */
-            function () use ($alias, $commit, $language): ?array {
-                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
-                    'directory' => 'statements',
-                    'alias' => $alias,
-                    'commit' => $commit,
-                    'language' => $language,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemResourceImpl([
+                'directory' => 'statements',
+                'alias' => $alias,
+                'commit' => $commit,
+                'language' => $language,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -2122,15 +2116,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            /** @return ProblemStatement|null */
-            function () use ($problem, $commit, $language): ?array {
-                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
-                    'directory' => 'solutions',
-                    'alias' => strval($problem->alias),
-                    'commit' => $commit,
-                    'language' => $language,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemResourceImpl([
+                'directory' => 'solutions',
+                'alias' => strval($problem->alias),
+                'commit' => $commit,
+                'language' => $language,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -2148,13 +2139,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            /** @return ProblemSettings */
-            function () use ($problem): array {
-                return \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
-                    'alias' => strval($problem->alias),
-                    'commit' => $problem->commit,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
+                'alias' => strval($problem->alias),
+                'commit' => $problem->commit,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -4396,6 +4384,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response = [
             'smartyProperties' => [
                 'payload' => [
+                    'histogram' => [
+                        'difficultyHistogram' => $problem->difficulty_histogram,
+                        'qualityHistogram' => $problem->quality_histogram,
+                        'quality' => floatval($problem->quality),
+                        'difficulty' => floatval($problem->difficulty),
+                    ],
                     'problem' => [
                         'alias' => $details['alias'],
                         'karel_problem' => count(
@@ -4483,6 +4477,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'dismissedBeforeAC' => $nominationStatus['dismissedBeforeAC'],
             'nominated' => $nominationStatus['nominated'],
             'nominatedBeforeAC' => $nominationStatus['nominatedBeforeAC'],
+            'language' => $details['statement']['language'],
+            'canNominateProblem' => !is_null($r->user),
             'solved' => false,
             'tried' => false,
         ];
@@ -4674,10 +4670,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
             'all',
-            /** @return list<\OmegaUp\DAO\VO\Tags> */
-            function () {
-                return \OmegaUp\DAO\Tags::getAll();
-            },
+            fn () => \OmegaUp\DAO\Tags::getAll(),
             APC_USER_CACHE_SESSION_TIMEOUT
         );
     }
@@ -5192,11 +5185,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
-            function () use ($problem): bool {
-                return \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
-                    $problem
-                );
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
+                $problem
+            ),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }

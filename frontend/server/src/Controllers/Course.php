@@ -2614,9 +2614,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         if (!empty($courseEditDetails['assignments'])) {
             $assignment = array_filter(
                 $courseEditDetails['assignments'],
-                function (array $assignment) use ($r) {
-                    return $assignment['alias'] === $r['assignment_alias'];
-                }
+                fn (array $assignment) => $assignment['alias'] === $r['assignment_alias']
             );
             $assignment = array_shift($assignment);
         }
@@ -2958,10 +2956,13 @@ class Course extends \OmegaUp\Controllers\Controller {
             $coursesTypes
         );
 
-        $courses['student'] = array_filter($courses['student'], function ($course) {
-            return is_null($course['finish_time'])
-                || $course['finish_time']->time > \OmegaUp\Time::get();
-        });
+        $courses['student'] = array_filter(
+            $courses['student'],
+            fn ($course) => (
+                is_null($course['finish_time']) ||
+                $course['finish_time']->time > \OmegaUp\Time::get()
+            )
+        );
         $courses['student'] = array_slice($courses['student'], 0, 5);
 
         // Checks whether a public course has been open already by user
@@ -2969,9 +2970,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $matchedCourses = array_values(
                 array_filter(
                     $courses['student'],
-                    function ($course) use ($publicCourse) {
-                        return $course['alias'] === $publicCourse['alias'];
-                    }
+                    fn ($course) => $course['alias'] === $publicCourse['alias']
                 )
             );
             if (!empty($matchedCourses)) {
@@ -4009,12 +4008,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             'start_time',
             'finish_time',
             'school_id',
-            'show_scoreboard' => ['transform' => function (string $value): bool {
-                return boolval($value);
-            }],
-            'needs_basic_information' => ['transform' => function (string $value): bool {
-                return boolval($value);
-            }],
+            'show_scoreboard' => [
+                'transform' => fn (string $value): bool => boolval($value),
+            ],
+            'needs_basic_information' => [
+                'transform' => fn (string $value): bool => boolval($value),
+            ],
             'requests_user_information',
             'admission_mode',
         ];

@@ -954,9 +954,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             /**
              * @param array{mode: int, type: string, id: string, size: int, path: string} $case
              */
-            function (int $sum, $case): int {
-                return $sum + $case['size'];
-            },
+            fn (int $sum, $case) => $sum + $case['size'],
             0
         );
 
@@ -997,18 +995,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_CASES_CONTENTS,
             "{$problemAlias}-{$revision}-{$directory}",
-            /** @return ProblemCasesContents */
-            function () use (
+            fn () => self::getProblemCasesContentsImpl(
                 $directory,
                 $problemAlias,
                 $revision
-            ) {
-                return self::getProblemCasesContentsImpl(
-                    $directory,
-                    $problemAlias,
-                    $revision
-                );
-            },
+            ),
             24 * 60 * 60 // expire in 1 day
         );
     }
@@ -1354,9 +1345,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $signedHeaders = join(
             ';',
             array_map(
-                function (string $key): string {
-                    return strtolower($key);
-                },
+                fn (string $key) => strtolower($key),
                 array_keys($headers)
             )
         );
@@ -1369,9 +1358,9 @@ class Run extends \OmegaUp\Controllers\Controller {
                 join(
                     '',
                     array_map(
-                        function (string $key) use ($headers): string {
-                            return strtolower($key) . ":{$headers[$key]}\n";
-                        },
+                        fn (string $key) => (
+                            strtolower($key) . ":{$headers[$key]}\n"
+                        ),
                         array_keys($headers)
                     )
                 ),
@@ -1429,9 +1418,7 @@ class Run extends \OmegaUp\Controllers\Controller {
             [
                 CURLOPT_URL => "https://{$headers['Host']}{$resourcePath}",
                 CURLOPT_HTTPHEADER => array_map(
-                    function (string $key) use ($headers): string {
-                        return "{$key}: {$headers[$key]}";
-                    },
+                    fn (string $key) => "{$key}: {$headers[$key]}",
                     array_keys($headers)
                 ),
                 CURLOPT_RETURNTRANSFER => intval(!$passthru),

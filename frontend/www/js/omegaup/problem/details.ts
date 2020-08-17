@@ -11,13 +11,14 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-details', {
         props: {
           allRuns: payload.allRuns,
-          clarifications: payload.clarifications,
+          initialClarifications: payload.clarifications,
           problem: payload.problem,
           runs: payload.runs,
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: payload.nominationStatus,
           solutionStatus: payload.solutionStatus,
+          histogram: payload.histogram,
         },
       });
     },

@@ -10,7 +10,11 @@
       </slot>
     </a>
     <transition name="fade">
-      <form class="popup" v-on:submit.prevent="" v-show="showForm">
+      <form
+        class="popup h-auto w-auto"
+        v-on:submit.prevent=""
+        v-show="showForm"
+      >
         <button class="close" type="button" v-on:click="onHide(true)">×</button>
         <div class="container-fluid">
           <template v-if="currentView === 'content'">
@@ -60,6 +64,7 @@
                     <li
                       class="tag-select"
                       v-for="problemTopic in sortedProblemTags"
+                      v-bind:key="problemTopic.value"
                     >
                       <label class="tag-select"
                         ><input
@@ -97,10 +102,9 @@
                   {{ T.qualityFormQualityVeryGood }}</label
                 >
               </div>
-              <div class="button-row">
-                <div class="col-md-4"></div>
+              <div class="button-row text-right">
                 <button
-                  class="col-md-4 btn btn-primary"
+                  class="col-md-4 mr-2 btn btn-primary"
                   type="submit"
                   v-bind:disabled="
                     !this.quality && !this.tags.length && !this.difficulty
@@ -110,7 +114,7 @@
                   {{ T.wordsSend }}
                 </button>
                 <button
-                  class="col-md-4 btn btn-default"
+                  class="col-md-4 btn btn-secondary"
                   type="button"
                   v-on:click="onHide(true)"
                 >
@@ -136,8 +140,6 @@
   bottom: 10px;
   right: 4%;
   z-index: 9999999 !important;
-  width: 550px;
-  height: 443px;
   margin: 2em auto 0 auto;
   border: 2px solid #ccc;
   padding: 1em;
@@ -342,6 +344,11 @@ export default class QualityNominationPopup extends Vue {
     }
   }
 
+  onLocalNominatedHide(): void {
+    this.localNominated = true;
+    this.onHide(false);
+  }
+
   onShowSuggestion(): void {
     this.showFormOverride = true;
     this.localDismissed = false;
@@ -350,9 +357,8 @@ export default class QualityNominationPopup extends Vue {
   onSubmit(): void {
     this.$emit('submit', this);
     this.currentView = 'thanks';
-    this.localNominated = true;
 
-    setTimeout(() => this.onHide(false), 1000);
+    setTimeout(() => this.onLocalNominatedHide(), 2000);
   }
 
   @Watch('dismissed')
