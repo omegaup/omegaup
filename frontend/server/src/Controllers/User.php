@@ -2324,9 +2324,9 @@ class User extends \OmegaUp\Controllers\Controller {
             'username',
             'scholar_degree',
             'birth_date' => [
-                'transform' => function (int $value): string {
-                    return strval(gmdate('Y-m-d', $value));
-                },
+                'transform' => fn (int $value): string => strval(
+                    gmdate('Y-m-d', $value)
+                ),
             ],
             'preferred_language',
             'is_private',
@@ -2461,17 +2461,11 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::CODERS_OF_THE_MONTH,
             "{$date}-{$rowCount}",
-            /** @return list<CoderOfTheMonth> */
-            function () use (
+            fn () => \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
                 $date,
+                'all',
                 $rowCount
-            ): array {
-                return \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
-                    $date,
-                    'all',
-                    $rowCount
-                );
-            },
+            ),
             60 * 60 * 12 // 12 hours
         );
     }
@@ -2534,18 +2528,10 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK,
             "{$offset}-{$rowCount}",
-            /**
-             * @return AuthorsRank
-             */
-            function () use (
+            fn () => \OmegaUp\DAO\UserRank::getAuthorsRank(
                 $offset,
                 $rowCount
-            ): array {
-                return \OmegaUp\DAO\UserRank::getAuthorsRank(
-                    $offset,
-                    $rowCount
-                );
-            },
+            ),
             APC_USER_CACHE_USER_RANK_TIMEOUT
         );
     }

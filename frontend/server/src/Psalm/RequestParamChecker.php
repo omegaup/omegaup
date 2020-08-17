@@ -384,9 +384,7 @@ class RequestParamChecker implements
         foreach (
             $finder->find(
                 $statements,
-                function (\PhpParser\Node $node): bool {
-                    return $node instanceof \PhpParser\Node\Stmt\ClassLike;
-                }
+                fn (\PhpParser\Node $node) => $node instanceof \PhpParser\Node\Stmt\ClassLike
             ) as $classStmt
         ) {
             self::processClass(
@@ -619,9 +617,9 @@ class RequestParamChecker implements
             if (!empty($expected)) {
                 $parsedDocComment->tags = $parsedDocComment->tags + [
                     'omegaup-request-param' => array_map(
-                        function (RequestParamDescription $description): string {
-                            return strval($description);
-                        },
+                        fn (RequestParamDescription $description) => strval(
+                            $description
+                        ),
                         array_values($expected)
                     ),
                 ];

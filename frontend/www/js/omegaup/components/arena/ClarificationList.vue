@@ -36,6 +36,7 @@
                   <option
                     v-for="problem in contestProblems"
                     v-bind:value="problem.alias"
+                    v-bind:key="problem.alias"
                   >
                     {{ problem.title }}</option
                   >
@@ -75,7 +76,7 @@
             <th class="text-center" scope="col" v-if="inContest">
               {{ T.wordsContest }}
             </th>
-            <th class="text-center" scope="col" v-else="">
+            <th class="text-center" scope="col" v-else>
               {{ T.wordsProblem }}
             </th>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>

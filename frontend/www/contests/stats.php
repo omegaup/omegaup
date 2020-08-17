@@ -7,9 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r) {
-        return \OmegaUp\Controllers\Contest::getStatsDataForSmarty(
-            $r
-        );
-    }
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Contest::getStatsDataForSmarty(
+        $r
+    )
 );

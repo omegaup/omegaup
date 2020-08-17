@@ -98,9 +98,7 @@ class RequestParam {
         }
         usort(
             $result,
-            function (RequestParam $a, RequestParam $b): int {
-                return strcmp($a->name, $b->name);
-            }
+            fn (RequestParam $a, RequestParam $b) => strcmp($a->name, $b->name)
         );
         return $result;
     }

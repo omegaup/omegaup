@@ -10,11 +10,7 @@
       </slot>
     </a>
     <transition name="fade">
-      <form
-        class="panel panel-default popup"
-        v-on:submit.prevent=""
-        v-show="showForm"
-      >
+      <form class="popup" v-on:submit.prevent="" v-show="showForm">
         <button class="close" type="button" v-on:click="onHide(true)">×</button>
         <div class="container-fluid">
           <template v-if="currentView === 'content'">
@@ -146,6 +142,7 @@
   border: 2px solid #ccc;
   padding: 1em;
   overflow: auto;
+  background: #fff;
 }
 
 .qualitynomination-popup .control-label {
