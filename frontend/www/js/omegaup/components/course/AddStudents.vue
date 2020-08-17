@@ -8,7 +8,7 @@
         "
       >
         <div class="form-group">
-          <h5 class="card-title">{{ T.courseEditAddStudentsDescription }}</h5>
+          <p class="card-title">{{ T.courseEditAddStudentsDescription }}</p>
           <label>{{ T.username }}</label>
           <span
             aria-hidden="true"
