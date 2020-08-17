@@ -68,9 +68,10 @@ class CourseListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertArrayHasKey('admin', $response);
         $this->assertArrayHasKey('student', $response);
-        $studentCourses = array_filter($response['student'], function ($course) {
-            return $course['admission_mode'] !== \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC;
-        });
+        $studentCourses = array_filter(
+            $response['student'],
+            fn ($course) => $course['admission_mode'] !== \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
+        );
         $this->assertEquals(1, count($studentCourses));
         $course_array = $response['student'][0];
         \OmegaUp\Validators::validateNumber(

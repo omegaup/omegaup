@@ -317,6 +317,7 @@ const translations: { [key: string]: string; } = {
   courseEditAddAssignment: "Adicionar designa\u00e7\u00e3o",
   courseEditAddGroupAdminsTooltip: "Adicionar grupos de administratores",
   courseEditAddProblems: "Adicionar problema",
+  courseEditAddStudentsDescription: "Gerenciar os alunos que participar\u00e3o do curso",
   courseEditAddStudentsTooltip: "Adicionar alunos usando seu nome de usu\u00e1rio omegaUp",
   courseEditAdmins: "Administratores",
   courseEditAdminsEmpty: "N\u00e3o hay administratores",

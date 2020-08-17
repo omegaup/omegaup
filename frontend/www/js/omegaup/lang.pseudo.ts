@@ -317,6 +317,7 @@ const translations: { [key: string]: string; } = {
   courseEditAddAssignment: "(Add a55ignm3n7)",
   courseEditAddGroupAdminsTooltip: "(Add gr0up5 admin5)",
   courseEditAddProblems: "(Add pr0b13m)",
+  courseEditAddStudentsDescription: "(Manag3 7h3 57ud3n75 wh0 wi11 par7icipa73 in 7h3 c0ur53)",
   courseEditAddStudentsTooltip: "(Add 57ud3n75 u5ing 7h3ir 0m3gaUp u53rnam3)",
   courseEditAdmins: "(Admini57ra70r5)",
   courseEditAdminsEmpty: "(N0 admini57ra70r5)",

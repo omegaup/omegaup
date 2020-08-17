@@ -317,6 +317,7 @@ const translations: { [key: string]: string; } = {
   courseEditAddAssignment: "Add assignment",
   courseEditAddGroupAdminsTooltip: "Add groups admins",
   courseEditAddProblems: "Add problem",
+  courseEditAddStudentsDescription: "Manage the students who will participate in the course",
   courseEditAddStudentsTooltip: "Add students using their omegaUp username",
   courseEditAdmins: "Administrators",
   courseEditAdminsEmpty: "No administrators",

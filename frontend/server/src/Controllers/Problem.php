@@ -1409,12 +1409,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order',
             'languages' => [
                 'transform' =>
-                /**
-                 * @param list<string>|string $value
-                 */
-                function ($value): string {
-                    return is_array($value) ? join(',', $value) : $value;
-                }
+                /** @param list<string>|string $value */
+                fn ($value): string => is_array($value) ? join(',', $value) : $value
             ],
         ];
         $params->updateValueParams($problem, $valueProperties);
@@ -2090,15 +2086,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$alias}-{$commit}-{$language}-markdown",
-            /** @return ProblemStatement|null */
-            function () use ($alias, $commit, $language): ?array {
-                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
-                    'directory' => 'statements',
-                    'alias' => $alias,
-                    'commit' => $commit,
-                    'language' => $language,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemResourceImpl([
+                'directory' => 'statements',
+                'alias' => $alias,
+                'commit' => $commit,
+                'language' => $language,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -2123,15 +2116,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            /** @return ProblemStatement|null */
-            function () use ($problem, $commit, $language): ?array {
-                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
-                    'directory' => 'solutions',
-                    'alias' => strval($problem->alias),
-                    'commit' => $commit,
-                    'language' => $language,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemResourceImpl([
+                'directory' => 'solutions',
+                'alias' => strval($problem->alias),
+                'commit' => $commit,
+                'language' => $language,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -2149,13 +2139,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            /** @return ProblemSettings */
-            function () use ($problem): array {
-                return \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
-                    'alias' => strval($problem->alias),
-                    'commit' => $problem->commit,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
+                'alias' => strval($problem->alias),
+                'commit' => $problem->commit,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -4683,10 +4670,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
             'all',
-            /** @return list<\OmegaUp\DAO\VO\Tags> */
-            function () {
-                return \OmegaUp\DAO\Tags::getAll();
-            },
+            fn () => \OmegaUp\DAO\Tags::getAll(),
             APC_USER_CACHE_SESSION_TIMEOUT
         );
     }
@@ -5201,11 +5185,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
-            function () use ($problem): bool {
-                return \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
-                    $problem
-                );
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
+                $problem
+            ),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }

@@ -661,9 +661,10 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
         ]));
-        $this->assertArrayContainsWithPredicate($response['results'], function ($problem) use (&$problemData) {
-            return $problem['alias'] == $problemData['request']['problem_alias'];
-        });
+        $this->assertArrayContainsWithPredicate(
+            $response['results'],
+            fn ($problem) => $problem['alias'] == $problemData['request']['problem_alias']
+        );
         $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
