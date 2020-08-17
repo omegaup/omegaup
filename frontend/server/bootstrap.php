@@ -85,9 +85,7 @@ if (!is_null(NEW_RELIC_SCRIPT_HASH)) {
     array_push($contentSecurityPolicy['script-src'], NEW_RELIC_SCRIPT_HASH);
 }
 header('Content-Security-Policy: ' . implode('; ', array_map(
-    function ($k) use ($contentSecurityPolicy) {
-        return "{$k} " . implode(' ', $contentSecurityPolicy[$k]);
-    },
+    fn ($k) => "{$k} " . implode(' ', $contentSecurityPolicy[$k]),
     array_keys($contentSecurityPolicy)
 )));
 header('X-Frame-Options: DENY');
