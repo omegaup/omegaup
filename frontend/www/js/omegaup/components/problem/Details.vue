@@ -118,7 +118,7 @@
         v-bind:class="{ 'show active': selectedTab === 'solution' }"
       >
         <omegaup-problem-solution
-          v-bind:status="status"
+          v-bind:status="solutionStatus"
           v-bind:solution="solution"
           v-bind:available-tokens="availableTokens"
           v-bind:all-tokens="allTokens"
@@ -178,7 +178,7 @@ table td {
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -247,6 +247,9 @@ export default class ProblemDetails extends Vue {
   @Prop() nominationStatus!: types.NominationStatus;
   @Prop() runs!: types.Run[];
   @Prop() solutionStatus!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
+  @Prop({ default: 0 }) availableTokens!: number;
+  @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
 
   T = T;
@@ -254,10 +257,6 @@ export default class ProblemDetails extends Vue {
   time = time;
   selectedTab = 'problems';
   clarifications = this.initialClarifications || [];
-  availableTokens = 0;
-  allTokens = 0;
-  status = this.solutionStatus;
-  solution: types.ProblemStatement | null = null;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -283,6 +282,11 @@ export default class ProblemDetails extends Vue {
       },
     ];
     return tabs.filter((tab) => tab.visible);
+  }
+
+  @Watch('initialClarifications')
+  onClarificationsChanged(newValue: types.Clarification[]): void {
+    this.clarifications = newValue;
   }
 }
 </script>
