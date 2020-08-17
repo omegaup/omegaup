@@ -8,10 +8,8 @@
         "
       >
         <div class="form-group">
-          <label>{{ T.wordsUserName }}</label>
-          <p class="help-block">
-            {{ T.courseEditAddStudents_user_desc }}
-          </p>
+          <h5 class="card-title">{{ T.courseEditAddStudentsDescription }}</h5>
+          <label>{{ T.username }}</label>
           <span
             aria-hidden="true"
             class="glyphicon glyphicon-info-sign"
