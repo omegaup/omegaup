@@ -7,19 +7,25 @@
     </div>
     <div class="card-body">
       <form>
-        <select v-model="selectedStudent">
-          <option v-bind:value="student" v-for="student in students">
-            {{ student.name || student.username }}
-          </option>
-        </select>
+        <div class="form-group col-md-3">
+          <label>{{ T.courseStudentSelectStudent }}</label>
+          <select class="ml-1 form-control" v-model="selectedStudent">
+            <option v-bind:value="student" v-for="student in students">
+              {{ student.name || student.username }}
+            </option>
+          </select>
+        </div>
       </form>
       <hr />
       <form>
-        <select v-model="selectedAssignment">
-          <option v-bind:value="assignment" v-for="assignment in assignments">
-            {{ assignment.name }}
-          </option>
-        </select>
+        <div class="form-group col-md-3">
+          <label>{{ T.courseStudentSelectAssignment }}</label>
+          <select class="ml-1 form-control" v-model="selectedAssignment">
+            <option v-bind:value="assignment" v-for="assignment in assignments">
+              {{ assignment.name }}
+            </option>
+          </select>
+        </div>
       </form>
       <div v-if="selectedAssignment">
         <p
