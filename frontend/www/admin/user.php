@@ -35,16 +35,13 @@ foreach (\OmegaUp\Experiments::getInstance()->getAllKnownExperiments() as $exper
 }
 
 $payload = [
-    'emails' => array_map(function ($email) {
-        return $email->email;
-    }, $emails),
-    'experiments' => array_map(function ($experiment) {
-        return $experiment->experiment;
-    }, $userExperiments),
+    'emails' => array_map(fn ($email) => $email->email, $emails),
+    'experiments' => array_map(
+        fn ($experiment) => $experiment->experiment,
+        $userExperiments
+    ),
     'systemExperiments' => $systemExperiments,
-    'roleNames' => array_map(function ($role) {
-        return ['name' => $role->name];
-    }, $roles),
+    'roleNames' => array_map(fn ($role) => ['name' => $role->name], $roles),
     'systemRoles' => $systemRoles,
     'username' => $username,
     'verified' => $user->verified != 0,

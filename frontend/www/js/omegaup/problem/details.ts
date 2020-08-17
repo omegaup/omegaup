@@ -21,7 +21,8 @@ OmegaUp.on('ready', () => {
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: payload.nominationStatus,
-          clarifications: this.clarifications,
+          histogram: payload.histogram,
+          initialClarifications: this.initialClarifications,
           solutionStatus: this.solutionStatus,
           solution: this.solution,
           availableTokens: this.availableTokens,
@@ -170,7 +171,7 @@ OmegaUp.on('ready', () => {
                 })
                   .then(
                     (response) =>
-                      (this.clarifications = response.clarifications),
+                      (this.initialClarifications = response.clarifications),
                   )
                   .catch(ui.apiError);
               })
@@ -180,7 +181,7 @@ OmegaUp.on('ready', () => {
       });
     },
     data: {
-      clarifications: payload.clarifications,
+      initialClarifications: payload.clarifications,
       solutionStatus: payload.solutionStatus,
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
