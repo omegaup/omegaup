@@ -430,6 +430,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
 
         $results = \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
             $courseData['course']->course_id,
+            $courseData['course']->group_id
         );
 
         $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);

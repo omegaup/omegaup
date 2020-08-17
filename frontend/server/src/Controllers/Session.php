@@ -131,9 +131,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
-                function () use ($r) {
-                    return self::getCurrentSessionImpl($r);
-                },
+                fn () => self::getCurrentSessionImpl($r),
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
             return self::$_currentSession;

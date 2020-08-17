@@ -299,9 +299,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ' AND ',
                 array_map(
                     /** @param array{0: string, 1: list<string>} $clause */
-                    function (array $clause): string {
-                        return $clause[0];
-                    },
+                    fn (array $clause) => $clause[0],
                     $clauses
                 )
             );

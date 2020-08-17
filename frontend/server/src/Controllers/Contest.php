@@ -153,21 +153,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
-            $callback = /** @return list<ContestListItem> */ function () use (
+            $callback = /** @return list<ContestListItem> */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
                 $page,
                 $pageSize,
                 $activeContests,
                 $recommended,
                 $query
-            ): array {
-                return \OmegaUp\DAO\Contests::getAllPublicContests(
-                    $page,
-                    $pageSize,
-                    $activeContests,
-                    $recommended,
-                    $query
-                );
-            };
+            );
             if (empty($query)) {
                 $contests = \OmegaUp\Cache::getFromCacheOrSet(
                     \OmegaUp\Cache::CONTESTS_LIST_PUBLIC,
@@ -194,21 +186,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
-            $callback = /** @return list<ContestListItem> */ function () use (
+            $callback = /** @return list<ContestListItem> */ fn () => \OmegaUp\DAO\Contests::getAllContests(
                 $page,
                 $pageSize,
                 $activeContests,
                 $recommended,
                 $query
-            ): array {
-                return \OmegaUp\DAO\Contests::getAllContests(
-                    $page,
-                    $pageSize,
-                    $activeContests,
-                    $recommended,
-                    $query
-                );
-            };
+            );
             if (empty($query)) {
                 $contests = \OmegaUp\Cache::getFromCacheOrSet(
                     \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN,
@@ -336,18 +320,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         return self::getContestListInternal(
             $r,
-            function (
+            fn (
                 int $identityId,
                 int $page,
                 int $pageSize,
                 ?string $query
-            ) {
-                return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
-                    $identityId,
-                    $page,
-                    $pageSize
-                );
-            }
+            ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
+                $identityId,
+                $page,
+                $pageSize
+            )
         );
     }
 
@@ -364,20 +346,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         return self::getContestListInternal(
             $r,
-            function (
+            fn (
                 int $identityId,
                 int $page,
                 int $pageSize,
                 ?string $query
-            ) {
-                return \OmegaUp\DAO\Contests::getContestsParticipating(
-                    $identityId,
-                    $page,
-                    $pageSize,
-                    \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                    $query
-                );
-            }
+            ) => \OmegaUp\DAO\Contests::getContestsParticipating(
+                $identityId,
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+                $query
+            )
         );
     }
 
@@ -749,18 +729,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contestsList = self::getContestListInternal(
             $r,
-            function (
+            fn (
                 int $identityId,
                 int $page,
                 int $pageSize,
                 ?string $query
-            ) {
-                return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
-                    $identityId,
-                    $page,
-                    $pageSize
-                );
-            }
+            ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
+                $identityId,
+                $page,
+                $pageSize
+            )
         );
 
         return [
@@ -3824,23 +3802,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'description',
             'start_time',
             'finish_time',
-            'window_length' => ['transform' => function (?int $value): ?int {
-                return empty($value) ? null : $value;
-            }],
+            'window_length' => [
+                'transform' => fn (?int $value): ?int => empty(
+                    $value
+                ) ? null : $value,
+            ],
             'scoreboard',
             'points_decay_factor',
             'partial_score',
             'submissions_gap',
             'feedback',
-            'penalty' => ['transform' => function (string $value): int {
-                return max(0, intval($value));
-            }],
+            'penalty' => ['transform' => fn (string $value): int => max(
+                0,
+                intval($value)
+            )],
             'penalty_type',
             'penalty_calc_policy',
             'show_scoreboard_after' => [
-                'transform' => function (string $value): bool {
-                    return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                }
+                'transform' => fn (string $value): bool => boolval(
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                ),
             ],
             'languages' => [
                 'transform' =>
@@ -3912,9 +3893,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     /**
                      * @param array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string} $identity
                      */
-                    function ($identity): int {
-                        return $identity['identity_id'];
-                    },
+                    fn ($identity) => $identity['identity_id'],
                     $identities
                 );
                 self::preAcceptAccessRequest(
