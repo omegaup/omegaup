@@ -16,7 +16,6 @@
           </select>
         </div>
       </form>
-      <hr />
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectAssignment }}</label>
