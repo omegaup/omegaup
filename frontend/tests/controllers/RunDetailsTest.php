@@ -251,6 +251,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'contest_alias' => $this->contestData['request']['alias'],
             'feedback' => $feedback,
+            'languages' => 'c11-gcc',
         ]));
 
         $waRunData = \OmegaUp\Test\Factories\Run::createRun(
@@ -305,6 +306,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'contest_alias' => $this->contestData['request']['alias'],
             'feedback' => $feedback,
+            'languages' => 'c11-gcc',
         ]));
 
         $waRunData = \OmegaUp\Test\Factories\Run::createRun(

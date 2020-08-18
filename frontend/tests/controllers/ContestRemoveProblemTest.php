@@ -193,7 +193,8 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             [
                 'auth_token' =>  $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'admission_mode' => 'public' // Update public
+                'admission_mode' => 'public', // Update public
+                'languages' => 'c11-gcc'
             ]
         );
 
@@ -208,7 +209,10 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRemoveOldestProblemFromPublicContestWithTwoProblems() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
-                ['admissionMode' => 'private']
+                [
+                    'admissionMode' => 'private',
+                    'languages' => 'c11-gcc'
+                ]
             )
         );
 
@@ -281,7 +285,10 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
     public function testRemoveProblemsFromPublicContestWithASingleProblem() {
         $contestData = \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
-                ['admissionMode' => 'private']
+                [
+                    'admissionMode' => 'private',
+                    'languages' => 'c11-gcc'
+                ]
             )
         );
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();

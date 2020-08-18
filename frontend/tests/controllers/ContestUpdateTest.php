@@ -19,6 +19,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'title' => \OmegaUp\Test\Utils::createRandomString(),
+            'languages' => 'c11-gcc',
         ]);
 
         // Call API
@@ -69,6 +70,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'admission_mode' => 'public',
+                'languages' => 'c11-gcc',
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -105,6 +107,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'public',
+            'languages' => 'c11-gcc',
         ]);
 
         // Call API
@@ -253,6 +256,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'start_time' => $contestData['request']['start_time'] + 1,
+                'languages' => 'c11-gcc',
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -278,6 +282,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'start_time' => $contestData['request']['start_time'],
+            'languages' => 'c11-gcc',
         ]);
 
         // Call API
@@ -306,6 +311,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'start_time' => $contestData['request']['start_time'],
             'title' => $contestData['request']['title'],
+            'languages' => 'c11-gcc',
         ]);
 
         // Call API
@@ -381,6 +387,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'runtime',
+                'languages' => 'c11-gcc',
             ]));
             $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
@@ -398,6 +405,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'none',
+                'languages' => 'c11-gcc',
             ]));
             $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
@@ -412,6 +420,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'problem_open',
+                'languages' => 'c11-gcc',
             ]));
             $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
@@ -426,6 +435,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'penalty_type' => 'contest_start',
+                'languages' => 'c11-gcc',
             ]));
             $response = \OmegaUp\Controllers\Contest::apiRuns(new \OmegaUp\Request([
                 'contest_alias' => $contestData['request']['alias'],
@@ -495,6 +505,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'window_length' => 0,
+            'languages' => 'c11-gcc',
         ]));
         $contest = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
@@ -512,6 +523,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'window_length' => $windowLength,
+            'languages' => 'c11-gcc',
         ]));
         $contest = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
@@ -544,6 +556,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'window_length' => $windowLength,
+            'languages' => 'c11-gcc',
         ]));
         $contest = \OmegaUp\Controllers\Contest::apiDetails(new \OmegaUp\Request([
             'contest_alias' => $contestData['request']['alias'],
@@ -617,6 +630,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'window_length' => $windowLength,
+            'languages' => 'c11-gcc',
         ]));
 
         $identities = \OmegaUp\Controllers\Contest::apiUsers(new \OmegaUp\Request([
@@ -690,6 +704,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'window_length' => 30,
+            'languages' => 'c11-gcc',
         ]));
 
         // 15 minutes later User can not create a run because the contest is over
@@ -754,6 +769,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'finish_time' => $originalTime->time + 60 * 5 * 60,
+            'languages' => 'c11-gcc',
         ]));
 
         // User creates a run 50 minutes later, it is ok
@@ -931,7 +947,8 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
-            'window_length' => 60
+            'window_length' => 60,
+            'languages' => 'c11-gcc'
         ]);
 
         // Call API
@@ -998,7 +1015,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'admission_mode' => 'public',
-                'languages' => '',
+                'languages' => 'c11-gcc',
             ])
         );
 
@@ -1112,6 +1129,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'partial_score' => $partialScore,
+                'languages' => 'c11-gcc',
             ])
         );
 

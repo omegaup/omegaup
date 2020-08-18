@@ -224,7 +224,9 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // User3 automatically organizes a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(new \OmegaUp\Test\Factories\ContestParams(
+            ['languages' => 'c11-gcc']
+        ));
         $identities[] = $contestData['director'];
 
         \OmegaUp\Test\Factories\Schools::addUserToSchool(

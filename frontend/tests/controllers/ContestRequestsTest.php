@@ -24,6 +24,7 @@ class ContestRequestsTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
+            'languages' => 'c11-gcc',
         ]));
 
         $result = [

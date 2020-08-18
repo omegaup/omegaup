@@ -103,6 +103,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $directorLogin->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'private',
+            'languages' => 'c11-gcc',
         ]));
 
         // Expictly added identity to contest
