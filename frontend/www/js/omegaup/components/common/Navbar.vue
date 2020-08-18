@@ -164,11 +164,6 @@
               <li>
                 <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
               </li>
-              <li>
-                <a href="https://omegaup.com/preguntas/">{{
-                  T.navQuestions
-                }}</a>
-              </li>
             </ul>
           </li>
         </ul>
