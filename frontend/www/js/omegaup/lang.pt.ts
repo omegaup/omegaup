@@ -569,7 +569,6 @@ const translations: { [key: string]: string; } = {
   navMyQualityNomination: "Meus relat\u00f3rios de problemas",
   navProblems: "Problemas",
   navQualityNominationQueue: "Exibir fila de nomea\u00e7\u00e3o",
-  navQuestions: "Perguntas",
   navRanking: "Ranking",
   navRecent: "\u00daltima atividade",
   navSchoolOfTheMonth: "Escola do m\u00eas",
