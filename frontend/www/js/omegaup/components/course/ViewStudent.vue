@@ -36,6 +36,7 @@
         <div>
           <ul class="nav nav-tabs" role="tablist">
             <li
+              class="nav-item"
               role="presentation"
               v-bind:class="{ active: problem == selectedProblem }"
               v-for="problem in problems"
@@ -44,6 +45,7 @@
                 aria-controls="home"
                 data-toggle="tab"
                 href="#home"
+                class="nav-link"
                 role="tab"
                 v-bind:data-problem-alias="problem.alias"
                 v-on:click="selectedProblem = problem"
@@ -60,26 +62,38 @@
               {{ T.courseAssignmentProblemRunsEmpty }}
             </div>
           </div>
-          <div class="card" v-else="">
-            <div class="card-header">
-              <pre>{{ bestRunSource(selectedProblem) }}</pre>
+          <div v-else="">
+            <div class="card">
+              <div class="card-header">
+                {{ T.wordsCode }}
+              </div>
+              <div class="card-body">
+                <pre>{{ bestRunSource(selectedProblem) }}</pre>
+              </div>
             </div>
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>{{ T.wordsTime }}</th>
-                  <th>{{ T.wordsStatus }}</th>
-                  <th class="numeric">{{ T.wordsPercentage }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="run in selectedProblem.runs">
-                  <td>{{ time.formatDateTime(run.time) }}</td>
-                  <td>{{ run.verdict }}</td>
-                  <td class="numeric">{{ 100 * run.score }}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="card">
+              <div class="card-header">
+                {{ T.wordsSubmissions }}
+              </div>
+              <div class="card-body px-0">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>{{ T.wordsTime }}</th>
+                      <th>{{ T.wordsStatus }}</th>
+                      <th class="numeric">{{ T.wordsPercentage }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="run in selectedProblem.runs">
+                      <td>{{ time.formatDateTime(run.time) }}</td>
+                      <td>{{ run.verdict }}</td>
+                      <td class="numeric">{{ 100 * run.score }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
