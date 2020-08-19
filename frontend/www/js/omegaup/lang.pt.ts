@@ -369,6 +369,8 @@ const translations: { [key: string]: string; } = {
   courseStudentCountLabel: "Alunos: %(student_count)",
   courseStudentNotInCourse: "O estudante n\u00e3o estava no curso.",
   courseStudentRemoved: "O estudante foi removido com sucesso.",
+  courseStudentSelectAssignment: "Selecione designa\u00e7\u00e3o",
+  courseStudentSelectStudent: "Selecione o aluno",
   courseStudentsEmpty: "N\u00e3o h\u00e1 alunos",
   courseStudentsProgress: "Progresso do aluno",
   courseStudentsProgressExportToSpreadsheet: "Exportar tabela como:",
