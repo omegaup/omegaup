@@ -1936,7 +1936,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Show scoreboard is always optional
         $r->ensureOptionalBool('show_scoreboard_after');
 
-        // languages is always optional
+        // languages is always required
         if (empty($r['languages'])) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',

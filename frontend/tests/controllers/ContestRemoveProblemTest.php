@@ -194,7 +194,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' =>  $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'admission_mode' => 'public', // Update public
-                'languages' => 'c11-gcc'
+                'languages' => 'c11-gcc',
             ]
         );
 
@@ -211,7 +211,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams(
                 [
                     'admissionMode' => 'private',
-                    'languages' => 'c11-gcc'
+                    'languages' => 'c11-gcc',
                 ]
             )
         );
@@ -287,7 +287,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Test\Factories\ContestParams(
                 [
                     'admissionMode' => 'private',
-                    'languages' => 'c11-gcc'
+                    'languages' => 'c11-gcc',
                 ]
             )
         );

@@ -29,7 +29,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         foreach ($apicall['requests'] as $req) {
             $params = [
                 'auth_token' => $login->auth_token,
-                'languages' => 'c11-gcc'
+                'languages' => 'c11-gcc',
             ];
             foreach ($req['params'] as $k => $v) {
                 $params[$k] = $v;
@@ -249,7 +249,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             new \OmegaUp\Test\Factories\ContestParams(
                 [
                     'contestDirector' => $identityTwo,
-                    'languages' => 'c11-gcc'
+                    'languages' => 'c11-gcc',
                 ]
             )
         );

@@ -229,7 +229,7 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
                 'contest_alias' => $virtualContestAlias,
                 'title' => 'testtest',
                 'auth_token' => $login->auth_token,
-                'languages' => 'c11-gcc'
+                'languages' => 'c11-gcc',
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {

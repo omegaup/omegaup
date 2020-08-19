@@ -948,7 +948,7 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contest['request']['alias'],
             'auth_token' => $directorLogin->auth_token,
             'window_length' => 60,
-            'languages' => 'c11-gcc'
+            'languages' => 'c11-gcc',
         ]);
 
         // Call API
