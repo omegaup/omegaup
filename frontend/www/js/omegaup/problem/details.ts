@@ -2,6 +2,8 @@ import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
+import { Arena, GetOptionsFromLocation } from '../arena/arena';
+import ArenaAdmin from '../arena/admin_arena';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -177,6 +179,30 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'tab-selected': (tabName: string) => {
+            arenaInstance.activeTab = tabName;
+            if (arenaInstance.activeTab === 'problems') {
+              if (window.location.hash.indexOf('/new-run') !== -1) {
+                if (!OmegaUp.loggedIn) {
+                  window.location.href = `/login/?redirect=${escape(
+                    window.location.href,
+                  )}`;
+                  return;
+                }
+                arenaInstance.detectShowRun();
+                $('#overlay form:not([data-run-submit])').hide();
+                $('#overlay').show();
+              }
+            }
+
+            if (arenaInstance.activeTab === 'clarifications') {
+              $('#clarifications-count').css('font-weight', 'normal');
+            }
+            window.location.replace(`#${arenaInstance.activeTab}`);
+          },
+          details: (run: types.Run) => {
+            window.location.hash += `/show-run:${run.guid}`;
+          },
         },
       });
     },
@@ -191,4 +217,46 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-details': problem_Details,
     },
   });
+
+  const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
+  arenaInstance.renderProblem(payload.problem);
+
+  const onlyProblemHashChanged = () => {
+    if (arenaInstance.activeTab !== 'problems') {
+      return;
+    }
+    if (window.location.hash.indexOf('/new-run') !== -1) {
+      if (!OmegaUp.loggedIn) {
+        window.location.href = `/login/?redirect=${escape(
+          window.location.href,
+        )}`;
+        return;
+      }
+      $('#overlay form:not([data-run-submit])').hide();
+      $('#overlay').show();
+    }
+  };
+
+  if (payload.runs && payload.user.loggedIn) {
+    for (const run of payload.runs) {
+      arenaInstance.trackRun(run);
+    }
+  }
+
+  if (payload.user.admin) {
+    const adminInstance = new ArenaAdmin(arenaInstance);
+    adminInstance.refreshRuns();
+    adminInstance.refreshClarifications();
+    setInterval(() => {
+      adminInstance.refreshRuns();
+      adminInstance.refreshClarifications();
+    }, 5 * 60 * 1000);
+  }
+
+  window.addEventListener('hashchange', () => {
+    onlyProblemHashChanged();
+  });
+
+  // Everything is loaded
+  onlyProblemHashChanged();
 });

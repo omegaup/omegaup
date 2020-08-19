@@ -1,9 +1,14 @@
 <template>
-  <div>
-    <ul class="nav justify-content-center nav-tabs" role="tablist">
-      <li class="nav-item" v-for="tab in availableTabs" v-bind:key="tab.name">
+  <div class="mt-4">
+    <ul class="nav justify-content-center nav-tabs">
+      <li
+        class="nav-item"
+        role="tablist"
+        v-for="tab in availableTabs"
+        v-bind:key="tab.name"
+      >
         <a
-          href="#"
+          v-bind:href="`#${tab.name}`"
           class="nav-link"
           data-toggle="tab"
           role="tab"
@@ -69,41 +74,44 @@
             }}
           </div>
         </template>
-        <omegaup-quality-nomination-review
-          v-if="user.reviewer && !nominationStatus.already_reviewed"
-          v-on:submit="
-            (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
-          "
-        ></omegaup-quality-nomination-review>
-        <omegaup-quality-nomination-demotion
-          v-on:submit="
-            (qualityDemotionComponent) =>
-              $emit('submit-demotion', qualityDemotionComponent)
-          "
-        ></omegaup-quality-nomination-demotion>
-        <omegaup-quality-nomination-promotion
-          v-bind:can-nominate-problem="nominationStatus.canNoominateProblem"
-          v-bind:dismissed="nominationStatus.dismissed"
-          v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
-          v-bind:nominated="nominationStatus.nominated"
-          v-bind:nomination-before-a-c="nominationStatus.nominationBeforeAC"
-          v-bind:solved="nominationStatus.solved"
-          v-bind:tried="nominationStatus.tried"
-          v-bind:problem-alias="problem.alias"
-          v-on:submit="
-            (qualityPromotionComponent) =>
-              $emit('submit-promotion', qualityPromotionComponent)
-          "
-          v-on:dismiss="
-            (qualityPromotionComponent) =>
-              $emit('dismiss-promotion', qualityPromotionComponent)
-          "
-        ></omegaup-quality-nomination-promotion>
+        <template v-if="this.user.loggedIn">
+          <omegaup-quality-nomination-review
+            v-if="user.reviewer && !nominationStatus.already_reviewed"
+            v-on:submit="
+              (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+            "
+          ></omegaup-quality-nomination-review>
+          <omegaup-quality-nomination-demotion
+            v-on:submit="
+              (qualityDemotionComponent) =>
+                $emit('submit-demotion', qualityDemotionComponent)
+            "
+          ></omegaup-quality-nomination-demotion>
+          <omegaup-quality-nomination-promotion
+            v-bind:can-nominate-problem="nominationStatus.canNominateProblem"
+            v-bind:dismissed="nominationStatus.dismissed"
+            v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
+            v-bind:nominated="nominationStatus.nominated"
+            v-bind:nomination-before-a-c="nominationStatus.nominationBeforeAC"
+            v-bind:solved="nominationStatus.solved"
+            v-bind:tried="nominationStatus.tried"
+            v-bind:problem-alias="problem.alias"
+            v-on:submit="
+              (qualityPromotionComponent) =>
+                $emit('submit-promotion', qualityPromotionComponent)
+            "
+            v-on:dismiss="
+              (qualityPromotionComponent) =>
+                $emit('dismiss-promotion', qualityPromotionComponent)
+            "
+          ></omegaup-quality-nomination-promotion>
+        </template>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
           v-bind:runs="runs"
           v-bind:show-details="true"
           v-bind:problemset-problems="[]"
+          v-on:details="(run) => $emit('details', run)"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
           v-bind:quality-histogram="histogram.qualityHistogram"
@@ -155,6 +163,12 @@
         ></omegaup-arena-clarification-list>
       </div>
     </div>
+    <!-- id-lint off -->
+    <div id="overlay">
+      <div id="run-submit"></div>
+      <div id="run-details"></div>
+    </div>
+    <!-- id-lint on -->
   </div>
 </template>
 
@@ -282,6 +296,11 @@ export default class ProblemDetails extends Vue {
       },
     ];
     return tabs.filter((tab) => tab.visible);
+  }
+
+  @Watch('selectedTab')
+  onSelectedTabChanged(newValue: string, oldValue: string): void {
+    this.$emit('tab-selected', newValue);
   }
 
   @Watch('initialClarifications')

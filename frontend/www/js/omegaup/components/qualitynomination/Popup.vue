@@ -1,5 +1,9 @@
 <template>
-  <div class="qualitynomination-popup">
+  <div
+    class="qualitynomination-popup"
+    v-bind:class="{ overlay: showForm }"
+    v-on:click="onCloseOverlay"
+  >
     <a
       v-bind:href="suggestLink"
       v-on:click="onShowSuggestion"
@@ -134,7 +138,19 @@
   </div>
 </template>
 
-<style>
+<style scoped>
+.overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999998;
+}
+
 .qualitynomination-popup .popup {
   position: fixed;
   bottom: 10px;
@@ -335,6 +351,14 @@ export default class QualityNominationPopup extends Vue {
       return '#';
     }
     return `#problems/${self.problemAlias}`;
+  }
+
+  onCloseOverlay(event: Event): void {
+    if ((<HTMLElement>event.target).classList.contains('overlay')) {
+      return;
+    }
+    this.showFormOverride = false;
+    this.localDismissed = false;
   }
 
   onHide(isDismissed: boolean): void {

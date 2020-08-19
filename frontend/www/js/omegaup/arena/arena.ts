@@ -582,7 +582,7 @@ export class Arena {
           });
         },
         data: {
-          languages: [],
+          languages: ['py3'],
           preferredLanguage: '',
           nextSubmissionTimestamp: new Date(0),
         },
@@ -2154,6 +2154,7 @@ export class Arena {
       }
       groups = detailsGroups;
     }
+    console.log(this.runDetailsView);
     if (this.runDetailsView) {
       this.runDetailsView.data = Object.assign({}, data, {
         logs: data.logs || '',
@@ -2315,9 +2316,14 @@ export function GetOptionsFromLocation(
     options.isPractice = true;
   }
 
-  if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
+  if (
+    arenaLocation.pathname.indexOf('/arena/problemv2/') !== -1 ||
+    arenaLocation.pathname.indexOf('/arena/problem/') !== -1
+  ) {
     options.isOnlyProblem = true;
-    const match = /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    const match = /\/arena\/problemv2\/([^\/]+)\/?/.exec(
+      arenaLocation.pathname,
+    );
     if (match) {
       options.onlyProblemAlias = match[1];
     }
