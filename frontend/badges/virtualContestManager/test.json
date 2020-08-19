@@ -40,13 +40,12 @@
                 "start_time": "1560786190",
                 "finish_time": "1560872590",
                 "window_length": "0",
-                "scoreboard": 90,
+                "scoreboard": 100,
                 "points_decay_factor": 0,
                 "partial_score": 1,
                 "submissions_gap": 1200,
                 "feedback": "detailed",
                 "penalty_type": "contest_start",
-                "languages": "c11-gcc",
                 "penalty_calc_policy": "sum",
                 "admission_mode": "private",
                 "show_scoreboard_after": "true"
@@ -56,8 +55,7 @@
               "api": "\\OmegaUp\\Controllers\\Contest::apiCreateVirtual",
               "params": {
                 "alias": "prueba",
-                "start_time": "1560958990",
-                "languages": "c11-gcc"
+                "start_time": "1560958990"
               }
             }
           ]
