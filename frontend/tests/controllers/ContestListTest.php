@@ -748,7 +748,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contests[1]['request']['alias'],
             'admission_mode' => 'private',
-            'languages' => 'c11-gcc',
         ]));
 
         \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() + 10);
@@ -757,7 +756,6 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contests[1]['request']['alias'],
             'admission_mode' => 'public',
-            'languages' => 'c11-gcc',
         ]));
 
         // New order must be [1, 2, 0]

@@ -228,7 +228,6 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
-            'languages' => 'c11-gcc',
         ]);
         \OmegaUp\Controllers\Contest::apiUpdate($r1);
 
@@ -429,7 +428,6 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
-            'languages' => 'c11-gcc',
         ]));
 
         // Create two users
@@ -494,7 +492,6 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
-            'languages' => 'c11-gcc',
         ]));
 
         // Invited contestants should access without a new request

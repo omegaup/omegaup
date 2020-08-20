@@ -70,7 +70,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'admission_mode' => 'public',
-                'languages' => 'c11-gcc',
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -107,7 +106,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'public',
-            'languages' => 'c11-gcc',
         ]);
 
         // Call API
@@ -1015,7 +1013,6 @@ class ContestUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
                 'admission_mode' => 'public',
-                'languages' => 'c11-gcc',
             ])
         );
 
