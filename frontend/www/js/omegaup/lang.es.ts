@@ -782,6 +782,7 @@ const translations: { [key: string]: string; } = {
   problemRestrictedTagInteractive: "Interactivo",
   problemRestrictedTagKarel: "Karel",
   problemRestrictedTagLanguage: "Lenguaje",
+  problemRestrictedTagNoSubmissions: "Lectura (Sin env\u00edos)",
   problemRestrictedTagOnlyOutput: "Solo salida",
   problemSolutionNotVisible: "No tienes permiso para ver la soluci\u00f3n del problema. Intenta resolver el problema primero.",
   problemSuccessfullyAdded: "Problema agregado con \u00e9xito",
