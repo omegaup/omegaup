@@ -202,11 +202,6 @@
                 <a class="dropdown-item" href="http://blog.omegaup.com/">{{
                   T.navBlog
                 }}</a>
-                <a
-                  class="dropdown-item"
-                  href="https://omegaup.com/preguntas/"
-                  >{{ T.navQuestions }}</a
-                >
               </div>
             </li>
           </ul>
