@@ -228,19 +228,21 @@ def assert_js_errors(driver,
             message for message, seen in zip(expected_messages, seen_messages)
             if not seen
         ]
-        if missed_paths or missed_messages:
-            raise Exception(
-                ('Some messages were not matched\n'
-                 '\tMatched errors:\n\t\t{matched_errors}\n'
-                 '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
-                 '\tMissed paths:\n\t\t{missed_paths}\n'
-                 '\tMissed messages:\n\t\t{missed_messages}\n').format(
-                     matched_errors='\n'.join(
-                         json.dumps(entry) for entry in matched_errors),
-                     unmatched_errors='\n'.join(
-                         json.dumps(entry) for entry in unmatched_errors),
-                     missed_paths='\n'.join(missed_paths),
-                     missed_messages='\n'.join(missed_messages)))
+        # Rising exceptions only when browser is not firefox
+        if driver.browser_name != 'firefox':
+            if missed_paths or missed_messages:
+                raise Exception(
+                    ('Some messages were not matched\n'
+                     '\tMatched errors:\n\t\t{matched_errors}\n'
+                     '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
+                     '\tMissed paths:\n\t\t{missed_paths}\n'
+                     '\tMissed messages:\n\t\t{missed_messages}\n').format(
+                         matched_errors='\n'.join(
+                             json.dumps(entry) for entry in matched_errors),
+                         unmatched_errors='\n'.join(
+                             json.dumps(entry) for entry in unmatched_errors),
+                         missed_paths='\n'.join(missed_paths),
+                         missed_messages='\n'.join(missed_messages)))
 
 
 @contextlib.contextmanager
