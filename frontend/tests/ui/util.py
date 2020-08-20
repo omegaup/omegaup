@@ -221,28 +221,29 @@ def assert_js_errors(driver,
                 unmatched_errors.append(entry)
         driver.log_collector.extend(unmatched_errors)
 
-        missed_paths = [
-            path for path, seen in zip(expected_paths, seen_paths) if not seen
-        ]
-        missed_messages = [
-            message for message, seen in zip(expected_messages, seen_messages)
-            if not seen
-        ]
-        # Rising exceptions only when browser is not firefox
-        if driver.browser_name != 'firefox':
-            if missed_paths or missed_messages:
-                raise Exception(
-                    ('Some messages were not matched\n'
-                     '\tMatched errors:\n\t\t{matched_errors}\n'
-                     '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
-                     '\tMissed paths:\n\t\t{missed_paths}\n'
-                     '\tMissed messages:\n\t\t{missed_messages}\n').format(
-                         matched_errors='\n'.join(
-                             json.dumps(entry) for entry in matched_errors),
-                         unmatched_errors='\n'.join(
-                             json.dumps(entry) for entry in unmatched_errors),
-                         missed_paths='\n'.join(missed_paths),
-                         missed_messages='\n'.join(missed_messages)))
+    if driver.browser_name == 'firefox':
+        # Firefox does not support providing console message contents.
+        return
+    missed_paths = [
+        path for path, seen in zip(expected_paths, seen_paths) if not seen
+    ]
+    missed_messages = [
+        message for message, seen in zip(expected_messages, seen_messages)
+        if not seen
+    ]
+    if missed_paths or missed_messages:
+        raise Exception(
+            ('Some messages were not matched\n'
+             '\tMatched errors:\n\t\t{matched_errors}\n'
+             '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
+             '\tMissed paths:\n\t\t{missed_paths}\n'
+             '\tMissed messages:\n\t\t{missed_messages}\n').format(
+                 matched_errors='\n'.join(
+                     json.dumps(entry) for entry in matched_errors),
+                 unmatched_errors='\n'.join(
+                     json.dumps(entry) for entry in unmatched_errors),
+                 missed_paths='\n'.join(missed_paths),
+                 missed_messages='\n'.join(missed_messages)))
 
 
 @contextlib.contextmanager
