@@ -150,21 +150,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $cacheKey = "{$activeContests}-{$recommended}-{$page}-{$pageSize}";
         if (is_null($identity) || is_null($identity->identity_id)) {
             // Get all public contests
-            $callback = /** @return list<ContestListItem> */ function () use (
+            $callback = /** @return list<ContestListItem> */ fn () => \OmegaUp\DAO\Contests::getAllPublicContests(
                 $page,
                 $pageSize,
                 $activeContests,
                 $recommended,
                 $query
-            ): array {
-                return \OmegaUp\DAO\Contests::getAllPublicContests(
-                    $page,
-                    $pageSize,
-                    $activeContests,
-                    $recommended,
-                    $query
-                );
-            };
+            );
             if (empty($query)) {
                 $contests = \OmegaUp\Cache::getFromCacheOrSet(
                     \OmegaUp\Cache::CONTESTS_LIST_PUBLIC,
@@ -191,21 +183,13 @@ class Contest extends \OmegaUp\Controllers\Controller {
             );
         } elseif (\OmegaUp\Authorization::isSystemAdmin($identity)) {
             // Get all contests
-            $callback = /** @return list<ContestListItem> */ function () use (
+            $callback = /** @return list<ContestListItem> */ fn () => \OmegaUp\DAO\Contests::getAllContests(
                 $page,
                 $pageSize,
                 $activeContests,
                 $recommended,
                 $query
-            ): array {
-                return \OmegaUp\DAO\Contests::getAllContests(
-                    $page,
-                    $pageSize,
-                    $activeContests,
-                    $recommended,
-                    $query
-                );
-            };
+            );
             if (empty($query)) {
                 $contests = \OmegaUp\Cache::getFromCacheOrSet(
                     \OmegaUp\Cache::CONTESTS_LIST_SYSTEM_ADMIN,
@@ -333,18 +317,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         return self::getContestListInternal(
             $r,
-            function (
+            fn (
                 int $identityId,
                 int $page,
                 int $pageSize,
                 ?string $query
-            ) {
-                return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
-                    $identityId,
-                    $page,
-                    $pageSize
-                );
-            }
+            ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
+                $identityId,
+                $page,
+                $pageSize
+            )
         );
     }
 
@@ -361,20 +343,18 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         return self::getContestListInternal(
             $r,
-            function (
+            fn (
                 int $identityId,
                 int $page,
                 int $pageSize,
                 ?string $query
-            ) {
-                return \OmegaUp\DAO\Contests::getContestsParticipating(
-                    $identityId,
-                    $page,
-                    $pageSize,
-                    \OmegaUp\DAO\Enum\ActiveStatus::ALL,
-                    $query
-                );
-            }
+            ) => \OmegaUp\DAO\Contests::getContestsParticipating(
+                $identityId,
+                $page,
+                $pageSize,
+                \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+                $query
+            )
         );
     }
 
@@ -746,18 +726,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
 
         $contestsList = self::getContestListInternal(
             $r,
-            function (
+            fn (
                 int $identityId,
                 int $page,
                 int $pageSize,
                 ?string $query
-            ) {
-                return \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
-                    $identityId,
-                    $page,
-                    $pageSize
-                );
-            }
+            ) => \OmegaUp\DAO\Contests::getAllContestsOwnedByUser(
+                $identityId,
+                $page,
+                $pageSize
+            )
         );
 
         return [
@@ -1617,6 +1595,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): void {
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $currentUserId;
+
         // Push changes
         try {
             // Begin a new transaction
@@ -1665,7 +1644,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'titleInUse',
+                    'aliasInUse',
                     $e
                 );
             }
@@ -1781,6 +1760,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -1842,7 +1822,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Validate start & finish time
             if ($startTime->time > $finishTime->time) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'contestNewInvalidStartTime'
+                    'contestNewInvalidStartTime',
+                    'finish_time'
                 );
             }
             $contestLength = $finishTime->time - $startTime->time;
@@ -1851,7 +1832,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Validate max contest length
         if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'contestLengthTooLong'
+                'contestLengthTooLong',
+                'finish_time'
             );
         }
 
@@ -1878,10 +1860,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'alias',
             $isRequired
         );
+        if (
+            !empty(
+                $r['alias']
+            ) && !is_null(
+                \OmegaUp\DAO\Contests::getByAlias(
+                    $r['alias']
+                )
+            )
+        ) {
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'aliasInUse'
+            );
+            $exception->addCustomMessageToArray('parameter', 'alias');
+            throw $exception;
+        }
         $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureOptionalBool('partial_score');
         $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
+        $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
         \OmegaUp\Validators::validateNumberInRange(
@@ -1990,6 +1988,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -2024,6 +2023,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -3615,13 +3615,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
+     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -3689,23 +3690,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'description',
             'start_time',
             'finish_time',
-            'window_length' => ['transform' => function (?int $value): ?int {
-                return empty($value) ? null : $value;
-            }],
+            'window_length' => [
+                'transform' => fn (?int $value): ?int => empty(
+                    $value
+                ) ? null : $value,
+            ],
             'scoreboard',
             'points_decay_factor',
             'partial_score',
             'submissions_gap',
             'feedback',
-            'penalty' => ['transform' => function (string $value): int {
-                return max(0, intval($value));
-            }],
+            'penalty' => ['transform' => fn (string $value): int => max(
+                0,
+                intval($value)
+            )],
             'penalty_type',
             'penalty_calc_policy',
             'show_scoreboard_after' => [
-                'transform' => function (string $value): bool {
-                    return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                }
+                'transform' => fn (string $value): bool => boolval(
+                    filter_var($value, FILTER_VALIDATE_BOOLEAN)
+                ),
             ],
             'languages' => [
                 'transform' =>
@@ -3777,9 +3781,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     /**
                      * @param array{access_time: \OmegaUp\Timestamp|null, country_id: null|string, email: null|string, end_time: \OmegaUp\Timestamp|null, identity_id: int, is_invited: bool, user_id: int|null, username: string} $identity
                      */
-                    function ($identity): int {
-                        return $identity['identity_id'];
-                    },
+                    fn ($identity) => $identity['identity_id'],
                     $identities
                 );
                 self::preAcceptAccessRequest(

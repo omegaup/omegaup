@@ -523,10 +523,10 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($contestants as $contestant) {
             $this->assertArrayContainsWithPredicate(
                 $identities,
-                function ($identity) use ($contestant, $isInvited) {
-                    return $identity['user_id'] == $contestant->user_id &&
-                    $identity['is_invited'] == $isInvited;
-                }
+                fn ($identity) => (
+                    $identity['user_id'] == $contestant->user_id &&
+                    $identity['is_invited'] == $isInvited
+                )
             );
         }
     }

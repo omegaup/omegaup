@@ -41,9 +41,7 @@ class Admin extends \OmegaUp\Controllers\Controller {
                      * @param array{gender: string, users: int} $row
                      * @return array<string, int>
                      */
-                    function (array $row): array {
-                        return [$row['gender'] => $row['users']];
-                    },
+                    fn (array $row) => [$row['gender'] => $row['users']],
                     \OmegaUp\DAO\Identities::countActiveUsersByGender(
                         $startTime,
                         $endTime
