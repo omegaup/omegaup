@@ -1707,6 +1707,13 @@ export namespace types {
     status: string;
   }
 
+  export interface Histogram {
+    difficulty: number;
+    difficultyHistogram?: string;
+    quality: number;
+    qualityHistogram?: string;
+  }
+
   export interface IdentityRequest {
     accepted?: boolean;
     admin?: { name?: string; username: string };
@@ -1788,8 +1795,10 @@ export namespace types {
 
   export interface NominationStatus {
     alreadyReviewed: boolean;
+    canNominateProblem: boolean;
     dismissed: boolean;
     dismissedBeforeAC: boolean;
+    language: string;
     nominated: boolean;
     nominatedBeforeAC: boolean;
     solved: boolean;
@@ -1923,6 +1932,7 @@ export namespace types {
   export interface ProblemDetailsv2Payload {
     allRuns?: types.Run[];
     clarifications?: types.Clarification[];
+    histogram: types.Histogram;
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
     runs?: types.Run[];

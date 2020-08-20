@@ -62,6 +62,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 SELECT
                     pr.assignment_alias,
                     pr.problem_alias,
+                    pr.problem_id,
+                    pr.order,
                     MAX(`r`.`contest_score`) AS max_user_score_for_problem
                 FROM
                     `Groups_Identities` AS `gi`
@@ -72,7 +74,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                             `a`.`alias` AS assignment_alias,
                             `a`.`problemset_id`,
                             `p`.`problem_id`,
-                            `p`.`alias` AS problem_alias
+                            `p`.`alias` AS problem_alias,
+                            `psp`.`order`
                         FROM
                             `Assignments` AS `a`
                         INNER JOIN
@@ -102,7 +105,10 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                     `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
             ) AS bpr
             GROUP BY
-                bpr.problem_alias, bpr.assignment_alias;';
+                bpr.problem_alias, bpr.assignment_alias
+            ORDER BY
+                bpr.order, bpr.problem_id;
+        ';
 
         /** @var list<array{assignment_alias: string, problem_alias: string, variance: float}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(

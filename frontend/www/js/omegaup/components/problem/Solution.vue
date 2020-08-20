@@ -1,11 +1,11 @@
 <template>
-  <div class="panel">
+  <div class="card">
     <omegaup-markdown
       v-if="showSolution"
       v-bind:markdown="solution.markdown"
       v-bind:image-mapping="solution.images"
     ></omegaup-markdown>
-    <div class="interstitial" v-else="showSolution">
+    <div class="interstitial" v-else>
       <p v-html="statusMessage"></p>
       <p
         v-html="

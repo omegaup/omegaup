@@ -1714,6 +1714,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): void {
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $currentUserId;
+
         // Push changes
         try {
             // Begin a new transaction
@@ -1762,7 +1763,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transRollback();
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                    'titleInUse',
+                    'aliasInUse',
                     $e
                 );
             }
@@ -1878,6 +1879,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -1939,7 +1941,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
             // Validate start & finish time
             if ($startTime->time > $finishTime->time) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'contestNewInvalidStartTime'
+                    'contestNewInvalidStartTime',
+                    'finish_time'
                 );
             }
             $contestLength = $finishTime->time - $startTime->time;
@@ -1948,7 +1951,8 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Validate max contest length
         if ($contestLength > \OmegaUp\Controllers\Contest::MAX_CONTEST_LENGTH_SECONDS) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'contestLengthTooLong'
+                'contestLengthTooLong',
+                'finish_time'
             );
         }
 
@@ -1975,10 +1979,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'alias',
             $isRequired
         );
+        if (
+            !empty(
+                $r['alias']
+            ) && !is_null(
+                \OmegaUp\DAO\Contests::getByAlias(
+                    $r['alias']
+                )
+            )
+        ) {
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'aliasInUse'
+            );
+            $exception->addCustomMessageToArray('parameter', 'alias');
+            throw $exception;
+        }
         $r->ensureOptionalFloat('scoreboard', 0, 100, $isRequired);
         $r->ensureOptionalFloat('points_decay_factor', 0, 1, $isRequired);
         $r->ensureOptionalBool('partial_score');
         $r->ensureOptionalInt('submissions_gap', 0, null, $isRequired);
+        $r->ensureOptionalInt('penalty', 0, 10000, $isRequired);
         // Validate the submission_gap in minutes so that the error message
         // matches what is displayed in the UI.
         \OmegaUp\Validators::validateNumberInRange(
@@ -2087,6 +2107,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -2121,6 +2142,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor
@@ -3712,13 +3734,14 @@ class Contest extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $admission_mode
      * @omegaup-request-param mixed $alias
-     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $feedback
      * @omegaup-request-param int $finish_time
      * @omegaup-request-param mixed $languages
+     * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param bool|null $partial_score
+     * @omegaup-request-param int|null $penalty
      * @omegaup-request-param mixed $penalty_calc_policy
      * @omegaup-request-param mixed $penalty_type
      * @omegaup-request-param float|null $points_decay_factor

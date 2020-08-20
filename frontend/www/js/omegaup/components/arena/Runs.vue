@@ -126,7 +126,11 @@
 
             <div class="row">
               <div class="col-sm col-12" v-if="filters.length > 0">
-                <span class="btn btn-secondary mr-3" v-for="filter in filters">
+                <span
+                  class="btn btn-secondary mr-3"
+                  v-for="filter in filters"
+                  v-bind:key="filter.name"
+                >
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
                   >
@@ -160,7 +164,7 @@
         </thead>
         <tfoot v-if="problemAlias != null">
           <tr>
-            <td colspan="9">
+            <td colspan="10">
               <a
                 v-bind:href="`/arena/${contestAlias}/practice/`"
                 v-if="isContestFinished"
