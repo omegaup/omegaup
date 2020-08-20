@@ -7,7 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type Contest=array{acl_id?: int, admission_mode: string, alias: string, contest_id: int, description: string, feedback?: string, finish_time: \OmegaUp\Timestamp, languages?: null|string, last_updated: \OmegaUp\Timestamp, original_finish_time?: \OmegaUp\Timestamp, partial_score: bool, penalty?: int, penalty_calc_policy?: string, penalty_type?: string, points_decay_factor?: float, problemset_id: int, recommended: bool, rerun_id: int, scoreboard?: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after?: int, start_time: \OmegaUp\Timestamp, submissions_gap?: int, title: string, urgent?: int, window_length: int|null}
- * @psalm-type CachedContestDetails=array{admission_mode: string, alias: string, description: string, director: null|string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: non-empty-list<string>, needs_basic_information: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>, problemset_id: int, requests_user_information: string, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}
+ * @psalm-type ContestDetails=array{admission_mode: string, alias: string, description: string, director: null|string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: non-empty-list<string>, needs_basic_information: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>, problemset_id: int, requests_user_information: string, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null}
  * @psalm-type ContestAdminDetails=array{admission_mode: string, alias: string, description: string, director: null|string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: non-empty-list<string>, needs_basic_information: bool, original_contest_alias: null|string, original_problemset_id: int|null, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problems: list<array{accepted: int, accepts_submissions: bool, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, problem_id: int, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}>, problemset_id: int, requests_user_information: string, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_penalty: bool, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null, opened: bool, admin: bool, available_languages: array<string, string>}
  * @psalm-type ConsentStatement=array{contest_alias: string, privacy_git_object_id?: string, share_user_information: bool|null, statement_type?: string}
  * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
@@ -808,10 +808,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $problemset = \OmegaUp\DAO\Problemsets::getByPK(
             $contest->problemset_id
         );
-
-        $problemset = \OmegaUp\DAO\Problemsets::getByPK(
-            $contest->problemset_id
-        );
         if (is_null($problemset) || is_null($problemset->problemset_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemsetNotFound'
@@ -820,9 +816,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $problems = \OmegaUp\DAO\ProblemsetProblems::getProblemsByProblemset(
             $problemset->problemset_id
         );
-        foreach ($problems as &$problem) {
-            unset($problem['problem_id']);
-        }
 
         // Requests
         $resultAdmins = \OmegaUp\DAO\ProblemsetIdentityRequest::getFirstAdminForProblemsetRequest(
@@ -832,20 +825,11 @@ class Contest extends \OmegaUp\Controllers\Controller {
             $contest->problemset_id
         );
 
-        $admins = [];
         $requestsAdmins = [];
         foreach ($resultAdmins as $result) {
-            $adminId = $result['admin_id'];
-            if (!empty($adminId) && !array_key_exists($adminId, $admins)) {
-                $admin = [];
-                $data = \OmegaUp\DAO\Identities::findByUserId($adminId);
-                if (!is_null($data)) {
-                    $admin = [
-                        'username' => $data->username,
-                    ];
-                }
-                $requestsAdmins[$result['identity_id']] = $admin;
-            }
+            $requestsAdmins[$result['identity_id']] = [
+                'username' => $result['username']
+            ];
         }
 
         $usersRequests = array_map(function ($request) use ($requestsAdmins) {
@@ -1226,7 +1210,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
      * Returns details of a Contest. This is shared between apiDetails and
      * apiAdminDetails.
      *
-     * @return CachedContestDetails
+     * @return ContestDetails
      */
     private static function getCachedDetails(
         string $contestAlias,
@@ -1235,7 +1219,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::CONTEST_INFO,
             $contestAlias,
-            /** @return CachedContestDetails */
+            /** @return ContestDetails */
             function () use ($contest, &$result) {
                 // Initialize response to be the contest information
                 /** @var array{admission_mode: string, alias: string, description: string, feedback: string, finish_time: \OmegaUp\Timestamp, languages: string, partial_score: bool, penalty: int, penalty_calc_policy: string, penalty_type: string, points_decay_factor: float, problemset_id: int, rerun_id: int, scoreboard: int, scoreboard_url: string, scoreboard_url_admin: string, show_scoreboard_after: bool, start_time: \OmegaUp\Timestamp, submissions_gap: int, title: string, window_length: int|null} */

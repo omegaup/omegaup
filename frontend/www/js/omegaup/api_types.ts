@@ -1204,55 +1204,6 @@ export namespace types {
     username: string;
   }
 
-  export interface CachedContestDetails {
-    admission_mode: string;
-    alias: string;
-    description: string;
-    director?: string;
-    feedback: string;
-    finish_time: Date;
-    languages: string[];
-    needs_basic_information: boolean;
-    original_contest_alias?: string;
-    original_problemset_id?: number;
-    partial_score: boolean;
-    penalty: number;
-    penalty_calc_policy: string;
-    penalty_type: string;
-    points_decay_factor: number;
-    problems: {
-      accepted: number;
-      accepts_submissions: boolean;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      input_limit: number;
-      languages: string;
-      letter: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      quality_seal: boolean;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
-    problemset_id: number;
-    requests_user_information: string;
-    rerun_id: number;
-    scoreboard: number;
-    scoreboard_url: string;
-    scoreboard_url_admin: string;
-    show_penalty: boolean;
-    show_scoreboard_after: boolean;
-    start_time: Date;
-    submissions_gap: number;
-    title: string;
-    window_length?: number;
-  }
-
   export interface Clarification {
     answer?: string;
     author?: string;
@@ -1384,6 +1335,55 @@ export namespace types {
     languages: string[];
     needs_basic_information: boolean;
     opened: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    partial_score: boolean;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problems: {
+      accepted: number;
+      accepts_submissions: boolean;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      input_limit: number;
+      languages: string;
+      letter: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      quality_seal: boolean;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
+    problemset_id: number;
+    requests_user_information: string;
+    rerun_id: number;
+    scoreboard: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestDetails {
+    admission_mode: string;
+    alias: string;
+    description: string;
+    director?: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string[];
+    needs_basic_information: boolean;
     original_contest_alias?: string;
     original_problemset_id?: number;
     partial_score: boolean;
