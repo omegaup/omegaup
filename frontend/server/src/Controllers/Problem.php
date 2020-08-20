@@ -48,7 +48,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'problemRestrictedTagKarel',
         'problemRestrictedTagLanguage',
         'problemRestrictedTagOnlyOutput',
-        'problemRestrictedTagInteractive'
+        'problemRestrictedTagInteractive',
+        'problemRestrictedTagNoSubmissions',
     ];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
     const VALID_SORTING_MODES = ['asc', 'desc'];
@@ -1570,6 +1571,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } elseif (!empty(array_intersect(['kp', 'kj'], $languages))) {
             \OmegaUp\Controllers\Problem::addTag(
                 'problemRestrictedTagKarel',
+                true,
+                $problem,
+                true
+            );
+        } elseif (in_array('', $languages)) {
+            \OmegaUp\Controllers\Problem::addTag(
+                'problemRestrictedTagNoSubmissions',
                 true,
                 $problem,
                 true
