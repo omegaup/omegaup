@@ -1,8 +1,8 @@
 <template>
   <div class="qualitynomination-demotionpopup">
-    <a href="#" v-on:click="onReportInappropriateProblem">{{
-      T.wordsReportProblem
-    }}</a>
+    <button class="btn btn-link" v-on:click="onReportInappropriateProblem">
+      {{ T.wordsReportProblem }}
+    </button>
     <form class="popup h-auto w-auto" v-show="showReportDialog">
       <template v-if="currentView == 'question'">
         <button class="close" type="button" v-on:click="onHide">×</button>
@@ -141,6 +141,7 @@ export default class QualityNominationDemotionPopup extends Vue {
 
   onHide(): void {
     this.showReportDialog = false;
+    this.$emit('dismiss');
   }
 
   onReportInappropriateProblem(): void {
@@ -149,6 +150,7 @@ export default class QualityNominationDemotionPopup extends Vue {
     this.rationale = '';
     this.original = '';
     this.selectedReason = '';
+    this.$emit('update:value', true);
   }
 
   onSubmit(): void {

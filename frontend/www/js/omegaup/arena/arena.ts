@@ -1905,6 +1905,19 @@ export class Arena {
     this.ephemeralGrader.send('setSettings', this.currentProblem.settings);
   }
 
+  detectNewRun(): void {
+    if (window.location.hash.indexOf('/new-run') !== -1) {
+      if (!OmegaUp.loggedIn) {
+        window.location.href = `/login/?redirect=${escape(
+          window.location.href,
+        )}`;
+        return;
+      }
+      $('#overlay form:not([data-run-submit])').hide();
+      $('#overlay').show();
+    }
+  }
+
   detectShowRun(): void {
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);
@@ -2154,7 +2167,6 @@ export class Arena {
       }
       groups = detailsGroups;
     }
-    console.log(this.runDetailsView);
     if (this.runDetailsView) {
       this.runDetailsView.data = Object.assign({}, data, {
         logs: data.logs || '',
@@ -2321,7 +2333,7 @@ export function GetOptionsFromLocation(
     arenaLocation.pathname.indexOf('/arena/problem/') !== -1
   ) {
     options.isOnlyProblem = true;
-    const match = /\/arena\/problemv2\/([^\/]+)\/?/.exec(
+    const match = /\/arena\/problem(?:v2)?\/([^\/]+)\/?/.exec(
       arenaLocation.pathname,
     );
     if (match) {

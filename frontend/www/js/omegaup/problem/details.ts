@@ -182,26 +182,16 @@ OmegaUp.on('ready', () => {
           'tab-selected': (tabName: string) => {
             arenaInstance.activeTab = tabName;
             if (arenaInstance.activeTab === 'problems') {
-              if (window.location.hash.indexOf('/new-run') !== -1) {
-                if (!OmegaUp.loggedIn) {
-                  window.location.href = `/login/?redirect=${escape(
-                    window.location.href,
-                  )}`;
-                  return;
-                }
-                arenaInstance.detectShowRun();
-                $('#overlay form:not([data-run-submit])').hide();
-                $('#overlay').show();
-              }
+              arenaInstance.detectNewRun();
             }
 
-            if (arenaInstance.activeTab === 'clarifications') {
-              $('#clarifications-count').css('font-weight', 'normal');
-            }
             window.location.replace(`#${arenaInstance.activeTab}`);
           },
           details: (run: types.Run) => {
-            window.location.hash += `/show-run:${run.guid}`;
+            window.location.replace(
+              `#${arenaInstance.activeTab}/show-run:${run.guid}`,
+            );
+            arenaInstance.detectShowRun();
           },
         },
       });
@@ -225,16 +215,7 @@ OmegaUp.on('ready', () => {
     if (arenaInstance.activeTab !== 'problems') {
       return;
     }
-    if (window.location.hash.indexOf('/new-run') !== -1) {
-      if (!OmegaUp.loggedIn) {
-        window.location.href = `/login/?redirect=${escape(
-          window.location.href,
-        )}`;
-        return;
-      }
-      $('#overlay form:not([data-run-submit])').hide();
-      $('#overlay').show();
-    }
+    arenaInstance.detectNewRun();
   };
 
   if (payload.runs && payload.user.loggedIn) {

@@ -4438,7 +4438,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'reviewer' => false,
                     ],
                 ],
-                'fullWidth' => true,
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblem'
                 ),

@@ -2,6 +2,7 @@
   <omegaup-popup
     v-bind:reviewer-nomination="true"
     v-bind:possible-tags="PROBLEM_CATEGORIES"
+    v-bind:value.sync="showOverlay"
     v-on:submit="$emit('submit', tag, qualitySeal)"
   >
     <template slot="link-title">
@@ -80,6 +81,7 @@ export default class ReviewerPopup extends Vue {
   T = T;
   qualitySeal = true;
   tag = '';
+  showOverlay = false;
 
   PROBLEM_CATEGORIES = [
     'problemLevelAdvancedCompetitiveProgramming',
@@ -90,5 +92,10 @@ export default class ReviewerPopup extends Vue {
     'problemLevelIntermediateDataStructuresAndAlgorithms',
     'problemLevelIntermediateMathsInProgramming',
   ];
+
+  @Watch('showOverlay')
+  onShowOverlayChanged(newValue: boolean): void {
+    this.$emit('update:value', newValue);
+  }
 }
 </script>

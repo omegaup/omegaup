@@ -15,9 +15,15 @@
           v-bind:aria-controls="tab.name"
           v-bind:class="{ active: selectedTab === tab.name }"
           v-bind:aria-selected="selectedTab === tab.name"
-          v-on:click="selectedTab = tab.name"
+          v-on:click="onTabSelected(tab.name)"
         >
           {{ tab.text }}
+          <span
+            class="clarifications-count"
+            v-bind:class="{ 'font-weight-bold': !clarificationsTabVisited }"
+            v-if="tab.name === 'clarifications'"
+            >{{ clarificationsCount }}</span
+          >
         </a>
       </li>
     </ul>
@@ -74,18 +80,23 @@
             }}
           </div>
         </template>
+        <omegaup-overlay v-show="showOverlay"> </omegaup-overlay>
         <template v-if="this.user.loggedIn">
           <omegaup-quality-nomination-review
             v-if="user.reviewer && !nominationStatus.already_reviewed"
+            v-bind:value.sync="showOverlay"
             v-on:submit="
               (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
             "
+            v-on:dismiss="showOverlay = false"
           ></omegaup-quality-nomination-review>
           <omegaup-quality-nomination-demotion
+            v-bind:value.sync="showOverlay"
             v-on:submit="
               (qualityDemotionComponent) =>
                 $emit('submit-demotion', qualityDemotionComponent)
             "
+            v-on:dismiss="showOverlay = false"
           ></omegaup-quality-nomination-demotion>
           <omegaup-quality-nomination-promotion
             v-bind:can-nominate-problem="nominationStatus.canNominateProblem"
@@ -96,13 +107,14 @@
             v-bind:solved="nominationStatus.solved"
             v-bind:tried="nominationStatus.tried"
             v-bind:problem-alias="problem.alias"
+            v-bind:value.sync="showOverlay"
             v-on:submit="
               (qualityPromotionComponent) =>
                 $emit('submit-promotion', qualityPromotionComponent)
             "
             v-on:dismiss="
               (qualityPromotionComponent) =>
-                $emit('dismiss-promotion', qualityPromotionComponent)
+                onDismissPromotion(qualityPromotionComponent)
             "
           ></omegaup-quality-nomination-promotion>
         </template>
@@ -208,6 +220,7 @@ import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
 import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -238,6 +251,7 @@ interface Tab {
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
@@ -271,6 +285,8 @@ export default class ProblemDetails extends Vue {
   time = time;
   selectedTab = 'problems';
   clarifications = this.initialClarifications || [];
+  showOverlay = false;
+  clarificationsTabVisited = false;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -296,6 +312,25 @@ export default class ProblemDetails extends Vue {
       },
     ];
     return tabs.filter((tab) => tab.visible);
+  }
+
+  get clarificationsCount(): string {
+    if (this.clarifications.length === 0) return '';
+    return `(${this.clarifications.length})`;
+  }
+
+  onTabSelected(tabName: string): void {
+    if (this.selectedTab === 'clarifications') {
+      this.clarificationsTabVisited = true;
+    }
+    this.selectedTab = tabName;
+  }
+
+  onDismissPromotion(
+    qualityPromotionComponent: qualitynomination_Promotion,
+  ): void {
+    this.showOverlay = false;
+    this.$emit('dismiss-promotion', qualityPromotionComponent);
   }
 
   @Watch('selectedTab')
