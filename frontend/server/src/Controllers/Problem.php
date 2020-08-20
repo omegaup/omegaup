@@ -49,7 +49,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'problemRestrictedTagLanguage',
         'problemRestrictedTagOnlyOutput',
         'problemRestrictedTagInteractive',
-        'wordsNoSubmissions'
+        'problemRestrictedTagNoSubmissions'
     ];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
     const VALID_SORTING_MODES = ['asc', 'desc'];
@@ -1577,7 +1577,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         } elseif (in_array('', $languages)) {
             \OmegaUp\Controllers\Problem::addTag(
-                'wordsNoSubmissions',
+                'problemRestrictedTagNoSubmissions',
                 true,
                 $problem,
                 true
