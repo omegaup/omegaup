@@ -2075,21 +2075,26 @@ class Contest extends \OmegaUp\Controllers\Controller {
         // Show scoreboard is always optional
         $r->ensureOptionalBool('show_scoreboard_after');
 
-        // languages is always optional
-        if (!empty($r['languages'])) {
-            if (is_string($r['languages'])) {
-                $r['languages'] = explode(',', $r['languages']);
-            }
-            if (is_array($r['languages'])) {
-                foreach ($r['languages'] as $language) {
-                    \OmegaUp\Validators::validateOptionalInEnum(
-                        $language,
-                        'languages',
-                        array_keys(
-                            \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
-                        )
-                    );
-                }
+        // languages is required only when a contest is created
+        if ($isRequired && empty($r['languages'])) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'languages'
+            );
+        }
+
+        if (is_string($r['languages'])) {
+            $r['languages'] = explode(',', $r['languages']);
+        }
+        if (is_array($r['languages'])) {
+            foreach ($r['languages'] as $language) {
+                \OmegaUp\Validators::validateOptionalInEnum(
+                    $language,
+                    'languages',
+                    array_keys(
+                        \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES
+                    )
+                );
             }
         }
     }

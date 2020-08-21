@@ -62,6 +62,7 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'contest_alias' => $contestData['request']['alias'],
             'title' => $contestData['request']['title'],
+            'languages' => 'c11-gcc',
         ]));
 
         // To validate, we update the title to the original request and send
@@ -160,6 +161,7 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'group' => $groupData['request']['alias'],
             'contest_alias' => $contestData['request']['alias'],
+            'languages' => 'c11-gcc',
         ]);
 
         // Call api
@@ -176,6 +178,9 @@ class ContestAddAdminTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Update title
         $r['title'] = \OmegaUp\Test\Utils::createRandomString();
+
+        // Update Languages
+        $r['languages'] = 'c11-gcc';
 
         // Call API
         $response = \OmegaUp\Controllers\Contest::apiUpdate($r);
