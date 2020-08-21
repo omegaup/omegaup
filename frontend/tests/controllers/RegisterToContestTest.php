@@ -23,6 +23,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
             'start_time' => \OmegaUp\Time::get() + 60 * 60,
+            'languages' => 'c11-gcc',
         ]);
         $request['finish_time'] = $request['start_time'] + 60;
         \OmegaUp\Controllers\Contest::apiUpdate($request);
@@ -59,6 +60,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'auth_token' => $adminLogin->auth_token,
             'start_time' => \OmegaUp\Time::get() - 1,
+            'languages' => 'c11-gcc',
         ]);
         $request['finish_time'] = $request['start_time'] + 60;
         \OmegaUp\Controllers\Contest::apiUpdate($request);
@@ -136,6 +138,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'admission_mode' => 'registration',
             'auth_token' => $adminLogin->auth_token,
+            'languages' => 'c11-gcc',
         ]);
         \OmegaUp\Controllers\Contest::apiUpdate($r1);
 
@@ -271,6 +274,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'needs_basic_information' => 1,
             'auth_token' => $adminLogin->auth_token,
+            'languages' => 'c11-gcc',
         ]));
 
         // Contestant will try to open the contest, it should fail
@@ -314,6 +318,7 @@ class RegisterToContestTest extends \OmegaUp\Test\ControllerTestCase {
             'contest_alias' => $contestData['request']['alias'],
             'basic_information' => 1,
             'auth_token' => $adminLogin->auth_token,
+            'languages' => 'c11-gcc',
         ]));
 
         // Contestant will try to open the contes, this should fail

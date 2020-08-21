@@ -109,7 +109,7 @@ class ContestParams {
             $this->contestDirectorUser = $params['contestDirectorUser'] ?? $user;
         }
         $this->windowLength = $params['windowLength'] ?? null;
-        $this->languages = $params['languages'] ?? null;
+        $this->languages = $params['languages'] ?? ['c11-gcc','c11-clang','cpp11-gcc','cpp11-clang','cpp17-gcc','cpp17-clang','java','py2','py3','rb','cs','pas','hs','lua'];
         $this->startTime = (
             $params['startTime'] ??
             new \OmegaUp\Timestamp(\OmegaUp\Time::get() - 60 * 60)
