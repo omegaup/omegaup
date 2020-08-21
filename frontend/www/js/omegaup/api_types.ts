@@ -108,6 +108,50 @@ export namespace types {
       );
     }
 
+    export function ContestEditPayload(
+      elementId: string = 'payload',
+    ): types.ContestEditPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        x.requests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.last_update)
+              x.last_update = ((x: number) => new Date(x * 1000))(
+                x.last_update,
+              );
+            x.request_time = ((x: number) => new Date(x * 1000))(
+              x.request_time,
+            );
+            return x;
+          });
+        })(x.requests);
+        x.users = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.access_time)
+              x.access_time = ((x: number) => new Date(x * 1000))(
+                x.access_time,
+              );
+            if (x.end_time)
+              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+            return x;
+          });
+        })(x.users);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ContestIntroPayload(
       elementId: string = 'payload',
     ): types.ContestIntroPayload {
@@ -1277,6 +1321,144 @@ export namespace types {
     title: string;
     urgent?: number;
     window_length?: number;
+  }
+
+  export interface ContestAdminDetails {
+    admin: boolean;
+    admission_mode: string;
+    alias: string;
+    available_languages: { [key: string]: string };
+    description: string;
+    director?: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string[];
+    needs_basic_information: boolean;
+    opened: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    partial_score: boolean;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problems: {
+      accepted: number;
+      accepts_submissions: boolean;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      input_limit: number;
+      languages: string;
+      letter: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      quality_seal: boolean;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
+    problemset_id: number;
+    requests_user_information: string;
+    rerun_id: number;
+    scoreboard: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestDetails {
+    admission_mode: string;
+    alias: string;
+    description: string;
+    director?: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string[];
+    needs_basic_information: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    partial_score: boolean;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problems: {
+      accepted: number;
+      accepts_submissions: boolean;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      input_limit: number;
+      languages: string;
+      letter: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      quality_seal: boolean;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
+    problemset_id: number;
+    requests_user_information: string;
+    rerun_id: number;
+    scoreboard: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestEditPayload {
+    admins: { role: string; username: string }[];
+    details: types.ContestAdminDetails;
+    group_admins: { alias: string; name: string; role: string }[];
+    groups: { alias: string; name: string }[];
+    problems: {
+      accepted: number;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      languages: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
+    requests: {
+      accepted?: boolean;
+      admin?: { username?: string };
+      country?: string;
+      last_update?: Date;
+      request_time: Date;
+      username: string;
+    }[];
+    users: {
+      access_time?: Date;
+      country_id?: string;
+      end_time?: Date;
+      is_owner?: number;
+      username: string;
+    }[];
   }
 
   export interface ContestIntroPayload {
@@ -2515,39 +2697,7 @@ export namespace messages {
   export type ContestAddUserResponse = {};
   export type ContestAdminDetailsRequest = { [key: string]: any };
   export type _ContestAdminDetailsServerResponse = any;
-  export type ContestAdminDetailsResponse = {
-    admin: boolean;
-    admission_mode: string;
-    alias: string;
-    available_languages: { [key: string]: string };
-    description: string;
-    director?: string;
-    feedback: string;
-    finish_time: Date;
-    languages: string[];
-    needs_basic_information: boolean;
-    opened: boolean;
-    original_contest_alias?: string;
-    original_problemset_id?: number;
-    partial_score: boolean;
-    penalty: number;
-    penalty_calc_policy: string;
-    penalty_type: string;
-    points_decay_factor: number;
-    problems: types.ProblemsetProblem[];
-    problemset_id: number;
-    requests_user_information: string;
-    rerun_id: number;
-    scoreboard: number;
-    scoreboard_url: string;
-    scoreboard_url_admin: string;
-    show_penalty: boolean;
-    show_scoreboard_after: boolean;
-    start_time: Date;
-    submissions_gap: number;
-    title: string;
-    window_length?: number;
-  };
+  export type ContestAdminDetailsResponse = types.ContestAdminDetails;
   export type ContestAdminListRequest = { [key: string]: any };
   export type _ContestAdminListServerResponse = any;
   export type ContestAdminListResponse = { contests: types.Contest[] };
