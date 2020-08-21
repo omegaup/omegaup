@@ -1,5 +1,8 @@
 <template>
-  <div class="overlay"></div>
+  <div>
+    <slot name="link-title"></slot>
+    <div class="overlay" v-if="showOverlay"></div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -20,5 +23,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
 @Component
-export default class Overlay extends Vue {}
+export default class Overlay extends Vue {
+  @Prop({ default: false }) showOverlay!: boolean;
+}
 </script>

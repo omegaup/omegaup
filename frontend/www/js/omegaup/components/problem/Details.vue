@@ -80,9 +80,12 @@
             }}
           </div>
         </template>
-        <omegaup-overlay v-show="showOverlay"> </omegaup-overlay>
-        <template v-if="this.user.loggedIn">
+        <omegaup-overlay
+          v-bind:show-overlay="showOverlay"
+          v-if="this.user.loggedIn"
+        >
           <omegaup-quality-nomination-review
+            slot="link-title"
             v-if="user.reviewer && !nominationStatus.already_reviewed"
             v-bind:value.sync="showOverlay"
             v-on:submit="
@@ -91,14 +94,17 @@
             v-on:dismiss="showOverlay = false"
           ></omegaup-quality-nomination-review>
           <omegaup-quality-nomination-demotion
+            slot="link-title"
             v-bind:value.sync="showOverlay"
             v-on:submit="
               (qualityDemotionComponent) =>
                 $emit('submit-demotion', qualityDemotionComponent)
             "
             v-on:dismiss="showOverlay = false"
-          ></omegaup-quality-nomination-demotion>
+          >
+          </omegaup-quality-nomination-demotion>
           <omegaup-quality-nomination-promotion
+            slot="link-title"
             v-bind:can-nominate-problem="nominationStatus.canNominateProblem"
             v-bind:dismissed="nominationStatus.dismissed"
             v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
@@ -117,7 +123,7 @@
                 onDismissPromotion(qualityPromotionComponent)
             "
           ></omegaup-quality-nomination-promotion>
-        </template>
+        </omegaup-overlay>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
           v-bind:runs="runs"

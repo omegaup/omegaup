@@ -67,9 +67,7 @@
         </div>
       </template>
       <template v-if="currentView == 'thanks'">
-        <div class="centered">
-          <h1>{{ T.reportProblemFormThanksForReview }}</h1>
-        </div>
+        <h1>{{ T.reportProblemFormThanksForReview }}</h1>
       </template>
     </form>
   </div>

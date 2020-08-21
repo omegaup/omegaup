@@ -582,7 +582,7 @@ export class Arena {
           });
         },
         data: {
-          languages: ['py3'],
+          languages: [],
           preferredLanguage: '',
           nextSubmissionTimestamp: new Date(0),
         },
