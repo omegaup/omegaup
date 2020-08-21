@@ -88,6 +88,7 @@
 					"points_decay_factor": 0,
 					"partial_score": "true",
 					"submissions_gap": 1200,
+					"penalty": 0,
 					"feedback": "detailed",
 					"penalty_type": "contest_start",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",

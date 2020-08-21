@@ -342,6 +342,14 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
             )
         );
 
+        $smartyResult = \OmegaUp\Controllers\Badge::getDetailsForSmarty(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'badge_alias' => 'problemSetter'
+        ]));
+        $this->assertNotNull(
+            $smartyResult['smartyProperties']['payload']['badge']['assignation_time']
+        );
+
         $contestManagerResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'user' => $user,

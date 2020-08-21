@@ -7,19 +7,24 @@
     </div>
     <div class="card-body">
       <form>
-        <select v-model="selectedStudent">
-          <option v-bind:value="student" v-for="student in students">
-            {{ student.name || student.username }}
-          </option>
-        </select>
+        <div class="form-group col-md-3">
+          <label>{{ T.courseStudentSelectStudent }}</label>
+          <select class="ml-1 form-control" v-model="selectedStudent">
+            <option v-bind:value="student" v-for="student in students">
+              {{ student.name || student.username }}
+            </option>
+          </select>
+        </div>
       </form>
-      <hr />
       <form>
-        <select v-model="selectedAssignment">
-          <option v-bind:value="assignment" v-for="assignment in assignments">
-            {{ assignment.name }}
-          </option>
-        </select>
+        <div class="form-group col-md-3">
+          <label>{{ T.courseStudentSelectAssignment }}</label>
+          <select class="ml-1 form-control" v-model="selectedAssignment">
+            <option v-bind:value="assignment" v-for="assignment in assignments">
+              {{ assignment.name }}
+            </option>
+          </select>
+        </div>
       </form>
       <div v-if="selectedAssignment">
         <p
@@ -27,54 +32,66 @@
           v-text="selectedAssignment.description"
         ></p>
         <hr />
-        <div>
-          <ul class="nav nav-tabs" role="tablist">
-            <li
-              role="presentation"
-              v-bind:class="{ active: problem == selectedProblem }"
-              v-for="problem in problems"
-            >
-              <a
-                aria-controls="home"
-                data-toggle="tab"
-                href="#home"
-                role="tab"
-                v-bind:data-problem-alias="problem.alias"
-                v-on:click="selectedProblem = problem"
+        <div class="card">
+          <div class="card-header">
+            <ul class="nav nav-pills card-header-pills">
+              <li
+                class="nav-item"
+                role="presentation"
+                v-bind:class="{ active: problem == selectedProblem }"
+                v-for="problem in problems"
               >
-                <template v-if="problem.runs.length &gt; 0">
-                  {{ bestScore(problem) * problem.points }} /
-                  {{ problem.points }} - </template
-                >{{ problem.title }} ({{ problem.runs.length }})</a
-              >
-            </li>
-          </ul>
+                <a
+                  aria-controls="home"
+                  data-toggle="tab"
+                  href="#home"
+                  class="nav-link"
+                  role="tab"
+                  v-bind:data-problem-alias="problem.alias"
+                  v-on:click="selectedProblem = problem"
+                >
+                  <template v-if="problem.runs.length &gt; 0">
+                    {{ bestScore(problem) * problem.points }} /
+                    {{ problem.points }} - </template
+                  >{{ problem.title }} ({{ problem.runs.length }})</a
+                >
+              </li>
+            </ul>
+          </div>
           <div v-if="!selectedProblem || selectedProblem.runs.length == 0">
-            <div class="empty-category">
+            <div class="empty-category px-10 py-10">
               {{ T.courseAssignmentProblemRunsEmpty }}
             </div>
           </div>
-          <div class="card" v-else="">
-            <div class="card-header">
+          <template v-else="">
+            <div class="card-body pb-0">
+              <h5 class="card-title">
+                {{ T.arenaCommonCode }}
+              </h5>
               <pre>{{ bestRunSource(selectedProblem) }}</pre>
             </div>
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>{{ T.wordsTime }}</th>
-                  <th>{{ T.wordsStatus }}</th>
-                  <th class="numeric">{{ T.wordsPercentage }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="run in selectedProblem.runs">
-                  <td>{{ time.formatDateTime(run.time) }}</td>
-                  <td>{{ run.verdict }}</td>
-                  <td class="numeric">{{ 100 * run.score }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <div class="card-body pb-0">
+              <h5 class="card-title">
+                {{ T.wordsSubmissions }}
+              </h5>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>{{ T.wordsTime }}</th>
+                    <th>{{ T.wordsStatus }}</th>
+                    <th class="numeric">{{ T.wordsPercentage }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="run in selectedProblem.runs">
+                    <td>{{ time.formatDateTime(run.time) }}</td>
+                    <td>{{ run.verdict }}</td>
+                    <td class="numeric">{{ 100 * run.score }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
         </div>
       </div>
     </div>
