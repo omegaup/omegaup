@@ -42,21 +42,16 @@ class ApiCaller {
             $apiException = $e;
         } catch (\Exception $e) {
             $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                'generalError',
                 $e
             );
         }
 
-        self::$log->error($apiException);
+        self::logException($apiException);
         \OmegaUp\Metrics::getInstance()->apiStatus(
             strval($request->methodName),
             intval($apiException->getCode())
         );
-        if (
-            extension_loaded('newrelic') &&
-            $apiException->getCode() == 500
-        ) {
-            newrelic_notice_error(strval($apiException));
-        }
         /** @var array<string, mixed> */
         return $apiException->asResponseArray();
     }
@@ -98,14 +93,8 @@ class ApiCaller {
             $response = self::call($r);
         } catch (\OmegaUp\Exceptions\ApiException $apiException) {
             $r = null;
+            self::logException($apiException);
             $response = $apiException->asResponseArray();
-            self::$log->error($apiException);
-            if (
-                extension_loaded('newrelic') &&
-                $apiException->getCode() == 500
-            ) {
-                newrelic_notice_error(strval($apiException));
-            }
         }
         return self::render($response, $r);
     }
@@ -171,10 +160,7 @@ class ApiCaller {
             }
             if ($jsonResult === false) {
                 $apiException = new \OmegaUp\Exceptions\InternalServerErrorException();
-                self::$log->error($apiException);
-                if (extension_loaded('newrelic')) {
-                    newrelic_notice_error(strval($apiException));
-                }
+                self::logException($apiException);
                 $jsonResult = json_encode($apiException->asResponseArray());
             }
         }
@@ -297,12 +283,14 @@ class ApiCaller {
             $apiException = $e;
         } else {
             $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                'generalError',
                 $e
             );
         }
 
+        self::logException($apiException);
+
         if ($apiException->getcode() == 400) {
-            self::$log->info("{$apiException}");
             header('HTTP/1.1 400 Bad Request');
             die(
                 file_get_contents(
@@ -311,7 +299,6 @@ class ApiCaller {
             );
         }
         if ($apiException->getCode() == 401) {
-            self::$log->info("{$apiException}");
             header(
                 'Location: /login/?redirect=' . urlencode(
                     strval(
@@ -322,7 +309,6 @@ class ApiCaller {
             die();
         }
         if ($apiException->getCode() == 403) {
-            self::$log->info("{$apiException}");
             // Even though this is forbidden, we pretend the resource did not
             // exist.
             header('HTTP/1.1 404 Not Found');
@@ -333,7 +319,6 @@ class ApiCaller {
             );
         }
         if ($apiException->getcode() == 404) {
-            self::$log->info("{$apiException}");
             header('HTTP/1.1 404 Not Found');
             die(
                 file_get_contents(
@@ -341,16 +326,26 @@ class ApiCaller {
                 )
             );
         }
-        self::$log->error("{$apiException}");
-        if (extension_loaded('newrelic') && $apiException->getCode() == 500) {
-            newrelic_notice_error(strval($apiException));
-        }
         header('HTTP/1.1 500 Internal Server Error');
         die(
             file_get_contents(
                 sprintf('%s/www/500.html', strval(OMEGAUP_ROOT))
             )
         );
+    }
+
+    public static function logException(
+        \OmegaUp\Exceptions\ApiException $apiException
+    ): void {
+        $stringifiedException = strval($apiException);
+        if ($apiException->getCode() >= 500 && $apiException->getCode() < 600) {
+            self::$log->error($stringifiedException);
+            if (extension_loaded('newrelic')) {
+                newrelic_notice_error($stringifiedException);
+            }
+        } else {
+            self::$log->info($stringifiedException);
+        }
     }
 }
 

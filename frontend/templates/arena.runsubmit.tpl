@@ -6,20 +6,20 @@
 					{#wordsLanguage#}
 					<select name="language">
 						<option value="" default="default"></option>
-						<option value="cpp17-gcc">C++17 (g++ 7.4)</option>
-						<option value="cpp17-clang">C++17 (clang++ 6.0)</option>
-						<option value="cpp11-gcc">C++11 (g++ 7.4)</option>
-						<option value="cpp11-clang">C++11 (clang++ 6.0)</option>
-						<option value="c11-gcc">C (gcc 7.4)</option>
-						<option value="c11-clang">C (clang 6.0)</option>
-						<option value="cs">C# (dotnet 2.2)</option>
-						<option value="hs">Haskell (ghc 8.0)</option>
-						<option value="java">Java (openjdk 11.0)</option>
+						<option value="cpp17-gcc">C++17 (g++ 9.3)</option>
+						<option value="cpp17-clang">C++17 (clang++ 10.0)</option>
+						<option value="cpp11-gcc">C++11 (g++ 9.3)</option>
+						<option value="cpp11-clang">C++11 (clang++ 10.0)</option>
+						<option value="c11-gcc">C (gcc 9.3)</option>
+						<option value="c11-clang">C (clang 10.0)</option>
+						<option value="cs">C# (8.0, dotnet 3.1)</option>
+						<option value="hs">Haskell (ghc 8.6)</option>
+						<option value="java">Java (openjdk 14.0)</option>
 						<option value="pas">Pascal (fpc 3.0)</option>
-						<option value="py3">Python 3.6</option>
+						<option value="py3">Python 3.8</option>
 						<option value="py2">Python 2.7</option>
-						<option value="rb">Ruby (2.5)</option>
-						<option value="lua">Lua (5.2)</option>
+						<option value="rb">Ruby (2.7)</option>
+						<option value="lua">Lua (5.3)</option>
 						<option value="kp">Karel (Pascal)</option>
 						<option value="kj">Karel (Java)</option>
 						<option value="cat">{#wordsJustOutput#}</option>

@@ -64,10 +64,7 @@
                 </template>
               </div>
             </li>
-            <li
-              v-bind:class="{ active: navbarSection === 'contests' }"
-              v-else=""
-            >
+            <li v-bind:class="{ active: navbarSection === 'contests' }" v-else>
               <a class="nav-link px-2" href="/arena/" data-nav-contests-arena>{{
                 T.wordsContests
               }}</a>
@@ -102,6 +99,13 @@
                   </a>
                 </template>
               </div>
+            </li>
+            <li
+              v-bind:class="{ active: navbarSection === 'course' }"
+              data-nav-course
+              v-else
+            >
+              <a class="nav-link px-2" href="/course/">{{ T.navCourses }}</a>
             </li>
             <li
               class="nav-item dropdown nav-problems"
@@ -198,15 +202,10 @@
                 <a class="dropdown-item" href="http://blog.omegaup.com/">{{
                   T.navBlog
                 }}</a>
-                <a
-                  class="dropdown-item"
-                  href="https://omegaup.com/preguntas/"
-                  >{{ T.navQuestions }}</a
-                >
               </div>
             </li>
           </ul>
-          <ul class="navbar-nav mr-auto" v-else=""></ul>
+          <ul class="navbar-nav mr-auto" v-else></ul>
           <!-- in lockdown or contest mode there is no left navbar -->
           <ul class="navbar-nav navbar-right" v-if="!isLoggedIn">
             <li class="nav-item">
@@ -215,7 +214,7 @@
               }}</a>
             </li>
           </ul>
-          <ul class="navbar-nav navbar-right" v-else="">
+          <ul class="navbar-nav navbar-right" v-else>
             <!--
               TODO: Hay que darle soporte a estos dos componentes
             <omegaup-notifications-clarifications
@@ -377,10 +376,6 @@ export default class Navbar extends Vue {
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
-  }
-
-  get showNavbar(): boolean {
-    return this.isAdmin && !this.omegaUpLockDown && !this.inContest;
   }
 
   readNotifications(notifications: types.Notification[], url?: string): void {

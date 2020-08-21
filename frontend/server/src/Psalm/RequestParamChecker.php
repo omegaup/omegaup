@@ -30,7 +30,10 @@ class RequestParamChecker implements
         'OmegaUp\\Request::ensureoptionalbool' => 'bool|null',
         'OmegaUp\\Request::ensureint' => 'int',
         'OmegaUp\\Request::ensureoptionalint' => 'int|null',
-        'OmegaUp\\Request::ensurefloat' => 'float|null',
+        'OmegaUp\\Request::ensurefloat' => 'float',
+        'OmegaUp\\Request::ensureoptionalfloat' => 'float|null',
+        'OmegaUp\\Request::ensurestring' => 'string',
+        'OmegaUp\\Request::ensureoptionalstring' => 'string|null',
         'OmegaUp\\Request::ensuretimestamp' => '\\OmegaUp\\Timestamp',
         'OmegaUp\\Request::ensureoptionaltimestamp' => '\\OmegaUp\\Timestamp|null',
     ];
@@ -147,6 +150,105 @@ class RequestParamChecker implements
     }
 
     /**
+     * Called for every Request ensureEnum/ensureOptionalEnum.
+     *
+     * @param \Psalm\FileManipulation[] $fileReplacements
+     *
+     * @return null|false
+     */
+    private static function processRequestEnum(
+        \PhpParser\Node\Expr\MethodCall $expr,
+        \Psalm\Context $context,
+        \Psalm\StatementsSource $statementsSource,
+        \Psalm\Codebase $codebase,
+        array &$fileReplacements = []
+    ) {
+        $varType = $statementsSource->getNodeTypeProvider()->getType(
+            $expr->var
+        );
+        if (is_null($varType)) {
+            return null;
+        }
+        $foundRequest = false;
+        foreach ($varType->getAtomicTypes() as $typeName => $type) {
+            if (
+                $type instanceof \Psalm\Type\Atomic\TNamedObject &&
+                $type->value == 'OmegaUp\\Request'
+            ) {
+                $foundRequest = true;
+                break;
+            }
+        }
+        if (!$foundRequest) {
+            return null;
+        }
+
+        /** @var \PhpParser\Node\Identifier $expr->name */
+        $methodId = 'OmegaUp\\Request::' . strtolower($expr->name->name);
+
+        if (
+            $methodId !== 'OmegaUp\\Request::ensureenum' &&
+            $methodId !== 'OmegaUp\\Request::ensureoptionalenum'
+        ) {
+            return null;
+        }
+
+        if (!is_null($context->calling_function_id)) {
+            $functionId = strtolower($context->calling_function_id);
+        } elseif (!is_null($context->calling_method_id)) {
+            $functionId = $context->calling_method_id;
+        } else {
+            throw new \Exception('Empty calling method/function id');
+        }
+
+        if (count($expr->args) < 2) {
+            if (
+                \Psalm\IssueBuffer::accepts(
+                    new EnumMissingArguments(
+                        "{$methodId}() missing some arguments",
+                        new \Psalm\CodeLocation($statementsSource, $expr)
+                    ),
+                    $statementsSource->getSuppressedIssues()
+                )
+            ) {
+                return false;
+            }
+            return null;
+        }
+        if (!$expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_) {
+            if (
+                // Methods within \OmegaUp\Request are exempt
+                strpos($functionId, 'omegaup\\request::') !== 0 &&
+                \Psalm\IssueBuffer::accepts(
+                    new RequestAccessNotALiteralString(
+                        "{$methodId}() argument not a literal string",
+                        new \Psalm\CodeLocation($statementsSource, $expr)
+                    ),
+                    $statementsSource->getSuppressedIssues()
+                )
+            ) {
+                return false;
+            }
+            return null;
+        }
+
+        $returnType = $statementsSource->getNodeTypeProvider()->getType(
+            $expr
+        );
+        if (is_null($returnType)) {
+            return null;
+        }
+
+        self::processParameter(
+            $functionId,
+            $expr->args[0]->value->value,
+            $returnType,
+            $codebase
+        );
+        return null;
+    }
+
+    /**
      * Called after a statement has been checked
      *
      * @param \Psalm\FileManipulation[] $fileReplacements
@@ -168,6 +270,14 @@ class RequestParamChecker implements
         }
         if ($expr instanceof \PhpParser\Node\Expr\ArrayDimFetch) {
             return self::processRequestPropertyFetch(
+                $expr,
+                $context,
+                $statementsSource,
+                $codebase,
+                $fileReplacements
+            );
+        } elseif ($expr instanceof \PhpParser\Node\Expr\MethodCall) {
+            return self::processRequestEnum(
                 $expr,
                 $context,
                 $statementsSource,
@@ -274,9 +384,7 @@ class RequestParamChecker implements
         foreach (
             $finder->find(
                 $statements,
-                function (\PhpParser\Node $node): bool {
-                    return $node instanceof \PhpParser\Node\Stmt\ClassLike;
-                }
+                fn (\PhpParser\Node $node) => $node instanceof \PhpParser\Node\Stmt\ClassLike
             ) as $classStmt
         ) {
             self::processClass(
@@ -509,9 +617,9 @@ class RequestParamChecker implements
             if (!empty($expected)) {
                 $parsedDocComment->tags = $parsedDocComment->tags + [
                     'omegaup-request-param' => array_map(
-                        function (RequestParamDescription $description): string {
-                            return strval($description);
-                        },
+                        fn (RequestParamDescription $description) => strval(
+                            $description
+                        ),
                         array_values($expected)
                     ),
                 ];
@@ -576,15 +684,39 @@ class RequestParamDescription {
     }
 
     public function __toString(): string {
-        if (is_null($this->description)) {
-            return "{$this->type} \${$this->name}";
+        $result = $this->stringifyType() . " \${$this->name}";
+        if (!is_null($this->description)) {
+            $result .= " {$this->description}";
         }
-        return "{$this->type} \${$this->name} {$this->description}";
+        return $result;
+    }
+
+    private function stringifyType(): string {
+        if ($this->type->hasLiteralValue()) {
+            $types = [];
+            foreach ($this->type->getAtomicTypes() as $type) {
+                if ($type instanceof \Psalm\Type\Atomic\TLiteralFloat) {
+                    $types[] = strval($type->value);
+                } elseif ($type instanceof \Psalm\Type\Atomic\TLiteralString) {
+                    $types[] = "'" . strval($type->value) . "'";
+                } elseif ($type instanceof \Psalm\Type\Atomic\TLiteralInt) {
+                    $types[] = strval($type->value);
+                } else {
+                    $types[] = strval($type);
+                }
+            }
+            sort($types);
+            return implode('|', $types);
+        }
+        return strval($this->type);
     }
 }
 
-class RequestAccessNotALiteralString extends \Psalm\Issue\PluginIssue {
+class EnumMissingArguments extends \Psalm\Issue\PluginIssue {
 }
 
 class MismatchingDocblockOmegaUpRequestParamAnnotation extends \Psalm\Issue\PluginIssue {
+}
+
+class RequestAccessNotALiteralString extends \Psalm\Issue\PluginIssue {
 }

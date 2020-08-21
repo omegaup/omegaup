@@ -45,8 +45,9 @@ class Notification extends \OmegaUp\Controllers\Controller {
     public static function apiReadNotifications(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
         if (empty($r['notifications'])) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'notificationIdsNotProvided'
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'notifications'
             );
         }
         $notifications = [];
@@ -64,7 +65,7 @@ class Notification extends \OmegaUp\Controllers\Controller {
             $notification = \OmegaUp\DAO\Notifications::getByPK($id);
             if (is_null($notification)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
-                    'notificationDoesntExist'
+                    'notificationNotFound'
                 );
             }
             if ($notification->user_id !== $r->user->user_id) {

@@ -266,6 +266,8 @@ export class Arena {
     socketStatus: JQuery;
   };
 
+  initialClarifications: types.Clarification[] = [];
+
   navbarAssignments: Vue | null = null;
 
   navbarProblems:
@@ -1400,17 +1402,18 @@ export class Arena {
   updateClarification(clarification: types.Clarification): void {
     let r: JQuery | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
-    if (this.commonNavbar === null) {
-      return;
-    }
-    const clarifications = this.commonNavbar.initialClarifications;
+    const clarifications =
+      this.commonNavbar?.initialClarifications ?? this.initialClarifications;
     if (this.clarifications[clarification.clarification_id]) {
       r = this.clarifications[clarification.clarification_id];
       if (this.problemsetAdmin) {
-        this.commonNavbar.initialClarifications = clarifications.filter(
+        this.initialClarifications = clarifications.filter(
           (notification) =>
             notification.clarification_id !== clarification.clarification_id,
         );
+        if (this.commonNavbar !== null) {
+          this.commonNavbar.initialClarifications = this.initialClarifications;
+        }
       } else {
         clarifications.push(clarification);
       }
@@ -1536,6 +1539,19 @@ export class Arena {
 
     if (this.commonNavbar !== null) {
       this.commonNavbar.initialClarifications = clarifications
+        .filter((clarification) =>
+          // Removing all unsolved clarifications.
+          this.problemsetAdmin
+            ? clarification.answer === null
+            : clarification.answer !== null &&
+              // Removing all unanswered clarifications.
+              localStorage.getItem(
+                `clarification-${clarification.clarification_id}`,
+              ) === null,
+        )
+        .reverse();
+    } else {
+      this.initialClarifications = clarifications
         .filter((clarification) =>
           // Removing all unsolved clarifications.
           this.problemsetAdmin
@@ -2158,10 +2174,11 @@ export class Arena {
             'detailed')
         ),
       });
+      const runDetailsView = <HTMLElement | null>(
+        document.querySelector('[data-run-details-view]')
+      );
+      if (runDetailsView) runDetailsView.style.display = 'block';
     }
-    (<HTMLElement>(
-      document.querySelector('[data-run-details-view]')
-    )).style.display = 'block';
   }
 
   trackRun(run: types.Run): void {

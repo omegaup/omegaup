@@ -221,26 +221,29 @@ def assert_js_errors(driver,
                 unmatched_errors.append(entry)
         driver.log_collector.extend(unmatched_errors)
 
-        missed_paths = [
-            path for path, seen in zip(expected_paths, seen_paths) if not seen
-        ]
-        missed_messages = [
-            message for message, seen in zip(expected_messages, seen_messages)
-            if not seen
-        ]
-        if missed_paths or missed_messages:
-            raise Exception(
-                ('Some messages were not matched\n'
-                 '\tMatched errors:\n\t\t{matched_errors}\n'
-                 '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
-                 '\tMissed paths:\n\t\t{missed_paths}\n'
-                 '\tMissed messages:\n\t\t{missed_messages}\n').format(
-                     matched_errors='\n'.join(
-                         json.dumps(entry) for entry in matched_errors),
-                     unmatched_errors='\n'.join(
-                         json.dumps(entry) for entry in unmatched_errors),
-                     missed_paths='\n'.join(missed_paths),
-                     missed_messages='\n'.join(missed_messages)))
+    if driver.browser_name == 'firefox':
+        # Firefox does not support providing console message contents.
+        return
+    missed_paths = [
+        path for path, seen in zip(expected_paths, seen_paths) if not seen
+    ]
+    missed_messages = [
+        message for message, seen in zip(expected_messages, seen_messages)
+        if not seen
+    ]
+    if missed_paths or missed_messages:
+        raise Exception(
+            ('Some messages were not matched\n'
+             '\tMatched errors:\n\t\t{matched_errors}\n'
+             '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
+             '\tMissed paths:\n\t\t{missed_paths}\n'
+             '\tMissed messages:\n\t\t{missed_messages}\n').format(
+                 matched_errors='\n'.join(
+                     json.dumps(entry) for entry in matched_errors),
+                 unmatched_errors='\n'.join(
+                     json.dumps(entry) for entry in unmatched_errors),
+                 missed_paths='\n'.join(missed_paths),
+                 missed_messages='\n'.join(missed_messages)))
 
 
 @contextlib.contextmanager
@@ -299,7 +302,7 @@ def create_problem(
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//input[@name = "alias"]'))).send_keys(problem_alias)
+                 '//input[@name = "problem_alias"]'))).send_keys(problem_alias)
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
@@ -326,14 +329,6 @@ def create_problem(
             )
         )
     ).select_by_value('problemLevelBasicKarel')
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (
-                By.CSS_SELECTOR,
-                'button[data-level-button]'
-            )
-        )
-    ).click()
     contents_element = driver.browser.find_element_by_name(
         'problem_contents')
     contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))

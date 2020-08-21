@@ -69,9 +69,7 @@ class APCCacheAdapter extends CacheAdapter {
         /** @var T */
         return apcu_entry(
             $key,
-            function (string $key) use ($defaultVar) {
-                return $defaultVar;
-            },
+            fn (string $key) => $defaultVar,
             $ttl
         );
     }

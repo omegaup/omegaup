@@ -6,7 +6,7 @@
 			{
 				"api": "/problem/create/",
 				"params": {
-					"visibility": 2,
+					"visibility": "public",
 					"title": "Sumas",
 					"problem_alias": "sumas",
 					"validator": "token-numeric",
@@ -30,7 +30,7 @@
 			{
 				"api": "/problem/create/",
 				"params": {
-					"visibility": 2,
+					"visibility": "public",
 					"title": "Triangulos",
 					"problem_alias": "triangulos",
 					"validator": "token-numeric",
@@ -54,7 +54,7 @@
 			{
 				"api": "/problem/create/",
 				"params": {
-					"visibility": 2,
+					"visibility": "public",
 					"title": "Karel Hello World",
 					"problem_alias": "karel-helloworld",
 					"validator": "token",
@@ -88,8 +88,10 @@
 					"points_decay_factor": 0,
 					"partial_score": "true",
 					"submissions_gap": 1200,
+					"penalty": 0,
 					"feedback": "detailed",
 					"penalty_type": "contest_start",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"penalty_calc_policy": "sum",
 					"admission_mode": "private",
 					"show_scoreboard_after": "true"
@@ -115,7 +117,8 @@
 				"api": "/contest/update/",
 				"params": {
 					"contest_alias": "prueba",
-					"admission_mode": "public"
+					"admission_mode": "public",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
 				}
 			},
 			{

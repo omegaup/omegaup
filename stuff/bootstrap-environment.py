@@ -8,6 +8,7 @@ A tool to run an import script to populate the database with objects.
 '''
 
 import argparse
+import errno
 import grp
 import json
 import logging
@@ -191,6 +192,11 @@ def _purge_old_problems() -> None:
     can_delete = 'www-data' in (grp.getgrgid(grid).gr_name
                                 for grid in os.getgroups())
     problems_root = os.path.join(OMEGAUP_RUNTIME_ROOT, 'problems.git')
+    if not os.path.isdir(OMEGAUP_RUNTIME_ROOT):
+        raise RuntimeError('Please run this script inside the VM / container'
+                           ) from FileNotFoundError(errno.ENOENT,
+                                                    os.strerror(errno.ENOENT),
+                                                    OMEGAUP_RUNTIME_ROOT)
     if not os.path.isdir(problems_root):
         return
     for alias in os.listdir(problems_root):

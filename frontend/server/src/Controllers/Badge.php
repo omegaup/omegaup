@@ -160,7 +160,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
                     'badges' => $badges,
                     'ownedBadges' => $ownedBadges['badges']
                 ],
-                'title' => 'omegaupTitleBadges'
+                'title' => new \OmegaUp\TranslationString('omegaupTitleBadges')
             ],
             'entrypoint' => 'badge_list',
         ];
@@ -182,22 +182,20 @@ class Badge extends \OmegaUp\Controllers\Controller {
             $r['badge_alias'],
             \OmegaUp\Controllers\Badge::getAllBadges()
         );
+
+        $details = self::getBadgeDetails($r['badge_alias']);
+        if (!is_null($r->user)) {
+            $details['assignation_time'] = \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
+                $r->user,
+                $r['badge_alias']
+            );
+        }
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'badge' => (
-                        self::getBadgeDetails($r['badge_alias']) +
-                        [
-                            'assignation_time' => is_null($r->user) ?
-                                null :
-                                \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
-                                    $r->user,
-                                    $r['badge_alias']
-                                ),
-                        ]
-                    ),
+                    'badge' => $details,
                 ],
-                'title' => 'omegaupTitleBadges'
+                'title' => new \OmegaUp\TranslationString('omegaupTitleBadges')
             ],
             'entrypoint' => 'badge_details',
         ];

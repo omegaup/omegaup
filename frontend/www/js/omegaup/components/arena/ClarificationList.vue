@@ -36,6 +36,7 @@
                   <option
                     v-for="problem in contestProblems"
                     v-bind:value="problem.alias"
+                    v-bind:key="problem.alias"
                   >
                     {{ problem.title }}</option
                   >
@@ -75,7 +76,7 @@
             <th class="text-center" scope="col" v-if="inContest">
               {{ T.wordsContest }}
             </th>
-            <th class="text-center" scope="col" v-else="">
+            <th class="text-center" scope="col" v-else>
               {{ T.wordsProblem }}
             </th>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
@@ -90,6 +91,10 @@
             v-bind:in-contest="inContest"
             v-bind:key="clarification.clarification_id"
             v-bind:clarification="clarification"
+            v-on:clarification-response="
+              (id, responseText, isPublic) =>
+                $emit('clarification-response', id, responseText, isPublic)
+            "
           ></omegaup-clarification>
         </tbody>
       </table>

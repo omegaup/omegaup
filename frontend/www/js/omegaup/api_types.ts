@@ -108,6 +108,50 @@ export namespace types {
       );
     }
 
+    export function ContestEditPayload(
+      elementId: string = 'payload',
+    ): types.ContestEditPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        x.requests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.last_update)
+              x.last_update = ((x: number) => new Date(x * 1000))(
+                x.last_update,
+              );
+            x.request_time = ((x: number) => new Date(x * 1000))(
+              x.request_time,
+            );
+            return x;
+          });
+        })(x.requests);
+        x.users = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            if (x.access_time)
+              x.access_time = ((x: number) => new Date(x * 1000))(
+                x.access_time,
+              );
+            if (x.end_time)
+              x.end_time = ((x: number) => new Date(x * 1000))(x.end_time);
+            return x;
+          });
+        })(x.users);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function ContestIntroPayload(
       elementId: string = 'payload',
     ): types.ContestIntroPayload {
@@ -300,6 +344,47 @@ export namespace types {
       );
     }
 
+    export function CourseAssignmentEditPayload(
+      elementId: string = 'payload',
+    ): types.CourseAssignmentEditPayload {
+      return ((x) => {
+        if (x.assignment)
+          x.assignment = ((x) => {
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.assignment);
+        x.course = ((x) => {
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseDetailsPayload {
@@ -401,6 +486,21 @@ export namespace types {
                     return x;
                   }
                   return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (x.finish_time)
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -419,6 +519,21 @@ export namespace types {
                     return x;
                   }
                   return x.map((x) => {
+                    x.assignments = ((x) => {
+                      if (!Array.isArray(x)) {
+                        return x;
+                      }
+                      return x.map((x) => {
+                        if (x.finish_time)
+                          x.finish_time = ((x: number) => new Date(x * 1000))(
+                            x.finish_time,
+                          );
+                        x.start_time = ((x: number) => new Date(x * 1000))(
+                          x.start_time,
+                        );
+                        return x;
+                      });
+                    })(x.assignments);
                     if (x.finish_time)
                       x.finish_time = ((x: number) => new Date(x * 1000))(
                         x.finish_time,
@@ -448,90 +563,79 @@ export namespace types {
     ): types.CourseListPayload {
       return ((x) => {
         x.courses = ((x) => {
-          x.public = ((x) => {
-            x.filteredCourses = ((x) => {
-              x.current = ((x) => {
-                x.courses = ((x) => {
-                  if (!Array.isArray(x)) {
+          if (x instanceof Object) {
+            Object.keys(x).forEach(
+              (y) =>
+                (x[y] = ((x) => {
+                  x.filteredCourses = ((x) => {
+                    x.current = ((x) => {
+                      x.courses = ((x) => {
+                        if (!Array.isArray(x)) {
+                          return x;
+                        }
+                        return x.map((x) => {
+                          x.assignments = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              if (x.finish_time)
+                                x.finish_time = ((x: number) =>
+                                  new Date(x * 1000))(x.finish_time);
+                              x.start_time = ((x: number) =>
+                                new Date(x * 1000))(x.start_time);
+                              return x;
+                            });
+                          })(x.assignments);
+                          if (x.finish_time)
+                            x.finish_time = ((x: number) => new Date(x * 1000))(
+                              x.finish_time,
+                            );
+                          x.start_time = ((x: number) => new Date(x * 1000))(
+                            x.start_time,
+                          );
+                          return x;
+                        });
+                      })(x.courses);
+                      return x;
+                    })(x.current);
+                    x.past = ((x) => {
+                      x.courses = ((x) => {
+                        if (!Array.isArray(x)) {
+                          return x;
+                        }
+                        return x.map((x) => {
+                          x.assignments = ((x) => {
+                            if (!Array.isArray(x)) {
+                              return x;
+                            }
+                            return x.map((x) => {
+                              if (x.finish_time)
+                                x.finish_time = ((x: number) =>
+                                  new Date(x * 1000))(x.finish_time);
+                              x.start_time = ((x: number) =>
+                                new Date(x * 1000))(x.start_time);
+                              return x;
+                            });
+                          })(x.assignments);
+                          if (x.finish_time)
+                            x.finish_time = ((x: number) => new Date(x * 1000))(
+                              x.finish_time,
+                            );
+                          x.start_time = ((x: number) => new Date(x * 1000))(
+                            x.start_time,
+                          );
+                          return x;
+                        });
+                      })(x.courses);
+                      return x;
+                    })(x.past);
                     return x;
-                  }
-                  return x.map((x) => {
-                    if (x.finish_time)
-                      x.finish_time = ((x: number) => new Date(x * 1000))(
-                        x.finish_time,
-                      );
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
-                    return x;
-                  });
-                })(x.courses);
-                return x;
-              })(x.current);
-              x.past = ((x) => {
-                x.courses = ((x) => {
-                  if (!Array.isArray(x)) {
-                    return x;
-                  }
-                  return x.map((x) => {
-                    if (x.finish_time)
-                      x.finish_time = ((x: number) => new Date(x * 1000))(
-                        x.finish_time,
-                      );
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
-                    return x;
-                  });
-                })(x.courses);
-                return x;
-              })(x.past);
-              return x;
-            })(x.filteredCourses);
-            return x;
-          })(x.public);
-          x.student = ((x) => {
-            x.filteredCourses = ((x) => {
-              x.current = ((x) => {
-                x.courses = ((x) => {
-                  if (!Array.isArray(x)) {
-                    return x;
-                  }
-                  return x.map((x) => {
-                    if (x.finish_time)
-                      x.finish_time = ((x: number) => new Date(x * 1000))(
-                        x.finish_time,
-                      );
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
-                    return x;
-                  });
-                })(x.courses);
-                return x;
-              })(x.current);
-              x.past = ((x) => {
-                x.courses = ((x) => {
-                  if (!Array.isArray(x)) {
-                    return x;
-                  }
-                  return x.map((x) => {
-                    if (x.finish_time)
-                      x.finish_time = ((x: number) => new Date(x * 1000))(
-                        x.finish_time,
-                      );
-                    x.start_time = ((x: number) => new Date(x * 1000))(
-                      x.start_time,
-                    );
-                    return x;
-                  });
-                })(x.courses);
-                return x;
-              })(x.past);
-              return x;
-            })(x.filteredCourses);
-            return x;
-          })(x.student);
+                  })(x.filteredCourses);
+                  return x;
+                })(x[y])),
+            );
+          }
           return x;
         })(x.courses);
         return x;
@@ -668,6 +772,26 @@ export namespace types {
       elementId: string = 'payload',
     ): types.ProblemDetailsv2Payload {
       return ((x) => {
+        if (x.allRuns)
+          x.allRuns = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.allRuns);
+        if (x.clarifications)
+          x.clarifications = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.clarifications);
         x.problem = ((x) => {
           if (x.problemsetter)
             x.problemsetter = ((x) => {
@@ -679,6 +803,25 @@ export namespace types {
             })(x.problemsetter);
           return x;
         })(x.problem);
+        if (x.runs)
+          x.runs = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.runs);
+        x.solvers = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.solvers);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -984,17 +1127,12 @@ export namespace types {
 
   export interface AddedProblem {
     alias: string;
+    commit?: string;
     points: number;
   }
 
   export interface AdminCourses {
     admin: types.CoursesByAccessMode;
-  }
-
-  export interface AllCourses {
-    admin: types.CoursesByAccessMode;
-    public: types.CoursesByAccessMode;
-    student: types.CoursesByAccessMode;
   }
 
   export interface ArenaProblemDetails {
@@ -1054,6 +1192,15 @@ export namespace types {
   export interface BadgeListPayload {
     badges: string[];
     ownedBadges: types.Badge[];
+  }
+
+  export interface BestSolvers {
+    classname: string;
+    language: string;
+    memory: number;
+    runtime: number;
+    time: Date;
+    username: string;
   }
 
   export interface Clarification {
@@ -1175,6 +1322,144 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestAdminDetails {
+    admin: boolean;
+    admission_mode: string;
+    alias: string;
+    available_languages: { [key: string]: string };
+    description: string;
+    director?: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string[];
+    needs_basic_information: boolean;
+    opened: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    partial_score: boolean;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problems: {
+      accepted: number;
+      accepts_submissions: boolean;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      input_limit: number;
+      languages: string;
+      letter: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      quality_seal: boolean;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
+    problemset_id: number;
+    requests_user_information: string;
+    rerun_id: number;
+    scoreboard: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestDetails {
+    admission_mode: string;
+    alias: string;
+    description: string;
+    director?: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string[];
+    needs_basic_information: boolean;
+    original_contest_alias?: string;
+    original_problemset_id?: number;
+    partial_score: boolean;
+    penalty: number;
+    penalty_calc_policy: string;
+    penalty_type: string;
+    points_decay_factor: number;
+    problems: {
+      accepted: number;
+      accepts_submissions: boolean;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      input_limit: number;
+      languages: string;
+      letter: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      quality_seal: boolean;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
+    problemset_id: number;
+    requests_user_information: string;
+    rerun_id: number;
+    scoreboard: number;
+    scoreboard_url: string;
+    scoreboard_url_admin: string;
+    show_penalty: boolean;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    window_length?: number;
+  }
+
+  export interface ContestEditPayload {
+    admins: { role: string; username: string }[];
+    details: types.ContestAdminDetails;
+    group_admins: { alias: string; name: string; role: string }[];
+    groups: { alias: string; name: string }[];
+    problems: {
+      accepted: number;
+      alias: string;
+      commit: string;
+      difficulty: number;
+      languages: string;
+      order: number;
+      points: number;
+      problem_id: number;
+      submissions: number;
+      title: string;
+      version: string;
+      visibility: number;
+      visits: number;
+    }[];
+    requests: {
+      accepted?: boolean;
+      admin?: { username?: string };
+      country?: string;
+      last_update?: Date;
+      request_time: Date;
+      username: string;
+    }[];
+    users: {
+      access_time?: Date;
+      country_id?: string;
+      end_time?: Date;
+      is_owner?: number;
+      username: string;
+    }[];
+  }
+
   export interface ContestIntroPayload {
     contest: types.ContestPublicDetails;
     needsBasicInformation?: boolean;
@@ -1269,6 +1554,11 @@ export namespace types {
     start_time: Date;
   }
 
+  export interface CourseAssignmentEditPayload {
+    assignment?: types.CourseAssignment;
+    course: types.CourseDetails;
+  }
+
   export interface CourseDetails {
     admission_mode?: string;
     alias: string;
@@ -1315,6 +1605,7 @@ export namespace types {
   }
 
   export interface CourseListPayload {
+    course_type?: string;
     courses: types.StudentCourses;
   }
 
@@ -1361,7 +1652,6 @@ export namespace types {
 
   export interface CourseStudent {
     name?: string;
-    progress: { [key: string]: number };
     username: string;
   }
 
@@ -1391,10 +1681,16 @@ export namespace types {
   }
 
   export interface FilteredCourse {
+    accept_teacher?: boolean;
+    admission_mode: string;
     alias: string;
+    assignments: types.CourseAssignment[];
     counts: { [key: string]: number };
     finish_time?: Date;
+    is_open: boolean;
     name: string;
+    progress?: number;
+    school_name?: string;
     start_time: Date;
   }
 
@@ -1408,6 +1704,13 @@ export namespace types {
       running: { id: number; name: string }[];
     };
     status: string;
+  }
+
+  export interface Histogram {
+    difficulty: number;
+    difficultyHistogram?: string;
+    quality: number;
+    qualityHistogram?: string;
   }
 
   export interface IdentityRequest {
@@ -1491,8 +1794,10 @@ export namespace types {
 
   export interface NominationStatus {
     alreadyReviewed: boolean;
+    canNominateProblem: boolean;
     dismissed: boolean;
     dismissedBeforeAC: boolean;
+    language: string;
     nominated: boolean;
     nominatedBeforeAC: boolean;
     solved: boolean;
@@ -1572,13 +1877,7 @@ export namespace types {
     score: number;
     settings: types.ProblemSettings;
     show_diff: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1618,13 +1917,7 @@ export namespace types {
     settings: types.ProblemSettings;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     solution_status?: string;
-    solvers?: {
-      language: string;
-      memory: number;
-      runtime: number;
-      time: Date;
-      username: string;
-    }[];
+    solvers?: types.BestSolvers[];
     source?: string;
     statement: types.ProblemStatement;
     submissions: number;
@@ -1636,8 +1929,14 @@ export namespace types {
   }
 
   export interface ProblemDetailsv2Payload {
+    allRuns?: types.Run[];
+    clarifications?: types.Clarification[];
+    histogram: types.Histogram;
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
+    runs?: types.Run[];
+    solutionStatus?: string;
+    solvers: types.BestSolvers[];
     user: types.UserInfoForProblem;
   }
 
@@ -1689,6 +1988,8 @@ export namespace types {
     message?: string;
     outputLimit: number | string;
     overallWallTimeLimit: number | string;
+    parameter?: string;
+    problem_level: string;
     publicTags: string[];
     selectedTags?: types.SelectedTag[];
     showDiff: string;
@@ -1712,8 +2013,13 @@ export namespace types {
   }
 
   export interface ProblemInfo {
+    accepts_submissions: boolean;
     alias: string;
+    commit: string;
+    input_limit: number;
     karel_problem: boolean;
+    languages: string[];
+    letter?: string;
     limits: {
       input_limit: string;
       memory_limit: string;
@@ -2140,19 +2446,24 @@ export namespace types {
   }
 
   export interface StudentCourses {
-    public: types.CoursesByAccessMode;
-    student: types.CoursesByAccessMode;
+    [key: string]: types.CoursesByAccessMode;
+  }
+
+  export interface StudentProgress {
+    name?: string;
+    progress: { [key: string]: { [key: string]: number } };
+    username: string;
   }
 
   export interface StudentProgressPayload {
     course: types.CourseDetails;
     student: string;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
   }
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
-    students: types.CourseStudent[];
+    students: types.StudentProgress[];
   }
 
   export interface Submission {
@@ -2387,39 +2698,7 @@ export namespace messages {
   export type ContestAddUserResponse = {};
   export type ContestAdminDetailsRequest = { [key: string]: any };
   export type _ContestAdminDetailsServerResponse = any;
-  export type ContestAdminDetailsResponse = {
-    admin: boolean;
-    admission_mode: string;
-    alias: string;
-    available_languages: { [key: string]: string };
-    description: string;
-    director?: string;
-    feedback: string;
-    finish_time: Date;
-    languages: string[];
-    needs_basic_information: boolean;
-    opened: boolean;
-    original_contest_alias?: string;
-    original_problemset_id?: number;
-    partial_score: boolean;
-    penalty: number;
-    penalty_calc_policy: string;
-    penalty_type: string;
-    points_decay_factor: number;
-    problems: types.ProblemsetProblem[];
-    problemset_id: number;
-    requests_user_information: string;
-    rerun_id: number;
-    scoreboard: number;
-    scoreboard_url: string;
-    scoreboard_url_admin: string;
-    show_penalty: boolean;
-    show_scoreboard_after: boolean;
-    start_time: Date;
-    submissions_gap: number;
-    title: string;
-    window_length?: number;
-  };
+  export type ContestAdminDetailsResponse = types.ContestAdminDetails;
   export type ContestAdminListRequest = { [key: string]: any };
   export type _ContestAdminListServerResponse = any;
   export type ContestAdminListResponse = { contests: types.Contest[] };

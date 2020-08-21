@@ -39,7 +39,7 @@
 				"yarn run refactor"
 			],
 			"whitelist": [
-				"frontend/www/(js|ux)/.*\\.js$"
+				"frontend/www/js/.*\\.js$"
 			],
 			"blacklist": [
 				".*third_party.*",
@@ -47,6 +47,9 @@
 			]
 		},
 		"typescript": {
+			"extra_js_linters": [
+				"yarn run refactor"
+			],
 			"whitelist": [
 				"frontend/www/.*\\.ts$"
 			],

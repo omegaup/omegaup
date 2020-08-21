@@ -5,6 +5,7 @@ import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import course_AssignmentDetails from '../components/course/AssignmentDetails.vue';
+import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Edit from '../components/course/Edit.vue';
 import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
@@ -20,6 +21,7 @@ Vue.use(Clipboard);
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
   const courseAlias = payload.course.alias;
+
   const courseEdit = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -51,7 +53,7 @@ OmegaUp.on('ready', () => {
                   start_time: source.startTime,
                   alias: source.alias,
                   show_scoreboard: source.showScoreboard,
-                  needs_basic_information: source.needs_basic_information,
+                  needs_basic_information: source.needsBasicInformation,
                   requests_user_information: source.requests_user_information,
                   school_id: schoolId ?? undefined,
                   unlimited_duration: source.unlimitedDuration,
@@ -76,7 +78,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'submit-new-assignment': (source: course_AssignmentDetails) => {
+          'submit-new-assignment': (
+            source: course_AssignmentDetails,
+            problems: types.AddedProblem[],
+          ) => {
             const params = {
               name: source.name,
               description: source.description,
@@ -113,6 +118,7 @@ OmegaUp.on('ready', () => {
               Object.assign(params, {
                 alias: source.alias,
                 course_alias: courseAlias,
+                problems: JSON.stringify(problems),
               });
 
               if (source.unlimitedDuration) {
@@ -157,43 +163,56 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'sort-homeworks': (
-            courseAlias: string,
-            homeworksAliases: string[],
-          ) => {
+          'sort-content': (courseAlias: string, contentAliases: string[]) => {
             api.Course.updateAssignmentsOrder({
               course_alias: courseAlias,
-              assignments: JSON.stringify(homeworksAliases),
+              assignments: JSON.stringify(contentAliases),
             })
               .then(() => {
-                ui.success(T.homeworksOrderUpdated);
+                ui.success(T.contentOrderUpdated);
               })
               .catch(ui.apiError);
           },
-          'sort-tests': (courseAlias: string, testsAliases: string[]) => {
-            api.Course.updateAssignmentsOrder({
-              course_alias: courseAlias,
-              assignments: JSON.stringify(testsAliases),
-            })
-              .then(() => {
-                ui.success(T.testsOrderUpdated);
+          'get-versions': (
+            problemAlias: string,
+            source: course_ProblemList,
+          ) => {
+            api.Problem.versions({ problem_alias: problemAlias })
+              .then((result) => {
+                source.versionLog = result.log;
+                let publishedCommitHash = result.published;
+                for (const problem of source.problems) {
+                  if (problem.alias === problemAlias) {
+                    publishedCommitHash = problem.commit;
+                    break;
+                  }
+                }
+                for (const revision of result.log) {
+                  if (publishedCommitHash === revision.commit) {
+                    source.selectedRevision = source.publishedRevision = revision;
+                    break;
+                  }
+                }
               })
               .catch(ui.apiError);
           },
           'add-problem': (
             assignment: types.CourseAssignment,
-            problemAlias: string,
+            problem: types.AddedProblem,
           ) => {
-            api.Course.addProblem({
+            const problemParams: messages.CourseAddProblemRequest = {
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
-              problem_alias: problemAlias,
-            })
+              problem_alias: problem.alias,
+              points: problem.points,
+            };
+            if (problem.commit) {
+              problemParams.commit = problem.commit;
+            }
+            api.Course.addProblem(problemParams)
               .then(() => {
                 ui.success(T.courseAssignmentProblemAdded);
                 this.refreshProblemList(assignment);
-                component.assignmentFormMode =
-                  omegaup.AssignmentFormMode.Default;
               })
               .catch(ui.apiError);
           },
@@ -247,7 +266,7 @@ OmegaUp.on('ready', () => {
           },
           'update-admission-mode': (admissionMode: string) => {
             api.Course.update({
-              course_alias: courseAlias,
+              alias: courseAlias,
               admission_mode: admissionMode,
             })
               .then(() => {
@@ -295,7 +314,7 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.ignoreError);
           },
-          'remove-student': (student: types.CourseStudent) => {
+          'remove-student': (student: types.StudentProgress) => {
             api.Course.removeStudent({
               course_alias: courseAlias,
               usernameOrEmail: student.username,
@@ -395,7 +414,7 @@ OmegaUp.on('ready', () => {
       refreshAssignmentsList: (): void => {
         api.Course.listAssignments({ course_alias: courseAlias })
           .then((response) => {
-            courseEdit.data.course.assignments = response.assignments;
+            component.assignments = response.assignments;
             component.onResetAssignmentForm();
           })
           .catch(ui.apiError);
@@ -406,7 +425,7 @@ OmegaUp.on('ready', () => {
           course: courseAlias,
         })
           .then((response) => {
-            courseEdit.data.assignmentProblems = response.problems;
+            component.assignmentProblems = response.problems;
           })
           .catch(ui.apiError);
       },

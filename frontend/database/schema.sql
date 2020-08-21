@@ -37,7 +37,7 @@ CREATE TABLE `Assignments` (
   `description` tinytext NOT NULL,
   `alias` varchar(32) NOT NULL,
   `publish_time_delay` int DEFAULT NULL,
-  `assignment_type` enum('homework','test') NOT NULL,
+  `assignment_type` enum('homework','lesson','test') NOT NULL DEFAULT 'homework' COMMENT 'Almacena el tipo de contenido que se va a dar de alta',
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `finish_time` timestamp NULL DEFAULT NULL,
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
@@ -565,7 +565,6 @@ CREATE TABLE `Problems_Languages` (
 CREATE TABLE `Problems_Tags` (
   `problem_id` int NOT NULL,
   `tag_id` int NOT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '0',
   `source` enum('owner','voted','quality') NOT NULL DEFAULT 'owner' COMMENT 'El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.',
   PRIMARY KEY (`problem_id`,`tag_id`),
   KEY `problem_id` (`problem_id`),

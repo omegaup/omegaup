@@ -42,6 +42,83 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     }
 
     /**
+     * Returns each problem with the statistics of the runs submmited by the students
+     *
+     * @return list<array{assignment_alias: string, problem_alias: string, variance: float}>
+     */
+    public static function getAssignmentsProblemsStatistics(
+        int $courseId,
+        int $groupId
+    ): array {
+        $sql = '
+            SELECT
+                bpr.assignment_alias,
+                bpr.problem_alias,
+                COALESCE (
+                    VARIANCE(bpr.max_user_score_for_problem),
+                    0
+                ) AS variance
+            FROM (
+                SELECT
+                    pr.assignment_alias,
+                    pr.problem_alias,
+                    pr.problem_id,
+                    pr.order,
+                    MAX(`r`.`contest_score`) AS max_user_score_for_problem
+                FROM
+                    `Groups_Identities` AS `gi`
+                CROSS JOIN
+                    (
+                        SELECT
+                            `a`.`assignment_id`,
+                            `a`.`alias` AS assignment_alias,
+                            `a`.`problemset_id`,
+                            `p`.`problem_id`,
+                            `p`.`alias` AS problem_alias,
+                            `psp`.`order`
+                        FROM
+                            `Assignments` AS `a`
+                        INNER JOIN
+                            `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
+                        INNER JOIN
+                            `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+                        INNER JOIN
+                            `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
+                        WHERE
+                            `a`.`course_id` = ?
+                        GROUP BY
+                            `a`.`assignment_id`, `p`.`problem_id`
+                    ) AS pr
+                INNER JOIN
+                    `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
+                LEFT JOIN
+                    `Submissions` AS `s`
+                ON
+                    `s`.`problem_id` = `pr`.`problem_id`
+                    AND `s`.`identity_id` = `i`.`identity_id`
+                    AND `s`.`problemset_id` = `pr`.`problemset_id`
+                LEFT JOIN
+                    `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+                WHERE
+                    `gi`.`group_id` = ?
+                GROUP BY
+                    `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
+            ) AS bpr
+            GROUP BY
+                bpr.problem_alias, bpr.assignment_alias
+            ORDER BY
+                bpr.order, bpr.problem_id;
+        ';
+
+        /** @var list<array{assignment_alias: string, problem_alias: string, variance: float}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ $courseId, $groupId ]
+        );
+        return $results;
+    }
+
+    /**
      * @return array<string, int>
      */
     public static function getAssignmentCountsForCourse(int $courseId): array {
@@ -223,5 +300,23 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             $sql,
             [$problemset->problemset_id]
         );
+    }
+
+    public static function getNextPositionOrder(int $courseId): int {
+        $sql = '
+            SELECT
+                COUNT(a.assignment_id)
+            FROM
+                Assignments a
+            WHERE
+                a.course_id = ?;
+            ';
+
+        /** @var int|null */
+        $numberOfAssignments = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [$courseId]
+        );
+        return intval($numberOfAssignments) + 1;
     }
 }

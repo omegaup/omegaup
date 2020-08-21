@@ -8,7 +8,8 @@
         "
       >
         <div class="form-group">
-          <label>{{ T.wordsStudent }}</label>
+          <p class="card-title">{{ T.courseEditAddStudentsDescription }}</p>
+          <label>{{ T.username }}</label>
           <span
             aria-hidden="true"
             class="glyphicon glyphicon-info-sign"
@@ -23,7 +24,7 @@
         </div>
         <div class="form-group pull-right">
           <button class="btn btn-primary" type="submit">
-            {{ T.wordsAddStudent }}
+            {{ T.wordsAddStudents }}
           </button>
         </div>
         <div class="form-group">
@@ -95,7 +96,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
@@ -110,7 +110,7 @@ import common_Requests from '../common/Requests.vue';
 })
 export default class CourseAddStudents extends Vue {
   @Prop() courseAlias!: string;
-  @Prop() students!: omegaup.CourseStudent[];
+  @Prop() students!: types.CourseStudent[];
   @Prop({ required: false }) identityRequests!: types.IdentityRequest[];
 
   T = T;
@@ -120,7 +120,7 @@ export default class CourseAddStudents extends Vue {
   participants = '';
   requests: types.IdentityRequest[] = [];
 
-  studentProgressUrl(student: omegaup.CourseStudent): string {
+  studentProgressUrl(student: types.CourseStudent): string {
     return `/course/${this.courseAlias}/student/${student.username}/`;
   }
 

@@ -51,6 +51,8 @@ module.exports = {
     contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
+    course_assignment_edit:
+      './frontend/www/js/omegaup/course/assignment_edit.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
     course_edit: './frontend/www/js/omegaup/course/edit.ts',
     course_intro: './frontend/www/js/omegaup/course/intro.js',
@@ -58,6 +60,7 @@ module.exports = {
     course_mine: './frontend/www/js/omegaup/course/mine.ts',
     course_new: './frontend/www/js/omegaup/course/new.ts',
     course_scoreboard: './frontend/www/js/omegaup/course/scoreboard.js',
+    course_single_list: './frontend/www/js/omegaup/course/single_list.ts',
     course_student: './frontend/www/js/omegaup/course/student.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
     group_identities: './frontend/www/js/omegaup/group/identities.js',
@@ -116,23 +119,25 @@ module.exports = {
   },
 
   plugins: [
-    new CopyWebpackPlugin([
-      {
-        from: './frontend/badges/**/query.sql',
-        to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
-        transform(content, filepath) {
-          const iconPath = `${path.dirname(filepath)}/icon.svg`;
-          return fs.existsSync(iconPath)
-            ? fs.readFileSync(iconPath)
-            : defaultBadgeIcon;
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './frontend/badges/**/query.sql',
+          to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
+          transform(content, filepath) {
+            const iconPath = `${path.dirname(filepath)}/icon.svg`;
+            return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) :
+                                             defaultBadgeIcon;
+          },
+          transformPath(targetPath, absolutePath) {
+            return `media/dist/badges/${
+                path.basename(
+                    path.dirname(absolutePath),
+                    )}.svg`;
+          },
         },
-        transformPath(targetPath, absolutePath) {
-          return `media/dist/badges/${path.basename(
-            path.dirname(absolutePath),
-          )}.svg`;
-        },
-      },
-    ]),
+      ],
+    }),
     new VueLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin({
       vue: true,

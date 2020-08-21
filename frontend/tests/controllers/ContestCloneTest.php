@@ -85,7 +85,7 @@ class ContestCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('titleInUse', $e->getMessage());
+            $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
 

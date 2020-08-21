@@ -3,12 +3,12 @@ FROM ubuntu:focal
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
-        curl ca-certificates xz-utils openjdk-11-jre-headless wait-for-it && \
+        curl ca-certificates xz-utils openjdk-14-jre-headless wait-for-it && \
     /usr/sbin/update-ca-certificates && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -sL https://github.com/omegaup/quark/releases/download/v1.1.34/omegaup-backend.tar.xz | tar xJ -C /
+RUN curl -sL https://github.com/omegaup/quark/releases/download/v1.1.40/omegaup-backend.tar.xz | tar xJ -C /
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar -o /usr/share/java/libinteractive.jar
 RUN mkdir -p /etc/omegaup/grader
 

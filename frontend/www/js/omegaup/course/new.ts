@@ -55,7 +55,7 @@ OmegaUp.on('ready', () => {
                   description: source.description,
                   start_time: source.startTime,
                   show_scoreboard: source.showScoreboard,
-                  needs_basic_information: source.needs_basic_information,
+                  needs_basic_information: source.needsBasicInformation,
                   requests_user_information: source.requests_user_information,
                   school_id: schoolId ?? undefined,
                   unlimited_duration: source.unlimitedDuration,
@@ -68,7 +68,7 @@ OmegaUp.on('ready', () => {
                   .then(() => {
                     this.invalidParameterName = '';
                     window.location.replace(
-                      `/course/${source.alias}/edit/#assignments`,
+                      `/course/${source.alias}/edit/#content`,
                     );
                   })
                   .catch((error) => {

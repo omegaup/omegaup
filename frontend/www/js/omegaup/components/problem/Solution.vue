@@ -1,11 +1,11 @@
 <template>
-  <div class="panel">
+  <div class="card">
     <omegaup-markdown
       v-if="showSolution"
       v-bind:markdown="solution.markdown"
       v-bind:image-mapping="solution.images"
     ></omegaup-markdown>
-    <div class="interstitial" v-else="showSolution">
+    <div class="interstitial" v-else>
       <p v-html="statusMessage"></p>
       <p
         v-html="
@@ -14,27 +14,34 @@
             total: allTokens,
           })
         "
-        v-show="allTokens !== null &amp;&amp; availableTokens !== null"
+        v-show="allTokens !== null && availableTokens !== null"
       ></p>
       <div class="text-center">
-        <a
+        <button
           class="btn btn-primary btn-md"
           v-if="status === 'unlocked'"
           v-on:click="$emit('get-solution')"
-          >{{ T.wordsSeeSolution }}</a
         >
-        <a
+          {{ T.wordsSeeSolution }}
+        </button>
+        <button
           class="btn btn-primary btn-md"
-          v-else-if="status === 'locked' &amp;&amp; allTokens === null &amp;&amp; availableTokens === null"
+          v-else-if="
+            status === 'locked' &&
+            allTokens === null &&
+            availableTokens === null
+          "
           v-on:click="$emit('get-tokens')"
-          >{{ T.solutionViewCurrentTokens }}</a
         >
-        <a
+          {{ T.solutionViewCurrentTokens }}
+        </button>
+        <button
           class="btn btn-primary btn-md"
-          v-else-if="status === 'locked' &amp;&amp; availableTokens &gt; 0"
+          v-else-if="status === 'locked' && availableTokens &gt; 0"
           v-on:click="$emit('unlock-solution')"
-          >{{ T.wordsUnlockSolution }}</a
         >
+          {{ T.wordsUnlockSolution }}
+        </button>
       </div>
     </div>
   </div>

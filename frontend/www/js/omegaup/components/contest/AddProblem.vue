@@ -128,16 +128,17 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import problem_Versions from '../problem/Versions.vue';
 
-const emptyCommit = {
-  author: null,
+const emptyCommit: types.ProblemVersion = {
+  author: {},
   commit: '',
-  commiter: null,
+  committer: {},
   message: '',
   parents: [],
   tree: {},
@@ -168,7 +169,7 @@ export default class AddProblem extends Vue {
     title: '',
     input_limit: 0,
   };
-  versionLog: omegaup.Commit[] = [];
+  versionLog: types.ProblemVersion[] = [];
   useLatestVersion = true;
   publishedRevision = emptyCommit;
   selectedRevision = emptyCommit;
@@ -196,7 +197,10 @@ export default class AddProblem extends Vue {
     this.$emit('emit-remove-problem', this);
   }
 
-  onRunsDiff(versions: omegaup.Commit[], selectedCommit: omegaup.Commit): void {
+  onRunsDiff(
+    versions: types.ProblemVersion[],
+    selectedCommit: types.ProblemVersion,
+  ): void {
     let found = false;
     for (const problem of this.problems) {
       if (this.alias === problem.alias) {
@@ -222,9 +226,8 @@ export default class AddProblem extends Vue {
   get addProblemButtonDisabled(): boolean {
     if (this.useLatestVersion) {
       return this.alias === '';
-    } else {
-      return this.selectedRevision.commit === '';
     }
+    return this.selectedRevision.commit === '';
   }
 
   @Watch('problems')

@@ -9,8 +9,26 @@ if [[ "${CI}" == "true" ]]; then
 	exit 0
 fi
 
-if [[ ! -f /opt/omegaup/frontend/server/config.php ]]; then
-  cat > /opt/omegaup/frontend/server/config.php <<EOF
+function ensure_contents() {
+	local path="$1"
+	local contents="$2"
+
+	local expected_hash="$(echo "${contents}" | sha1sum 2>/dev/null | sed -e 's/\s.*//' || true)"
+	local actual_hash="$(sha1sum "${path}" 2>/dev/null | sed -e 's/\s.*//' || true)"
+
+	if [[ "${expected_hash}" == "${actual_hash}" ]]; then
+		return
+	fi
+	echo "${contents}" | cat > "${path}"
+}
+
+# Create a directory for Psalm's benefit.
+if [[ ! -d /opt/omegaup/frontend/www/phpminiadmin ]]; then
+	mkdir -p /opt/omegaup/frontend/www/phpminiadmin
+fi
+
+# Create configuration files.
+! read -r -d '' config_contents <<EOF
 <?php
 define('OMEGAUP_ALLOW_PRIVILEGE_SELF_ASSIGNMENT', true);
 define('OMEGAUP_CSP_LOG_FILE', '/tmp/csp.log');
@@ -28,7 +46,15 @@ define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
 define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
 EOF
-fi
+ensure_contents "/opt/omegaup/frontend/server/config.php" "${config_contents}"
+
+! read -r -d '' test_config_contents <<EOF
+<?php
+define('OMEGAUP_DB_HOST', 'mysql');
+define('OMEGAUP_DB_PASS', 'omegaup');
+define('OMEGAUP_DB_USER', 'omegaup');
+EOF
+ensure_contents "/opt/omegaup/frontend/tests/test_config.php" "${test_config_contents}"
 
 # Install all the git hooks.
 for hook in /opt/omegaup/stuff/git-hooks/*; do

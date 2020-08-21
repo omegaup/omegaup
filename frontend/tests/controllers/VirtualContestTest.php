@@ -228,7 +228,8 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiUpdate(new \OmegaUp\Request([
                 'contest_alias' => $virtualContestAlias,
                 'title' => 'testtest',
-                'auth_token' => $login->auth_token
+                'auth_token' => $login->auth_token,
+                'languages' => 'c11-gcc',
             ]));
             $this->fail('Should have thrown a ForbiddenAccessException');
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {

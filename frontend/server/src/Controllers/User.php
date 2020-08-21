@@ -319,13 +319,13 @@ class User extends \OmegaUp\Controllers\Controller {
     private static function sendVerificationEmail(\OmegaUp\DAO\VO\Users $user): void {
         if (is_null($user->main_email_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userOrMailNotfound'
+                'userOrMailNotFound'
             );
         }
         $email = \OmegaUp\DAO\Emails::getByPK($user->main_email_id);
         if (is_null($email) || is_null($email->email)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userOrMailNotfound'
+                'userOrMailNotFound'
             );
         }
 
@@ -338,11 +338,9 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $subject = \OmegaUp\Translations::getInstance()->get(
             'verificationEmailSubject'
-        )
-            ?: 'verificationEmailSubject';
+        );
         $body = \OmegaUp\ApiUtils::formatString(
-            \OmegaUp\Translations::getInstance()->get('verificationEmailBody')
-                ?: 'verificationEmailBody',
+            \OmegaUp\Translations::getInstance()->get('verificationEmailBody'),
             [
                 'verification_id' => strval($user->verification_id),
             ]
@@ -2326,9 +2324,9 @@ class User extends \OmegaUp\Controllers\Controller {
             'username',
             'scholar_degree',
             'birth_date' => [
-                'transform' => function (int $value): string {
-                    return strval(gmdate('Y-m-d', $value));
-                },
+                'transform' => fn (int $value): string => strval(
+                    gmdate('Y-m-d', $value)
+                ),
             ],
             'preferred_language',
             'is_private',
@@ -2463,17 +2461,11 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::CODERS_OF_THE_MONTH,
             "{$date}-{$rowCount}",
-            /** @return list<CoderOfTheMonth> */
-            function () use (
+            fn () => \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
                 $date,
+                'all',
                 $rowCount
-            ): array {
-                return \OmegaUp\DAO\CoderOfTheMonth::getCandidatesToCoderOfTheMonth(
-                    $date,
-                    'all',
-                    $rowCount
-                );
-            },
+            ),
             60 * 60 * 12 // 12 hours
         );
     }
@@ -2536,18 +2528,10 @@ class User extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK,
             "{$offset}-{$rowCount}",
-            /**
-             * @return AuthorsRank
-             */
-            function () use (
+            fn () => \OmegaUp\DAO\UserRank::getAuthorsRank(
                 $offset,
                 $rowCount
-            ): array {
-                return \OmegaUp\DAO\UserRank::getAuthorsRank(
-                    $offset,
-                    $rowCount
-                );
-            },
+            ),
             APC_USER_CACHE_USER_RANK_TIMEOUT
         );
     }
@@ -2584,7 +2568,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         /*$params=*/[]
                     ),
                 ],
-                'title' => 'omegaupTitleAuthorsRank',
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleAuthorsRank'
+                ),
             ],
             'entrypoint' => 'authors_rank',
         ];
@@ -3622,8 +3608,12 @@ class User extends \OmegaUp\Controllers\Controller {
                 'payload' => $response,
                 'title' => (
                     (strval($category) === 'female') ?
-                    'omegaupTitleCodersofthemonthFemale' :
-                    'omegaupTitleCodersofthemonth'
+                    new \OmegaUp\TranslationString(
+                        'omegaupTitleCodersofthemonthFemale'
+                    ) :
+                    new \OmegaUp\TranslationString(
+                        'omegaupTitleCodersofthemonth'
+                    )
                 ),
             ],
             'entrypoint' => 'coder_of_the_month',
@@ -3675,15 +3665,20 @@ class User extends \OmegaUp\Controllers\Controller {
                             )
                         ),
                     ],
-                    'title' => 'omegaupTitleProfile',
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleProfile'
+                    ),
                 ],
                 'template' => 'user.profile.tpl',
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             return [
                 'smartyProperties' => [
                     'payload' => ['statusError' => $e->getErrorMessage()],
-                    'title' => 'omegaupTitleProfile'
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleProfile'
+                    )
                 ],
                 'template' => 'user.profile.tpl',
             ];
@@ -3716,6 +3711,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             $smartyProperties = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
             ];
@@ -3759,6 +3755,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 ),
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             $smartyProperties = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
             ];
@@ -3794,6 +3791,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 'practice' => false,
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
             $smartyProperties = [
                 'STATUS_ERROR' => $e->getErrorMessage(),
             ];
@@ -3836,7 +3834,7 @@ class User extends \OmegaUp\Controllers\Controller {
         foreach ($coders as $coder) {
             $userInfo = \OmegaUp\DAO\Users::FindByUsername($coder['username']);
             if (is_null($userInfo)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $classname = \OmegaUp\DAO\Users::getRankingClassName(
                 $userInfo->user_id
@@ -3861,7 +3859,7 @@ class User extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Identities $identity
     ): bool {
         if (is_null($identity->username)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return strpos($identity->username, ':') !== false;
     }

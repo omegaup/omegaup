@@ -459,22 +459,23 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 intval($user->main_identity_id)
             );
             if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
             $problemsets = array_filter(
                 $problemsets,
-                function (\OmegaUp\DAO\VO\Problemsets $problemset) use ($identity) {
-                    return \OmegaUp\Authorization::isAdmin(
-                        $identity,
-                        $problemset
-                    );
-                }
+                fn (\OmegaUp\DAO\VO\Problemsets $problemset) => \OmegaUp\Authorization::isAdmin(
+                    $identity,
+                    $problemset
+                )
             );
 
             if (!empty($problemsets)) {
-                $problemsetIds = array_map(function (\OmegaUp\DAO\VO\Problemsets $p) {
-                    return intval($p->problemset_id);
-                }, $problemsets);
+                $problemsetIds = array_map(
+                    fn (\OmegaUp\DAO\VO\Problemsets $p) => intval(
+                        $p->problemset_id
+                    ),
+                    $problemsets
+                );
                 $problemsetPlaceholders = implode(
                     ', ',
                     array_fill(

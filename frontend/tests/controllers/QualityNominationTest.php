@@ -273,7 +273,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\Omegaup\Exceptions\PreconditionFailedException $e) {
             $this->assertEquals(
-                'reviewerHasAlreadySentNominationForProblem',
+                'qualityNominationReviewerHasAlreadySentNominationForProblem',
                 $e->getMessage()
             );
         }
@@ -863,7 +863,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testDemotionCanBeBannedByReviewer() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
+            'visibility' => 'public'
         ]));
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -1081,7 +1081,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         int $visibility
     ) {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE
+            'visibility' => 'private'
         ]));
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
@@ -1345,9 +1345,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $nomination = $this->findByPredicate(
             $response['nominations'],
-            function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
-            }
+            fn ($nomination) => $nomination['problem']['alias'] == $problemData['request']['problem_alias']
         );
         $this->assertNotNull($nomination);
         $this->assertEquals(
@@ -1358,9 +1356,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         // Login as one of the reviewers of that nomination.
         $reviewer = $this->findByPredicate(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers,
-            function ($reviewer) use (&$nomination) {
-                return $reviewer->username == $nomination['votes'][0]['user']['username'];
-            }
+            fn ($reviewer) => $reviewer->username == $nomination['votes'][0]['user']['username']
         );
         $this->assertNotNull($reviewer);
         $login = self::login($reviewer);
@@ -1369,9 +1365,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertArrayContainsWithPredicate(
             $response['nominations'],
-            function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
-            }
+            fn ($nomination) => $nomination['problem']['alias'] == $problemData['request']['problem_alias']
         );
     }
 
@@ -1804,9 +1798,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             true /* includeVoted */
         );
 
-        $extractName = function ($tag) {
-            return $tag['name'];
-        };
+        $extractName = fn ($tag) => $tag['name'];
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
         $this->assertEquals(
@@ -2248,13 +2240,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTopicDynamicProgramming',
             1 /* public */
         );
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
+        $tags = array_map(
+            fn ($tag) => $tag['name'],
+            \OmegaUp\DAO\ProblemsTags::getProblemTags(
+                $problemData[0]['problem'],
+                false /* public_only */,
+                true /* includeVoted */
+            )
+        );
         $this->assertEquals(
             $tags,
             ['problemTopicDynamicProgramming', 'problemRestrictedTagLanguage']
@@ -2262,13 +2255,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
+        $tags = array_map(
+            fn ($tag) => $tag['name'],
+            \OmegaUp\DAO\ProblemsTags::getProblemTags(
+                $problemData[0]['problem'],
+                false /* public_only */,
+                true /* includeVoted */
+            )
+        );
         $this->assertEquals(
             $tags,
             ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemRestrictedTagLanguage']
@@ -2518,7 +2512,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * A PHPUnit data provider for all the tests that can accept a status.
      *
-     * @return list<array{0: string, 1: int, 2: int, 3: string, 4:array<int:boolean>, 5: boolean }>
+     * @return list<array{0: string, 1: int, 2: string, 3:array<string:boolean>, 4: boolean }>
      */
     public function qualityNominationsDemotionStatusApiUpdateCaseProvider(): array {
         return [
@@ -2527,13 +2521,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
                 'qualityNominationProblemHasWarning',
                 [
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false
+                    'private_banned' => false,
+                    'public_banned' => false,
+                    'private' => false,
+                    'private_warning' => true,
+                    'public_warning' => true,
+                    'public' => false,
+                    'promoted' => false
                 ],
                 true
             ],
@@ -2542,13 +2536,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
                 'qualityNominationProblemHasWarning',
                 [
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true
+                    'private_banned' => true,
+                    'public_banned' => true,
+                    'private' => true,
+                    'private_warning' => true,
+                    'public_warning' => true,
+                    'public' => true,
+                    'promoted' => true
                 ],
                 false
             ],
@@ -2557,13 +2551,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
                 'qualityNominationProblemHasBeenBanned',
                 [
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => false,
-                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => false
+                    'private_banned' => false,
+                    'public_banned' => true,
+                    'private' => false,
+                    'private_warning' => false,
+                    'public_warning' => false,
+                    'public' => false,
+                    'promoted' => false
                 ],
                 true,
             ],
@@ -2572,13 +2566,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
                 'qualityNominationProblemHasBeenBanned',
                 [
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PUBLIC => true,
-                    \OmegaUp\ProblemParams::VISIBILITY_PROMOTED => true
+                    'private_banned' => true,
+                    'public_banned' => true,
+                    'private' => true,
+                    'private_warning' => true,
+                    'public_warning' => true,
+                    'public' => true,
+                    'promoted' => true
                 ],
                 false,
             ]
@@ -2593,7 +2587,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testUserCannotUpdateProblemWithDemotionResolved(
         string $status,
-        int $visibility,
+        int $intVisibility,
         string $errorMessage,
         array $invalidVisibilities,
         bool $loginAsAuthor
@@ -2655,7 +2649,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
         ]));
         $this->assertEquals(
-            $visibility,
+            $intVisibility,
             $problem['visibility'],
             "Problem should have been public {$status}"
         );

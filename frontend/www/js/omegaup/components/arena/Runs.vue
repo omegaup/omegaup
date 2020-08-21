@@ -1,5 +1,5 @@
 <template>
-  <div class="card mt-5">
+  <div class="mt-2">
     <template v-if="globalRuns">
       <!-- TODO: This code should be removed when we stop using jquery and the
         migration to vue was over -->
@@ -68,23 +68,23 @@
               >{{ T.wordsLanguage }}:
               <select v-model="filterLanguage">
                 <option value="">{{ T.wordsAll }}</option>
-                <option value="cpp17-gcc">C++17 (g++ 7.4)</option>
-                <option value="cpp17-clang">C++17 (clang++ 6.0)</option>
-                <option value="cpp11-gcc">C++11 (g++ 7.4)</option>
-                <option value="cpp11-clang">C++11 (clang++ 6.0)</option>
-                <option value="c11-gcc">C (gcc 7.4)</option>
-                <option value="c11-clang">C (clang 6.0)</option>
-                <option value="cs">C# (dotnet 2.2)</option>
-                <option value="hs">Haskell (ghc 8.0)</option>
-                <option value="java">Java (openjdk 11.0)</option>
+                <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
+                <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
+                <option value="cpp11-gcc">C++11 (g++ 9.3)</option>
+                <option value="cpp11-clang">C++11 (clang++ 10.0)</option>
+                <option value="c11-gcc">C (gcc 9.3)</option>
+                <option value="c11-clang">C (clang 10.0)</option>
+                <option value="cs">C# (8.0, dotnet 3.1)</option>
+                <option value="hs">Haskell (ghc 8.6)</option>
+                <option value="java">Java (openjdk 14.0)</option>
                 <option value="pas">Pascal (fpc 3.0)</option>
-                <option value="py3">Python 3.6</option>
+                <option value="py3">Python 3.8</option>
                 <option value="py2">Python 2.7</option>
-                <option value="rb">Ruby (2.5)</option>
-                <option value="lua">Lua (5.2)</option>
+                <option value="rb">Ruby (2.7)</option>
+                <option value="lua">Lua (5.3)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
-                <option value="cat">{{ T.wordsJustOutput }}</option>
+                <option value="cat">{#wordsJustOutput#}</option>
               </select>
             </label>
 
@@ -126,7 +126,11 @@
 
             <div class="row">
               <div class="col-sm col-12" v-if="filters.length > 0">
-                <span class="btn btn-secondary mr-3" v-for="filter in filters">
+                <span
+                  class="btn btn-secondary mr-3"
+                  v-for="filter in filters"
+                  v-bind:key="filter.name"
+                >
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
                   >
@@ -160,7 +164,7 @@
         </thead>
         <tfoot v-if="problemAlias != null">
           <tr>
-            <td colspan="9">
+            <td colspan="10">
               <a
                 v-bind:href="`/arena/${contestAlias}/practice/`"
                 v-if="isContestFinished"
@@ -172,7 +176,7 @@
                     ? `#problems/${problemAlias}/new-run`
                     : `/arena/${contestAlias}/`
                 "
-                v-else=""
+                v-else
                 >{{
                   isProblemsetOpened
                     ? T.wordsNewSubmissions
@@ -183,7 +187,7 @@
           </tr>
         </tfoot>
         <tbody>
-          <tr v-for="run in filteredRuns">
+          <tr v-for="run in filteredRuns" v-bind:key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
               <acronym v-bind:title="run.guid">
@@ -286,9 +290,40 @@
   </div>
 </template>
 
-<style>
+<style lang="scss" scoped>
 caption {
   caption-side: top;
+}
+
+.runs {
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-top: 2em;
+}
+
+.runs caption {
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+.runs td,
+.runs th {
+  border: 1px solid #ccc;
+  border-width: 1px 0;
+  text-align: center;
+}
+
+.runs tfoot td a {
+  display: block;
+  padding: 0.5em;
+  text-decoration: none;
+  color: #000;
+  background: #ccc;
+  text-align: center;
+}
+.runs tfoot td a:hover {
+  background: #fff;
 }
 </style>
 

@@ -73,6 +73,7 @@ class Request extends \ArrayObject {
         }
         if (is_null($response) || !is_array($response)) {
             $apiException = new \OmegaUp\Exceptions\InternalServerErrorException(
+                'generalError',
                 new \Exception('API did not return an array.')
             );
         }
@@ -133,7 +134,7 @@ class Request extends \ArrayObject {
                 $key
             );
         }
-        return self::ensureBool($key);
+        return $this->ensureBool($key);
     }
 
     /**
@@ -180,7 +181,42 @@ class Request extends \ArrayObject {
                 $key
             );
         }
-        return self::ensureInt($key, $lowerBound, $upperBound);
+        return $this->ensureInt($key, $lowerBound, $upperBound);
+    }
+
+    /**
+     * Ensures that the value associated with the key is a string.
+     */
+    public function ensureString(string $key): string {
+        if (!self::offsetExists($key)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        $this[$key] = strval($val);
+        return strval($val);
+    }
+
+    /**
+     * Ensures that the value associated with the key is a string or null
+     */
+    public function ensureOptionalString(
+        string $key,
+        bool $required = false
+    ): ?string {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return null;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        return $this->ensureString($key);
     }
 
     /**
@@ -238,13 +274,9 @@ class Request extends \ArrayObject {
     public function ensureFloat(
         string $key,
         ?float $lowerBound = null,
-        ?float $upperBound = null,
-        bool $required = true
-    ): void {
+        ?float $upperBound = null
+    ): float {
         if (!self::offsetExists($key)) {
-            if (!$required) {
-                return;
-            }
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
@@ -259,6 +291,86 @@ class Request extends \ArrayObject {
             $upperBound
         );
         $this[$key] = floatval($val);
+        return floatval($this[$key]);
+    }
+
+    /**
+     * Ensures that the value associated with the key is a float.
+     */
+    public function ensureOptionalFloat(
+        string $key,
+        ?float $lowerBound = null,
+        ?float $upperBound = null,
+        bool $required = false
+    ): ?float {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return null;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        return $this->ensureFloat($key, $lowerBound, $upperBound);
+    }
+
+    /**
+     * Ensures that the value associated with the key is in an enum.
+     *
+     * @psalm-template TValue
+     * @param array<int, TValue> $enumValues
+     * @return TValue
+     */
+    public function ensureEnum(
+        string $key,
+        array $enumValues
+    ) {
+        if (!self::offsetExists($key)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        /** @var mixed */
+        $val = $this->offsetGet($key);
+        foreach ($enumValues as $enumValue) {
+            if ($val == $enumValue) {
+                return $enumValue;
+            }
+        }
+        throw new \OmegaUp\Exceptions\InvalidParameterException(
+            'parameterNotInExpectedSet',
+            $key,
+            [
+                'bad_elements' => strval($val),
+                'expected_set' => implode(', ', $enumValues),
+            ]
+        );
+    }
+
+    /**
+     * Ensures that the value associated with the key is in an enum.
+     *
+     * @psalm-template TValue
+     * @param array<int, TValue> $enumValues
+     * @return TValue|null
+     */
+    public function ensureOptionalEnum(
+        string $key,
+        array $enumValues,
+        bool $required = false
+    ) {
+        if (!self::offsetExists($key)) {
+            if (!$required) {
+                return null;
+            }
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                $key
+            );
+        }
+        return $this->ensureEnum($key, $enumValues);
     }
 
     /**

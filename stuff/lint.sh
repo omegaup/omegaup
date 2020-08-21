@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 OMEGAUP_ROOT="$(/usr/bin/git rev-parse --show-toplevel)"
 
 if [[ $# != 0 ]]; then
@@ -36,7 +38,7 @@ if [[ -z "${DOCKER_PATH}" ]]; then
 	exit 1
 fi
 
-exec "${DOCKER_PATH}" run $TTY_ARGS --rm \
+"${DOCKER_PATH}" run $TTY_ARGS --rm \
 	--user "$(id -u):$(id -g)" \
 	--env "GIT_AUTHOR_NAME=$(git config user.name)" \
 	--env "GIT_AUTHOR_EMAIL=$(git config user.email)" \
@@ -46,4 +48,6 @@ exec "${DOCKER_PATH}" run $TTY_ARGS --rm \
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20200715 --command-name="./stuff/lint.sh" $ARGS
+	omegaup/hook_tools:20200816 --command-name="./stuff/lint.sh" $ARGS
+
+echo OK

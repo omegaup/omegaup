@@ -35,10 +35,12 @@ describe('Details.vue', () => {
     });
 
     expect(wrapper.text()).toContain(courseName);
-    expect(wrapper.find('a[data-button-homework]').text()).toBe(
-      T.wordsNewHomework,
+    expect(wrapper.find('a[data-button-progress-students]').text()).toBe(
+      T.courseStudentsProgress,
     );
-    expect(wrapper.find('a[data-button-exam]').text()).toBe(T.wordsNewExam);
+    expect(wrapper.find('a[data-button-manage-students]').text()).toBe(
+      T.wordsAddStudent,
+    );
   });
 
   it('Should handle empty assignments and progress as student', () => {
@@ -67,8 +69,11 @@ describe('Details.vue', () => {
       },
     });
 
-    expect(wrapper.find('a[data-button-homework]').exists()).toBe(false);
-    expect(wrapper.find('a[data-button-exam]').exists()).toBe(false);
+    expect(
+      wrapper.find('a[data-button-progress-students]').exists(),
+    ).toBeFalsy();
+    expect(wrapper.find('a[data-button-manage-students]').exists()).toBeFalsy();
+    expect(wrapper.text()).not.toContain(T.wordsCloneThisCourse);
   });
 
   it('Should handle assignments without finish_time', () => {
@@ -76,7 +81,7 @@ describe('Details.vue', () => {
     const wrapper = shallowMount(course_Details, {
       propsData: {
         course: <types.CourseDetails>{
-          admission_mode: 'registration',
+          admission_mode: 'public',
           alias: 'test-course',
           assignments: [
             {
@@ -118,7 +123,8 @@ describe('Details.vue', () => {
     });
 
     expect(
-      wrapper.find('[data-homework-alias="test-assignment"]').text(),
+      wrapper.find('[data-content-alias="test-assignment"]').text(),
     ).toContain('—');
+    expect(wrapper.text()).toContain(T.wordsCloneThisCourse);
   });
 });
