@@ -187,6 +187,9 @@ OmegaUp.on('ready', () => {
 
             window.location.replace(`#${arenaInstance.activeTab}`);
           },
+          'submit-run': (code: string, language: string) => {
+            arenaInstance.submitRun(code, language);
+          },
           details: (run: types.Run) => {
             window.location.replace(
               `#${arenaInstance.activeTab}/show-run:${run.guid}`,

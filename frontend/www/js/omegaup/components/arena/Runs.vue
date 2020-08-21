@@ -176,6 +176,7 @@
                     ? `#problems/${problemAlias}/new-run`
                     : `/arena/${contestAlias}/`
                 "
+                v-on:click="onNewSubmission"
                 v-else
                 >{{
                   isProblemsetOpened
@@ -641,6 +642,10 @@ export default class Runs extends Vue {
     } else {
       currentFilter.value = value;
     }
+  }
+
+  onNewSubmission(): void {
+    this.$emit('new-submission');
   }
 
   onRemoveFilter(filter: string): void {

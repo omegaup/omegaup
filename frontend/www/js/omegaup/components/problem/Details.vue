@@ -123,6 +123,16 @@
                 onDismissPromotion(qualityPromotionComponent)
             "
           ></omegaup-quality-nomination-promotion>
+          <omegaup-arena-runsubmit
+            slot="link-title"
+            v-bind:preferred-language="problem.preferred_language"
+            v-bind:languages="problem.languages"
+            v-bind:initial-show-form="showFormRunSubmit"
+            v-on:dismiss="onDismissNewSubmission"
+            v-on:submit-run="
+              (code, selectedLanguage) => onSubmitRun(code, selectedLanguage)
+            "
+          ></omegaup-arena-runsubmit>
         </omegaup-overlay>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
@@ -130,6 +140,7 @@
           v-bind:show-details="true"
           v-bind:problemset-problems="[]"
           v-on:details="(run) => $emit('details', run)"
+          v-on:new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
           v-bind:quality-histogram="histogram.qualityHistogram"
@@ -183,7 +194,6 @@
     </div>
     <!-- id-lint off -->
     <div id="overlay">
-      <div id="run-submit"></div>
       <div id="run-details"></div>
     </div>
     <!-- id-lint on -->
@@ -217,6 +227,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
+import arena_RunSubmit from '../arena/RunSubmit.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
@@ -255,6 +266,7 @@ interface Tab {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-runsubmit': arena_RunSubmit,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
@@ -292,6 +304,7 @@ export default class ProblemDetails extends Vue {
   selectedTab = 'problems';
   clarifications = this.initialClarifications || [];
   showOverlay = false;
+  showFormRunSubmit = false;
   clarificationsTabVisited = false;
 
   get availableTabs(): Tab[] {
@@ -330,6 +343,21 @@ export default class ProblemDetails extends Vue {
       this.clarificationsTabVisited = true;
     }
     this.selectedTab = tabName;
+  }
+
+  onNewSubmission(): void {
+    this.showOverlay = true;
+    this.showFormRunSubmit = true;
+  }
+
+  onDismissNewSubmission(): void {
+    this.showOverlay = false;
+    this.showFormRunSubmit = false;
+  }
+
+  onSubmitRun(code: string, selectedLanguage: string): void {
+    this.$emit('submit-run', code, selectedLanguage);
+    this.onDismissNewSubmission();
   }
 
   onDismissPromotion(
