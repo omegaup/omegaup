@@ -1322,6 +1322,11 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestAdmin {
+    role: string;
+    username: string;
+  }
+
   export interface ContestAdminDetails {
     admin: boolean;
     admission_mode: string;
@@ -1424,40 +1429,24 @@ export namespace types {
   }
 
   export interface ContestEditPayload {
-    admins: { role: string; username: string }[];
+    admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
-    group_admins: { alias: string; name: string; role: string }[];
-    groups: { alias: string; name: string }[];
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
-    requests: {
-      accepted?: boolean;
-      admin?: { username?: string };
-      country?: string;
-      last_update?: Date;
-      request_time: Date;
-      username: string;
-    }[];
-    users: {
-      access_time?: Date;
-      country_id?: string;
-      end_time?: Date;
-      is_owner?: number;
-      username: string;
-    }[];
+    group_admins: types.ContestGroupAdmin[];
+    groups: types.ContestGroup[];
+    problems: types.ContestProblem[];
+    requests: types.ContestRequest[];
+    users: types.ContestUser[];
+  }
+
+  export interface ContestGroup {
+    alias: string;
+    name: string;
+  }
+
+  export interface ContestGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface ContestIntroPayload {
@@ -1507,6 +1496,22 @@ export namespace types {
     languages: { [key: string]: string };
   }
 
+  export interface ContestProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    order: number;
+    points: number;
+    problem_id: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
@@ -1531,6 +1536,23 @@ export namespace types {
     user_registration_answered?: boolean;
     user_registration_requested?: boolean;
     window_length?: number;
+  }
+
+  export interface ContestRequest {
+    accepted?: boolean;
+    admin?: { username?: string };
+    country?: string;
+    last_update?: Date;
+    request_time: Date;
+    username: string;
+  }
+
+  export interface ContestUser {
+    access_time?: Date;
+    country_id?: string;
+    end_time?: Date;
+    is_owner?: number;
+    username: string;
   }
 
   export interface CourseAdmin {
@@ -2792,23 +2814,7 @@ export namespace messages {
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemsRequest = { [key: string]: any };
-  export type ContestProblemsResponse = {
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
-  };
+  export type ContestProblemsResponse = { problems: types.ContestProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
   export type ContestPublicDetailsResponse = types.ContestPublicDetails;
@@ -2933,13 +2939,7 @@ export namespace messages {
   export type _ContestUsersServerResponse = any;
   export type ContestUsersResponse = {
     groups: { alias: string; name: string }[];
-    users: {
-      access_time?: Date;
-      country_id?: string;
-      end_time?: Date;
-      is_owner?: number;
-      username: string;
-    }[];
+    users: types.ContestUser[];
   };
 
   // Course
