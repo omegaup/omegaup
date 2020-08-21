@@ -813,16 +813,15 @@ export namespace types {
               return x;
             });
           })(x.runs);
-        if (x.solvers)
-          x.solvers = ((x) => {
-            if (!Array.isArray(x)) {
-              return x;
-            }
-            return x.map((x) => {
-              x.time = ((x: number) => new Date(x * 1000))(x.time);
-              return x;
-            });
-          })(x.solvers);
+        x.solvers = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.solvers);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1937,7 +1936,7 @@ export namespace types {
     problem: types.ProblemInfo;
     runs?: types.Run[];
     solutionStatus?: string;
-    solvers?: types.BestSolvers[];
+    solvers: types.BestSolvers[];
     user: types.UserInfoForProblem;
   }
 
@@ -2016,8 +2015,10 @@ export namespace types {
   export interface ProblemInfo {
     accepts_submissions: boolean;
     alias: string;
+    commit: string;
     input_limit: number;
     karel_problem: boolean;
+    languages: string[];
     letter?: string;
     limits: {
       input_limit: string;

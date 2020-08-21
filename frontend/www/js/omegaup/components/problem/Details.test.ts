@@ -11,6 +11,8 @@ describe('Details.vue', () => {
     alias: 'triangulos',
     accepts_submissions: true,
     karel_problem: false,
+    commit: 'abc',
+    languages: ['py3'],
     limits: {
       input_limit: '10 KiB',
       memory_limit: '32 MiB',
