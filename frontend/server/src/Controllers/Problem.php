@@ -512,13 +512,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            // Operation failed in something we know it could fail, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
-
-            throw $e;
         } catch (\Exception $e) {
-            self::$log->error("Failed to upload problem {$problem->alias}", $e);
+            self::$log->error("Failed to create problem {$problem->alias}", $e);
 
             // Operation failed unexpectedly, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
@@ -1110,6 +1105,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to rejudge problem {$problem->alias}",
+                $e
+            );
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
         }
@@ -1501,15 +1500,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            // Operation failed in the data layer, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
-
-            throw $e;
         } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to update problem {$problem->alias}: ",
+                $e
+            );
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
-            self::$log->error('Failed to update problem', $e);
 
             throw $e;
         }
@@ -2976,9 +2973,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to update problem {$problem->alias}: ",
+                $e
+            );
             // Operation failed in the data layer, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
-            self::$log->error('Failed to update problem: ', $e);
 
             throw $e;
         }
@@ -4010,7 +4010,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ]));
             }
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
+        } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to update languages for problem {$problem->alias}: ",
+                $e
+            );
             // Operation failed in something we know it could fail, rollback transaction
             \OmegaUp\DAO\DAO::transRollback();
             throw $e;
