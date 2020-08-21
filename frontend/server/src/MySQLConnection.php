@@ -340,8 +340,13 @@ class MySQLConnection {
     ): ?\mysqli_result {
         $query = $this->BindQueryParams($sql, $params);
         $result = $this->_connection->query($query, $resultmode);
-        if ($result === false && $this->_connection->errno == 2006) {
-            // Let's try to reconnect and do this one more time.
+        if (
+            $result === false &&
+            $this->_needsFlushing === false &&
+            $this->_connection->errno == 2006
+        ) {
+            // If there have not been any non-committed updates to the
+            // database, let's try to reconnect and do this one more time.
             $this->connect();
             $result = $this->_connection->query($query, $resultmode);
         }
