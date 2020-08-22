@@ -451,27 +451,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $user->user_id;
 
+        // Create the problem before attempting to communicate with the
+        // database.
+        $temporaryAlias = (
+            "temp.{$params->problemAlias}." .
+            intval(microtime(/*$get_as_float=*/true) * 1000000)
+        );
+        $problemDeployer = new \OmegaUp\ProblemDeployer(
+            $temporaryAlias,
+            $acceptsSubmissions
+        );
+        $problemDeployer->commit(
+            'Initial commit',
+            $identity,
+            \OmegaUp\ProblemDeployer::CREATE,
+            $problemSettings
+        );
+        $problem->commit = $problemDeployer->publishedCommit ?: '';
+        $problem->current_version = $problemDeployer->privateTreeHash;
+
         // Insert new problem
         try {
             \OmegaUp\DAO\DAO::transBegin();
-
-            $temporaryAlias = (
-                "temp.{$params->problemAlias}." .
-                intval(microtime(/*$get_as_float=*/true) * 1000000)
-            );
-
-            $problemDeployer = new \OmegaUp\ProblemDeployer(
-                $temporaryAlias,
-                $acceptsSubmissions
-            );
-            $problemDeployer->commit(
-                'Initial commit',
-                $identity,
-                \OmegaUp\ProblemDeployer::CREATE,
-                $problemSettings
-            );
-            $problem->commit = $problemDeployer->publishedCommit ?: '';
-            $problem->current_version = $problemDeployer->privateTreeHash;
 
             // Save the contest object with data sent by user to the database
             \OmegaUp\DAO\ACLs::create($acl);
