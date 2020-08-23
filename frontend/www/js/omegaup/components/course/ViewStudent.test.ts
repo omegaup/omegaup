@@ -19,7 +19,9 @@ describe('ViewStudent.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toBe(T.courseAssignmentProblemRunsEmpty);
+    expect(wrapper.text()).toContain(T.courseStudentSelectStudent);
+    expect(wrapper.text()).toContain(T.courseStudentSelectAssignment);
+    expect(wrapper.text()).toContain(T.courseAssignmentProblemRunsEmpty);
   });
 
   it('Should handle runs', async () => {

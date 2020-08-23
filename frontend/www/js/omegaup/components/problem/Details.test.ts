@@ -11,6 +11,8 @@ describe('Details.vue', () => {
     alias: 'triangulos',
     accepts_submissions: true,
     karel_problem: false,
+    commit: 'abc',
+    languages: ['py3'],
     limits: {
       input_limit: '10 KiB',
       memory_limit: '32 MiB',
@@ -74,6 +76,13 @@ describe('Details.vue', () => {
     tried: false,
   };
 
+  const histogram = <types.Histogram>{
+    difficulty: 0.0,
+    difficultyHistogram: undefined,
+    quality: 0.0,
+    qualityHistogram: undefined,
+  };
+
   it('Should handle no nomination payload', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
@@ -83,6 +92,8 @@ describe('Details.vue', () => {
         runs: <types.Run[]>[],
         allRuns: <types.Run[]>[],
         clarifications: <types.Clarification[]>[],
+        solutionStatus: 'not_found',
+        histogram: histogram,
       },
     });
 
