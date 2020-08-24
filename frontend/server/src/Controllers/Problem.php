@@ -359,6 +359,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 )
             );
         }
+        if (empty($params->problemLevel)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'level_tag',
+            );
+        }
 
         return [
             'problem' => $problem,
