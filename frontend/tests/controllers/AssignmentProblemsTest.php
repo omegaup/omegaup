@@ -452,13 +452,13 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(100, $results[0]['maximum']);
         $this->assertEquals(100, $results[1]['maximum']);
         $this->assertEquals(0, $results[2]['maximum']);
-        // Count over 60%
-        $this->assertEquals(1, $results[0]['highScoreCount']);
-        $this->assertEquals(2, $results[1]['highScoreCount']);
+        // Percent over 60%
+        $this->assertEquals(0.5, $results[0]['highScoreCount']);
+        $this->assertEquals(1, $results[1]['highScoreCount']);
         $this->assertEquals(0, $results[2]['highScoreCount']);
-        // Count at 0%
-        $this->assertEquals(1, $results[0]['lowScoreCount']);
+        // Percent at 0%
+        $this->assertEquals(0.5, $results[0]['lowScoreCount']);
         $this->assertEquals(0, $results[1]['lowScoreCount']);
-        $this->assertEquals(2, $results[2]['lowScoreCount']);
+        $this->assertEquals(1, $results[2]['lowScoreCount']);
     }
 }

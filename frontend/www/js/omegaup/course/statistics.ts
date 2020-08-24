@@ -38,28 +38,18 @@ OmegaUp.on('ready', function () {
 
   const gethighScoreCount = (stats: types.CourseStatisticsPayload) => {
     let highScore = [];
-    const studentCount = stats.course.student_count;
-    if (studentCount) {
-      for (const problem in stats.problemStats) {
-        highScore.push(
-          (stats.problemStats[problem].highScoreCount / studentCount) * 100,
-        );
-      }
+    for (const problem in stats.problemStats) {
+      highScore.push(stats.problemStats[problem].highScoreCount * 100);
     }
-    return highScore || 0;
+    return highScore;
   };
 
   const getlowScoreCount = (stats: types.CourseStatisticsPayload) => {
     let lowScore = [];
-    const studentCount = stats.course.student_count;
-    if (studentCount) {
-      for (const problem in stats.problemStats) {
-        lowScore.push(
-          (stats.problemStats[problem].lowScoreCount / studentCount) * 100,
-        );
-      }
+    for (const problem in stats.problemStats) {
+      lowScore.push(stats.problemStats[problem].lowScoreCount * 100);
     }
-    return lowScore || 0;
+    return lowScore;
   };
 
   const getMaximum = (stats: types.CourseStatisticsPayload) => {
