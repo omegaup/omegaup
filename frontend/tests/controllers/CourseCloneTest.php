@@ -58,6 +58,13 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
+        $courseCloneLog = \OmegaUp\DAO\CourseCloneLog::getAll();
+        $coursesLog = array_filter(
+            $courseCloneLog,
+            fn (\OmegaUp\DAO\VO\CourseCloneLog $courseLog) =>
+                $courseLog->course_id === $courseData['course_id']
+        );
+        $this->assertCount(1, $coursesLog);
 
         $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
