@@ -481,7 +481,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
-            // TODO: rename 'tag' for 'level'
+            // TODO: rename 'tag' to 'level'.
             if (
                 isset($contents['tag']) &&
                 !in_array($contents['tag'], self::LEVEL_TAGS)
