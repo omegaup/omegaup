@@ -63,6 +63,149 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTopicTwoPointers',
     ];
 
+    const ALLOWED_PUBLIC_TAGS = [
+        'problemTagInteractive',
+        'problemTagOutputOnly',
+        'problemTagLanguage',
+        'problemTagKarel',
+        'problemTagInputAndOutput',
+        'problemTagArithmetic',
+        'problemTagConditionals',
+        'problemTagLoops',
+        'problemTagFunctions',
+        'problemTagArrays',
+        'problemTagMatrices',
+        'problemTagCharsAndStrings',
+        'problemTagFormattedInputAndOutput',
+        'problemTagSimulation',
+        'problemTagImplementation',
+        'problemTagAnalyticGeometry',
+        'problemTagSystemsOfEquations',
+        'problemTagDiophantineEquations',
+        'problemTagGCDAndLCM',
+        'problemTagModularArithmetic',
+        'problemTagModularMultiplicativeInverse',
+        'problemTagChineseRemainderTheorem',
+        'problemTagRecursion',
+        'problemTagPermutations',
+        'problemTagCombinations',
+        'problemTagDivisibilityRules',
+        'problemTagCountingProblems',
+        'problemTagCombinatorialDesigns',
+        'problemTagGameTheory',
+        'problemTagNumberTheory',
+        'problemTagNumericalSeries',
+        'problemTagPartialSums',
+        'problemTagPrimalityTest',
+        'problemTagPrimeGeneration',
+        'problemTagPrimeFactorization',
+        'problemTagFourierTransformation',
+        'problemTagBigNumbers',
+        'problemTagBooleanAlgebra',
+        'problemTagBitManipulation',
+        'problemTagProbabilityAndStatistics',
+        'problemTagExponentiationBySquaring',
+        'problemTagSorting',
+        'problemTagBinarySearch',
+        'problemTagExponentialSearch',
+        'problemTagStringMatching',
+        'problemTagStacks',
+        'problemTagQueues',
+        'problemTagLinkedLists',
+        'problemTagHeaps',
+        'problemTagTreeTransversal',
+        'problemTagBinarySearchTree',
+        'problemTagGraphRepresentation',
+        'problemTagGraphConnectivity',
+        'problemTagDirectedGraphs',
+        'problemTagTrees',
+        'problemTagBreadthFirstSearch',
+        'problemTagDepthFirstSearch',
+        'problemTagShortestPaths',
+        'problemTagMinimumSpanningTrees',
+        'problemTagTopologicalSorting',
+        'problemTagGraphsWithNegativeWeights',
+        'problemTagDisjointSets',
+        'problemTagHashing',
+        'problemTagInvertedIndices',
+        'problemTagTries',
+        'problemTagBruteForce',
+        'problemTagIncrementalSearch',
+        'problemTagBacktracking',
+        'problemTagLocalSearch',
+        'problemTagGreedyAlgorithms',
+        'problemTagDivideAndConquer',
+        'problemTagMemorization',
+        'problemTagDynamicProgramming',
+        'problemTagSubArraySearch',
+        'problemTagSubsequenceSearch',
+        'problemTagMeetInTheMiddle',
+        'problemTagBipartiteMatching',
+        'problemTagMaxFlow',
+        'problemTagWaveletTrees',
+        'problemTagSegmentTrees',
+        'problemTagSuffixTrees',
+        'problemTagFenwickTrees',
+        'problemTagLeastCommonAncestor',
+        'problemTagLazyPropagation',
+        'problemTagOfflineQueries',
+        'problemTagSlidingWindow',
+        'problemTagMonotoneStack',
+        'problemTagTwoPointersTechnique',
+        'problemTagSQRTDecomposition',
+        'problemTagPalindromeAlgorithms',
+        'problemTagNearestNeighbors',
+        'problemTagConvexHull',
+        'problemTagSweepLine',
+        'problemTagLexingAndParsing',
+        'problemTagGeneticAlgorithms',
+        'problemTagParticleSwarmOptimization',
+        'problemTagHeuristics',
+        'problemTagDataCompression',
+        'problemTagBigData',
+        'problemTagOMI',
+        'problemTagOMIAguascalientes',
+        'problemTagOMIBajaCalifornia',
+        'problemTagOMIBajaCaliforniaSur',
+        'problemTagOMICampeche',
+        'problemTagOMICoahuila',
+        'problemTagOMIColima',
+        'problemTagOMIChiapas',
+        'problemTagOMIChihuahua',
+        'problemTagOMIDistritoFederal',
+        'problemTagOMIDurango',
+        'problemTagOMIGuanajuato',
+        'problemTagOMIGuerrero',
+        'problemTagOMIHidalgo',
+        'problemTagOMIJalisco',
+        'problemTagOMIMexico',
+        'problemTagOMIMichoacan',
+        'problemTagOMIMorelos',
+        'problemTagOMINayarit',
+        'problemTagOMINuevoLeon',
+        'problemTagOMIOaxaca',
+        'problemTagOMIPuebla',
+        'problemTagOMIQueretaro',
+        'problemTagOMIQuintanaRoo',
+        'problemTagOMISanLuisPotosi',
+        'problemTagOMISinaloa',
+        'problemTagOMISonora',
+        'problemTagOMITabasco',
+        'problemTagOMITamaulipas',
+        'problemTagOMITlaxcala',
+        'problemTagOMIVeracruz',
+        'problemTagOMIYucatan',
+        'problemTagOMIZacatecas',
+        'problemTagOMIPS',
+        'problemTagIOI',
+        'problemTagICPC',
+        'problemTagCIIC',
+        'problemTagCodingCup',
+        'problemTagCodingRush',
+        'problemTagCOCI',
+        'problemTagBOI',
+    ];
+
     const LEVEL_TAGS = [
         'problemLevelAdvancedCompetitiveProgramming',
         'problemLevelAdvancedSpecializedTopics',
@@ -338,7 +481,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
-
+            // TODO: rename 'tag' for 'level'
             if (
                 isset($contents['tag']) &&
                 !in_array($contents['tag'], self::LEVEL_TAGS)
@@ -347,6 +490,29 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'parameterInvalid',
                     'contents'
                 );
+            }
+
+            if (
+                isset($contents['tags']) 
+            ) {
+                if (!is_array($contents['tags'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'contents'
+                    );
+                }
+                /** @var mixed $tag */
+                foreach ($contents['tags'] as &$tag) {
+                    if (
+                        !is_string($tag) ||
+                        !in_array($tag, self::ALLOWED_PUBLIC_TAGS)
+                    ) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterInvalid',
+                            'contents'
+                        );
+                    }
+                }
             }
 
             if (

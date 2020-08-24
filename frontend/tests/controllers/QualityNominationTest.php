@@ -223,6 +223,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode([
                     'quality_seal' => false,
                     'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+                    'tags' => ['problemTagFunctions', 'problemTagRecursion'],
                 ]),
             ]));
             $this->fail('The user must be a reviewer.');
@@ -241,9 +242,26 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode([
                     'quality_seal' => false,
                     'tag' => 'problemLevel',
+                    'tags' => ['problemTagFunctions', 'problemTagRecursion'],
                 ]),
             ]));
             $this->fail('The tag should be one of the level tags group.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+                    'tags' => ['problemTopic'],
+                ]),
+            ]));
+            $this->fail('The tag should be one of the public tags group.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterInvalid', $e->getMessage());
         }
@@ -1913,6 +1931,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
             ]),
         ]));
 
@@ -1926,6 +1945,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
             ]),
         ]));
 
@@ -1993,6 +2013,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags'=> ['problemTagQueues', 'problemTagRecursion'],
             ]),
         ]));
 
