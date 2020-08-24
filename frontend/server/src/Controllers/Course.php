@@ -31,7 +31,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
- * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<array{assignment_alias: string, problem_alias: string, variance: float, average: float, highScoreCount: int, lowScoreCount: int, minimum: float, maximum: float, maxPoints: float}>}
+ * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<array{assignment_alias: string, problem_alias: string, variance: float|null, average: float|null, highScoreCount: int, lowScoreCount: int, minimum: float|null, maximum: float, maxPoints: float}>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}

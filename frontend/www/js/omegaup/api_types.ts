@@ -1686,14 +1686,14 @@ export namespace types {
     course: types.CourseDetails;
     problemStats: {
       assignment_alias: string;
-      average: number;
+      average?: number;
       highScoreCount: number;
       lowScoreCount: number;
       maxPoints: number;
       maximum: number;
-      minimum: number;
+      minimum?: number;
       problem_alias: string;
-      variance: number;
+      variance?: number;
     }[];
   }
 

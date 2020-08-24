@@ -44,7 +44,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, problem_alias: string, variance: float, average: float, highScoreCount: int, lowScoreCount: int, minimum: float, maximum: float, maxPoints: float}>
+     * @return list<array{assignment_alias: string, problem_alias: string, variance: float|null, average: float|null, highScoreCount: int, lowScoreCount: int, minimum: float|null, maximum: float|null, maxPoints: float}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
@@ -120,7 +120,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, problem_alias: string, variance: float, average: float, highScoreCount: int, lowScoreCount: int, minimum: float, maximum: float, maxPoints: float}> */
+        /** @var list<array{assignment_alias: string, problem_alias: string, variance: float|null, average: float|null, highScoreCount: int, lowScoreCount: int, minimum: float|null, maximum: float|null, maxPoints: float}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]

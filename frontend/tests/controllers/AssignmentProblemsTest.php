@@ -353,7 +353,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testAssignmentProblemsVariance() {
+    public function testAssignmentProblemsStatistics() {
         $problemsData = [];
         for ($i = 0; $i < 3; $i++) {
             $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -440,5 +440,25 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertGreaterThan(0, $results[0]['variance']);
         $this->assertEquals(0, $results[1]['variance']);
         $this->assertEquals(0, $results[2]['variance']);
+        // Average
+        $this->assertEquals(50, $results[0]['average']);
+        $this->assertEquals(100, $results[1]['average']);
+        $this->assertEquals(0, $results[2]['average']);
+        // Minimum
+        $this->assertEquals(0, $results[0]['minimum']);
+        $this->assertEquals(100, $results[1]['minimum']);
+        $this->assertEquals(0, $results[2]['minimum']);
+        // Maximum
+        $this->assertEquals(100, $results[0]['maximum']);
+        $this->assertEquals(100, $results[1]['maximum']);
+        $this->assertEquals(0, $results[2]['maximum']);
+        // Count over 60%
+        $this->assertEquals(1, $results[0]['highScoreCount']);
+        $this->assertEquals(2, $results[1]['highScoreCount']);
+        $this->assertEquals(0, $results[2]['highScoreCount']);
+        // Count at 0%
+        $this->assertEquals(1, $results[0]['lowScoreCount']);
+        $this->assertEquals(0, $results[1]['lowScoreCount']);
+        $this->assertEquals(2, $results[2]['lowScoreCount']);
     }
 }
