@@ -1592,6 +1592,7 @@ const translations: { [key: string]: string; } = {
   wordsWallTimeInSeconds: "Tiempo-real (Seg)",
   wordsWarningProblem: "Conservar con una advertencia",
   wordsYes: "S\u00ed",
+  youMustOpenBeforeSubmit: "Debes abrir el problema antes de hacer un env\u00edo",
 };
 
 export {translations as default};
