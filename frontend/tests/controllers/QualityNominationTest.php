@@ -2013,7 +2013,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemLevelBasicIntroductionToProgramming',
-                'tags'=> ['problemTagQueues', 'problemTagRecursion'],
+                'tags' => ['problemTagQueues', 'problemTagRecursion'],
             ]),
         ]));
 

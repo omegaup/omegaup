@@ -493,7 +493,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             }
 
             if (
-                isset($contents['tags']) 
+                isset($contents['tags'])
             ) {
                 if (!is_array($contents['tags'])) {
                     throw new \OmegaUp\Exceptions\InvalidParameterException(
