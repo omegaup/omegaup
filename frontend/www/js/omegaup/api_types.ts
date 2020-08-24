@@ -1690,7 +1690,7 @@ export namespace types {
       highScoreCount: number;
       lowScoreCount: number;
       maxPoints: number;
-      maximum: number;
+      maximum?: number;
       minimum?: number;
       problem_alias: string;
       variance?: number;

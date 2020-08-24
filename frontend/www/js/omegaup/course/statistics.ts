@@ -23,7 +23,7 @@ OmegaUp.on('ready', function () {
   const getVariance = (stats: types.CourseStatisticsPayload) => {
     let variance = [];
     for (const problem in stats.problemStats) {
-      variance.push(stats.problemStats[problem].variance);
+      variance.push(stats.problemStats[problem].variance || 0);
     }
     return variance;
   };
@@ -31,7 +31,7 @@ OmegaUp.on('ready', function () {
   const getAverage = (stats: types.CourseStatisticsPayload) => {
     let average = [];
     for (const problem in stats.problemStats) {
-      average.push(stats.problemStats[problem].average);
+      average.push(stats.problemStats[problem].average || 0);
     }
     return average;
   };
@@ -65,7 +65,7 @@ OmegaUp.on('ready', function () {
   const getMaximum = (stats: types.CourseStatisticsPayload) => {
     let maximum = [];
     for (const problem in stats.problemStats) {
-      maximum.push(stats.problemStats[problem].maximum);
+      maximum.push(stats.problemStats[problem].maximum || 0);
     }
     return maximum;
   };
@@ -73,7 +73,7 @@ OmegaUp.on('ready', function () {
   const getMinimum = (stats: types.CourseStatisticsPayload) => {
     let minimum = [];
     for (const problem in stats.problemStats) {
-      minimum.push(stats.problemStats[problem].minimum);
+      minimum.push(stats.problemStats[problem].minimum || 0);
     }
     return minimum;
   };
@@ -89,9 +89,9 @@ OmegaUp.on('ready', function () {
 
   const getMaxVariance = (stats: types.CourseStatisticsPayload) => {
     let maxVariance = 0;
-    for (const problem in stats.problemStats) {
-      if (stats.problemStats[problem].variance > maxVariance)
-        maxVariance = stats.problemStats[problem].variance;
+    const variance = getVariance(stats);
+    for (let i = 0; i < variance.length; i++) {
+      if (variance[i] > maxVariance) maxVariance = variance[i];
     }
     return maxVariance;
   };
