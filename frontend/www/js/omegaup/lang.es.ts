@@ -1561,7 +1561,7 @@ const translations: { [key: string]: string; } = {
   wordsStatistics: "Estad\u00edsticas",
   wordsStatus: "Estatus",
   wordsStudent: "Estudiante",
-  wordsStudentsAbove: "Estudiantes puntuado arriba",
+  wordsStudentsAbove: "Estudiantes puntuado arriba de",
   wordsStudentsScored: "Estudiantes puntuado",
   wordsSubmissionDate: "Fecha de env\u00edo",
   wordsSubmissions: "Env\u00edos",

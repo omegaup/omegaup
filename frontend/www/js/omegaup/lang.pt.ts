@@ -1561,7 +1561,7 @@ const translations: { [key: string]: string; } = {
   wordsStatistics: "Estat\u00edsticas",
   wordsStatus: "Status",
   wordsStudent: "Aluna",
-  wordsStudentsAbove: "Aluna pontua\u00e7\u00e3o superior",
+  wordsStudentsAbove: "Pontua\u00e7\u00e3o de estudante acima de",
   wordsStudentsScored: "Aluna pontua\u00e7\u00e3o",
   wordsSubmissionDate: "Data de solu\u00e7\u00e3o",
   wordsSubmissions: "Solu\u00e7\u00f5es",
