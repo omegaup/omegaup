@@ -51,7 +51,13 @@ class ProblemParams {
     public $allowUserAddTags;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string} $params
+     * @readonly
+     * @var string
+     */
+    public $levelTags;
+
+    /**
+     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, level_tag?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -60,6 +66,7 @@ class ProblemParams {
         $this->visibility = $params['visibility'] ?? 'public';
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
+        $this->levelTags = $params['level_tag'] ?? 'problemLevelBasicIntroductionToProgramming';
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];
@@ -132,6 +139,7 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
+            'level_tag' => 'problemLevelBasicIntroductionToProgramming',
         ]);
 
         // Set file upload context
