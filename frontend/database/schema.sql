@@ -176,7 +176,7 @@ CREATE TABLE `Countries` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Course_Clone_Log` (
   `course_clone_log_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador del intento de clonar curso',
-  `ip` int unsigned NOT NULL COMMENT 'Dirección IP desde la cual se intentó clonar el curso.',
+  `ip` varchar(40) NOT NULL COMMENT 'Dirección IP desde la cual se intentó clonar el curso.',
   `course_id` int NOT NULL COMMENT 'ID del curso original',
   `new_course_id` int DEFAULT NULL COMMENT 'ID del curso nuevo, null si no se pudo colonar el curso',
   `token_payload` varchar(50) NOT NULL COMMENT 'Claims del token usado para intentar clonar, independientemente de si fue exitoso o no.',
