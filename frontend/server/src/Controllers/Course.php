@@ -600,7 +600,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         } finally {
             \OmegaUp\DAO\CourseCloneLog::create(
                 new \OmegaUp\DAO\VO\CourseCloneLog([
-                    'ip' => ip2long(strval($_SERVER['REMOTE_ADDR'])),
+                    'ip' => strval($_SERVER['REMOTE_ADDR']),
                     'course_id' => $originalCourse->course_id,
                     'new_course_id' => !is_null(
                         $course
