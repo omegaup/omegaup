@@ -754,6 +754,7 @@ problemEditSlowWarning = "<strong>Aviso</strong>: Para não desestabilizar o res
 problemEditSolution = "Editar Solução"
 problemEditSource = "Fonte do problema"
 problemEditTagPublic = "A etiqueta estará visível"
+problemEditTagPublicRequired = "É obrigatório selecionar pelo menos uma etiqueta pública"
 problemEditUpdatedSuccessfully = "Problema atualizado com sucesso!"
 problemExists = "Outro problema com esse nome já existe. Escolha outro nome."
 problemHasBeenUsedInContestOrCourse = "O problema não pode ser excluído, porque ele foi usado em um concurso ou um curso"

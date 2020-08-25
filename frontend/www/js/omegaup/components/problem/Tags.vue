@@ -11,7 +11,9 @@
           v-bind:auto-close="true"
           v-bind:placeholder="T.publicTagsPlaceholder"
           v-bind:required="true"
-          v-bind:input-class="errors.includes('public_tags') ? 'is-invalid' : ''"
+          v-bind:input-class="
+            errors.includes('public_tags') ? 'is-invalid' : ''
+          "
         >
         </vue-typeahead-bootstrap>
       </div>
@@ -23,6 +25,12 @@
             </th>
             <th class="text-center" scope="col">
               {{ T.contestEditTagDelete }}
+              <a
+                data-toggle="tooltip"
+                rel="tooltip"
+                v-bind:title="T.problemEditTagPublicRequired"
+                ><img src="/media/question.png"
+              /></a>
             </th>
           </tr>
         </thead>
@@ -38,6 +46,7 @@
                 type="button"
                 class="btn btn-danger"
                 v-on:click="removeTag(tag, /*public=*/ true)"
+                v-bind:disabled="selectedPublicTags.length < 2"
               >
                 <font-awesome-icon v-bind:icon="['fas', 'trash']" />
               </button>
@@ -244,6 +253,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 library.add(faTrash);
+
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
 
 @Component({
   components: {

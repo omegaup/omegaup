@@ -756,6 +756,7 @@ const translations: { [key: string]: string; } = {
   problemEditSolution: "Edit Solution",
   problemEditSource: "Problem source",
   problemEditTagPublic: "Tag will be visible",
+  problemEditTagPublicRequired: "It's required to select at least one public tag",
   problemEditUpdatedSuccessfully: "Problem updated succesfully!",
   problemExists: "Another problem with that name already exists. Choose another name.",
   problemHasBeenUsedInContestOrCourse: "Problem can not be deleted, because it has been used in a contest or a course",
