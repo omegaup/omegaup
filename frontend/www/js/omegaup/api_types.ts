@@ -1687,8 +1687,8 @@ export namespace types {
     problemStats: {
       assignment_alias: string;
       average?: number;
-      highScoreCount: number;
-      lowScoreCount: number;
+      highScoreCount?: number;
+      lowScoreCount?: number;
       maxPoints: number;
       maximum?: number;
       minimum?: number;

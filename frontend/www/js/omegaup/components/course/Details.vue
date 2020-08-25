@@ -42,12 +42,6 @@
                 v-bind:href="`/course/${course.alias}/activity/`"
                 >{{ T.wordsActivityReport }}</a
               >
-              <a
-                data-button-activity-report
-                class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/statistics/`"
-                >{{ T.omegaupTitleCourseStatistics }}</a
-              >
             </div>
           </div>
         </div>
