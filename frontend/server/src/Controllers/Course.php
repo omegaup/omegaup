@@ -522,6 +522,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\DAO\DAO::transBegin();
+        $course = null;
 
         try {
             // Create the course (and group)
@@ -591,9 +592,25 @@ class Course extends \OmegaUp\Controllers\Controller {
                 }
             }
             \OmegaUp\DAO\DAO::transEnd();
+            $result = 'success';
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
+            $result = 'unknown';
             throw $e;
+        } finally {
+            \OmegaUp\DAO\CourseCloneLog::create(
+                new \OmegaUp\DAO\VO\CourseCloneLog([
+                    'ip' => strval($_SERVER['REMOTE_ADDR']),
+                    'course_id' => $originalCourse->course_id,
+                    'new_course_id' => !is_null(
+                        $course
+                    ) ? $course->course_id : null,
+                    'token_payload' => '',
+                    'timestamp' => \OmegaUp\Time::get(),
+                    'user_id' => $r->user->user_id,
+                    'result' => $result,
+                ])
+            );
         }
 
         return [

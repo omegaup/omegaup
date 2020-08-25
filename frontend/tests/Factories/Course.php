@@ -158,7 +158,7 @@ class Course {
 
     /**
      * @param array{homework?: int, test?: int} $assignmentsPerType
-     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string, assignment_problemset_ids: list<int>}
+     * @return array{admin: \OmegaUp\DAO\VO\Identities, assignment_aliases: list<string>, course_alias: string, course_id: int, assignment_problemset_ids: list<int>}
      */
     public static function createCourseWithNAssignmentsPerType(
         array $assignmentsPerType,
@@ -223,6 +223,7 @@ class Course {
         return [
             'admin' => $admin,
             'course_alias' => $courseAlias,
+            'course_id' => $course->course_id,
             'assignment_aliases' => $assignmentAliases,
             'assignment_problemset_ids' => $assignmentProblemsetIds,
         ];
