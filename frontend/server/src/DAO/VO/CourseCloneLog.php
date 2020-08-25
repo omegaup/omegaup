@@ -42,7 +42,7 @@ class CourseCloneLog extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['ip'])) {
-            $this->ip = intval(
+            $this->ip = strval(
                 $data['ip']
             );
         }
@@ -100,7 +100,7 @@ class CourseCloneLog extends \OmegaUp\DAO\VO\VO {
     /**
      * Dirección IP desde la cual se intentó clonar el curso.
      *
-     * @var int|null
+     * @var string|null
      */
     public $ip = null;
 

@@ -44,11 +44,7 @@ abstract class CourseCloneLog {
                     `course_clone_log_id` = ?
                 );';
         $params = [
-            (
-                is_null($Course_Clone_Log->ip) ?
-                null :
-                intval($Course_Clone_Log->ip)
-            ),
+            $Course_Clone_Log->ip,
             (
                 is_null($Course_Clone_Log->course_id) ?
                 null :
@@ -254,11 +250,7 @@ abstract class CourseCloneLog {
                     ?
                 );';
         $params = [
-            (
-                is_null($Course_Clone_Log->ip) ?
-                null :
-                intval($Course_Clone_Log->ip)
-            ),
+            $Course_Clone_Log->ip,
             (
                 is_null($Course_Clone_Log->course_id) ?
                 null :
