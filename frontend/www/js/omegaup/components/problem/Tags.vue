@@ -10,6 +10,8 @@
           v-on:hit="addPublicTag"
           v-bind:auto-close="true"
           v-bind:placeholder="T.publicTagsPlaceholder"
+          v-bind:required="true"
+          v-bind:input-class="errors.includes('public_tags') ? 'is-invalid' : ''"
         >
         </vue-typeahead-bootstrap>
       </div>
@@ -260,6 +262,7 @@ export default class ProblemTags extends Vue {
   @Prop({ default: true }) initialAllowTags!: boolean;
   @Prop({ default: false }) canAddNewTags!: boolean;
   @Prop({ default: false }) isCreate!: boolean;
+  @Prop({ default: () => [] }) errors!: string[];
 
   T = T;
   allowTags = this.initialAllowTags;
