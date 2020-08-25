@@ -7,7 +7,6 @@ import * as api from '../api';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestEditPayload();
-  console.log(payload);
 
   const contestEdit = new Vue({
     el: '#main-container',
