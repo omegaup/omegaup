@@ -298,7 +298,7 @@ export default class UserProfile extends Vue {
     }
   }
 
-  get periodStatisticOptions(): any {
+  get periodStatisticOptions(): Highcharts.Options {
     return {
       title: {
         text: ui.formatString(T.profileStatisticsVerdictsOf, {
@@ -351,7 +351,7 @@ export default class UserProfile extends Vue {
       series: [],
     };
   }
-  get aggregateStatisticOptions(): any {
+  get aggregateStatisticOptions(): Highcharts.Options {
     return {
       title: {
         text: ui.formatString(T.profileStatisticsVerdictsOf, {
@@ -359,8 +359,6 @@ export default class UserProfile extends Vue {
         }),
       },
       chart: {
-        plotBackgroundColor: null,
-        plotBorderWidth: null,
         plotShadow: false,
         type: 'pie',
       },
@@ -387,6 +385,7 @@ export default class UserProfile extends Vue {
         {
           name: T.profileStatisticsRuns,
           data: [],
+          type: 'pie',
         },
       ],
     };
@@ -395,6 +394,7 @@ export default class UserProfile extends Vue {
     e: user_Charts,
     categories: string[],
     data: omegaup.RunData[],
+    type: 'pie',
   ) {
     e.periodStatisticOptions.xAxis.categories = categories;
     e.periodStatisticOptions.series = data;
