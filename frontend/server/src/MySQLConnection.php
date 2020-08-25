@@ -338,13 +338,18 @@ class MySQLConnection {
         array $params,
         int $resultmode
     ): ?\mysqli_result {
-        $result = $this->_connection->query(
-            $this->BindQueryParams(
-                $sql,
-                $params
-            ),
-            $resultmode
-        );
+        $query = $this->BindQueryParams($sql, $params);
+        $result = $this->_connection->query($query, $resultmode);
+        if (
+            $result === false &&
+            $this->_needsFlushing === false &&
+            $this->_connection->errno == 2006
+        ) {
+            // If there have not been any non-committed updates to the
+            // database, let's try to reconnect and do this one more time.
+            $this->connect();
+            $result = $this->_connection->query($query, $resultmode);
+        }
         if ($result === false) {
             $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
             \Logger::getLogger('mysql')->debug($errorMessage);
