@@ -7,9 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r): array {
-        return \OmegaUp\Controllers\Problem::getLibinteractiveGenForSmarty(
-            $r
-        );
-    }
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Problem::getLibinteractiveGenForSmarty(
+        $r
+    )
 );

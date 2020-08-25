@@ -502,16 +502,22 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]))['tags'];
 
         foreach ($expectedTags as $selectedTag) {
-            $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-                return $tag['name'] == $selectedTag['tagname'];
-            });
+            $this->assertArrayContainsWithPredicate(
+                $tags,
+                fn ($tag) => $tag['name'] == $selectedTag['tagname']
+            );
         }
-        $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-            return $tag['name'] == 'problemRestrictedTagLanguage';
-        });
-        $this->assertArrayNotContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-            return ($tag['name'] == 'problemRestrictedTagKarel' || $tag['name'] == 'problemRestrictedTagOnlyOutput');
-        });
+        $this->assertArrayContainsWithPredicate(
+            $tags,
+            fn ($tag) => $tag['name'] == 'problemRestrictedTagLanguage'
+        );
+        $this->assertArrayNotContainsWithPredicate(
+            $tags,
+            fn ($tag) => (
+                $tag['name'] == 'problemRestrictedTagKarel' ||
+                $tag['name'] == 'problemRestrictedTagOnlyOutput'
+            )
+        );
     }
 
     /**
@@ -666,6 +672,11 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->submissions);
         $this->assertEquals(0, $problem->accepted);
         $this->assertEquals(0, $problem->difficulty);
+
+        \OmegaUp\Controllers\Problem::regenerateTemplates(
+            $problem->alias,
+            $problem->commit
+        );
 
         // Verify that the templates were generated.
         $this->assertTrue(

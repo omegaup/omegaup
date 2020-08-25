@@ -24,22 +24,30 @@
             <label>{{ T.wordsTitle }}</label>
             <input
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'title',
+              }"
               name="title"
               data-title
               v-bind:placeholder="titlePlaceHolder"
               size="30"
               type="text"
               v-model="title"
+              required="required"
             />
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
             <input
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'alias',
+              }"
               name="alias"
               v-bind:disabled="update"
               type="text"
               v-model="alias"
+              required="required"
             />
             <p class="help-block">
               {{ T.contestNewFormShortTitle_alias_Desc }}
@@ -58,6 +66,7 @@
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
               v-model="finishTime"
+              v-bind:is-invalid="invalidParameterName === 'finish_time'"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
           </div>
@@ -67,10 +76,14 @@
             <label>{{ T.contestNewFormDescription }}</label>
             <textarea
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'description',
+              }"
               name="description"
               cols="30"
               rows="10"
               v-model="description"
+              required="required"
             ></textarea>
           </div>
           <div class="form-group col-md-6">
@@ -83,6 +96,9 @@
             </div>
             <input
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'window_length',
+              }"
               size="3"
               type="text"
               v-bind:disabled="!windowLengthEnabled"
@@ -96,10 +112,14 @@
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
               class="form-control scoreboard-time-percent"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'scoreboard',
+              }"
               name="scoreboard"
               size="3"
               type="text"
               v-model="scoreboard"
+              required="required"
             />
             <p class="help-block">
               {{ T.contestNewFormScoreboardTimePercentDesc }}
@@ -109,9 +129,13 @@
             <label>{{ T.contestNewFormSubmissionsSeparation }}</label>
             <input
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'submissions_gap',
+              }"
               size="2"
               type="text"
               v-model="submissionsGap"
+              required="required"
             />
             <p class="help-block">
               {{ T.contestNewFormSubmissionsSeparationDesc }}
@@ -141,9 +165,13 @@
             <label>{{ T.wordsPenalty }}</label>
             <input
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'penalty',
+              }"
               size="2"
               type="text"
               v-model="penalty"
+              required="required"
             />
             <p class="help-block">{{ T.contestNewFormPenaltyDesc }}</p>
           </div>
@@ -196,9 +224,13 @@
             <label>{{ T.contestNewFormPointDecrementFactor }}</label>
             <input
               class="form-control"
+              v-bind:class="{
+                'is-invalid': invalidParameterName === 'points_decay_factor',
+              }"
               size="4"
               type="text"
               v-model="pointsDecayFactor"
+              required="required"
             />
             <p class="help-block">
               {{ T.contestNewFormPointDecrementFactorDesc }}
@@ -213,6 +245,7 @@
               v-bind:multiple="true"
               v-bind:placeholder="T.contestNewFormLanguages"
               v-bind:close-on-select="false"
+              v-bind:allow-empty="false"
             >
             </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
@@ -292,7 +325,6 @@ export default class NewForm extends Vue {
   @Prop({ default: '' }) initialDescription!: string;
   @Prop({ default: 'none' }) initialFeedback!: string;
   @Prop() initialFinishTime!: Date;
-  @Prop({ default: () => [] }) initialLanguages!: Array<string>;
   @Prop({ default: false }) initialNeedsBasicInformation!: boolean;
   @Prop({ default: 0 }) initialPenalty!: number;
   @Prop({ default: 'none' }) initialPenaltyType!: string;
@@ -305,13 +337,14 @@ export default class NewForm extends Vue {
   @Prop() initialSubmissionsGap!: number;
   @Prop({ default: '' }) initialTitle!: string;
   @Prop({ default: null }) initialWindowLength!: null | number;
+  @Prop({ default: null }) invalidParameterName!: null | string;
 
   T = T;
   alias = this.initialAlias;
   description = this.initialDescription;
   feedback = this.initialFeedback;
   finishTime = this.initialFinishTime;
-  languages = this.initialLanguages;
+  languages = Object.keys(this.allLanguages);
   needsBasicInformation = this.initialNeedsBasicInformation;
   penalty = this.initialPenalty;
   penaltyType = this.initialPenaltyType;
@@ -337,7 +370,7 @@ export default class NewForm extends Vue {
   }
 
   fillOmi(): void {
-    this.languages = [];
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;
@@ -351,7 +384,7 @@ export default class NewForm extends Vue {
   }
 
   fillPreIoi(): void {
-    this.languages = [];
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
     this.windowLengthEnabled = true;
     this.windowLength = 180;
@@ -365,7 +398,7 @@ export default class NewForm extends Vue {
   }
 
   fillConacup(): void {
-    this.languages = [];
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;

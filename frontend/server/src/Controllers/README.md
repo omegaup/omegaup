@@ -550,39 +550,9 @@ remaining time from the contest, or register the opened time.
 
 ### Returns
 
-| Name                        | Type                         |
-| --------------------------- | ---------------------------- |
-| `admin`                     | `boolean`                    |
-| `admission_mode`            | `string`                     |
-| `alias`                     | `string`                     |
-| `available_languages`       | `{ [key: string]: string; }` |
-| `description`               | `string`                     |
-| `director`                  | `string`                     |
-| `feedback`                  | `string`                     |
-| `finish_time`               | `Date`                       |
-| `languages`                 | `string[]`                   |
-| `needs_basic_information`   | `boolean`                    |
-| `opened`                    | `boolean`                    |
-| `original_contest_alias`    | `string`                     |
-| `original_problemset_id`    | `number`                     |
-| `partial_score`             | `boolean`                    |
-| `penalty`                   | `number`                     |
-| `penalty_calc_policy`       | `string`                     |
-| `penalty_type`              | `string`                     |
-| `points_decay_factor`       | `number`                     |
-| `problems`                  | `types.ProblemsetProblem[]`  |
-| `problemset_id`             | `number`                     |
-| `requests_user_information` | `string`                     |
-| `rerun_id`                  | `number`                     |
-| `scoreboard`                | `number`                     |
-| `scoreboard_url`            | `string`                     |
-| `scoreboard_url_admin`      | `string`                     |
-| `show_penalty`              | `boolean`                    |
-| `show_scoreboard_after`     | `boolean`                    |
-| `start_time`                | `Date`                       |
-| `submissions_gap`           | `number`                     |
-| `title`                     | `string`                     |
-| `window_length`             | `number`                     |
+```typescript
+types.ContestAdminDetails;
+```
 
 ## `/api/contest/adminList/`
 
@@ -902,9 +872,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `problems` | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; order: number; points: number; problem_id: number; submissions: number; title: string; version: string; visibility: number; visits: number; }[]` |
+| Name       | Type                     |
+| ---------- | ------------------------ |
+| `problems` | `types.ContestProblem[]` |
 
 ## `/api/contest/publicDetails/`
 
@@ -1271,6 +1241,7 @@ Update a Contest
 | `languages`                 | `mixed`                  |             |
 | `needs_basic_information`   | `bool|null`              |             |
 | `partial_score`             | `bool|null`              |             |
+| `penalty`                   | `int|null`               |             |
 | `penalty_calc_policy`       | `mixed`                  |             |
 | `penalty_type`              | `mixed`                  |             |
 | `points_decay_factor`       | `float|null`             |             |
@@ -1320,10 +1291,10 @@ Returns ALL identities participating in a contest
 
 ### Returns
 
-| Name     | Type                                                                                               |
-| -------- | -------------------------------------------------------------------------------------------------- |
-| `groups` | `{ alias: string; name: string; }[]`                                                               |
-| `users`  | `{ access_time: Date; country_id: string; end_time: Date; is_owner: number; username: string; }[]` |
+| Name     | Type                                 |
+| -------- | ------------------------------------ |
+| `groups` | `{ alias: string; name: string; }[]` |
+| `users`  | `types.ContestUser[]`                |
 
 # Course
 

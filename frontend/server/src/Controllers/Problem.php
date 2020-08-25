@@ -6,21 +6,22 @@ namespace OmegaUp\Controllers;
  * ProblemsController
  *
  * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
- * @psalm-type NominationStatus=array{alreadyReviewed: bool, dismissed: bool, dismissedBeforeAC: bool, nominated: bool, nominatedBeforeAC: bool, solved: bool, tried: bool}
+ * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language: string, nominated: bool, nominatedBeforeAC: bool, solved: bool, tried: bool}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettings=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
  * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
  * @psalm-type ProblemSettings=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettings, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
- * @psalm-type ProblemInfo=array{alias: string, karel_problem: bool, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettings, source: null|string, statement: ProblemStatement, title: string, visibility: int}
+ * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettings, source: null|string, statement: ProblemStatement, title: string, visibility: int}
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
  * @psalm-type ArenaProblemDetails=array{accepts_submissions: bool, alias: string, commit: string, input_limit: int, languages: list<string>, letter?: string, points: float, problem_id?: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>,  settings?: ProblemSettings, source?: string, statement?: ProblemStatement, title: string, visibility: int}
- * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, show_diff: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
+ * @psalm-type BestSolvers=array{classname: string, language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type ProblemDetails=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, show_diff: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type StatsPayload=array{alias: string, entity_type: string, cases_stats?: array<string, int>, pending_runs: list<string>, total_runs: int, verdict_counts: array<string, int>, max_wait_time?: \OmegaUp\Timestamp|null, max_wait_time_guid?: null|string, distribution?: array<int, int>, size_of_bucket?: float, total_points?: float}
  * @psalm-type ProblemSettingsSummaryPayload=array{problem: ArenaProblemDetails, problem_admin: bool}
  * @psalm-type SelectedTag=array{public: bool, tagname: string}
@@ -28,8 +29,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type ProblemVersion=array{author: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, commit: string, committer: array{email?: string, name?: string, time: \OmegaUp\Timestamp|null}, message?: string, parents?: list<string>, tree: array<string, string>|null, version: null|string}
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
- * @psalm-type ProblemDetailsPayload=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
- * @psalm-type ProblemDetailsv2Payload=array{nominationStatus?: NominationStatus, problem: ProblemInfo, user: UserInfoForProblem}
+ * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
+ * @psalm-type ProblemDetailsPayload=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
+ * @psalm-type ProblemDetailsv2Payload=array{allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -46,7 +48,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'problemRestrictedTagKarel',
         'problemRestrictedTagLanguage',
         'problemRestrictedTagOnlyOutput',
-        'problemRestrictedTagInteractive'
+        'problemRestrictedTagInteractive',
+        'problemRestrictedTagNoSubmissions',
     ];
     const VALID_LANGUAGES = ['en', 'es', 'pt'];
     const VALID_SORTING_MODES = ['asc', 'desc'];
@@ -448,23 +451,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $acl = new \OmegaUp\DAO\VO\ACLs();
         $acl->owner_id = $user->user_id;
 
+        // Create the problem before attempting to communicate with the
+        // database.
+        $temporaryAlias = (
+            "temp.{$params->problemAlias}." .
+            intval(microtime(/*$get_as_float=*/true) * 1000000)
+        );
+        $problemDeployer = new \OmegaUp\ProblemDeployer(
+            $temporaryAlias,
+            $acceptsSubmissions
+        );
+        $problemDeployer->commit(
+            'Initial commit',
+            $identity,
+            \OmegaUp\ProblemDeployer::CREATE,
+            $problemSettings
+        );
+        $problem->commit = $problemDeployer->publishedCommit ?: '';
+        $problem->current_version = $problemDeployer->privateTreeHash;
+
         // Insert new problem
         try {
             \OmegaUp\DAO\DAO::transBegin();
-
-            // Commit at the very end
-            $problemDeployer = new \OmegaUp\ProblemDeployer(
-                $params->problemAlias,
-                $acceptsSubmissions
-            );
-            $problemDeployer->commit(
-                'Initial commit',
-                $identity,
-                \OmegaUp\ProblemDeployer::CREATE,
-                $problemSettings
-            );
-            $problem->commit = $problemDeployer->publishedCommit ?: '';
-            $problem->current_version = $problemDeployer->privateTreeHash;
 
             // Save the contest object with data sent by user to the database
             \OmegaUp\DAO\ACLs::create($acl);
@@ -507,18 +515,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-            \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
+            \OmegaUp\Controllers\Problem::setRestrictedTags(
+                $problem,
+                $temporaryAlias
+            );
+
+            // Once all the checks and validations have been performed, rename
+            // the problem to its final name.
+            $problemDeployer->renameRepository($params->problemAlias);
+
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            // Operation failed in something we know it could fail, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
-
-            throw $e;
         } catch (\Exception $e) {
-            self::$log->error("Failed to upload problem {$problem->alias}", $e);
+            self::$log->error("Failed to create problem {$problem->alias}", $e);
 
-            // Operation failed unexpectedly, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
+            try {
+                // Operation failed in the data layer, try to rollback transaction
+                \OmegaUp\DAO\DAO::transRollback();
+            } catch (\Exception $rollbackException) {
+                self::$log->error(
+                    'Failed to roll back transaction: ',
+                    $rollbackException
+                );
+            }
 
             if (\OmegaUp\DAO\DAO::isDuplicateEntryException($e)) {
                 throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
@@ -1107,7 +1125,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
+            self::$log->error(
+                "Failed to rejudge problem {$problem->alias}",
+                $e
+            );
+            try {
+                // Operation failed in the data layer, try to rollback transaction
+                \OmegaUp\DAO\DAO::transRollback();
+            } catch (\Exception $rollbackException) {
+                self::$log->error(
+                    'Failed to roll back transaction: ',
+                    $rollbackException
+                );
+            }
             throw $e;
         }
         \OmegaUp\Grader::getInstance()->rejudge($runs, false);
@@ -1407,12 +1437,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order',
             'languages' => [
                 'transform' =>
-                /**
-                 * @param list<string>|string $value
-                 */
-                function ($value): string {
-                    return is_array($value) ? join(',', $value) : $value;
-                }
+                /** @param list<string>|string $value */
+                fn ($value): string => is_array($value) ? join(',', $value) : $value
             ],
         ];
         $params->updateValueParams($problem, $valueProperties);
@@ -1502,15 +1528,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
             \OmegaUp\Controllers\Problem::setRestrictedTags($problem);
 
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            // Operation failed in the data layer, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
-
-            throw $e;
         } catch (\Exception $e) {
-            // Operation failed in the data layer, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
-            self::$log->error('Failed to update problem', $e);
+            self::$log->error(
+                "Failed to update problem {$problem->alias}: ",
+                $e
+            );
+            try {
+                // Operation failed in the data layer, try to rollback transaction
+                \OmegaUp\DAO\DAO::transRollback();
+            } catch (\Exception $rollbackException) {
+                self::$log->error(
+                    'Failed to roll back transaction: ',
+                    $rollbackException
+                );
+            }
 
             throw $e;
         }
@@ -1559,7 +1590,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return $response;
     }
 
-    private static function setRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {
+    private static function setRestrictedTags(
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?string $temporaryAlias = null
+    ): void {
         \OmegaUp\DAO\ProblemsTags::clearRestrictedTags($problem);
         $languages = explode(',', $problem->languages);
         if (in_array('cat', $languages)) {
@@ -1576,6 +1610,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem,
                 true
             );
+        } elseif (in_array('', $languages)) {
+            \OmegaUp\Controllers\Problem::addTag(
+                'problemRestrictedTagNoSubmissions',
+                true,
+                $problem,
+                true
+            );
         } else {
             \OmegaUp\Controllers\Problem::addTag(
                 'problemRestrictedTagLanguage',
@@ -1586,7 +1627,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $problemArtifacts = new \OmegaUp\ProblemArtifacts(
-            strval($problem->alias)
+            $temporaryAlias ?? strval($problem->alias)
         );
         /** @var ProblemSettings */
         $distribSettings = json_decode(
@@ -2088,15 +2129,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_STATEMENT,
             "{$alias}-{$commit}-{$language}-markdown",
-            /** @return ProblemStatement|null */
-            function () use ($alias, $commit, $language): ?array {
-                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
-                    'directory' => 'statements',
-                    'alias' => $alias,
-                    'commit' => $commit,
-                    'language' => $language,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemResourceImpl([
+                'directory' => 'statements',
+                'alias' => $alias,
+                'commit' => $commit,
+                'language' => $language,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -2121,15 +2159,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION,
             "{$problem->alias}-{$commit}-{$language}-markdown",
-            /** @return ProblemStatement|null */
-            function () use ($problem, $commit, $language): ?array {
-                return \OmegaUp\Controllers\Problem::getProblemResourceImpl([
-                    'directory' => 'solutions',
-                    'alias' => strval($problem->alias),
-                    'commit' => $commit,
-                    'language' => $language,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemResourceImpl([
+                'directory' => 'solutions',
+                'alias' => strval($problem->alias),
+                'commit' => $commit,
+                'language' => $language,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -2147,13 +2182,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SETTINGS_DISTRIB,
             "{$problem->alias}-{$problem->commit}",
-            /** @return ProblemSettings */
-            function () use ($problem): array {
-                return \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
-                    'alias' => strval($problem->alias),
-                    'commit' => $problem->commit,
-                ]);
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemSettingsDistribImpl([
+                'alias' => strval($problem->alias),
+                'commit' => $problem->commit,
+            ]),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }
@@ -2979,9 +3011,19 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
-            // Operation failed in the data layer, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
-            self::$log->error('Failed to update problem: ', $e);
+            self::$log->error(
+                "Failed to update problem {$problem->alias}: ",
+                $e
+            );
+            try {
+                // Operation failed in the data layer, try to rollback transaction
+                \OmegaUp\DAO\DAO::transRollback();
+            } catch (\Exception $rollbackException) {
+                self::$log->error(
+                    'Failed to roll back transaction: ',
+                    $rollbackException
+                );
+            }
 
             throw $e;
         }
@@ -4013,9 +4055,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ]));
             }
             \OmegaUp\DAO\DAO::transEnd();
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            // Operation failed in something we know it could fail, rollback transaction
-            \OmegaUp\DAO\DAO::transRollback();
+        } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to update languages for problem {$problem->alias}: ",
+                $e
+            );
+            try {
+                // Operation failed in the data layer, try to rollback transaction
+                \OmegaUp\DAO\DAO::transRollback();
+            } catch (\Exception $rollbackException) {
+                self::$log->error(
+                    'Failed to roll back transaction: ',
+                    $rollbackException
+                );
+            }
             throw $e;
         }
     }
@@ -4140,7 +4193,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{karel_problem: bool, nomination_payload: array{already_reviewed: bool, problem_alias: string, reviewer: bool}, payload: ProblemDetailsPayload, problem_admin: bool, problemsetter: ProblemsetterInfo|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, sample_input?: string, settings_summary_payload: ProblemSettingsSummaryPayload, solvers: list<array{language: string, memory: float, runtime: float, time: \OmegaUp\Timestamp, username: string}>, source: null|string}, template: string}
+     * @return array{smartyProperties: array{karel_problem: bool, nomination_payload: array{already_reviewed: bool, problem_alias: string, reviewer: bool}, payload: ProblemDetailsPayload, problem_admin: bool, problemsetter: ProblemsetterInfo|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, sample_input?: string, settings_summary_payload: ProblemSettingsSummaryPayload, solvers: list<BestSolvers>, source: null|string}, template: string}
      * @omegaup-request-param mixed $contest_alias
      * @omegaup-request-param mixed $lang
      * @omegaup-request-param bool|null $prevent_problemset_open
@@ -4395,6 +4448,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $response = [
             'smartyProperties' => [
                 'payload' => [
+                    'histogram' => [
+                        'difficultyHistogram' => $problem->difficulty_histogram,
+                        'qualityHistogram' => $problem->quality_histogram,
+                        'quality' => floatval($problem->quality),
+                        'difficulty' => floatval($problem->difficulty),
+                    ],
                     'problem' => [
                         'alias' => $details['alias'],
                         'karel_problem' => count(
@@ -4403,6 +4462,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 ['kp', 'kj']
                             )
                         ) === 2,
+                        'commit' => $details['commit'],
+                        'languages' => $details['languages'],
                         'limits' => [
                             'input_limit' => (
                                 $details['input_limit'] / 1024
@@ -4429,7 +4490,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         ),
                         'title' => $details['title'],
                         'visibility' => $details['visibility'],
+                        'accepts_submissions' => $details['accepts_submissions'],
+                        'input_limit' => $details['input_limit'],
                     ],
+                    'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
+                        intval($problem->problem_id)
+                    ),
                     'user' => [
                         'loggedIn' => false,
                         'admin' => false,
@@ -4480,6 +4546,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'dismissedBeforeAC' => $nominationStatus['dismissedBeforeAC'],
             'nominated' => $nominationStatus['nominated'],
             'nominatedBeforeAC' => $nominationStatus['nominatedBeforeAC'],
+            'language' => $details['statement']['language'],
+            'canNominateProblem' => !is_null($r->user),
             'solved' => false,
             'tried' => false,
         ];
@@ -4493,7 +4561,50 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $response['smartyProperties']['payload']['nominationStatus'] = $nominationPayload;
+        $response['smartyProperties']['payload'] = array_merge(
+            $response['smartyProperties']['payload'],
+            [
+                'nominationStatus' => $nominationPayload,
+                'runs' => \OmegaUp\DAO\Runs::getForProblemDetails(
+                    intval($problem->problem_id),
+                    /*$problemsetId=*/null,
+                    intval($r->identity->identity_id)
+                ),
+                'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
+                    intval($problem->problem_id)
+                ),
+                'solutionStatus' => self::getProblemSolutionStatus(
+                    $problem,
+                    $r->identity
+                ),
+                'clarifications' => \OmegaUp\DAO\Clarifications::getProblemClarifications(
+                    $problem->problem_id,
+                    $isAdmin,
+                    $r->identity->identity_id,
+                    /*$offset=*/null,
+                    /*rowcount=*/0
+                ),
+            ]
+        );
+        if ($isAdmin) {
+            $allRuns = [];
+            foreach (
+                \OmegaUp\DAO\Runs::getAllRuns(
+                    /*$problemset_id=*/                    null,
+                    /*$status=*/null,
+                    /*$verdict=*/null,
+                    $problem->problem_id,
+                    /*$language=*/null,
+                    /*$identity_id=*/null,
+                    /*$offset=*/null,
+                    /*$rowcount=*/null
+                ) as $run
+            ) {
+                unset($run['run_id']);
+                $allRuns[] = $run;
+            }
+            $response['smartyProperties']['payload']['allRuns'] = $allRuns;
+        }
 
         return $response;
     }
@@ -4628,10 +4739,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
             'all',
-            /** @return list<\OmegaUp\DAO\VO\Tags> */
-            function () {
-                return \OmegaUp\DAO\Tags::getAll();
-            },
+            fn () => \OmegaUp\DAO\Tags::getAll(),
             APC_USER_CACHE_SESSION_TIMEOUT
         );
     }
@@ -5146,11 +5254,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::PROBLEM_SOLUTION_EXISTS,
             "{$problem->alias}-{$problem->commit}",
-            function () use ($problem): bool {
-                return \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
-                    $problem
-                );
-            },
+            fn () => \OmegaUp\Controllers\Problem::getProblemSolutionExistenceImpl(
+                $problem
+            ),
             APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
         );
     }

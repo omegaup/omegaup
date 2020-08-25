@@ -1363,9 +1363,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $nomination = $this->findByPredicate(
             $response['nominations'],
-            function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
-            }
+            fn ($nomination) => $nomination['problem']['alias'] == $problemData['request']['problem_alias']
         );
         $this->assertNotNull($nomination);
         $this->assertEquals(
@@ -1376,9 +1374,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         // Login as one of the reviewers of that nomination.
         $reviewer = $this->findByPredicate(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers,
-            function ($reviewer) use (&$nomination) {
-                return $reviewer->username == $nomination['votes'][0]['user']['username'];
-            }
+            fn ($reviewer) => $reviewer->username == $nomination['votes'][0]['user']['username']
         );
         $this->assertNotNull($reviewer);
         $login = self::login($reviewer);
@@ -1387,9 +1383,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         $this->assertArrayContainsWithPredicate(
             $response['nominations'],
-            function ($nomination) use (&$problemData) {
-                return $nomination['problem']['alias'] == $problemData['request']['problem_alias'];
-            }
+            fn ($nomination) => $nomination['problem']['alias'] == $problemData['request']['problem_alias']
         );
     }
 
@@ -1822,9 +1816,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             true /* includeVoted */
         );
 
-        $extractName = function ($tag) {
-            return $tag['name'];
-        };
+        $extractName = fn ($tag) => $tag['name'];
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
         $this->assertEquals(
@@ -2269,13 +2261,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'problemTopicDynamicProgramming',
             1 /* public */
         );
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
+        $tags = array_map(
+            fn ($tag) => $tag['name'],
+            \OmegaUp\DAO\ProblemsTags::getProblemTags(
+                $problemData[0]['problem'],
+                false /* public_only */,
+                true /* includeVoted */
+            )
+        );
         $this->assertEquals(
             $tags,
             ['problemTopicDynamicProgramming', 'problemRestrictedTagLanguage']
@@ -2283,13 +2276,14 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
-        $tags = array_map(function ($tag) {
-            return $tag['name'];
-        }, \OmegaUp\DAO\ProblemsTags::getProblemTags(
-            $problemData[0]['problem'],
-            false /* public_only */,
-            true /* includeVoted */
-        ));
+        $tags = array_map(
+            fn ($tag) => $tag['name'],
+            \OmegaUp\DAO\ProblemsTags::getProblemTags(
+                $problemData[0]['problem'],
+                false /* public_only */,
+                true /* includeVoted */
+            )
+        );
         $this->assertEquals(
             $tags,
             ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemRestrictedTagLanguage']
