@@ -303,6 +303,7 @@
 	"courseAssignmentStartDateBeforeCourseStartDate": "La fecha de inicio de la tarea es previa a la fecha de inicio del curso",
 	"courseAssignmentUpdated": "Trabajo actualizado exitosamente!",
 	"courseBasicInformationNeeded": "Para unirte al curso debes completar tu informaci\u00f3n b\u00e1sica. Ir a <a href=\"/profile/edit/\">Mi perfil</a>",
+	"courseCardAboutCourses": "Acerca de curosos",
 	"courseCardCourseResume": "Continuar",
 	"courseCardDueDate": "Finaliza %(due_date)",
 	"courseCardImpartedBy": "Impartido por <span class=\"font-weight-bold\">%(school_name)</span>",

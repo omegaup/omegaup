@@ -304,6 +304,7 @@ const translations: { [key: string]: string; } = {
   courseAssignmentStartDateBeforeCourseStartDate: "A data de in\u00edcio da tarefa \u00e9 anterior \u00e0 data de in\u00edcio do curso",
   courseAssignmentUpdated: "Designa\u00e7\u00e3o editada com sucesso!",
   courseBasicInformationNeeded: "Para participar do curso, voc\u00ea deve preencher sua informa\u00e7\u00f5e b\u00e1sica. V\u00e1 para o <a href=\"/profile/edit/\">Meu perfil</a>",
+  courseCardAboutCourses: "Sobre cursos",
   courseCardCourseResume: "Retomar",
   courseCardDueDate: "Termina %(due_date)",
   courseCardImpartedBy: "Transmitido por <span class=\"font-weight-bold\">%(school_name)</span>",
