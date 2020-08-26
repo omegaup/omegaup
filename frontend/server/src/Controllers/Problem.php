@@ -326,7 +326,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $hasPublicTags = false;
             foreach ($selectedTags as $tag) {
-                if(!$hasPublicTags){
+                if (!$hasPublicTags) {
                     $hasPublicTags = boolval($tag['public']);
                 }
                 if (empty($tag['tagname'])) {
