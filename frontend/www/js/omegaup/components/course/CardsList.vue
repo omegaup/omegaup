@@ -1,6 +1,15 @@
 <template>
   <div>
-    <h1 class="card-title">{{ T.navAllCourses }}</h1>
+    <!--<h1 class="card-title">{{ T.navAllCourses }}</h1>-->
+    <div class="card-header mb-3">
+      <h1>{{ T.courseCardAboutCourses }}</h1>
+      <p>{{ T.courseCardAboutCourses }}</p>
+      <div class="text-right align-middle">
+          <a v-bind:href="`/course/list/${accessMode}/`">{{
+            T.courseListSeeAllCourses
+          }}</a>
+        </div>
+    </div>
 
     <div class="container">
       <div
