@@ -186,26 +186,39 @@ class Request extends \ArrayObject {
 
     /**
      * Ensures that the value associated with the key is a string.
+     *
+     * @param null|callable(string):bool $validator
      */
-    public function ensureString(string $key): string {
+    public function ensureString(
+        string $key,
+        ?callable $validator = null
+    ): string {
         if (!self::offsetExists($key)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
                 $key
             );
         }
-        /** @var mixed */
-        $val = $this->offsetGet($key);
-        $this[$key] = strval($val);
-        return strval($val);
+        $val = strval($this->offsetGet($key));
+        if (!is_null($validator) && !$validator($val)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $key
+            );
+        }
+        $this[$key] = $val;
+        return $val;
     }
 
     /**
      * Ensures that the value associated with the key is a string or null
+     *
+     * @param null|callable(string):bool $validator
      */
     public function ensureOptionalString(
         string $key,
-        bool $required = false
+        bool $required = false,
+        ?callable $validator = null
     ): ?string {
         if (!self::offsetExists($key)) {
             if (!$required) {
@@ -216,7 +229,7 @@ class Request extends \ArrayObject {
                 $key
             );
         }
-        return $this->ensureString($key);
+        return $this->ensureString($key, $validator);
     }
 
     /**
