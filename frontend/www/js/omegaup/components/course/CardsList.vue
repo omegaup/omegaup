@@ -5,10 +5,8 @@
       <h1>{{ T.courseCardAboutCourses }}</h1>
       <p>{{ T.courseCardAboutCourses }}</p>
       <div class="text-right align-middle">
-          <a v-bind:href="`/course/list/`">{{
-            T.wordsReadMore
-          }}</a>
-        </div>
+        <a v-bind:href="`/course/list/`">{{ T.wordsReadMore }}</a>
+      </div>
     </div>
 
     <div class="container">
