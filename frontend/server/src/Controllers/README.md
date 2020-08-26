@@ -3931,9 +3931,9 @@ Gets extra information of the identity:
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 
@@ -4254,9 +4254,9 @@ Gets verify status of a user
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 
@@ -4319,9 +4319,9 @@ Updates the main email of the current user
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 

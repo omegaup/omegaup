@@ -1485,7 +1485,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Gets verify status of a user
      *
-     * @omegaup-request-param mixed $email
+     * @omegaup-request-param string $email
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -1498,12 +1498,11 @@ class User extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['email'],
-            'email'
+        $email = $r->ensureString(
+            'email',
+            fn (string $email) => \OmegaUp\Validators::email($email)
         );
-
-        $response = \OmegaUp\DAO\Users::getStatusVerified($r['email']);
+        $response = \OmegaUp\DAO\Users::getStatusVerified($email);
 
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1522,7 +1521,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * - last password change request
      * - verify status
      *
-     * @omegaup-request-param mixed $email
+     * @omegaup-request-param string $email
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -1531,13 +1530,16 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiExtraInformation(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
+        $email = $r->ensureString(
+            'email',
+            fn (string $email) => \OmegaUp\Validators::email($email)
+        );
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $response = \OmegaUp\DAO\Identities::getExtraInformation($r['email']);
+        $response = \OmegaUp\DAO\Identities::getExtraInformation($email);
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
@@ -2597,7 +2599,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Updates the main email of the current user
      *
-     * @omegaup-request-param mixed $email
+     * @omegaup-request-param string $email
      *
      * @param \OmegaUp\Request $r
      *
@@ -2606,7 +2608,10 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiUpdateMainEmail(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateEmail($r['email'], 'email');
+        $emailParam = $r->ensureString(
+            'email',
+            fn (string $email) => \OmegaUp\Validators::email($email)
+        );
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
@@ -2615,9 +2620,17 @@ class User extends \OmegaUp\Controllers\Controller {
             if (!is_null($r->user->main_email_id)) {
                 $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
                 if (!is_null($email)) {
-                    $email->email = $r['email'];
+                    $email->email = $emailParam;
                     \OmegaUp\DAO\Emails::update($email);
                 }
+            } else {
+                $email = new \OmegaUp\DAO\VO\Emails([
+                    'user_id' => $r->user->user_id,
+                    'email' => $emailParam,
+                ]);
+                \OmegaUp\DAO\Emails::create($email);
+                $r->user->main_email_id = $email->email_id;
+                \OmegaUp\DAO\Users::update($r->user);
             }
 
             // Add verification_id if not there
