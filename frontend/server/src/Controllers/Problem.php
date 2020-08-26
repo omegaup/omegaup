@@ -320,13 +320,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             ) : null;
             if (empty($selectedTags)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterEmpty',
+                    'problemEditTagPublicRequired',
                     'public_tags'
                 );
             }
             $hasPublicTags = false;
             foreach ($selectedTags as $tag) {
-                if (!$hasPublicTags) {
+                if(!$hasPublicTags){
                     $hasPublicTags = boolval($tag['public']);
                 }
                 if (empty($tag['tagname'])) {
@@ -338,7 +338,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             if (!$hasPublicTags) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'parameterEmpty',
+                    'problemEditTagPublicRequired',
                     'public_tags'
                 );
             }
