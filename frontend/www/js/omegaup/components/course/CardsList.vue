@@ -3,7 +3,7 @@
     <!--<h1 class="card-title">{{ T.navAllCourses }}</h1>-->
     <div class="card-header mb-3">
       <h1>{{ T.courseCardAboutCourses }}</h1>
-      <p>{{ T.frontPageIntroduction }}</p>
+      <p>{{ T.arenaPageIntroduction }}</p>
       <div class="text-right align-middle">
           <a v-bind:href="`/course/list/`">{{
             T.wordsReadMore

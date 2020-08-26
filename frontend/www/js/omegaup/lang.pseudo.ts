@@ -1521,6 +1521,7 @@ const translations: { [key: string]: string; } = {
   wordsRanking: "(Ranking)",
   wordsRatio: "(Ra7i0)",
   wordsReadAgain: "(R3ad again)",
+  wordsReadMore: "(R3ad m0r3)",
   wordsReason: "(R3a50n)",
   wordsRegistration: "(R3gi57ra7i0n/0p3n)",
   wordsRejudge: "(R3judg3)",
