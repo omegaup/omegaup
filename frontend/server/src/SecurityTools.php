@@ -33,7 +33,7 @@ class SecurityTools {
     private static $_gitserverSecretKey = null;
 
     /**
-     * @var null|\ParagonIE\Paseto\Keys\AsymmetricSecretKey
+     * @var null|\ParagonIE\Paseto\Keys\SymmetricKey
      */
     private static $_courseCloneSecretKey = null;
 
@@ -176,78 +176,29 @@ class SecurityTools {
             return 'Authorization: OmegaUpSharedSecret ' . OMEGAUP_GITSERVER_SECRET_TOKEN . ' ' . $username;
         }
 
-        return 'Authorization: Bearer ' . self::getGitserverAuthorizationToken(
-            $problem,
-            $username
+        return 'Authorization: Bearer ' . self::getAuthorizationToken(
+            /*$claims*/            ['problem' => $problem],
+            /*$subject*/$username,
+            /*$expiration*/'PT5M',
+            /*$tokenType=*/'gitserver'
         );
     }
 
     /**
-     * Gets a Bearer authorization token for a particular user to be used the
-     * gitserver that is valid for a single problem for 5 minutes.
+     * Gets a Bearer authorization token for a particular subject that is valid
+     * for a single claim in a given time.
      *
-     * @param string $problem  The problem alias.
-     * @param string $username The username that can use the token.
+     * @param array<string, string> $claims
+     * @param string                $subject
+     * @param string                $expiration
+     * @param string                $tokenType
      * @return string The Bearer authorization token.
      */
-    public static function getGitserverAuthorizationToken(
-        string $problem,
-        string $username
-    ): string {
-        // Given that we already have an autoload configured, we cannot use
-        // sodium_compat's (fast) autoloader. Instead, simulate what it does
-        // here, with the full path of the standard autoload file.
-        require_once 'libs/third_party/sodium_compat/autoload.php';
-        \ParagonIE_Sodium_Compat::$fastMult = true;
-
-        require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64UrlSafe.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Binary.php';
-
-        require_once 'libs/third_party/paseto/src/KeyInterface.php';
-        require_once 'libs/third_party/paseto/src/SendingKey.php';
-        require_once 'libs/third_party/paseto/src/ReceivingKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricSecretKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricPublicKey.php';
-        require_once 'libs/third_party/paseto/src/ProtocolCollection.php';
-        require_once 'libs/third_party/paseto/src/ProtocolInterface.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version1.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version2.php';
-        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
-        require_once 'libs/third_party/paseto/src/JsonToken.php';
-        require_once 'libs/third_party/paseto/src/Purpose.php';
-        require_once 'libs/third_party/paseto/src/Builder.php';
-        require_once 'libs/third_party/paseto/src/Util.php';
-        require_once 'libs/third_party/paseto/src/Parsing/Header.php';
-        require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
-        require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
-
-        if (is_null(self::$_gitserverSecretKey)) {
-            self::$_gitserverSecretKey = new \ParagonIE\Paseto\Keys\AsymmetricSecretKey(
-                base64_decode(OMEGAUP_GITSERVER_SECRET_KEY)
-            );
-        }
-        return self::getGitserverAuthorizationToken(
-            /*$secretKey=*/            self::$_gitserverSecretKey,
-            /*$subject=*/$username,
-            /*$claims=*/['problem' => $problem],
-            /*$expirationFormat=*/'PT5M',
-            /*$purpose=*/'public'
-        );
-    }
-
-    /**
-     * Gets a Bearer authorization token for a particular user to be used the
-     * feature of course cloning that is valid for a single course for 7 days.
-     *
-     * @param string $courseId
-     * @param string $userId.
-     * @return string The Bearer authorization token.
-     */
-    public static function getCourseCloneAuthorizationToken(
-        int $courseId,
-        int $userId
+    public static function getAuthorizationToken(
+        $claims,
+        $subject,
+        $expiration,
+        $tokenType
     ): string {
         // Given that we already have an autoload configured, we cannot use
         // sodium_compat's (fast) autoloader. Instead, simulate what it does
@@ -280,52 +231,38 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
         require_once 'libs/third_party/paseto/src/Exception/InvalidKeyException.php';
 
-        if (is_null(self::$_courseCloneSecretKey)) {
-            self::$_courseCloneSecretKey = new \ParagonIE\Paseto\Keys\SymmetricKey(
-                base64_decode(OMEGAUP_COURSE_CLONE_SECRET_KEY)
-            );
+        if ($tokenType === 'gitserver') {
+            if (is_null(self::$_gitserverSecretKey)) {
+                self::$_gitserverSecretKey = new \ParagonIE\Paseto\Keys\AsymmetricSecretKey(
+                    base64_decode(OMEGAUP_GITSERVER_SECRET_KEY)
+                );
+            }
+            $secretKey = self::$_gitserverSecretKey;
+            $purpose = \ParagonIE\Paseto\Purpose::public();
+        } else {
+            if (is_null(self::$_courseCloneSecretKey)) {
+                self::$_courseCloneSecretKey = new \ParagonIE\Paseto\Keys\SymmetricKey(
+                    base64_decode(OMEGAUP_COURSE_CLONE_SECRET_KEY)
+                );
+            }
+            $secretKey = self::$_courseCloneSecretKey;
+            $purpose = \ParagonIE\Paseto\Purpose::local();
         }
-        return self::getAuthorizationToken(
-            /*$secretKey=*/            self::$_courseCloneSecretKey,
-            /*$subject=*/$userId,
-            /*$claims=*/[
-                'course' => $courseId,
-                'permissions' => 'clone',
-            ],
-            /*$expirationFormat=*/'P7D',
-            /*$purpose=*/'local'
-        );
-    }
 
-    /**
-     * @param \ParagonIE\Paseto\Keys\AsymmetricSecretKey|\ParagonIE\Paseto\Keys\SymmetricKey $secretKey
-     * @param int|string $subject
-     * @param array<string, int|string> $claims
-     * @return string
-     */
-    private static function getAuthorizationToken(
-        $secretKey,
-        $subject,
-        $claims,
-        string $expirationFormat,
-        string $purpose,
-        string $issuer = 'omegaUp frontend'
-    ): string {
-        $tokenPurpose = $purpose === 'public' ? \ParagonIE\Paseto\Purpose::public() : \ParagonIE\Paseto\Purpose::local();
         $token = (new \ParagonIE\Paseto\Builder())
             ->setKey($secretKey)
             ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
-            ->setPurpose($tokenPurpose)
+            ->setPurpose($purpose)
             ->setExpiration(
                 (new \DateTime(
                     'now'
                 ))->add(
                     new \DateInterval(
-                        $expirationFormat
+                        $expiration
                     )
                 )
             )
-            ->setIssuer($issuer)
+            ->setIssuer('omegaUp frontend')
             ->setSubject($subject)
             ->setClaims($claims);
         return $token->toString();

@@ -1181,6 +1181,7 @@ const translations: { [key: string]: string; } = {
   titleInUse: "El t\u00edtulo ya est\u00e1 siendo usado. Por favor elige un t\u00edtulo distinto.",
   totalRuns: "Total de env\u00edos: %(numRuns)",
   unableToVerifyCaptcha: "No fue posible verificar el captcha. Vuelve a cargar la p\u00e1gina e intenta de nuevo.",
+  unnecessaryTokenForPublicCourses: "El token no es necesario para los cursos p\u00fablicos",
   unsupportedBrowser: "Su navegador no admite todas las funciones de esta p\u00e1gina. Intenta actualizar a un <a href=\"https://github.com/omegaup/omegaup#navegadores-soportados\" target=\"blank\">navegador soportado</a>.",
   unverifiedUser: "Usurio no verificado.",
   updateItemsError: "Ocurri\u00f3 un error al actualizar los items",

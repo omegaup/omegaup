@@ -1619,9 +1619,9 @@ types.CourseDetails;
 
 ### Parameters
 
-| Name           | Type    | Description |
-| -------------- | ------- | ----------- |
-| `course_alias` | `mixed` |             |
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
 
 ### Returns
 

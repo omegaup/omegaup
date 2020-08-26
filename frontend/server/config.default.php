@@ -94,7 +94,10 @@ try_define('OMEGAUP_GRADER_FAKE', false);
 # ####################################
 # COURSE CLONE CONFIG
 # ####################################
-try_define('OMEGAUP_COURSE_CLONE_SECRET_KEY', 'omegaup');
+try_define(
+    'OMEGAUP_COURSE_CLONE_SECRET_KEY',
+    'om6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesEegaup'
+);
 
 # ####################################
 # FACEBOOK LOGIN CONFIG

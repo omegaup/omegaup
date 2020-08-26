@@ -487,7 +487,8 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      * @return array{token: string}
-     * @omegaup-request-param mixed $course_alias
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiGenerateTokenForCloneCourse(
         \OmegaUp\Request $r
@@ -497,22 +498,32 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['course_alias'],
-            'course_alias'
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
+                $courseAlias
+            )
         );
-        $course = self::validateCourseExists($r['course_alias']);
+        $course = self::validateCourseExists($courseAlias);
 
-        if (
-            !\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)
-            || $course->admission_mode === \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC
-        ) {
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $token = \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
-            $course->course_id,
-            $r->user->user_id
+        if ($course->admission_mode === \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'unnecessaryTokenForPublicCourses'
+            );
+        }
+
+        $token = \OmegaUp\SecurityTools::getAuthorizationToken(
+            /*$claims=*/            [
+                'course' => strval($course->course_id),
+                'permissions' => 'clone',
+            ],
+            /*$subject=*/strval($r->user->user_id),
+            /*$expiration=*/'P7D',
+            /*$tokenType=*/'clonecourse'
         );
 
         return [
