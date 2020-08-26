@@ -96,7 +96,7 @@ try_define('OMEGAUP_GRADER_FAKE', false);
 # ####################################
 try_define(
     'OMEGAUP_COURSE_CLONE_SECRET_KEY',
-    'om6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesEegaup'
+    '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE'
 );
 
 # ####################################

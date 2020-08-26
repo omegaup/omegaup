@@ -516,18 +516,16 @@ class Course extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        $token = \OmegaUp\SecurityTools::getAuthorizationToken(
-            /*$claims=*/            [
-                'course' => strval($course->course_id),
-                'permissions' => 'clone',
-            ],
-            /*$subject=*/strval($r->user->user_id),
-            /*$expiration=*/'P7D',
-            /*$tokenType=*/'clonecourse'
-        );
-
+        $claims = [
+            'course' => strval($course->alias),
+            'permissions' => 'clone',
+        ];
+        $subject = strval($r->user->user_id);
         return [
-            'token' => $token,
+            'token' => \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
+                $claims,
+                $subject
+            ),
         ];
     }
 

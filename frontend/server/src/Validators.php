@@ -62,16 +62,10 @@ class Validators {
     }
 
     /**
-     * Check whether parameter value is string and not empty
-     *
-     * @param mixed $parameter
-     * @psalm-assert string $parameter
+     * Check whether parameter value is non-empty string
      */
-    public static function stringNonEmpty($parameter): bool {
-        if (!is_string($parameter) || empty($parameter)) {
-            return false;
-        }
-        return true;
+    public static function stringNonEmpty(string $parameter): bool {
+        return !empty($parameter);
     }
 
     /**
