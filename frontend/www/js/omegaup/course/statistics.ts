@@ -39,7 +39,7 @@ OmegaUp.on('ready', function () {
   const gethighScoreCount = (stats: types.CourseStatisticsPayload) => {
     let highScore = [];
     for (const problem in stats.problemStats) {
-      highScore.push(stats.problemStats[problem].highScoreCount * 100);
+      highScore.push(stats.problemStats[problem].high_score_percentage || 0);
     }
     return highScore;
   };
@@ -47,7 +47,7 @@ OmegaUp.on('ready', function () {
   const getlowScoreCount = (stats: types.CourseStatisticsPayload) => {
     let lowScore = [];
     for (const problem in stats.problemStats) {
-      lowScore.push(stats.problemStats[problem].lowScoreCount * 100);
+      lowScore.push(stats.problemStats[problem].low_score_percentage || 0);
     }
     return lowScore;
   };
