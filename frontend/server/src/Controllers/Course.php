@@ -31,6 +31,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
+ * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, maxPoints: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
@@ -3053,6 +3054,47 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('courseList'),
             ],
             'entrypoint' => 'course_list',
+        ];
+    }
+
+    /**
+     * @omegaup-request-param mixed $course
+     *
+     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: string}, entrypoint: string}
+     */
+    public static function getCourseStatisticsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
+
+        $course = self::validateCourseExists($r['course']);
+
+        if (is_null($course->course_id) || is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                    'problemStats' => \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
+                        $course->course_id,
+                        $course->group_id
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseStatistics'
+                ),
+            ],
+            'entrypoint' => 'course_statistics'
         ];
     }
 
