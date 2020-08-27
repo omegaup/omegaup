@@ -652,6 +652,38 @@ export namespace types {
       );
     }
 
+    export function CourseStatisticsPayload(
+      elementId: string = 'payload',
+    ): types.CourseStatisticsPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseSubmissionsListPayload(
       elementId: string = 'payload',
     ): types.CourseSubmissionsListPayload {
@@ -1670,6 +1702,21 @@ export namespace types {
     alias: string;
     title: string;
     username: string;
+  }
+
+  export interface CourseStatisticsPayload {
+    course: types.CourseDetails;
+    problemStats: {
+      assignment_alias: string;
+      average?: number;
+      high_score_percentage?: number;
+      low_score_percentage?: number;
+      maxPoints: number;
+      maximum?: number;
+      minimum?: number;
+      problem_alias: string;
+      variance?: number;
+    }[];
   }
 
   export interface CourseStudent {
