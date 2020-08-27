@@ -872,9 +872,9 @@ Gets the problems from a contest
 
 ### Returns
 
-| Name       | Type                                                                                                                                                                                                                                        |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `problems` | `{ accepted: number; alias: string; commit: string; difficulty: number; languages: string; order: number; points: number; problem_id: number; submissions: number; title: string; version: string; visibility: number; visits: number; }[]` |
+| Name       | Type                     |
+| ---------- | ------------------------ |
+| `problems` | `types.ContestProblem[]` |
 
 ## `/api/contest/publicDetails/`
 
@@ -1291,10 +1291,10 @@ Returns ALL identities participating in a contest
 
 ### Returns
 
-| Name     | Type                                                                                               |
-| -------- | -------------------------------------------------------------------------------------------------- |
-| `groups` | `{ alias: string; name: string; }[]`                                                               |
-| `users`  | `{ access_time: Date; country_id: string; end_time: Date; is_owner: number; username: string; }[]` |
+| Name     | Type                                 |
+| -------- | ------------------------------------ |
+| `groups` | `{ alias: string; name: string; }[]` |
+| `users`  | `types.ContestUser[]`                |
 
 # Course
 
@@ -3914,9 +3914,9 @@ Gets extra information of the identity:
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 
@@ -4237,9 +4237,9 @@ Gets verify status of a user
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 
@@ -4302,9 +4302,9 @@ Updates the main email of the current user
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 
