@@ -286,8 +286,8 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
 
         if (is_null(self::$_courseCloneSecretKey)) {
-            self::$_courseCloneSecretKey = new \ParagonIE\Paseto\Keys\SymmetricKey(
-                base64_decode(OMEGAUP_COURSE_CLONE_SECRET_KEY) . '='
+            self::$_courseCloneSecretKey = \ParagonIE\Paseto\Keys\SymmetricKey::fromEncodedString(
+                OMEGAUP_COURSE_CLONE_SECRET_KEY
             );
         }
         $token = (new \ParagonIE\Paseto\Builder())

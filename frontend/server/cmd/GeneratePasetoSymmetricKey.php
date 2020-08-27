@@ -29,6 +29,6 @@ require_once 'libs/third_party/paseto/src/Protocol/Version1.php';
 require_once 'libs/third_party/paseto/src/Protocol/Version2.php';
 require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
 
-echo(base64_encode(\ParagonIE\Paseto\Keys\SymmetricKey::generate(
+echo(\ParagonIE\Paseto\Keys\SymmetricKey::generate(
     new \ParagonIE\Paseto\Protocol\Version2()
-)->raw()) . "\n");
+)->encode() . "\n");

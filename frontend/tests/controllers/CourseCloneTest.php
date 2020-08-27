@@ -343,5 +343,6 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertNotEmpty($token);
         $this->assertStringContainsString('v2.', $token);
         $this->assertStringContainsString('local.', $token);
+        $this->assertEquals(245, strlen($token));
     }
 }
