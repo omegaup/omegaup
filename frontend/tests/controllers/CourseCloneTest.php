@@ -339,5 +339,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
             ])
         );
+
+        $this->assertNotEmpty($token);
+        $this->assertStringContainsString('v2.', $token);
+        $this->assertStringContainsString('local.', $token);
     }
 }

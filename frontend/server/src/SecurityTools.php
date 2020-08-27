@@ -287,7 +287,7 @@ class SecurityTools {
 
         if (is_null(self::$_courseCloneSecretKey)) {
             self::$_courseCloneSecretKey = new \ParagonIE\Paseto\Keys\SymmetricKey(
-                base64_decode(OMEGAUP_COURSE_CLONE_SECRET_KEY)
+                base64_decode(OMEGAUP_COURSE_CLONE_SECRET_KEY) . '='
             );
         }
         $token = (new \ParagonIE\Paseto\Builder())
