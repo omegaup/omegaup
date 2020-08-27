@@ -4,11 +4,7 @@
 // here, with the full path of the standard autoload file.
 ini_set(
     'include_path',
-    ini_get(
-        'include_path'
-    ) . PATH_SEPARATOR . dirname(
-        __DIR__
-    )
+    ini_get('include_path') . PATH_SEPARATOR . dirname(__DIR__)
 );
 require_once 'libs/third_party/sodium_compat/autoload.php';
 \ParagonIE_Sodium_Compat::$fastMult = true;
