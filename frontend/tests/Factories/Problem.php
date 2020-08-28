@@ -306,31 +306,4 @@ class Problem {
         // Call api
         \OmegaUp\Controllers\Problem::apiAddTag($r);
     }
-
-    public static function initPublicTags(): void {
-        $tags = [
-            'problemLevelAdvancedCompetitiveProgramming',
-            'problemLevelAdvancedSpecializedTopics',
-            'problemLevelBasicIntroductionToProgramming',
-            'problemLevelBasicKarel',
-            'problemTagArrays',
-            'problemTagBigData',
-            'problemTagGreedyAlgorithms',
-            'problemTagHashing',
-            'problemTagMatrices',
-            'problemTagMaxFlow',
-            'problemTagMeetInTheMiddle',
-            'problemTagNumberTheory',
-        ];
-        foreach ($tags as $tag) {
-            \OmegaUp\DAO\Tags::create(
-                new \OmegaUp\DAO\VO\Tags(
-                    [
-                        'name' => $tag,
-                        'public' => true,
-                    ]
-                )
-            );
-        }
-    }
 }

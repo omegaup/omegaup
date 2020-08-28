@@ -14,7 +14,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
-        \OmegaUp\Test\Factories\Problem::initPublicTags();
     }
 
     /**
@@ -672,6 +671,11 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->submissions);
         $this->assertEquals(0, $problem->accepted);
         $this->assertEquals(0, $problem->difficulty);
+
+        \OmegaUp\Controllers\Problem::regenerateTemplates(
+            $problem->alias,
+            $problem->commit
+        );
 
         // Verify that the templates were generated.
         $this->assertTrue(
