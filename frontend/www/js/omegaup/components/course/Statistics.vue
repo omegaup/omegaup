@@ -119,15 +119,14 @@ export default class Statistics extends Vue {
   get maxPoints() {
     let maxPoints = 0;
     for (const problem of this.problemStats) {
-      if (problem.maxPoints > maxPoints) maxPoints = problem.maxPoints;
+      if (problem.max_points > maxPoints) maxPoints = problem.max_points;
     }
     return maxPoints;
   }
   get maxVariance() {
     let maxVariance = 0;
-    const variance = this.getStatistic('variance');
-    for (let i = 0; i < variance.length; i++) {
-      if (variance[i] > maxVariance) maxVariance = variance[i];
+    for (const variance of this.getStatistic('variance')) {
+      if (variance > maxVariance) maxVariance = variance;
     }
     return maxVariance;
   }

@@ -1703,7 +1703,7 @@ export namespace types {
     average?: number;
     high_score_percentage?: number;
     low_score_percentage?: number;
-    maxPoints: number;
+    max_points: number;
     maximum?: number;
     minimum?: number;
     problem_alias: string;
