@@ -14,7 +14,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
-        \OmegaUp\Test\Factories\Problem::initPublicTags();
     }
 
     /**
