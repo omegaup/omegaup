@@ -157,8 +157,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $r['overall_wall_time_limit']
             );
         }
-        if (!is_null($r['level_tag'])) {
-            $params['problem_level'] = strval($r['level_tag']);
+        if (!is_null($r['problem_level'])) {
+            $params['problem_level'] = strval($r['problem_level']);
         }
         if (!is_null($r['selected_tags'])) {
             $params['selected_tags'] = strval($r['selected_tags']);
@@ -5115,7 +5115,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'languages' => strval($r['languages']),
                                 'validator' => strval($r['validator']),
                                 'tags' => $tags,
-                                'problem_level' => strval($r['level_tag']),
+                                'problem_level' => strval($r['problem_level']),
                                 'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                                 'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                             ],
@@ -5156,7 +5156,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             $sortedLanguages
                         ),
                         'tags' => $tags,
-                        'problem_level' => '',
+                        'problem_level' => 'problemLevelBasicIntroductionToProgramming',
                         'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     ],
