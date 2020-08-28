@@ -4,6 +4,12 @@
       <form class="publish-form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
+          <a
+            data-toggle="tooltip"
+            rel="tooltip"
+            v-bind:title="T.courseEditAdmissionModeDescription ">
+            <img src="/media/question.png"/>
+          </a>
           <select
             class="form-control"
             name="admission-mode"
@@ -49,9 +55,11 @@
             <span v-html="admissionModeDescription"></span>
           </p>
         </div>
+        <div class="text-right">
         <button class="btn btn-primary change-admission-mode" type="submit">
           {{ T.wordsSaveChanges }}
         </button>
+        </div>
       </form>
     </div>
   </div>
