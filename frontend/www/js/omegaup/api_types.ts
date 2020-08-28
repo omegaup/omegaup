@@ -3052,6 +3052,8 @@ export namespace messages {
   export type CourseDetailsRequest = { [key: string]: any };
   export type _CourseDetailsServerResponse = any;
   export type CourseDetailsResponse = types.CourseDetails;
+  export type CourseGenerateTokenForCloneCourseRequest = { [key: string]: any };
+  export type CourseGenerateTokenForCloneCourseResponse = { token: string };
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
@@ -3927,6 +3929,9 @@ export namespace controllers {
     details: (
       params?: messages.CourseDetailsRequest,
     ) => Promise<messages.CourseDetailsResponse>;
+    generateTokenForCloneCourse: (
+      params?: messages.CourseGenerateTokenForCloneCourseRequest,
+    ) => Promise<messages.CourseGenerateTokenForCloneCourseResponse>;
     getProblemUsers: (
       params?: messages.CourseGetProblemUsersRequest,
     ) => Promise<messages.CourseGetProblemUsersResponse>;
