@@ -112,19 +112,14 @@ export default class Statistics extends Vue {
   }
   //helper functions
   get problems() {
-    let problems = [];
-    for (const problem in this.problemStats) {
-      problems.push(
-        `${this.problemStats[problem].assignment_alias} - ${this.problemStats[problem].problem_alias}`,
-      );
-    }
-    return problems;
+    return this.problemStats.map(
+      (problem) => `${problem.assignment_alias} - ${problem.problem_alias}`,
+    );
   }
   get maxPoints() {
     let maxPoints = 0;
-    for (const problem in this.problemStats) {
-      if (this.problemStats[problem].maxPoints > maxPoints)
-        maxPoints = this.problemStats[problem].maxPoints;
+    for (const problem of this.problemStats) {
+      if (problem.maxPoints > maxPoints) maxPoints = problem.maxPoints;
     }
     return maxPoints;
   }
