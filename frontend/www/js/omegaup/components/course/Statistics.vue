@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <h2 class="text-center">
-      <a v-bind:href="courseUrl">{{ course.name }}</a>
+      <a v-bind:href="`/course/${course.alias}/`">{{ course.name }}</a>
     </h2>
     <br />
     <div>
@@ -31,32 +31,165 @@ import * as ui from '../../ui';
 })
 export default class Statistics extends Vue {
   @Prop() course!: types.CourseDetails;
-  @Prop() varianceChartOptions!: Chart;
-  @Prop() averageChartOptions!: Chart;
-  @Prop() highScoreChartOptions!: Chart;
-  @Prop() lowScoreChartOptions!: Chart;
-  @Prop() maximumChartOptions!: Chart;
-  @Prop() minimumChartOptions!: Chart;
+  @Prop() problemStats!: types.CourseProblemStatistics[];
   T = T;
-  get courseUrl(): string {
-    return `/course/${this.course.alias}/`;
+  //chart options
+  selected = this.varianceChartOptions;
+  options = [
+    { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
+    { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
+    {
+      value: this.highScoreChartOptions,
+      text: T.courseStatisticsStudentsAbove,
+    },
+    {
+      value: this.lowScoreChartOptions,
+      text: T.courseStatisticsStudentsScored,
+    },
+    { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
+    { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
+  ];
+  //get chart options
+  get varianceChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsScoreVariance,
+      '{y}',
+      T.courseStatisticsVariance,
+      this.getStatistic('variance'),
+      this.maxVariance,
+      this.problems,
+    );
   }
-  data() {
+  get averageChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsAverageScore,
+      '{y}',
+      T.wordsScore,
+      this.getStatistic('average'),
+      this.maxPoints,
+      this.problems,
+    );
+  }
+  get highScoreChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsStudentsAbove,
+      '{y} %',
+      T.wordsPercentage,
+      this.getStatistic('high_score_percentage'),
+      100,
+      this.problems,
+    );
+  }
+  get lowScoreChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsStudentsScored,
+      '{y} %',
+      T.wordsPercentage,
+      this.getStatistic('low_score_percentage'),
+      100,
+      this.problems,
+    );
+  }
+  get minimumChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsMinimumScore,
+      '{y}',
+      T.wordsScore,
+      this.getStatistic('minimum'),
+      this.maxPoints,
+      this.problems,
+    );
+  }
+  get maximumChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsMaximumScore,
+      '{y}',
+      T.wordsScore,
+      this.getStatistic('maximum'),
+      this.maxPoints,
+      this.problems,
+    );
+  }
+  //helper functions
+  get problems() {
+    let problems = [];
+    for (const problem in this.problemStats) {
+      problems.push(
+        `${this.problemStats[problem].assignment_alias} - ${this.problemStats[problem].problem_alias}`,
+      );
+    }
+    return problems;
+  }
+  get maxPoints() {
+    let maxPoints = 0;
+    for (const problem in this.problemStats) {
+      if (this.problemStats[problem].maxPoints > maxPoints)
+        maxPoints = this.problemStats[problem].maxPoints;
+    }
+    return maxPoints;
+  }
+  get maxVariance() {
+    let maxVariance = 0;
+    const variance = this.getStatistic('variance');
+    for (let i = 0; i < variance.length; i++) {
+      if (variance[i] > maxVariance) maxVariance = variance[i];
+    }
+    return maxVariance;
+  }
+  getStatistic(
+    name:
+      | 'variance'
+      | 'average'
+      | 'high_score_percentage'
+      | 'low_score_percentage'
+      | 'maximum'
+      | 'minimum',
+  ) {
+    return this.problemStats.map((problem) => problem[name] || 0);
+  }
+  //title = string
+  //yLabel = '{y}' or '{y} %'
+  //data = getStatistics("chart_type")
+  //yMax = get maxPoints() or get maxVariance()
+  createChartOptions(
+    title: string,
+    yLabel: string,
+    yName: string,
+    data: number[],
+    yMax: number,
+    problems: string[],
+  ) {
     return {
-      selected: this.varianceChartOptions,
-      options: [
-        { value: this.varianceChartOptions, text: T.wordsVariance },
-        { value: this.averageChartOptions, text: T.wordsAverageScore },
-        {
-          value: this.highScoreChartOptions,
-          text: `${T.wordsStudentsAbove} 60%`,
+      chart: {
+        type: 'bar',
+      },
+      title: {
+        text: title,
+      },
+      xAxis: {
+        categories: problems,
+        title: T.wordsProblem,
+        min: 0,
+      },
+      yAxis: {
+        min: 0,
+        max: yMax,
+        title: yName,
+      },
+      tooltip: {},
+      plotOptions: {
+        bar: {
+          dataLabels: {
+            enabled: true,
+            format: yLabel,
+          },
         },
+      },
+      series: [
         {
-          value: this.lowScoreChartOptions,
-          text: `${T.wordsStudentsScored} 0%`,
+          name: yName,
+          data: data,
         },
-        { value: this.minimumChartOptions, text: T.wordsMinimumScore },
-        { value: this.maximumChartOptions, text: T.wordsMaximumScore },
       ],
     };
   }
