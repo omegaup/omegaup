@@ -54,7 +54,7 @@ class ProblemParams {
      * @readonly
      * @var string
      */
-    public $levelTags;
+    public $problemLevel;
 
     /**
      * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string} $params
@@ -66,7 +66,7 @@ class ProblemParams {
         $this->visibility = $params['visibility'] ?? 'public';
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
-        $this->levelTags = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
+        $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];

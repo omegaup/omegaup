@@ -272,7 +272,7 @@ class ProblemParams {
             $params['languages']
         ) : null;
         $this->updatePublished = $params['update_published'] ?? \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
-        $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
+        $this->problemLevel = $params['problem_level'] ?? null;
         $this->selectedTagsAsJSON = $params['selected_tags'] ?? null;
         $this->source = $params['source'] ?? null;
         $this->validator = $params['validator'] ?? null;
