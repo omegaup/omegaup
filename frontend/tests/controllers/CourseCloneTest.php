@@ -320,4 +320,28 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
     }
+
+    public function testGenerateCloneCourseToken() {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($admin);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            $admin,
+            $adminLogin,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE
+        );
+
+        [
+            'token' => $token,
+        ] = \OmegaUp\Controllers\Course::apiGenerateTokenForCloneCourse(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $this->assertNotEmpty($token);
+        $this->assertStringContainsString('v2.', $token);
+        $this->assertStringContainsString('local.', $token);
+    }
 }

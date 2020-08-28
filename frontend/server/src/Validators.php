@@ -62,6 +62,13 @@ class Validators {
     }
 
     /**
+     * Check whether parameter value is non-empty string
+     */
+    public static function stringNonEmpty(string $parameter): bool {
+        return !empty($parameter);
+    }
+
+    /**
      * Check if a parameter is present, it is a non-empty string.
      *
      * @param mixed $parameter
