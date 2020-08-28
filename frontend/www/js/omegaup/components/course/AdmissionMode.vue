@@ -3,12 +3,13 @@
     <div class="card-body">
       <form class="publish-form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{ T.contestNewFormAdmissionMode }}</label>
+          <label>{{ T.contestNewFormAdmissionModeSelect }}</label>
           <a
             data-toggle="tooltip"
             rel="tooltip"
-            v-bind:title="T.courseEditAdmissionModeDescription ">
-            <img src="/media/question.png"/>
+            v-bind:title="T.courseEditAdmissionModeDescription"
+          >
+            <img src="/media/question.png" />
           </a>
           <select
             class="form-control"
@@ -56,9 +57,9 @@
           </p>
         </div>
         <div class="text-right">
-        <button class="btn btn-primary change-admission-mode" type="submit">
-          {{ T.wordsSaveChanges }}
-        </button>
+          <button class="btn btn-primary change-admission-mode" type="submit">
+            {{ T.wordsSaveChanges }}
+          </button>
         </div>
       </form>
     </div>
