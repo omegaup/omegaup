@@ -142,6 +142,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'time_limit' => 12345,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed some properties',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertTrue($response['rejudged']);
         unset($_FILES['problem_contents']);
@@ -194,6 +195,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Add example',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
         unset($_FILES['problem_contents']);
@@ -280,6 +282,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'time_limit' => $newTimeLimit,
             'problem_alias' => $problemAlias,
             'message' => 'Increased time limit',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertTrue($response['rejudged']);
         unset($_FILES['problem_contents']);
@@ -326,6 +329,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'languages' => $languages,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Changed alias and languages',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -410,7 +414,8 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Solution modified for test.',
-            'solution' => $solution
+            'solution' => $solution,
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         $this->assertEquals('ok', $response['status']);
@@ -482,6 +487,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'time_limit' => 12345,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'message' => 'This should fail',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
             $this->fail('Expected update to fail');
         } catch (\OmegaUp\Exceptions\ProblemDeploymentFailedException $e) {
@@ -536,6 +542,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'title' => $newTitle,
             'message' => 'Admin powers',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -723,6 +730,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problem->alias,
             'visibility' => 'private',
             'message' => 'public -> private',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -731,12 +739,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problem->alias,
             'visibility' => 'private',
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -746,6 +756,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problem->alias,
             'visibility' => 'public',
             'message' => 'private -> public',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -754,12 +765,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problem->alias,
             'visibility' => 'public',
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -768,6 +781,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problem->alias,
             'visibility' => 'public_banned',
             'message' => 'public -> banned',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -795,12 +809,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problem->alias,
             'visibility' => 'public_banned',
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -810,6 +826,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problem->alias,
                 'visibility' => 'private',
                 'message' => 'banned -> private',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
             $this->fail('Cannot un-ban problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -843,12 +860,14 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problem->alias,
             'visibility' => 'promoted',
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
         $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problem->alias,
             'message' => 'no-op',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertFalse($response['rejudged']);
 
@@ -858,6 +877,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problem->alias,
                 'visibility' => 'private',
                 'message' => 'promoted -> private',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
             $this->fail('Cannot un-promote problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -873,6 +893,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problem->alias,
                 'visibility' => 'public',
                 'message' => 'promoted -> public',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
             $this->fail('Cannot un-promote problem from API');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -1046,6 +1067,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'extra_wall_time' => 1000,
                 'memory_limit' => 64000,
                 'output_limit' => 20480,
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
             $this->assertTrue($response['rejudged']);
             $this->assertEquals(1, $detourGrader->getGraderCallCount());
@@ -1095,6 +1117,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'extra_wall_time' => 0,
                 'memory_limit' => 32000,
                 'output_limit' => 10240,
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
             $this->assertTrue($response['rejudged']);
             $this->assertEquals(0, $detourGrader->getGraderCallCount());
@@ -1225,6 +1248,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'input_limit' => $newInputLimit,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'message' => 'Changed input limit',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         );
 
@@ -1243,6 +1267,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'email_clarifications' => $newEmailClarifications,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'message' => 'Changed email clarifications',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         );
 
@@ -1263,6 +1288,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'email_clarifications' => $newEmailClarifications,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'message' => 'Changed email clarifications',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         );
 
@@ -1372,6 +1398,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'memory_limit' => 64000,
                 'output_limit' => 20480,
                 'update_published' => $updatePublished,
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
             $this->assertEquals(
                 $response['rejudged'],
@@ -1758,6 +1785,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'output_limit' => $newOutputLimit,
             'overall_wall_time_limit' => $newOverallWallTimeLimit,
             'message' => 'Updated all problem settings',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         // Verify problem settings were set.
@@ -1802,6 +1830,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemAlias,
             'visibility' => 'private',
             'message' => 'Visibility updated to private',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         // Verify problem settings were not modified.
@@ -1864,6 +1893,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'output_limit' => $newOutputLimit,
             'overall_wall_time_limit' => $newOverallWallTimeLimit,
             'message' => 'Visibility updated to private',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         // Verify problem settings were not modified.
@@ -1929,6 +1959,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'show_diff' => $showDiffValue,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'message' => 'Changed show_diff',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         );
         // Verify data in DB
@@ -1999,6 +2030,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
                 'allow_user_add_tags' => $allowUserAddTagsValue,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'message' => 'Changed allow_user_add_tags',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         );
         // Verify data in DB

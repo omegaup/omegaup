@@ -210,6 +210,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problems[0]['problem']->alias,
                 'visibility' => 'private',
                 'message' => 'public -> private',
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
             ]));
 
             try {

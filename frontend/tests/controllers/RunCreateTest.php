@@ -922,6 +922,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
              'problem_alias' => $problem->alias,
              'visibility' => 'public_banned',
              'message' => 'public_banned',
+             'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         try {
@@ -951,6 +952,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
              'problem_alias' => $problem->alias,
              'visibility' => 'private_banned',
              'message' => 'private_banned',
+             'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         try {
