@@ -2,7 +2,7 @@
 	"custom_linters": [
 		{
 			"name": "api",
-			"path": "stuff/api.py",
+			"path": "stuff/api_linter.py",
 			"class_name": "ApiLinter"
 		},
 		{
@@ -12,7 +12,7 @@
 		},
 		{
 			"name": "i18n",
-			"path": "stuff/i18n.py",
+			"path": "stuff/i18n_linter.py",
 			"class_name": "I18nLinter"
 		}
 	],
