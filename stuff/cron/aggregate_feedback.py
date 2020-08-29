@@ -16,7 +16,7 @@ import operator
 import os
 import sys
 import warnings
-from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple
+from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple, Set
 from typing import DefaultDict
 
 import MySQLdb.constants.ER
@@ -399,7 +399,7 @@ def aggregate_reviewers_feedback_for_problem(
         total_votes = 0
         seal_positive_votes = 0
         level_tag_votes: DefaultDict[str, int] = collections.defaultdict(int)
-        topic_tag_votes = set()
+        topic_tag_votes: Set[str] = set()
         for row in cur:
             try:
                 contents = json.loads(row[0])
@@ -413,8 +413,7 @@ def aggregate_reviewers_feedback_for_problem(
                 level_tag_votes[contents['tag']] += 1
             if 'tags' in contents:
                 # Take the union of voted topic tags
-                for tag in contents['tags']:
-                    topic_tag_votes.add(tag)
+                topic_tag_votes.update(contents['tags'])
 
         # Update the quality_seal for problem
         cur.execute(
@@ -429,27 +428,17 @@ def aggregate_reviewers_feedback_for_problem(
 
         # Delete old level and topic tags for problem and add the new ones
         most_voted_level = max(level_tag_votes, key=level_tag_votes.get)
+        final_tags = list({(problem_id, tag) for tag in topic_tag_votes} |
+                          {(problem_id, most_voted_level)})
+
         cur.execute("""DELETE FROM
                                `Problems_Tags`
                            WHERE
                                `problem_id` = %s AND `source` = 'quality';""",
                     (problem_id,))
 
-        cur.execute("""INSERT IGNORE INTO
-                               `Problems_Tags`(`problem_id`, `tag_id`,
-                                               `source`)
-                           SELECT
-                               %s AS `problem_id`,
-                               `t`.`tag_id` AS `tag_id`,
-                               'quality' AS `source`
-                           FROM
-                               `Tags` AS `t`
-                           WHERE
-                               `t`.`name` = %s;""",
-                    (problem_id, most_voted_level))
-
         # Add new tags for problem
-        if len(topic_tag_votes) != 0:
+        if len(final_tags) != 0:
             cur.executemany("""INSERT IGNORE INTO
                                    `Problems_Tags`(`problem_id`, `tag_id`,
                                                    `source`)
@@ -461,8 +450,7 @@ def aggregate_reviewers_feedback_for_problem(
                                    `Tags` AS `t`
                                WHERE
                                    `t`.`name` = %s;""",
-                            (list(map(lambda tag: (problem_id, tag),
-                                      topic_tag_votes))))
+                            (final_tags))
 
 
 def aggregate_reviewers_feedback(
