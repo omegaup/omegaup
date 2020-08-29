@@ -5,36 +5,29 @@
         <h4>{{ T.courseCloneGenerateLinkTitle }}</h4>
         <p>{{ T.courseCloneGenerateLinkDescription }}</p>
         <div class="row">
-          <div class="form-group col-md-12">
-            <textarea
-              class="form-control"
-              v-html="cloneCourseURL"
-              rows="5"
-              readonly
-            ></textarea>
-          </div>
-          <div class="form-group col-md-12">
-            <button class="btn btn-primary mr-3" type="submit">
+          <div class="input-group mx-3">
+            <button class="btn btn-primary" type="submit">
               {{ T.courseCloneGenerateLinkButton }}
             </button>
-            <button
-              class="btn btn-primary"
-              type="button"
-              v-on:click="copiedToClipboard = true"
-              v-clipboard="() => cloneCourseURL"
-              v-bind:disabled="!cloneCourseURL"
-              data-copy-to-clipboard
-            >
-              {{ T.wordsCopyToClipboard }}
-            </button>
-            <span class="ml-3" data-copied v-if="copiedToClipboard === true">
-              <font-awesome-icon
-                icon="check-circle"
-                size="2x"
-                v-bind:style="{ color: 'green' }"
-              />
-              {{ T.passwordResetLinkCopiedToClipboard }}
-            </span>
+            <input
+              class="form-control input-group-append"
+              v-bind:value="cloneCourseURL"
+              readonly
+              v-on:focus="$event.target.select()"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                v-on:click="copiedToClipboard = true"
+                v-clipboard="() => cloneCourseURL"
+                v-bind:disabled="!cloneCourseURL"
+                v-bind:title="T.wordsCopyToClipboard"
+                data-copy-to-clipboard
+              >
+                <font-awesome-icon icon="clipboard" />
+              </button>
+            </div>
           </div>
         </div>
       </form>
@@ -46,6 +39,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
+import * as ui from '../../ui';
 
 import {
   FontAwesomeIcon,
@@ -80,7 +74,8 @@ export default class CourseGenerateLinkClone extends Vue {
 
   @Watch('copiedToClipboard')
   onPropertyChanged(newValue: boolean): void {
-    setTimeout(() => (this.copiedToClipboard = false), 5000);
+    if (!newValue) return;
+    ui.success(T.passwordResetLinkCopiedToClipboard);
   }
 }
 </script>

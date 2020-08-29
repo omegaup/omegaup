@@ -243,8 +243,9 @@
             (alias, name, startTime) => $emit('clone', alias, name, startTime)
           "
         ></omegaup-course-clone>
+        <!-- Show omegaup-course-generate-link-clone when PR #4570 is merged -->
         <omegaup-course-generate-link-clone
-          v-if="data.course.admission_mode !== admissionMode.Public"
+          v-if="data.course.admission_mode !== admissionMode.Public && false"
           v-bind:alias="data.course.alias"
           v-bind:token="token"
           v-on:generate-link="(alias) => $emit('generate-link', alias)"
