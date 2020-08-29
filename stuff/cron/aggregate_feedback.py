@@ -438,19 +438,18 @@ def aggregate_reviewers_feedback_for_problem(
                     (problem_id,))
 
         # Add new tags for problem
-        if len(final_tags) != 0:
-            cur.executemany("""INSERT IGNORE INTO
-                                   `Problems_Tags`(`problem_id`, `tag_id`,
-                                                   `source`)
-                               SELECT
-                                   %s AS `problem_id`,
-                                   `t`.`tag_id` AS `tag_id`,
-                                   'quality' AS `source`
-                               FROM
-                                   `Tags` AS `t`
-                               WHERE
-                                   `t`.`name` = %s;""",
-                            (final_tags))
+        cur.executemany("""INSERT IGNORE INTO
+                               `Problems_Tags`(`problem_id`, `tag_id`,
+                                               `source`)
+                           SELECT
+                               %s AS `problem_id`,
+                               `t`.`tag_id` AS `tag_id`,
+                               'quality' AS `source`
+                           FROM
+                               `Tags` AS `t`
+                           WHERE
+                               `t`.`name` = %s;""",
+                        (final_tags))
 
 
 def aggregate_reviewers_feedback(
