@@ -703,13 +703,15 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'name' => 'test-tag',
-            'public' => false,
+            'public' => true,
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         $response = \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'name' => 'test-tag',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $this->assertTrue($response['tags'][0]['public']);
         $this->assertFalse($response['tags'][1]['public']);
@@ -913,7 +915,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(
             [
                 [
-                    'name' => 'problemRestrictedTagLanguage',
+                    'name' => 'problemLevelBasicIntroductionToProgramming',
                     'public' => '1',
                 ],
             ],
