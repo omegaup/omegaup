@@ -1633,8 +1633,11 @@ export namespace types {
   }
 
   export interface CourseDetailsPayload {
+    classname?: string;
     details: types.CourseDetails;
     progress: types.AssignmentProgress;
+    token?: string;
+    username?: string;
   }
 
   export interface CourseEditPayload {

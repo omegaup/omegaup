@@ -1531,10 +1531,11 @@ Clone a course
 
 | Name           | Type                | Description |
 | -------------- | ------------------- | ----------- |
-| `alias`        | `mixed`             |             |
-| `course_alias` | `mixed`             |             |
-| `name`         | `mixed`             |             |
+| `alias`        | `string`            |             |
+| `course_alias` | `string`            |             |
+| `name`         | `string`            |             |
 | `start_time`   | `OmegaUp\Timestamp` |             |
+| `token`        | `null|string`       |             |
 
 ### Returns
 
@@ -1654,10 +1655,11 @@ Show course intro only on public courses when user is not yet registered
 
 ### Parameters
 
-| Name               | Type    | Description |
-| ------------------ | ------- | ----------- |
-| `assignment_alias` | `mixed` |             |
-| `course_alias`     | `mixed` |             |
+| Name               | Type          | Description |
+| ------------------ | ------------- | ----------- |
+| `assignment_alias` | `mixed`       |             |
+| `course_alias`     | `string`      |             |
+| `token`            | `null|string` |             |
 
 ### Returns
 

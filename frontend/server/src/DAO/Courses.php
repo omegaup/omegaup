@@ -703,4 +703,53 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             [$courseAlias, $startTimestamp, $endTimestamp, $courseAlias, $completionRate]
         );
     }
+
+    /**
+     * @return array{classname: string, username: string}|null
+     */
+    public static function getCreatorInformation(
+        \OmegaUp\DAO\VO\Courses $course
+    ): array {
+        $sql = 'SELECT
+                    i.username,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
+                FROM
+                    Users u
+                INNER JOIN
+                    ACLs a
+                ON
+                    u.user_id = a.owner_id
+                INNER JOIN
+                    Identities i
+                ON
+                    u.main_identity_id = i.identity_id
+                WHERE
+                    a.acl_id = ?
+                LIMIT
+                    1;';
+        /** @var array{classname: string, username: string}|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+            $sql,
+            [$course->acl_id]
+        );
+    }
 }
