@@ -1701,6 +1701,7 @@ export namespace types {
   export interface CourseProblemStatistics {
     assignment_alias: string;
     average?: number;
+    avg_runs?: number;
     high_score_percentage?: number;
     low_score_percentage?: number;
     max_points: number;

@@ -44,7 +44,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
+     * @return list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
@@ -64,7 +64,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             ) * 100 AS low_score_percentage,
             MIN(bpr.max_user_score_for_problem) as minimum,
             MAX(bpr.max_user_score_for_problem) as maximum,
-            bpr.max_points
+            bpr.max_points,
+            AVG(bpr.run_count) AS avg_runs
         FROM (
             SELECT
                 pr.assignment_alias,
@@ -73,7 +74,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 pr.order,
                 pr.max_points,
                 COALESCE(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
-                COALESCE(MAX(`r`.`score`), 0) AS max_user_percent_for_problem
+                COALESCE(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
+                COALESCE(COUNT(`r`.`submission_id`), 0) AS run_count
             FROM
                 `Groups_Identities` AS `gi`
             CROSS JOIN
@@ -120,7 +122,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
+        /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]

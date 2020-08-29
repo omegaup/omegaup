@@ -48,6 +48,7 @@ export default class Statistics extends Vue {
     },
     { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
     { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
+    { value: this.runsChartOptions, text: T.courseStatisticsAverageRuns },
   ];
   //get chart options
   get varianceChartOptions() {
@@ -56,7 +57,7 @@ export default class Statistics extends Vue {
       '{y}',
       T.courseStatisticsVariance,
       this.getStatistic('variance'),
-      this.maxVariance,
+      this.getMaxStat('variance'),
       this.problems,
     );
   }
@@ -110,6 +111,16 @@ export default class Statistics extends Vue {
       this.problems,
     );
   }
+  get runsChartOptions() {
+    return this.createChartOptions(
+      T.courseStatisticsAverageRuns,
+      '{y}',
+      T.wordsRuns,
+      this.getStatistic('avg_runs'),
+      this.getMaxStat('avg_runs'),
+      this.problems,
+    );
+  }
   //helper functions
   get problems() {
     return this.problemStats.map(
@@ -123,28 +134,29 @@ export default class Statistics extends Vue {
     }
     return maxPoints;
   }
-  get maxVariance() {
-    let maxVariance = 0;
-    for (const variance of this.getStatistic('variance')) {
-      if (variance > maxVariance) maxVariance = variance;
+  getMaxStat(statistic: 'variance' | 'avg_runs') {
+    let max = 0;
+    for (const stat of this.getStatistic(statistic)) {
+      if (stat > max) max = stat;
     }
-    return maxVariance;
+    return max;
   }
   getStatistic(
     name:
       | 'variance'
       | 'average'
+      | 'avg_runs'
       | 'high_score_percentage'
       | 'low_score_percentage'
       | 'maximum'
       | 'minimum',
   ) {
-    return this.problemStats.map((problem) => problem[name] || 0);
+    return this.problemStats.map((problem) => Math.round(problem[name] || 0));
   }
-  //title = string
   //yLabel = '{y}' or '{y} %'
+  //yName = data type (percentage, score, etc.)
   //data = getStatistics("chart_type")
-  //yMax = get maxPoints() or get maxVariance()
+  //yMax = get maxPoints() or getMaxStat
   createChartOptions(
     title: string,
     yLabel: string,

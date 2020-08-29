@@ -364,6 +364,7 @@
 	"courseNewFormUserInformationRequired": "Request participant information",
 	"courseNewFormUserInformationRequiredDesc": "Enable this option to request access to the information of the participants that belong to the course in order to be contacted later. Keep in mind that the participants can choose whether they want to give access to their information or not.",
 	"courseNotFound": "Course not found",
+	"courseStatisticsAverageRuns": "Average submissions",
 	"courseStatisticsAverageScore": "Average score",
 	"courseStatisticsMaximumScore": "Maximum score",
 	"courseStatisticsMinimumScore": "Minimum score",

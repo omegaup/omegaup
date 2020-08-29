@@ -365,6 +365,7 @@ const translations: { [key: string]: string; } = {
   courseNewFormUserInformationRequired: "Solicitar informa\u00e7\u00f5es do participante",
   courseNewFormUserInformationRequiredDesc: "Ative esta op\u00e7\u00e3o para solicitar acesso \u00e0s informa\u00e7\u00f5es dos participantes que pertencem ao curso para serem contatados mais tarde. Tenha em mente que o participante pode escolher se deseja dar acesso a suas informa\u00e7\u00f5es ou n\u00e3o.",
   courseNotFound: "Curso n\u00e3o encontrado",
+  courseStatisticsAverageRuns: "Solu\u00e7\u00f5es m\u00e9dia",
   courseStatisticsAverageScore: "Pontua\u00e7\u00e3o m\u00e9dia",
   courseStatisticsMaximumScore: "Pontua\u00e7\u00e3o m\u00e1xima",
   courseStatisticsMinimumScore: "Pontua\u00e7\u00e3o m\u00ednima",
