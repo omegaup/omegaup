@@ -307,6 +307,7 @@
 	"courseCardDueDate": "Finaliza %(due_date)",
 	"courseCardImpartedBy": "Impartido por <span class=\"font-weight-bold\">%(school_name)</span>",
 	"courseCardShowTopics": "Mostrar temario",
+	"courseCloneCreatedBy": "Creado por",
 	"courseContentEmpty": "No hay contenido",
 	"courseContentNewFormTypeDesc": "El tipo de contenido es usado para distinguir una tarea de una lecci\u00f3n o examen visualmente en los cursos.",
 	"courseDetails": "Detalles del curso",
