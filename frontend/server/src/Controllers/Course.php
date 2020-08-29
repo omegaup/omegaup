@@ -31,7 +31,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
- * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, maxPoints: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>}
+ * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}
+ * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
@@ -487,6 +488,50 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{token: string}
+     *
+     * @omegaup-request-param string $course_alias
+     */
+    public static function apiGenerateTokenForCloneCourse(
+        \OmegaUp\Request $r
+    ): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+
+        $r->ensureMainUserIdentity();
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
+                $courseAlias
+            )
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if ($course->admission_mode === \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'unnecessaryTokenForPublicCourses'
+            );
+        }
+
+        $claims = [
+            'course' => strval($course->alias),
+            'permissions' => 'clone',
+        ];
+        $subject = strval($r->user->user_id);
+        return [
+            'token' => \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
+                $claims,
+                $subject
+            ),
+        ];
+    }
+
+    /**
      * Clone a course
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -527,18 +572,21 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         try {
             // Create the course (and group)
-            $course = \OmegaUp\Controllers\Course::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-                'name' => $r['name'],
-                'description' => $originalCourse->description,
-                'alias' => $r['alias'],
-                'school_id' => $originalCourse->school_id,
-                'start_time' => $startTime,
-                'finish_time' => $cloneCourseFinishTime,
-                'admission_mode' => self::ADMISSION_MODE_PRIVATE,
-                'show_scoreboard' => $originalCourse->show_scoreboard,
-                'needs_basic_information' => $originalCourse->needs_basic_information,
-                'requests_user_information' => $originalCourse->requests_user_information
-            ]), $r->user);
+            $course = \OmegaUp\Controllers\Course::createCourseAndGroup(
+                new \OmegaUp\DAO\VO\Courses([
+                    'name' => $r['name'],
+                    'description' => $originalCourse->description,
+                    'alias' => $r['alias'],
+                    'school_id' => $originalCourse->school_id,
+                    'start_time' => $startTime,
+                    'finish_time' => $cloneCourseFinishTime,
+                    'admission_mode' => self::ADMISSION_MODE_PRIVATE,
+                    'show_scoreboard' => $originalCourse->show_scoreboard,
+                    'needs_basic_information' => $originalCourse->needs_basic_information,
+                    'requests_user_information' => $originalCourse->requests_user_information
+                ]),
+                $r->user
+            );
 
             $assignmentsProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsAssignmentByCourseAlias(
                 $originalCourse

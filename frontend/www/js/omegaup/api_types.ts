@@ -1698,6 +1698,18 @@ export namespace types {
     visits: number;
   }
 
+  export interface CourseProblemStatistics {
+    assignment_alias: string;
+    average?: number;
+    high_score_percentage?: number;
+    low_score_percentage?: number;
+    max_points: number;
+    maximum?: number;
+    minimum?: number;
+    problem_alias: string;
+    variance?: number;
+  }
+
   export interface CourseProblemTried {
     alias: string;
     title: string;
@@ -1706,17 +1718,7 @@ export namespace types {
 
   export interface CourseStatisticsPayload {
     course: types.CourseDetails;
-    problemStats: {
-      assignment_alias: string;
-      average?: number;
-      high_score_percentage?: number;
-      low_score_percentage?: number;
-      maxPoints: number;
-      maximum?: number;
-      minimum?: number;
-      problem_alias: string;
-      variance?: number;
-    }[];
+    problemStats: types.CourseProblemStatistics[];
   }
 
   export interface CourseStudent {
@@ -3050,6 +3052,8 @@ export namespace messages {
   export type CourseDetailsRequest = { [key: string]: any };
   export type _CourseDetailsServerResponse = any;
   export type CourseDetailsResponse = types.CourseDetails;
+  export type CourseGenerateTokenForCloneCourseRequest = { [key: string]: any };
+  export type CourseGenerateTokenForCloneCourseResponse = { token: string };
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
@@ -3925,6 +3929,9 @@ export namespace controllers {
     details: (
       params?: messages.CourseDetailsRequest,
     ) => Promise<messages.CourseDetailsResponse>;
+    generateTokenForCloneCourse: (
+      params?: messages.CourseGenerateTokenForCloneCourseRequest,
+    ) => Promise<messages.CourseGenerateTokenForCloneCourseResponse>;
     getProblemUsers: (
       params?: messages.CourseGetProblemUsersRequest,
     ) => Promise<messages.CourseGetProblemUsersResponse>;
