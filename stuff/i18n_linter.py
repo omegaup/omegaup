@@ -10,6 +10,8 @@ import os
 import re
 import sys
 
+from typing import List, Set
+
 from hook_tools import linters
 from hook_tools import git_tools
 
@@ -103,7 +105,8 @@ class I18nLinter(linters.Linter):
 
     def _get_translated_strings(self, contents_callback):
         strings = {}
-        languages = set()
+        languages: Set[str] = set()
+        diagnostics: List[linters.Diagnostic] = []
         for lang in self._LANGS:
             filename = '%s/%s.lang' % (self._TEMPLATES_PATH, lang)
             languages.add(lang)
@@ -116,13 +119,18 @@ class I18nLinter(linters.Linter):
                         strings[key] = collections.defaultdict(str)
                     match = re.compile(r'^"((?:[^"]|\\")*)"$').match(value)
                     if match is None:
-                        raise Exception("Invalid value")
+                        raise Exception(f'Invalid line {row.strip()!r}')
                     strings[key][lang] = match.group(1).replace(r'\"', '"')
-                except:  # noqa: bare-except
-                    raise linters.LinterException(
-                        'Invalid i18n line "%s" in %s:%d' %
-                        (row.strip(), filename, lineno + 1),
-                        fixable=False)
+                except Exception as exc:  # pylint: disable=broad-except
+                    diagnostics.append(
+                        linters.Diagnostic(str(exc),
+                                           filename=filename,
+                                           lineno=lineno + 1,
+                                           line=row.strip()))
+        if diagnostics:
+            raise linters.LinterException('Invalid i18n files',
+                                          fixable=False,
+                                          diagnostics=diagnostics)
 
         # Removing badges entries
         return {
@@ -130,33 +138,26 @@ class I18nLinter(linters.Linter):
         }
 
     def _check_missing_entries(self, strings, languages):
-        missing_items_lang = set()
+        diagnostics: List[linters.Diagnostic] = []
         for key, values in strings.items():
             missing_languages = languages.difference(list(values.keys()))
             if missing_languages:
-                print('%s%s%s' % (self._HEADER, key, self._NORMAL),
-                      file=sys.stderr)
-
-                for lang in sorted(languages):
-                    if lang in values:
-                        print('\t%s%-10s%s %s' %
-                              (self._OKGREEN, lang, self._NORMAL,
-                               values[lang]), file=sys.stderr)
-                    else:
-                        print('\t%s%-10s%s missing%s' %
-                              (self._OKGREEN, lang, self._FAIL, self._NORMAL),
-                              file=sys.stderr)
-                        missing_items_lang.add(lang)
-
-                raise linters.LinterException(
-                    'There are missing items in the %s.lang'
-                    ' file' % missing_items_lang,
-                    fixable=False)
+                for lang in missing_languages:
+                    diagnostics.append(
+                        linters.Diagnostic(f'Missing entry: {key!r}',
+                                           filename=os.path.join(
+                                               self._TEMPLATES_PATH,
+                                               f'{lang}.lang')))
+                continue
 
             if key == 'locale':
                 values['pseudo'] = 'pseudo'
             else:
                 values['pseudo'] = self._pseudoloc(values['en'])
+        if diagnostics:
+            raise linters.LinterException(
+                'There are missing items in some files',
+                diagnostics=diagnostics)
 
     @staticmethod
     def _generate_content_entry(new_contents, original_contents, path,
@@ -195,11 +196,6 @@ class I18nLinter(linters.Linter):
                                          contents_callback=contents_callback)
 
         return new_contents, original_contents
-
-    def run_one(self, filename, contents):
-        '''Runs the linter against |contents|.'''
-        # pylint: disable=no-self-use, unused-argument
-        return contents, []
 
     def run_all(self, file_contents, contents_callback):
         '''Runs the linter against a subset of files.'''
