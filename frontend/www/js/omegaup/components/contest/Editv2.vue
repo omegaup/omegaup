@@ -10,7 +10,7 @@
         <small>
           &ndash;
           <a v-bind:href="`/arena/${details.alias}/`">
-            {{ T.contestDetailsoToContest }}</a
+            {{ T.contestDetailsGoToContest }}</a
           >
         </small>
       </h1>
