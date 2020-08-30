@@ -27,6 +27,10 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
       - name: Download gitserver
         run: |
           DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.15/omegaup-gitserver.tar.xz'

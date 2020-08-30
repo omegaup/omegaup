@@ -71,6 +71,7 @@
   - [`/api/course/create/`](#apicoursecreate)
   - [`/api/course/createAssignment/`](#apicoursecreateassignment)
   - [`/api/course/details/`](#apicoursedetails)
+  - [`/api/course/generateTokenForCloneCourse/`](#apicoursegeneratetokenforclonecourse)
   - [`/api/course/getProblemUsers/`](#apicoursegetproblemusers)
   - [`/api/course/introDetails/`](#apicourseintrodetails)
   - [`/api/course/listAssignments/`](#apicourselistassignments)
@@ -1611,6 +1612,22 @@ Returns details of a given course
 ```typescript
 types.CourseDetails;
 ```
+
+## `/api/course/generateTokenForCloneCourse/`
+
+### Description
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `token` | `string` |
 
 ## `/api/course/getProblemUsers/`
 
@@ -3914,9 +3931,9 @@ Gets extra information of the identity:
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 
@@ -4237,9 +4254,9 @@ Gets verify status of a user
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 
@@ -4302,9 +4319,9 @@ Updates the main email of the current user
 
 ### Parameters
 
-| Name    | Type    | Description |
-| ------- | ------- | ----------- |
-| `email` | `mixed` |             |
+| Name    | Type     | Description |
+| ------- | -------- | ----------- |
+| `email` | `string` |             |
 
 ### Returns
 

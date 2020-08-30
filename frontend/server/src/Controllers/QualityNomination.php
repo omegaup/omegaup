@@ -64,11 +64,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     const ALLOWED_PUBLIC_TAGS = [
-        'problemTagInteractive',
-        'problemTagOutputOnly',
-        'problemTagLanguage',
-        'problemTagKarel',
-        'problemTagInputAndOutput',
         'problemTagArithmetic',
         'problemTagConditionals',
         'problemTagLoops',
