@@ -1,7 +1,7 @@
 {include file='head.tpl' htmlTitle="{#interviews#}" inline}
 
 <div class="page-header">
-	<h1><span>{#frontPageLoading#}</span> <small></small></h1>
+	<h1><span><img src="/media/wait.gif" /></span> <small></small></h1>
 </div>
 
 <ul class="nav nav-tabs nav-justified" id="sections">

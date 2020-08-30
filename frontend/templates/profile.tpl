@@ -46,13 +46,7 @@
 				<h2 class="panel-title">{#profileSolvedProblems#} <span class="badge" id="problems-solved-total">0</span></h2>
 			</div>
 			<table class="table table-striped" id="problems-solved">
-				<thead>
-					<tr>
-						<th colspan="3">{#profileSolvedProblemsTableTitle#}</th>
-					</tr>
-				</thead>
 				<tbody>
-
 				</tbody>
 			</table>
 			<div id="problems-solved-wait"><img src="/media/wait.gif" /></div>
@@ -63,13 +57,7 @@
 				<h2 class="panel-title">{#profileUnsolvedProblems#} <span class="badge" id="problems-unsolved-total">0</span></h2>
 			</div>
 			<table class="table table-striped" id="problems-unsolved">
-				<thead>
-					<tr>
-						<th colspan="3">{#profileUnsolvedProblemsTableTitle#}</th>
-					</tr>
-				</thead>
 				<tbody>
-
 				</tbody>
 			</table>
 			<div id="problems-unsolved-wait"><img src="/media/wait.gif" /></div>
