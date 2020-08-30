@@ -2,7 +2,7 @@
 	"custom_linters": [
 		{
 			"name": "api",
-			"path": "stuff/api.py",
+			"path": "stuff/api_linter.py",
 			"class_name": "ApiLinter"
 		},
 		{
@@ -12,8 +12,13 @@
 		},
 		{
 			"name": "i18n",
-			"path": "stuff/i18n.py",
+			"path": "stuff/i18n_linter.py",
 			"class_name": "I18nLinter"
+		},
+		{
+			"name": "translation_strings",
+			"path": "stuff/translation_strings_linter.py",
+			"class_name": "TranslationStringsLinter"
 		}
 	],
 	"lint": {
@@ -95,6 +100,12 @@
 			"whitelist": [
 				"frontend/database/schema.sql",
 				"frontend/server/libs/dao/base/.*\\.base\\.php$"
+			]
+		},
+		"translation_strings": {
+			"whitelist": [
+				"^frontend/www/js/.*\\.(js|ts|vue)$",
+				"^frontend/templates/.*\\.tpl$"
 			]
 		}
 	}
