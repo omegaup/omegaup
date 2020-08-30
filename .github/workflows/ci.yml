@@ -88,7 +88,16 @@ jobs:
           mkdir -p frontend/www/{phpminiadmin,preguntas}
           touch 'frontend/server/config.php'
           touch 'frontend/tests/test_config.php'
-          ./vendor/bin/psalm
+          ./vendor/bin/psalm \
+            --output-format=github \
+            --long-progress \
+            --update-baseline \
+            --show-info=false
+          if [[ "$(/usr/bin/git status --porcelain psalm.baseline.xml)" != "" ]]; then
+            /usr/bin/git diff -- psalm.baseline.xml
+            echo '::warning file=psalm.baseline.xml::Some psalm errors have been fixed! Please run: `./vendor/bin/psalm --show-info=false --update-baseline`'
+            exit 1
+          fi
 
       - name: Upload code coverage
         run: bash <(curl -s https://codecov.io/bash) -cF php

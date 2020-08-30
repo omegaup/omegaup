@@ -601,7 +601,7 @@ class APIGenerator {
                         $returnType->removeType('null');
                     }
                     $properties[
-                        strval($reflectionProperty->name)
+                        $reflectionProperty->getName()
                     ] = $this->typeMapper->convertTypeToTypeScript(
                         $returnType,
                         $typeName
