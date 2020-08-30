@@ -142,7 +142,7 @@ jobs:
           touch 'frontend/server/config.php'
           touch 'frontend/tests/test_config.php'
 
-          ./stuff/lint.sh validate --all < /dev/null
+          ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
 
   selenium:
     runs-on: ubuntu-latest
