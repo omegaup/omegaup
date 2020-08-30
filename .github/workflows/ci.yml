@@ -160,7 +160,7 @@ jobs:
           MYSQL_DATABASE: omegaup
 
       frontend:
-        image: omegaup/dev-php:20200824
+        image: omegaup/dev-php:20200830
         ports:
           - 8001:8001
         volumes:
