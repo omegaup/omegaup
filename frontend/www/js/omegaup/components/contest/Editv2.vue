@@ -122,6 +122,26 @@
           "
         ></omegaup-contest-new-form>
       </div>
+      <div class="tab-pane active problems" v-if="showTab === 'problems'">
+        <omegaup-contest-add-problem
+          v-bind:contest-alias="details.alias"
+          v-bind:initial-points="details.partial_score ? 100 : 1"
+          v-bind:initial-problems="problems"
+          v-on:add-problem="(problem) => $emit('add-problem', problem)"
+          v-on:get-versions="
+            (problemAlias, addProblemComponent) =>
+              $emit('get-versions', problemAlias, addProblemComponent)
+          "
+          v-on:remove-problem="
+            (problemAlias) => $emit('remove-problem', problemAlias)
+          "
+          v-on:runs-diff="
+            (problemAlias, versions, selectedCommit) =>
+              $emit('runs-diff', problemAlias, versions, selectedCommit)
+          "
+        >
+        </omegaup-contest-add-problem>
+      </div>
     </div>
   </div>
 </template>
@@ -132,7 +152,7 @@ import { omegaup, OmegaUp } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
-import contest_AddProblem from './AddProblem.vue';
+import contest_AddProblem from './AddProblemv2.vue';
 import contest_Admins from '../common/Admins.vue';
 import contest_Clone from './Clone.vue';
 import contest_Contestant from './Contestant.vue';
