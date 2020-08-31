@@ -71,7 +71,10 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']
         );
-        //$this->assertNull($problemLevel);
+        $this->assertEqual(
+            $problemLevel,
+            'problemLevelBasicIntroductionToProgramming'
+        );
 
         $selectedLevel = 'problemLevelBasicKarel';
         \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
@@ -696,7 +699,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'name' => 'test-tag',
-            'public' => true,
+            'public' => false,
         ]));
 
         $response = \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
