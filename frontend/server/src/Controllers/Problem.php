@@ -426,7 +426,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity,
             $params
         );
-
+        if (empty($params->problemLevel)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'level_tag',
+            );
+        }
         // Populate a new Problem object
         $problem = new \OmegaUp\DAO\VO\Problems([
             'visibility' => $params->visibility ?? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
@@ -493,27 +498,25 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
 
             // Add problem level tag
-            if (!empty($params->problemLevel)) {
-                $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
+            $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
-                if (
-                    is_null($tag) ||
-                    !in_array(
-                        $tag->name,
-                        \OmegaUp\Controllers\Tag::getLevelTags()
-                    )
-                ) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'notProblemLevelTag',
-                        'level_tag'
-                    );
-                }
-
-                \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
-                    $problem,
-                    $tag
+            if (
+                is_null($tag) ||
+                !in_array(
+                    $tag->name,
+                    \OmegaUp\Controllers\Tag::getLevelTags()
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'notProblemLevelTag',
+                    'level_tag'
                 );
             }
+
+            \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+                $problem,
+                $tag
+            );
 
             \OmegaUp\Controllers\Problem::setRestrictedTags(
                 $problem,
