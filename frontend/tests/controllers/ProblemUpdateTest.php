@@ -71,7 +71,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']
         );
-        $this->assertEqual(
+        $this->assertEquals(
             $problemLevel,
             'problemLevelBasicIntroductionToProgramming'
         );

@@ -501,11 +501,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
             if (
-                    is_null($tag) ||
-                    !in_array(
-                        $tag->name,
-                        \OmegaUp\Controllers\Tag::getLevelTags()
-                    )
+                is_null($tag) ||
+                !in_array(
+                    $tag->name,
+                    \OmegaUp\Controllers\Tag::getLevelTags()
+                )
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'notProblemLevelTag',
@@ -513,10 +513,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 );
             }
 
-                \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
-                    $problem,
-                    $tag
-                );
+            \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+                $problem,
+                $tag
+            );
 
             \OmegaUp\Controllers\Problem::setRestrictedTags(
                 $problem,
