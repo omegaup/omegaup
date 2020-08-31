@@ -396,11 +396,22 @@ export default class UserProfile extends Vue {
     data: omegaup.RunData[],
     type: 'pie',
   ) {
-    e.periodStatisticOptions.xAxis.categories = categories;
-    e.periodStatisticOptions.series = data;
+    (<Highcharts.XAxisOptions>(
+      e.periodStatisticOptions.xAxis
+    )).categories = categories;
+    e.periodStatisticOptions.series = data.map(
+      (x) =>
+        <Highcharts.SeriesColumnOptions>{
+          data: x.data,
+          name: x.name,
+          type: 'column',
+        },
+    );
   }
+
   onAggregateStatistics(e: user_Charts) {
-    e.aggregateStatisticOptions.series[0].data = e.normalizedRunCounts;
+    (<Highcharts.SeriesPieOptions>e.aggregateStatisticOptions.series[0]).data =
+      e.normalizedRunCounts;
   }
 }
 </script>

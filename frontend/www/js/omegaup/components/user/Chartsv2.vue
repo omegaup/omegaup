@@ -76,13 +76,6 @@ interface NormalizedPeriodRunCounts {
   year: omegaup.RunCounts;
 }
 
-interface NormalizedRunCounts {
-  name: string;
-  y: number;
-  sliced?: boolean;
-  selected?: boolean;
-}
-
 const emptyGroupedPeriods = {
   day: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
   week: { WA: 0, PA: 0, AC: 0, TLE: 0, RTE: 0 },
@@ -156,7 +149,7 @@ export default class UserCharts extends Vue {
     return total;
   }
 
-  get normalizedRunCounts(): NormalizedRunCounts[] {
+  get normalizedRunCounts(): Highcharts.PointOptionsObject[] {
     const total = this.totalRuns;
     const stats = this.data.runs;
     const runs = stats.reduce(
@@ -178,7 +171,7 @@ export default class UserCharts extends Vue {
       },
     );
     const verdicts = Object.keys(runs);
-    const response: NormalizedRunCounts[] = [];
+    const response: Highcharts.PointOptionsObject[] = [];
     for (const verdict of verdicts) {
       const numRuns = runs[verdict];
       if (verdict == 'AC') {
