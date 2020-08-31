@@ -7,10 +7,5 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::getSmartyInstance()->display(
-    sprintf(
-        '%s/templates/scoreboardmerge.tpl',
-        strval(
-            OMEGAUP_ROOT
-        )
-    )
+    \OmegaUp\UITools::templatePath('scoreboardmerge')
 );

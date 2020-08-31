@@ -361,8 +361,7 @@ class Utils {
         ));
         self::shellExec(
             ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/cron/update_ranks.py' .
+             dirname(__DIR__, 2) . '/stuff/cron/update_ranks.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --update-coder-of-the-month ' .
@@ -380,8 +379,7 @@ class Utils {
         self::commit();
         self::shellExec(
             ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/cron/aggregate_feedback.py' .
+             dirname(__DIR__, 2) . '/stuff/cron/aggregate_feedback.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
@@ -396,8 +394,7 @@ class Utils {
         self::commit();
         self::shellExec(
             ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/cron/assign_badges.py' .
+             dirname(__DIR__, 2) . '/stuff/cron/assign_badges.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .

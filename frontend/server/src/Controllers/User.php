@@ -417,10 +417,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiChangePassword(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
 
         $hashedPassword = null;
@@ -2912,10 +2909,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddRole(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
 
@@ -2940,9 +2934,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiRemoveRole(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
 
@@ -2967,9 +2959,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddGroup(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
         $group = self::validateAddRemoveGroup($r['group']);
@@ -2993,9 +2983,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiRemoveGroup(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
         $group = self::validateAddRemoveGroup($r['group']);
@@ -3014,7 +3002,6 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $experiment
      */
     private static function validateAddRemoveExperiment(\OmegaUp\Request $r): void {
-        /** @var \OmegaUp\DAO\VO\Identities $r->identity */
         if (
             is_null($r->identity) ||
             !\OmegaUp\Authorization::isSystemAdmin($r->identity)
@@ -3047,10 +3034,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddExperiment(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         self::validateAddRemoveExperiment($r);
 
@@ -3072,10 +3056,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiRemoveExperiment(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         self::validateAddRemoveExperiment($r);
 
@@ -3520,7 +3501,10 @@ class User extends \OmegaUp\Controllers\Controller {
                     'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
                         $rowCount
                     ),
-                    'currentUserInfo' => !is_null($r->identity) ? [
+                    'currentUserInfo' => (
+                        !is_null($r->identity) &&
+                        !is_null($r->identity->username)
+                    ) ? [
                         'username' => $r->identity->username,
                     ] : [],
                 ],

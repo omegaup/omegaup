@@ -564,9 +564,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddAdmin(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
@@ -614,9 +612,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddGroupAdmin(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
@@ -5537,9 +5533,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ['LANG' => 'en_US.UTF-8']
             );
             if (!is_resource($proc)) {
+                $lastError = error_get_last();
                 return [
                     'smartyProperties' => [
-                        'error' => strval(error_get_last()),
+                        'error' => $lastError['message'] ?? '',
                     ],
                     'template' => 'libinteractive.gen.tpl',
                 ];
