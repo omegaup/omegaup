@@ -353,7 +353,6 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problems[0]['problem']->alias,
             'visibility' => 'private',
             'message' => 'public -> private',
-            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
         $response = \OmegaUp\Controllers\User::apiProblemsCreated(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,

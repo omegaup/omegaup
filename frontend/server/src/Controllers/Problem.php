@@ -359,12 +359,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 )
             );
         }
-        if (empty($params->problemLevel)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'level_tag',
-            );
-        }
 
         return [
             'problem' => $problem,
@@ -518,6 +512,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
                     $problem,
                     $tag
+                );
+            } else {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterEmpty',
+                    'level_tag',
                 );
             }
 
@@ -5212,7 +5211,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             $sortedLanguages
                         ),
                         'tags' => $tags,
-                        'problem_level' => 'problemLevelBasicIntroductionToProgramming',
+                        'problem_level' => '',
                         'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     ],
