@@ -269,6 +269,8 @@ export default class UserProfile extends Vue {
   T = T;
   columns = 3;
   selectedTab = 'badges';
+  normalizedRunCounts: Highcharts.PointOptionsObject[] = [];
+
   get createdProblems(): Problem[] {
     if (!this.data.createdProblems) return [];
     return this.data.createdProblems.map((problem) => new Problem(problem));
@@ -384,7 +386,7 @@ export default class UserProfile extends Vue {
       series: [
         {
           name: T.profileStatisticsRuns,
-          data: [],
+          data: this.normalizedRunCounts,
           type: 'pie',
         },
       ],
@@ -410,8 +412,7 @@ export default class UserProfile extends Vue {
   }
 
   onAggregateStatistics(e: user_Charts) {
-    (<Highcharts.SeriesPieOptions>e.aggregateStatisticOptions.series[0]).data =
-      e.normalizedRunCounts;
+    this.normalizedRunCounts = e.normalizedRunCounts;
   }
 }
 </script>
