@@ -607,7 +607,7 @@ class NoOpGrader extends \OmegaUp\Grader {
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
         bool $missingOk = false,
-        array $headers = []
+        array $fileHeaders = []
     ): ?bool {
         $path = "{$run->run_id}/{$filename}";
         if (!array_key_exists($path, $this->_resources)) {

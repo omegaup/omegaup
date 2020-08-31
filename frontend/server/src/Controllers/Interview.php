@@ -12,9 +12,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $title
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
@@ -100,9 +98,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddUsers(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
