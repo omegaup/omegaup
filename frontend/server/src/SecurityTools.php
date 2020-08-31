@@ -248,64 +248,65 @@ class SecurityTools {
      * gitserver that is valid for a single problem for 5 minutes.
      *
      * @param array<string, string> $claims
-     * @param string $subject
+     * @param \OmegaUp\DAO\VO\Identities $subject
      * @return string The Bearer authorization token.
      */
     public static function getCourseCloneAuthorizationToken(
         array $claims,
-        string $subject
+        \OmegaUp\DAO\VO\Identities $subject
     ): string {
-        // Given that we already have an autoload configured, we cannot use
-        // sodium_compat's (fast) autoloader. Instead, simulate what it does
-        // here, with the full path of the standard autoload file.
-        require_once 'libs/third_party/sodium_compat/autoload.php';
-        \ParagonIE_Sodium_Compat::$fastMult = true;
-
-        require_once 'libs/third_party/constant_time_encoding/src/EncoderInterface.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Base64UrlSafe.php';
-        require_once 'libs/third_party/constant_time_encoding/src/Binary.php';
-
-        require_once 'libs/third_party/paseto/src/KeyInterface.php';
-        require_once 'libs/third_party/paseto/src/SendingKey.php';
-        require_once 'libs/third_party/paseto/src/ReceivingKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/SymmetricKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricSecretKey.php';
-        require_once 'libs/third_party/paseto/src/Keys/AsymmetricPublicKey.php';
-        require_once 'libs/third_party/paseto/src/ProtocolCollection.php';
-        require_once 'libs/third_party/paseto/src/ProtocolInterface.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version1.php';
-        require_once 'libs/third_party/paseto/src/Protocol/Version2.php';
-        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
-        require_once 'libs/third_party/paseto/src/JsonToken.php';
-        require_once 'libs/third_party/paseto/src/Purpose.php';
-        require_once 'libs/third_party/paseto/src/Builder.php';
-        require_once 'libs/third_party/paseto/src/Util.php';
-        require_once 'libs/third_party/paseto/src/Parsing/Header.php';
-        require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
-        require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
-
-        if (is_null(self::$_courseCloneSecretKey)) {
-            self::$_courseCloneSecretKey = \ParagonIE\Paseto\Keys\SymmetricKey::fromEncodedString(
-                OMEGAUP_COURSE_CLONE_SECRET_KEY
-            );
-        }
+        $secretKey = self::getCourseCloneSecretKey();
         $token = (new \ParagonIE\Paseto\Builder())
-            ->setKey(self::$_courseCloneSecretKey)
+            ->setKey($secretKey)
             ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
             ->setPurpose(\ParagonIE\Paseto\Purpose::local())
             ->setExpiration(
-                (new \DateTime('now'))->add(new \DateInterval('P7D'))
+                (\DateTime::createFromFormat(
+                    'U',
+                    \OmegaUp\Time::get()
+                ))->add(
+                    new \DateInterval(
+                        'P7D'
+                    )
+                )
             )
-            ->setIssuer('omegaUp frontend')
-            ->setSubject($subject)
+            ->setIssuer($subject->username)
+            ->setSubject(strval($subject->user_id))
             ->setClaims($claims);
         return $token->toString();
     }
 
+    /**
+     * @return array<string, string>
+     */
     public static function getDecodedCloneCourseToken(
-        string $sharedKey
-    ): \ParagonIE\Paseto\JsonToken {
+        string $token,
+        string $courseAlias
+    ): array {
+        $parser = \ParagonIE\Paseto\Parser()::getLocal(
+            self::getCourseCloneSecretKey(),
+            \ParagonIE\Paseto\ProtocolCollection::v2()
+        )
+            ->addRule(
+                new \ParagonIE\Paseto\Rules\ValidAt(
+                    (new \DateTime())->setTimestamp(\OmegaUp\Time::get())
+                )
+            )
+            ->addRule(new ClaimRule('course', $courseAlias))
+            ->addRule(new ClaimRule('permissions', 'clone'));
+
+        $parsedToken = $parser->parse($token, /*$skipValidation=*/true);
+        $claims = $parsedToken->getClaims();
+        if (!$parsedToken->validate()) {
+            throw new \ParagonIE\Paseto\JsonToken($claims);
+        }
+        return $claims;
+    }
+
+    /**
+     * @psalm-return \ParagonIE\Paseto\Keys\SymmetricKey
+     */
+    private static function getCourseCloneSecretKey() {
         // Given that we already have an autoload configured, we cannot use
         // sodium_compat's (fast) autoloader. Instead, simulate what it does
         // here, with the full path of the standard autoload file.
@@ -342,16 +343,6 @@ class SecurityTools {
                 OMEGAUP_COURSE_CLONE_SECRET_KEY
             );
         }
-
-        $parser = (new \ParagonIE\Paseto\Parser())
-            ->setKey(self::$_courseCloneSecretKey)
-            ->setPurpose(\ParagonIE\Paseto\Purpose::local())
-            ->setAllowedVersions(\ParagonIE\Paseto\ProtocolCollection::v2());
-
-        try {
-            return $parser->parse($sharedKey);
-        } catch (\ParagonIE\Paseto\Exception\PasetoException $e) {
-            throw $e;
-        }
+        return self::$_courseCloneSecretKey;
     }
 }

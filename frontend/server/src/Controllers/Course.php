@@ -22,7 +22,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>}
- * @psalm-type CourseDetailsPayload=array{classname?: string, details: CourseDetails, progress: AssignmentProgress, token: null|string, username?: string}
+ * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress: AssignmentProgress}
+ * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}|null, details: CourseDetails, token: string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
  * @psalm-type CourseProblemTried=array{alias: string, title: string, username: string}
@@ -521,11 +522,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course' => strval($course->alias),
             'permissions' => 'clone',
         ];
-        $subject = strval($r->user->user_id);
         return [
             'token' => \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
                 $claims,
-                $subject
+                /*$subject=*/$r->identity
             ),
         ];
     }
@@ -565,7 +565,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         $token = $r->ensureOptionalString('token');
         if (!is_null($token)) {
             $decodedToken = \OmegaUp\SecurityTools::getDecodedCloneCourseToken(
-                $token
+                $token,
+                $courseAlias
             );
         }
         $originalCourse = self::validateCourseExists($courseAlias);
@@ -677,7 +678,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         return [
-            'alias' => strval($r['alias'])
+            'alias' => $newAlias,
         ];
     }
 
@@ -2539,7 +2540,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param null|string $token
      */
     public static function apiIntroDetails(\OmegaUp\Request $r) {
         $introDetails = self::getIntroDetails($r);
@@ -2554,10 +2554,53 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param null|string $token
      */
     public static function getCourseDetailsForSmarty(\OmegaUp\Request $r): array {
         return self::getIntroDetails($r);
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: string}}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $token
+     */
+    public static function getCourseCloneDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+        $r->ensureMainUserIdentity();
+        $alias = $r->ensureString(
+            'course_alias',
+            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
+        );
+        $token = $r->ensureString(
+            'token',
+            fn (string $token) => \OmegaUp\Validators::stringNonEmpty($token)
+        );
+        $course = self::validateCourseExists($alias);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'creator' => \OmegaUp\DAO\Courses::getCreatorInformation(
+                        $course
+                    ),
+                    'details' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                    'token' => $token,
+                ],
+                'title' => new \OmegaUp\TranslationString('wordsCloneCourse'),
+            ],
+            'entrypoint' => 'course_clone',
+        ];
     }
 
     /**
@@ -3167,7 +3210,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param string $course_alias
-     * @omegaup-request-param null|string $token
      *
      * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
      */
@@ -3176,14 +3218,12 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
         }
         $r->ensureIdentity();
-
         $courseAlias = $r->ensureString(
             'course_alias',
             fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
                 $courseAlias
             )
         );
-        $token = $r->ensureOptionalString('token');
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
@@ -3210,8 +3250,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
         if (
             $shouldShowIntro &&
-            $course->admission_mode === self::ADMISSION_MODE_PRIVATE &&
-            is_null($token)
+            $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -3248,28 +3287,14 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $course->course_id,
                         $r->identity->identity_id
                     ),
-                    'token' => $token,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCourseDetails'
                 ),
             ],
-            'entrypoint' => is_null($token) ? 'course_details' : 'course_clone',
+            'entrypoint' => 'course_details',
         ];
-        if (
-            (
-                $commonDetails['is_admin']
-                && !$showAssignment
-            )
-            || !is_null($token)
-        ) {
-            $creator = \OmegaUp\DAO\Courses::getCreatorInformation($course);
-            if (!is_null($creator)) {
-                $entrypointResponse['smartyProperties']['payload'] = array_merge(
-                    $creator,
-                    $entrypointResponse['smartyProperties']['payload']
-                );
-            }
+        if ($commonDetails['is_admin'] && !$showAssignment) {
             return $entrypointResponse;
         }
 

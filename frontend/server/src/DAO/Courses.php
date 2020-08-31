@@ -709,7 +709,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
      */
     public static function getCreatorInformation(
         \OmegaUp\DAO\VO\Courses $course
-    ): array {
+    ): ?array {
         $sql = 'SELECT
                     i.username,
                     IFNULL(

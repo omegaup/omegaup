@@ -367,15 +367,101 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        \OmegaUp\Controllers\Course::apiClone(
+        $newAlias = \OmegaUp\Test\Utils::createRandomString();
+        $clonedCourse = \OmegaUp\Controllers\Course::apiClone(
             new \OmegaUp\Request([
                 'auth_token' => $adminLogin->auth_token,
                 'token' => $token,
                 'course_alias' => $courseData['course_alias'],
-                'alias' => \OmegaUp\Test\Utils::createRandomString(),
-                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $newAlias,
+                'name' => $newAlias,
                 'start_time' => \OmegaUp\Time::get(),
             ])
         );
+
+        $this->assertEquals($clonedCourse['alias'], $newAlias);
+    }
+
+    /**
+     * @dataProvider courseCloneInvalidTokenProvider
+     */
+    public function testCreateSchoolAssignmentWithProblems(
+        bool $rightTime,
+        bool $rightCourse,
+        bool $validToken
+    ) {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($admin);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            $admin,
+            $adminLogin,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE
+        );
+
+        $otherCourseData = \OmegaUp\Test\Factories\Course::createCourse(
+            $admin,
+            $adminLogin,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE
+        );
+
+        $currentTime = \OmegaUp\Time::get();
+        if (!$rightTime) {
+            // Needed to test an expired token
+            \OmegaUp\Time::setTimeForTesting($currentTime - (8 * 24 * 60 * 60));
+        }
+
+        [
+            'token' => $token,
+        ] = \OmegaUp\Controllers\Course::apiGenerateTokenForCloneCourse(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        if (!$rightTime) {
+            // Returning to the original time
+            \OmegaUp\Time::setTimeForTesting($currentTime);
+        }
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $originalAlias = $courseData['course_alias'];
+        if (!$rightCourse) {
+            $originalAlias = $otherCourseData['course_alias'];
+        }
+        if (!$validToken) {
+            $token = 'v2.local.fak3T0k3n';
+        }
+        $newAlias = \OmegaUp\Test\Utils::createRandomString();
+        try {
+            $clonedCourse = \OmegaUp\Controllers\Course::apiClone(
+                new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'token' => $token,
+                    'course_alias' => $originalAlias,
+                    'alias' => $newAlias,
+                    'name' => $newAlias,
+                    'start_time' => \OmegaUp\Time::get(),
+                ])
+            );
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * A PHPUnit data provider for the test with invalid tokens.
+     *
+     * @return list<array{0: bool, 1: bool, 2: bool}>
+     */
+    public function courseCloneInvalidTokenProvider(): array {
+        return [
+            [false, true, true],
+            [true, false, true],
+            [true, true, false],
+        ];
     }
 }

@@ -1655,11 +1655,10 @@ Show course intro only on public courses when user is not yet registered
 
 ### Parameters
 
-| Name               | Type          | Description |
-| ------------------ | ------------- | ----------- |
-| `assignment_alias` | `mixed`       |             |
-| `course_alias`     | `string`      |             |
-| `token`            | `null|string` |             |
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `assignment_alias` | `mixed`  |             |
+| `course_alias`     | `string` |             |
 
 ### Returns
 
