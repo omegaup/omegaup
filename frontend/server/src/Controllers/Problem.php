@@ -518,7 +518,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $tag
                 );
 
-
             \OmegaUp\Controllers\Problem::setRestrictedTags(
                 $problem,
                 $temporaryAlias
