@@ -44,73 +44,83 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, problem_alias: string, variance: float}>
+     * @return list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
         int $groupId
     ): array {
         $sql = '
+        SELECT
+            bpr.assignment_alias,
+            bpr.problem_alias,
+            VARIANCE(bpr.max_user_score_for_problem) AS variance,
+            AVG(bpr.max_user_score_for_problem) AS average,
+            AVG(
+                CASE WHEN bpr.max_user_percent_for_problem > 0.6 THEN 1 ELSE 0 END
+            ) * 100 AS high_score_percentage,
+            AVG(
+                CASE WHEN bpr.max_user_percent_for_problem = 0 THEN 1 ELSE 0 END
+            ) * 100 AS low_score_percentage,
+            MIN(bpr.max_user_score_for_problem) as minimum,
+            MAX(bpr.max_user_score_for_problem) as maximum,
+            bpr.max_points
+        FROM (
             SELECT
-                bpr.assignment_alias,
-                bpr.problem_alias,
-                COALESCE (
-                    VARIANCE(bpr.max_user_score_for_problem),
-                    0
-                ) AS variance
-            FROM (
+                pr.assignment_alias,
+                pr.problem_alias,
+                pr.problem_id,
+                pr.order,
+                pr.max_points,
+                COALESCE(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
+                COALESCE(MAX(`r`.`score`), 0) AS max_user_percent_for_problem
+            FROM
+                `Groups_Identities` AS `gi`
+            CROSS JOIN
+                (
                 SELECT
-                    pr.assignment_alias,
-                    pr.problem_alias,
-                    pr.problem_id,
-                    pr.order,
-                    MAX(`r`.`contest_score`) AS max_user_score_for_problem
+                    `a`.`assignment_id`,
+                    `a`.`alias` AS assignment_alias,
+                    `a`.`problemset_id`,
+                    `p`.`problem_id`,
+                    `p`.`alias` AS problem_alias,
+                    `psp`.`points` as max_points,
+                    `psp`.`order`
                 FROM
-                    `Groups_Identities` AS `gi`
-                CROSS JOIN
-                    (
-                        SELECT
-                            `a`.`assignment_id`,
-                            `a`.`alias` AS assignment_alias,
-                            `a`.`problemset_id`,
-                            `p`.`problem_id`,
-                            `p`.`alias` AS problem_alias,
-                            `psp`.`order`
-                        FROM
-                            `Assignments` AS `a`
-                        INNER JOIN
-                            `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
-                        INNER JOIN
-                            `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
-                        INNER JOIN
-                            `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
-                        WHERE
-                            `a`.`course_id` = ?
-                        GROUP BY
-                            `a`.`assignment_id`, `p`.`problem_id`
-                    ) AS pr
+                    `Assignments` AS `a`
                 INNER JOIN
-                    `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
-                LEFT JOIN
-                    `Submissions` AS `s`
-                ON
-                    `s`.`problem_id` = `pr`.`problem_id`
-                    AND `s`.`identity_id` = `i`.`identity_id`
-                    AND `s`.`problemset_id` = `pr`.`problemset_id`
-                LEFT JOIN
-                    `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+                    `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
+                INNER JOIN
+                    `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+                INNER JOIN
+                    `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
                 WHERE
-                    `gi`.`group_id` = ?
+                    `a`.`course_id` = ?
                 GROUP BY
-                    `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
-            ) AS bpr
+                    `a`.`assignment_id`, `p`.`problem_id`
+                ) AS pr
+            INNER JOIN
+                `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
+            LEFT JOIN
+                `Submissions` AS `s`
+            ON
+                `s`.`problem_id` = `pr`.`problem_id`
+                AND `s`.`identity_id` = `i`.`identity_id`
+                AND `s`.`problemset_id` = `pr`.`problemset_id`
+            LEFT JOIN
+                `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+            WHERE
+                `gi`.`group_id` = ?
             GROUP BY
-                bpr.problem_alias, bpr.assignment_alias
-            ORDER BY
-                bpr.order, bpr.problem_id;
+                `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`
+        ) AS bpr
+        GROUP BY
+            bpr.problem_alias, bpr.assignment_alias
+        ORDER BY
+            bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, problem_alias: string, variance: float}> */
+        /** @var list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]

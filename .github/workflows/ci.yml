@@ -27,6 +27,10 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
       - name: Download gitserver
         run: |
           DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.15/omegaup-gitserver.tar.xz'
@@ -138,7 +142,7 @@ jobs:
           touch 'frontend/server/config.php'
           touch 'frontend/tests/test_config.php'
 
-          ./stuff/lint.sh validate --all < /dev/null
+          ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
 
   selenium:
     runs-on: ubuntu-latest
@@ -156,7 +160,7 @@ jobs:
           MYSQL_DATABASE: omegaup
 
       frontend:
-        image: omegaup/dev-php:20200808
+        image: omegaup/dev-php:20200830
         ports:
           - 8001:8001
         volumes:

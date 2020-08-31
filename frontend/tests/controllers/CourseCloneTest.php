@@ -58,6 +58,11 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
+        $this->assertArrayContainsWithPredicateExactlyOnce(
+            \OmegaUp\DAO\CourseCloneLog::getAll(),
+            fn (\OmegaUp\DAO\VO\CourseCloneLog $courseLog) =>
+                $courseLog->course_id === $courseData['course_id']
+        );
 
         $assignments = \OmegaUp\Controllers\Course::apiListAssignments(new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
@@ -314,5 +319,29 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
+    }
+
+    public function testGenerateCloneCourseToken() {
+        ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
+        $adminLogin = self::login($admin);
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            $admin,
+            $adminLogin,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE
+        );
+
+        [
+            'token' => $token,
+        ] = \OmegaUp\Controllers\Course::apiGenerateTokenForCloneCourse(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        $this->assertNotEmpty($token);
+        $this->assertStringContainsString('v2.', $token);
+        $this->assertStringContainsString('local.', $token);
     }
 }
