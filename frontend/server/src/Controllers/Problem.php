@@ -498,7 +498,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
 
             // Add problem level tag
-                $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
+            $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
             if (
                 is_null($tag) ||
