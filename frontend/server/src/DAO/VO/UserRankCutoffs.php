@@ -42,9 +42,9 @@ class UserRankCutoffs extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['classname'])) {
-            $this->classname = strval(
+            $this->classname = is_scalar(
                 $data['classname']
-            );
+            ) ? strval($data['classname']) : '';
         }
     }
 

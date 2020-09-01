@@ -50,14 +50,14 @@ class ContestLog extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['from_admission_mode'])) {
-            $this->from_admission_mode = strval(
+            $this->from_admission_mode = is_scalar(
                 $data['from_admission_mode']
-            );
+            ) ? strval($data['from_admission_mode']) : '';
         }
         if (isset($data['to_admission_mode'])) {
-            $this->to_admission_mode = strval(
+            $this->to_admission_mode = is_scalar(
                 $data['to_admission_mode']
-            );
+            ) ? strval($data['to_admission_mode']) : '';
         }
         if (isset($data['time'])) {
             /**
