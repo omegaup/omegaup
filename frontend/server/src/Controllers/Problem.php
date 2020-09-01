@@ -1573,7 +1573,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if ($redirect === true) {
-            header("Location: {$_SERVER['HTTP_REFERER']}");
+            header('Location: ' . (
+                \OmegaUp\Request::getServerVar('HTTP_REFERER') ?? '/'
+            ));
         }
 
         self::invalidateCache($problem, $updatedStatementLanguages);

@@ -258,7 +258,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => intval($identity->identity_id),
-            'ip' => ip2long(strval($_SERVER['REMOTE_ADDR'])),
+            'ip' => ip2long(
+                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+            ),
         ]));
 
         self::invalidateLocalCache();

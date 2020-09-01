@@ -22,9 +22,7 @@ class UITools {
         }
         header(
             'Location: /login.php?redirect=' . urlencode(
-                strval(
-                    $_SERVER['REQUEST_URI']
-                )
+                \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/'
             )
         );
         die();

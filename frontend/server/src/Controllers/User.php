@@ -165,7 +165,9 @@ class User extends \OmegaUp\Controllers\Controller {
             $data = [
                 'secret' => OMEGAUP_RECAPTCHA_SECRET,
                 'response' => $createUserParams->recaptcha,
-                'remoteip' => $_SERVER['REMOTE_ADDR'],
+                'remoteip' => (
+                    \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                ),
             ];
 
             // use key 'http' even if you send the request to https://...
