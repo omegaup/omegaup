@@ -54,10 +54,9 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Course.php">
-    <MixedArgument occurrences="6">
+    <MixedArgument occurrences="5">
       <code>$r['problems']</code>
       <code>$_SERVER['REMOTE_ADDR']</code>
-      <code>$r['alias']</code>
       <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$r['problem_alias']</code>
       <code>$r['username']</code>
