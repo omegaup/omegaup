@@ -43,9 +43,8 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Course.php">
-    <MixedArgument occurrences="4">
+    <MixedArgument occurrences="3">
       <code>$r['problems']</code>
-      <code>$r['alias']</code>
       <code>$r['problem_alias']</code>
       <code>$r['username']</code>
     </MixedArgument>
