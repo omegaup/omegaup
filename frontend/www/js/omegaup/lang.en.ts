@@ -1191,6 +1191,7 @@ const translations: { [key: string]: string; } = {
   tagSourceOwner: "Author's tag",
   tagSourceVoted: "User's tag",
   titleInUse: "Title already exists. Please choose a different title.",
+  tokenDecodeFailed: "There was a problem decoding the token.",
   totalRuns: "Total runs: %(numRuns)",
   unableToVerifyCaptcha: "We failed to verify the captcha. Please reload the page and try again.",
   unnecessaryTokenForPublicCourses: "Token is unnecessary for public courses",

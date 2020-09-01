@@ -1191,6 +1191,7 @@ const translations: { [key: string]: string; } = {
   tagSourceOwner: "Etiqueta del autor",
   tagSourceVoted: "Etiqueta de los usuarios",
   titleInUse: "El t\u00edtulo ya est\u00e1 siendo usado. Por favor elige un t\u00edtulo distinto.",
+  tokenDecodeFailed: "Hubo un problema al decodificar el token.",
   totalRuns: "Total de env\u00edos: %(numRuns)",
   unableToVerifyCaptcha: "No fue posible verificar el captcha. Vuelve a cargar la p\u00e1gina e intenta de nuevo.",
   unnecessaryTokenForPublicCourses: "El token no es necesario para los cursos p\u00fablicos",

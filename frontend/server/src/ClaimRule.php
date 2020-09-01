@@ -1,18 +1,8 @@
 <?php
 declare(strict_types=1);
-namespace \ParagonIE\Paseto\Rules;
+namespace OmegaUp;
 
-use ParagonIE\Paseto\{
-    JsonToken,
-    ValidationRuleInterface
-};
-use ParagonIE\Paseto\Exception\PasetoException;
-
-/**
- * Class ClaimRule
- * @package \ParagonIE\Paseto\Rules
- */
-class ClaimRule implements ValidationRuleInterface {
+class ClaimRule implements \ParagonIE\Paseto\ValidationRuleInterface {
     /** @var string $failure */
     protected $failure = 'OK';
 
@@ -24,7 +14,8 @@ class ClaimRule implements ValidationRuleInterface {
 
     /**
      * ClaimRule constructor.
-     * @param string $audience
+     * @param string $rule
+     * @param string $value
      */
     public function __construct(string $rule, string $value) {
         $this->rule = $rule;
@@ -42,16 +33,16 @@ class ClaimRule implements ValidationRuleInterface {
      * @param JsonToken $token
      * @return bool
      */
-    public function isValid(JsonToken $token): bool {
+    public function isValid(\ParagonIE\Paseto\JsonToken $token): bool {
         try {
-            $claims = $token->getClaims();
-            if (!\hash_equals($this->value, $claims[$this->rule])) {
-                $this->failure = 'This token is not intended for ' .
-                    $this->value . ' (expected); instead, it is intended for ' .
-                    $claims[$this->rule] . ' instead.';
+            $value = $token->get($this->claim);
+            if (!\hash_equals($this->value, $value)) {
+                $this->failure = 'This token was expected to be for claim "' .
+                    $this->claim . '" = "' . $this->value . '"; instead, it ' .
+                        'is intended for "' . $claim . '" instead.';
                 return false;
             }
-        } catch (PasetoException $ex) {
+        } catch (\ParagonIE\Paseto\PasetoException $ex) {
             $this->failure = $ex->getMessage();
             return false;
         }

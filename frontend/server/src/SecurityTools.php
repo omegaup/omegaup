@@ -283,7 +283,7 @@ class SecurityTools {
         string $token,
         string $courseAlias
     ): array {
-        $parser = \ParagonIE\Paseto\Parser()::getLocal(
+        $parser = \ParagonIE\Paseto\Parser::getLocal(
             self::getCourseCloneSecretKey(),
             \ParagonIE\Paseto\ProtocolCollection::v2()
         )
@@ -292,13 +292,13 @@ class SecurityTools {
                     (new \DateTime())->setTimestamp(\OmegaUp\Time::get())
                 )
             )
-            ->addRule(new ClaimRule('course', $courseAlias))
-            ->addRule(new ClaimRule('permissions', 'clone'));
+            ->addRule(new \OmegaUp\ClaimRule('course', $courseAlias))
+            ->addRule(new \OmegaUp\ClaimRule('permissions', 'clone'));
 
         $parsedToken = $parser->parse($token, /*$skipValidation=*/true);
         $claims = $parsedToken->getClaims();
-        if (!$parsedToken->validate()) {
-            throw new \ParagonIE\Paseto\JsonToken($claims);
+        if (!$parser->validate($parsedToken)) {
+            throw new \OmegaUp\Exceptions\TokenDecodeException($claims);
         }
         return $claims;
     }
@@ -334,10 +334,13 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/Builder.php';
         require_once 'libs/third_party/paseto/src/Parser.php';
         require_once 'libs/third_party/paseto/src/Util.php';
+        require_once 'libs/third_party/paseto/src/ValidationRuleInterface.php';
+        require_once 'libs/third_party/paseto/src/Rules/ValidAt.php';
         require_once 'libs/third_party/paseto/src/Parsing/Header.php';
         require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
         require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
         require_once 'libs/third_party/paseto/src/Exception/SecurityException.php';
+        require_once 'libs/third_party/paseto/src/Exception/NotFoundException.php';
         if (is_null(self::$_courseCloneSecretKey)) {
             self::$_courseCloneSecretKey = \ParagonIE\Paseto\Keys\SymmetricKey::fromEncodedString(
                 OMEGAUP_COURSE_CLONE_SECRET_KEY
