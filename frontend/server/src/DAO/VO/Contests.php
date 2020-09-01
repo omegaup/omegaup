@@ -68,14 +68,14 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['title'])) {
-            $this->title = strval(
+            $this->title = is_scalar(
                 $data['title']
-            );
+            ) ? strval($data['title']) : '';
         }
         if (isset($data['description'])) {
-            $this->description = strval(
+            $this->description = is_scalar(
                 $data['description']
-            );
+            ) ? strval($data['description']) : '';
         }
         if (isset($data['start_time'])) {
             /**
@@ -133,14 +133,14 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['admission_mode'])) {
-            $this->admission_mode = strval(
+            $this->admission_mode = is_scalar(
                 $data['admission_mode']
-            );
+            ) ? strval($data['admission_mode']) : '';
         }
         if (isset($data['alias'])) {
-            $this->alias = strval(
+            $this->alias = is_scalar(
                 $data['alias']
-            );
+            ) ? strval($data['alias']) : '';
         }
         if (isset($data['scoreboard'])) {
             $this->scoreboard = intval(
@@ -163,9 +163,9 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['feedback'])) {
-            $this->feedback = strval(
+            $this->feedback = is_scalar(
                 $data['feedback']
-            );
+            ) ? strval($data['feedback']) : '';
         }
         if (isset($data['penalty'])) {
             $this->penalty = intval(
@@ -173,14 +173,14 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['penalty_type'])) {
-            $this->penalty_type = strval(
+            $this->penalty_type = is_scalar(
                 $data['penalty_type']
-            );
+            ) ? strval($data['penalty_type']) : '';
         }
         if (isset($data['penalty_calc_policy'])) {
-            $this->penalty_calc_policy = strval(
+            $this->penalty_calc_policy = is_scalar(
                 $data['penalty_calc_policy']
-            );
+            ) ? strval($data['penalty_calc_policy']) : '';
         }
         if (isset($data['show_scoreboard_after'])) {
             $this->show_scoreboard_after = boolval(
@@ -193,9 +193,9 @@ class Contests extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['languages'])) {
-            $this->languages = strval(
+            $this->languages = is_scalar(
                 $data['languages']
-            );
+            ) ? strval($data['languages']) : '';
         }
         if (isset($data['recommended'])) {
             $this->recommended = boolval(

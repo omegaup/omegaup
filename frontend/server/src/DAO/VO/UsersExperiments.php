@@ -36,9 +36,9 @@ class UsersExperiments extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['experiment'])) {
-            $this->experiment = strval(
+            $this->experiment = is_scalar(
                 $data['experiment']
-            );
+            ) ? strval($data['experiment']) : '';
         }
     }
 

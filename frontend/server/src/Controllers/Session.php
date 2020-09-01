@@ -88,15 +88,12 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
             return $authToken;
         }
-        if (
-            isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
-                && self::isAuthTokenValid(
-                    strval(
-                        $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]
-                    )
-                )
-        ) {
-            return strval($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+
+        $cookie = \OmegaUp\Request::getRequestVar(
+            OMEGAUP_AUTH_TOKEN_COOKIE_NAME
+        );
+        if (!empty($cookie) && self::isAuthTokenValid($cookie)) {
+            return $cookie;
         }
         return null;
     }
@@ -258,7 +255,9 @@ class Session extends \OmegaUp\Controllers\Controller {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => intval($identity->identity_id),
-            'ip' => ip2long(strval($_SERVER['REMOTE_ADDR'])),
+            'ip' => ip2long(
+                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+            ),
         ]));
 
         self::invalidateLocalCache();
@@ -525,7 +524,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             OMEGAUP_LINKEDIN_CLIENTID,
             OMEGAUP_LINKEDIN_SECRET,
             OMEGAUP_URL . '/login?linkedin',
-            isset($_GET['redirect']) ? strval($_GET['redirect']) : null
+            \OmegaUp\Request::getRequestVar('redirect')
         );
     }
     public static function getLinkedInLoginUrl(): string {
@@ -536,18 +535,17 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @return array<string, mixed>
      */
     public static function LoginViaLinkedIn(): array {
-        if (empty($_GET['code']) || empty($_GET['state'])) {
+        $code = \OmegaUp\Request::getRequestVar('code');
+        $state = \OmegaUp\Request::getRequestVar('state');
+        if (empty($code) || empty($state)) {
             return ['status' => 'error'];
         }
 
         try {
             $li = self::getLinkedInInstance();
-            $authToken = $li->getAuthToken(
-                strval($_GET['code']),
-                strval($_GET['state'])
-            );
+            $authToken = $li->getAuthToken($code, $state);
             $profile = $li->getProfileInfo($authToken);
-            $redirect = $li->extractRedirect(strval($_GET['state']));
+            $redirect = $li->extractRedirect($state);
             if (!is_null($redirect)) {
                 $_GET['redirect'] = $redirect;
             }
