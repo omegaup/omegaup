@@ -521,10 +521,11 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course' => strval($course->alias),
             'permissions' => 'clone',
         ];
+        $subject = strval($r->user->user_id);
         return [
             'token' => \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
                 $claims,
-                /*$subject=*/$r->identity
+                $subject
             ),
         ];
     }

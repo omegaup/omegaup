@@ -248,12 +248,12 @@ class SecurityTools {
      * gitserver that is valid for a single problem for 5 minutes.
      *
      * @param array<string, string> $claims
-     * @param \OmegaUp\DAO\VO\Identities $subject
+     * @param string $subject
      * @return string The Bearer authorization token.
      */
     public static function getCourseCloneAuthorizationToken(
         array $claims,
-        \OmegaUp\DAO\VO\Identities $subject
+        string $subject
     ): string {
         // Given that we already have an autoload configured, we cannot use
         // sodium_compat's (fast) autoloader. Instead, simulate what it does
@@ -297,8 +297,8 @@ class SecurityTools {
             ->setExpiration(
                 (new \DateTime('now'))->add(new \DateInterval('P7D'))
             )
-            ->setIssuer($subject->username ?? '')
-            ->setSubject(strval($subject->user_id ?? ''))
+            ->setIssuer('omegaUp frontend')
+            ->setSubject($subject)
             ->setClaims($claims);
         return $token->toString();
     }
