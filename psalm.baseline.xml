@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="3.14.2@3538fe1955d47f6ee926c0769d71af6db08aa488">
   <file src="frontend/server/src/ApiCaller.php">
-    <MixedArgument occurrences="3">
-      <code>$_SERVER['HTTP_REFERER']</code>
-      <code>$_SERVER['REQUEST_URI']</code>
-      <code>$_SERVER['REQUEST_URI']</code>
-    </MixedArgument>
     <PossiblyNullArgument occurrences="2">
       <code>$request-&gt;methodName</code>
       <code>$request-&gt;methodName</code>
@@ -37,9 +32,8 @@
     </MixedArgument>
   </file>
   <file src="frontend/server/src/Controllers/Contest.php">
-    <MixedArgument occurrences="4">
+    <MixedArgument occurrences="3">
       <code>$r['query']</code>
-      <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$field</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
@@ -49,11 +43,9 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Course.php">
-    <MixedArgument occurrences="6">
+    <MixedArgument occurrences="4">
       <code>$r['problems']</code>
-      <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$r['alias']</code>
-      <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$r['problem_alias']</code>
       <code>$r['username']</code>
     </MixedArgument>
@@ -84,14 +76,13 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Identity.php">
-    <MixedArgument occurrences="7">
+    <MixedArgument occurrences="6">
       <code>$r['country_id']</code>
       <code>$r['state_id']</code>
       <code>$r['country_id']</code>
       <code>$r['state_id']</code>
       <code>$request['lang']</code>
       <code>$_GET['lang']</code>
-      <code>$_SERVER['HTTP_ACCEPT_LANGUAGE']</code>
     </MixedArgument>
     <PossiblyNullArgument occurrences="2">
       <code>$identity-&gt;username</code>
@@ -195,8 +186,7 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Run.php">
-    <MixedArgument occurrences="6">
-      <code>$_SERVER['REMOTE_ADDR']</code>
+    <MixedArgument occurrences="5">
       <code>$filtered['guid']</code>
       <code>$filtered['language']</code>
       <code>$filtered['status']</code>
@@ -227,13 +217,12 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Session.php">
-    <MixedArgument occurrences="10">
+    <MixedArgument occurrences="9">
       <code>$r['auth_token']</code>
       <code>$_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]</code>
       <code>$_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]</code>
       <code>$r['auth_token']</code>
       <code>$r['auth_token']</code>
-      <code>$_SERVER['REMOTE_ADDR']</code>
       <code>$_GET['redirect']</code>
       <code>$_GET['code']</code>
       <code>$_GET['state']</code>
@@ -333,14 +322,12 @@
     </MixedArgument>
   </file>
   <file src="frontend/server/src/SessionManager.php">
-    <MixedArgument occurrences="2">
-      <code>$_SERVER['HTTP_COOKIE']</code>
+    <MixedArgument occurrences="1">
       <code>$_COOKIE[$name]</code>
     </MixedArgument>
   </file>
   <file src="frontend/server/src/UITools.php">
-    <MixedArgument occurrences="3">
-      <code>$_SERVER['REQUEST_URI']</code>
+    <MixedArgument occurrences="2">
       <code>$smartyProperties['title']</code>
       <code>$smarty-&gt;getConfigVars($titleVar)</code>
     </MixedArgument>
@@ -392,12 +379,6 @@
   <file src="frontend/www/arena/problemprint.php">
     <MixedArgument occurrences="1">
       <code>$r['problem_alias']</code>
-    </MixedArgument>
-  </file>
-  <file src="frontend/www/libinteractive/index.php">
-    <MixedArgument occurrences="2">
-      <code>$_SERVER['HTTP_ACCEPT_LANGUAGE']</code>
-      <code>$_SERVER['REQUEST_URI']</code>
     </MixedArgument>
   </file>
   <file src="frontend/www/userverifyemail.php">

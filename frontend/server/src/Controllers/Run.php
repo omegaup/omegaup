@@ -512,7 +512,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity_id' => $r->identity->identity_id,
             'submission_id' => $submission->submission_id,
             'problemset_id' => $submission->problemset_id,
-            'ip' => ip2long(strval($_SERVER['REMOTE_ADDR']))
+            'ip' => ip2long(
+                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+            ),
         ]));
 
         $problem->submissions++;

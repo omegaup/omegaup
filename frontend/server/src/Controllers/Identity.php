@@ -816,12 +816,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
         /** @var array<string, float> */
         $langs = [];
 
-        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        $acceptLanguage = \OmegaUp\Request::getServerVar(
+            'HTTP_ACCEPT_LANGUAGE'
+        );
+        if (!empty($acceptLanguage)) {
             // break up string into pieces (languages and q factors)
             if (
                 preg_match_all(
                     '/([a-z]{1,8}(?:-[a-z]{1,8})?)\s*(?:;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
-                    strval($_SERVER['HTTP_ACCEPT_LANGUAGE']),
+                    $acceptLanguage,
                     $langParse
                 ) !== false &&
                 !empty($langParse[1])
