@@ -3468,7 +3468,10 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Not logged, but there is no problem with this
-            /** @var null $r->identity */
+            /**
+             * @var null $r->identity
+             * @var null $r->identity->username
+             */
         }
         $date = !empty($r['date']) ? strval($r['date']) : null;
         $firstDay = self::getCurrentMonthFirstDay($date);

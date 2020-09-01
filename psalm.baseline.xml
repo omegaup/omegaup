@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="3.14.2@3538fe1955d47f6ee926c0769d71af6db08aa488">
-  <file src="frontend/server/bootstrap.php">
-    <MixedArgument occurrences="1">
-      <code>$_SERVER['HTTP_HOST']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/server/src/ApiCaller.php">
     <MixedArgument occurrences="3">
       <code>$_SERVER['HTTP_REFERER']</code>
@@ -155,7 +150,7 @@
       <code>$r['language']</code>
       <code>$r['language']</code>
     </MixedArgument>
-    <PossiblyNullArgument occurrences="28">
+    <PossiblyNullArgument occurrences="27">
       <code>$run-&gt;run_id</code>
       <code>$problem-&gt;alias</code>
       <code>$problem-&gt;alias</code>
@@ -181,7 +176,6 @@
       <code>$r['sort_order']</code>
       <code>$r['order_by']</code>
       <code>$r['language']</code>
-      <code>$r-&gt;identity-&gt;identity_id</code>
       <code>$problem-&gt;alias</code>
       <code>$e-&gt;parameter</code>
     </PossiblyNullArgument>

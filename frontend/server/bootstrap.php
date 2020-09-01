@@ -45,7 +45,8 @@ if (!defined('OMEGAUP_LOCKDOWN')) {
     define(
         'OMEGAUP_LOCKDOWN',
         isset($_SERVER['HTTP_HOST']) &&
-        strpos(strval($_SERVER['HTTP_HOST']), OMEGAUP_LOCKDOWN_DOMAIN) === 0
+        is_string($_SERVER['HTTP_HOST']) &&
+        strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0
     );
 }
 
