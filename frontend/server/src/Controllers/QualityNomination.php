@@ -64,11 +64,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     ];
 
     const ALLOWED_PUBLIC_TAGS = [
-        'problemTagInteractive',
-        'problemTagOutputOnly',
-        'problemTagLanguage',
-        'problemTagKarel',
-        'problemTagInputAndOutput',
         'problemTagArithmetic',
         'problemTagConditionals',
         'problemTagLoops',
@@ -629,9 +624,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{qualitynomination_id: int}
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Validate request
         $r->ensureMainUserIdentity();
@@ -685,9 +678,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiResolve(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         \OmegaUp\Validators::validateInEnum(
             $r['status'],
@@ -1012,9 +1003,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiList(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
@@ -1093,9 +1082,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page_size
      */
     public static function apiMyAssignedList(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Validate request
         $r->ensureMainUserIdentity();
@@ -1112,9 +1099,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
@@ -1169,9 +1154,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $qualitynomination_id
      */
     public static function apiDetails(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Validate request
         $r->ensureMainUserIdentity();
 
@@ -1273,9 +1256,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     public static function getDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         $r->ensureInt('qualitynomination_id');
@@ -1303,9 +1284,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      */
     public static function getListForSmarty(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         $r->ensureOptionalInt('page');
@@ -1341,9 +1320,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      */
     public static function getMyListForSmarty(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         $r->ensureOptionalInt('page');

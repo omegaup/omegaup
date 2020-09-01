@@ -60,24 +60,24 @@ class UserRank extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['username'])) {
-            $this->username = strval(
+            $this->username = is_scalar(
                 $data['username']
-            );
+            ) ? strval($data['username']) : '';
         }
         if (isset($data['name'])) {
-            $this->name = strval(
+            $this->name = is_scalar(
                 $data['name']
-            );
+            ) ? strval($data['name']) : '';
         }
         if (isset($data['country_id'])) {
-            $this->country_id = strval(
+            $this->country_id = is_scalar(
                 $data['country_id']
-            );
+            ) ? strval($data['country_id']) : '';
         }
         if (isset($data['state_id'])) {
-            $this->state_id = strval(
+            $this->state_id = is_scalar(
                 $data['state_id']
-            );
+            ) ? strval($data['state_id']) : '';
         }
         if (isset($data['school_id'])) {
             $this->school_id = intval(

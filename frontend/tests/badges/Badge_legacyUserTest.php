@@ -5,7 +5,8 @@
  *
  * @author RuizYugen
  */
-class LegacyUser extends \OmegaUp\Test\BadgesTestCase {
+// phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
+class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
     public function addProblemRun(\OmegaUp\DAO\VO\Identities $identity): void {
         $newProblem = \OmegaUp\Test\Factories\Problem::createProblem();
         $run = \OmegaUp\Test\Factories\Run::createRunToProblem(

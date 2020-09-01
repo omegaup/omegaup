@@ -37,9 +37,9 @@ class Emails extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['email'])) {
-            $this->email = strval(
+            $this->email = is_scalar(
                 $data['email']
-            );
+            ) ? strval($data['email']) : '';
         }
         if (isset($data['user_id'])) {
             $this->user_id = intval(
