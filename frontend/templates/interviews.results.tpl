@@ -1,7 +1,7 @@
 {include file='head.tpl' htmlTitle="{#interviewList#}" inline}
 
 <div class="page-header">
-	<h1><span>{#frontPageLoading#}</span><small></small></h1>
+	<h1><span><img src="/media/wait.gif" /></span><small></small></h1>
 	<h3><small></small></h3>
 </div>
 

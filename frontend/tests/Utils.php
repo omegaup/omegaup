@@ -207,6 +207,7 @@ class Utils {
             'Contest_Log',
             'Contests',
             'Courses',
+            'Course_Clone_Log',
             'Course_Identity_Request',
             'Course_Identity_Request_History',
             'Emails',
@@ -241,7 +242,6 @@ class Utils {
             'School_Of_The_Month',
             'Submissions',
             'Submission_Log',
-            'Tags',
             'User_Roles',
             'User_Rank',
             'Users',
@@ -264,6 +264,14 @@ class Utils {
             // Tables with special entries.
             \OmegaUp\MySQLConnection::getInstance()->Execute(
                 'DELETE FROM `Groups_` WHERE `alias` NOT LIKE "%:%";'
+            );
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                'DELETE FROM
+                    `Tags`
+                WHERE
+                    `name` NOT LIKE "problemTag%" AND
+                    `name` NOT LIKE "problemRestrictedTag%" AND
+                    `name` NOT LIKE "problemLevel%";'
             );
 
             // The format of the question changed from this id
@@ -353,8 +361,7 @@ class Utils {
         ));
         self::shellExec(
             ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/cron/update_ranks.py' .
+             dirname(__DIR__, 2) . '/stuff/cron/update_ranks.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --update-coder-of-the-month ' .
@@ -372,8 +379,7 @@ class Utils {
         self::commit();
         self::shellExec(
             ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/cron/aggregate_feedback.py' .
+             dirname(__DIR__, 2) . '/stuff/cron/aggregate_feedback.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .
@@ -388,8 +394,7 @@ class Utils {
         self::commit();
         self::shellExec(
             ('python3 ' .
-             escapeshellarg(strval(OMEGAUP_ROOT)) .
-             '/../stuff/cron/assign_badges.py' .
+             dirname(__DIR__, 2) . '/stuff/cron/assign_badges.py' .
              ' --verbose ' .
              ' --logfile ' . escapeshellarg(OMEGAUP_LOG_FILE) .
              ' --host ' . escapeshellarg(OMEGAUP_DB_HOST) .

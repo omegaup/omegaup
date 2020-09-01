@@ -5,7 +5,8 @@
  *
  * @author RuizYugen
  */
-class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
+// phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
+class Badge_cppCourseGraduateTest extends \OmegaUp\Test\BadgesTestCase {
     protected $courseData;
     protected $students;
     protected $submissionSource;
@@ -13,7 +14,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
 
     public function setUp(): void {
         parent::setUp();
-        $courseAlias = 'Curso-de-Python-FutureLabs';
+        $courseAlias = 'introduccion_a_cpp';
 
         //create course
         $this->courseData = \OmegaUp\Test\Factories\Course::createCourseWithAssignments(
@@ -60,10 +61,10 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             );
         }
 
-        $this->submissionSource = 'print(3)';
+        $this->submissionSource = "#include <stdio.h>\nint main() { printf(\"3\"); return 0; }";
     }
 
-    public function testCoursePythonUserEarnBadge() {
+    public function testCourseCppUserEarnBadge() {
         // This user will receive the badge because they will resolve 4 differents problems
         // of the course
         $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
@@ -75,7 +76,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             'auth_token' => $studentLogin->auth_token,
             'problemset_id' => $this->courseData['assignment_problemset_ids'][0],
             'problem_alias' => $this->problems[0]['problem']->alias,
-        'language' => 'py3',
+        'language' => 'c11-gcc',
         'source' => $this->submissionSource,
         ]));
         \OmegaUp\Test\Factories\Run::gradeRun(
@@ -89,7 +90,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             'auth_token' => $studentLogin->auth_token,
             'problemset_id' => $this->courseData['assignment_problemset_ids'][0],
             'problem_alias' => $this->problems[1]['problem']->alias,
-            'language' => 'py3',
+            'language' => 'c11-gcc',
         'source' => $this->submissionSource,
         ]));
         \OmegaUp\Test\Factories\Run::gradeRun(
@@ -105,7 +106,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             'auth_token' => $studentLogin->auth_token,
             'problemset_id' => $this->courseData['assignment_problemset_ids'][1],
             'problem_alias' => $this->problems[2]['problem']->alias,
-            'language' => 'py3',
+            'language' => 'c11-gcc',
             'source' => $this->submissionSource,
         ]));
         \OmegaUp\Test\Factories\Run::gradeRun(
@@ -116,13 +117,13 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             $runResponse['guid']
         );
 
-        $queryPath = static::OMEGAUP_BADGES_ROOT . '/pythonCourseGraduate/' . static::QUERY_FILE;
+        $queryPath = static::OMEGAUP_BADGES_ROOT . '/cppCourseGraduate/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [$this->students[0]->user_id];
         $this->assertEquals($expected, $results);
     }
 
-    public function testCoursePythonUserDoNotEarnBadge() {
+    public function testCourseCppUserDoNotEarnBadge() {
         // This user will not receive the badge because they will only solve a problem
         // with multiple submissions.
         $studentLogin = \OmegaUp\Test\ControllerTestCase::login(
@@ -135,7 +136,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
                 'auth_token' => $studentLogin->auth_token,
                 'problemset_id' => $this->courseData['assignment_problemset_ids'][0],
                 'problem_alias' => $this->problems[0]['problem']->alias,
-                'language' => 'py3',
+                'language' => 'c11-gcc',
                 'source' => $this->submissionSource,
             ]));
             \OmegaUp\Test\Factories\Run::gradeRun(
@@ -147,7 +148,7 @@ class PythonCourseGraduate extends \OmegaUp\Test\BadgesTestCase {
             );
         }
 
-        $queryPath = static::OMEGAUP_BADGES_ROOT . '/pythonCourseGraduate/' . static::QUERY_FILE;
+        $queryPath = static::OMEGAUP_BADGES_ROOT . '/cppCourseGraduate/' . static::QUERY_FILE;
         $results = self::getSortedResults(file_get_contents($queryPath));
         $expected = [];
         $this->assertEquals($expected, $results);
