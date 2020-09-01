@@ -1,11 +1,11 @@
 <template>
-    <div class="card-header mb-3">
-      <h1>{{ T.courseCardAboutCourses }}</h1>
-      <p>{{ T.courseCardAboutCourses }}</p>
-      <div class="text-right align-middle">
-        <a v-bind:href="`/course/list/`">{{ T.wordsReadMore }}</a>
-      </div>
+  <div class="card-header mb-3">
+    <h1>{{ T.courseCardAboutCourses }}</h1>
+    <p>{{ T.courseCardAboutCourses }}</p>
+    <div class="text-right align-middle">
+      <a v-bind:href="`/course/list/`">{{ T.wordsReadMore }}</a>
     </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -16,6 +16,6 @@ import T from '../../lang';
 
 @Component
 export default class CourseDescriptionCard extends Vue {
-    T = T;
+  T = T;
 }
 </script>
