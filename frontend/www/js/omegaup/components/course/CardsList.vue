@@ -1,13 +1,7 @@
 <template>
   <div>
-    <!--<h1 class="card-title">{{ T.navAllCourses }}</h1>-->
-    <div class="card-header mb-3">
-      <h1>{{ T.courseCardAboutCourses }}</h1>
-      <p>{{ T.courseCardAboutCourses }}</p>
-      <div class="text-right align-middle">
-        <a v-bind:href="`/course/list/`">{{ T.wordsReadMore }}</a>
-      </div>
-    </div>
+    <h1 class="card-title">{{ T.navAllCourses }}</h1>
+    <omegaup-description-card></omegaup-description-card>
 
     <div class="container">
       <div
@@ -81,6 +75,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import course_CourseCard from './CourseCard.vue';
+import course_DescriptionCard from './CourseDescriptionCard.vue';
 
 import {
   FontAwesomeIcon,
@@ -93,6 +88,7 @@ library.add(fas);
 
 @Component({
   components: {
+    'omegaup-description-card': course_DescriptionCard,
     'omegaup-course-card': course_CourseCard,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
