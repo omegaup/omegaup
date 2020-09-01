@@ -215,4 +215,53 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
             $results[2]['progress'][$assignment][$problemsData[2]['problem']->alias]
         );
     }
+
+    public function testGetStudentsProgressForCourseWithZeroes() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData['points'] = 0;
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignment = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        // assignment is going to have the first 3 problems
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignment,
+            [$problemData]
+        );
+
+        [
+            'user' => $user,
+            'identity' => $participant
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $results = \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            $courseData['course']->course_id,
+            $courseData['course']->group_id,
+        );
+
+        $this->assertCount(1, $results);
+        $this->assertEquals($participant->name, $results[0]['name']);
+        $this->assertArrayHasKey($assignment, $results[0]['progress']);
+        $this->assertEquals(
+            0,
+            $results[0]['progress'][$assignment][$problemData['problem']->alias]
+        );
+    }
 }
