@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import course_Clone from '../components/course/ClonePrivate.vue';
+import course_Clone from '../components/course/CloneWithToken.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -7,7 +7,7 @@ import * as ui from '../ui';
 import T from '../lang';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.CourseDetailsPayload();
+  const payload = types.payloadParsers.CourseCloneDetailsPayload();
   new Vue({
     el: '#main-container',
     render: function (createElement) {

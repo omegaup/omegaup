@@ -67,7 +67,7 @@ library.add(fas);
     'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
-export default class CourseClonePrivate extends Vue {
+export default class CourseCloneWithToken extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() username!: string;
   @Prop() classname!: string;
