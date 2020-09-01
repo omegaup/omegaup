@@ -326,7 +326,7 @@
 	"courseEditAdmissionModeDescription": "Manual: Los estudiantes no pueden inscribirse a menos que sean expl\u00edcitamente invitados.\nCompartir URL: Cualquiera con el link puede solicitar inscribirse. Adicionalmente, puedes agregar de forma manual los nombres de usuario de los estudiantes.",
 	"courseEditClone": "Clonar",
 	"courseEditCourseClonedSuccessfully": "\u00a1Tu curso ha sido clonado exitosamente! <a href=\"/course/%(course_alias)/edit/\">Editar curso</a>",
-	"courseEditCourseEdited": "Tu curso ha sido editado!",
+	"courseEditCourseEdited": "\u00a1Tu curso ha sido editado!",
 	"courseEditCourseEditedAndGoToCourse": "\u00a1Tu curso ha sido editado! <a href=\"/course/%(alias)\">Ir al curso</a>",
 	"courseEditGoToCourse": "Ir al curso",
 	"courseEditGroupAdminsEmpty": "No hay grupos de administradores",
