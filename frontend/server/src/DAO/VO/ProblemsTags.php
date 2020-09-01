@@ -42,9 +42,9 @@ class ProblemsTags extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['source'])) {
-            $this->source = strval(
+            $this->source = is_scalar(
                 $data['source']
-            );
+            ) ? strval($data['source']) : '';
         }
     }
 

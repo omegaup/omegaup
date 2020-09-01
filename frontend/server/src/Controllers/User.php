@@ -165,7 +165,9 @@ class User extends \OmegaUp\Controllers\Controller {
             $data = [
                 'secret' => OMEGAUP_RECAPTCHA_SECRET,
                 'response' => $createUserParams->recaptcha,
-                'remoteip' => $_SERVER['REMOTE_ADDR'],
+                'remoteip' => (
+                    \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                ),
             ];
 
             // use key 'http' even if you send the request to https://...
@@ -3468,7 +3470,10 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Not logged, but there is no problem with this
-            /** @var null $r->identity */
+            /**
+             * @var null $r->identity
+             * @var null $r->identity->username
+             */
         }
         $date = !empty($r['date']) ? strval($r['date']) : null;
         $firstDay = self::getCurrentMonthFirstDay($date);

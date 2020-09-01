@@ -50,19 +50,19 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['description'])) {
-            $this->description = strval(
+            $this->description = is_scalar(
                 $data['description']
-            );
+            ) ? strval($data['description']) : '';
         }
         if (isset($data['time'])) {
-            $this->time = strval(
+            $this->time = is_scalar(
                 $data['time']
-            );
+            ) ? strval($data['time']) : '';
         }
         if (isset($data['interview_url'])) {
-            $this->interview_url = strval(
+            $this->interview_url = is_scalar(
                 $data['interview_url']
-            );
+            ) ? strval($data['interview_url']) : '';
         }
         if (isset($data['ranking'])) {
             $this->ranking = intval(
@@ -80,9 +80,9 @@ class CoderOfTheMonth extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['category'])) {
-            $this->category = strval(
+            $this->category = is_scalar(
                 $data['category']
-            );
+            ) ? strval($data['category']) : '';
         }
         if (isset($data['score'])) {
             $this->score = floatval(

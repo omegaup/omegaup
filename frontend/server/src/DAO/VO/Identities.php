@@ -44,19 +44,19 @@ class Identities extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['username'])) {
-            $this->username = strval(
+            $this->username = is_scalar(
                 $data['username']
-            );
+            ) ? strval($data['username']) : '';
         }
         if (isset($data['password'])) {
-            $this->password = strval(
+            $this->password = is_scalar(
                 $data['password']
-            );
+            ) ? strval($data['password']) : '';
         }
         if (isset($data['name'])) {
-            $this->name = strval(
+            $this->name = is_scalar(
                 $data['name']
-            );
+            ) ? strval($data['name']) : '';
         }
         if (isset($data['user_id'])) {
             $this->user_id = intval(
@@ -69,19 +69,19 @@ class Identities extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['country_id'])) {
-            $this->country_id = strval(
+            $this->country_id = is_scalar(
                 $data['country_id']
-            );
+            ) ? strval($data['country_id']) : '';
         }
         if (isset($data['state_id'])) {
-            $this->state_id = strval(
+            $this->state_id = is_scalar(
                 $data['state_id']
-            );
+            ) ? strval($data['state_id']) : '';
         }
         if (isset($data['gender'])) {
-            $this->gender = strval(
+            $this->gender = is_scalar(
                 $data['gender']
-            );
+            ) ? strval($data['gender']) : '';
         }
         if (isset($data['current_identity_school_id'])) {
             $this->current_identity_school_id = intval(

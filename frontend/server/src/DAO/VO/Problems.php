@@ -68,29 +68,29 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['title'])) {
-            $this->title = strval(
+            $this->title = is_scalar(
                 $data['title']
-            );
+            ) ? strval($data['title']) : '';
         }
         if (isset($data['alias'])) {
-            $this->alias = strval(
+            $this->alias = is_scalar(
                 $data['alias']
-            );
+            ) ? strval($data['alias']) : '';
         }
         if (isset($data['commit'])) {
-            $this->commit = strval(
+            $this->commit = is_scalar(
                 $data['commit']
-            );
+            ) ? strval($data['commit']) : '';
         }
         if (isset($data['current_version'])) {
-            $this->current_version = strval(
+            $this->current_version = is_scalar(
                 $data['current_version']
-            );
+            ) ? strval($data['current_version']) : '';
         }
         if (isset($data['languages'])) {
-            $this->languages = strval(
+            $this->languages = is_scalar(
                 $data['languages']
-            );
+            ) ? strval($data['languages']) : '';
         }
         if (isset($data['input_limit'])) {
             $this->input_limit = intval(
@@ -133,14 +133,14 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['source'])) {
-            $this->source = strval(
+            $this->source = is_scalar(
                 $data['source']
-            );
+            ) ? strval($data['source']) : '';
         }
         if (isset($data['order'])) {
-            $this->order = strval(
+            $this->order = is_scalar(
                 $data['order']
-            );
+            ) ? strval($data['order']) : '';
         }
         if (isset($data['deprecated'])) {
             $this->deprecated = boolval(
@@ -158,14 +158,14 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['quality_histogram'])) {
-            $this->quality_histogram = strval(
+            $this->quality_histogram = is_scalar(
                 $data['quality_histogram']
-            );
+            ) ? strval($data['quality_histogram']) : '';
         }
         if (isset($data['difficulty_histogram'])) {
-            $this->difficulty_histogram = strval(
+            $this->difficulty_histogram = is_scalar(
                 $data['difficulty_histogram']
-            );
+            ) ? strval($data['difficulty_histogram']) : '';
         }
         if (isset($data['quality_seal'])) {
             $this->quality_seal = boolval(
@@ -173,9 +173,9 @@ class Problems extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['show_diff'])) {
-            $this->show_diff = strval(
+            $this->show_diff = is_scalar(
                 $data['show_diff']
-            );
+            ) ? strval($data['show_diff']) : '';
         }
         if (isset($data['allow_user_add_tags'])) {
             $this->allow_user_add_tags = boolval(

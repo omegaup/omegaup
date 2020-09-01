@@ -658,7 +658,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         } finally {
             \OmegaUp\DAO\CourseCloneLog::create(
                 new \OmegaUp\DAO\VO\CourseCloneLog([
-                    'ip' => strval($_SERVER['REMOTE_ADDR']),
+                    'ip' => (
+                        \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                    ),
                     'course_id' => $originalCourse->course_id,
                     'new_course_id' => !is_null(
                         $course
@@ -2526,9 +2528,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function getCourseCloneDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
         $r->ensureMainUserIdentity();
         $alias = $r->ensureString(
             'course_alias',
@@ -3785,7 +3784,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\ProblemsetAccessLog::create(new \OmegaUp\DAO\VO\ProblemsetAccessLog([
                 'identity_id' => $r->identity->identity_id,
                 'problemset_id' => $tokenAuthenticationResult['assignment']->problemset_id,
-                'ip' => ip2long(strval($_SERVER['REMOTE_ADDR'])),
+                'ip' => ip2long(
+                    \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                ),
             ]));
         }
 

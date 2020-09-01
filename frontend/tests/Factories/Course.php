@@ -268,7 +268,7 @@ class Course {
     }
 
     /**
-     * @param list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}> $problems
+     * @param list<array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request, points?: float}> $problems
      * @return list<array{status: 'ok'}>
      */
     public static function addProblemsToAssignment(
@@ -285,6 +285,7 @@ class Course {
                 'course_alias' => $courseAlias,
                 'assignment_alias' => $assignmentAlias,
                 'problem_alias' => $problem['problem']->alias,
+                'points' => $problem['points'] ?? 100.0,
             ]));
         }
 

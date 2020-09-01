@@ -331,11 +331,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             }
 
             $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = (
-                $row['problem_score'] == 0
+                $row['problem_points'] == 0
             ) ? 0 :
-            floatval(
-                $row['problem_score']
-            ) / $row['problem_points'] * 100;
+            floatval($row['problem_score']) / $row['problem_points'] * 100;
         }
 
         usort(

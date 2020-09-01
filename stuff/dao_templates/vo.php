@@ -56,9 +56,9 @@ class {{ table.class_name }} extends \OmegaUp\DAO\VO\VO {
                 $data['{{ column.name }}']
             );
 {%- else %}
-            $this->{{ column.name }} = strval(
+            $this->{{ column.name }} = is_scalar(
                 $data['{{ column.name }}']
-            );
+            ) ? strval($data['{{ column.name }}']) : '';
 {%- endif %}
     {%- if column.default == 'CURRENT_TIMESTAMP' %}
         } else {
