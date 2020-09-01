@@ -4579,7 +4579,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'clarifications' => \OmegaUp\DAO\Clarifications::getProblemClarifications(
                     $problem->problem_id,
                     $isAdmin,
-                    $r->identity->identity_id,
+                    intval($r->identity->identity_id),
                     /*$offset=*/null,
                     /*rowcount=*/0
                 ),
