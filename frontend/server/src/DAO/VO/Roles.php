@@ -37,14 +37,14 @@ class Roles extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['name'])) {
-            $this->name = strval(
+            $this->name = is_scalar(
                 $data['name']
-            );
+            ) ? strval($data['name']) : '';
         }
         if (isset($data['description'])) {
-            $this->description = strval(
+            $this->description = is_scalar(
                 $data['description']
-            );
+            ) ? strval($data['description']) : '';
         }
     }
 
