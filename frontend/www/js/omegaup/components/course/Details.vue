@@ -212,7 +212,7 @@
             <omegaup-course-clone
               v-bind:initial-alias="course.alias"
               v-bind:initial-name="course.name"
-              v-on:emit-clone="
+              v-on:clone="
                 (alias, name, startTime) =>
                   $emit('clone', alias, name, startTime)
               "

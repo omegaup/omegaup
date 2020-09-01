@@ -16,7 +16,7 @@ describe('Clone.vue', () => {
     });
 
     expect(
-      wrapper.find('.omegaup-course-clone input[type="date"]').text(),
+      wrapper.find('div[data-course-clone] input[type="date"]').text(),
     ).toBe('');
   });
 });
