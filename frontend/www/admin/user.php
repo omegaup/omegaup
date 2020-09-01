@@ -7,7 +7,11 @@ require_once('../../server/bootstrap.php');
 \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
 \OmegaUp\UITools::redirectIfNoAdmin();
 
-$username = strval($_REQUEST['username']);
+$username = \OmegaUp\Request::getRequestVar('username');
+if (is_null($username)) {
+    header('HTTP/1.1 404 Not found');
+    die();
+}
 $user = \OmegaUp\DAO\Users::FindByUsername($username);
 if (is_null($user) || is_null($user->user_id)) {
     header('HTTP/1.1 404 Not found');

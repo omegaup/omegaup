@@ -76,13 +76,12 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Identity.php">
-    <MixedArgument occurrences="6">
+    <MixedArgument occurrences="5">
       <code>$r['country_id']</code>
       <code>$r['state_id']</code>
       <code>$r['country_id']</code>
       <code>$r['state_id']</code>
       <code>$request['lang']</code>
-      <code>$_GET['lang']</code>
     </MixedArgument>
     <PossiblyNullArgument occurrences="2">
       <code>$identity-&gt;username</code>
@@ -217,16 +216,10 @@
     </PossiblyNullArgument>
   </file>
   <file src="frontend/server/src/Controllers/Session.php">
-    <MixedArgument occurrences="9">
-      <code>$r['auth_token']</code>
-      <code>$_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]</code>
-      <code>$_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]</code>
+    <MixedArgument occurrences="3">
       <code>$r['auth_token']</code>
       <code>$r['auth_token']</code>
-      <code>$_GET['redirect']</code>
-      <code>$_GET['code']</code>
-      <code>$_GET['state']</code>
-      <code>$_GET['state']</code>
+      <code>$r['auth_token']</code>
     </MixedArgument>
     <PossiblyNullArgument occurrences="3">
       <code>$helper-&gt;getError()</code>
@@ -371,19 +364,9 @@
       <code>$r['name']</code>
     </MixedArgument>
   </file>
-  <file src="frontend/www/admin/user.php">
-    <MixedArgument occurrences="1">
-      <code>$_REQUEST['username']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/www/arena/problemprint.php">
     <MixedArgument occurrences="1">
       <code>$r['problem_alias']</code>
-    </MixedArgument>
-  </file>
-  <file src="frontend/www/userverifyemail.php">
-    <MixedArgument occurrences="1">
-      <code>$_REQUEST['redirecttointerview']</code>
     </MixedArgument>
   </file>
 </files>

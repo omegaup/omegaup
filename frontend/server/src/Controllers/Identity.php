@@ -788,10 +788,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 strval($request['lang'])
             );
         }
-        if (isset($_GET['lang'])) {
-            return self::convertToSupportedLanguage(
-                strval($_GET['lang'])
-            );
+        $requestLang = \OmegaUp\Request::getRequestVar('lang');
+        if (!empty($requestLang)) {
+            return self::convertToSupportedLanguage($requestLang);
         }
 
         try {
