@@ -21,7 +21,8 @@
 					"show_diff": "examples",
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-					"email_clarifications": 1
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -45,7 +46,8 @@
 					"show_diff": "all",
 					"allow_user_add_tags": "true",
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-					"email_clarifications": 1
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/triangulos.zip"
@@ -68,7 +70,8 @@
 					"allow_user_add_tags": "true",
 					"source": "omegaUp classics",
 					"languages": "kp,kj",
-					"email_clarifications": 1
+					"email_clarifications": 1,
+					"problem_level": "problemLevelBasicIntroductionToProgramming"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/karel_helloworld.zip"
@@ -91,6 +94,7 @@
 					"penalty": 0,
 					"feedback": "detailed",
 					"penalty_type": "contest_start",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"penalty_calc_policy": "sum",
 					"admission_mode": "private",
 					"show_scoreboard_after": "true"
@@ -116,7 +120,8 @@
 				"api": "/contest/update/",
 				"params": {
 					"contest_alias": "prueba",
-					"admission_mode": "public"
+					"admission_mode": "public",
+					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua"
 				}
 			},
 			{

@@ -365,11 +365,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         /** @var null|int */
         $problemsetId = null;
         if ($isPractice) {
-            if (OMEGAUP_LOCKDOWN) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'lockdown'
-                );
-            }
+            \OmegaUp\Controllers\Controller::ensureNotInLockdown();
             $submitDelay = 0;
             $type = 'normal';
         } else {
@@ -1145,6 +1141,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         bool $showDetails
     ): array {
         $response = [];
+
+        /** @psalm-suppress TypeDoesNotContainType this can be defined to true sometimes. */
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
@@ -1186,9 +1184,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDownload(\OmegaUp\Request $r): void {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Get the user who is calling this API
         $r->ensureIdentity();
         $showDiff = $r->ensureOptionalBool('show_diff') ?? false;
@@ -1318,7 +1314,11 @@ class Run extends \OmegaUp\Controllers\Controller {
     ): ?string {
         if (
             !defined('AWS_CLI_SECRET_ACCESS_KEY') ||
-            empty(AWS_CLI_SECRET_ACCESS_KEY)
+            !defined('AWS_CLI_ACCESS_KEY_ID') ||
+            empty(AWS_CLI_SECRET_ACCESS_KEY) ||
+            empty(AWS_CLI_ACCESS_KEY_ID) ||
+            !is_string(AWS_CLI_SECRET_ACCESS_KEY) ||
+            !is_string(AWS_CLI_ACCESS_KEY_ID)
         ) {
             return null;
         }
@@ -1326,8 +1326,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (strpos($resourcePath, '/') !== 0) {
             $resourcePath = "/{$resourcePath}";
         }
-        $accessKeyId = strval(AWS_CLI_ACCESS_KEY_ID);
-        $secretAccessKey = strval(AWS_CLI_SECRET_ACCESS_KEY);
+        $accessKeyId = AWS_CLI_ACCESS_KEY_ID;
+        $secretAccessKey = AWS_CLI_SECRET_ACCESS_KEY;
         $regionName = 'us-east-1';
         $bucketName = 'omegaup-runs';
         $serviceName = 's3';

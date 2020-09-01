@@ -25,7 +25,7 @@ fi
 # This runs the controllers + badges PHPUnit tests, as well as the MySQL return
 # type check.
 "${OMEGAUP_ROOT}/stuff/mysql_types.sh"
-"${OMEGAUP_ROOT}/vendor/bin/psalm"
+"${OMEGAUP_ROOT}/vendor/bin/psalm" --update-baseline --show-info=false
 
 if [[ "${IN_DOCKER}" == 1 ]]; then
 	echo "Please run \`./stuff/lint.sh ${REF}\` outside the container after this."

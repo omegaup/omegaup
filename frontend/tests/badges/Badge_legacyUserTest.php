@@ -5,7 +5,8 @@
  *
  * @author RuizYugen
  */
-class LegacyUser extends \OmegaUp\Test\BadgesTestCase {
+// phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
+class Badge_legacyUserTest extends \OmegaUp\Test\BadgesTestCase {
     public function addProblemRun(\OmegaUp\DAO\VO\Identities $identity): void {
         $newProblem = \OmegaUp\Test\Factories\Problem::createProblem();
         $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
@@ -142,6 +143,7 @@ class LegacyUser extends \OmegaUp\Test\BadgesTestCase {
             'penalty' => 0,
             'feedback' => 'detailed',
             'penalty_type' => 'contest_start',
+            'languages' => 'c11-gcc',
             'penalty_calc_policy' => 'sum',
             'admission_mode' => 'private',
             'show_scoreboard_after' => 'true',

@@ -14,7 +14,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
-        \OmegaUp\Test\Factories\Problem::initPublicTags();
     }
 
     /**
@@ -412,7 +411,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Delete the image and check that it exists after
         // regeneration.
         unlink(IMAGES_PATH . $imagePath);
-        $this->assertFileNotExists(IMAGES_PATH . $imagePath);
+        $this->assertFileDoesNotExist(IMAGES_PATH . $imagePath);
         \OmegaUp\Controllers\Problem::regenerateImage(
             $r['problem_alias'],
             $imageGitObjectId,
@@ -673,6 +672,11 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->accepted);
         $this->assertEquals(0, $problem->difficulty);
 
+        \OmegaUp\Controllers\Problem::regenerateTemplates(
+            $problem->alias,
+            $problem->commit
+        );
+
         // Verify that the templates were generated.
         $this->assertTrue(
             file_exists(
@@ -748,6 +752,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'title' => $title,
             'problem_alias' => $problemAlias,
             'source' => 'yo',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         $response = \OmegaUp\Controllers\Problem::apiDetails(

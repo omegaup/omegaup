@@ -31,6 +31,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
+ * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}
+ * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
@@ -486,6 +488,48 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{token: string}
+     *
+     * @omegaup-request-param string $course_alias
+     */
+    public static function apiGenerateTokenForCloneCourse(
+        \OmegaUp\Request $r
+    ): array {
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
+
+        $r->ensureMainUserIdentity();
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
+                $courseAlias
+            )
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        if ($course->admission_mode === \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException(
+                'unnecessaryTokenForPublicCourses'
+            );
+        }
+
+        $claims = [
+            'course' => strval($course->alias),
+            'permissions' => 'clone',
+        ];
+        $subject = strval($r->user->user_id);
+        return [
+            'token' => \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
+                $claims,
+                $subject
+            ),
+        ];
+    }
+
+    /**
      * Clone a course
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -499,9 +543,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param OmegaUp\Timestamp $start_time
      */
     public static function apiClone(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -522,21 +564,25 @@ class Course extends \OmegaUp\Controllers\Controller {
         }
 
         \OmegaUp\DAO\DAO::transBegin();
+        $course = null;
 
         try {
             // Create the course (and group)
-            $course = \OmegaUp\Controllers\Course::createCourseAndGroup(new \OmegaUp\DAO\VO\Courses([
-                'name' => $r['name'],
-                'description' => $originalCourse->description,
-                'alias' => $r['alias'],
-                'school_id' => $originalCourse->school_id,
-                'start_time' => $startTime,
-                'finish_time' => $cloneCourseFinishTime,
-                'admission_mode' => self::ADMISSION_MODE_PRIVATE,
-                'show_scoreboard' => $originalCourse->show_scoreboard,
-                'needs_basic_information' => $originalCourse->needs_basic_information,
-                'requests_user_information' => $originalCourse->requests_user_information
-            ]), $r->user);
+            $course = \OmegaUp\Controllers\Course::createCourseAndGroup(
+                new \OmegaUp\DAO\VO\Courses([
+                    'name' => $r['name'],
+                    'description' => $originalCourse->description,
+                    'alias' => $r['alias'],
+                    'school_id' => $originalCourse->school_id,
+                    'start_time' => $startTime,
+                    'finish_time' => $cloneCourseFinishTime,
+                    'admission_mode' => self::ADMISSION_MODE_PRIVATE,
+                    'show_scoreboard' => $originalCourse->show_scoreboard,
+                    'needs_basic_information' => $originalCourse->needs_basic_information,
+                    'requests_user_information' => $originalCourse->requests_user_information
+                ]),
+                $r->user
+            );
 
             $assignmentsProblems = \OmegaUp\DAO\ProblemsetProblems::getProblemsAssignmentByCourseAlias(
                 $originalCourse
@@ -591,9 +637,25 @@ class Course extends \OmegaUp\Controllers\Controller {
                 }
             }
             \OmegaUp\DAO\DAO::transEnd();
+            $result = 'success';
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
+            $result = 'unknown';
             throw $e;
+        } finally {
+            \OmegaUp\DAO\CourseCloneLog::create(
+                new \OmegaUp\DAO\VO\CourseCloneLog([
+                    'ip' => strval($_SERVER['REMOTE_ADDR']),
+                    'course_id' => $originalCourse->course_id,
+                    'new_course_id' => !is_null(
+                        $course
+                    ) ? $course->course_id : null,
+                    'token_payload' => '',
+                    'timestamp' => \OmegaUp\Time::get(),
+                    'user_id' => $r->user->user_id,
+                    'result' => $result,
+                ])
+            );
         }
 
         return [
@@ -623,9 +685,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $unlimited_duration
      */
     public static function apiCreate(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         if (isset($r['public'])) {
@@ -853,9 +913,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $unlimited_duration
      */
     public static function apiCreateAssignment(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -914,9 +972,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $unlimited_duration
      */
     public static function apiUpdateAssignment(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
@@ -1016,9 +1072,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: 'ok'}
      */
     public static function apiAddProblem(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1089,9 +1143,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1190,9 +1242,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1276,9 +1326,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{identities: list<string>}
      */
     public static function apiGetProblemUsers(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1326,9 +1374,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiRemoveProblem(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1414,9 +1460,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function apiListAssignments(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1473,9 +1517,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course_alias
      */
     public static function apiRemoveAssignment(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1610,9 +1652,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page_size
      */
     public static function apiListCourses(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
 
@@ -1827,9 +1867,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{students: list<CourseStudent>}
      */
     public static function apiListStudents(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1863,9 +1901,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{problems: list<CourseProblem>}
      */
     public static function apiStudentProgress(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -1960,9 +1996,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{assignments: AssignmentProgress}
      */
     public static function apiMyProgress(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['alias'], 'alias');
@@ -2009,9 +2043,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddStudent(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
 
@@ -2151,9 +2183,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiRemoveStudent(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -2242,9 +2272,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddAdmin(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
@@ -2360,9 +2388,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddGroupAdmin(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
@@ -2993,6 +3019,47 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @omegaup-request-param mixed $course
+     *
+     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: string}, entrypoint: string}
+     */
+    public static function getCourseStatisticsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureIdentity();
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
+
+        $course = self::validateCourseExists($r['course']);
+
+        if (is_null($course->course_id) || is_null($course->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'course' => self::getCommonCourseDetails(
+                        $course,
+                        $r->identity
+                    ),
+                    'problemStats' => \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
+                        $course->course_id,
+                        $course->group_id
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseStatistics'
+                ),
+            ],
+            'entrypoint' => 'course_statistics'
+        ];
+    }
+
+    /**
      * @param CoursesList $courses
      * @param list<string> $coursesTypes
      *
@@ -3048,9 +3115,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
      */
     public static function getIntroDetails(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
@@ -3406,9 +3471,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return CourseDetails
      */
     public static function apiAdminDetails(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['alias'], 'alias');
         $course = self::validateCourseExists($r['alias']);
@@ -3608,9 +3671,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $token
      */
     public static function apiAssignmentDetails(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course'],
             'course'
@@ -3936,9 +3997,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return CourseDetails
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -3980,9 +4039,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param bool|null $unlimited_duration
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureIdentity();
         \OmegaUp\Validators::validateStringNonEmpty(

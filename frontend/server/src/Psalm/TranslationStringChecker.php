@@ -35,8 +35,8 @@ class TranslationStringChecker implements
     public static function afterAnalysis(
         \Psalm\Codebase $codebase,
         array $issues,
-        array $buildInfo,
-        \Psalm\SourceControl\SourceControlInfo $sourceControlInfo = null
+        array $build_info,
+        \Psalm\SourceControl\SourceControlInfo $source_control_info = null
     ) {
     }
 
@@ -66,16 +66,16 @@ class TranslationStringChecker implements
     /**
      * Called after a statement has been checked
      *
-     * @param \Psalm\FileManipulation[] $fileReplacements
+     * @param \Psalm\FileManipulation[] $file_replacements
      *
      * @return null|false
      */
     public static function afterExpressionAnalysis(
         \PhpParser\Node\Expr $expr,
         \Psalm\Context $context,
-        \Psalm\StatementsSource $statementsSource,
+        \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
-        array &$fileReplacements = []
+        array &$file_replacements = []
     ) {
         if (!($expr instanceof \PhpParser\Node\Expr\New_)) {
             return;
@@ -96,9 +96,9 @@ class TranslationStringChecker implements
                 \Psalm\IssueBuffer::accepts(
                     new TranslationStringNotALiteralString(
                         'First argument to an Exception constructor not a literal string',
-                        new \Psalm\CodeLocation($statementsSource, $expr)
+                        new \Psalm\CodeLocation($statements_source, $expr)
                     ),
-                    $statementsSource->getSuppressedIssues()
+                    $statements_source->getSuppressedIssues()
                 )
             ) {
                 return false;
@@ -111,9 +111,9 @@ class TranslationStringChecker implements
                 \Psalm\IssueBuffer::accepts(
                     new TranslationStringNotFound(
                         "Translation string '$translationString' not found",
-                        new \Psalm\CodeLocation($statementsSource, $expr)
+                        new \Psalm\CodeLocation($statements_source, $expr)
                     ),
-                    $statementsSource->getSuppressedIssues()
+                    $statements_source->getSuppressedIssues()
                 )
             ) {
                 return false;
@@ -125,22 +125,22 @@ class TranslationStringChecker implements
 
     /**
      * @param  \PhpParser\Node\Expr\MethodCall|\PhpParser\Node\Expr\StaticCall $expr
-     * @param  \Psalm\FileManipulation[] $fileReplacements
+     * @param  \Psalm\FileManipulation[] $file_replacements
      *
      * @return void
      */
     public static function afterMethodCallAnalysis(
         $expr,
-        string $methodId,
-        string $appearingMethodId,
-        string $declaringMethodId,
+        string $method_id,
+        string $appearing_method_id,
+        string $declaring_method_id,
         \Psalm\Context $context,
-        \Psalm\StatementsSource $statementsSource,
+        \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
-        array &$fileReplacements = [],
-        \Psalm\Type\Union &$returnTypeCandidate = null
+        array &$file_replacements = [],
+        \Psalm\Type\Union &$return_type_candidate = null
     ) {
-        if ($methodId !== 'OmegaUp\\Translations::get') {
+        if ($method_id !== 'OmegaUp\\Translations::get') {
             return;
         }
         if (!($expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_)) {
@@ -148,9 +148,9 @@ class TranslationStringChecker implements
                 \Psalm\IssueBuffer::accepts(
                     new TranslationStringNotALiteralString(
                         'First argument to an Exception constructor not a literal string',
-                        new \Psalm\CodeLocation($statementsSource, $expr)
+                        new \Psalm\CodeLocation($statements_source, $expr)
                     ),
-                    $statementsSource->getSuppressedIssues()
+                    $statements_source->getSuppressedIssues()
                 )
             ) {
                 // do nothing
@@ -163,9 +163,9 @@ class TranslationStringChecker implements
                 \Psalm\IssueBuffer::accepts(
                     new TranslationStringNotFound(
                         "Translation string '$translationString' not found",
-                        new \Psalm\CodeLocation($statementsSource, $expr)
+                        new \Psalm\CodeLocation($statements_source, $expr)
                     ),
-                    $statementsSource->getSuppressedIssues()
+                    $statements_source->getSuppressedIssues()
                 )
             ) {
                 // do nothing

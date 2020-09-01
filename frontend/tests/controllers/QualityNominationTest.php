@@ -5,7 +5,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         parent::setUp();
 
         \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
-        \OmegaUp\Test\Factories\QualityNomination::initTags();
+        \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
     }
 
     /**
@@ -223,6 +223,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode([
                     'quality_seal' => false,
                     'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+                    'tags' => ['problemTagFunctions', 'problemTagRecursion'],
                 ]),
             ]));
             $this->fail('The user must be a reviewer.');
@@ -241,9 +242,26 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode([
                     'quality_seal' => false,
                     'tag' => 'problemLevel',
+                    'tags' => ['problemTagFunctions', 'problemTagRecursion'],
                 ]),
             ]));
             $this->fail('The tag should be one of the level tags group.');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+
+        try {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemData['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => false,
+                    'tag' => 'problemLevelAdvancedCompetitiveProgramming',
+                    'tags' => ['problemTopic'],
+                ]),
+            ]));
+            $this->fail('The tag should be one of the public tags group.');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('parameterInvalid', $e->getMessage());
         }
@@ -1801,15 +1819,29 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $extractName = fn ($tag) => $tag['name'];
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags1,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemTopicMatrices', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemRestrictedTagLanguage',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemTopicMatrices'
+            ]
         );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags3,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemRestrictedTagLanguage',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicGeometry',
+                'problemTopicSorting'
+            ]
         );
 
         \OmegaUp\Test\Utils::runUpdateRanks();
@@ -1876,15 +1908,28 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags1,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemRestrictedTagLanguage'
+            ]
         );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags3,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicGeometry',
+                'problemTopicSorting',
+                'problemRestrictedTagLanguage'
+            ]
         );
     }
 
@@ -1905,6 +1950,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
             ]),
         ]));
 
@@ -1918,6 +1964,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
             ]),
         ]));
 
@@ -1985,6 +2032,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
             'contents' => json_encode([
                 'quality_seal' => true,
                 'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagQueues', 'problemTagRecursion'],
             ]),
         ]));
 
@@ -2248,9 +2296,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 true /* includeVoted */
             )
         );
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags,
-            ['problemTopicDynamicProgramming', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemRestrictedTagLanguage'
+            ]
         );
 
         \OmegaUp\Test\Utils::runAggregateFeedback();
@@ -2263,9 +2315,15 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 true /* includeVoted */
             )
         );
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemRestrictedTagLanguage'
+            ]
         );
     }
 

@@ -15,10 +15,5 @@ foreach ($result as $key => $value) {
 }
 
 \OmegaUp\UITools::getSmartyInstance()->display(
-    sprintf(
-        '%s/templates/group.list.tpl',
-        strval(
-            OMEGAUP_ROOT
-        )
-    )
+    \OmegaUp\UITools::templatePath('group.list')
 );

@@ -4,7 +4,7 @@
 
 import importlib
 import os
-from typing import Any, Callable, Mapping, Optional, Sequence, Text, Tuple
+from typing import Optional, Sequence
 
 from hook_tools import linters
 
@@ -14,20 +14,14 @@ class DaoLinter(linters.Linter):
 
     # pylint: disable=R0903
 
-    def __init__(self, options: Optional[Mapping[Text, Any]] = None) -> None:
+    def __init__(self, options: Optional[linters.Options] = None) -> None:
         # pylint: disable=unused-argument
         super().__init__()
 
-    def run_one(self, filename: Text,
-                contents: bytes) -> Tuple[bytes, Sequence[Text]]:
-        '''Runs the linter against |contents|.'''
-        # pylint: disable=no-self-use, unused-argument
-        return contents, []
-
     def run_all(
-            self, filenames: Sequence[Text],
-            contents_callback: Callable[[Text], bytes]
-    ) -> Tuple[Mapping[Text, bytes], Mapping[Text, bytes], Sequence[Text]]:
+            self, filenames: Sequence[str],
+            contents_callback: linters.ContentsCallback
+    ) -> linters.MultipleResults:
         '''Runs the linter against a subset of files.'''
         # pylint: disable=no-self-use, unused-argument
 
@@ -53,10 +47,11 @@ class DaoLinter(linters.Linter):
             original_contents[path] = contents_callback(path)
             new_contents[path] = contents.encode('utf-8')
 
-        return new_contents, original_contents, ['dao']
+        return linters.MultipleResults(new_contents, original_contents,
+                                       ['dao'])
 
     @property
-    def name(self) -> Text:
+    def name(self) -> str:
         '''Gets the name of the linter.'''
         return 'dao'
 
