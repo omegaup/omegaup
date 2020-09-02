@@ -13,8 +13,8 @@ class TokenValidateException extends \Exception {
      * @param string $message
      * @param array<string, string> $claims
      */
-    public function __construct($message = 'tokenDecodeCorrupt', $claims = []) {
-        parent::__construct($message, 400);
+    public function __construct($message = 'token_corrupted', $claims = []) {
+        parent::__construct($message);
         $this->claims = $claims;
     }
 }

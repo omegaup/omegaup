@@ -253,21 +253,14 @@ class SecurityTools {
      */
     public static function getCourseCloneAuthorizationToken($claims, $issuer) {
         $secretKey = self::getCourseCloneSecretKey();
+        $currentTime = (new \DateTime())->setTimestamp(\OmegaUp\Time::get());
         $token = (new \ParagonIE\Paseto\Builder())
             ->setKey($secretKey)
             ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
             ->setPurpose(\ParagonIE\Paseto\Purpose::local())
-            ->setExpiration(
-                (new \DateTime())
-                    ->setTimestamp(\OmegaUp\Time::get())
-                    ->add(new \DateInterval('P7D'))
-            )
-            ->setNotBefore(
-                (new \DateTime())->setTimestamp(
-                    \OmegaUp\Time::get()
-                )
-            )
-            ->setIssuedAt((new \DateTime())->setTimestamp(\OmegaUp\Time::get()))
+            ->setNotBefore($currentTime)
+            ->setIssuedAt($currentTime)
+            ->setExpiration($currentTime->add(new \DateInterval('P7D')))
             ->setIssuer($issuer)
             ->setClaims($claims);
         return $token->toString();
@@ -302,7 +295,7 @@ class SecurityTools {
             )
         ) {
             throw new \OmegaUp\Exceptions\TokenValidateException(
-                'tokenDecodeInvalid',
+                'token_invalid',
                 $claims
             );
         }
@@ -312,7 +305,7 @@ class SecurityTools {
             ))->isValid($parsedToken)
         ) {
             throw new \OmegaUp\Exceptions\TokenValidateException(
-                'tokenDecodeExpired',
+                'token_expired',
                 $claims
             );
         }
@@ -357,7 +350,6 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
         require_once 'libs/third_party/paseto/src/Exception/SecurityException.php';
         require_once 'libs/third_party/paseto/src/Exception/NotFoundException.php';
-        //require_once 'src/Exceptions/NotFoundException.php';
         if (is_null(self::$_courseCloneSecretKey)) {
             self::$_courseCloneSecretKey = \ParagonIE\Paseto\Keys\SymmetricKey::fromEncodedString(
                 OMEGAUP_COURSE_CLONE_SECRET_KEY

@@ -321,7 +321,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
     }
 
-    private function createCourseWithCloneToken() {
+    private function createCourseWithCloneToken(int $creationTime = (2 * 60)) {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = self::login($admin);
 
@@ -331,6 +331,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE
         );
 
+        $currentTime = \OmegaUp\Time::get();
+        \OmegaUp\Time::setTimeForTesting($currentTime - $creationTime);
+
         [
             'token' => $token,
         ] = \OmegaUp\Controllers\Course::apiGenerateTokenForCloneCourse(
@@ -339,6 +342,8 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
             ])
         );
+
+        \OmegaUp\Time::setTimeForTesting($currentTime);
 
         return [
             'alias' => $courseData['course_alias'],
@@ -381,17 +386,10 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     public function testUseExpiredToken() {
-        $currentTime = \OmegaUp\Time::get();
-
-        // Needed to test an expired token
-        \OmegaUp\Time::setTimeForTesting($currentTime - (8 * 24 * 60 * 60));
-
         [
             'token' => $token,
             'alias' => $originalAlias,
-        ] = $this->createCourseWithCloneToken();
-
-        \OmegaUp\Time::setTimeForTesting($currentTime);
+        ] = $this->createCourseWithCloneToken((8 * 24 * 60 * 60));
 
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
@@ -408,9 +406,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                     'start_time' => \OmegaUp\Time::get(),
                 ])
             );
-            $this->assertFail('It should fail');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeExpired');
+            $this->fail('It should fail');
+        } catch (\OmegaUp\Exceptions\TokenValidateException $e) {
+            $this->assertEquals($e->getMessage(), 'token_expired');
         }
     }
 
@@ -433,9 +431,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                     'start_time' => \OmegaUp\Time::get(),
                 ])
             );
-            $this->assertFail('It should fail');
-        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeInvalid');
+            $this->fail('It should fail');
+        } catch (\OmegaUp\Exceptions\TokenValidateException $e) {
+            $this->assertEquals($e->getMessage(), 'token_invalid');
         }
     }
 
@@ -457,9 +455,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                     'start_time' => \OmegaUp\Time::get(),
                 ])
             );
-            $this->assertFail('It should fail');
+            $this->fail('It should fail');
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeCorrupted');
+            $this->assertEquals($e->getMessage(), 'token_corrupted');
         }
     }
 }

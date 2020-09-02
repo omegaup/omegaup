@@ -572,13 +572,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 self::$log->error(
                     "Error validating token for course {$courseAlias}: $e"
                 );
-                $result = 'token_corrupted';
-                if ($e->getMessage() === 'tokenDecodeExpired') {
-                    $result = 'token_expired';
-                } elseif ($e->getMessage() === 'tokenDecodeInvalid') {
-                    $result = 'token_invalid';
-                }
-
                 \OmegaUp\DAO\CourseCloneLog::create(
                     new \OmegaUp\DAO\VO\CourseCloneLog([
                         'ip' => (
@@ -589,21 +582,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'token_payload' => json_encode($e->claims),
                         'timestamp' => \OmegaUp\Time::get(),
                         'user_id' => $r->user->user_id,
-                        'result' => $result,
+                        'result' => $e->getMessage(),
                     ])
                 );
-
-                if ($e->getMessage() === 'tokenDecodeExpired') {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'tokenDecodeExpired',
-                        'token'
-                    );
-                } elseif ($e->getMessage() === 'tokenDecodeInvalid') {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'tokenDecodeInvalid',
-                        'token'
-                    );
-                }
+                throw $e;
             } catch (\Exception $e) {
                 self::$log->error(
                     "Error decoding token for course {$courseAlias}",
@@ -624,7 +606,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ])
                 );
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'tokenDecodeCorrupted',
+                    'token_corrupted',
                     'token'
                 );
             }
