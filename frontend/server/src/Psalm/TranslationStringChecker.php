@@ -45,6 +45,7 @@ class TranslationStringChecker implements
      * translation string name as first parameter.
      */
     private static function isSupportedConstructor(
+        \Psalm\Codebase $codebase,
         string $constructorClassName
     ): bool {
         if ($constructorClassName === 'omegaup\\translationstring') {
@@ -60,7 +61,13 @@ class TranslationStringChecker implements
             // This one class does not use translation strings.
             return false;
         }
-        return true;
+        return (
+            $constructorClassName === 'omegaup\\exceptions\\apiexception' ||
+            $codebase->classExtends(
+                $constructorClassName,
+                'omegaup\\exceptions\\apiexception'
+            )
+        );
     }
 
     /**
@@ -84,7 +91,12 @@ class TranslationStringChecker implements
             // Not something we can reason about.
             return;
         }
-        if (!self::isSupportedConstructor($expr->class->toLowerString())) {
+        if (
+            !self::isSupportedConstructor(
+                $codebase,
+                $expr->class->toLowerString()
+            )
+        ) {
             return;
         }
         if (empty($expr->args)) {
