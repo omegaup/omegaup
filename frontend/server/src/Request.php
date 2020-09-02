@@ -199,7 +199,13 @@ class Request extends \ArrayObject {
                 $key
             );
         }
-        $val = strval($this->offsetGet($key));
+        /** @var mixed */
+        $mixedVal = $this->offsetGet($key);
+        $val = (
+            is_scalar($mixedVal) || is_object($mixedVal) ?
+            strval($mixedVal) :
+            ''
+        );
         if (!is_null($validator) && !$validator($val)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterInvalid',
@@ -356,7 +362,11 @@ class Request extends \ArrayObject {
             'parameterNotInExpectedSet',
             $key,
             [
-                'bad_elements' => strval($val),
+                'bad_elements' => (
+                    is_scalar($val) || is_object($val) ?
+                    strval($val) :
+                    ''
+                ),
                 'expected_set' => implode(', ', $enumValues),
             ]
         );
@@ -461,16 +471,25 @@ class Request extends \ArrayObject {
             return $default;
         }
 
-        if (is_array($this[$param])) {
+        /** @var mixed */
+        $value = $this[$param];
+        if (is_array($value)) {
             /** @var list<string> */
-            return $this[$param];
+            return $value;
         }
 
-        if (empty($this[$param])) {
+        if (empty($value)) {
             return [];
         }
 
-        $strings = explode(',', strval($this[$param]));
+        $strings = explode(
+            ',',
+            (
+                is_scalar($value) || is_object($value) ?
+                strval($value) :
+                ''
+            )
+        );
 
         /** @var list<string> */
         return array_unique($strings);
@@ -486,7 +505,15 @@ class Request extends \ArrayObject {
         $result = [];
         /** @var mixed $value */
         foreach ($this as $key => $value) {
-            $result[strval($key)] = strval($value);
+            $result[
+                is_scalar($key) || is_object($key) ?
+                strval($key) :
+                ''
+            ] = (
+                is_scalar($value) || is_object($value) ?
+                strval($value) :
+                ''
+            );
         }
         return $result;
     }
