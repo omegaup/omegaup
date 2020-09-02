@@ -2,7 +2,7 @@
 <psalm
     totallyTyped="true"
     autoloader="frontend/server/bootstrap.php"
-    cacheDirectory="frontend/tests/runfiles/psalm"
+    cacheDirectory="/tmp/psalm"
     hoistConstants="true"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -28,7 +28,7 @@
     </projectFiles>
 
     <stubs>
-      <file name="frontend/server/stubs.php" />
+       <file name="frontend/server/stubs.php" />
 
        <!-- For PASSWORD_ARGON2ID -->
        <file name="vendor/jetbrains/phpstorm-stubs/standard/password.php" />
