@@ -524,7 +524,6 @@ class Course extends \OmegaUp\Controllers\Controller {
         return [
             'token' => \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
                 $claims,
-                /*$subject=*/strval($r->identity->user_id),
                 /*$issuer=*/$r->identity->username
             ),
         ];
@@ -569,15 +568,16 @@ class Course extends \OmegaUp\Controllers\Controller {
                     $token,
                     $courseAlias
                 );
-            } catch (\OmegaUp\Exceptions\TokenDecodeException $e) {
-                $result = 'token_corrupted';
-                if (isset($e->claims)) {
-                    $result = 'token_expired';
-                }
+            } catch (\OmegaUp\Exceptions\TokenValidateException $e) {
                 self::$log->error(
-                    "Error decoding token for course {$courseAlias}",
-                    $e
+                    "Error validating token for course {$courseAlias}: $e"
                 );
+                $result = 'token_corrupted';
+                if ($e->getMessage() === 'tokenDecodeExpired') {
+                    $result = 'token_expired';
+                } elseif ($e->getMessage() === 'tokenDecodeInvalid') {
+                    $result = 'token_invalid';
+                }
 
                 \OmegaUp\DAO\CourseCloneLog::create(
                     new \OmegaUp\DAO\VO\CourseCloneLog([
@@ -592,13 +592,45 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'result' => $result,
                     ])
                 );
+
+                if ($e->getMessage() === 'tokenDecodeExpired') {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'tokenDecodeExpired',
+                        'token'
+                    );
+                } elseif ($e->getMessage() === 'tokenDecodeInvalid') {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'tokenDecodeInvalid',
+                        'token'
+                    );
+                }
+            } catch (\Exception $e) {
+                self::$log->error(
+                    "Error decoding token for course {$courseAlias}",
+                    $e
+                );
+
+                \OmegaUp\DAO\CourseCloneLog::create(
+                    new \OmegaUp\DAO\VO\CourseCloneLog([
+                        'ip' => (
+                            \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                        ),
+                        'course_id' => $originalCourse->course_id,
+                        'new_course_id' => null,
+                        'token_payload' => '',
+                        'timestamp' => \OmegaUp\Time::get(),
+                        'user_id' => $r->user->user_id,
+                        'result' => 'token_corrupted',
+                    ])
+                );
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'tokenDecodeFailed',
+                    'tokenDecodeCorrupted',
                     'token'
                 );
             }
+        } else {
+            self::validateClone($r, $originalCourse);
         }
-        self::validateClone($r, $originalCourse);
 
         $startTime = $r->ensureTimestamp('start_time');
         $offset = $startTime->time - $originalCourse->start_time->time;

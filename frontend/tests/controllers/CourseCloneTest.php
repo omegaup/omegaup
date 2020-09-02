@@ -410,7 +410,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertFail('It should fail');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeFailed');
+            $this->assertEquals($e->getMessage(), 'tokenDecodeExpired');
         }
     }
 
@@ -435,7 +435,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertFail('It should fail');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeFailed');
+            $this->assertEquals($e->getMessage(), 'tokenDecodeInvalid');
         }
     }
 
@@ -459,7 +459,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->assertFail('It should fail');
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            $this->assertEquals($e->getMessage(), 'tokenDecodeFailed');
+            $this->assertEquals($e->getMessage(), 'tokenDecodeCorrupted');
         }
     }
 }
