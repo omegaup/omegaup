@@ -32,6 +32,7 @@ import * as ui from '../../ui';
 export default class Statistics extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() problemStats!: types.CourseProblemStatistics[];
+  @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   //chart options
   selected = this.varianceChartOptions;
@@ -49,8 +50,40 @@ export default class Statistics extends Vue {
     { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
     { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
     { value: this.runsChartOptions, text: T.courseStatisticsAverageRuns },
+    { value: this.verdictChartOptions, text: 'Verdict distribution' },
   ];
   //get chart options
+  get verdictChartOptions() {
+    return {
+      chart: {
+        type: 'bar',
+      },
+      title: {
+        text: 'Verdict distribution',
+      },
+      xAxis: {
+        categories: this.problems,
+        title: T.wordsProblem,
+        min: 0,
+      },
+      yAxis: {
+        min: 0,
+        max: 10,
+        title: 'Runs',
+      },
+      tooltip: {},
+      plotOptions: {
+        series: {
+          dataLabels: {
+            enabled: true,
+            format: '{y}',
+          },
+          stacking: 'normal',
+        },
+      },
+      series: this.verdictStats,
+    };
+  }
   get varianceChartOptions() {
     return this.createChartOptions(
       T.courseStatisticsScoreVariance,
@@ -141,6 +174,17 @@ export default class Statistics extends Vue {
     }
     return max;
   }
+  get verdictStats() {
+    let verdictRuns: {
+      [key: string]: number[];
+    } = {};
+    for (const stat of this.verdicts) {
+      if(!verdictRuns[stat.verdict])
+        verdictRuns[stat.verdict] = [];
+      verdictRuns[stat.verdict].push(stat.runs);
+    }
+    return verdictRuns;
+  }
   getStatistic(
     name:
       | 'variance'
@@ -151,7 +195,9 @@ export default class Statistics extends Vue {
       | 'maximum'
       | 'minimum',
   ) {
-    return this.problemStats.map((problem) => Math.round(problem[name] || 0));
+    return this.problemStats.map((problem) =>
+      parseFloat((problem[name] || 0).toFixed(1)),
+    );
   }
   //yLabel = '{y}' or '{y} %'
   //yName = data type (percentage, score, etc.)

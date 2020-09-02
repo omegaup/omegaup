@@ -1717,9 +1717,17 @@ export namespace types {
     username: string;
   }
 
+  export interface CourseProblemVerdict {
+    assignment_alias: string;
+    problem_alias: string;
+    runs: number;
+    verdict: string;
+  }
+
   export interface CourseStatisticsPayload {
     course: types.CourseDetails;
     problemStats: types.CourseProblemStatistics[];
+    verdicts: types.CourseProblemVerdict[];
   }
 
   export interface CourseStudent {
