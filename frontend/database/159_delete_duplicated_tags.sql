@@ -14,7 +14,6 @@ AND
         'problemTagInteractive'
     );
 
-
 DELETE FROM
     `Tags`
 WHERE
