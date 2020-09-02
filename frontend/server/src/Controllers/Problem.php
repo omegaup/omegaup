@@ -426,7 +426,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity,
             $params
         );
-
+        if (empty($params->problemLevel)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'level_tag',
+            );
+        }
         // Populate a new Problem object
         $problem = new \OmegaUp\DAO\VO\Problems([
             'visibility' => $params->visibility ?? \OmegaUp\ProblemParams::VISIBILITY_PRIVATE,
@@ -493,27 +498,25 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
 
             // Add problem level tag
-            if (!empty($params->problemLevel)) {
-                $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
+            $tag = \OmegaUp\DAO\Tags::getByName($params->problemLevel);
 
-                if (
-                    is_null($tag) ||
-                    !in_array(
-                        $tag->name,
-                        \OmegaUp\Controllers\Tag::getLevelTags()
-                    )
-                ) {
-                    throw new \OmegaUp\Exceptions\InvalidParameterException(
-                        'notProblemLevelTag',
-                        'level_tag'
-                    );
-                }
-
-                \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
-                    $problem,
-                    $tag
+            if (
+                is_null($tag) ||
+                !in_array(
+                    $tag->name,
+                    \OmegaUp\Controllers\Tag::getLevelTags()
+                )
+            ) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'notProblemLevelTag',
+                    'level_tag'
                 );
             }
+
+            \OmegaUp\DAO\ProblemsTags::updateProblemLevel(
+                $problem,
+                $tag
+            );
 
             \OmegaUp\Controllers\Problem::setRestrictedTags(
                 $problem,
@@ -561,9 +564,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddAdmin(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
@@ -611,9 +612,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddGroupAdmin(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
@@ -1470,9 +1469,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $operation = \OmegaUp\ProblemDeployer::UPDATE_SETTINGS;
             if (
                 isset($_FILES['problem_contents'])
-                && is_array($_FILES['problem_contents'])
+                && isset($_FILES['problem_contents']['tmp_name'])
                 && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                    strval($_FILES['problem_contents']['tmp_name'])
+                    $_FILES['problem_contents']['tmp_name']
                 )
             ) {
                 $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
@@ -1574,7 +1573,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if ($redirect === true) {
-            header("Location: {$_SERVER['HTTP_REFERER']}");
+            header('Location: ' . (
+                \OmegaUp\Request::getServerVar('HTTP_REFERER') ?? '/'
+            ));
         }
 
         self::invalidateCache($problem, $updatedStatementLanguages);
@@ -4580,7 +4581,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'clarifications' => \OmegaUp\DAO\Clarifications::getProblemClarifications(
                     $problem->problem_id,
                     $isAdmin,
-                    $r->identity->identity_id,
+                    intval($r->identity->identity_id),
                     /*$offset=*/null,
                     /*rowcount=*/0
                 ),
@@ -5534,9 +5535,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ['LANG' => 'en_US.UTF-8']
             );
             if (!is_resource($proc)) {
+                $lastError = error_get_last();
                 return [
                     'smartyProperties' => [
-                        'error' => strval(error_get_last()),
+                        'error' => $lastError['message'] ?? '',
                     ],
                     'template' => 'libinteractive.gen.tpl',
                 ];

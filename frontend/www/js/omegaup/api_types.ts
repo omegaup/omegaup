@@ -385,6 +385,38 @@ export namespace types {
       );
     }
 
+    export function CourseCloneDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CourseCloneDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseDetailsPayload {
@@ -1613,6 +1645,12 @@ export namespace types {
     course: types.CourseDetails;
   }
 
+  export interface CourseCloneDetailsPayload {
+    creator?: { classname: string; username: string };
+    details: types.CourseDetails;
+    token: string;
+  }
+
   export interface CourseDetails {
     admission_mode?: string;
     alias: string;
@@ -1698,6 +1736,18 @@ export namespace types {
     visits: number;
   }
 
+  export interface CourseProblemStatistics {
+    assignment_alias: string;
+    average?: number;
+    high_score_percentage?: number;
+    low_score_percentage?: number;
+    max_points: number;
+    maximum?: number;
+    minimum?: number;
+    problem_alias: string;
+    variance?: number;
+  }
+
   export interface CourseProblemTried {
     alias: string;
     title: string;
@@ -1706,17 +1756,7 @@ export namespace types {
 
   export interface CourseStatisticsPayload {
     course: types.CourseDetails;
-    problemStats: {
-      assignment_alias: string;
-      average?: number;
-      high_score_percentage?: number;
-      low_score_percentage?: number;
-      maxPoints: number;
-      maximum?: number;
-      minimum?: number;
-      problem_alias: string;
-      variance?: number;
-    }[];
+    problemStats: types.CourseProblemStatistics[];
   }
 
   export interface CourseStudent {

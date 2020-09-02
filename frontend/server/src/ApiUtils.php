@@ -137,7 +137,11 @@ class ApiUtils {
     ): string {
         /** @var mixed $value*/
         foreach ($namedArgs as $key => $value) {
-            $format = str_replace("%($key)", strval($value), $format);
+            $format = str_replace(
+                "%($key)",
+                is_scalar($value) ? strval($value) : '',
+                $format
+            );
         }
         return $format;
     }

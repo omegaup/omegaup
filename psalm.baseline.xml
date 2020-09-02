@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<files psalm-version="3.15@de6e7f324f44dde540ebe7ebd4eb481b97c86f30">
+  <file src="frontend/server/src/Controllers/Authorization.php">
+    <MixedArgument occurrences="1">
+      <code>$r['token']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Badge.php">
+    <MixedArgument occurrences="2">
+      <code>static::OMEGAUP_BADGES_ROOT</code>
+      <code>static::OMEGAUP_BADGES_ROOT</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Contest.php">
+    <MixedArgument occurrences="3">
+      <code>$r['query']</code>
+      <code>$field</code>
+      <code>$r['contest_alias']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Course.php">
+    <MixedArgument occurrences="3">
+      <code>$r['problems']</code>
+      <code>$r['problem_alias']</code>
+      <code>$r['username']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Identity.php">
+    <MixedArgument occurrences="5">
+      <code>$r['country_id']</code>
+      <code>$r['state_id']</code>
+      <code>$r['country_id']</code>
+      <code>$r['state_id']</code>
+      <code>$request['lang']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Interview.php">
+    <MixedArgument occurrences="1">
+      <code>$r['interview_alias']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Problem.php">
+    <MixedArgument occurrences="43">
+      <code>$r['languages']</code>
+      <code>$r['problem_level']</code>
+      <code>$r['selected_tags']</code>
+      <code>$r['source']</code>
+      <code>$r['title']</code>
+      <code>$r['update_published']</code>
+      <code>$r['validator']</code>
+      <code>$r['visibility']</code>
+      <code>$r['show_diff']</code>
+      <code>$r['statement_type']</code>
+      <code>$r['contest_alias']</code>
+      <code>$r['statement_type']</code>
+      <code>$r['username']</code>
+      <code>$r['status']</code>
+      <code>$r['verdict']</code>
+      <code>$r['language']</code>
+      <code>$r['query']</code>
+      <code>$r['difficulty_range']</code>
+      <code>$r['programming_languages']</code>
+      <code>$r['contest_alias']</code>
+      <code>$r['statement_type']</code>
+      <code>$r['contest_alias']</code>
+      <code>$r['statement_type']</code>
+      <code>$r['statement_type']</code>
+      <code>$r['problem']</code>
+      <code>$r['directory']</code>
+      <code>$r['title']</code>
+      <code>$r['problem_alias']</code>
+      <code>$r['source']</code>
+      <code>$r['show_diff']</code>
+      <code>$r['time_limit']</code>
+      <code>$r['validator_time_limit']</code>
+      <code>$r['overall_wall_time_limit']</code>
+      <code>$r['extra_wall_time']</code>
+      <code>$r['output_limit']</code>
+      <code>$r['input_limit']</code>
+      <code>$r['memory_limit']</code>
+      <code>$r['languages']</code>
+      <code>$r['validator']</code>
+      <code>$r['problem_level']</code>
+      <code>$r['extension']</code>
+      <code>$r['language']</code>
+      <code>$r['language']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/QualityNomination.php">
+    <MixedArgument occurrences="4">
+      <code>$r['nomination']</code>
+      <code>$r['status']</code>
+      <code>$r['status']</code>
+      <code>$r['query']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Run.php">
+    <MixedArgument occurrences="5">
+      <code>$filtered['guid']</code>
+      <code>$filtered['language']</code>
+      <code>$filtered['status']</code>
+      <code>$filtered['type']</code>
+      <code>$filtered['verdict']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/Session.php">
+    <MixedArgument occurrences="3">
+      <code>$r['auth_token']</code>
+      <code>$r['auth_token']</code>
+      <code>$r['auth_token']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/Controllers/User.php">
+    <MixedArgument occurrences="4">
+      <code>$r['gender']</code>
+      <code>$r2['contest_alias']</code>
+      <code>$r['experiment']</code>
+      <code>$r['date']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/DAO/Problems.php">
+    <MixedArgument occurrences="4">
+      <code>$problemsUser['alias']</code>
+      <code>$problemsUser['title']</code>
+      <code>$problemsUser['username']</code>
+      <code>$row['email']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/ScoreboardParams.php">
+    <MixedArgument occurrences="4">
+      <code>$params['alias']</code>
+      <code>$params['title']</code>
+      <code>$params['penalty_calc_policy']</code>
+      <code>$params['auth_token']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/server/src/UITools.php">
+    <MixedArgument occurrences="2">
+      <code>$smartyProperties['title']</code>
+      <code>$smarty-&gt;getConfigVars($titleVar)</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/tests/ControllerTestCase.php">
+    <MixedArgument occurrences="1">
+      <code>$r['title']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/tests/Factories/Contest.php">
+    <MixedArgument occurrences="7">
+      <code>$r['alias']</code>
+      <code>$problemData['request']['problem_alias']</code>
+      <code>$contestData['request']['alias']</code>
+      <code>$contestData['request']['alias']</code>
+      <code>$contestData['request']['alias']</code>
+      <code>$contestData['request']['alias']</code>
+      <code>$contestData['request']['alias']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/tests/Factories/Problem.php">
+    <MixedArgument occurrences="1">
+      <code>$r['problem_alias']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/tests/Factories/Schools.php">
+    <MixedArgument occurrences="1">
+      <code>$r['name']</code>
+    </MixedArgument>
+  </file>
+  <file src="frontend/www/arena/problemprint.php">
+    <MixedArgument occurrences="1">
+      <code>$r['problem_alias']</code>
+    </MixedArgument>
+  </file>
+</files>

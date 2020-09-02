@@ -70,13 +70,12 @@ class ProblemDeployer {
         if (
             isset($_FILES['problem_contents'])
             && isset($_FILES['problem_contents']['tmp_name'])
-            && is_string($_FILES['problem_contents']['tmp_name'])
             && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                strval($_FILES['problem_contents']['tmp_name'])
+                $_FILES['problem_contents']['tmp_name']
             )
         ) {
             /** @psalm-suppress MixedArrayAccess */
-            $this->zipPath = strval($_FILES['problem_contents']['tmp_name']);
+            $this->zipPath = $_FILES['problem_contents']['tmp_name'];
         } else {
             $this->zipPath = __DIR__ . '/empty.zip';
         }

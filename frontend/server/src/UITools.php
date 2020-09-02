@@ -22,9 +22,7 @@ class UITools {
         }
         header(
             'Location: /login.php?redirect=' . urlencode(
-                strval(
-                    $_SERVER['REQUEST_URI']
-                )
+                \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/'
             )
         );
         die();
@@ -330,5 +328,16 @@ class UITools {
                 )
             );
         }
+    }
+
+    /**
+     * Return the path of a Smarty template.
+     */
+    public static function templatePath(string $templateName): string {
+        return sprintf(
+            '%s/templates/%s.tpl',
+            strval(OMEGAUP_ROOT),
+            $templateName
+        );
     }
 }

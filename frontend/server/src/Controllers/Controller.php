@@ -173,6 +173,13 @@ class Controller {
         }
         return $importantChange;
     }
+
+    public static function ensureNotInLockdown(): void {
+        /** @psalm-suppress TypeDoesNotContainType this can be defined to true sometimes. */
+        if (OMEGAUP_LOCKDOWN) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
+        }
+    }
 }
 
 \OmegaUp\Controllers\Controller::$log = \Logger::getLogger('controller');

@@ -70,9 +70,9 @@ class QualityNominationComments extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['contents'])) {
-            $this->contents = strval(
+            $this->contents = is_scalar(
                 $data['contents']
-            );
+            ) ? strval($data['contents']) : '';
         }
     }
 
