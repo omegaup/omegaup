@@ -51,19 +51,19 @@ class Interviews extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['alias'])) {
-            $this->alias = strval(
+            $this->alias = is_scalar(
                 $data['alias']
-            );
+            ) ? strval($data['alias']) : '';
         }
         if (isset($data['title'])) {
-            $this->title = strval(
+            $this->title = is_scalar(
                 $data['title']
-            );
+            ) ? strval($data['title']) : '';
         }
         if (isset($data['description'])) {
-            $this->description = strval(
+            $this->description = is_scalar(
                 $data['description']
-            );
+            ) ? strval($data['description']) : '';
         }
         if (isset($data['window_length'])) {
             $this->window_length = intval(

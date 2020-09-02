@@ -45,9 +45,9 @@ class SchoolOfTheMonth extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['time'])) {
-            $this->time = strval(
+            $this->time = is_scalar(
                 $data['time']
-            );
+            ) ? strval($data['time']) : '';
         }
         if (isset($data['ranking'])) {
             $this->ranking = intval(

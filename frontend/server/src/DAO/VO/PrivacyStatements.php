@@ -37,14 +37,14 @@ class PrivacyStatements extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['git_object_id'])) {
-            $this->git_object_id = strval(
+            $this->git_object_id = is_scalar(
                 $data['git_object_id']
-            );
+            ) ? strval($data['git_object_id']) : '';
         }
         if (isset($data['type'])) {
-            $this->type = strval(
+            $this->type = is_scalar(
                 $data['type']
-            );
+            ) ? strval($data['type']) : '';
         }
     }
 
