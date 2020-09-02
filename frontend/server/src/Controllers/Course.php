@@ -597,6 +597,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'token'
                     );
                 }
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'tokenDecodeUnknown',
+                    'token'
+                );
             } catch (\Exception $e) {
                 self::$log->error(
                     "Error decoding token for course {$courseAlias}",
