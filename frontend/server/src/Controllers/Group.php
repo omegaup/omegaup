@@ -387,7 +387,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{IS_ORGANIZER: bool, payload: array{countries: \OmegaUp\DAO\VO\Countries[]}}
+     * @return array{smartyProperties: array{IS_ORGANIZER: bool, payload: array{countries: list<\OmegaUp\DAO\VO\Countries>}}, template: string}
      */
     public static function getGroupEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -401,14 +401,17 @@ class Group extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
         return [
-            'IS_ORGANIZER' => $isOrganizer,
-            'payload' => [
-                'countries' => \OmegaUp\DAO\Countries::getAll(
-                    null,
-                    100,
-                    'name'
-                ),
+            'smartyProperties' => [
+                'IS_ORGANIZER' => $isOrganizer,
+                'payload' => [
+                    'countries' => \OmegaUp\DAO\Countries::getAll(
+                        null,
+                        100,
+                        'name'
+                    ),
+                ],
             ],
+            'template' => 'group.edit.tpl',
         ];
     }
 
