@@ -165,9 +165,9 @@ class MySQLConnection {
                 $chunks[] = $params[$i] ? '1' : '0';
             } else {
                 $chunks[] = "'" . $this->_connection->real_escape_string(
-                    strval(
-                        $params[$i]
-                    )
+                    is_scalar($params[$i]) || is_object($params[$i]) ?
+                    strval($params[$i]) :
+                    ''
                 ) . "'";
             }
             $chunks[] = $inputChunks[$i + 1];
@@ -256,11 +256,15 @@ class MySQLConnection {
                 return floatval($value);
 
             case FieldType::TYPE_TIMESTAMP:
-                return new \OmegaUp\Timestamp(strtotime(strval($value)));
+                return new \OmegaUp\Timestamp(strtotime(
+                    is_scalar($value) || is_object($value) ? strval($value) : ''
+                ));
 
             case FieldType::TYPE_STRING:
             default:
-                return strval($value);
+                return (
+                    is_scalar($value) || is_object($value) ? strval($value) : ''
+                );
         }
     }
 
