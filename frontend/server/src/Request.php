@@ -490,6 +490,26 @@ class Request extends \ArrayObject {
         }
         return $result;
     }
+
+    /**
+     * Returns the content of $_SERVER[$name] as a string (or null).
+     */
+    public static function getServerVar(string $name): ?string {
+        if (!isset($_SERVER[$name]) || !is_string($_SERVER[$name])) {
+            return null;
+        }
+        return $_SERVER[$name];
+    }
+
+    /**
+     * Returns the content of $_REQUEST[$name] as a string (or null).
+     */
+    public static function getRequestVar(string $name): ?string {
+        if (!isset($_REQUEST[$name]) || !is_string($_REQUEST[$name])) {
+            return null;
+        }
+        return $_REQUEST[$name];
+    }
 }
 
 \OmegaUp\Request::$_requestId = str_replace('.', '', uniqid('', true));

@@ -1573,7 +1573,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         if ($redirect === true) {
-            header("Location: {$_SERVER['HTTP_REFERER']}");
+            header('Location: ' . (
+                \OmegaUp\Request::getServerVar('HTTP_REFERER') ?? '/'
+            ));
         }
 
         self::invalidateCache($problem, $updatedStatementLanguages);
@@ -4579,7 +4581,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'clarifications' => \OmegaUp\DAO\Clarifications::getProblemClarifications(
                     $problem->problem_id,
                     $isAdmin,
-                    $r->identity->identity_id,
+                    intval($r->identity->identity_id),
                     /*$offset=*/null,
                     /*rowcount=*/0
                 ),
