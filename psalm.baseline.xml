@@ -45,7 +45,7 @@
     </MixedArgument>
   </file>
   <file src="frontend/server/src/Controllers/Problem.php">
-    <MixedArgument occurrences="44">
+    <MixedArgument occurrences="43">
       <code>$r['languages']</code>
       <code>$r['problem_level']</code>
       <code>$r['selected_tags']</code>
@@ -55,7 +55,6 @@
       <code>$r['validator']</code>
       <code>$r['visibility']</code>
       <code>$r['show_diff']</code>
-      <code>$_FILES['problem_contents']['tmp_name']</code>
       <code>$r['statement_type']</code>
       <code>$r['contest_alias']</code>
       <code>$r['statement_type']</code>
@@ -139,12 +138,6 @@
       <code>$value</code>
     </MixedArgument>
   </file>
-  <file src="frontend/server/src/ProblemDeployer.php">
-    <MixedArgument occurrences="2">
-      <code>$_FILES['problem_contents']['tmp_name']</code>
-      <code>$_FILES['problem_contents']['tmp_name']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/server/src/Request.php">
     <MixedArgument occurrences="5">
       <code>$this-&gt;offsetGet($key)</code>
@@ -160,11 +153,6 @@
       <code>$params['title']</code>
       <code>$params['penalty_calc_policy']</code>
       <code>$params['auth_token']</code>
-    </MixedArgument>
-  </file>
-  <file src="frontend/server/src/SessionManager.php">
-    <MixedArgument occurrences="1">
-      <code>$_COOKIE[$name]</code>
     </MixedArgument>
   </file>
   <file src="frontend/server/src/UITools.php">

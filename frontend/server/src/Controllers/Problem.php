@@ -1469,9 +1469,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $operation = \OmegaUp\ProblemDeployer::UPDATE_SETTINGS;
             if (
                 isset($_FILES['problem_contents'])
-                && is_array($_FILES['problem_contents'])
+                && isset($_FILES['problem_contents']['tmp_name'])
                 && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                    strval($_FILES['problem_contents']['tmp_name'])
+                    $_FILES['problem_contents']['tmp_name']
                 )
             ) {
                 $operation = \OmegaUp\ProblemDeployer::UPDATE_CASES;
