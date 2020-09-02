@@ -65,7 +65,7 @@ abstract class Problems {
                 null :
                 intval($Problems->acl_id)
             ),
-            intval($Problems->visibility),
+            $Problems->visibility,
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
@@ -351,7 +351,7 @@ abstract class Problems {
                 null :
                 intval($Problems->acl_id)
             ),
-            intval($Problems->visibility),
+            $Problems->visibility,
             $Problems->title,
             $Problems->alias,
             $Problems->commit,
