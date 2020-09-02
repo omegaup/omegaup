@@ -248,12 +248,14 @@ class SecurityTools {
      * gitserver that is valid for a single problem for 5 minutes.
      *
      * @param array<string, string> $claims
-     * @param \OmegaUp\DAO\VO\Identities $subject
+     * @param string $subject
+     * @param string $issuer
      * @return string The Bearer authorization token.
      */
     public static function getCourseCloneAuthorizationToken(
         array $claims,
-        \OmegaUp\DAO\VO\Identities $subject
+        string $subject,
+        string $issuer
     ): string {
         $secretKey = self::getCourseCloneSecretKey();
         $token = (new \ParagonIE\Paseto\Builder())
@@ -261,17 +263,12 @@ class SecurityTools {
             ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
             ->setPurpose(\ParagonIE\Paseto\Purpose::local())
             ->setExpiration(
-                (\DateTime::createFromFormat(
-                    'U',
-                    \OmegaUp\Time::get()
-                ))->add(
-                    new \DateInterval(
-                        'P7D'
-                    )
-                )
+                (new \DateTime())
+                    ->setTimestamp(\OmegaUp\Time::get())
+                    ->add(new \DateInterval('P7D'))
             )
-            ->setIssuer($subject->username)
-            ->setSubject(strval($subject->user_id))
+            ->setIssuer($issuer)
+            ->setSubject($subject)
             ->setClaims($claims);
         return $token->toString();
     }
@@ -294,11 +291,18 @@ class SecurityTools {
             )
             ->addRule(new \OmegaUp\ClaimRule('course', $courseAlias))
             ->addRule(new \OmegaUp\ClaimRule('permissions', 'clone'));
-
-        $parsedToken = $parser->parse($token, /*$skipValidation=*/true);
+        try {
+            $parsedToken = $parser->parse($token, /*$skipValidation=*/true);
+        } catch (\ParagonIE\Paseto\Exception\PasetoException $e) {
+            throw new \OmegaUp\Exceptions\TokenDecodeException();
+        }
+        /** @var array<string, string> */
         $claims = $parsedToken->getClaims();
         if (!$parser->validate($parsedToken)) {
-            throw new \OmegaUp\Exceptions\TokenDecodeException($claims);
+            throw new \OmegaUp\Exceptions\TokenDecodeException(
+                'tokenDecodeFailed',
+                $claims
+            );
         }
         return $claims;
     }

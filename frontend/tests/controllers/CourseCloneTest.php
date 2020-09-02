@@ -409,11 +409,8 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
             $this->assertFail('It should fail');
-        } catch (\OmegaUp\Exceptions\TokenDecodeException $e) {
-            $this->assertLessThan(
-                \OmegaUp\Time::get(),
-                strtotime($e->claims['exp'])
-            );
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'tokenDecodeFailed');
         }
     }
 
@@ -437,8 +434,8 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
             $this->assertFail('It should fail');
-        } catch (\OmegaUp\Exceptions\TokenDecodeException $e) {
-            $this->assertNotEquals($e->claims['course'], $primaryAlias);
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'tokenDecodeFailed');
         }
     }
 
@@ -461,8 +458,8 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 ])
             );
             $this->assertFail('It should fail');
-        } catch (\ParagonIE\Paseto\Exception\PasetoException $e) {
-            $this->assertEquals($e->getMessage(), 'An error occurred');
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $this->assertEquals($e->getMessage(), 'tokenDecodeFailed');
         }
     }
 }
