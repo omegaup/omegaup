@@ -179,8 +179,7 @@ export default class Statistics extends Vue {
       [key: string]: number[];
     } = {};
     for (const stat of this.verdicts) {
-      if(!verdictRuns[stat.verdict])
-        verdictRuns[stat.verdict] = [];
+      if (!verdictRuns[stat.verdict]) verdictRuns[stat.verdict] = [];
       verdictRuns[stat.verdict].push(stat.runs);
     }
     return verdictRuns;
