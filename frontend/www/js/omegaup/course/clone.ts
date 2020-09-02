@@ -11,10 +11,10 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     render: function (createElement) {
-      return createElement('omegaup-course-details', {
+      return createElement('omegaup-course-clone', {
         props: {
-          username: payload.username,
-          classname: payload.classname,
+          username: payload.creator?.username,
+          classname: payload.creator?.classname,
           course: payload.details,
           token: payload.token,
         },
@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
       });
     },
     components: {
-      'omegaup-course-details': course_Clone,
+      'omegaup-course-clone': course_Clone,
     },
   });
 });
