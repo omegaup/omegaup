@@ -373,6 +373,7 @@ const translations: { [key: string]: string; } = {
   courseStatisticsStudentsAbove: "(S7ud3n75 5c0r3d ab0v3 60%)",
   courseStatisticsStudentsScored: "(S7ud3n75 5c0r3d a7 0%)",
   courseStatisticsVariance: "(Varianc3)",
+  courseStatisticsVerdicts: "(V3rdic7 di57ribu7i0n)",
   courseStudentAdded: "(S7ud3n7 add3d 5ucc355fu11y.)",
   courseStudentAlreadyPresent: "(Th3 57ud3n7 had a1r3ady add3d 70 7h3 c0ur53.)",
   courseStudentCountLabel: "(S7ud3n75: %(student_count))",

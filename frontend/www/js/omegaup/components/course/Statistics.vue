@@ -50,40 +50,9 @@ export default class Statistics extends Vue {
     { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
     { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
     { value: this.runsChartOptions, text: T.courseStatisticsAverageRuns },
-    { value: this.verdictChartOptions, text: 'Verdict distribution' },
+    { value: this.verdictChartOptions, text: T.courseStatisticsVerdicts },
   ];
   //get chart options
-  get verdictChartOptions() {
-    return {
-      chart: {
-        type: 'bar',
-      },
-      title: {
-        text: 'Verdict distribution',
-      },
-      xAxis: {
-        categories: this.problems,
-        title: T.wordsProblem,
-        min: 0,
-      },
-      yAxis: {
-        min: 0,
-        max: 10,
-        title: 'Runs',
-      },
-      tooltip: {},
-      plotOptions: {
-        series: {
-          dataLabels: {
-            enabled: true,
-            format: '{y}',
-          },
-          stacking: 'normal',
-        },
-      },
-      series: this.verdictStats,
-    };
-  }
   get varianceChartOptions() {
     return this.createChartOptions(
       T.courseStatisticsScoreVariance,
@@ -154,6 +123,37 @@ export default class Statistics extends Vue {
       this.problems,
     );
   }
+  get verdictChartOptions() {
+    return {
+      chart: {
+        type: 'bar',
+      },
+      title: {
+        text: T.courseStatisticsVerdicts,
+      },
+      xAxis: {
+        categories: this.problems,
+        title: T.wordsProblem,
+        min: 0,
+      },
+      yAxis: {
+        min: 0,
+        max: this.maxRuns,
+        title: T.wordsRuns,
+      },
+      tooltip: {},
+      plotOptions: {
+        series: {
+          dataLabels: {
+            enabled: true,
+            format: '{y}',
+          },
+          stacking: 'normal',
+        },
+      },
+      series: this.verdictStats,
+    };
+  }
   //helper functions
   get problems() {
     return this.problemStats.map(
@@ -174,15 +174,40 @@ export default class Statistics extends Vue {
     }
     return max;
   }
-  get verdictStats() {
-    let verdictRuns: {
-      [key: string]: number[];
-    } = {};
+  get maxRuns() {
+    let problems: string[] = [];
+    let runSum: number[] = [];
     for (const stat of this.verdicts) {
-      if (!verdictRuns[stat.verdict]) verdictRuns[stat.verdict] = [];
-      verdictRuns[stat.verdict].push(stat.runs);
+      if (!problems.includes(stat.problem_alias)) {
+        problems.push(stat.problem_alias);
+        runSum[problems.indexOf(stat.problem_alias)] = 0;
+      }
+      runSum[problems.indexOf(stat.problem_alias)] += stat.runs;
     }
-    return verdictRuns;
+    let maxRuns = 0;
+    for (let i = 0; i < runSum.length; i++) {
+      if (runSum[i] > maxRuns) maxRuns = runSum[i];
+    }
+    return maxRuns;
+  }
+  get verdictStats() {
+    let verdict: string[] = [];
+    let run: number[][] = [];
+    for (const stat of this.verdicts) {
+      if (!verdict.includes(stat.verdict)) {
+        verdict.push(stat.verdict);
+        run[verdict.indexOf(stat.verdict)] = [];
+      }
+      run[verdict.indexOf(stat.verdict)].push(stat.runs);
+    }
+    let series: { name: string; data: number[] }[] = [];
+    for (const verdictName of verdict) {
+      series.push({
+        name: verdictName,
+        data: run[verdict.indexOf(verdictName)],
+      });
+    }
+    return series;
   }
   getStatistic(
     name:

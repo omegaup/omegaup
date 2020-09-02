@@ -372,6 +372,7 @@
 	"courseStatisticsStudentsAbove": "Estudiantes puntuado arriba de 60%",
 	"courseStatisticsStudentsScored": "Estudiantes puntuado a 0%",
 	"courseStatisticsVariance": "Varianza",
+	"courseStatisticsVerdicts": "Distribuci\u00f3n de veredictos",
 	"courseStudentAdded": "Estudiante agregado al curso exitosamente.",
 	"courseStudentAlreadyPresent": "El estudiante ya hab\u00eda sido agregado al curso.",
 	"courseStudentCountLabel": "Estudiantes: %(student_count)",

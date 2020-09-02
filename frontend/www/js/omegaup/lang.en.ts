@@ -373,6 +373,7 @@ const translations: { [key: string]: string; } = {
   courseStatisticsStudentsAbove: "Students scored above 60%",
   courseStatisticsStudentsScored: "Students scored at 0%",
   courseStatisticsVariance: "Variance",
+  courseStatisticsVerdicts: "Verdict distribution",
   courseStudentAdded: "Student added successfully.",
   courseStudentAlreadyPresent: "The student had already added to the course.",
   courseStudentCountLabel: "Students: %(student_count)",
