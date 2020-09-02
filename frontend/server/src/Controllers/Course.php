@@ -521,11 +521,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course' => strval($course->alias),
             'permissions' => 'clone',
         ];
-        $subject = strval($r->user->user_id);
         return [
             'token' => \OmegaUp\SecurityTools::getCourseCloneAuthorizationToken(
                 $claims,
-                $subject
+                /*$issuer=*/$r->identity->username
             ),
         ];
     }
@@ -561,11 +560,74 @@ class Course extends \OmegaUp\Controllers\Controller {
             fn (string $name) => \OmegaUp\Validators::stringNonEmpty($name)
         );
         $token = $r->ensureOptionalString('token');
-        if (!is_null($token)) {
-            // TODO: Add function to decode token, and all the validations
-        }
         $originalCourse = self::validateCourseExists($courseAlias);
-        self::validateClone($r, $originalCourse);
+        $decodedToken = null;
+        if (!is_null($token)) {
+            try {
+                $decodedToken = \OmegaUp\SecurityTools::getDecodedCloneCourseToken(
+                    $token,
+                    $courseAlias
+                );
+            } catch (\OmegaUp\Exceptions\TokenValidateException $e) {
+                self::$log->error(
+                    "Error validating token for course {$courseAlias}: $e"
+                );
+                \OmegaUp\DAO\CourseCloneLog::create(
+                    new \OmegaUp\DAO\VO\CourseCloneLog([
+                        'ip' => (
+                            \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                        ),
+                        'course_id' => $originalCourse->course_id,
+                        'new_course_id' => null,
+                        'token_payload' => json_encode($e->claims),
+                        'timestamp' => \OmegaUp\Time::get(),
+                        'user_id' => $r->user->user_id,
+                        'result' => $e->getMessage(),
+                    ])
+                );
+                if ($e->getMessage() === 'token_invalid') {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'tokenDecodeInvalid',
+                        'token'
+                    );
+                }
+                if ($e->getMessage() === 'token_expired') {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'tokenDecodeExpired',
+                        'token'
+                    );
+                }
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'tokenDecodeUnknown',
+                    'token'
+                );
+            } catch (\Exception $e) {
+                self::$log->error(
+                    "Error decoding token for course {$courseAlias}",
+                    $e
+                );
+
+                \OmegaUp\DAO\CourseCloneLog::create(
+                    new \OmegaUp\DAO\VO\CourseCloneLog([
+                        'ip' => (
+                            \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                        ),
+                        'course_id' => $originalCourse->course_id,
+                        'new_course_id' => null,
+                        'token_payload' => '',
+                        'timestamp' => \OmegaUp\Time::get(),
+                        'user_id' => $r->user->user_id,
+                        'result' => 'token_corrupted',
+                    ])
+                );
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'tokenDecodeCorrupted',
+                    'token'
+                );
+            }
+        } else {
+            self::validateClone($r, $originalCourse);
+        }
 
         $startTime = $r->ensureTimestamp('start_time');
         $offset = $startTime->time - $originalCourse->start_time->time;
@@ -666,7 +728,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'new_course_id' => !is_null(
                         $course
                     ) ? $course->course_id : null,
-                    'token_payload' => '',
+                    'token_payload' => json_encode($decodedToken),
                     'timestamp' => \OmegaUp\Time::get(),
                     'user_id' => $r->user->user_id,
                     'result' => $result,
@@ -2501,7 +2563,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $assignment_alias
      * @omegaup-request-param string $course_alias
-     * */
+     */
     public static function apiIntroDetails(\OmegaUp\Request $r) {
         $introDetails = self::getIntroDetails($r);
         if (!isset($introDetails['smartyProperties']['coursePayload'])) {
