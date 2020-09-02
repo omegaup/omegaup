@@ -585,7 +585,18 @@ class Course extends \OmegaUp\Controllers\Controller {
                         'result' => $e->getMessage(),
                     ])
                 );
-                throw $e;
+                if ($e->getMessage() === 'token_invalid') {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'tokenDecodeInvalid',
+                        'token'
+                    );
+                }
+                if ($e->getMessage() === 'token_expired') {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'tokenDecodeExpired',
+                        'token'
+                    );
+                }
             } catch (\Exception $e) {
                 self::$log->error(
                     "Error decoding token for course {$courseAlias}",
@@ -606,7 +617,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     ])
                 );
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
-                    'token_corrupted',
+                    'tokenDecodeCorrupted',
                     'token'
                 );
             }
