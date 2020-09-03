@@ -306,6 +306,7 @@ const translations: { [key: string]: string; } = {
   courseBasicInformationNeeded: "Para unirte al curso debes completar tu informaci\u00f3n b\u00e1sica. Ir a <a href=\"/profile/edit/\">Mi perfil</a>",
   courseCardAboutCourses: "Acerca de cursos",
   courseCardCourseResume: "Continuar",
+  courseCardDescriptionCourses: "Descripci\u00f3n:\nLos cursos en omegaUp son para\n- Profesores que desean crear cursos en l\u00ednea\n- Alumnos que participan en los cursos de sus clases\n- Cualquier usuario que desea aprender m\u00e1s sobre programaci\u00f3n participando en los cursos p\u00fablicos",
   courseCardDueDate: "Finaliza %(due_date)",
   courseCardImpartedBy: "Impartido por <span class=\"font-weight-bold\">%(school_name)</span>",
   courseCardShowTopics: "Mostrar temario",
