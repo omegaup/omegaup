@@ -338,7 +338,7 @@ class Request extends \ArrayObject {
      * Ensures that the value associated with the key is in an enum.
      *
      * @psalm-template TValue
-     * @param array<int, TValue> $enumValues
+     * @param array<array-key, TValue> $enumValues
      * @return TValue
      */
     public function ensureEnum(

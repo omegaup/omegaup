@@ -162,11 +162,17 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase {
     /**
      * Assert that contest in the request actually exists in the DB
      *
+     * @omegaup-request-param string $title
+     *
      * @param \OmegaUp\Request $r
      */
     public function assertContest(\OmegaUp\Request $r): void {
         // Validate that data was written to DB by getting the contest by title
-        $contests = \OmegaUp\DAO\Contests::getByTitle(strval($r['title']));
+        $contests = \OmegaUp\DAO\Contests::getByTitle(
+            $r->ensureString(
+                'title'
+            )
+        );
         $this->assertNotEmpty($contests);
         $contest = $contests[0];
 

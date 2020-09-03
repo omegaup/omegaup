@@ -17,15 +17,15 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return list<string>
      */
     public static function getAllBadges(): array {
+        /** @psalm-suppress MixedArgument OMEGAUP_BADGES_ROOT is really a string. */
         $aliases = array_diff(
-            scandir(
-                strval(static::OMEGAUP_BADGES_ROOT)
-            ),
+            scandir(static::OMEGAUP_BADGES_ROOT),
             ['..', '.', 'default_icon.svg']
         );
         $results = [];
         foreach ($aliases as $alias) {
-            if (!is_dir(strval(static::OMEGAUP_BADGES_ROOT) . "/${alias}")) {
+            /** @psalm-suppress MixedOperand OMEGAUP_BADGES_ROOT is really a string. */
+            if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
                 continue;
             }
             $results[] = $alias;

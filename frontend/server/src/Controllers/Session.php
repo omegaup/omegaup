@@ -77,10 +77,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      */
     private static function getAuthToken(\OmegaUp\Request $r): ?string {
         $sessionManager = self::getSessionManagerInstance();
-        $authToken = null;
-        if (!is_null($r['auth_token'])) {
-            $authToken = strval($r['auth_token']);
-        } else {
+        $authToken = $r->ensureOptionalString('auth_token');
+        if (is_null($authToken)) {
             $authToken = $sessionManager->getCookie(
                 OMEGAUP_AUTH_TOKEN_COOKIE_NAME
             );
@@ -114,11 +112,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($r)) {
             $r = new \OmegaUp\Request();
         }
-        if (is_null($r['auth_token'])) {
+        $authToken = $r->ensureOptionalString('auth_token');
+        if (is_null($authToken)) {
             $authToken = self::getAuthToken($r);
             $r['auth_token'] = $authToken;
-        } else {
-            $authToken = strval($r['auth_token']);
         }
         if (
             defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
@@ -143,7 +140,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
      */
     private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
-        if (empty($r['auth_token'])) {
+        $authToken = $r->ensureOptionalString('auth_token');
+        if (empty($authToken)) {
             return [
                 'valid' => false,
                 'email' => null,
@@ -154,7 +152,6 @@ class Session extends \OmegaUp\Controllers\Controller {
                 'is_admin' => false,
             ];
         }
-        $authToken = strval($r['auth_token']);
 
         $currentIdentityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $authToken
