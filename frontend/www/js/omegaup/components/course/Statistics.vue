@@ -60,7 +60,7 @@ export default class Statistics extends Vue {
       T.courseStatisticsVariance,
       this.getStatistic('variance'),
       this.getMaxStat('variance'),
-      this.problems,
+      this.problemLabels
     );
   }
   get averageChartOptions() {
@@ -70,7 +70,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('average'),
       this.maxPoints,
-      this.problems,
+      this.problemLabels
     );
   }
   get highScoreChartOptions() {
@@ -80,7 +80,7 @@ export default class Statistics extends Vue {
       T.wordsPercentage,
       this.getStatistic('high_score_percentage'),
       100,
-      this.problems,
+      this.problemLabels
     );
   }
   get lowScoreChartOptions() {
@@ -90,7 +90,7 @@ export default class Statistics extends Vue {
       T.wordsPercentage,
       this.getStatistic('low_score_percentage'),
       100,
-      this.problems,
+      this.problemLabels
     );
   }
   get minimumChartOptions() {
@@ -100,7 +100,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('minimum'),
       this.maxPoints,
-      this.problems,
+      this.problemLabels
     );
   }
   get maximumChartOptions() {
@@ -110,7 +110,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('maximum'),
       this.maxPoints,
-      this.problems,
+      this.problemLabels
     );
   }
   get runsChartOptions() {
@@ -120,7 +120,7 @@ export default class Statistics extends Vue {
       T.wordsRuns,
       this.getStatistic('avg_runs'),
       this.getMaxStat('avg_runs'),
-      this.problems,
+      this.problemLabels
     );
   }
   get verdictChartOptions() {
@@ -132,30 +132,32 @@ export default class Statistics extends Vue {
         text: T.courseStatisticsVerdicts,
       },
       xAxis: {
-        categories: this.problems,
+        categories: this.problemLabels,
         title: T.wordsProblem,
         min: 0,
       },
       yAxis: {
         min: 0,
-        max: this.maxRuns,
+        max: 100,
         title: T.wordsRuns,
       },
       tooltip: {},
       plotOptions: {
         series: {
+          stacking: 'normal',
+        },
+        bar: {
           dataLabels: {
             enabled: true,
-            format: '{y}',
+            format: '{y} %',
           },
-          stacking: 'normal',
         },
       },
       series: this.verdictStats,
     };
   }
   //helper functions
-  get problems() {
+  get problemLabels() {
     return this.problemStats.map(
       (problem) => `${problem.assignment_alias} - ${problem.problem_alias}`,
     );
@@ -174,37 +176,73 @@ export default class Statistics extends Vue {
     }
     return max;
   }
-  get maxRuns() {
-    let problems: string[] = [];
+  get problemList() {
+    return this.problemStats.map((problem) => problem.problem_alias);
+  }
+  get runsPerAssignment() {
+    const problems: string[] = this.problemList;
     let runSum: number[] = [];
     for (const stat of this.verdicts) {
-      if (!problems.includes(stat.problem_alias)) {
-        problems.push(stat.problem_alias);
-        runSum[problems.indexOf(stat.problem_alias)] = 0;
+      const problemIndex: number = problems.indexOf(stat.problem_alias);
+      if (!runSum[problemIndex]) {
+        runSum[problemIndex] = 0;
       }
-      runSum[problems.indexOf(stat.problem_alias)] += stat.runs;
+      runSum[problemIndex] += stat.runs;
     }
-    let maxRuns = 0;
-    for (let i = 0; i < runSum.length; i++) {
-      if (runSum[i] > maxRuns) maxRuns = runSum[i];
+    for (const problem of problems) {
+      if (!runSum[problems.indexOf(problem)]) {
+        runSum[problems.indexOf(problem)] = 0;
+      }
     }
-    return maxRuns;
+    return runSum;
+  }
+  get verdictList() {
+    let verdicts: string[] = [];
+    for (const stat of this.verdicts) {
+      if (!verdicts.includes(stat.verdict)) verdicts.push(stat.verdict);
+    }
+    return verdicts;
   }
   get verdictStats() {
-    let verdict: string[] = [];
-    let run: number[][] = [];
+    let verdicts: string[] = this.verdictList;
+    let runs: number[][] = [];
+    const assignmentRuns: number[] = this.runsPerAssignment;
+    let problemsCounted: number[] = [];
+    const problems: string[] = this.problemList;
+    let prevProblem: string = this.verdicts[0].problem_alias;
+    problemsCounted[problems.indexOf(prevProblem)] = 1;
     for (const stat of this.verdicts) {
-      if (!verdict.includes(stat.verdict)) {
-        verdict.push(stat.verdict);
-        run[verdict.indexOf(stat.verdict)] = [];
+      const verdictIndex: number = verdicts.indexOf(stat.verdict);
+      const problemIndex: number = problems.indexOf(stat.problem_alias);
+      if (stat.problem_alias != prevProblem) {
+        problemsCounted[problemIndex] = 1;
+        prevProblem = stat.problem_alias;
       }
-      run[verdict.indexOf(stat.verdict)].push(stat.runs);
+      if (!runs[verdictIndex])
+        runs[verdictIndex] = []
+      runs[verdictIndex][problemIndex] = parseFloat((stat.runs / assignmentRuns[problemIndex] * 100).toFixed(1));
+    }
+    //fill in problems with 0 runs
+    for (const problem of problems) {
+      const problemIndex: number = problems.indexOf(problem);
+      if (!problemsCounted[problemIndex]) {
+        for (let run of runs) {
+          run[problemIndex] = 0;
+        }
+      }
+    }
+    //edge case - null values
+    for (const run of runs) {
+      for (let i = 0; i < run.length; i++) {
+        if(!run[i])
+        run[i] = 0;
+      }
     }
     let series: { name: string; data: number[] }[] = [];
-    for (const verdictName of verdict) {
+    for (const verdictName of verdicts) {
       series.push({
         name: verdictName,
-        data: run[verdict.indexOf(verdictName)],
+        data: runs[verdicts.indexOf(verdictName)],
       });
     }
     return series;
