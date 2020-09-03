@@ -3,9 +3,9 @@ import expect from 'expect';
 
 import T from '../../lang';
 
-import course_DesciptionCard from './CourseDescriptionCard.vue';
+import course_DesciptionCard from './DescriptionCard.vue';
 
-describe('CourseDescriptionCard.vue', () => {
+describe('DescriptionCard.vue', () => {
   const wrapper = mount(course_DesciptionCard);
 
   expect(wrapper.text()).toContain(T.courseCardAboutCourses);

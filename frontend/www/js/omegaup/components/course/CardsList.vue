@@ -75,7 +75,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import course_CourseCard from './CourseCard.vue';
-import course_DescriptionCard from './CourseDescriptionCard.vue';
+import DescriptionCard from './DescriptionCard.vue';
 
 import {
   FontAwesomeIcon,
@@ -88,7 +88,7 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-description-card': course_DescriptionCard,
+    'omegaup-description-card': DescriptionCard,
     'omegaup-course-card': course_CourseCard,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,

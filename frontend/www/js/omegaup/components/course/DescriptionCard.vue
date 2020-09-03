@@ -1,9 +1,9 @@
 <template>
   <div class="card-header mb-3">
     <h1>{{ T.courseCardAboutCourses }}</h1>
-    <p>{{ T.courseCardAboutCourses }}</p>
+    <p>{{ T.courseCardDescriptionCourses }}</p>
     <div class="text-right align-middle">
-      <a v-bind:href="`/course/list/`">{{ T.wordsReadMore }}</a>
+      <a v-bind:href="`https://blog.omegaup.com/cursos-en-omegaup/`">{{ T.wordsReadMore }}</a>
     </div>
   </div>
 </template>
@@ -15,7 +15,7 @@ import * as ui from '../../ui';
 import T from '../../lang';
 
 @Component
-export default class CourseDescriptionCard extends Vue {
+export default class DescriptionCard extends Vue {
   T = T;
 }
 </script>
