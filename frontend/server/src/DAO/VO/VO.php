@@ -2,21 +2,21 @@
 
 namespace OmegaUp\DAO\VO;
 
-/** Value Object.
+/**
+ * Value Object.
  *
- * Esta clase abstracta comprende metodos comunes para todas los objetos VO
- * @access private
- * @package docs
- *
+ * Esta clase abstracta comprende metodos comunes para todos los objetos VO.
  */
 abstract class VO {
     /**
      * Gets an associative array that is good for JSON marshaling.
      *
-     * @return array<string, mixed>
+     * @return array<string, null|scalar|\OmegaUp\Timestamp>
      */
     public function asArray(): array {
-        return get_object_vars($this);
+        /** @var array<string, null|scalar|\OmegaUp\Timestamp> */
+        $result = get_object_vars($this);
+        return $result;
     }
 
     /**
@@ -37,18 +37,16 @@ abstract class VO {
      * good for JSON marshaling.
      *
      * @param string[] $filters
-     * @return array<string, mixed>
+     * @return array<string, null|scalar|\OmegaUp\Timestamp>
      */
     public function asFilteredArray(iterable $filters): array {
         // Get the complete representation of the array
         $completeArray = $this->asArray();
         // Declare an empty array to return
-        /** @var array<string, mixed> */
         $returnArray = [];
         foreach ($filters as $filter) {
             // Only return properties included in $filters array
             if (isset($completeArray[$filter])) {
-                /** @var array<string, mixed> */
                 $returnArray[$filter] = $completeArray[$filter];
             } else {
                 $returnArray[$filter] = null;

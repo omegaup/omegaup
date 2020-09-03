@@ -4469,7 +4469,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
         }
 
         // Build a csv
-        /** @var string[][] */
         $csvData = [];
 
         // Build titles
@@ -4552,13 +4551,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @param mixed[] $csvRow
+     * @param list<scalar> $csvRow
      *
      * @return list<string>
      */
     private static function escapeCsv($csvRow): array {
         $escapedRow = [];
-        /** @var mixed $field */
         foreach ($csvRow as $field) {
             if (is_string($field) && $field[0] == '=') {
                 $escapedRow[] = "'" . $field;

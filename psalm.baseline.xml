@@ -12,9 +12,8 @@
     </MixedArgument>
   </file>
   <file src="frontend/server/src/Controllers/Contest.php">
-    <MixedArgument occurrences="3">
+    <MixedArgument occurrences="2">
       <code>$r['query']</code>
-      <code>$field</code>
       <code>$r['contest_alias']</code>
     </MixedArgument>
   </file>
@@ -94,15 +93,6 @@
       <code>$r['query']</code>
     </MixedArgument>
   </file>
-  <file src="frontend/server/src/Controllers/Run.php">
-    <MixedArgument occurrences="5">
-      <code>$filtered['guid']</code>
-      <code>$filtered['language']</code>
-      <code>$filtered['status']</code>
-      <code>$filtered['type']</code>
-      <code>$filtered['verdict']</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/server/src/Controllers/Session.php">
     <MixedArgument occurrences="3">
       <code>$r['auth_token']</code>
@@ -118,42 +108,14 @@
       <code>$r['date']</code>
     </MixedArgument>
   </file>
-  <file src="frontend/server/src/DAO/Problems.php">
-    <MixedArgument occurrences="4">
-      <code>$problemsUser['alias']</code>
-      <code>$problemsUser['title']</code>
-      <code>$problemsUser['username']</code>
-      <code>$row['email']</code>
-    </MixedArgument>
-  </file>
-  <file src="frontend/server/src/ScoreboardParams.php">
-    <MixedArgument occurrences="4">
-      <code>$params['alias']</code>
-      <code>$params['title']</code>
-      <code>$params['penalty_calc_policy']</code>
-      <code>$params['auth_token']</code>
-    </MixedArgument>
-  </file>
-  <file src="frontend/server/src/UITools.php">
-    <MixedArgument occurrences="2">
-      <code>$smartyProperties['title']</code>
-      <code>$smarty-&gt;getConfigVars($titleVar)</code>
-    </MixedArgument>
-  </file>
   <file src="frontend/tests/ControllerTestCase.php">
     <MixedArgument occurrences="1">
       <code>$r['title']</code>
     </MixedArgument>
   </file>
   <file src="frontend/tests/Factories/Contest.php">
-    <MixedArgument occurrences="7">
+    <MixedArgument occurrences="1">
       <code>$r['alias']</code>
-      <code>$problemData['request']['problem_alias']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']['alias']</code>
-      <code>$contestData['request']['alias']</code>
     </MixedArgument>
   </file>
   <file src="frontend/tests/Factories/Problem.php">
