@@ -158,7 +158,7 @@
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
-#overlay {
+[data-overlay] {
   display: none;
   position: fixed;
   top: 0;

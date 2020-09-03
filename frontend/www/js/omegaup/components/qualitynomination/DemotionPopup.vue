@@ -1,7 +1,9 @@
 <template>
   <div class="qualitynomination-demotionpopup">
     <button class="btn btn-link" v-on:click="onReportInappropriateProblem">
-      {{ T.wordsReportProblem }}
+      <slot name="activator">
+        {{ T.wordsReportProblem }}
+      </slot>
     </button>
     <form class="popup h-auto w-auto" v-show="showReportDialog">
       <template v-if="currentView == 'question'">

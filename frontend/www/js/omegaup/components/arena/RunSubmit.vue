@@ -64,69 +64,10 @@
   </form>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 .CodeMirror pre.CodeMirror-line {
   padding: 0px 35px;
-}
-form {
-  background: #eee;
-  width: 80%;
-  height: 80%;
-  margin: auto;
-  border: 2px solid #ccc;
-  padding: 1em;
-  position: fixed;
-  overflow-y: auto;
-  overflow-x: hidden;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  z-index: 9999999;
-  .close-container {
-    width: 100%;
-    .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: $omegaup-white;
-      border: 1px solid #ccc;
-      border-width: 0 0 1px 1px;
-      font-size: 110%;
-      width: 25px;
-      height: 25px;
-      &:hover {
-        background-color: #eee;
-      }
-    }
-  }
-  .languages {
-    width: 100%;
-  }
-  .filename-extension {
-    width: 100%;
-  }
-  .run-submit-paste-text {
-    width: 100%;
-  }
-  .code-view {
-    width: 100%;
-    flex-grow: 1;
-    overflow: auto;
-  }
-  .upload-file {
-    width: 100%;
-  }
-  .submit-run {
-    width: 100%;
-  }
-}
-input[type='submit'] {
-  font-size: 110%;
-  padding: 0.3em 0.5em;
 }
 </style>
 

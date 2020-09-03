@@ -92,7 +92,11 @@
               (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
             "
             v-on:dismiss="showOverlay = false"
-          ></omegaup-quality-nomination-review>
+          >
+            <template slot="activator">
+              {{ T.reviewerNomination }}
+            </template>
+          </omegaup-quality-nomination-review>
           <omegaup-quality-nomination-demotion
             slot="link-title"
             v-bind:value.sync="showOverlay"
@@ -102,6 +106,9 @@
             "
             v-on:dismiss="showOverlay = false"
           >
+            <template slot="activator">
+              {{ T.wordsReportProblem }}
+            </template>
           </omegaup-quality-nomination-demotion>
           <omegaup-quality-nomination-promotion
             slot="link-title"
@@ -122,9 +129,13 @@
               (qualityPromotionComponent) =>
                 onDismissPromotion(qualityPromotionComponent)
             "
-          ></omegaup-quality-nomination-promotion>
+          >
+            <template slot="link-title">
+              {{ T.qualityNominationRateProblem }}
+            </template>
+          </omegaup-quality-nomination-promotion>
           <omegaup-arena-runsubmit
-            slot="link-title"
+            slot="popup-content"
             v-bind:preferred-language="problem.preferred_language"
             v-bind:languages="problem.languages"
             v-bind:initial-show-form="showFormRunSubmit"
@@ -192,11 +203,6 @@
         ></omegaup-arena-clarification-list>
       </div>
     </div>
-    <!-- id-lint off -->
-    <div id="overlay">
-      <div id="run-details"></div>
-    </div>
-    <!-- id-lint on -->
   </div>
 </template>
 

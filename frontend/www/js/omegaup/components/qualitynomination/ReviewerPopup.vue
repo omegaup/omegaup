@@ -5,9 +5,11 @@
     v-bind:value.sync="showOverlay"
     v-on:submit="$emit('submit', tag, qualitySeal)"
   >
-    <template slot="link-title">
-      {{ T.reviewerNomination }}
-    </template>
+    <solt name="activator">
+      <template slot="link-title">
+        {{ T.reviewerNomination }}
+      </template>
+    </solt>
     <template slot="popup-content" slot-scope="slotProps">
       <div class="title-text">
         {{ T.reviewerNominationFormTitle }}

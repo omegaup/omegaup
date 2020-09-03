@@ -1,13 +1,9 @@
 <template>
   <div class="mt-2">
     <template v-if="globalRuns">
-      <!-- TODO: This code should be removed when we stop using jquery and the
-        migration to vue was over -->
-      <!-- id-lint off -->
-      <div id="overlay">
-        <div id="run-details"></div>
-      </div>
-      <!-- id-lint on -->
+      <omegaup-overlay v-bind:show-overlay="showOverlay">
+        <omegaup-arena-rundetails></omegaup-arena-rundetails>
+      </omegaup-overlay>
       <div class="card-header">
         <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
       </div>
@@ -399,6 +395,7 @@ export default class Runs extends Vue {
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
+  showOverlay = false;
 
   get filteredRuns(): types.Run[] {
     if (

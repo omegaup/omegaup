@@ -91,7 +91,7 @@
 {/if}
 {include file='arena.clarification_list.tpl' contest=true inline}
 		</div>
-		<div id="overlay">
+		<div id="overlay" data-overlay>
 			{if !empty($payload)}
 				<script type="text/json" id="payload">{$payload|json_encode}</script>
 			{/if}
