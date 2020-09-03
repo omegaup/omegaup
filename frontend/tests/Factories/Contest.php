@@ -237,7 +237,7 @@ class Contest {
             $r['admission_mode'] = 'public';
         }
 
-        $contest = \OmegaUp\DAO\Contests::getByAlias(strval($r['alias']));
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r->ensureString('alias'));
 
         return [
             'director' => $contestData['director'],

@@ -91,7 +91,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
      * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $problems
+     * @omegaup-request-param string|null $problems
      * @omegaup-request-param OmegaUp\Timestamp $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
@@ -150,13 +150,12 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
 
         $addedProblems = [];
-        if (!empty($r['problems'])) {
+        $problemsJson = $r->ensureOptionalString('problems');
+        if (!empty($problemsJson)) {
           /** @var list<array{alias: string, commit?: string, points?: int|float|string}> */
             $problemsData = json_decode(
-                strval(
-                    $r['problems']
-                ), /*$assoc=*/
-                true
+                $problemsJson,
+                /*$assoc=*/ true
             );
             foreach ($problemsData as $problemData) {
                 if (!isset($problemData['alias'])) {
@@ -985,7 +984,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
      * @omegaup-request-param int|null $order
-     * @omegaup-request-param mixed $problems
+     * @omegaup-request-param null|string $problems
      * @omegaup-request-param mixed $publish_time_delay
      * @omegaup-request-param mixed $start_time
      * @omegaup-request-param bool|null $unlimited_duration
@@ -3954,10 +3953,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course_alias
      * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param mixed $offset
-     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param mixed $rowcount
      * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      *
      * @return array{runs: list<Run>}
@@ -4012,10 +4011,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $course_alias
      * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param int $offset
-     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param null|string $username
      * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
      */
     private static function validateRuns(
@@ -4073,11 +4072,9 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Check filter by problem, is optional
         $problem = null;
-        if (!is_null($r['problem_alias'])) {
-            $problem = \OmegaUp\DAO\Problems::getByAlias(
-                strval($r['problem_alias'])
-            );
-
+        $problemAlias = $r->ensureOptionalString('problem_alias');
+        if (!is_null($problemAlias)) {
+            $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
             if (is_null($problem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'
@@ -4092,9 +4089,10 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Get user if we have something in username
         $identity = null;
-        if (!is_null($r['username'])) {
+        $username = $r->ensureOptionalString('username');
+        if (!is_null($username)) {
             $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                strval($r['username'])
+                $username
             );
         }
 
