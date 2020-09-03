@@ -273,9 +273,8 @@ class SecurityTools {
         string $token,
         string $courseAlias
     ): array {
-        $secretKey = self::getCourseCloneSecretKey();
         $parser = \ParagonIE\Paseto\Parser::getLocal(
-            $secretKey,
+            self::getCourseCloneSecretKey(),
             \ParagonIE\Paseto\ProtocolCollection::v2()
         );
         $parsedToken = $parser->parse($token, /*$skipValidation=*/true);

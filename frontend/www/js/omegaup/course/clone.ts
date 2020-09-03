@@ -13,8 +13,8 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-course-clone', {
         props: {
-          username: payload.creator?.username,
-          classname: payload.creator?.classname,
+          username: payload.creator.username,
+          classname: payload.creator.classname,
           course: payload.details,
           token: payload.token,
         },
