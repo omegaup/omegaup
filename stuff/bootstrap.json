@@ -23,7 +23,7 @@
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"public_tags": "problemTagBinarySearchTree"
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -49,7 +49,7 @@
 					"languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"public_tags": "problemTagBinarySearchTree"
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/triangulos.zip"
@@ -74,7 +74,7 @@
 					"languages": "kp,kj",
 					"email_clarifications": 1,
 					"problem_level": "problemLevelBasicIntroductionToProgramming",
-					"public_tags": "problemTagBinarySearchTree"
+					"selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
 				},
 				"files": {
 					"problem_contents": "frontend/tests/resources/karel_helloworld.zip"

@@ -56,14 +56,14 @@ class ProblemParams {
      */
     public $problemLevel;
 
-        /**
+    /**
      * @readonly
      * @var string
      */
-    public $publicTags;
+    public $selectedTags;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, public_tags?: string} $params
+     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -73,7 +73,12 @@ class ProblemParams {
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
-        $this->publicTags = $params['public_tags'] ?? 'problemTagBinarySearchTree';
+        $this->publicTags = $params['public_tags'] ?? $params['selected_tags'] ?? json_encode([
+            [
+                'tagname' => 'problemTagBinarySearchTree',
+                'public' => true,
+            ],
+        ]);
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];
@@ -147,7 +152,7 @@ class Problem {
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
             'problem_level' => 'problemLevelBasicIntroductionToProgramming',
-            'public_tags' => 'problemTagBinarySearchTree',
+            'public_tags' => $params->selectedTags,
         ]);
 
         // Set file upload context
