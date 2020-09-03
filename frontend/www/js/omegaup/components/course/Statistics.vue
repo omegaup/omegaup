@@ -60,7 +60,7 @@ export default class Statistics extends Vue {
       T.courseStatisticsVariance,
       this.getStatistic('variance'),
       this.getMaxStat('variance'),
-      this.problemLabels
+      this.problemLabels,
     );
   }
   get averageChartOptions() {
@@ -70,7 +70,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('average'),
       this.maxPoints,
-      this.problemLabels
+      this.problemLabels,
     );
   }
   get highScoreChartOptions() {
@@ -80,7 +80,7 @@ export default class Statistics extends Vue {
       T.wordsPercentage,
       this.getStatistic('high_score_percentage'),
       100,
-      this.problemLabels
+      this.problemLabels,
     );
   }
   get lowScoreChartOptions() {
@@ -90,7 +90,7 @@ export default class Statistics extends Vue {
       T.wordsPercentage,
       this.getStatistic('low_score_percentage'),
       100,
-      this.problemLabels
+      this.problemLabels,
     );
   }
   get minimumChartOptions() {
@@ -100,7 +100,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('minimum'),
       this.maxPoints,
-      this.problemLabels
+      this.problemLabels,
     );
   }
   get maximumChartOptions() {
@@ -110,7 +110,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('maximum'),
       this.maxPoints,
-      this.problemLabels
+      this.problemLabels,
     );
   }
   get runsChartOptions() {
@@ -120,7 +120,7 @@ export default class Statistics extends Vue {
       T.wordsRuns,
       this.getStatistic('avg_runs'),
       this.getMaxStat('avg_runs'),
-      this.problemLabels
+      this.problemLabels,
     );
   }
   get verdictChartOptions() {
@@ -218,9 +218,10 @@ export default class Statistics extends Vue {
         problemsCounted[problemIndex] = 1;
         prevProblem = stat.problem_alias;
       }
-      if (!runs[verdictIndex])
-        runs[verdictIndex] = []
-      runs[verdictIndex][problemIndex] = parseFloat((stat.runs / assignmentRuns[problemIndex] * 100).toFixed(1));
+      if (!runs[verdictIndex]) runs[verdictIndex] = [];
+      runs[verdictIndex][problemIndex] = parseFloat(
+        ((stat.runs / assignmentRuns[problemIndex]) * 100).toFixed(1),
+      );
     }
     //fill in problems with 0 runs
     for (const problem of problems) {
@@ -234,8 +235,7 @@ export default class Statistics extends Vue {
     //edge case - null values
     for (const run of runs) {
       for (let i = 0; i < run.length; i++) {
-        if(!run[i])
-        run[i] = 0;
+        if (!run[i]) run[i] = 0;
       }
     }
     let series: { name: string; data: number[] }[] = [];
