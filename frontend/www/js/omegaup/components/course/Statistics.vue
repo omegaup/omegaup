@@ -32,7 +32,6 @@ import * as ui from '../../ui';
 export default class Statistics extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() problemStats!: types.CourseProblemStatistics[];
-  @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   //chart options
   selected = this.varianceChartOptions;
@@ -49,8 +48,6 @@ export default class Statistics extends Vue {
     },
     { value: this.minimumChartOptions, text: T.courseStatisticsMinimumScore },
     { value: this.maximumChartOptions, text: T.courseStatisticsMaximumScore },
-    { value: this.runsChartOptions, text: T.courseStatisticsAverageRuns },
-    { value: this.verdictChartOptions, text: T.courseStatisticsVerdicts },
   ];
   //get chart options
   get varianceChartOptions() {
@@ -59,8 +56,8 @@ export default class Statistics extends Vue {
       '{y}',
       T.courseStatisticsVariance,
       this.getStatistic('variance'),
-      this.getMaxStat('variance'),
-      this.problemLabels,
+      this.maxVariance,
+      this.problems,
     );
   }
   get averageChartOptions() {
@@ -70,7 +67,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('average'),
       this.maxPoints,
-      this.problemLabels,
+      this.problems,
     );
   }
   get highScoreChartOptions() {
@@ -80,7 +77,7 @@ export default class Statistics extends Vue {
       T.wordsPercentage,
       this.getStatistic('high_score_percentage'),
       100,
-      this.problemLabels,
+      this.problems,
     );
   }
   get lowScoreChartOptions() {
@@ -90,7 +87,7 @@ export default class Statistics extends Vue {
       T.wordsPercentage,
       this.getStatistic('low_score_percentage'),
       100,
-      this.problemLabels,
+      this.problems,
     );
   }
   get minimumChartOptions() {
@@ -100,7 +97,7 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('minimum'),
       this.maxPoints,
-      this.problemLabels,
+      this.problems,
     );
   }
   get maximumChartOptions() {
@@ -110,54 +107,11 @@ export default class Statistics extends Vue {
       T.wordsScore,
       this.getStatistic('maximum'),
       this.maxPoints,
-      this.problemLabels,
+      this.problems,
     );
-  }
-  get runsChartOptions() {
-    return this.createChartOptions(
-      T.courseStatisticsAverageRuns,
-      '{y}',
-      T.wordsRuns,
-      this.getStatistic('avg_runs'),
-      this.getMaxStat('avg_runs'),
-      this.problemLabels,
-    );
-  }
-  get verdictChartOptions() {
-    return {
-      chart: {
-        type: 'bar',
-      },
-      title: {
-        text: T.courseStatisticsVerdicts,
-      },
-      xAxis: {
-        categories: this.problemLabels,
-        title: T.wordsProblem,
-        min: 0,
-      },
-      yAxis: {
-        min: 0,
-        max: 100,
-        title: T.wordsRuns,
-      },
-      tooltip: {},
-      plotOptions: {
-        series: {
-          stacking: 'normal',
-        },
-        bar: {
-          dataLabels: {
-            enabled: true,
-            format: '{y} %',
-          },
-        },
-      },
-      series: this.verdictStats,
-    };
   }
   //helper functions
-  get problemLabels() {
+  get problems() {
     return this.problemStats.map(
       (problem) => `${problem.assignment_alias} - ${problem.problem_alias}`,
     );
@@ -169,102 +123,28 @@ export default class Statistics extends Vue {
     }
     return maxPoints;
   }
-  getMaxStat(statistic: 'variance' | 'avg_runs') {
-    let max = 0;
-    for (const stat of this.getStatistic(statistic)) {
-      if (stat > max) max = stat;
+  get maxVariance() {
+    let maxVariance = 0;
+    for (const variance of this.getStatistic('variance')) {
+      if (variance > maxVariance) maxVariance = variance;
     }
-    return max;
-  }
-  get problemList() {
-    return this.problemStats.map((problem) => problem.problem_alias);
-  }
-  get runsPerAssignment() {
-    const problems: string[] = this.problemList;
-    let runSum: number[] = [];
-    for (const stat of this.verdicts) {
-      const problemIndex: number = problems.indexOf(stat.problem_alias);
-      if (!runSum[problemIndex]) {
-        runSum[problemIndex] = 0;
-      }
-      runSum[problemIndex] += stat.runs;
-    }
-    for (const problem of problems) {
-      if (!runSum[problems.indexOf(problem)]) {
-        runSum[problems.indexOf(problem)] = 0;
-      }
-    }
-    return runSum;
-  }
-  get verdictList() {
-    let verdicts: string[] = [];
-    for (const stat of this.verdicts) {
-      if (!verdicts.includes(stat.verdict)) verdicts.push(stat.verdict);
-    }
-    return verdicts;
-  }
-  get verdictStats() {
-    let verdicts: string[] = this.verdictList;
-    let runs: number[][] = [];
-    const assignmentRuns: number[] = this.runsPerAssignment;
-    let problemsCounted: number[] = [];
-    const problems: string[] = this.problemList;
-    let prevProblem: string = this.verdicts[0].problem_alias;
-    problemsCounted[problems.indexOf(prevProblem)] = 1;
-    for (const stat of this.verdicts) {
-      const verdictIndex: number = verdicts.indexOf(stat.verdict);
-      const problemIndex: number = problems.indexOf(stat.problem_alias);
-      if (stat.problem_alias != prevProblem) {
-        problemsCounted[problemIndex] = 1;
-        prevProblem = stat.problem_alias;
-      }
-      if (!runs[verdictIndex]) runs[verdictIndex] = [];
-      runs[verdictIndex][problemIndex] = parseFloat(
-        ((stat.runs / assignmentRuns[problemIndex]) * 100).toFixed(1),
-      );
-    }
-    //fill in problems with 0 runs
-    for (const problem of problems) {
-      const problemIndex: number = problems.indexOf(problem);
-      if (!problemsCounted[problemIndex]) {
-        for (let run of runs) {
-          run[problemIndex] = 0;
-        }
-      }
-    }
-    //edge case - null values
-    for (const run of runs) {
-      for (let i = 0; i < run.length; i++) {
-        if (!run[i]) run[i] = 0;
-      }
-    }
-    let series: { name: string; data: number[] }[] = [];
-    for (const verdictName of verdicts) {
-      series.push({
-        name: verdictName,
-        data: runs[verdicts.indexOf(verdictName)],
-      });
-    }
-    return series;
+    return maxVariance;
   }
   getStatistic(
     name:
       | 'variance'
       | 'average'
-      | 'avg_runs'
       | 'high_score_percentage'
       | 'low_score_percentage'
       | 'maximum'
       | 'minimum',
   ) {
-    return this.problemStats.map((problem) =>
-      parseFloat((problem[name] || 0).toFixed(1)),
-    );
+    return this.problemStats.map((problem) => problem[name] || 0);
   }
+  //title = string
   //yLabel = '{y}' or '{y} %'
-  //yName = data type (percentage, score, etc.)
   //data = getStatistics("chart_type")
-  //yMax = get maxPoints() or getMaxStat
+  //yMax = get maxPoints() or get maxVariance()
   createChartOptions(
     title: string,
     yLabel: string,
