@@ -237,7 +237,7 @@ class Contest {
             $r['admission_mode'] = 'public';
         }
 
-        $contest = \OmegaUp\DAO\Contests::getByAlias(strval($r['alias']));
+        $contest = \OmegaUp\DAO\Contests::getByAlias($r->ensureString('alias'));
 
         return [
             'director' => $contestData['director'],
@@ -325,8 +325,10 @@ class Contest {
 
         return \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'contest_alias' => $contestData['request']['alias'],
-            'problem_alias' => strval($problemData['request']['problem_alias']),
+            'contest_alias' => $contestData['request']->ensureString('alias'),
+            'problem_alias' => (
+                $problemData['request']->ensureString('problem_alias')
+            ),
         ]));
     }
 
@@ -337,19 +339,17 @@ class Contest {
         array $contestData,
         \OmegaUp\DAO\VO\Identities $identity
     ): void {
-        // Prepare our request
-        $r = new \OmegaUp\Request();
-        $r['contest_alias'] = strval($contestData['request']['alias']);
-        $r['usernameOrEmail'] = $identity->username;
-
         // Log in the contest director
         $login = \OmegaUp\Test\ControllerTestCase::login(
             $contestData['director']
         );
-        $r['auth_token'] = $login->auth_token;
 
         // Call api
-        \OmegaUp\Controllers\Contest::apiAddUser($r);
+        \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']->ensureString('alias'),
+            'usernameOrEmail' => $identity->username,
+        ]));
     }
 
     /**
@@ -357,21 +357,19 @@ class Contest {
      */
     public static function addIdentity(
         array $contestData,
-        \OmegaUp\DAO\VO\Identities $identitiy
+        \OmegaUp\DAO\VO\Identities $identity
     ): void {
-        // Prepare our request
-        $r = new \OmegaUp\Request();
-        $r['contest_alias'] = strval($contestData['request']['alias']);
-        $r['usernameOrEmail'] = $identitiy->username;
-
         // Log in the contest director
         $login = \OmegaUp\Test\ControllerTestCase::login(
             $contestData['director']
         );
-        $r['auth_token'] = $login->auth_token;
 
         // Call api
-        \OmegaUp\Controllers\Contest::apiAddUser($r);
+        \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']->ensureString('alias'),
+            'usernameOrEmail' => $identity->username,
+        ]));
     }
 
     /**
@@ -381,19 +379,17 @@ class Contest {
         $contestData,
         \OmegaUp\DAO\VO\Identities $user
     ): void {
-        // Prepare our request
-        $r = new \OmegaUp\Request();
-        $r['contest_alias'] = strval($contestData['request']['alias']);
-        $r['usernameOrEmail'] = $user->username;
-
         // Log in the contest director
         $login = \OmegaUp\Test\ControllerTestCase::login(
             $contestData['director']
         );
-        $r['auth_token'] = $login->auth_token;
 
         // Call api
-        \OmegaUp\Controllers\Contest::apiAddAdmin($r);
+        \OmegaUp\Controllers\Contest::apiAddAdmin(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'contest_alias' => $contestData['request']->ensureString('alias'),
+            'usernameOrEmail' => $user->username,
+        ]));
     }
 
     /**
@@ -427,7 +423,7 @@ class Contest {
         ?\OmegaUp\Timestamp $lastUpdated = null
     ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
-            strval($contestData['request']['alias'])
+            $contestData['request']->ensureString('alias')
         );
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -449,7 +445,7 @@ class Contest {
         int $percentage
     ): void {
         $contest = \OmegaUp\DAO\Contests::getByAlias(
-            strval($contestData['request']['alias'])
+            $contestData['request']->ensureString('alias')
         );
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
