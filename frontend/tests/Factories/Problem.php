@@ -75,7 +75,7 @@ class ProblemParams {
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
         $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
             [
-                'tagname' => 'problemTagBinarySearchTree',
+                'tagname' => 'problemLevelBasicIntroductionToProgramming',
                 'public' => true,
             ],
         ]);
