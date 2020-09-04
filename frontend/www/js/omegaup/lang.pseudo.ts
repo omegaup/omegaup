@@ -306,7 +306,7 @@ const translations: { [key: string]: string; } = {
   courseBasicInformationNeeded: "(T0 j0in 7h3 c0ur53 y0u mu57 fi11 in y0ur ba5ic inf0rma7i0n. G0 70 <a hr3f=\"/pr0fi13/3di7/\">My pr0fi13</a>)",
   courseCardAboutCourses: "(Ab0u7 c0ur535)",
   courseCardCourseResume: "(R35um3)",
-  courseCardDescriptionCourses: "(<p>D35crip7i0n:</p><p>Th3 c0ur535 a7 0m3gaUp ar3 f0r</p><u1><1i>T3ach3r5 wh0 wan7 70 cr3a73 0n1in3 c0ur535</1i><1i>S7ud3n75 par7icipa7ing in 7h3 c0ur535 0f 7h3ir c1a5535</1i><1i>Any u53r wh0 wan75 70 13arn m0r3 ab0u7 pr0gramming by par7icipa7ing in pub1ic c0ur535</1i></u1>)",
+  courseCardDescriptionCourses: "(<p>Th3 c0ur535 a7 0m3gaUp ar3 f0r</p><u1><1i>T3ach3r5 wh0 wan7 70 cr3a73 0n1in3 c0ur535</1i><1i>S7ud3n75 par7icipa7ing in 7h3 c0ur535 0f 7h3ir c1a5535</1i><1i>Any u53r wh0 wan75 70 13arn m0r3 ab0u7 pr0gramming by par7icipa7ing in pub1ic c0ur535</1i></u1>)",
   courseCardDueDate: "(Du3 %(due_date))",
   courseCardImpartedBy: "(Impar73d by <5pan c1a55=\"f0n7-w3igh7-b01d\">%(school_name)</5pan>)",
   courseCardShowTopics: "(Sh0w 70pic5)",
