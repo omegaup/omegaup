@@ -20,11 +20,6 @@ describe('GenerateLinkClone.vue', () => {
         token: 'v2.local.fak3T0k3n',
       },
     });
-    expect(wrapper.find('textarea').text()).toContain('v2.local.fak3T0k3n');
-
-    await wrapper.find('button[data-copy-to-clipboard]').trigger('click');
-    expect(wrapper.find('span[data-copied]').text()).toBe(
-      T.passwordResetLinkCopiedToClipboard,
-    );
+    expect(wrapper.text()).toContain(T.courseCloneGenerateLinkDescription);
   });
 });

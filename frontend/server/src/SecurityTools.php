@@ -248,13 +248,76 @@ class SecurityTools {
      * gitserver that is valid for a single problem for 5 minutes.
      *
      * @param array<string, string> $claims
-     * @param string $subject
+     * @param string $issuer
      * @return string The Bearer authorization token.
      */
-    public static function getCourseCloneAuthorizationToken(
-        array $claims,
-        string $subject
-    ): string {
+    public static function getCourseCloneAuthorizationToken($claims, $issuer) {
+        $secretKey = self::getCourseCloneSecretKey();
+        $currentTime = (new \DateTime())->setTimestamp(\OmegaUp\Time::get());
+        $token = (new \ParagonIE\Paseto\Builder())
+            ->setKey($secretKey)
+            ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
+            ->setPurpose(\ParagonIE\Paseto\Purpose::local())
+            ->setNotBefore($currentTime)
+            ->setIssuedAt($currentTime)
+            ->setExpiration($currentTime->add(new \DateInterval('P7D')))
+            ->setIssuer($issuer)
+            ->setClaims($claims);
+        return $token->toString();
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getDecodedCloneCourseToken(
+        string $token,
+        string $courseAlias
+    ): array {
+        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
+        require_once 'libs/third_party/paseto/src/Parser.php';
+        $parser = \ParagonIE\Paseto\Parser::getLocal(
+            self::getCourseCloneSecretKey(),
+            \ParagonIE\Paseto\ProtocolCollection::v2()
+        );
+        $parsedToken = $parser->parse($token, /*$skipValidation=*/true);
+        /** @var array<string, string> */
+        $claims = $parsedToken->getClaims();
+        if (
+            !(new \OmegaUp\ClaimRule(
+                'permissions',
+                'clone'
+            ))->isValid(
+                $parsedToken
+            ) ||
+            !(new \OmegaUp\ClaimRule(
+                'course',
+                $courseAlias
+            ))->isValid(
+                $parsedToken
+            )
+        ) {
+            throw new \OmegaUp\Exceptions\TokenValidateException(
+                'token_invalid',
+                $claims
+            );
+        }
+        if (
+            !(new \ParagonIE\Paseto\Rules\ValidAt(
+                (new \DateTime())->setTimestamp(\OmegaUp\Time::get())
+            ))->isValid($parsedToken)
+        ) {
+            throw new \OmegaUp\Exceptions\TokenValidateException(
+                'token_expired',
+                $claims
+            );
+        }
+        return $claims;
+    }
+
+    /**
+     * @psalm-return \ParagonIE\Paseto\Keys\SymmetricKey
+     */
+    private static function getCourseCloneSecretKey() {
         // Given that we already have an autoload configured, we cannot use
         // sodium_compat's (fast) autoloader. Instead, simulate what it does
         // here, with the full path of the standard autoload file.
@@ -281,25 +344,18 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/Purpose.php';
         require_once 'libs/third_party/paseto/src/Builder.php';
         require_once 'libs/third_party/paseto/src/Util.php';
+        require_once 'libs/third_party/paseto/src/ValidationRuleInterface.php';
+        require_once 'libs/third_party/paseto/src/Rules/ValidAt.php';
         require_once 'libs/third_party/paseto/src/Parsing/Header.php';
         require_once 'libs/third_party/paseto/src/Parsing/PasetoMessage.php';
         require_once 'libs/third_party/paseto/src/Exception/PasetoException.php';
-
+        require_once 'libs/third_party/paseto/src/Exception/SecurityException.php';
+        require_once 'libs/third_party/paseto/src/Exception/NotFoundException.php';
         if (is_null(self::$_courseCloneSecretKey)) {
             self::$_courseCloneSecretKey = \ParagonIE\Paseto\Keys\SymmetricKey::fromEncodedString(
                 OMEGAUP_COURSE_CLONE_SECRET_KEY
             );
         }
-        $token = (new \ParagonIE\Paseto\Builder())
-            ->setKey(self::$_courseCloneSecretKey)
-            ->setVersion(new \ParagonIE\Paseto\Protocol\Version2())
-            ->setPurpose(\ParagonIE\Paseto\Purpose::local())
-            ->setExpiration(
-                (new \DateTime('now'))->add(new \DateInterval('P7D'))
-            )
-            ->setIssuer('omegaUp frontend')
-            ->setSubject($subject)
-            ->setClaims($claims);
-        return $token->toString();
+        return self::$_courseCloneSecretKey;
     }
 }

@@ -5,7 +5,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         parent::setUp();
 
         \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
-        \OmegaUp\Test\Factories\QualityNomination::initTags();
+        \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
     }
 
     /**
@@ -1819,15 +1819,29 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         $extractName = fn ($tag) => $tag['name'];
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags1,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemTopicMatrices', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemRestrictedTagLanguage',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemTopicMatrices'
+            ]
         );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags3,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemRestrictedTagLanguage',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicGeometry',
+                'problemTopicSorting'
+            ]
         );
 
         \OmegaUp\Test\Utils::runUpdateRanks();
@@ -1894,15 +1908,28 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $tags1 = array_map($extractName, $tagArrayForProblem1);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags1,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemRestrictedTagLanguage'
+            ]
         );
 
         $tags3 = array_map($extractName, $tagArrayForProblem3);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags3,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicGeometry', 'problemTopicSorting', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicGeometry',
+                'problemTopicSorting',
+                'problemRestrictedTagLanguage'
+            ]
         );
     }
 
@@ -2269,9 +2296,13 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 true /* includeVoted */
             )
         );
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags,
-            ['problemTopicDynamicProgramming', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemRestrictedTagLanguage'
+            ]
         );
 
         \OmegaUp\Test\Utils::runAggregateFeedback();
@@ -2284,9 +2315,15 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
                 true /* includeVoted */
             )
         );
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             $tags,
-            ['problemTopicDynamicProgramming', 'problemTopicGreedy', 'problemTopicMath', 'problemRestrictedTagLanguage']
+            [
+                'problemLevelBasicIntroductionToProgramming',
+                'problemTopicDynamicProgramming',
+                'problemTopicGreedy',
+                'problemTopicMath',
+                'problemRestrictedTagLanguage'
+            ]
         );
     }
 

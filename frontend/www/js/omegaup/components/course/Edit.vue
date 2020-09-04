@@ -166,9 +166,6 @@
         <omegaup-course-admision-mode
           v-bind:initial-admission-mode="data.course.admission_mode"
           v-bind:should-show-public-option="data.course.is_curator"
-          v-bind:admission-mode-description="
-            T.courseEditAdmissionModeDescription
-          "
           v-bind:course-alias="data.course.alias"
           v-on:emit-update-admission-mode="
             (admisionMode) => $emit('update-admission-mode', admisionMode)
@@ -235,21 +232,25 @@
       </div>
 
       <div class="tab-pane active" role="tabpanel" v-if="showTab === 'clone'">
-        <omegaup-course-clone
-          class="mb-4"
-          v-bind:initial-alias="data.course.alias"
-          v-bind:initial-name="data.course.name"
-          v-on:emit-clone="
-            (alias, name, startTime) => $emit('clone', alias, name, startTime)
-          "
-        ></omegaup-course-clone>
-        <!-- Show omegaup-course-generate-link-clone when PR #4570 is merged -->
-        <omegaup-course-generate-link-clone
-          v-if="data.course.admission_mode !== admissionMode.Public && false"
-          v-bind:alias="data.course.alias"
-          v-bind:token="token"
-          v-on:generate-link="(alias) => $emit('generate-link', alias)"
-        ></omegaup-course-generate-link-clone>
+        <div class="card">
+          <div class="card-body">
+            <omegaup-course-clone
+              class="mb-4"
+              v-bind:initial-alias="data.course.alias"
+              v-bind:initial-name="data.course.name"
+              v-on:clone="
+                (alias, name, startTime) =>
+                  $emit('clone', alias, name, startTime)
+              "
+            ></omegaup-course-clone>
+            <omegaup-course-generate-link-clone
+              v-if="data.course.admission_mode !== admissionMode.Public"
+              v-bind:alias="data.course.alias"
+              v-bind:token="token"
+              v-on:generate-link="(alias) => $emit('generate-link', alias)"
+            ></omegaup-course-generate-link-clone>
+          </div>
+        </div>
       </div>
     </div>
   </div>

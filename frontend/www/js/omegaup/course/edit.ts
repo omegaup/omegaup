@@ -264,6 +264,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'update-admission-mode': (admissionMode: string) => {
+            courseEdit.data.course.admission_mode = admissionMode;
             api.Course.update({
               alias: courseAlias,
               admission_mode: admissionMode,
