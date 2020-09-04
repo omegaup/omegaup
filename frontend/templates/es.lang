@@ -303,7 +303,7 @@ courseAssignmentStartDateBeforeCourseStartDate = "La fecha de inicio de la tarea
 courseAssignmentUpdated = "Trabajo actualizado exitosamente!"
 courseBasicInformationNeeded = "Para unirte al curso debes completar tu información básica. Ir a <a href=\"/profile/edit/\">Mi perfil</a>"
 courseCardAboutCourses = "Acerca de cursos"
-courseCardDescriptionCourses = "<ul><li>escripción:</li><li>Los cursos en omegaUp son para</li><li>- Profesores que desean crear cursos en línea</li><li>- Alumnos que participan en los cursos de sus clases</li><li>- Cualquier usuario que desea aprender más sobre programación participando en los cursos públicos</li></ul>"
+courseCardDescriptionCourses = "escripción:<br><br>Los cursos en omegaUp son para<br><br>- Profesores que desean crear cursos en línea<br><br>- Alumnos que participan en los cursos de sus clases<br><br>- Cualquier usuario que desea aprender más sobre programación participando en los cursos públicos"
 courseCardCourseResume = "Continuar"
 courseCardDueDate = "Finaliza %(due_date)"
 courseCardImpartedBy = "Impartido por <span class=\"font-weight-bold\">%(school_name)</span>"

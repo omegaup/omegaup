@@ -9,6 +9,6 @@ describe('DescriptionCard.vue', () => {
   const wrapper = mount(course_DesciptionCard);
 
   expect(wrapper.text()).toContain(T.courseCardAboutCourses);
-  expect(wrapper.text()).toContain(T.courseCardAboutCourses);
+  expect(wrapper.text()).toContain(T.courseCardDescriptionCourses);
   expect(wrapper.text()).toContain(T.wordsReadMore);
 });
