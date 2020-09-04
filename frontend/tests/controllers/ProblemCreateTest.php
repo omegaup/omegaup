@@ -753,7 +753,12 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemAlias,
             'source' => 'yo',
             'problem_level' => 'problemLevelBasicIntroductionToProgramming',
-            'public_tags' => 'problemTagBinarySearchTree',
+            'selected_tags' => json_encode([
+                [
+                    'tagname' => 'problemTagBinarySearchTree',
+                    'public' => true,
+                ],
+            ]),
         ]));
 
         $response = \OmegaUp\Controllers\Problem::apiDetails(

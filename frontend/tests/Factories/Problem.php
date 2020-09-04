@@ -73,7 +73,7 @@ class ProblemParams {
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
-        $this->publicTags = $params['public_tags'] ?? $params['selected_tags'] ?? json_encode([
+        $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
             [
                 'tagname' => 'problemTagBinarySearchTree',
                 'public' => true,
@@ -152,7 +152,7 @@ class Problem {
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
             'problem_level' => 'problemLevelBasicIntroductionToProgramming',
-            'public_tags' => $params->selectedTags,
+            'selected_tags' => $params->selectedTags,
         ]);
 
         // Set file upload context
