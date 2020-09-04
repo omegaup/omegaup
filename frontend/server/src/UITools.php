@@ -280,17 +280,19 @@ class UITools {
         }
 
         if (!is_null($entrypoint)) {
-            if (!isset($smartyProperties['title'])) {
+            if (
+                !isset($smartyProperties['title']) ||
+                !is_string($smartyProperties['title'])
+            ) {
                 $titleVar = (
                     'omegaupTitle' .
                     str_replace('_', '', ucwords($entrypoint, '_'))
                 );
             } else {
-                $titleVar = strval($smartyProperties['title']);
+                $titleVar = $smartyProperties['title'];
             }
-            $smartyProperties['title'] = strval(
-                $smarty->getConfigVars($titleVar)
-            );
+            /** @var string */
+            $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
         }
 
         /** @var mixed $value */

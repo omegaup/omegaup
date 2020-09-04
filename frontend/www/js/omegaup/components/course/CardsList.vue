@@ -1,7 +1,15 @@
 <template>
   <div>
     <h1 class="card-title">{{ T.navAllCourses }}</h1>
-
+    <div class="card-header mb-3">
+      <h1>{{ T.courseCardAboutCourses }}</h1>
+      <p v-html="T.courseCardDescriptionCourses"></p>
+      <div class="text-right align-middle">
+        <a href="https://blog.omegaup.com/cursos-en-omegaup/">{{
+          T.wordsReadMore
+        }}</a>
+      </div>
+    </div>
     <div class="container">
       <div
         class="row"
