@@ -1,8 +1,15 @@
 <template>
   <div>
     <h1 class="card-title">{{ T.navAllCourses }}</h1>
-    <omegaup-description-card></omegaup-description-card>
-
+    <div class="card-header mb-3">
+      <h1>{{ T.courseCardAboutCourses }}</h1>
+      <p v-html="T.courseCardDescriptionCourses"></p>
+      <div class="text-right align-middle">
+        <a href="https://blog.omegaup.com/cursos-en-omegaup/">{{
+          T.wordsReadMore
+        }}</a>
+      </div>
+    </div>
     <div class="container">
       <div
         class="row"
@@ -75,7 +82,6 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import course_CourseCard from './CourseCard.vue';
-import DescriptionCard from './DescriptionCard.vue';
 
 import {
   FontAwesomeIcon,
@@ -88,7 +94,6 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-description-card': DescriptionCard,
     'omegaup-course-card': course_CourseCard,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
