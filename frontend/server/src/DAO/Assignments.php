@@ -141,61 +141,52 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     ): array {
         $sql = '
         SELECT
-            bpr.assignment_alias,
-            bpr.problem_alias,
-            bpr.verdict AS verdict,
-            COUNT(bpr.runs) AS runs
-        FROM (
+            pr.assignment_alias,
+            pr.problem_alias,
+            pr.problem_id,
+            pr.order,
+            `r`.`verdict` AS verdict,
+            COUNT(*) AS runs
+        FROM
+            `Groups_Identities` AS `gi`
+        CROSS JOIN
+            (
             SELECT
-                pr.assignment_alias,
-                pr.problem_alias,
-                pr.problem_id,
-                pr.order,
-                `r`.`verdict` AS verdict,
-                COUNT(*) AS runs
+                `a`.`assignment_id`,
+                `a`.`alias` AS assignment_alias,
+                `a`.`problemset_id`,
+                `p`.`problem_id`,
+                `p`.`alias` AS problem_alias,
+                `psp`.`order`
             FROM
-                `Groups_Identities` AS `gi`
-            CROSS JOIN
-                (
-                SELECT
-                    `a`.`assignment_id`,
-                    `a`.`alias` AS assignment_alias,
-                    `a`.`problemset_id`,
-                    `p`.`problem_id`,
-                    `p`.`alias` AS problem_alias,
-                    `psp`.`order`
-                FROM
-                    `Assignments` AS `a`
-                INNER JOIN
-                    `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
-                INNER JOIN
-                    `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
-                INNER JOIN
-                    `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
-                WHERE
-                    `a`.`course_id` = ?
-                GROUP BY
-                    `a`.`assignment_id`, `p`.`problem_id`
-                ) AS pr
+                `Assignments` AS `a`
             INNER JOIN
-                `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
-            LEFT JOIN
-                `Submissions` AS `s`
-            ON
-                `s`.`problem_id` = `pr`.`problem_id`
-                AND `s`.`identity_id` = `i`.`identity_id`
-                AND `s`.`problemset_id` = `pr`.`problemset_id`
-            LEFT JOIN
-                `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+                `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
+            INNER JOIN
+                `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+            INNER JOIN
+                `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
             WHERE
-                `gi`.`group_id` = ? AND `r`.`status` = "ready" AND `s`.`type` = "normal"
+                `a`.`course_id` = ?
             GROUP BY
-                `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
-        ) AS bpr
+                `a`.`assignment_id`, `p`.`problem_id`
+            ) AS pr
+        INNER JOIN
+            `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
+        LEFT JOIN
+            `Submissions` AS `s`
+        ON
+            `s`.`problem_id` = `pr`.`problem_id`
+            AND `s`.`identity_id` = `i`.`identity_id`
+            AND `s`.`problemset_id` = `pr`.`problemset_id`
+        LEFT JOIN
+            `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+        WHERE
+            `gi`.`group_id` = ? AND `r`.`status` = "ready" AND `s`.`type` = "normal"
         GROUP BY
-            bpr.problem_alias, bpr.assignment_alias, verdict
+            `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
         ORDER BY
-            bpr.order, bpr.problem_id;
+            pr.order, pr.problem_id;
         ';
 
         /** @var list<array{assignment_alias: string, problem_alias: string, runs: int, verdict: string}> */

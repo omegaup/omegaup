@@ -219,23 +219,15 @@ export default class Statistics extends Vue {
         prevProblem = stat.problem_alias;
       }
       if (!runs[verdictIndex]) runs[verdictIndex] = [];
-      runs[verdictIndex][problemIndex] = parseFloat(
-        ((stat.runs / assignmentRuns[problemIndex]) * 100).toFixed(1),
-      );
-    }
-    //fill in problems with 0 runs
-    for (const problem of problems) {
-      const problemIndex: number = problems.indexOf(problem);
-      if (!problemsCounted[problemIndex]) {
-        for (let run of runs) {
-          run[problemIndex] = 0;
-        }
-      }
+      if (!runs[verdictIndex][problemIndex])
+        runs[verdictIndex][problemIndex] = 0;
+      runs[verdictIndex][problemIndex] += stat.runs;
     }
     //edge case - null values
     for (const run of runs) {
-      for (let i = 0; i < run.length; i++) {
+      for (let i = 0; i < problems.length; i++) {
         if (!run[i]) run[i] = 0;
+        run[i] = (run[i] / assignmentRuns[i]) * 100;
       }
     }
     let series: { name: string; data: number[] }[] = [];
