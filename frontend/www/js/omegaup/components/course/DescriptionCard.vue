@@ -3,7 +3,9 @@
     <h1>{{ T.courseCardAboutCourses }}</h1>
     <p v-html="T.courseCardDescriptionCourses"></p>
     <div class="text-right align-middle">
-      <a v-bind:href="`https://blog.omegaup.com/cursos-en-omegaup/`">{{ T.wordsReadMore }}</a>
+      <a v-bind:href="`https://blog.omegaup.com/cursos-en-omegaup/`">{{
+        T.wordsReadMore
+      }}</a>
     </div>
   </div>
 </template>

@@ -306,7 +306,7 @@ const translations: { [key: string]: string; } = {
   courseBasicInformationNeeded: "Para participar do curso, voc\u00ea deve preencher sua informa\u00e7\u00f5e b\u00e1sica. V\u00e1 para o <a href=\"/profile/edit/\">Meu perfil</a>",
   courseCardAboutCourses: "Sobre cursos",
   courseCardCourseResume: "Retomar",
-  courseCardDescriptionCourses: "Descri\u00e7\u00e3o:\nOs cursos do omegaUp s\u00e3o para\n- Professores que desejam criar cursos online\n- Alunos participando dos cursos de suas aulas\n- Qualquer usu\u00e1rio que deseja aprender mais sobre programa\u00e7\u00e3o participando de cursos p\u00fablicos",
+  courseCardDescriptionCourses: "Descri\u00e7\u00e3o:<br><br>Os cursos do omegaUp s\u00e3o para<br><br>- Professores que desejam criar cursos online<br><br>- Alunos participando dos cursos de suas aulas<br><br>- Qualquer usu\u00e1rio que deseja aprender mais sobre programa\u00e7\u00e3o participando de cursos p\u00fablicos",
   courseCardDueDate: "Termina %(due_date)",
   courseCardImpartedBy: "Transmitido por <span class=\"font-weight-bold\">%(school_name)</span>",
   courseCardShowTopics: "Mostrar t\u00f3picos",
