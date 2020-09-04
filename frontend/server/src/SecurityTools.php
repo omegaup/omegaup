@@ -273,6 +273,8 @@ class SecurityTools {
         string $token,
         string $courseAlias
     ): array {
+        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
+        require_once 'libs/third_party/paseto/src/Parser.php';
         $parser = \ParagonIE\Paseto\Parser::getLocal(
             self::getCourseCloneSecretKey(),
             \ParagonIE\Paseto\ProtocolCollection::v2()
@@ -341,7 +343,6 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/JsonToken.php';
         require_once 'libs/third_party/paseto/src/Purpose.php';
         require_once 'libs/third_party/paseto/src/Builder.php';
-        require_once 'libs/third_party/paseto/src/Parser.php';
         require_once 'libs/third_party/paseto/src/Util.php';
         require_once 'libs/third_party/paseto/src/ValidationRuleInterface.php';
         require_once 'libs/third_party/paseto/src/Rules/ValidAt.php';

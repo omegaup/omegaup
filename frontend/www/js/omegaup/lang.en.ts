@@ -311,6 +311,7 @@ const translations: { [key: string]: string; } = {
   courseCardDueDate: "Due %(due_date)",
   courseCardImpartedBy: "Imparted by <span class=\"font-weight-bold\">%(school_name)</span>",
   courseCardShowTopics: "Show topics",
+  courseCloneCreatedBy: "Created by",
   courseContentEmpty: "No content",
   courseContentNewFormTypeDesc: "The content type is used to distinguish tests from homeworks or lessons visually.",
   courseDetails: "Course details",
