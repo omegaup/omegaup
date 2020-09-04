@@ -385,6 +385,38 @@ export namespace types {
       );
     }
 
+    export function CourseCloneDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CourseCloneDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseDetailsPayload {
@@ -649,6 +681,38 @@ export namespace types {
     ): types.CourseNewPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function CourseStatisticsPayload(
+      elementId: string = 'payload',
+    ): types.CourseStatisticsPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
       );
     }
 
@@ -1581,6 +1645,12 @@ export namespace types {
     course: types.CourseDetails;
   }
 
+  export interface CourseCloneDetailsPayload {
+    creator?: { classname: string; username: string };
+    details: types.CourseDetails;
+    token: string;
+  }
+
   export interface CourseDetails {
     admission_mode?: string;
     alias: string;
@@ -1666,10 +1736,27 @@ export namespace types {
     visits: number;
   }
 
+  export interface CourseProblemStatistics {
+    assignment_alias: string;
+    average?: number;
+    high_score_percentage?: number;
+    low_score_percentage?: number;
+    max_points: number;
+    maximum?: number;
+    minimum?: number;
+    problem_alias: string;
+    variance?: number;
+  }
+
   export interface CourseProblemTried {
     alias: string;
     title: string;
     username: string;
+  }
+
+  export interface CourseStatisticsPayload {
+    course: types.CourseDetails;
+    problemStats: types.CourseProblemStatistics[];
   }
 
   export interface CourseStudent {
@@ -3003,6 +3090,8 @@ export namespace messages {
   export type CourseDetailsRequest = { [key: string]: any };
   export type _CourseDetailsServerResponse = any;
   export type CourseDetailsResponse = types.CourseDetails;
+  export type CourseGenerateTokenForCloneCourseRequest = { [key: string]: any };
+  export type CourseGenerateTokenForCloneCourseResponse = { token: string };
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
@@ -3878,6 +3967,9 @@ export namespace controllers {
     details: (
       params?: messages.CourseDetailsRequest,
     ) => Promise<messages.CourseDetailsResponse>;
+    generateTokenForCloneCourse: (
+      params?: messages.CourseGenerateTokenForCloneCourseRequest,
+    ) => Promise<messages.CourseGenerateTokenForCloneCourseResponse>;
     getProblemUsers: (
       params?: messages.CourseGetProblemUsersRequest,
     ) => Promise<messages.CourseGetProblemUsersResponse>;

@@ -42,6 +42,12 @@
                 v-bind:href="`/course/${course.alias}/activity/`"
                 >{{ T.wordsActivityReport }}</a
               >
+              <a
+                data-button-activity-report
+                class="dropdown-item"
+                v-bind:href="`/course/${course.alias}/statistics/`"
+                >{{ T.omegaupTitleCourseStatistics }}</a
+              >
             </div>
           </div>
         </div>
@@ -206,7 +212,7 @@
             <omegaup-course-clone
               v-bind:initial-alias="course.alias"
               v-bind:initial-name="course.name"
-              v-on:emit-clone="
+              v-on:clone="
                 (alias, name, startTime) =>
                   $emit('clone', alias, name, startTime)
               "

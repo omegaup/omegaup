@@ -51,7 +51,13 @@ class ProblemParams {
     public $allowUserAddTags;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string} $params
+     * @readonly
+     * @var string
+     */
+    public $problemLevel;
+
+    /**
+     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -60,6 +66,7 @@ class ProblemParams {
         $this->visibility = $params['visibility'] ?? 'public';
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
+        $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];
@@ -132,6 +139,7 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]);
 
         // Set file upload context
@@ -195,9 +203,7 @@ class Problem {
         // Call the API
         \OmegaUp\Controllers\Problem::apiCreate($r);
         $problem = \OmegaUp\DAO\Problems::getByAlias(
-            strval(
-                $r['problem_alias']
-            )
+            $r->ensureString('problem_alias')
         );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -297,32 +303,5 @@ class Problem {
 
         // Call api
         \OmegaUp\Controllers\Problem::apiAddTag($r);
-    }
-
-    public static function initPublicTags(): void {
-        $tags = [
-            'problemLevelAdvancedCompetitiveProgramming',
-            'problemLevelAdvancedSpecializedTopics',
-            'problemLevelBasicIntroductionToProgramming',
-            'problemLevelBasicKarel',
-            'problemTagArrays',
-            'problemTagBigData',
-            'problemTagGreedyAlgorithms',
-            'problemTagHashing',
-            'problemTagMatrices',
-            'problemTagMaxFlow',
-            'problemTagMeetInTheMiddle',
-            'problemTagNumberTheory',
-        ];
-        foreach ($tags as $tag) {
-            \OmegaUp\DAO\Tags::create(
-                new \OmegaUp\DAO\VO\Tags(
-                    [
-                        'name' => $tag,
-                        'public' => true,
-                    ]
-                )
-            );
-        }
     }
 }

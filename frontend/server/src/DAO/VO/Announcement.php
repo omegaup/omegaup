@@ -58,9 +58,9 @@ class Announcement extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['description'])) {
-            $this->description = strval(
+            $this->description = is_scalar(
                 $data['description']
-            );
+            ) ? strval($data['description']) : '';
         }
     }
 

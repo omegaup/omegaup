@@ -62,6 +62,13 @@ class Validators {
     }
 
     /**
+     * Check whether parameter value is non-empty string
+     */
+    public static function stringNonEmpty(string $parameter): bool {
+        return !empty($parameter);
+    }
+
+    /**
      * Check if a parameter is present, it is a non-empty string.
      *
      * @param mixed $parameter
@@ -484,7 +491,11 @@ class Validators {
                 'parameterNotInExpectedSet',
                 $parameterName,
                 [
-                    'bad_elements' => strval($parameter),
+                    'bad_elements' => (
+                        is_scalar($parameter) || is_object($parameter) ?
+                        strval($parameter) :
+                        ''
+                    ),
                     'expected_set' => implode(', ', $enum),
                 ]
             );

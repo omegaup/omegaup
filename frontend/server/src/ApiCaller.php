@@ -62,14 +62,12 @@ class ApiCaller {
      * @return bool whether this was a CSRF attempt.
      */
     private static function isCSRFAttempt(): bool {
-        if (empty($_SERVER['HTTP_REFERER'])) {
+        $httpReferer = \OmegaUp\Request::getServerVar('HTTP_REFERER');
+        if (empty($httpReferer)) {
             // This API request was explicitly created.
             return false;
         }
-        $referrerHost = parse_url(
-            strval($_SERVER['HTTP_REFERER']),
-            PHP_URL_HOST
-        );
+        $referrerHost = parse_url($httpReferer, PHP_URL_HOST);
         if (is_null($referrerHost)) {
             // Malformed referrer. Fail closed and prefer to not allow this.
             return true;
@@ -175,7 +173,7 @@ class ApiCaller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      */
     private static function createRequest() {
-        $apiAsUrl = strval($_SERVER['REQUEST_URI']);
+        $apiAsUrl = \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/';
         // Spliting only by '/' results in URIs with parameters like this:
         //      /api/problem/list/?page=1
         //                       ^^
@@ -301,9 +299,7 @@ class ApiCaller {
         if ($apiException->getCode() == 401) {
             header(
                 'Location: /login/?redirect=' . urlencode(
-                    strval(
-                        $_SERVER['REQUEST_URI']
-                    )
+                    \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/'
                 )
             );
             die();

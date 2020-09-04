@@ -365,11 +365,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         /** @var null|int */
         $problemsetId = null;
         if ($isPractice) {
-            if (OMEGAUP_LOCKDOWN) {
-                throw new \OmegaUp\Exceptions\ForbiddenAccessException(
-                    'lockdown'
-                );
-            }
+            \OmegaUp\Controllers\Controller::ensureNotInLockdown();
             $submitDelay = 0;
             $type = 'normal';
         } else {
@@ -516,7 +512,9 @@ class Run extends \OmegaUp\Controllers\Controller {
             'identity_id' => $r->identity->identity_id,
             'submission_id' => $submission->submission_id,
             'problemset_id' => $submission->problemset_id,
-            'ip' => ip2long(strval($_SERVER['REMOTE_ADDR']))
+            'ip' => ip2long(
+                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+            ),
         ]));
 
         $problem->submissions++;
@@ -648,43 +646,47 @@ class Run extends \OmegaUp\Controllers\Controller {
                 'status', 'verdict', 'runtime', 'penalty', 'memory', 'score', 'contest_score',
             ])
         );
-        $filtered['guid'] = strval($filtered['guid']);
-        $filtered['alias'] = strval($problem->alias);
-        $filtered['contest_alias'] = null;
         /** @var \OmegaUp\Timestamp $filtered['time'] */
-        $filtered['time'] = new \OmegaUp\Timestamp($filtered['time']);
-        $filtered['score'] = round(floatval($filtered['score']), 4);
-        $filtered['runtime'] = intval($filtered['runtime']);
-        $filtered['penalty'] = intval($filtered['penalty']);
-        $filtered['memory'] = intval($filtered['memory']);
-        $filtered['submit_delay'] = intval($filtered['submit_delay']);
-        $filtered['language'] = strval($filtered['language']);
-        $filtered['status'] = strval($filtered['status']);
-        $filtered['type'] = strval($filtered['type']);
-        $filtered['verdict'] = strval($filtered['verdict']);
+        $result = [
+            'guid' => strval($filtered['guid']),
+            'alias' => strval($problem->alias),
+            'contest_alias' => null,
+            'time' => new \OmegaUp\Timestamp($filtered['time']),
+            'contest_score' => null,
+            'score' => round(floatval($filtered['score']), 4),
+            'runtime' => intval($filtered['runtime']),
+            'penalty' => intval($filtered['penalty']),
+            'memory' => intval($filtered['memory']),
+            'submit_delay' => intval($filtered['submit_delay']),
+            'language' => strval($filtered['language']),
+            'status' => strval($filtered['status']),
+            'type' => strval($filtered['type']),
+            'verdict' => strval($filtered['verdict']),
+            'country' => 'xx',
+            'username' => (
+                ($submission->identity_id == $r->identity->identity_id) ?
+                $r->identity->username
+                : ''
+            ),
+            'classname' => 'user-rank-unranked',
+        ];
         if (!is_null($filtered['contest_score'])) {
             if (
                 is_null($contest)
                 || $contest->partial_score
                 || $filtered['score'] == 1
             ) {
-                $filtered['contest_score'] = round(
+                $result['contest_score'] = round(
                     floatval($filtered['contest_score']),
                     2
                 );
+                $result['score'] = 1;
             } else {
-                $filtered['contest_score'] = 0;
-                $filtered['score'] = 0;
+                $result['contest_score'] = 0;
+                $result['score'] = 0;
             }
         }
-        if ($submission->identity_id == $r->identity->identity_id) {
-            $filtered['username'] = $r->identity->username;
-        } else {
-            $filtered['username'] = '';
-        }
-        $filtered['classname'] = 'user-rank-unranked';
-        $filtered['country'] = 'xx';
-        return $filtered;
+        return $result;
     }
 
     /**
@@ -1145,6 +1147,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         bool $showDetails
     ): array {
         $response = [];
+
+        /** @psalm-suppress TypeDoesNotContainType this can be defined to true sometimes. */
         if (OMEGAUP_LOCKDOWN) {
             $response['source'] = 'lockdownDetailsDisabled';
         } else {
@@ -1186,9 +1190,7 @@ class Run extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
     public static function apiDownload(\OmegaUp\Request $r): void {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Get the user who is calling this API
         $r->ensureIdentity();
         $showDiff = $r->ensureOptionalBool('show_diff') ?? false;
@@ -1318,7 +1320,11 @@ class Run extends \OmegaUp\Controllers\Controller {
     ): ?string {
         if (
             !defined('AWS_CLI_SECRET_ACCESS_KEY') ||
-            empty(AWS_CLI_SECRET_ACCESS_KEY)
+            !defined('AWS_CLI_ACCESS_KEY_ID') ||
+            empty(AWS_CLI_SECRET_ACCESS_KEY) ||
+            empty(AWS_CLI_ACCESS_KEY_ID) ||
+            !is_string(AWS_CLI_SECRET_ACCESS_KEY) ||
+            !is_string(AWS_CLI_ACCESS_KEY_ID)
         ) {
             return null;
         }
@@ -1326,8 +1332,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (strpos($resourcePath, '/') !== 0) {
             $resourcePath = "/{$resourcePath}";
         }
-        $accessKeyId = strval(AWS_CLI_ACCESS_KEY_ID);
-        $secretAccessKey = strval(AWS_CLI_SECRET_ACCESS_KEY);
+        $accessKeyId = AWS_CLI_ACCESS_KEY_ID;
+        $secretAccessKey = AWS_CLI_SECRET_ACCESS_KEY;
         $regionName = 'us-east-1';
         $bucketName = 'omegaup-runs';
         $serviceName = 's3';
