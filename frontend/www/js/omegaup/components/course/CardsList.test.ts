@@ -61,5 +61,12 @@ describe('CardsList.vue', () => {
     });
 
     expect(wrapper.text()).toContain(T.navAllCourses);
+    expect(wrapper.text()).toContain(T.courseCardAboutCourses);
+    expect(wrapper.text()).toContain(
+      T.courseCardDescriptionCourses.split(
+        /[<ul>|</ul>|<li>|</li>|<p>|</p>]+/,
+      )[0],
+    );
+    expect(wrapper.text()).toContain(T.wordsReadMore);
   });
 });
