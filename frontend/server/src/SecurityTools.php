@@ -339,6 +339,7 @@ class SecurityTools {
         require_once 'libs/third_party/paseto/src/ProtocolInterface.php';
         require_once 'libs/third_party/paseto/src/Protocol/Version1.php';
         require_once 'libs/third_party/paseto/src/Protocol/Version2.php';
+        require_once 'libs/third_party/paseto/src/Traits/RegisteredClaims.php';
         require_once 'libs/third_party/paseto/src/JsonToken.php';
         require_once 'libs/third_party/paseto/src/Purpose.php';
         require_once 'libs/third_party/paseto/src/Builder.php';
