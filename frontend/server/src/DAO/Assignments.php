@@ -133,7 +133,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the count of each verdict
      *
-     * @return list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: string|null}>
+     * @return list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}>
      */
     public static function getAssignmentVerdictDistribution(
         int $courseId,
@@ -188,7 +188,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             pr.order, pr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: string|null}> */
+        /** @var list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]
