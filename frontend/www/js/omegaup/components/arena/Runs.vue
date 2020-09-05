@@ -332,6 +332,8 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
+import arena_RunDetails from '../arena/RunDetails.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
 import Autocomplete from '../Autocomplete.vue';
 
@@ -361,8 +363,10 @@ declare global {
 @Component({
   components: {
     FontAwesomeIcon,
+    'omegaup-arena-rundetails': arena_RunDetails,
     'omegaup-autocomplete': Autocomplete,
     'omegaup-user-username': user_Username,
+    'omegaup-overlay': omegaup_Overlay,
   },
 })
 export default class Runs extends Vue {
