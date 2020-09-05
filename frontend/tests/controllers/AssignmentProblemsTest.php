@@ -398,7 +398,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             $identities[0]
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'CE');
-        
+
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemsData[0],
             $courseData,
@@ -575,7 +575,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);
-        
+
         // Variance of the third problem should be 0, no user did anything
         $this->assertEquals('AC', $results[0]['verdict']);
         $this->assertEquals('CE', $results[2]['verdict']);
