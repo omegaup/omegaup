@@ -397,6 +397,13 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData,
             $identities[0]
         );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'CE');
+        
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[0]
+        );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
@@ -460,5 +467,124 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(50, $results[0]['low_score_percentage']);
         $this->assertEquals(0, $results[1]['low_score_percentage']);
         $this->assertEquals(100, $results[2]['low_score_percentage']);
+        //average runs
+        $this->assertGreaterThan(1, $results[0]['avg_runs']);
+        $this->assertEquals(1, $results[1]['avg_runs']);
+        $this->assertLessThan(1, $results[2]['avg_runs']);
+    }
+
+    public function testAssignmentVerdictDistribution() {
+        $problemsData = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemsData[0], $problemsData[1], $problemsData[2]]
+        );
+
+        $identities = [];
+        [
+            'user' => $user,
+            'identity' => $identities[]
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[0]
+        );
+
+        [
+            'user' => $user,
+            'identity' => $identities[]
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[1]
+        );
+
+        // First student will solve problem0, get 'CE', 'CE' then solve problem 1, and won't try problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'CE');
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'CE');
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Second student will solve problem0, get 'TLE' then solve problem 1, and fail problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'TLE');
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[2],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+
+        $results = \OmegaUp\DAO\Assignments::getAssignmentVerdictDistribution(
+            $courseData['course']->course_id,
+            $courseData['course']->group_id
+        );
+
+        $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);
+        
+        // Variance of the third problem should be 0, no user did anything
+        $this->assertEquals('AC', $results[0]['verdict']);
+        $this->assertEquals('CE', $results[2]['verdict']);
+        $this->assertEquals(2, $results[2]['runs']);
+        $this->assertEquals('AC', $results[1]['verdict']);
+        $this->assertEquals('AC', $results[3]['verdict']);
+        $this->assertEquals('TLE', $results[4]['verdict']);
+        $this->assertEquals('AC', $results[5]['verdict']);
+        $this->assertEquals('WA', $results[6]['verdict']);
+        $this->assertEquals(1, $results[6]['runs']);
     }
 }

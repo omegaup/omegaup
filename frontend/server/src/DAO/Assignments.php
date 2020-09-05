@@ -144,7 +144,6 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             pr.assignment_alias,
             pr.problem_alias,
             pr.problem_id,
-            pr.order,
             `r`.`verdict` AS verdict,
             COUNT(*) AS runs
         FROM
