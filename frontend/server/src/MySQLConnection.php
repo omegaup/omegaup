@@ -165,9 +165,9 @@ class MySQLConnection {
                 $chunks[] = $params[$i] ? '1' : '0';
             } else {
                 $chunks[] = "'" . $this->_connection->real_escape_string(
-                    strval(
-                        $params[$i]
-                    )
+                    is_scalar($params[$i]) || is_object($params[$i]) ?
+                    strval($params[$i]) :
+                    ''
                 ) . "'";
             }
             $chunks[] = $inputChunks[$i + 1];
@@ -256,11 +256,15 @@ class MySQLConnection {
                 return floatval($value);
 
             case FieldType::TYPE_TIMESTAMP:
-                return new \OmegaUp\Timestamp(strtotime(strval($value)));
+                return new \OmegaUp\Timestamp(strtotime(
+                    is_scalar($value) || is_object($value) ? strval($value) : ''
+                ));
 
             case FieldType::TYPE_STRING:
             default:
-                return strval($value);
+                return (
+                    is_scalar($value) || is_object($value) ? strval($value) : ''
+                );
         }
     }
 
@@ -338,13 +342,18 @@ class MySQLConnection {
         array $params,
         int $resultmode
     ): ?\mysqli_result {
-        $result = $this->_connection->query(
-            $this->BindQueryParams(
-                $sql,
-                $params
-            ),
-            $resultmode
-        );
+        $query = $this->BindQueryParams($sql, $params);
+        $result = $this->_connection->query($query, $resultmode);
+        if (
+            $result === false &&
+            $this->_needsFlushing === false &&
+            $this->_connection->errno == 2006
+        ) {
+            // If there have not been any non-committed updates to the
+            // database, let's try to reconnect and do this one more time.
+            $this->connect();
+            $result = $this->_connection->query($query, $resultmode);
+        }
         if ($result === false) {
             $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
             \Logger::getLogger('mysql')->debug($errorMessage);

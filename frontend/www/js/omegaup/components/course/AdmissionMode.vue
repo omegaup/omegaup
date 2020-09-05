@@ -3,7 +3,14 @@
     <div class="card-body">
       <form class="publish-form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{ T.contestNewFormAdmissionMode }}</label>
+          <label>{{ T.contestNewFormAdmissionModeSelect }}</label>
+          <a
+            data-toggle="tooltip"
+            rel="tooltip"
+            v-bind:title="T.courseEditAdmissionModeDescription"
+          >
+            <img src="/media/question.png" />
+          </a>
           <select
             class="form-control"
             name="admission-mode"
@@ -27,14 +34,14 @@
               v-bind:value="courseURL"
             />
             <div class="form-inline">
-              <a
-                href="#"
+              <button
                 class="btn btn-primary"
-                role="button"
+                type="button"
                 v-on:click="copiedToClipboard = true"
                 v-clipboard="courseURL"
-                >{{ T.wordsCopyToClipboard }}</a
               >
+                {{ T.wordsCopyToClipboard }}
+              </button>
               <span class="ml-3" v-if="copiedToClipboard === true">
                 <font-awesome-icon
                   icon="check-circle"
@@ -49,9 +56,11 @@
             <span v-html="admissionModeDescription"></span>
           </p>
         </div>
-        <button class="btn btn-primary change-admission-mode" type="submit">
-          {{ T.wordsSaveChanges }}
-        </button>
+        <div class="text-right">
+          <button class="btn btn-primary change-admission-mode" type="submit">
+            {{ T.wordsSaveChanges }}
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -59,7 +68,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import Clipboard from 'v-clipboard';
 import T from '../../lang';
 
 import {
@@ -70,6 +79,7 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
+Vue.use(Clipboard);
 
 @Component({
   components: {

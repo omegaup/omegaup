@@ -39,6 +39,26 @@ class RequestParamChecker implements
     ];
 
     /**
+     * A mapping of \OmegaUp\Validator::validateXxx() methods to the type that they
+     * are enforcing the API parameter to be.
+     */
+    const VALIDATOR_TYPE_MAPPING = [
+        'OmegaUp\\Validators::validatenumber' => 'int',
+        'OmegaUp\\Validators::validatenumberinrange' => 'int',
+        'OmegaUp\\Validators::validateoptionalnumber' => 'int|null',
+        'OmegaUp\\Validators::validateemail' => 'string',
+        'OmegaUp\\Validators::validatestringnonempty' => 'string',
+        'OmegaUp\\Validators::validatestringoflengthinrange' => 'string|null',
+        'OmegaUp\\Validators::validateoptionalstringnonempty' => 'string|null',
+        'OmegaUp\\Validators::validatevalidalias' => 'string|null',
+        'OmegaUp\\Validators::validatevalidnamespacedalias' => 'string',
+        'OmegaUp\\Validators::validatevalidusernameidentity' => 'string',
+        'OmegaUp\\Validators::validatedate' => 'string',
+        'OmegaUp\\Validators::validateoptionaldate' => 'string|null',
+        'OmegaUp\\Validators::validatetimestampinrange' => '\\OmegaUp\\Timestamp',
+    ];
+
+    /**
      * Registers the fact that $functionId expects a parameter of name
      * $parameterName to have the specified $type.
      *
@@ -89,18 +109,18 @@ class RequestParamChecker implements
     /**
      * Called for every Request property fetch.
      *
-     * @param \Psalm\FileManipulation[] $fileReplacements
+     * @param \Psalm\FileManipulation[] $file_replacements
      *
      * @return null|false
      */
     private static function processRequestPropertyFetch(
         \PhpParser\Node\Expr\ArrayDimFetch $expr,
         \Psalm\Context $context,
-        \Psalm\StatementsSource $statementsSource,
+        \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
-        array &$fileReplacements = []
+        array &$file_replacements = []
     ) {
-        $varType = $statementsSource->getNodeTypeProvider()->getType(
+        $varType = $statements_source->getNodeTypeProvider()->getType(
             $expr->var
         );
         if (is_null($varType)) {
@@ -124,9 +144,9 @@ class RequestParamChecker implements
                 \Psalm\IssueBuffer::accepts(
                     new RequestAccessNotALiteralString(
                         'Request array access not a literal string',
-                        new \Psalm\CodeLocation($statementsSource, $expr)
+                        new \Psalm\CodeLocation($statements_source, $expr)
                     ),
-                    $statementsSource->getSuppressedIssues()
+                    $statements_source->getSuppressedIssues()
                 )
             ) {
                 return false;
@@ -152,18 +172,18 @@ class RequestParamChecker implements
     /**
      * Called for every Request ensureEnum/ensureOptionalEnum.
      *
-     * @param \Psalm\FileManipulation[] $fileReplacements
+     * @param \Psalm\FileManipulation[] $file_replacements
      *
      * @return null|false
      */
     private static function processRequestEnum(
         \PhpParser\Node\Expr\MethodCall $expr,
         \Psalm\Context $context,
-        \Psalm\StatementsSource $statementsSource,
+        \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
-        array &$fileReplacements = []
+        array &$file_replacements = []
     ) {
-        $varType = $statementsSource->getNodeTypeProvider()->getType(
+        $varType = $statements_source->getNodeTypeProvider()->getType(
             $expr->var
         );
         if (is_null($varType)) {
@@ -206,9 +226,9 @@ class RequestParamChecker implements
                 \Psalm\IssueBuffer::accepts(
                     new EnumMissingArguments(
                         "{$methodId}() missing some arguments",
-                        new \Psalm\CodeLocation($statementsSource, $expr)
+                        new \Psalm\CodeLocation($statements_source, $expr)
                     ),
-                    $statementsSource->getSuppressedIssues()
+                    $statements_source->getSuppressedIssues()
                 )
             ) {
                 return false;
@@ -222,9 +242,9 @@ class RequestParamChecker implements
                 \Psalm\IssueBuffer::accepts(
                     new RequestAccessNotALiteralString(
                         "{$methodId}() argument not a literal string",
-                        new \Psalm\CodeLocation($statementsSource, $expr)
+                        new \Psalm\CodeLocation($statements_source, $expr)
                     ),
-                    $statementsSource->getSuppressedIssues()
+                    $statements_source->getSuppressedIssues()
                 )
             ) {
                 return false;
@@ -232,7 +252,7 @@ class RequestParamChecker implements
             return null;
         }
 
-        $returnType = $statementsSource->getNodeTypeProvider()->getType(
+        $returnType = $statements_source->getNodeTypeProvider()->getType(
             $expr
         );
         if (is_null($returnType)) {
@@ -251,16 +271,16 @@ class RequestParamChecker implements
     /**
      * Called after a statement has been checked
      *
-     * @param \Psalm\FileManipulation[] $fileReplacements
+     * @param \Psalm\FileManipulation[] $file_replacements
      *
      * @return null|false
      */
     public static function afterExpressionAnalysis(
         \PhpParser\Node\Expr $expr,
         \Psalm\Context $context,
-        \Psalm\StatementsSource $statementsSource,
+        \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
-        array &$fileReplacements = []
+        array &$file_replacements = []
     ) {
         if (
             $context->parent !== 'OmegaUp\\Controllers\\Controller' &&
@@ -272,17 +292,17 @@ class RequestParamChecker implements
             return self::processRequestPropertyFetch(
                 $expr,
                 $context,
-                $statementsSource,
+                $statements_source,
                 $codebase,
-                $fileReplacements
+                $file_replacements
             );
         } elseif ($expr instanceof \PhpParser\Node\Expr\MethodCall) {
             return self::processRequestEnum(
                 $expr,
                 $context,
-                $statementsSource,
+                $statements_source,
                 $codebase,
-                $fileReplacements
+                $file_replacements
             );
         }
 
@@ -290,10 +310,10 @@ class RequestParamChecker implements
     }
 
     private static function processClass(
-        \PhpParser\Node\Stmt\ClassLike $classStmt,
+        \PhpParser\Node\Stmt\ClassLike $class_stmt,
         string $className
     ): void {
-        foreach ($classStmt->stmts as $methodStmt) {
+        foreach ($class_stmt->stmts as $methodStmt) {
             if (!$methodStmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
                 continue;
             }
@@ -380,15 +400,15 @@ class RequestParamChecker implements
             $methodStorage->location->file_path
         );
         $finder = new \PhpParser\NodeFinder();
-        /** @var \PhpParser\Node\Stmt\ClassLike $classStmt */
+        /** @var \PhpParser\Node\Stmt\ClassLike $class_stmt */
         foreach (
             $finder->find(
                 $statements,
                 fn (\PhpParser\Node $node) => $node instanceof \PhpParser\Node\Stmt\ClassLike
-            ) as $classStmt
+            ) as $class_stmt
         ) {
             self::processClass(
-                $classStmt,
+                $class_stmt,
                 $methodId->fq_class_name
             );
         }
@@ -400,20 +420,20 @@ class RequestParamChecker implements
 
     /**
      * @param  \PhpParser\Node\Expr\MethodCall|\PhpParser\Node\Expr\StaticCall $expr
-     * @param  \Psalm\FileManipulation[] $fileReplacements
+     * @param  \Psalm\FileManipulation[] $file_replacements
      *
      * @return void
      */
     public static function afterMethodCallAnalysis(
         $expr,
-        string $methodId,
-        string $appearingMethodId,
-        string $declaringMethodId,
+        string $method_id,
+        string $appearing_method_id,
+        string $declaring_method_id,
         \Psalm\Context $context,
-        \Psalm\StatementsSource $statementsSource,
+        \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
-        array &$fileReplacements = [],
-        \Psalm\Type\Union &$returnTypeCandidate = null
+        array &$file_replacements = [],
+        \Psalm\Type\Union &$return_type_candidate = null
     ) {
         if (!is_null($context->calling_function_id)) {
             $functionId = strtolower($context->calling_function_id);
@@ -423,17 +443,17 @@ class RequestParamChecker implements
             // Not being called from within a function-like.
             return;
         }
-        if (array_key_exists($methodId, self::ENSURE_TYPE_MAPPING)) {
+        if (array_key_exists($method_id, self::ENSURE_TYPE_MAPPING)) {
             if (!$expr->args[0]->value instanceof \PhpParser\Node\Scalar\String_) {
                 if (
                     // Methods within \OmegaUp\Request are exempt
                     strpos($functionId, 'omegaup\\request::') !== 0 &&
                     \Psalm\IssueBuffer::accepts(
                         new RequestAccessNotALiteralString(
-                            "{$methodId}() argument not a literal string",
-                            new \Psalm\CodeLocation($statementsSource, $expr)
+                            "{$method_id}() argument not a literal string",
+                            new \Psalm\CodeLocation($statements_source, $expr)
                         ),
-                        $statementsSource->getSuppressedIssues()
+                        $statements_source->getSuppressedIssues()
                     )
                 ) {
                     // do nothing
@@ -443,7 +463,74 @@ class RequestParamChecker implements
             self::processParameter(
                 $functionId,
                 $expr->args[0]->value->value,
-                \Psalm\Type::parseString(self::ENSURE_TYPE_MAPPING[$methodId]),
+                \Psalm\Type::parseString(self::ENSURE_TYPE_MAPPING[$method_id]),
+                $codebase
+            );
+            return;
+        }
+        if (array_key_exists($method_id, self::VALIDATOR_TYPE_MAPPING)) {
+            if (!$expr->args[1]->value instanceof \PhpParser\Node\Scalar\String_) {
+                if (
+                    // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
+                    strpos($functionId, 'omegaup\\request::') !== 0 &&
+                    strpos($functionId, 'omegaup\\validators::') !== 0 &&
+                    \Psalm\IssueBuffer::accepts(
+                        new RequestAccessNotALiteralString(
+                            "{$method_id}() second argument not a literal string",
+                            new \Psalm\CodeLocation($statements_source, $expr)
+                        ),
+                        $statements_source->getSuppressedIssues()
+                    )
+                ) {
+                    // do nothing
+                }
+                return;
+            }
+            if (
+                !$expr->args[0]->value instanceof \PhpParser\Node\Expr\ArrayDimFetch ||
+                !$expr->args[0]->value->var instanceof \PhpParser\Node\Expr\Variable ||
+                $expr->args[0]->value->var->name != 'r'
+            ) {
+                // This is not a Request access.
+                return;
+            }
+            if (!$expr->args[0]->value->dim instanceof \PhpParser\Node\Scalar\String_) {
+                if (
+                    // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
+                    strpos($functionId, 'omegaup\\request::') !== 0 &&
+                    strpos($functionId, 'omegaup\\validators::') !== 0 &&
+                    \Psalm\IssueBuffer::accepts(
+                        new RequestAccessNotALiteralString(
+                            "{$method_id}() second argument not a literal string",
+                            new \Psalm\CodeLocation($statements_source, $expr)
+                        ),
+                        $statements_source->getSuppressedIssues()
+                    )
+                ) {
+                    // do nothing
+                }
+                return;
+            }
+            if ($expr->args[0]->value->dim->value != $expr->args[1]->value->value) {
+                if (
+                    \Psalm\IssueBuffer::accepts(
+                        new RequestAccessNotALiteralString(
+                            "{$method_id}() second argument and \$r[] argument do not match",
+                            new \Psalm\CodeLocation($statements_source, $expr)
+                        ),
+                        $statements_source->getSuppressedIssues()
+                    )
+                ) {
+                    // do nothing
+                }
+                return;
+            }
+            self::processParameter(
+                $functionId,
+                $expr->args[1]->value->value,
+                \Psalm\Type::parseString(
+                    self::VALIDATOR_TYPE_MAPPING[$method_id]
+                ),
                 $codebase
             );
             return;
@@ -452,42 +539,42 @@ class RequestParamChecker implements
             self::$methodCallGraph[$functionId] = [];
         }
         self::$methodCallGraph[$functionId][strtolower(
-            $appearingMethodId
+            $appearing_method_id
         )] = true;
     }
 
     /**
      * Called after a statement has been checked
      *
-     * @param \Psalm\FileManipulation[] $fileReplacements
+     * @param \Psalm\FileManipulation[] $file_replacements
      *
      * @return null|false
      */
     public static function afterStatementAnalysis(
-        \PhpParser\Node\Stmt\ClassLike $classStmt,
-        \Psalm\Storage\ClassLikeStorage $classLikeStorage,
-        \Psalm\StatementsSource $statementsSource,
+        \PhpParser\Node\Stmt\ClassLike $stmt,
+        \Psalm\Storage\ClassLikeStorage $classlike_storage,
+        \Psalm\StatementsSource $statements_source,
         \Psalm\Codebase $codebase,
-        array &$fileReplacements = []
+        array &$file_replacements = []
     ) {
-        if (is_null($classLikeStorage->location)) {
+        if (is_null($classlike_storage->location)) {
             return null;
         }
 
         // First go through all the methods in this class, parsing the doc
         // comment for each and saving its parsed representation to
         // self::$parsedMethodTypeMapping.
-        self::processClass($classStmt, $classLikeStorage->name);
+        self::processClass($stmt, $classlike_storage->name);
 
         $fileContents = $codebase->getFileContents(
-            $classLikeStorage->location->file_name
+            $classlike_storage->location->file_name
         );
-        foreach ($classStmt->stmts as $methodStmt) {
+        foreach ($stmt->stmts as $methodStmt) {
             if (!$methodStmt instanceof \PhpParser\Node\Stmt\ClassMethod) {
                 continue;
             }
             $functionId = strtolower(
-                "{$classLikeStorage->name}::{$methodStmt->name->name}"
+                "{$classlike_storage->name}::{$methodStmt->name->name}"
             );
 
             $hasRequestArgument = false;
@@ -626,7 +713,7 @@ class RequestParamChecker implements
             }
 
             if ($codebase->alter_code) {
-                $fileReplacements[] = new \Psalm\FileManipulation(
+                $file_replacements[] = new \Psalm\FileManipulation(
                     $docblockStart,
                     $docblockEnd,
                     $parsedDocComment->render($indentation)
@@ -638,17 +725,17 @@ class RequestParamChecker implements
                     new MismatchingDocblockOmegaUpRequestParamAnnotation(
                         (
                         'Mismatched dockblock annotations for ' .
-                        "{$classLikeStorage->name}::{$methodStmt->name->name}: Wanted:\n\n" .
+                        "{$classlike_storage->name}::{$methodStmt->name->name}: Wanted:\n\n" .
                         $parsedDocComment->render('')
                         ),
                         new \Psalm\CodeLocation(
-                            $statementsSource,
+                            $statements_source,
                             $methodStmt,
                             null,
                             true
                         )
                     ),
-                    $statementsSource->getSuppressedIssues(),
+                    $statements_source->getSuppressedIssues(),
                     true
                 )
             ) {

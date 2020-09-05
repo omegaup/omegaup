@@ -51,14 +51,14 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['access_mode'])) {
-            $this->access_mode = strval(
+            $this->access_mode = is_scalar(
                 $data['access_mode']
-            );
+            ) ? strval($data['access_mode']) : '';
         }
         if (isset($data['languages'])) {
-            $this->languages = strval(
+            $this->languages = is_scalar(
                 $data['languages']
-            );
+            ) ? strval($data['languages']) : '';
         }
         if (isset($data['needs_basic_information'])) {
             $this->needs_basic_information = boolval(
@@ -66,24 +66,24 @@ class Problemsets extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = strval(
+            $this->requests_user_information = is_scalar(
                 $data['requests_user_information']
-            );
+            ) ? strval($data['requests_user_information']) : '';
         }
         if (isset($data['scoreboard_url'])) {
-            $this->scoreboard_url = strval(
+            $this->scoreboard_url = is_scalar(
                 $data['scoreboard_url']
-            );
+            ) ? strval($data['scoreboard_url']) : '';
         }
         if (isset($data['scoreboard_url_admin'])) {
-            $this->scoreboard_url_admin = strval(
+            $this->scoreboard_url_admin = is_scalar(
                 $data['scoreboard_url_admin']
-            );
+            ) ? strval($data['scoreboard_url_admin']) : '';
         }
         if (isset($data['type'])) {
-            $this->type = strval(
+            $this->type = is_scalar(
                 $data['type']
-            );
+            ) ? strval($data['type']) : '';
         }
         if (isset($data['contest_id'])) {
             $this->contest_id = intval(

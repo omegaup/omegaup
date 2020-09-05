@@ -167,7 +167,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 break;
 
             case 'phpunit':
-                $testPath = static::BADGES_TESTS_ROOT . "/{$badgeAlias}Test.php";
+                $testPath = static::BADGES_TESTS_ROOT . "/Badge_{$badgeAlias}Test.php";
                 $this->assertTrue(
                     file_exists($testPath),
                     "The file '{$testPath}' doesn't exist."

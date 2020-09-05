@@ -43,9 +43,9 @@ class UsersBadges extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['badge_alias'])) {
-            $this->badge_alias = strval(
+            $this->badge_alias = is_scalar(
                 $data['badge_alias']
-            );
+            ) ? strval($data['badge_alias']) : '';
         }
         if (isset($data['assignation_time'])) {
             /**

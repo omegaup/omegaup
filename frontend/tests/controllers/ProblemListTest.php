@@ -5,11 +5,6 @@
  * @author joemmanuel
  */
 class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
-    public function setUp(): void {
-        parent::setUp();
-        \OmegaUp\Test\Factories\Problem::initPublicTags();
-    }
-
     /**
      * Gets the list of problems
      */

@@ -6,15 +6,13 @@ class Interview extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
+     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param null|string $description
      * @omegaup-request-param int $duration
-     * @omegaup-request-param mixed $title
+     * @omegaup-request-param string $title
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
@@ -94,15 +92,13 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $interview_alias
-     * @omegaup-request-param mixed $usernameOrEmailsCSV
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $interview_alias
+     * @omegaup-request-param string $usernameOrEmailsCSV
      */
     public static function apiAddUsers(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Authenticate logged user
         $r->ensureIdentity();
@@ -238,7 +234,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $interview_alias
+     * @omegaup-request-param string $interview_alias
      *
      * @return array{description: null|string, contest_alias: null|string, problemset_id: int|null, users: list<array{user_id: int|null, username: string, access_time: \OmegaUp\Timestamp|null, email: null|string, opened_interview: bool, country: null|string}>}
      */
@@ -246,7 +242,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         $interview = \OmegaUp\DAO\Interviews::getByAlias(
-            strval($r['interview_alias'])
+            $r->ensureString('interview_alias')
         );
         if (is_null($interview)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -306,7 +302,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param string $contest_alias
      */
     public static function showIntro(\OmegaUp\Request $r): bool {
         \OmegaUp\Validators::validateStringNonEmpty(

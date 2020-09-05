@@ -74,7 +74,7 @@
       </li>
     </ul>
 
-    <div class="tab-content card">
+    <div class="tab-content">
       <div class="tab-pane active" role="tabpanel" v-if="showTab === 'course'">
         <omegaup-course-form
           v-bind:update="true"
@@ -166,9 +166,6 @@
         <omegaup-course-admision-mode
           v-bind:initial-admission-mode="data.course.admission_mode"
           v-bind:should-show-public-option="data.course.is_curator"
-          v-bind:admission-mode-description="
-            T.courseEditAdmissionModeDescription
-          "
           v-bind:course-alias="data.course.alias"
           v-on:emit-update-admission-mode="
             (admisionMode) => $emit('update-admission-mode', admisionMode)
@@ -235,13 +232,25 @@
       </div>
 
       <div class="tab-pane active" role="tabpanel" v-if="showTab === 'clone'">
-        <omegaup-course-clone
-          v-bind:initial-alias="data.course.alias"
-          v-bind:initial-name="data.course.name"
-          v-on:emit-clone="
-            (alias, name, startTime) => $emit('clone', alias, name, startTime)
-          "
-        ></omegaup-course-clone>
+        <div class="card">
+          <div class="card-body">
+            <omegaup-course-clone
+              class="mb-4"
+              v-bind:initial-alias="data.course.alias"
+              v-bind:initial-name="data.course.name"
+              v-on:clone="
+                (alias, name, startTime) =>
+                  $emit('clone', alias, name, startTime)
+              "
+            ></omegaup-course-clone>
+            <omegaup-course-generate-link-clone
+              v-if="data.course.admission_mode !== admissionMode.Public"
+              v-bind:alias="data.course.alias"
+              v-bind:token="token"
+              v-on:generate-link="(alias) => $emit('generate-link', alias)"
+            ></omegaup-course-generate-link-clone>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -257,6 +266,7 @@ import course_AddStudents from './AddStudents.vue';
 import common_Admins from '../common/Admins.vue';
 import common_GroupAdmins from '../common/GroupAdmins.vue';
 import course_Clone from './Clone.vue';
+import course_GenerateLinkClone from './GenerateLinkClone.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
@@ -300,6 +310,7 @@ const emptyAssignment: types.CourseAssignment = {
     'omegaup-common-admins': common_Admins,
     'omegaup-common-groupadmins': common_GroupAdmins,
     'omegaup-course-clone': course_Clone,
+    'omegaup-course-generate-link-clone': course_GenerateLinkClone,
   },
 })
 export default class CourseEdit extends Vue {
@@ -310,12 +321,14 @@ export default class CourseEdit extends Vue {
 
   T = T;
   showTab = this.initialTab;
+  admissionMode = omegaup.AdmissionMode;
 
   assignmentProblems = this.data.assignmentProblems;
   assignments = this.data.course.assignments;
   assignmentFormMode: omegaup.AssignmentFormMode =
     omegaup.AssignmentFormMode.Default;
   assignment = emptyAssignment;
+  token = '';
 
   get courseURL(): string {
     return `/course/${this.data.course.alias}/`;

@@ -5,8 +5,7 @@
 import os
 import subprocess
 import sys
-from typing import (Any, Callable, Dict, Mapping, Optional, Sequence, Text,
-                    Tuple)
+from typing import Any, Callable, Dict, Optional, Sequence, Text, Tuple
 
 from hook_tools import linters
 
@@ -89,17 +88,10 @@ class ApiLinter(linters.Linter):
         super().__init__()
         self.__options = options or {}
 
-    def run_one(self, filename: str,
-                contents: bytes) -> Tuple[bytes, Sequence[Text]]:
-        '''Runs the linter against |contents|.'''
-        # pylint: disable=no-self-use
-        del filename  # unused
-        return contents, []
-
     def run_all(
-            self, filenames: Sequence[Text],
-            contents_callback: Callable[[Text], bytes]
-    ) -> Tuple[Mapping[Text, bytes], Mapping[Text, bytes], Sequence[Text]]:
+            self, filenames: Sequence[str],
+            contents_callback: linters.ContentsCallback
+    ) -> linters.MultipleResults:
         '''Runs the linter against a subset of files.'''
         # pylint: disable=no-self-use
         del filenames  # unused
@@ -107,7 +99,8 @@ class ApiLinter(linters.Linter):
         new_contents, original_contents = _generate_new_contents(
             contents_callback)
 
-        return new_contents, original_contents, ['api']
+        return linters.MultipleResults(new_contents, original_contents,
+                                       ['api'])
 
     @property
     def name(self) -> Text:

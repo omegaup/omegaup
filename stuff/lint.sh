@@ -2,7 +2,7 @@
 
 set -e
 
-OMEGAUP_ROOT="$(/usr/bin/git rev-parse --show-toplevel)"
+OMEGAUP_ROOT="$(git rev-parse --show-toplevel)"
 
 if [[ $# != 0 ]]; then
 	# The caller has given us the explicit arguments.
@@ -14,8 +14,8 @@ else
 	if [ -d "${OMEGAUP_ROOT}/.git/refs/remotes/upstream" ]; then
 		REMOTE="upstream"
 	fi
-	REMOTE_HASH="$(/usr/bin/git rev-parse "${REMOTE}/master")"
-	MERGE_BASE="$(/usr/bin/git merge-base "${REMOTE_HASH}" HEAD)"
+	REMOTE_HASH="$(git rev-parse "${REMOTE}/master")"
+	MERGE_BASE="$(git merge-base "${REMOTE_HASH}" HEAD)"
 	ARGS="fix ${MERGE_BASE}"
 fi
 
@@ -26,7 +26,7 @@ else
 	TTY_ARGS=""
 fi
 
-if grep -q pids:/docker /proc/1/cgroup; then
+if [[ -d /proc ]] && grep -q pids:/docker /proc/1/cgroup; then
 	echo "Running ./stuff/lint.sh inside a container is not supported." 1>&2
 	echo "Please run this command outside the container" 1>&2
 	exit 1
@@ -48,6 +48,6 @@ fi
 	--volume "${OMEGAUP_ROOT}:${OMEGAUP_ROOT}" \
 	--env 'PYTHONIOENCODING=utf-8' \
 	--env "MYPYPATH=${OMEGAUP_ROOT}/stuff" \
-	omegaup/hook_tools:20200816 --command-name="./stuff/lint.sh" $ARGS
+	omegaup/hook_tools:20200830 --command-name="./stuff/lint.sh" $ARGS
 
 echo OK

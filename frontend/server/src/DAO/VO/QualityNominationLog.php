@@ -66,19 +66,19 @@ class QualityNominationLog extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['from_status'])) {
-            $this->from_status = strval(
+            $this->from_status = is_scalar(
                 $data['from_status']
-            );
+            ) ? strval($data['from_status']) : '';
         }
         if (isset($data['to_status'])) {
-            $this->to_status = strval(
+            $this->to_status = is_scalar(
                 $data['to_status']
-            );
+            ) ? strval($data['to_status']) : '';
         }
         if (isset($data['rationale'])) {
-            $this->rationale = strval(
+            $this->rationale = is_scalar(
                 $data['rationale']
-            );
+            ) ? strval($data['rationale']) : '';
         }
     }
 

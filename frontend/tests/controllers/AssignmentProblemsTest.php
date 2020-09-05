@@ -353,7 +353,7 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    public function testAssignmentProblemsVariance() {
+    public function testAssignmentProblemsStatistics() {
         $problemsData = [];
         for ($i = 0; $i < 3; $i++) {
             $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
@@ -392,6 +392,13 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         // First student will solve problem0 and problem1, and won't try problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'CE');
+
         $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
             $problemsData[0],
             $courseData,
@@ -440,5 +447,187 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertGreaterThan(0, $results[0]['variance']);
         $this->assertEquals(0, $results[1]['variance']);
         $this->assertEquals(0, $results[2]['variance']);
+        // Average
+        $this->assertEquals(50, $results[0]['average']);
+        $this->assertEquals(100, $results[1]['average']);
+        $this->assertEquals(0, $results[2]['average']);
+        // Minimum
+        $this->assertEquals(0, $results[0]['minimum']);
+        $this->assertEquals(100, $results[1]['minimum']);
+        $this->assertEquals(0, $results[2]['minimum']);
+        // Maximum
+        $this->assertEquals(100, $results[0]['maximum']);
+        $this->assertEquals(100, $results[1]['maximum']);
+        $this->assertEquals(0, $results[2]['maximum']);
+        // Percent over 60%
+        $this->assertEquals(50, $results[0]['high_score_percentage']);
+        $this->assertEquals(100, $results[1]['high_score_percentage']);
+        $this->assertEquals(0, $results[2]['high_score_percentage']);
+        // Percent at 0%
+        $this->assertEquals(50, $results[0]['low_score_percentage']);
+        $this->assertEquals(0, $results[1]['low_score_percentage']);
+        $this->assertEquals(100, $results[2]['low_score_percentage']);
+        //average runs
+        $this->assertGreaterThan(1, $results[0]['avg_runs']);
+        $this->assertEquals(1, $results[1]['avg_runs']);
+        $this->assertLessThan(1, $results[2]['avg_runs']);
+    }
+
+    public function testAssignmentVerdictDistribution() {
+        $problemsData = [];
+        for ($i = 0; $i < 3; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignmentAlias = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignmentAlias,
+            [$problemsData[0], $problemsData[1], $problemsData[2]]
+        );
+
+        $identities = [];
+        [
+            'user' => $user,
+            'identity' => $identities[]
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[0]
+        );
+
+        [
+            'user' => $user,
+            'identity' => $identities[]
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $identities[1]
+        );
+
+        // First student will solve problem0, get 'CE', 'CE' then solve problem 1, and won't try problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'CE');
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'CE');
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // Second student will solve problem0, get 'TLE' then solve problem 1, and fail problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'TLE');
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[2],
+            $courseData,
+            $identities[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+
+        $results = \OmegaUp\DAO\Assignments::getAssignmentVerdictDistribution(
+            $courseData['course']->course_id,
+            $courseData['course']->group_id
+        );
+        //check if results include expected runs and verdicts
+        $this->assertEquals(
+            $results,
+            [
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[0]['problem']->problem_id,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+
+              ],
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[0]['problem']->problem_id,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+              ],
+              [
+                'verdict' => 'CE',
+                'runs' => 2,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'TLE',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'WA',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[2]['problem']->problem_id,
+                'problem_alias' => $problemsData[2]['problem']->alias,
+              ],
+            ]
+        );
     }
 }

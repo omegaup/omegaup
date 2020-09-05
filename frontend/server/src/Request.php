@@ -186,8 +186,13 @@ class Request extends \ArrayObject {
 
     /**
      * Ensures that the value associated with the key is a string.
+     *
+     * @param null|callable(string):bool $validator
      */
-    public function ensureString(string $key): string {
+    public function ensureString(
+        string $key,
+        ?callable $validator = null
+    ): string {
         if (!self::offsetExists($key)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterEmpty',
@@ -195,17 +200,31 @@ class Request extends \ArrayObject {
             );
         }
         /** @var mixed */
-        $val = $this->offsetGet($key);
-        $this[$key] = strval($val);
-        return strval($val);
+        $mixedVal = $this->offsetGet($key);
+        $val = (
+            is_scalar($mixedVal) || is_object($mixedVal) ?
+            strval($mixedVal) :
+            ''
+        );
+        if (!is_null($validator) && !$validator($val)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalid',
+                $key
+            );
+        }
+        $this[$key] = $val;
+        return $val;
     }
 
     /**
      * Ensures that the value associated with the key is a string or null
+     *
+     * @param null|callable(string):bool $validator
      */
     public function ensureOptionalString(
         string $key,
-        bool $required = false
+        bool $required = false,
+        ?callable $validator = null
     ): ?string {
         if (!self::offsetExists($key)) {
             if (!$required) {
@@ -216,7 +235,7 @@ class Request extends \ArrayObject {
                 $key
             );
         }
-        return $this->ensureString($key);
+        return $this->ensureString($key, $validator);
     }
 
     /**
@@ -319,7 +338,7 @@ class Request extends \ArrayObject {
      * Ensures that the value associated with the key is in an enum.
      *
      * @psalm-template TValue
-     * @param array<int, TValue> $enumValues
+     * @param array<array-key, TValue> $enumValues
      * @return TValue
      */
     public function ensureEnum(
@@ -343,7 +362,11 @@ class Request extends \ArrayObject {
             'parameterNotInExpectedSet',
             $key,
             [
-                'bad_elements' => strval($val),
+                'bad_elements' => (
+                    is_scalar($val) || is_object($val) ?
+                    strval($val) :
+                    ''
+                ),
                 'expected_set' => implode(', ', $enumValues),
             ]
         );
@@ -448,16 +471,25 @@ class Request extends \ArrayObject {
             return $default;
         }
 
-        if (is_array($this[$param])) {
+        /** @var mixed */
+        $value = $this[$param];
+        if (is_array($value)) {
             /** @var list<string> */
-            return $this[$param];
+            return $value;
         }
 
-        if (empty($this[$param])) {
+        if (empty($value)) {
             return [];
         }
 
-        $strings = explode(',', strval($this[$param]));
+        $strings = explode(
+            ',',
+            (
+                is_scalar($value) || is_object($value) ?
+                strval($value) :
+                ''
+            )
+        );
 
         /** @var list<string> */
         return array_unique($strings);
@@ -473,9 +505,37 @@ class Request extends \ArrayObject {
         $result = [];
         /** @var mixed $value */
         foreach ($this as $key => $value) {
-            $result[strval($key)] = strval($value);
+            $result[
+                is_scalar($key) || is_object($key) ?
+                strval($key) :
+                ''
+            ] = (
+                is_scalar($value) || is_object($value) ?
+                strval($value) :
+                ''
+            );
         }
         return $result;
+    }
+
+    /**
+     * Returns the content of $_SERVER[$name] as a string (or null).
+     */
+    public static function getServerVar(string $name): ?string {
+        if (!isset($_SERVER[$name]) || !is_string($_SERVER[$name])) {
+            return null;
+        }
+        return $_SERVER[$name];
+    }
+
+    /**
+     * Returns the content of $_REQUEST[$name] as a string (or null).
+     */
+    public static function getRequestVar(string $name): ?string {
+        if (!isset($_REQUEST[$name]) || !is_string($_REQUEST[$name])) {
+            return null;
+        }
+        return $_REQUEST[$name];
     }
 }
 

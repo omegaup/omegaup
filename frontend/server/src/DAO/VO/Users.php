@@ -49,14 +49,14 @@ class Users extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['facebook_user_id'])) {
-            $this->facebook_user_id = strval(
+            $this->facebook_user_id = is_scalar(
                 $data['facebook_user_id']
-            );
+            ) ? strval($data['facebook_user_id']) : '';
         }
         if (isset($data['git_token'])) {
-            $this->git_token = strval(
+            $this->git_token = is_scalar(
                 $data['git_token']
-            );
+            ) ? strval($data['git_token']) : '';
         }
         if (isset($data['main_email_id'])) {
             $this->main_email_id = intval(
@@ -69,14 +69,14 @@ class Users extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['scholar_degree'])) {
-            $this->scholar_degree = strval(
+            $this->scholar_degree = is_scalar(
                 $data['scholar_degree']
-            );
+            ) ? strval($data['scholar_degree']) : '';
         }
         if (isset($data['birth_date'])) {
-            $this->birth_date = strval(
+            $this->birth_date = is_scalar(
                 $data['birth_date']
-            );
+            ) ? strval($data['birth_date']) : '';
         }
         if (isset($data['verified'])) {
             $this->verified = boolval(
@@ -84,14 +84,14 @@ class Users extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['verification_id'])) {
-            $this->verification_id = strval(
+            $this->verification_id = is_scalar(
                 $data['verification_id']
-            );
+            ) ? strval($data['verification_id']) : '';
         }
         if (isset($data['reset_digest'])) {
-            $this->reset_digest = strval(
+            $this->reset_digest = is_scalar(
                 $data['reset_digest']
-            );
+            ) ? strval($data['reset_digest']) : '';
         }
         if (isset($data['reset_sent_at'])) {
             /**
@@ -120,9 +120,9 @@ class Users extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['preferred_language'])) {
-            $this->preferred_language = strval(
+            $this->preferred_language = is_scalar(
                 $data['preferred_language']
-            );
+            ) ? strval($data['preferred_language']) : '';
         }
     }
 
