@@ -1759,7 +1759,7 @@ export namespace types {
     assignment_alias: string;
     problem_alias: string;
     runs: number;
-    verdict: string;
+    verdict?: string;
   }
 
   export interface CourseStatisticsPayload {
