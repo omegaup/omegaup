@@ -2,10 +2,10 @@ import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
-import { Arena, GetOptionsFromLocation } from '../arena/arena';
-import ArenaAdmin from '../arena/admin_arena';
+import { Arena, GetOptionsFromLocation, runsStore } from '../arena/arena';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
+import * as time from '../time';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
@@ -17,7 +17,9 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
-          allRuns: payload.allRuns,
+          initialTab: this.initialTab,
+          allRuns: this.allRuns,
+          runDetails: this.runDetails,
           problem: payload.problem,
           runs: payload.runs,
           solvers: payload.solvers,
@@ -29,6 +31,7 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
+          showNewRunWindow: this.showNewRunWindow,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -181,14 +184,13 @@ OmegaUp.on('ready', () => {
           },
           'tab-selected': (tabName: string) => {
             arenaInstance.activeTab = tabName;
-            if (arenaInstance.activeTab === 'problems') {
-              arenaInstance.detectNewRun();
-            }
-
             window.location.replace(`#${arenaInstance.activeTab}`);
           },
           'submit-run': (code: string, language: string) => {
             arenaInstance.submitRun(code, language);
+          },
+          'dismiss-popup': () => {
+            window.location.replace(`#${arenaInstance.activeTab}`);
           },
           details: (run: types.Run) => {
             window.location.replace(
@@ -205,6 +207,12 @@ OmegaUp.on('ready', () => {
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
       allTokens: 0,
+      allRuns: <types.Run[]>payload.allRuns,
+      runDetails: <types.RunDetails | null>null,
+      initialTab: window.location.hash
+        ? window.location.hash.substr(1).split('/')[0]
+        : 'problems',
+      showNewRunWindow: false,
     },
     components: {
       'omegaup-problem-details': problem_Details,
@@ -218,7 +226,17 @@ OmegaUp.on('ready', () => {
     if (arenaInstance.activeTab !== 'problems') {
       return;
     }
-    arenaInstance.detectNewRun();
+    detectNewRun();
+  };
+
+  const detectNewRun = () => {
+    if (window.location.hash.indexOf('/new-run') === -1) return;
+    if (!payload.user.loggedIn) {
+      window.location.href = `/login/?redirect=${escape(
+        window.location.pathname,
+      )}`;
+    }
+    problemDetails.showNewRunWindow = true;
   };
 
   if (payload.runs && payload.user.loggedIn) {
@@ -228,12 +246,33 @@ OmegaUp.on('ready', () => {
   }
 
   if (payload.user.admin) {
-    const adminInstance = new ArenaAdmin(arenaInstance);
-    adminInstance.refreshRuns();
-    adminInstance.refreshClarifications();
     setInterval(() => {
-      adminInstance.refreshRuns();
-      adminInstance.refreshClarifications();
+      api.Problem.runs({
+        problem_alias: payload.problem.alias,
+        show_all: true,
+        offset: 0,
+        rowcount: 100,
+      })
+        .then(time.remoteTimeAdapter)
+        .then((response) => {
+          runsStore.commit('clear');
+          for (const run of response.runs) {
+            arenaInstance.trackRun(run);
+          }
+          problemDetails.allRuns = runsStore.state.runs;
+        })
+        .catch(ui.apiError);
+      api.Problem.clarifications({
+        problem_alias: payload.problem.alias,
+        offset: 0,
+        rowcount: 100,
+      })
+        .then(time.remoteTimeAdapter)
+        .then(
+          (response) =>
+            (problemDetails.initialClarifications = response.clarifications),
+        )
+        .catch(ui.apiError);
     }, 5 * 60 * 1000);
   }
 

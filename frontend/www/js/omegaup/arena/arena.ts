@@ -1905,19 +1905,6 @@ export class Arena {
     this.ephemeralGrader.send('setSettings', this.currentProblem.settings);
   }
 
-  detectNewRun(): void {
-    if (window.location.hash.indexOf('/new-run') !== -1) {
-      if (!OmegaUp.loggedIn) {
-        window.location.href = `/login/?redirect=${escape(
-          window.location.href,
-        )}`;
-        return;
-      }
-      $('#overlay form:not([data-run-submit])').hide();
-      $('#overlay').show();
-    }
-  }
-
   detectShowRun(): void {
     const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
     const showRunMatch = window.location.hash.match(showRunRegex);

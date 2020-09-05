@@ -22,8 +22,8 @@ export default class ArenaAdmin {
     const globalRuns = this.arena.options.contestAlias === 'admin';
 
     this.setUpPagers();
-
     this.runsList = new Vue({
+      el: globalRuns ? '#main-container' : '#runs table.runs',
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -70,12 +70,6 @@ export default class ArenaAdmin {
       },
       components: { 'omegaup-arena-runs': arena_Runs },
     });
-
-    let element = globalRuns ? '#main-container' : '#runs table.runs';
-    const runsListElement = document.querySelector(element);
-    if (runsListElement) {
-      this.runsList.$mount(runsListElement);
-    }
   }
 
   setUpPagers(): void {

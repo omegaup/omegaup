@@ -144,13 +144,17 @@
               (code, selectedLanguage) => onSubmitRun(code, selectedLanguage)
             "
           ></omegaup-arena-runsubmit>
+          <omegaup-arena-rundetails
+            slot="popup-content"
+            v-bind:data="runDetails"
+          ></omegaup-arena-rundetails>
         </omegaup-overlay>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
           v-bind:runs="runs"
           v-bind:show-details="true"
           v-bind:problemset-problems="[]"
-          v-on:details="(run) => $emit('details', run)"
+          v-on:details="(run) => onShowRunDetails(run)"
           v-on:new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
@@ -233,6 +237,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
+import arena_RunDetails from '../arena/RunDetails.vue';
 import arena_RunSubmit from '../arena/RunSubmit.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
@@ -273,6 +278,7 @@ interface Tab {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-runsubmit': arena_RunSubmit,
+    'omegaup-arena-rundetails': arena_RunDetails,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
@@ -303,14 +309,18 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
+  @Prop() initialTab!: string;
+  @Prop() showNewRunWindow!: boolean;
+  @Prop() runDetails!: types.RunDetails;
 
   T = T;
   ui = ui;
   time = time;
-  selectedTab = 'problems';
+  selectedTab = this.initialTab;
   clarifications = this.initialClarifications || [];
   showOverlay = false;
   showFormRunSubmit = false;
+  showFormRunDetails = false;
   clarificationsTabVisited = false;
 
   get availableTabs(): Tab[] {
@@ -356,9 +366,17 @@ export default class ProblemDetails extends Vue {
     this.showFormRunSubmit = true;
   }
 
+  onShowRunDetails(run: types.Run): void {
+    this.showOverlay = true;
+    this.showFormRunDetails = true;
+    this.$emit('details', run);
+  }
+
   onDismissNewSubmission(): void {
     this.showOverlay = false;
     this.showFormRunSubmit = false;
+    this.showFormRunDetails = false;
+    this.$emit('dismiss-popup');
   }
 
   onSubmitRun(code: string, selectedLanguage: string): void {
@@ -381,6 +399,12 @@ export default class ProblemDetails extends Vue {
   @Watch('initialClarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
+  }
+
+  @Watch('showNewRunWindow')
+  onShowNewRunWindowChanged(newValue: boolean): void {
+    if (!newValue) return;
+    this.onNewSubmission();
   }
 }
 </script>
