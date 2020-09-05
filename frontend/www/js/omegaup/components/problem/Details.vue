@@ -139,7 +139,7 @@
             v-bind:preferred-language="problem.preferred_language"
             v-bind:languages="problem.languages"
             v-bind:initial-show-form="showFormRunSubmit"
-            v-on:dismiss="onDismissNewSubmission"
+            v-on:dismiss="onDismissPopup"
             v-on:submit-run="
               (code, selectedLanguage) => onSubmitRun(code, selectedLanguage)
             "
@@ -147,6 +147,8 @@
           <omegaup-arena-rundetails
             slot="popup-content"
             v-bind:data="runDetails"
+            v-bind:initial-show-form="showFormRunDetails"
+            v-on:dismiss="onDismissPopup"
           ></omegaup-arena-rundetails>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -154,7 +156,7 @@
           v-bind:runs="runs"
           v-bind:show-details="true"
           v-bind:problemset-problems="[]"
-          v-on:details="(run) => onShowRunDetails(run)"
+          v-on:details="(run) => onShowRunDetails(run.guid)"
           v-on:new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
@@ -191,6 +193,9 @@
           v-bind:show-pager="true"
           v-bind:show-disqualify="true"
           v-bind:problemset-problems="[]"
+          v-on:details="(run) => onShowRunDetails(run.guid)"
+          v-on:rejudge="(run) => $emit('rejudge', run)"
+          v-on:disqualify="(run) => $emit('disqualify', run)"
         ></omegaup-arena-runs>
       </div>
       <div
@@ -199,7 +204,7 @@
       >
         <omegaup-arena-clarification-list
           v-bind:clarifications="clarifications"
-          v-bind:in-contest="false"
+          v-bind:in-contest="true"
           v-on:clarification-response="
             (id, responseText, isPublic) =>
               $emit('clarification-response', id, responseText, isPublic)
@@ -311,6 +316,7 @@ export default class ProblemDetails extends Vue {
   @Prop() histogram!: types.Histogram;
   @Prop() initialTab!: string;
   @Prop() showNewRunWindow!: boolean;
+  @Prop() showRunDetailsWindow!: boolean;
   @Prop() runDetails!: types.RunDetails;
 
   T = T;
@@ -366,13 +372,14 @@ export default class ProblemDetails extends Vue {
     this.showFormRunSubmit = true;
   }
 
-  onShowRunDetails(run: types.Run): void {
+  onShowRunDetails(guid: string): void {
     this.showOverlay = true;
     this.showFormRunDetails = true;
-    this.$emit('details', run);
+    console.log('heeeereeee');
+    this.$emit('details', guid);
   }
 
-  onDismissNewSubmission(): void {
+  onDismissPopup(): void {
     this.showOverlay = false;
     this.showFormRunSubmit = false;
     this.showFormRunDetails = false;
@@ -381,7 +388,7 @@ export default class ProblemDetails extends Vue {
 
   onSubmitRun(code: string, selectedLanguage: string): void {
     this.$emit('submit-run', code, selectedLanguage);
-    this.onDismissNewSubmission();
+    this.onDismissPopup();
   }
 
   onDismissPromotion(
@@ -405,6 +412,12 @@ export default class ProblemDetails extends Vue {
   onShowNewRunWindowChanged(newValue: boolean): void {
     if (!newValue) return;
     this.onNewSubmission();
+  }
+
+  @Watch('showRunDetailsWindow')
+  onShowRunDetailsWindowChanged(newValue: boolean): void {
+    if (!newValue) return;
+    //this.onShowRunDetails();
   }
 }
 </script>

@@ -2,7 +2,12 @@ import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
-import { Arena, GetOptionsFromLocation, runsStore } from '../arena/arena';
+import {
+  Arena,
+  GetOptionsFromLocation,
+  runsStore,
+  myRunsStore,
+} from '../arena/arena';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as time from '../time';
@@ -21,7 +26,7 @@ OmegaUp.on('ready', () => {
           allRuns: this.allRuns,
           runDetails: this.runDetails,
           problem: payload.problem,
-          runs: payload.runs,
+          runs: this.runs,
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: payload.nominationStatus,
@@ -32,6 +37,7 @@ OmegaUp.on('ready', () => {
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
           showNewRunWindow: this.showNewRunWindow,
+          showRunDetailsWindow: this.showRunDetailsWindow,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -188,15 +194,35 @@ OmegaUp.on('ready', () => {
           },
           'submit-run': (code: string, language: string) => {
             arenaInstance.submitRun(code, language);
+            this.runs = myRunsStore.state.runs;
           },
           'dismiss-popup': () => {
             window.location.replace(`#${arenaInstance.activeTab}`);
           },
-          details: (run: types.Run) => {
+          details: (guid: string) => {
             window.location.replace(
-              `#${arenaInstance.activeTab}/show-run:${run.guid}`,
+              `#${arenaInstance.activeTab}/show-run:${guid}`,
             );
             arenaInstance.detectShowRun();
+          },
+          disqualify: (run: types.Run) => {
+            if (!window.confirm(T.runDisqualifyConfirm)) {
+              return;
+            }
+            api.Run.disqualify({ run_alias: run.guid })
+              .then((data) => {
+                run.type = 'disqualified';
+                arenaInstance.updateRunFallback(run.guid);
+              })
+              .catch(ui.ignoreError);
+          },
+          rejudge: (run: types.Run) => {
+            api.Run.rejudge({ run_alias: run.guid, debug: false })
+              .then((data) => {
+                run.status = 'rejudging';
+                arenaInstance.updateRunFallback(run.guid);
+              })
+              .catch(ui.ignoreError);
           },
         },
       });
@@ -208,11 +234,13 @@ OmegaUp.on('ready', () => {
       availableTokens: 0,
       allTokens: 0,
       allRuns: <types.Run[]>payload.allRuns,
+      runs: <types.Run[]>payload.runs,
       runDetails: <types.RunDetails | null>null,
       initialTab: window.location.hash
         ? window.location.hash.substr(1).split('/')[0]
         : 'problems',
       showNewRunWindow: false,
+      showRunDetailsWindow: false,
     },
     components: {
       'omegaup-problem-details': problem_Details,
@@ -227,6 +255,7 @@ OmegaUp.on('ready', () => {
       return;
     }
     detectNewRun();
+    detectRunDetails();
   };
 
   const detectNewRun = () => {
@@ -237,6 +266,12 @@ OmegaUp.on('ready', () => {
       )}`;
     }
     problemDetails.showNewRunWindow = true;
+  };
+
+  const detectRunDetails = () => {
+    if (window.location.hash.indexOf('/show-run:') === -1) return;
+    arenaInstance.detectShowRun();
+    problemDetails.showRunDetailsWindow = true;
   };
 
   if (payload.runs && payload.user.loggedIn) {

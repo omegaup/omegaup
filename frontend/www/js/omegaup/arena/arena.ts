@@ -110,7 +110,7 @@ export const runsStore = new Vuex.Store<RunsState>({
   },
 });
 
-const myRunsStore = new Vuex.Store<RunsState>({
+export const myRunsStore = new Vuex.Store<RunsState>({
   state: {
     runs: [],
     index: {},
