@@ -185,6 +185,17 @@
         class="tab-pane fade p-4"
         v-bind:class="{ 'show active': selectedTab === 'runs' }"
       >
+        <omegaup-overlay
+          v-bind:show-overlay="showOverlay"
+          v-if="this.user.loggedIn"
+        >
+          <omegaup-arena-rundetails
+            slot="popup-content"
+            v-bind:data="runDetails"
+            v-bind:initial-show-form="showFormRunDetails"
+            v-on:dismiss="onDismissPopup"
+          ></omegaup-arena-rundetails>
+        </omegaup-overlay>
         <omegaup-arena-runs
           v-bind:runs="allRuns"
           v-bind:show-details="true"
