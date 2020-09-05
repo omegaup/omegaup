@@ -4350,7 +4350,7 @@ contest updates with an access token.
 | --------------- | ------------- | ----------- |
 | `auth_token`    | `mixed`       |             |
 | `contest_admin` | `null|string` |             |
-| `contest_alias` | `mixed`       |             |
+| `contest_alias` | `null|string` |             |
 | `filter`        | `mixed`       |             |
 | `problemset_id` | `int`         |             |
 | `token`         | `mixed`       |             |
