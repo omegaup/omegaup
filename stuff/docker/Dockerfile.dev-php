@@ -15,12 +15,13 @@ RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
         php7.4-fpm php7.4-curl php7.4-mysql php7.4-sqlite3 php7.4-zip \
         php7.4-mbstring php7.4-json php7.4-opcache php7.4-xml php-apcu \
-        nginx git yarn nodejs supervisor python3-requests python3-mysqldb \
-        mysql-client-core-8.0 sudo wait-for-it && \
+        nginx git yarn nodejs supervisor python3-jinja2 python3-requests \
+        python3-mysqldb python3-pyparsing mysql-client-core-8.0 \
+        sudo wait-for-it && \
     apt-get autoremove -y && \
     apt-get clean
 
-RUN curl -sL https://getcomposer.org/download/1.10.1/composer.phar -o /usr/bin/composer
+RUN curl -sL https://getcomposer.org/download/1.10.10/composer.phar -o /usr/bin/composer
 RUN chmod +x /usr/bin/composer
 
 RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.15/omegaup-gitserver.tar.xz | tar xJ -C /

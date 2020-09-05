@@ -5,7 +5,8 @@
  *
  * @author carlosabcs
  */
-class OneHundredSolvedProblems extends \OmegaUp\Test\BadgesTestCase {
+// phpcs:ignore Squiz.Classes.ValidClassName.NotCamelCaps
+class Badge_100solvedProblemsTest extends \OmegaUp\Test\BadgesTestCase {
     public function test100SolvedProblems(): void {
         // Creates two users, one solves 99 problems the other 101.
         ['user' => $user99, 'identity' => $identity99] = \OmegaUp\Test\Factories\User::createUser();

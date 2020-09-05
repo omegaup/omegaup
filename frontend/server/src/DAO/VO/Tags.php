@@ -37,9 +37,9 @@ class Tags extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['name'])) {
-            $this->name = strval(
+            $this->name = is_scalar(
                 $data['name']
-            );
+            ) ? strval($data['name']) : '';
         }
         if (isset($data['public'])) {
             $this->public = boolval(

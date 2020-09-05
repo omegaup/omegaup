@@ -174,6 +174,26 @@ CREATE TABLE `Countries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Course_Clone_Log` (
+  `course_clone_log_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador del intento de clonar curso',
+  `ip` varchar(40) NOT NULL COMMENT 'Dirección IP desde la cual se intentó clonar el curso.',
+  `course_id` int NOT NULL COMMENT 'ID del curso original',
+  `new_course_id` int DEFAULT NULL COMMENT 'ID del curso nuevo, null si no se pudo colonar el curso',
+  `token_payload` varchar(220) NOT NULL COMMENT 'Claims del token usado para intentar clonar, independientemente de si fue exitoso o no.',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en la que el usuario intenta clonar el curso',
+  `user_id` int NOT NULL COMMENT 'ID del usuario que intentó clonar.',
+  `result` enum('unknown','success','token_expired','token_corrupted','token_invalid') NOT NULL DEFAULT 'success' COMMENT 'Resultado obtenido del intento de clonación de curso',
+  PRIMARY KEY (`course_clone_log_id`),
+  KEY `user_id` (`user_id`),
+  KEY `course_id` (`course_id`),
+  KEY `new_course_id` (`new_course_id`),
+  CONSTRAINT `fk_ccl_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
+  CONSTRAINT `fk_ccl_new_course_id` FOREIGN KEY (`new_course_id`) REFERENCES `Courses` (`course_id`),
+  CONSTRAINT `fk_ccl_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de registro para cursos clonados';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Course_Identity_Request` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `course_id` int NOT NULL COMMENT 'Curso al cual se necesita un request para ingresar',

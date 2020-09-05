@@ -389,11 +389,12 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 
         $login = self::login($identity);
-        $r = new \OmegaUp\Request([
-            'auth_token' => $login->auth_token,
-            'email' => 'new@email.com'
-        ]);
-        $response = \OmegaUp\Controllers\User::apiUpdateMainEmail($r);
+        $response = \OmegaUp\Controllers\User::apiUpdateMainEmail(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'email' => 'new@email.com'
+            ])
+        );
 
         // Check email in db
         $user_in_db = \OmegaUp\DAO\Users::findByEmail('new@email.com');
@@ -510,7 +511,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
                 'status' => $status,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-                'rationale' => 'ew plus something else'
+                'rationale' => 'ew plus something else',
             ])
         );
 

@@ -65,14 +65,14 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['guid'])) {
-            $this->guid = strval(
+            $this->guid = is_scalar(
                 $data['guid']
-            );
+            ) ? strval($data['guid']) : '';
         }
         if (isset($data['language'])) {
-            $this->language = strval(
+            $this->language = is_scalar(
                 $data['language']
-            );
+            ) ? strval($data['language']) : '';
         }
         if (isset($data['time'])) {
             /**
@@ -95,9 +95,9 @@ class Submissions extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['type'])) {
-            $this->type = strval(
+            $this->type = is_scalar(
                 $data['type']
-            );
+            ) ? strval($data['type']) : '';
         }
         if (isset($data['school_id'])) {
             $this->school_id = intval(

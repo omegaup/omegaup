@@ -3,7 +3,14 @@
     <div class="card-body">
       <form class="publish-form" v-on:submit.prevent="onSubmit">
         <div class="form-group">
-          <label>{{ T.contestNewFormAdmissionMode }}</label>
+          <label>{{ T.contestNewFormAdmissionModeSelect }}</label>
+          <a
+            data-toggle="tooltip"
+            rel="tooltip"
+            v-bind:title="T.courseEditAdmissionModeDescription"
+          >
+            <img src="/media/question.png" />
+          </a>
           <select
             class="form-control"
             name="admission-mode"
@@ -49,9 +56,11 @@
             <span v-html="admissionModeDescription"></span>
           </p>
         </div>
-        <button class="btn btn-primary change-admission-mode" type="submit">
-          {{ T.wordsSaveChanges }}
-        </button>
+        <div class="text-right">
+          <button class="btn btn-primary change-admission-mode" type="submit">
+            {{ T.wordsSaveChanges }}
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -59,7 +68,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
 import {

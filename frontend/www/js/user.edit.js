@@ -126,7 +126,7 @@ omegaup.OmegaUp.on('ready', function () {
       graduation_date: graduation_date.getTime() / 1000,
       school_name: $('#school').val(),
       locale: $('#locale').val(),
-      preferred_language: $('#programming_language').val(),
+      preferred_language: $('#programming_language').val() || undefined,
       is_private: $('#is_private').prop('checked'),
       hide_problem_tags: $('#hide_problem_tags').prop('checked'),
     };

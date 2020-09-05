@@ -154,7 +154,7 @@
                 </a>
                 <a class="ml-2" v-bind:href="`/arena/${contest.alias}/print/`">
                   <font-awesome-icon
-                    v-bind:title="T.wordsPrintableVersion"
+                    v-bind:title="T.contestPrintableVersion"
                     v-bind:icon="['fas', 'print']"
                   />
                 </a>

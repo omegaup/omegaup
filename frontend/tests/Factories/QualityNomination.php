@@ -25,29 +25,7 @@ class QualityNomination {
         }
     }
 
-    public static function initTags(): void {
-        \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'dp']));
-        \OmegaUp\DAO\Tags::create(new \OmegaUp\DAO\VO\Tags(['name' => 'math']));
-        \OmegaUp\DAO\Tags::create(
-            new \OmegaUp\DAO\VO\Tags(
-                ['name' => 'matrices']
-            )
-        );
-        \OmegaUp\DAO\Tags::create(
-            new \OmegaUp\DAO\VO\Tags(
-                ['name' => 'greedy']
-            )
-        );
-        \OmegaUp\DAO\Tags::create(
-            new \OmegaUp\DAO\VO\Tags(
-                ['name' => 'geometry']
-            )
-        );
-        \OmegaUp\DAO\Tags::create(
-            new \OmegaUp\DAO\VO\Tags(
-                ['name' => 'search']
-            )
-        );
+    public static function initTopicTags(): void {
         \OmegaUp\DAO\Tags::create(
             new \OmegaUp\DAO\VO\Tags(
                 ['name' => 'problemTopicDynamicProgramming']

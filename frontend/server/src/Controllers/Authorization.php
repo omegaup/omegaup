@@ -8,7 +8,7 @@
 class Authorization extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param string $token
      * @omegaup-request-param mixed $username
      *
      * @return array{has_solved: bool, is_admin: bool, can_view: bool, can_edit: bool}
@@ -28,7 +28,7 @@ class Authorization extends \OmegaUp\Controllers\Controller {
         // expire, so use a pre-shared secret to authenticate that
         // grants admin-level privileges just for this call.
         if (
-            strval($r['token']) !== OMEGAUP_GITSERVER_SECRET_TOKEN ||
+            $r->ensureString('token') !== OMEGAUP_GITSERVER_SECRET_TOKEN ||
             empty(OMEGAUP_GITSERVER_SECRET_TOKEN)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();

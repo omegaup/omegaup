@@ -41,15 +41,14 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     require_once(__DIR__ . '/config.default.php');
 }
 
-define(
-    'OMEGAUP_LOCKDOWN',
-    isset(
-        $_SERVER['HTTP_HOST']
-    ) && strpos(
-        strval($_SERVER['HTTP_HOST']),
-        OMEGAUP_LOCKDOWN_DOMAIN
-    ) === 0
-);
+if (!defined('OMEGAUP_LOCKDOWN')) {
+    define(
+        'OMEGAUP_LOCKDOWN',
+        isset($_SERVER['HTTP_HOST']) &&
+        is_string($_SERVER['HTTP_HOST']) &&
+        strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0
+    );
+}
 
 $contentSecurityPolicy = [
     'script-src' => [

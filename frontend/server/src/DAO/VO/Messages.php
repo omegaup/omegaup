@@ -55,9 +55,9 @@ class Messages extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['message'])) {
-            $this->message = strval(
+            $this->message = is_scalar(
                 $data['message']
-            );
+            ) ? strval($data['message']) : '';
         }
         if (isset($data['date'])) {
             /**

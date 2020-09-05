@@ -601,7 +601,7 @@ class APIGenerator {
                         $returnType->removeType('null');
                     }
                     $properties[
-                        strval($reflectionProperty->name)
+                        $reflectionProperty->getName()
                     ] = $this->typeMapper->convertTypeToTypeScript(
                         $returnType,
                         $typeName
@@ -882,6 +882,7 @@ function listDir(string $path): Generator {
 // It's a bit brittle to be fiddling with internal objects, but there is no
 // other way to get a valid instance.
 $rootDirectory = dirname(__DIR__, 3);
+/** @psalm-suppress DeprecatedClass cannot yet upgrade to Composer 2 */
 define('PSALM_VERSION', \PackageVersions\Versions::getVersion('vimeo/psalm'));
 $projectAnalyzer = new \Psalm\Internal\Analyzer\ProjectAnalyzer(
     \Psalm\Config::loadFromXMLFile(

@@ -70,13 +70,12 @@ class ProblemDeployer {
         if (
             isset($_FILES['problem_contents'])
             && isset($_FILES['problem_contents']['tmp_name'])
-            && is_string($_FILES['problem_contents']['tmp_name'])
             && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                strval($_FILES['problem_contents']['tmp_name'])
+                $_FILES['problem_contents']['tmp_name']
             )
         ) {
             /** @psalm-suppress MixedArrayAccess */
-            $this->zipPath = strval($_FILES['problem_contents']['tmp_name']);
+            $this->zipPath = $_FILES['problem_contents']['tmp_name'];
         } else {
             $this->zipPath = __DIR__ . '/empty.zip';
         }
@@ -179,7 +178,6 @@ class ProblemDeployer {
                 }
             }
         }
-        $this->generateLibinteractiveTemplates($this->publishedCommit);
     }
 
     /**
@@ -539,6 +537,51 @@ class ProblemDeployer {
             }
         } finally {
             curl_close($curl);
+        }
+    }
+
+    public function renameRepository(
+        string $targetAlias
+    ): void {
+        $curl = curl_init();
+        try {
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/rename-repository/{$targetAlias}",
+                    CURLOPT_HTTPHEADER => [
+                        // Unsetting Expect:, since it kind of breaks the gitserver.
+                        'Expect: ',
+                        \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
+                            $this->alias,
+                            'omegaup:system'
+                        ),
+                    ],
+                    CURLOPT_RETURNTRANSFER => 1,
+                ]
+            );
+            $output = curl_exec($curl);
+            /** @var int */
+            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $retval = ($output !== false && $statusCode == 200) ? 0 : 1;
+        } finally {
+            curl_close($curl);
+        }
+
+        if ($statusCode == 409) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'problemAliasExists'
+            );
+        }
+        if ($retval != 0) {
+            $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                'problemDeployerInternalError',
+                /*$context=*/null
+            );
+            $this->log->error(
+                "rename problem failed: HTTP/{$statusCode}: {$error}"
+            );
+            throw $error;
         }
     }
 }

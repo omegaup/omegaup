@@ -165,7 +165,9 @@ class User extends \OmegaUp\Controllers\Controller {
             $data = [
                 'secret' => OMEGAUP_RECAPTCHA_SECRET,
                 'response' => $createUserParams->recaptcha,
-                'remoteip' => $_SERVER['REMOTE_ADDR'],
+                'remoteip' => (
+                    \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+                ),
             ];
 
             // use key 'http' even if you send the request to https://...
@@ -417,10 +419,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiChangePassword(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
 
         $hashedPassword = null;
@@ -1485,7 +1484,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Gets verify status of a user
      *
-     * @omegaup-request-param mixed $email
+     * @omegaup-request-param string $email
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -1498,12 +1497,11 @@ class User extends \OmegaUp\Controllers\Controller {
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['email'],
-            'email'
+        $email = $r->ensureString(
+            'email',
+            fn (string $email) => \OmegaUp\Validators::email($email)
         );
-
-        $response = \OmegaUp\DAO\Users::getStatusVerified($r['email']);
+        $response = \OmegaUp\DAO\Users::getStatusVerified($email);
 
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -1522,7 +1520,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * - last password change request
      * - verify status
      *
-     * @omegaup-request-param mixed $email
+     * @omegaup-request-param string $email
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
@@ -1531,13 +1529,16 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function apiExtraInformation(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');
+        $email = $r->ensureString(
+            'email',
+            fn (string $email) => \OmegaUp\Validators::email($email)
+        );
 
         if (!\OmegaUp\Authorization::isSupportTeamMember($r->identity)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $response = \OmegaUp\DAO\Identities::getExtraInformation($r['email']);
+        $response = \OmegaUp\DAO\Identities::getExtraInformation($email);
         if (is_null($response)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidUser'
@@ -2128,7 +2129,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param mixed $birth_date
      * @omegaup-request-param mixed $country_id
-     * @omegaup-request-param mixed $gender
+     * @omegaup-request-param 'decline'|'female'|'male'|'other'|null $gender
      * @omegaup-request-param mixed $graduation_date
      * @omegaup-request-param bool|null $hide_problem_tags
      * @omegaup-request-param bool|null $is_private
@@ -2310,14 +2311,11 @@ class User extends \OmegaUp\Controllers\Controller {
 
         $r->ensureOptionalBool('is_private');
         $r->ensureOptionalBool('hide_problem_tags');
-
         if (!is_null($r['gender'])) {
-            \OmegaUp\Validators::validateInEnum(
-                $r['gender'],
+            $r->identity->gender = $r->ensureOptionalEnum(
                 'gender',
                 \OmegaUp\Controllers\User::ALLOWED_GENDER_OPTIONS
             );
-            $r->identity->gender = strval($r['gender']);
         }
 
         $userValueProperties = [
@@ -2597,7 +2595,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Updates the main email of the current user
      *
-     * @omegaup-request-param mixed $email
+     * @omegaup-request-param string $email
      *
      * @param \OmegaUp\Request $r
      *
@@ -2606,7 +2604,10 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiUpdateMainEmail(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateEmail($r['email'], 'email');
+        $emailParam = $r->ensureString(
+            'email',
+            fn (string $email) => \OmegaUp\Validators::email($email)
+        );
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
@@ -2615,9 +2616,17 @@ class User extends \OmegaUp\Controllers\Controller {
             if (!is_null($r->user->main_email_id)) {
                 $email = \OmegaUp\DAO\Emails::getByPK($r->user->main_email_id);
                 if (!is_null($email)) {
-                    $email->email = $r['email'];
+                    $email->email = $emailParam;
                     \OmegaUp\DAO\Emails::update($email);
                 }
+            } else {
+                $email = new \OmegaUp\DAO\VO\Emails([
+                    'user_id' => $r->user->user_id,
+                    'email' => $emailParam,
+                ]);
+                \OmegaUp\DAO\Emails::create($email);
+                $r->user->main_email_id = $email->email_id;
+                \OmegaUp\DAO\Users::update($r->user);
             }
 
             // Add verification_id if not there
@@ -2696,8 +2705,8 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{user: null|string, admin: bool, problem_admin: list<string>, contest_admin: list<string>, problemset_admin: list<int>}
      *
      * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param mixed $contest_admin
-     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param null|string $contest_admin
+     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param mixed $filter
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
@@ -2803,12 +2812,16 @@ class User extends \OmegaUp\Controllers\Controller {
                     ] = \OmegaUp\Controllers\Problemset::wrapRequest(new \OmegaUp\Request([
                         'problemset_id' => $tokens[2],
                         'auth_token' => $r['auth_token'],
-                        'tokens' => $tokens
+                        'tokens' => $tokens,
                     ]));
-                    if (!empty($r2['contest_admin'])) {
-                        $response['contest_admin'][] = strval(
-                            $r2['contest_alias']
-                        );
+                    $contestAlias = $r2->ensureOptionalString(
+                        'contest_alias'
+                    );
+                    if (
+                        !empty($contestAlias) &&
+                        ($r2->ensureOptionalBool('contest_admin') ?? false)
+                    ) {
+                        $response['contest_admin'][] = $contestAlias;
                     }
                     break;
                 case 'problem':
@@ -2899,10 +2912,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddRole(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
 
@@ -2927,9 +2937,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiRemoveRole(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['role'], 'role');
 
@@ -2954,9 +2962,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiAddGroup(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
         $group = self::validateAddRemoveGroup($r['group']);
@@ -2980,9 +2986,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      */
     public static function apiRemoveGroup(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
         \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
         $group = self::validateAddRemoveGroup($r['group']);
@@ -2998,84 +3002,53 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $experiment
-     */
-    private static function validateAddRemoveExperiment(\OmegaUp\Request $r): void {
-        /** @var \OmegaUp\DAO\VO\Identities $r->identity */
-        if (
-            is_null($r->identity) ||
-            !\OmegaUp\Authorization::isSystemAdmin($r->identity)
-        ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['experiment'],
-            'experiment'
-        );
-        if (
-            !in_array(
-                $r['experiment'],
-                \OmegaUp\Experiments::getInstance()->getAllKnownExperiments()
-            )
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterNotFound',
-                'experiment'
-            );
-        }
-    }
-
-    /**
      * Adds the experiment to the user.
      *
-     * @omegaup-request-param mixed $experiment
+     * @omegaup-request-param string $experiment
      *
      * @return array{status: string}
      */
     public static function apiAddExperiment(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        self::validateAddRemoveExperiment($r);
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         \OmegaUp\DAO\UsersExperiments::create(new \OmegaUp\DAO\VO\UsersExperiments([
             'user_id' => $r->user->user_id,
-            'experiment' => $r['experiment'],
+            'experiment' => $r->ensureEnum(
+                'experiment',
+                \OmegaUp\Experiments::getInstance()->getAllKnownExperiments()
+            ),
         ]));
 
-        return [
-            'status' => 'ok',
-        ];
+        return ['status' => 'ok'];
     }
 
     /**
      * Removes the experiment from the user.
      *
-     * @omegaup-request-param mixed $experiment
+     * @omegaup-request-param string $experiment
      *
      * @return array{status: string}
      */
     public static function apiRemoveExperiment(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
-
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        self::validateAddRemoveExperiment($r);
+        if (!\OmegaUp\Authorization::isSystemAdmin($r->identity)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
 
         \OmegaUp\DAO\UsersExperiments::delete(
             $r->user->user_id,
-            strval(
-                $r['experiment']
-            )
+            $r->ensureEnum(
+                'experiment',
+                \OmegaUp\Experiments::getInstance()->getAllKnownExperiments()
+            ),
         );
 
-        return [
-            'status' => 'ok',
-        ];
+        return ['status' => 'ok'];
     }
 
     /**
@@ -3465,7 +3438,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
     /**
      * @omegaup-request-param mixed $category
-     * @omegaup-request-param mixed $date
+     * @omegaup-request-param null|string $date
      *
      * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: IndexPayload}}
      */
@@ -3474,9 +3447,18 @@ class User extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Not logged, but there is no problem with this
-            /** @var null $r->identity */
+            /**
+             * @var null $r->identity
+             * @var null $r->identity->username
+             */
         }
-        $date = !empty($r['date']) ? strval($r['date']) : null;
+        $date = $r->ensureOptionalString(
+            'date',
+            /*$required=*/false,
+            fn (string $date): bool => \OmegaUp\Validators::stringNonEmpty(
+                $date
+            )
+        );
         $firstDay = self::getCurrentMonthFirstDay($date);
         $rowCount = 5;
 
@@ -3507,7 +3489,10 @@ class User extends \OmegaUp\Controllers\Controller {
                     'schoolRank' => \OmegaUp\Controllers\School::getTopSchoolsOfTheMonth(
                         $rowCount
                     ),
-                    'currentUserInfo' => !is_null($r->identity) ? [
+                    'currentUserInfo' => (
+                        !is_null($r->identity) &&
+                        !is_null($r->identity->username)
+                    ) ? [
                         'username' => $r->identity->username,
                     ] : [],
                 ],

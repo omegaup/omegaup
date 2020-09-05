@@ -10,6 +10,13 @@ namespace OmegaUp;
 class Validators {
     /**
      * Check if email is valid
+     */
+    public static function email(string $email): bool {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    /**
+     * Check if email is valid
      *
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
@@ -52,6 +59,13 @@ class Validators {
                 $parameterName
             );
         }
+    }
+
+    /**
+     * Check whether parameter value is non-empty string
+     */
+    public static function stringNonEmpty(string $parameter): bool {
+        return !empty($parameter);
     }
 
     /**
@@ -477,7 +491,11 @@ class Validators {
                 'parameterNotInExpectedSet',
                 $parameterName,
                 [
-                    'bad_elements' => strval($parameter),
+                    'bad_elements' => (
+                        is_scalar($parameter) || is_object($parameter) ?
+                        strval($parameter) :
+                        ''
+                    ),
                     'expected_set' => implode(', ', $enum),
                 ]
             );

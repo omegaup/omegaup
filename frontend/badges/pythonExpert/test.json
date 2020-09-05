@@ -24,7 +24,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -46,7 +47,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -68,7 +70,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -90,7 +93,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -112,7 +116,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -134,7 +139,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -156,7 +162,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -178,7 +185,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -200,7 +208,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -222,7 +231,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -244,7 +254,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -266,7 +277,8 @@
                                 "input_limit": 10240,
                                 "source": "omegaUp classics",
                                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                                "email_clarifications": 1
+                                "email_clarifications": 1,
+                                "problem_level":"problemLevelBasicIntroductionToProgramming"
                             },
                             "files": {
                                 "problem_contents": "frontend/tests/resources/testproblem.zip"

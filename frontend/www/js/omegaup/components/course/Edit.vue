@@ -166,9 +166,6 @@
         <omegaup-course-admision-mode
           v-bind:initial-admission-mode="data.course.admission_mode"
           v-bind:should-show-public-option="data.course.is_curator"
-          v-bind:admission-mode-description="
-            T.courseEditAdmissionModeDescription
-          "
           v-bind:course-alias="data.course.alias"
           v-on:emit-update-admission-mode="
             (admisionMode) => $emit('update-admission-mode', admisionMode)
@@ -235,13 +232,18 @@
       </div>
 
       <div class="tab-pane active" role="tabpanel" v-if="showTab === 'clone'">
-        <omegaup-course-clone
-          v-bind:initial-alias="data.course.alias"
-          v-bind:initial-name="data.course.name"
-          v-on:emit-clone="
-            (alias, name, startTime) => $emit('clone', alias, name, startTime)
-          "
-        ></omegaup-course-clone>
+        <div class="card">
+          <div class="card-body">
+            <omegaup-course-clone
+              v-bind:initial-alias="data.course.alias"
+              v-bind:initial-name="data.course.name"
+              v-on:clone="
+                (alias, name, startTime) =>
+                  $emit('clone', alias, name, startTime)
+              "
+            ></omegaup-course-clone>
+          </div>
+        </div>
       </div>
     </div>
   </div>

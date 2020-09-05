@@ -92,6 +92,14 @@ try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
 try_define('OMEGAUP_GRADER_FAKE', false);
 
 # ####################################
+# COURSE CLONE CONFIG
+# ####################################
+try_define(
+    'OMEGAUP_COURSE_CLONE_SECRET_KEY',
+    '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE'
+);
+
+# ####################################
 # FACEBOOK LOGIN CONFIG
 # ####################################
 try_define('OMEGAUP_FB_APPID', 'xxxxx');

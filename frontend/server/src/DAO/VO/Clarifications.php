@@ -53,14 +53,14 @@ class Clarifications extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['message'])) {
-            $this->message = strval(
+            $this->message = is_scalar(
                 $data['message']
-            );
+            ) ? strval($data['message']) : '';
         }
         if (isset($data['answer'])) {
-            $this->answer = strval(
+            $this->answer = is_scalar(
                 $data['answer']
-            );
+            ) ? strval($data['answer']) : '';
         }
         if (isset($data['time'])) {
             /**

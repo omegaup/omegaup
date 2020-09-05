@@ -1,15 +1,8 @@
 <?php
 
-/**
- * Description of UpdateClarificationTest
- *
- * @author joemmanuel
- */
-
-class UpdateClarificationTest extends \OmegaUp\Test\ControllerTestCase {
+class ClarificationUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Basic test for answer
-     *
      */
     public function testUpdateAnswer() {
         // Get a problem

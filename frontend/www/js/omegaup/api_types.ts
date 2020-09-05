@@ -385,6 +385,38 @@ export namespace types {
       );
     }
 
+    export function CourseCloneDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CourseCloneDetailsPayload {
+      return ((x) => {
+        x.details = ((x) => {
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function CourseDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseDetailsPayload {
@@ -649,6 +681,38 @@ export namespace types {
     ): types.CourseNewPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function CourseStatisticsPayload(
+      elementId: string = 'payload',
+    ): types.CourseStatisticsPayload {
+      return ((x) => {
+        x.course = ((x) => {
+          if (x.assignments)
+            x.assignments = ((x) => {
+              if (!Array.isArray(x)) {
+                return x;
+              }
+              return x.map((x) => {
+                if (x.finish_time)
+                  x.finish_time = ((x: number) => new Date(x * 1000))(
+                    x.finish_time,
+                  );
+                x.start_time = ((x: number) => new Date(x * 1000))(
+                  x.start_time,
+                );
+                return x;
+              });
+            })(x.assignments);
+          if (x.finish_time)
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+          return x;
+        })(x.course);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
       );
     }
 
@@ -1322,6 +1386,11 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestAdmin {
+    role: string;
+    username: string;
+  }
+
   export interface ContestAdminDetails {
     admin: boolean;
     admission_mode: string;
@@ -1424,40 +1493,24 @@ export namespace types {
   }
 
   export interface ContestEditPayload {
-    admins: { role: string; username: string }[];
+    admins: types.ContestAdmin[];
     details: types.ContestAdminDetails;
-    group_admins: { alias: string; name: string; role: string }[];
-    groups: { alias: string; name: string }[];
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
-    requests: {
-      accepted?: boolean;
-      admin?: { username?: string };
-      country?: string;
-      last_update?: Date;
-      request_time: Date;
-      username: string;
-    }[];
-    users: {
-      access_time?: Date;
-      country_id?: string;
-      end_time?: Date;
-      is_owner?: number;
-      username: string;
-    }[];
+    group_admins: types.ContestGroupAdmin[];
+    groups: types.ContestGroup[];
+    problems: types.ContestProblem[];
+    requests: types.ContestRequest[];
+    users: types.ContestUser[];
+  }
+
+  export interface ContestGroup {
+    alias: string;
+    name: string;
+  }
+
+  export interface ContestGroupAdmin {
+    alias: string;
+    name: string;
+    role: string;
   }
 
   export interface ContestIntroPayload {
@@ -1507,6 +1560,22 @@ export namespace types {
     languages: { [key: string]: string };
   }
 
+  export interface ContestProblem {
+    accepted: number;
+    alias: string;
+    commit: string;
+    difficulty: number;
+    languages: string;
+    order: number;
+    points: number;
+    problem_id: number;
+    submissions: number;
+    title: string;
+    version: string;
+    visibility: number;
+    visits: number;
+  }
+
   export interface ContestPublicDetails {
     admission_mode: string;
     alias: string;
@@ -1533,6 +1602,23 @@ export namespace types {
     window_length?: number;
   }
 
+  export interface ContestRequest {
+    accepted?: boolean;
+    admin?: { username?: string };
+    country?: string;
+    last_update?: Date;
+    request_time: Date;
+    username: string;
+  }
+
+  export interface ContestUser {
+    access_time?: Date;
+    country_id?: string;
+    end_time?: Date;
+    is_owner?: number;
+    username: string;
+  }
+
   export interface CourseAdmin {
     role: string;
     username: string;
@@ -1557,6 +1643,12 @@ export namespace types {
   export interface CourseAssignmentEditPayload {
     assignment?: types.CourseAssignment;
     course: types.CourseDetails;
+  }
+
+  export interface CourseCloneDetailsPayload {
+    creator: { classname: string; username: string };
+    details: types.CourseDetails;
+    token: string;
   }
 
   export interface CourseDetails {
@@ -1644,10 +1736,27 @@ export namespace types {
     visits: number;
   }
 
+  export interface CourseProblemStatistics {
+    assignment_alias: string;
+    average?: number;
+    high_score_percentage?: number;
+    low_score_percentage?: number;
+    max_points: number;
+    maximum?: number;
+    minimum?: number;
+    problem_alias: string;
+    variance?: number;
+  }
+
   export interface CourseProblemTried {
     alias: string;
     title: string;
     username: string;
+  }
+
+  export interface CourseStatisticsPayload {
+    course: types.CourseDetails;
+    problemStats: types.CourseProblemStatistics[];
   }
 
   export interface CourseStudent {
@@ -2792,23 +2901,7 @@ export namespace messages {
   export type ContestOpenRequest = { [key: string]: any };
   export type ContestOpenResponse = {};
   export type ContestProblemsRequest = { [key: string]: any };
-  export type ContestProblemsResponse = {
-    problems: {
-      accepted: number;
-      alias: string;
-      commit: string;
-      difficulty: number;
-      languages: string;
-      order: number;
-      points: number;
-      problem_id: number;
-      submissions: number;
-      title: string;
-      version: string;
-      visibility: number;
-      visits: number;
-    }[];
-  };
+  export type ContestProblemsResponse = { problems: types.ContestProblem[] };
   export type ContestPublicDetailsRequest = { [key: string]: any };
   export type _ContestPublicDetailsServerResponse = any;
   export type ContestPublicDetailsResponse = types.ContestPublicDetails;
@@ -2933,13 +3026,7 @@ export namespace messages {
   export type _ContestUsersServerResponse = any;
   export type ContestUsersResponse = {
     groups: { alias: string; name: string }[];
-    users: {
-      access_time?: Date;
-      country_id?: string;
-      end_time?: Date;
-      is_owner?: number;
-      username: string;
-    }[];
+    users: types.ContestUser[];
   };
 
   // Course
@@ -3003,6 +3090,8 @@ export namespace messages {
   export type CourseDetailsRequest = { [key: string]: any };
   export type _CourseDetailsServerResponse = any;
   export type CourseDetailsResponse = types.CourseDetails;
+  export type CourseGenerateTokenForCloneCourseRequest = { [key: string]: any };
+  export type CourseGenerateTokenForCloneCourseResponse = { token: string };
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
@@ -3878,6 +3967,9 @@ export namespace controllers {
     details: (
       params?: messages.CourseDetailsRequest,
     ) => Promise<messages.CourseDetailsResponse>;
+    generateTokenForCloneCourse: (
+      params?: messages.CourseGenerateTokenForCloneCourseRequest,
+    ) => Promise<messages.CourseGenerateTokenForCloneCourseResponse>;
     getProblemUsers: (
       params?: messages.CourseGetProblemUsersRequest,
     ) => Promise<messages.CourseGetProblemUsersResponse>;

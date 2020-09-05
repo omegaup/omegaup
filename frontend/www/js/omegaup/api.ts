@@ -669,6 +669,10 @@ export const Course = {
     x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
     return x;
   }),
+  generateTokenForCloneCourse: apiCall<
+    messages.CourseGenerateTokenForCloneCourseRequest,
+    messages.CourseGenerateTokenForCloneCourseResponse
+  >('/api/course/generateTokenForCloneCourse/'),
   getProblemUsers: apiCall<
     messages.CourseGetProblemUsersRequest,
     messages.CourseGetProblemUsersResponse

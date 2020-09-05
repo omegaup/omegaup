@@ -2,6 +2,7 @@ import Vue from 'vue';
 import user_BasicEdit from '../components/user/BasicEdit.vue';
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
+import * as ui from '../ui';
 
 OmegaUp.on('ready', function () {
   let basicEdit = new Vue({
@@ -20,7 +21,7 @@ OmegaUp.on('ready', function () {
               .then(function (response) {
                 window.location = '/profile/';
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -37,5 +38,5 @@ OmegaUp.on('ready', function () {
     .then(function (data) {
       basicEdit.username = data.username;
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 });
