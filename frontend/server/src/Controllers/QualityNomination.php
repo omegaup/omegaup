@@ -123,6 +123,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagDisjointSets',
         'problemTagHashing',
         'problemTagInvertedIndices',
+        'problemTagInputAndOutput',
         'problemTagTries',
         'problemTagBruteForce',
         'problemTagIncrementalSearch',

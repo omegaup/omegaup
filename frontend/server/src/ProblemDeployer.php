@@ -49,6 +49,7 @@ class ProblemDeployer {
         'json-parse-error' => 'problemDeployerJsonParseError',
         'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
         'no-statements' => 'problemDeployerNoStatements',
+        'no-es-statement' => 'problemDeployerEsNoStatement',
         'not-a-review' => 'problemDeployerNotAReview',
         'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
         'problem-bad-layout' => 'problemDeployerProblemBadLayout',
