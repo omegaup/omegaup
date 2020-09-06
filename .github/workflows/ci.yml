@@ -91,13 +91,7 @@ jobs:
           ./vendor/bin/psalm \
             --output-format=github \
             --long-progress \
-            --update-baseline \
             --show-info=false
-          if [[ "$(/usr/bin/git status --porcelain psalm.baseline.xml)" != "" ]]; then
-            /usr/bin/git diff -- psalm.baseline.xml
-            echo '::warning file=psalm.baseline.xml::Some psalm errors have been fixed! Please run: `./vendor/bin/psalm --show-info=false --update-baseline`'
-            exit 1
-          fi
 
       - name: Upload code coverage
         run: bash <(curl -s https://codecov.io/bash) -cF php
@@ -152,6 +146,16 @@ jobs:
           touch 'frontend/tests/test_config.php'
 
           ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
+
+      - name: Run Psalm
+        run: |
+          ./vendor/bin/psalm \
+            --output-format=github \
+            --long-progress \
+            --show-info=false
+
+      - name: Find unused translation strings
+        run: ./stuff/unused_translation_strings.py
 
   selenium:
     runs-on: ubuntu-latest
