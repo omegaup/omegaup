@@ -11,7 +11,7 @@
 @import '../../../sass/main.scss';
 
 [data-overlay] {
-  display: block;
+  display: block !important;
   position: fixed;
   top: 0;
   bottom: 0;
