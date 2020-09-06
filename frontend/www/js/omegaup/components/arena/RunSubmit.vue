@@ -1,5 +1,5 @@
 <template>
-  <form data-run-submit v-on:submit.prevent="onSubmit"  v-show="showForm">
+  <form data-run-submit v-on:submit.prevent="onSubmit" v-show="showForm">
     <div class="close-container">
       <button class="close" v-on:click="$emit('dismiss')">❌</button>
     </div>
