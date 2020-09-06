@@ -86,6 +86,7 @@ describe('Details.vue', () => {
   it('Should handle no nomination payload', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
+        initialTab: 'problems',
         problem: sampleProblem,
         user: user,
         nominationStatus: nominationStatus,

@@ -99,11 +99,27 @@
               $emit('dismiss-promotion', qualityPromotionComponent)
           "
         ></omegaup-quality-nomination-promotion>
+        <omegaup-overlay
+          v-bind:show-overlay="showOverlay"
+          v-if="this.user.loggedIn"
+        >
+          <omegaup-arena-runsubmit
+            slot="popup-content"
+            v-bind:preferred-language="problem.preferred_language"
+            v-bind:languages="problem.languages"
+            v-bind:initial-show-form="showFormRunSubmit"
+            v-on:dismiss="onDismissPopup"
+            v-on:submit-run="
+              (code, selectedLanguage) => onSubmitRun(code, selectedLanguage)
+            "
+          ></omegaup-arena-runsubmit>
+        </omegaup-overlay>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
           v-bind:runs="runs"
           v-bind:show-details="true"
           v-bind:problemset-problems="[]"
+          v-on:new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
           v-bind:quality-histogram="histogram.qualityHistogram"
@@ -185,6 +201,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
+import arena_RunSubmit from '../arena/RunSubmit.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
@@ -194,6 +211,7 @@ import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
 import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -222,8 +240,10 @@ interface Tab {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-runsubmit': arena_RunSubmit,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
@@ -251,12 +271,15 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
+  @Prop() showNewRunWindow!: boolean;
 
   T = T;
   ui = ui;
   time = time;
   selectedTab = 'problems';
   clarifications = this.initialClarifications || [];
+  showOverlay = false;
+  showFormRunSubmit = false;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -284,9 +307,31 @@ export default class ProblemDetails extends Vue {
     return tabs.filter((tab) => tab.visible);
   }
 
+  onNewSubmission(): void {
+    this.showOverlay = true;
+    this.showFormRunSubmit = true;
+  }
+
+  onDismissPopup(): void {
+    this.showOverlay = false;
+    this.showFormRunSubmit = false;
+    this.$emit('dismiss-popup');
+  }
+
+  onSubmitRun(code: string, selectedLanguage: string): void {
+    this.$emit('submit-run', code, selectedLanguage);
+    this.onDismissPopup();
+  }
+
   @Watch('initialClarifications')
   onClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
+  }
+
+  @Watch('showNewRunWindow')
+  onShowNewRunWindowChanged(newValue: boolean): void {
+    if (!newValue) return;
+    this.onNewSubmission();
   }
 }
 </script>
