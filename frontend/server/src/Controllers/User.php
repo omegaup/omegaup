@@ -2706,7 +2706,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param null|string $contest_admin
-     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param mixed $filter
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
@@ -2819,7 +2819,7 @@ class User extends \OmegaUp\Controllers\Controller {
                     );
                     if (
                         !empty($contestAlias) &&
-                        $r2->ensureOptionalBool('contest_admin') ?? false
+                        ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
                     }

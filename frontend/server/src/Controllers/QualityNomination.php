@@ -123,6 +123,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagDisjointSets',
         'problemTagHashing',
         'problemTagInvertedIndices',
+        'problemTagInputAndOutput',
         'problemTagTries',
         'problemTagBruteForce',
         'problemTagIncrementalSearch',
@@ -199,6 +200,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagCodingRush',
         'problemTagCOCI',
         'problemTagBOI',
+        'problemTagAnalysisOfRecurrences',
+        'problemTagUnformattedInputAndOutput',
+        'problemTagFileSeeking',
     ];
 
     const LEVEL_TAGS = [
