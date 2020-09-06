@@ -573,18 +573,61 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             $courseData['course']->course_id,
             $courseData['course']->group_id
         );
+        //check if results include expected runs and verdicts
+        $this->assertEquals(
+            $results,
+            [
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[0]['problem']->problem_id,
+                'problem_alias' => $problemsData[0]['problem']->alias,
 
-        $this->assertEquals($assignmentAlias, $results[0]['assignment_alias']);
-
-        // Variance of the third problem should be 0, no user did anything
-        $this->assertEquals('AC', $results[0]['verdict']);
-        $this->assertEquals('CE', $results[2]['verdict']);
-        $this->assertEquals(2, $results[2]['runs']);
-        $this->assertEquals('AC', $results[1]['verdict']);
-        $this->assertEquals('AC', $results[3]['verdict']);
-        $this->assertEquals('TLE', $results[4]['verdict']);
-        $this->assertEquals('AC', $results[5]['verdict']);
-        $this->assertEquals('WA', $results[6]['verdict']);
-        $this->assertEquals(1, $results[6]['runs']);
+              ],
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[0]['problem']->problem_id,
+                'problem_alias' => $problemsData[0]['problem']->alias,
+              ],
+              [
+                'verdict' => 'CE',
+                'runs' => 2,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'TLE',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
+              ],
+              [
+                'verdict' => 'WA',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[2]['problem']->problem_id,
+                'problem_alias' => $problemsData[2]['problem']->alias,
+              ],
+            ]
+        );
     }
 }
