@@ -3,4 +3,4 @@ INSERT INTO
 VALUES
     ('problemTagAnalysisOfRecurrences', 1),
     ('problemTagUnformattedInputAndOutput', 1),
-    ('ProblemTagFileSeeking', 1);
+    ('problemTagFileSeeking', 1);

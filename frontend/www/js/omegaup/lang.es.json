@@ -1,5 +1,4 @@
 {
-	"ProblemTagFileSeeking": "Posicionamiento en archivos",
 	"aboutToStart": "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas click en entrar, tu tiempo iniciar\u00e1.",
 	"addUsersToReviewerGroup": "Clic para agregar un usuario a la lista de revisores.",
 	"adminAdded": "Administrador agregado correctamente",
@@ -735,6 +734,7 @@
 	"problemTagExponentialSearch": "B\u00fasqueda exponencial",
 	"problemTagExponentiationBySquaring": "Exponenciaci\u00f3n binaria",
 	"problemTagFenwickTrees": "\u00c1rboles de Fenwick",
+	"problemTagFileSeeking": "Posicionamiento en archivos",
 	"problemTagFormattedInputAndOutput": "Entrada y salida con presentaci\u00f3n",
 	"problemTagFourierTransformation": "Transformada de Fourier",
 	"problemTagFunctions": "Funciones",

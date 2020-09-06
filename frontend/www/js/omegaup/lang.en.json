@@ -1,5 +1,4 @@
 {
-	"ProblemTagFileSeeking": "File seeking",
 	"aboutToStart": "You are about to start the contest. Once you click Start Contest your time will begin.",
 	"addUsersToReviewerGroup": "Click to add a user to the list of reviewers.",
 	"adminAdded": "Admin successfully added.",
@@ -735,6 +734,7 @@
 	"problemTagExponentialSearch": "Exponential search",
 	"problemTagExponentiationBySquaring": "Exponentiation by squaring",
 	"problemTagFenwickTrees": "Fenwick trees",
+	"problemTagFileSeeking": "File seeking",
 	"problemTagFormattedInputAndOutput": "Formatted input and output",
 	"problemTagFourierTransformation": "Fourier transformation",
 	"problemTagFunctions": "Functions",
