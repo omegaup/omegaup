@@ -9,14 +9,12 @@ import course_ProblemList from '../components/course/ProblemList.vue';
 import course_Edit from '../components/course/Edit.vue';
 import course_Form from '../components/course/Form.vue';
 import Sortable from 'sortablejs';
-import Clipboard from 'v-clipboard';
 
 Vue.directive('Sortable', {
   inserted: (el: HTMLElement, binding) => {
     new Sortable(el, binding.value || {});
   },
 });
-Vue.use(Clipboard);
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseEditPayload();
@@ -30,6 +28,7 @@ OmegaUp.on('ready', () => {
           data: this.data,
           initialTab: this.initialTab,
           invalidParameterName: this.invalidParameterName,
+          token: this.token,
         },
         on: {
           'submit-edit-course': (source: course_Form) => {
@@ -390,6 +389,16 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'generate-link': (alias: string) => {
+            api.Course.generateTokenForCloneCourse({
+              course_alias: alias,
+            })
+              .then((data) => {
+                ui.success(T.courseCloneGenerateLinkSuccess);
+                component.token = data.token;
+              })
+              .catch(ui.apiError);
+          },
         },
         ref: 'component',
       });
@@ -458,6 +467,7 @@ OmegaUp.on('ready', () => {
         ? window.location.hash.substr(1)
         : 'course',
       invalidParameterName: '',
+      token: '',
     },
     components: {
       'omegaup-course-edit': course_Edit,
