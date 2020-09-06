@@ -2489,10 +2489,10 @@ Adds a group admin to a problem
 
 ### Parameters
 
-| Name            | Type    | Description |
-| --------------- | ------- | ----------- |
-| `group`         | `mixed` |             |
-| `problem_alias` | `mixed` |             |
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `group`         | `string` |             |
+| `problem_alias` | `string` |             |
 
 ### Returns
 

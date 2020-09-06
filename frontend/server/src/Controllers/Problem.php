@@ -609,8 +609,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a group admin to a problem
      *
-     * @omegaup-request-param mixed $group
-     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param string $group
+     * @omegaup-request-param string $problem_alias
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
@@ -622,35 +622,25 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Authenticate logged user
         $r->ensureIdentity();
 
-        // Check problem_alias
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $r->ensureString('problem_alias')
         );
-        \OmegaUp\Validators::validateValidAlias($r['group'], 'group');
-
-        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
-        if (is_null($group) || is_null($group->group_id)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'invalidParameters'
-            );
-        }
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
+
+        $group = \OmegaUp\DAO\Groups::findByAlias($r->ensureString('group'));
+        if (is_null($group) || is_null($group->group_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
 
         // Only an admin can add other problem group admins
         if (!\OmegaUp\Authorization::isProblemAdmin($r->identity, $problem)) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-
         \OmegaUp\Controllers\ACL::addGroup($problem->acl_id, $group->group_id);
 
-        return [
-            'status' => 'ok',
-        ];
+        return ['status' => 'ok'];
     }
 
     /**
