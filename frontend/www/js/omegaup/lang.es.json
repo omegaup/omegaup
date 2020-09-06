@@ -1,4 +1,5 @@
 {
+	"ProblemTagFileSeeking": "Posicionamiento en archivos",
 	"aboutToStart": "Est\u00e1s a punto de iniciar el concurso. Una vez que hagas click en entrar, tu tiempo iniciar\u00e1.",
 	"addUsersToReviewerGroup": "Clic para agregar un usuario a la lista de revisores.",
 	"adminAdded": "Administrador agregado correctamente",
@@ -697,6 +698,7 @@
 	"problemSolutionNotVisible": "No tienes permiso para ver la soluci\u00f3n del problema. Intenta resolver el problema primero.",
 	"problemSuccessfullyAdded": "Problema agregado con \u00e9xito",
 	"problemSuccessfullyRemoved": "Problema eliminado con \u00e9xito",
+	"problemTagAnalysisOfRecurrences": "An\u00e1lisis de recurrencias",
 	"problemTagAnalyticGeometry": "Geometr\u00eda anal\u00edtica",
 	"problemTagArithmetic": "C\u00e1lculos aritm\u00e9ticos",
 	"problemTagArrays": "Arreglos",
@@ -832,6 +834,7 @@
 	"problemTagTrees": "\u00c1rboles",
 	"problemTagTries": "Tries",
 	"problemTagTwoPointersTechnique": "T\u00e9cnica de dos apuntadores",
+	"problemTagUnformattedInputAndOutput": "Entrada y salida sin formato",
 	"problemTagWaveletTrees": "\u00c1rboles Wavelet",
 	"problemTitleExists": "El titulo del problema ya existe, por favor selecciona otro.",
 	"problemTopic2Sat": "2-Sat",
