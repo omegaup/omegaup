@@ -1739,6 +1739,7 @@ export namespace types {
   export interface CourseProblemStatistics {
     assignment_alias: string;
     average?: number;
+    avg_runs?: number;
     high_score_percentage?: number;
     low_score_percentage?: number;
     max_points: number;
@@ -1754,9 +1755,18 @@ export namespace types {
     username: string;
   }
 
+  export interface CourseProblemVerdict {
+    assignment_alias: string;
+    problem_alias: string;
+    problem_id: number;
+    runs: number;
+    verdict?: string;
+  }
+
   export interface CourseStatisticsPayload {
     course: types.CourseDetails;
     problemStats: types.CourseProblemStatistics[];
+    verdicts: types.CourseProblemVerdict[];
   }
 
   export interface CourseStudent {
