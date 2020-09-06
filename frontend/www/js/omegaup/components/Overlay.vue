@@ -92,18 +92,9 @@
     height: 100%;
   }
 }
-#run-details .compile_error {
-  display: none;
-}
 .guid {
   font-family: monospace;
   padding: 0 0.3em;
-}
-#run-details .logs {
-  margin-top: 1em;
-  border-top: 1px dotted black;
-  padding-top: 1em;
-  display: none;
 }
 .cases {
   table {
