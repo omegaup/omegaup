@@ -2146,6 +2146,7 @@ export namespace types {
       time_limit: string;
     };
     points: number;
+    preferred_language?: string;
     problem_id: number;
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
