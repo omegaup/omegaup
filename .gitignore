@@ -93,6 +93,7 @@ frontend/www/media/dist/
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp
 frontend/www/docs/pas
+frontend/www/docs/java
 
 # Ignore VS Code json
 .vscode/*
