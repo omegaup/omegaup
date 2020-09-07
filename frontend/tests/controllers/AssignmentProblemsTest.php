@@ -598,7 +598,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[1]['problem']->problem_id,
                 'problem_alias' => $problemsData[1]['problem']->alias,
-
               ],
               [
                 'verdict' => 'AC',
