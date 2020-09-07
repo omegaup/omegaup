@@ -71,7 +71,10 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $problemLevel = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
             $problemData['problem']
         );
-        $this->assertNull($problemLevel);
+        $this->assertEquals(
+            $problemLevel,
+            'problemLevelBasicIntroductionToProgramming'
+        );
 
         $selectedLevel = 'problemLevelBasicKarel';
         \OmegaUp\Controllers\Problem::apiUpdateProblemLevel(new \OmegaUp\Request([
@@ -410,7 +413,7 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $login->auth_token,
             'problem_alias' => $problemData['request']['problem_alias'],
             'message' => 'Solution modified for test.',
-            'solution' => $solution
+            'solution' => $solution,
         ]));
 
         $this->assertEquals('ok', $response['status']);
@@ -704,8 +707,23 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'problem_alias' => $problemData['request']['problem_alias'],
             'name' => 'test-tag',
         ]));
-        $this->assertTrue($response['tags'][0]['public']);
-        $this->assertFalse($response['tags'][1]['public']);
+        $this->assertEqualsCanonicalizing(
+            [
+                [
+                    'name' => 'problemLevelBasicIntroductionToProgramming',
+                    'public' => true,
+                ],
+                [
+                    'name' => 'problemRestrictedTagLanguage',
+                    'public' => true,
+                ],
+                [
+                    'name' => 'test-tag',
+                    'public' => false,
+                ],
+            ],
+            $response['tags']
+        );
     }
 
     /**
@@ -889,11 +907,15 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
     public function testTags() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         $login = self::login($problemData['author']);
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             [
                 [
+                    'name' => 'problemLevelBasicIntroductionToProgramming',
+                    'public' => true,
+                ],
+                [
                     'name' => 'problemRestrictedTagLanguage',
-                    'public' => '1',
+                    'public' => true,
                 ],
             ],
             \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([
@@ -908,11 +930,15 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'name' => 'foo',
             'public' => false,
         ]));
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             [
                 [
+                    'name' => 'problemLevelBasicIntroductionToProgramming',
+                    'public' => true,
+                ],
+                [
                     'name' => 'problemRestrictedTagLanguage',
-                    'public' => '1',
+                    'public' => true,
                 ],
                 [
                     'name' => 'foo',
@@ -931,11 +957,15 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
             'name' => 'foo',
             'public' => 'true',
         ]));
-        $this->assertEquals(
+        $this->assertEqualsCanonicalizing(
             [
                 [
+                    'name' => 'problemLevelBasicIntroductionToProgramming',
+                    'public' => true,
+                ],
+                [
                     'name' => 'problemRestrictedTagLanguage',
-                    'public' => '1',
+                    'public' => true,
                 ],
             ],
             \OmegaUp\Controllers\Problem::apiTags(new \OmegaUp\Request([

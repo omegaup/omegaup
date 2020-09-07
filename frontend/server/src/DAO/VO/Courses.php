@@ -47,19 +47,19 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['name'])) {
-            $this->name = strval(
+            $this->name = is_scalar(
                 $data['name']
-            );
+            ) ? strval($data['name']) : '';
         }
         if (isset($data['description'])) {
-            $this->description = strval(
+            $this->description = is_scalar(
                 $data['description']
-            );
+            ) ? strval($data['description']) : '';
         }
         if (isset($data['alias'])) {
-            $this->alias = strval(
+            $this->alias = is_scalar(
                 $data['alias']
-            );
+            ) ? strval($data['alias']) : '';
         }
         if (isset($data['group_id'])) {
             $this->group_id = intval(
@@ -98,9 +98,9 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['admission_mode'])) {
-            $this->admission_mode = strval(
+            $this->admission_mode = is_scalar(
                 $data['admission_mode']
-            );
+            ) ? strval($data['admission_mode']) : '';
         }
         if (isset($data['school_id'])) {
             $this->school_id = intval(
@@ -113,9 +113,9 @@ class Courses extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['requests_user_information'])) {
-            $this->requests_user_information = strval(
+            $this->requests_user_information = is_scalar(
                 $data['requests_user_information']
-            );
+            ) ? strval($data['requests_user_information']) : '';
         }
         if (isset($data['show_scoreboard'])) {
             $this->show_scoreboard = boolval(

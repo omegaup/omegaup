@@ -9,7 +9,7 @@
     "process-timeout": 1200
   },
   "require-dev": {
-      "vimeo/psalm": "3.12.2",
+      "vimeo/psalm": "^3.15",
       "jetbrains/phpstorm-stubs": "^2019.3",
       "phpunit/phpunit": "^9"
   },

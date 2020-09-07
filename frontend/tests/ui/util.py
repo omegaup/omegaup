@@ -319,6 +319,12 @@ def create_problem(
     driver.browser.find_element_by_xpath(
         '//input[@type="radio" and @name="visibility" and @value="true"]'
     ).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//input[@type = "search"]'))).send_keys('Recur')
+    driver.wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, '.vbt-matched-text'))
+    ).click()
     Select(
         driver.wait.until(
             EC.element_to_be_clickable(

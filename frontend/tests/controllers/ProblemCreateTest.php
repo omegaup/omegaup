@@ -752,6 +752,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'title' => $title,
             'problem_alias' => $problemAlias,
             'source' => 'yo',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
         ]));
 
         $response = \OmegaUp\Controllers\Problem::apiDetails(

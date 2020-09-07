@@ -49,6 +49,7 @@ class ProblemDeployer {
         'json-parse-error' => 'problemDeployerJsonParseError',
         'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
         'no-statements' => 'problemDeployerNoStatements',
+        'no-es-statement' => 'problemDeployerEsNoStatement',
         'not-a-review' => 'problemDeployerNotAReview',
         'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
         'problem-bad-layout' => 'problemDeployerProblemBadLayout',
@@ -70,13 +71,12 @@ class ProblemDeployer {
         if (
             isset($_FILES['problem_contents'])
             && isset($_FILES['problem_contents']['tmp_name'])
-            && is_string($_FILES['problem_contents']['tmp_name'])
             && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                strval($_FILES['problem_contents']['tmp_name'])
+                $_FILES['problem_contents']['tmp_name']
             )
         ) {
             /** @psalm-suppress MixedArrayAccess */
-            $this->zipPath = strval($_FILES['problem_contents']['tmp_name']);
+            $this->zipPath = $_FILES['problem_contents']['tmp_name'];
         } else {
             $this->zipPath = __DIR__ . '/empty.zip';
         }

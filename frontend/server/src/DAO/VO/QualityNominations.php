@@ -51,14 +51,14 @@ class QualityNominations extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['nomination'])) {
-            $this->nomination = strval(
+            $this->nomination = is_scalar(
                 $data['nomination']
-            );
+            ) ? strval($data['nomination']) : '';
         }
         if (isset($data['contents'])) {
-            $this->contents = strval(
+            $this->contents = is_scalar(
                 $data['contents']
-            );
+            ) ? strval($data['contents']) : '';
         }
         if (isset($data['time'])) {
             /**
@@ -76,9 +76,9 @@ class QualityNominations extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['status'])) {
-            $this->status = strval(
+            $this->status = is_scalar(
                 $data['status']
-            );
+            ) ? strval($data['status']) : '';
         }
     }
 

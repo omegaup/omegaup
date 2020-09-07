@@ -511,7 +511,7 @@ class UserProfileTest extends \OmegaUp\Test\ControllerTestCase {
                 'status' => $status,
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'qualitynomination_id' => $qualitynomination['qualitynomination_id'],
-                'rationale' => 'ew plus something else'
+                'rationale' => 'ew plus something else',
             ])
         );
 

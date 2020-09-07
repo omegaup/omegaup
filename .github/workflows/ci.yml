@@ -88,7 +88,10 @@ jobs:
           mkdir -p frontend/www/{phpminiadmin,preguntas}
           touch 'frontend/server/config.php'
           touch 'frontend/tests/test_config.php'
-          ./vendor/bin/psalm
+          ./vendor/bin/psalm \
+            --output-format=github \
+            --long-progress \
+            --show-info=false
 
       - name: Upload code coverage
         run: bash <(curl -s https://codecov.io/bash) -cF php
@@ -143,6 +146,16 @@ jobs:
           touch 'frontend/tests/test_config.php'
 
           ./stuff/lint.sh --diagnostics-output=github validate --all < /dev/null
+
+      - name: Run Psalm
+        run: |
+          ./vendor/bin/psalm \
+            --output-format=github \
+            --long-progress \
+            --show-info=false
+
+      - name: Find unused translation strings
+        run: ./stuff/unused_translation_strings.py
 
   selenium:
     runs-on: ubuntu-latest

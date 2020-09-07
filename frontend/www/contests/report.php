@@ -16,10 +16,5 @@ foreach ($result as $key => $value) {
 }
 
 \OmegaUp\UITools::getSmartyInstance()->display(
-    sprintf(
-        '%s/templates/contest.report.tpl',
-        strval(
-            OMEGAUP_ROOT
-        )
-    )
+    \OmegaUp\UITools::templatePath('contest.report')
 );
