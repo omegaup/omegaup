@@ -1758,8 +1758,9 @@ export namespace types {
   export interface CourseProblemVerdict {
     assignment_alias: string;
     problem_alias: string;
+    problem_id: number;
     runs: number;
-    verdict: string;
+    verdict?: string;
   }
 
   export interface CourseStatisticsPayload {
