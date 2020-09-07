@@ -35,6 +35,12 @@ class RequestParam {
     public $type;
 
     /**
+     * @var bool
+     * @readonly
+     */
+    public $isOptional;
+
+    /**
      * @var string
      * @readonly
      */
@@ -51,6 +57,15 @@ class RequestParam {
         ?string $description
     ) {
         $this->type = $type;
+        $this->isOptional = !empty(
+            array_intersect(
+                ['null', 'mixed'],
+                explode(
+                    '|',
+                    $type
+                )
+            )
+        );
         $this->name = $name;
         $this->description = $description;
     }
@@ -98,9 +113,21 @@ class RequestParam {
         }
         usort(
             $result,
-            fn (RequestParam $a, RequestParam $b) => strcmp($a->name, $b->name)
+            fn (RequestParam $a, RequestParam $b) => $a->compare($b)
         );
         return $result;
+    }
+
+    /**
+     * A comparison function to order all required parameters before the
+     * non-required ones. Within each region, parameters are ordered
+     * lexicographically.
+     */
+    public function compare(RequestParam $b): int {
+        if ($this->isOptional != $b->isOptional) {
+            return ($this->isOptional ? 1 : 0) - ($b->isOptional ? 1 : 0);
+        }
+        return strcmp($this->name, $b->name);
     }
 }
 
