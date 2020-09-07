@@ -314,14 +314,14 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
                 'course_alias' => $courseData['course_alias'],
                 'name' => \OmegaUp\Test\Utils::createRandomString(),
                 'alias' => $courseAlias,
-                'start_time' => \OmegaUp\Time::get()
+                'start_time' => \OmegaUp\Time::get(),
             ])
         );
 
         $this->assertEquals($courseAlias, $courseClonedData['alias']);
     }
 
-    public function testGenerateCloneCourseToken() {
+    private function createCourseWithCloneToken(int $creationTime = (2 * 60)) {
         ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
         $adminLogin = self::login($admin);
 
@@ -330,6 +330,9 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             $adminLogin,
             \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE
         );
+
+        $currentTime = \OmegaUp\Time::get();
+        \OmegaUp\Time::setTimeForTesting($currentTime - $creationTime);
 
         [
             'token' => $token,
@@ -340,8 +343,121 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
+        \OmegaUp\Time::setTimeForTesting($currentTime);
+
+        return [
+            'alias' => $courseData['course_alias'],
+            'token' => $token,
+            'username' => $admin->username,
+            'userId' => $admin->user_id,
+        ];
+    }
+
+    public function testGenerateCloneCourseToken() {
+        ['token' => $token] = $this->createCourseWithCloneToken();
+
         $this->assertNotEmpty($token);
         $this->assertStringContainsString('v2.', $token);
         $this->assertStringContainsString('local.', $token);
+    }
+
+    public function testDecodeCloneCourseToken() {
+        [
+            'token' => $token,
+            'alias' => $originalAlias,
+        ] = $this->createCourseWithCloneToken();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        $newAlias = \OmegaUp\Test\Utils::createRandomString();
+        $clonedCourse = \OmegaUp\Controllers\Course::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'token' => $token,
+                'course_alias' => $originalAlias,
+                'alias' => $newAlias,
+                'name' => $newAlias,
+                'start_time' => \OmegaUp\Time::get(),
+            ])
+        );
+
+        $this->assertEquals($clonedCourse['alias'], $newAlias);
+    }
+
+    public function testUseExpiredToken() {
+        [
+            'token' => $token,
+            'alias' => $originalAlias,
+        ] = $this->createCourseWithCloneToken((8 * 24 * 60 * 60));
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $newAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        try {
+            $clonedCourse = \OmegaUp\Controllers\Course::apiClone(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'token' => $token,
+                    'course_alias' => $originalAlias,
+                    'alias' => $newAlias,
+                    'name' => $newAlias,
+                    'start_time' => \OmegaUp\Time::get(),
+                ])
+            );
+            $this->fail('It should fail');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'tokenDecodeExpired');
+        }
+    }
+
+    public function testUseTokenFromDifferentCourse() {
+        ['alias' => $primaryAlias] = $this->createCourseWithCloneToken();
+        ['token' => $secondaryToken] = $this->createCourseWithCloneToken();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $newAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        try {
+            $clonedCourse = \OmegaUp\Controllers\Course::apiClone(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'token' => $secondaryToken,
+                    'course_alias' => $primaryAlias,
+                    'alias' => $newAlias,
+                    'name' => $newAlias,
+                    'start_time' => \OmegaUp\Time::get(),
+                ])
+            );
+            $this->fail('It should fail');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'tokenDecodeInvalid');
+        }
+    }
+
+    public function testUseInvalidToken() {
+        ['alias' => $originalAlias] = $this->createCourseWithCloneToken();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $token = 'v2.local.kq6WbVsQfV6C6IEL3ilJE2owJ5XS8iTj7yZqhdwZkp0QEgIrqM-Fzoz1VrbH7fWtss0b5o0p3xMs0fzADT-Iz4JKjb7juKgZSqB9YxJNY9mHtfE72YmqBnikVv6zzuRuGVbD5zXkgjQ3Wb4GWlPHrDLdW73tZ_dbqNYhZkZk1MPIGl8gqqaGoR2_F4i4Lg6zZUiNRNCfXUMSKqW68jENikHMa0RRJARKQGy5gn3p2qCWQA-Wkb_1IOgcN2aeJtOn';
+        $newAlias = \OmegaUp\Test\Utils::createRandomString();
+        try {
+            $clonedCourse = \OmegaUp\Controllers\Course::apiClone(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'token' => $token,
+                    'course_alias' => $originalAlias,
+                    'alias' => $newAlias,
+                    'name' => $newAlias,
+                    'start_time' => \OmegaUp\Time::get(),
+                ])
+            );
+            $this->fail('It should fail');
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            $this->assertEquals($e->getMessage(), 'tokenDecodeCorrupted');
+        }
     }
 }

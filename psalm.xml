@@ -2,12 +2,12 @@
 <psalm
     totallyTyped="true"
     autoloader="frontend/server/bootstrap.php"
+    cacheDirectory="/tmp/psalm"
     hoistConstants="true"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-    errorBaseline="psalm.baseline.xml"
 >
     <projectFiles>
         <directory name="frontend" />
@@ -27,7 +27,7 @@
     </projectFiles>
 
     <stubs>
-      <file name="frontend/server/stubs.php" />
+       <file name="frontend/server/stubs.php" />
 
        <!-- For PASSWORD_ARGON2ID -->
        <file name="vendor/jetbrains/phpstorm-stubs/standard/password.php" />
@@ -51,4 +51,9 @@
             </errorLevel>
         </InvalidDocblock>
     </issueHandlers>
+
+    <globals>
+        <var name="_FILES" type="array&lt;string, array{tmp_name?: string}&gt;" />
+        <var name="_COOKIE" type="array&lt;string, string&gt;" />
+    </globals>
 </psalm>

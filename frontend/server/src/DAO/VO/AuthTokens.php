@@ -43,9 +43,9 @@ class AuthTokens extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['token'])) {
-            $this->token = strval(
+            $this->token = is_scalar(
                 $data['token']
-            );
+            ) ? strval($data['token']) : '';
         }
         if (isset($data['create_time'])) {
             /**

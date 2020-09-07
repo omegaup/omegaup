@@ -22,7 +22,7 @@ class Schools {
 
         // Call api
         $response = \OmegaUp\Controllers\School::apiCreate($r);
-        [$school] = \OmegaUp\DAO\Schools::findByName(strval($r['name']));
+        [$school] = \OmegaUp\DAO\Schools::findByName($r->ensureString('name'));
 
         return [
             'creator' => $identity,

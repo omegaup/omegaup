@@ -234,7 +234,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $interview_alias
+     * @omegaup-request-param string $interview_alias
      *
      * @return array{description: null|string, contest_alias: null|string, problemset_id: int|null, users: list<array{user_id: int|null, username: string, access_time: \OmegaUp\Timestamp|null, email: null|string, opened_interview: bool, country: null|string}>}
      */
@@ -242,7 +242,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         $interview = \OmegaUp\DAO\Interviews::getByAlias(
-            strval($r['interview_alias'])
+            $r->ensureString('interview_alias')
         );
         if (is_null($interview)) {
             throw new \OmegaUp\Exceptions\NotFoundException(

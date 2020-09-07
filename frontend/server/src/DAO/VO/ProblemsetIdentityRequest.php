@@ -76,9 +76,9 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['extra_note'])) {
-            $this->extra_note = strval(
+            $this->extra_note = is_scalar(
                 $data['extra_note']
-            );
+            ) ? strval($data['extra_note']) : '';
         }
     }
 

@@ -32,9 +32,9 @@ class RunCounts extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['date'])) {
-            $this->date = strval(
+            $this->date = is_scalar(
                 $data['date']
-            );
+            ) ? strval($data['date']) : '';
         }
         if (isset($data['total'])) {
             $this->total = intval(

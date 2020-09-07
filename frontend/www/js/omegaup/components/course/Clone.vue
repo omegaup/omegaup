@@ -1,48 +1,49 @@
 <template>
-  <div class="omegaup-course-clone card">
-    <div class="card-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
-        <div class="row">
-          <div class="form-group col-md-6">
-            <label
-              >{{ T.wordsName }}
-              <input class="form-control" type="text" v-model="name"
-            /></label>
-          </div>
-          <div class="form-group col-md-3">
-            <label
-              >{{ T.courseNewFormShortTitle_alias_ }}
-              <font-awesome-icon
-                v-bind:title="T.courseNewFormShortTitle_alias_Desc"
-                icon="info-circle" />
-              <input class="form-control" type="text" v-model="alias"
-            /></label>
-          </div>
-          <div class="form-group col-md-3">
-            <label
-              >{{ T.courseNewFormStartDate }}
-              <font-awesome-icon
-                v-bind:title="T.courseNewFormStartDateDesc"
-                icon="info-circle" />
-              <omegaup-datepicker v-model="startTime"></omegaup-datepicker
-            ></label>
-          </div>
+  <div data-course-clone>
+    <form
+      class="form"
+      v-on:submit.prevent="$emit('clone', alias, name, startTime)"
+    >
+      <div class="row">
+        <div class="form-group col-md-6">
+          <label
+            >{{ T.wordsName }}
+            <input class="form-control" type="text" v-model="name"
+          /></label>
         </div>
-        <div class="form-group text-right">
-          <button class="btn btn-primary" type="submit">
-            {{ T.wordsCloneCourse }}
-          </button>
+        <div class="form-group col-md-3">
+          <label
+            >{{ T.courseNewFormShortTitle_alias_ }}
+            <font-awesome-icon
+              v-bind:title="T.courseNewFormShortTitle_alias_Desc"
+              icon="info-circle" />
+            <input class="form-control" type="text" v-model="alias"
+          /></label>
         </div>
-      </form>
-    </div>
+        <div class="form-group col-md-3">
+          <label
+            >{{ T.courseNewFormStartDate }}
+            <font-awesome-icon
+              v-bind:title="T.courseNewFormStartDateDesc"
+              icon="info-circle" />
+            <omegaup-datepicker v-model="startTime"></omegaup-datepicker
+          ></label>
+        </div>
+      </div>
+      <div class="form-group text-right">
+        <button class="btn btn-primary" type="submit">
+          {{ T.wordsCloneCourse }}
+        </button>
+      </div>
+    </form>
   </div>
 </template>
 
-<style>
-.omegaup-course-clone .form-group > label {
+<style scoped>
+.form-group > label {
   width: 100%;
 }
-.omegaup-course-clone .faux-label {
+.faux-label {
   font-weight: bold;
 }
 </style>
@@ -77,9 +78,5 @@ export default class CourseClone extends Vue {
   alias = this.initialAlias;
   startTime = new Date();
   name = this.initialName;
-
-  onSubmit(): void {
-    this.$emit('emit-clone', this.alias, this.name, this.startTime);
-  }
 }
 </script>

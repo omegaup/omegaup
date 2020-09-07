@@ -7,7 +7,7 @@ $r['show_solvers'] = true;
 try {
     $result = \OmegaUp\Controllers\Problem::apiDetails($r);
     $problem = \OmegaUp\DAO\Problems::getByAlias(
-        strval($r['problem_alias'])
+        $r->ensureString('problem_alias')
     );
     if (is_null($problem) || empty($result['settings'])) {
         throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');

@@ -67,14 +67,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Create an Identity API
      *
-     * @omegaup-request-param mixed $country_id
+     * @omegaup-request-param null|string $country_id
      * @omegaup-request-param mixed $gender
      * @omegaup-request-param mixed $group_alias
      * @omegaup-request-param mixed $identities
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $password
      * @omegaup-request-param mixed $school_name
-     * @omegaup-request-param mixed $state_id
+     * @omegaup-request-param null|string $state_id
      * @omegaup-request-param mixed $username
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
@@ -117,12 +117,8 @@ class Identity extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\DAO::transBegin();
 
             // Prepare DAOs
-            $countryId = is_null(
-                $r['country_id']
-            ) ? null : strval(
-                $r['country_id']
-            );
-            $stateId = is_null($r['state_id']) ? null : strval($r['state_id']);
+            $countryId = $r->ensureOptionalString('country_id');
+            $stateId = $r->ensureOptionalString('state_id');
             $identity = self::createIdentity(
                 $r['username'],
                 $r['name'],
@@ -391,14 +387,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Update an Identity API
      *
-     * @omegaup-request-param mixed $country_id
+     * @omegaup-request-param null|string $country_id
      * @omegaup-request-param mixed $gender
      * @omegaup-request-param mixed $group_alias
      * @omegaup-request-param mixed $identities
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $original_username
      * @omegaup-request-param mixed $school_name
-     * @omegaup-request-param mixed $state_id
+     * @omegaup-request-param null|string $state_id
      * @omegaup-request-param mixed $username
      *
      * @return array{status: string}
@@ -447,11 +443,10 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         // Prepare DAOs
         $state = null;
-        if (!is_null($r['country_id']) && !is_null($r['state_id'])) {
-            $state = \OmegaUp\DAO\States::getByPK(
-                strval($r['country_id']),
-                strval($r['state_id'])
-            );
+        $countryId = $r->ensureOptionalString('country_id');
+        $stateId = $r->ensureOptionalString('state_id');
+        if (!is_null($countryId) && !is_null($stateId)) {
+            $state = \OmegaUp\DAO\States::getByPK($countryId, $stateId);
         }
         $identity = self::updateIdentity(
             $r['username'],
@@ -776,22 +771,24 @@ class Identity extends \OmegaUp\Controllers\Controller {
      * Returns the prefered language as a string (en,es,fra) of the identity given
      * If no identity is given, language is retrived from the browser.
      *
-     * @omegaup-request-param mixed $lang
+     * @omegaup-request-param null|string $lang
      */
     public static function getPreferredLanguage(
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\Request $request = null
     ): string {
         // for quick debugging
-        if (!is_null($request) && !empty($request['lang'])) {
-            return self::convertToSupportedLanguage(
-                strval($request['lang'])
-            );
+        $requestLanguage = (
+            !is_null($request) ?
+            $request->ensureOptionalString('lang') :
+            null
+        );
+        if (!empty($requestLanguage)) {
+            return self::convertToSupportedLanguage($requestLanguage);
         }
-        if (isset($_GET['lang'])) {
-            return self::convertToSupportedLanguage(
-                strval($_GET['lang'])
-            );
+        $requestLang = \OmegaUp\Request::getRequestVar('lang');
+        if (!empty($requestLang)) {
+            return self::convertToSupportedLanguage($requestLang);
         }
 
         try {
@@ -816,12 +813,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
         /** @var array<string, float> */
         $langs = [];
 
-        if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        $acceptLanguage = \OmegaUp\Request::getServerVar(
+            'HTTP_ACCEPT_LANGUAGE'
+        );
+        if (!empty($acceptLanguage)) {
             // break up string into pieces (languages and q factors)
             if (
                 preg_match_all(
                     '/([a-z]{1,8}(?:-[a-z]{1,8})?)\s*(?:;\s*q\s*=\s*(1|0\.[0-9]+))?/i',
-                    strval($_SERVER['HTTP_ACCEPT_LANGUAGE']),
+                    $acceptLanguage,
                     $langParse
                 ) !== false &&
                 !empty($langParse[1])

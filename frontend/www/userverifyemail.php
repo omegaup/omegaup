@@ -3,13 +3,14 @@
 require_once('../server/bootstrap_smarty.php');
 
 try {
-    \OmegaUp\Controllers\User::apiVerifyEmail(new \OmegaUp\Request($_REQUEST));
+    $r = new \OmegaUp\Request($_REQUEST);
+    \OmegaUp\Controllers\User::apiVerifyEmail($r);
 
-    if (!empty($_REQUEST['redirecttointerview'])) {
-        /** @psalm-suppress MixedArrayAccess $_REQUEST is okay. */
+    $redirectToInterview = $r->ensureOptionalString('redirecttointerview');
+    if (!empty($redirectToInterview)) {
         header(
             'Location: /login/?redirect=/interview/' .
-            urlencode(strval($_REQUEST['redirecttointerview'])) .
+            urlencode($redirectToInterview) .
             '/arena/'
         );
     } else {

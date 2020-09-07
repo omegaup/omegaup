@@ -123,6 +123,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagDisjointSets',
         'problemTagHashing',
         'problemTagInvertedIndices',
+        'problemTagInputAndOutput',
         'problemTagTries',
         'problemTagBruteForce',
         'problemTagIncrementalSearch',
@@ -199,6 +200,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagCodingRush',
         'problemTagCOCI',
         'problemTagBOI',
+        'problemTagAnalysisOfRecurrences',
+        'problemTagUnformattedInputAndOutput',
+        'problemTagFileSeeking',
     ];
 
     const LEVEL_TAGS = [
@@ -616,7 +620,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * `contents` field is empty.
      *
      * @omegaup-request-param mixed $contents
-     * @omegaup-request-param mixed $nomination
+     * @omegaup-request-param 'demotion'|'dismissal'|'promotion'|'quality_tag'|'suggestion' $nomination
      * @omegaup-request-param mixed $problem_alias
      *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
@@ -632,11 +636,6 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['problem_alias'],
             'problem_alias'
-        );
-        \OmegaUp\Validators::validateInEnum(
-            $r['nomination'],
-            'nomination',
-            ['suggestion', 'promotion', 'demotion', 'dismissal', 'quality_tag']
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         /**
@@ -657,7 +656,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
             $problem,
             $r->identity,
-            strval($r['nomination']),
+            $r->ensureEnum(
+                'nomination',
+                ['suggestion', 'promotion', 'demotion', 'dismissal', 'quality_tag']
+            ),
             $contents
         );
 
@@ -672,7 +674,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $problem_alias
      * @omegaup-request-param mixed $qualitynomination_id
      * @omegaup-request-param mixed $rationale
-     * @omegaup-request-param mixed $status
+     * @omegaup-request-param 'banned'|'open'|'resolved'|'warning' $status
      * @omegaup-request-param bool|null $all
      *
      * @return array{status: string}
@@ -680,8 +682,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     public static function apiResolve(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        \OmegaUp\Validators::validateInEnum(
-            $r['status'],
+        $status = $r->ensureEnum(
             'status',
             ['open', 'resolved', 'banned', 'warning']
         );
@@ -710,7 +711,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'onlyDemotionsSupported'
             );
         }
-        if ($r['status'] === $qualitynomination->status) {
+        if ($status === $qualitynomination->status) {
             return ['status' => 'ok'];
         }
 
@@ -736,7 +737,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
         );
         $newProblemVisibility = $problem->visibility;
-        switch ($r['status']) {
+        switch ($status) {
             case 'banned':
                 if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
@@ -763,7 +764,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $message = ($r['status'] === 'banned') ?
+        $message = ($status === 'banned') ?
             \OmegaUp\Translations::getInstance()->get(
                 'banningProblemDueToReport'
             ) :
@@ -800,7 +801,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                         'user_id' => $r->user->user_id,
                         'qualitynomination_id' => $nomination->qualitynomination_id,
                         'from_status' => $nomination->status,
-                        'to_status' => $r['status'],
+                        'to_status' => $status,
                         'rationale' => $r['rationale']
                     ])
                 );
@@ -810,15 +811,15 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 $contents = json_decode($nomination->contents ?? '{}', true);
                 $contents['rationale'] = $r['rationale'];
                 $nomination->contents = json_encode($contents);
-                $nomination->status = strval($r['status']);
+                $nomination->status = $status;
                 \OmegaUp\DAO\QualityNominations::update($nomination);
             }
-            if ($r['status'] == 'banned' || $r['status'] == 'warning') {
+            if ($status == 'banned' || $status == 'warning') {
                 self::sendNotificationEmail(
                     $problem,
                     $qualitynomination,
                     $r['rationale'] ?? '',
-                    strval($r['status'])
+                    $status
                 );
             }
             \OmegaUp\DAO\DAO::transEnd();
@@ -993,12 +994,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     *
+     * @omegaup-request-param 'author_username'|'nominator_username'|'problem_alias'|null $column
      * @omegaup-request-param int $offset
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
-     * @omegaup-request-param mixed $query
-     * @omegaup-request-param mixed $column
      *
      * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
@@ -1031,18 +1031,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ['promotion', 'demotion']
         );
 
-        if (!is_null($r['query']) && !is_null($r['column'])) {
-            \OmegaUp\Validators::validateOptionalInEnum(
-                $r['column'],
-                'column',
-                ['problem_alias','nominator_username','author_username']
-            );
-            $query = strval($r['query']);
-            $column = strval($r['column']);
-        } else {
-            $query = null;
-            $column = null;
-        }
+        $query = $r->ensureOptionalString('query');
+        $column = $r->ensureOptionalEnum(
+            'column',
+            ['problem_alias','nominator_username','author_username']
+        );
 
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
             /* nominator */            null,

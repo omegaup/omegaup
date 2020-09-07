@@ -50,9 +50,9 @@ class IdentitiesSchools extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['graduation_date'])) {
-            $this->graduation_date = strval(
+            $this->graduation_date = is_scalar(
                 $data['graduation_date']
-            );
+            ) ? strval($data['graduation_date']) : '';
         }
         if (isset($data['creation_time'])) {
             /**
