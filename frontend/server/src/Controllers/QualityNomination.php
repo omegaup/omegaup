@@ -619,13 +619,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * A user that has already solved a problem can dismiss suggestions. The
      * `contents` field is empty.
      *
-     * @omegaup-request-param mixed $contents
-     * @omegaup-request-param 'demotion'|'dismissal'|'promotion'|'quality_tag'|'suggestion' $nomination
-     * @omegaup-request-param mixed $problem_alias
-     *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
      * @return array{qualitynomination_id: int}
+     *
+     * @omegaup-request-param string $contents
+     * @omegaup-request-param 'demotion'|'dismissal'|'promotion'|'quality_tag'|'suggestion' $nomination
+     * @omegaup-request-param string $problem_alias
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -671,13 +671,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $qualitynomination_id
-     * @omegaup-request-param mixed $rationale
-     * @omegaup-request-param 'banned'|'open'|'resolved'|'warning' $status
-     * @omegaup-request-param bool|null $all
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param bool|null $all
+     * @omegaup-request-param null|string $problem_alias
+     * @omegaup-request-param int $qualitynomination_id
+     * @omegaup-request-param string $rationale
+     * @omegaup-request-param 'banned'|'open'|'resolved'|'warning' $status
      */
     public static function apiResolve(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
