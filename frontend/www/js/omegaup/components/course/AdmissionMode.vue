@@ -34,14 +34,14 @@
               v-bind:value="courseURL"
             />
             <div class="form-inline">
-              <a
-                href="#"
+              <button
                 class="btn btn-primary"
-                role="button"
+                type="button"
                 v-on:click="copiedToClipboard = true"
                 v-clipboard="courseURL"
-                >{{ T.wordsCopyToClipboard }}</a
               >
+                {{ T.wordsCopyToClipboard }}
+              </button>
               <span class="ml-3" v-if="copiedToClipboard === true">
                 <font-awesome-icon
                   icon="check-circle"
@@ -68,6 +68,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import Clipboard from 'v-clipboard';
 import T from '../../lang';
 
 import {
@@ -78,6 +79,7 @@ import {
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
+Vue.use(Clipboard);
 
 @Component({
   components: {
