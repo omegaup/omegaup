@@ -67,19 +67,19 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Create an Identity API
      *
-     * @omegaup-request-param null|string $country_id
-     * @omegaup-request-param mixed $gender
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $identities
-     * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $password
-     * @omegaup-request-param mixed $school_name
-     * @omegaup-request-param null|string $state_id
-     * @omegaup-request-param mixed $username
-     *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
      * @return array{username: string}
+     *
+     * @omegaup-request-param null|string $country_id
+     * @omegaup-request-param string $gender
+     * @omegaup-request-param null|string $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param string $name
+     * @omegaup-request-param string $password
+     * @omegaup-request-param string $school_name
+     * @omegaup-request-param null|string $state_id
+     * @omegaup-request-param string $username
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
@@ -176,12 +176,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Create bulk Identities API
      *
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $identities
+     * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $group_alias
+     * @omegaup-request-param string $identities
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $username
-     *
-     * @return array{status: string}
      */
     public static function apiBulkCreate(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
@@ -287,7 +287,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param null|string $group_alias
      * @omegaup-request-param mixed $identities
      * @omegaup-request-param mixed $name
      * @omegaup-request-param mixed $username
@@ -387,17 +387,17 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for Update an Identity API
      *
-     * @omegaup-request-param null|string $country_id
-     * @omegaup-request-param mixed $gender
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $identities
-     * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $original_username
-     * @omegaup-request-param mixed $school_name
-     * @omegaup-request-param null|string $state_id
-     * @omegaup-request-param mixed $username
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $country_id
+     * @omegaup-request-param string $gender
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param string $name
+     * @omegaup-request-param string $original_username
+     * @omegaup-request-param string $school_name
+     * @omegaup-request-param null|string $state_id
+     * @omegaup-request-param string $username
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
@@ -489,15 +489,15 @@ class Identity extends \OmegaUp\Controllers\Controller {
     /**
      * Entry point for change passowrd of an identity
      *
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $identities
-     * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $password
-     * @omegaup-request-param mixed $username
-     *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param string $password
+     * @omegaup-request-param string $username
      */
     public static function apiChangePassword(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
@@ -533,16 +533,16 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $identities
-     * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $username
-     *
      * @param \OmegaUp\Request $r
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
      * @return void
+     *
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param mixed $identities
+     * @omegaup-request-param mixed $name
+     * @omegaup-request-param mixed $username
      */
     private static function validateUpdateRequest(\OmegaUp\Request $r): void {
         $r->ensureIdentity();

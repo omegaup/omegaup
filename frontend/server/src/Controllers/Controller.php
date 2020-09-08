@@ -41,9 +41,9 @@ class Controller {
      *
      * Request must be authenticated before this function is called.
      *
-     * @omegaup-request-param mixed $username
-     *
      * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @omegaup-request-param string $username
      */
     protected static function resolveTargetUser(
         \OmegaUp\Request $r
@@ -72,9 +72,9 @@ class Controller {
      *
      * Request must be authenticated before this function is called.
      *
-     * @omegaup-request-param mixed $username
-     *
      * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @omegaup-request-param string $username
      */
     protected static function resolveTargetIdentity(
         \OmegaUp\Request $r

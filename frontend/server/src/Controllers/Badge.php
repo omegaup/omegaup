@@ -81,9 +81,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return array{assignation_time: \OmegaUp\Timestamp|null}
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -109,9 +109,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return Badge
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidAlias(
@@ -167,9 +167,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function getDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();

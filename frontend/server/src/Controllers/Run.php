@@ -81,17 +81,17 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Validates Create Run request
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $language
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $problemset_id
-     *
      * @throws \OmegaUp\Exceptions\ApiException
      * @throws \OmegaUp\Exceptions\NotAllowedToSubmitException
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{isPractice: bool, problem: \OmegaUp\DAO\VO\Problems, contest: null|\OmegaUp\DAO\VO\Contests, problemsetContainer: null|\OmegaUp\DAO\VO\Contests|\OmegaUp\DAO\VO\Assignments|\OmegaUp\DAO\VO\Interviews, problemset: null|\OmegaUp\DAO\VO\Problemsets}
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param mixed $problemset_id
      */
     private static function validateCreateRequest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -335,16 +335,16 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Create a new run
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $language
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $problemset_id
-     * @omegaup-request-param mixed $source
-     *
      * @throws \Exception
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return array{guid: string, submit_delay: int, submission_deadline: \OmegaUp\Timestamp, nextSubmissionTimestamp: \OmegaUp\Timestamp}
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param mixed $problemset_id
+     * @omegaup-request-param string $source
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -591,11 +591,11 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Get basic details of a run
      *
-     * @omegaup-request-param mixed $run_alias
-     *
      * @throws \OmegaUp\Exceptions\InvalidFilesystemOperationException
      *
      * @return Run
+     *
+     * @omegaup-request-param string $run_alias
      */
     public static function apiStatus(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -692,10 +692,10 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Re-sends a problem to Grader.
      *
-     * @omegaup-request-param mixed $debug
-     * @omegaup-request-param mixed $run_alias
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param mixed $debug
+     * @omegaup-request-param string $run_alias
      */
     public static function apiRejudge(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -759,9 +759,9 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Disqualify a submission
      *
-     * @omegaup-request-param mixed $run_alias
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $run_alias
      */
     public static function apiDisqualify(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -835,9 +835,9 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details of a run. Includes admin details if admin.
      *
-     * @omegaup-request-param mixed $run_alias
-     *
      * @return RunDetails
+     *
+     * @omegaup-request-param string $run_alias
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -1078,11 +1078,11 @@ class Run extends \OmegaUp\Controllers\Controller {
      * Given the run alias, returns the source code and any compile errors if any
      * Used in the arena, any contestant can view its own codes and compile errors
      *
-     * @omegaup-request-param mixed $run_alias
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{compile_error?: string, details?: array{compile_meta?: array<string, RunMetadata>, contest_score: float, groups?: list<array{cases: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: string, score: float, verdict: string}>, contest_score: float, group: string, max_score: float, score: float}>, judged_by: string, max_score?: float, memory?: float, score: float, time?: float, verdict: string, wall_time?: float}, source: string}
+     *
+     * @omegaup-request-param string $run_alias
      */
     public static function apiSource(\OmegaUp\Request $r): array {
         // Get the user who is calling this API
@@ -1487,13 +1487,13 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * Validator for List API
      *
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $username
-     *
      * @return array{problem: null|\OmegaUp\DAO\VO\Problems, identity: null|\OmegaUp\DAO\VO\Identities}
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      * @throws \OmegaUp\Exceptions\NotFoundException
+     *
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param string $username
      */
     private static function validateList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -1510,7 +1510,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['problem_alias'])) {
             \OmegaUp\Validators::validateStringNonEmpty(
                 $r['problem_alias'],
-                'problem'
+                'problem_alias'
             );
 
             $problem = \OmegaUp\DAO\Problems::getByAlias(
@@ -1553,10 +1553,10 @@ class Run extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $language
      * @omegaup-request-param int $offset
-     * @omegaup-request-param mixed $problem_alias
+     * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
-     * @omegaup-request-param mixed $username
+     * @omegaup-request-param string $username
      * @omegaup-request-param mixed $verdict
      */
     public static function apiList(\OmegaUp\Request $r): array {
