@@ -19,7 +19,9 @@
         </p>
         <p>
           <span class="font-weight-bold">{{ T.wordsDescription }}: </span>
-          {{ course.description }}
+          <omegaup-markdown
+            v-bind:markdown="course.description"
+          ></omegaup-markdown>
         </p>
         <li
           v-for="assignment of course.assignments"
@@ -47,6 +49,7 @@ import { types } from '../../api_types';
 import course_Clone from './Clone.vue';
 import DatePicker from '../DatePicker.vue';
 import omegaup_Username from '../user/Username.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 import {
   FontAwesomeIcon,
@@ -61,6 +64,7 @@ library.add(fas);
   components: {
     'omegaup-course-clone': course_Clone,
     'omegaup-datepicker': DatePicker,
+    'omegaup-markdown': omegaup_Markdown,
     'omegaup-username': omegaup_Username,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
