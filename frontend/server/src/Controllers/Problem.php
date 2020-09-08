@@ -861,30 +861,35 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param null|string $group
+     * @omegaup-request-param string $group
      * @omegaup-request-param string $problem_alias
      */
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r): array {
         // Authenticate logged user
         $r->ensureIdentity();
 
-        // Check problem_alias
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $r->ensureString(
+                'problem_alias',
+                fn (string $problemAlias) => \OmegaUp\Validators::isValidAlias(
+                    $problemAlias
+                )
+            )
         );
-        \OmegaUp\Validators::validateValidAlias($r['group'], 'group');
+        if (is_null($problem) || is_null($problem->acl_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
+        }
 
-        $group = \OmegaUp\DAO\Groups::findByAlias($r['group']);
+        $group = \OmegaUp\DAO\Groups::findByAlias(
+            $r->ensureString(
+                'group',
+                fn (string $group) => \OmegaUp\Validators::isValidAlias($group)
+            )
+        );
         if (is_null($group) || is_null($group->group_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
             );
-        }
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
-        if (is_null($problem) || is_null($problem->acl_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
         // Only admin is alowed to make modifications
@@ -897,9 +902,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $group->group_id
         );
 
-        return [
-            'status' => 'ok',
-        ];
+        return ['status' => 'ok'];
     }
 
     /**

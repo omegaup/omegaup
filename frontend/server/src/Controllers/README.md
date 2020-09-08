@@ -2770,10 +2770,10 @@ Removes a group admin from a problem
 
 ### Parameters
 
-| Name            | Type          | Description |
-| --------------- | ------------- | ----------- |
-| `problem_alias` | `string`      |             |
-| `group`         | `null|string` |             |
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `group`         | `string` |             |
+| `problem_alias` | `string` |             |
 
 ### Returns
 
