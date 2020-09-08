@@ -491,7 +491,11 @@ class Validators {
                 'parameterNotInExpectedSet',
                 $parameterName,
                 [
-                    'bad_elements' => strval($parameter),
+                    'bad_elements' => (
+                        is_scalar($parameter) || is_object($parameter) ?
+                        strval($parameter) :
+                        ''
+                    ),
                     'expected_set' => implode(', ', $enum),
                 ]
             );

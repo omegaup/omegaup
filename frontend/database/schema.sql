@@ -179,7 +179,7 @@ CREATE TABLE `Course_Clone_Log` (
   `ip` varchar(40) NOT NULL COMMENT 'Dirección IP desde la cual se intentó clonar el curso.',
   `course_id` int NOT NULL COMMENT 'ID del curso original',
   `new_course_id` int DEFAULT NULL COMMENT 'ID del curso nuevo, null si no se pudo colonar el curso',
-  `token_payload` varchar(50) NOT NULL COMMENT 'Claims del token usado para intentar clonar, independientemente de si fue exitoso o no.',
+  `token_payload` varchar(220) NOT NULL COMMENT 'Claims del token usado para intentar clonar, independientemente de si fue exitoso o no.',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en la que el usuario intenta clonar el curso',
   `user_id` int NOT NULL COMMENT 'ID del usuario que intentó clonar.',
   `result` enum('unknown','success','token_expired','token_corrupted','token_invalid') NOT NULL DEFAULT 'success' COMMENT 'Resultado obtenido del intento de clonación de curso',

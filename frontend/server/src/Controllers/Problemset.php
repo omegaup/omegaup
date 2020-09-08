@@ -102,11 +102,11 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     /**
      * @return Problemset
      *
-     * @omegaup-request-param mixed $assignment
+     * @omegaup-request-param string $assignment
      * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $interview_alias
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param string $course
+     * @omegaup-request-param string $interview_alias
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
@@ -146,10 +146,10 @@ class Problemset extends \OmegaUp\Controllers\Controller {
     /**
      * @return Scoreboard
      *
-     * @omegaup-request-param mixed $assignment
+     * @omegaup-request-param string $assignment
      * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $course
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param string $course
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
@@ -196,10 +196,10 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      *
      * @return array{events: list<ScoreboardEvent>}
      *
-     * @omegaup-request-param mixed $assignment
+     * @omegaup-request-param string $assignment
      * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $course
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param string $course
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens
@@ -239,7 +239,7 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}, request: \OmegaUp\Request}
      *
      * @omegaup-request-param mixed $auth_token
-     * @omegaup-request-param mixed $contest_alias
+     * @omegaup-request-param string $contest_alias
      * @omegaup-request-param int $problemset_id
      * @omegaup-request-param mixed $token
      * @omegaup-request-param mixed $tokens

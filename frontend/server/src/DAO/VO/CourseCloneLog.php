@@ -42,9 +42,9 @@ class CourseCloneLog extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['ip'])) {
-            $this->ip = strval(
+            $this->ip = is_scalar(
                 $data['ip']
-            );
+            ) ? strval($data['ip']) : '';
         }
         if (isset($data['course_id'])) {
             $this->course_id = intval(
@@ -57,9 +57,9 @@ class CourseCloneLog extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['token_payload'])) {
-            $this->token_payload = strval(
+            $this->token_payload = is_scalar(
                 $data['token_payload']
-            );
+            ) ? strval($data['token_payload']) : '';
         }
         if (isset($data['timestamp'])) {
             /**
@@ -82,9 +82,9 @@ class CourseCloneLog extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['result'])) {
-            $this->result = strval(
+            $this->result = is_scalar(
                 $data['result']
-            );
+            ) ? strval($data['result']) : '';
         }
     }
 

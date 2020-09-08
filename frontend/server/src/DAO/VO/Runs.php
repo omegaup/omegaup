@@ -52,24 +52,24 @@ class Runs extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['version'])) {
-            $this->version = strval(
+            $this->version = is_scalar(
                 $data['version']
-            );
+            ) ? strval($data['version']) : '';
         }
         if (isset($data['commit'])) {
-            $this->commit = strval(
+            $this->commit = is_scalar(
                 $data['commit']
-            );
+            ) ? strval($data['commit']) : '';
         }
         if (isset($data['status'])) {
-            $this->status = strval(
+            $this->status = is_scalar(
                 $data['status']
-            );
+            ) ? strval($data['status']) : '';
         }
         if (isset($data['verdict'])) {
-            $this->verdict = strval(
+            $this->verdict = is_scalar(
                 $data['verdict']
-            );
+            ) ? strval($data['verdict']) : '';
         }
         if (isset($data['runtime'])) {
             $this->runtime = intval(
@@ -112,9 +112,9 @@ class Runs extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['judged_by'])) {
-            $this->judged_by = strval(
+            $this->judged_by = is_scalar(
                 $data['judged_by']
-            );
+            ) ? strval($data['judged_by']) : '';
         }
     }
 

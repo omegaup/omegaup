@@ -216,9 +216,7 @@ class Problem {
         // Call the API
         \OmegaUp\Controllers\Problem::apiCreate($r);
         $problem = \OmegaUp\DAO\Problems::getByAlias(
-            strval(
-                $r['problem_alias']
-            )
+            $r->ensureString('problem_alias')
         );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(

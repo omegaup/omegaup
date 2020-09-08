@@ -17,15 +17,15 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return list<string>
      */
     public static function getAllBadges(): array {
+        /** @psalm-suppress MixedArgument OMEGAUP_BADGES_ROOT is really a string. */
         $aliases = array_diff(
-            scandir(
-                strval(static::OMEGAUP_BADGES_ROOT)
-            ),
+            scandir(static::OMEGAUP_BADGES_ROOT),
             ['..', '.', 'default_icon.svg']
         );
         $results = [];
         foreach ($aliases as $alias) {
-            if (!is_dir(strval(static::OMEGAUP_BADGES_ROOT) . "/${alias}")) {
+            /** @psalm-suppress MixedOperand OMEGAUP_BADGES_ROOT is really a string. */
+            if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
                 continue;
             }
             $results[] = $alias;
@@ -81,9 +81,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return array{assignation_time: \OmegaUp\Timestamp|null}
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -109,9 +109,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return Badge
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidAlias(
@@ -167,9 +167,9 @@ class Badge extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function getDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();

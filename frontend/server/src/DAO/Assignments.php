@@ -44,7 +44,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
+     * @return list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
@@ -64,7 +64,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             ) * 100 AS low_score_percentage,
             MIN(bpr.max_user_score_for_problem) as minimum,
             MAX(bpr.max_user_score_for_problem) as maximum,
-            bpr.max_points
+            bpr.max_points,
+            AVG(bpr.run_count) AS avg_runs
         FROM (
             SELECT
                 pr.assignment_alias,
@@ -73,7 +74,8 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
                 pr.order,
                 pr.max_points,
                 COALESCE(MAX(`r`.`contest_score`), 0) AS max_user_score_for_problem,
-                COALESCE(MAX(`r`.`score`), 0) AS max_user_percent_for_problem
+                COALESCE(MAX(`r`.`score`), 0) AS max_user_percent_for_problem,
+                COALESCE(COUNT(`r`.`submission_id`), 0) AS run_count
             FROM
                 `Groups_Identities` AS `gi`
             CROSS JOIN
@@ -120,7 +122,73 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
+        /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
+        $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [ $courseId, $groupId ]
+        );
+        return $results;
+    }
+
+    /**
+     * Returns each problem with the count of each verdict
+     *
+     * @return list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}>
+     */
+    public static function getAssignmentVerdictDistribution(
+        int $courseId,
+        int $groupId
+    ): array {
+        $sql = '
+        SELECT
+            pr.assignment_alias,
+            pr.problem_alias,
+            pr.problem_id,
+            `r`.`verdict` AS verdict,
+            COUNT(*) AS runs
+        FROM
+            `Groups_Identities` AS `gi`
+        CROSS JOIN
+            (
+            SELECT
+                `a`.`assignment_id`,
+                `a`.`alias` AS assignment_alias,
+                `a`.`problemset_id`,
+                `p`.`problem_id`,
+                `p`.`alias` AS problem_alias,
+                `psp`.`order`
+            FROM
+                `Assignments` AS `a`
+            INNER JOIN
+                `Problemsets` AS `ps` ON `a`.`problemset_id` = `ps`.`problemset_id`
+            INNER JOIN
+                `Problemset_Problems` AS `psp` ON `psp`.`problemset_id` = `ps`.`problemset_id`
+            INNER JOIN
+                `Problems` AS `p` ON `p`.`problem_id` = `psp`.`problem_id`
+            WHERE
+                `a`.`course_id` = ?
+            GROUP BY
+                `a`.`assignment_id`, `p`.`problem_id`
+            ) AS pr
+        INNER JOIN
+            `Identities` AS `i` ON `i`.`identity_id` = `gi`.`identity_id`
+        LEFT JOIN
+            `Submissions` AS `s`
+        ON
+            `s`.`problem_id` = `pr`.`problem_id`
+            AND `s`.`identity_id` = `i`.`identity_id`
+            AND `s`.`problemset_id` = `pr`.`problemset_id`
+        LEFT JOIN
+            `Runs` AS `r` ON `r`.`run_id` = `s`.`current_run_id`
+        WHERE
+            `gi`.`group_id` = ? AND `r`.`status` = "ready" AND `s`.`type` = "normal"
+        GROUP BY
+            `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
+        ORDER BY
+            pr.order, pr.problem_id;
+        ';
+
+        /** @var list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]

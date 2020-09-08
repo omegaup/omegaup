@@ -4,6 +4,7 @@ namespace OmegaUp\Psalm;
 
 class TranslationStringChecker implements
     \Psalm\Plugin\Hook\AfterAnalysisInterface,
+    \Psalm\Plugin\Hook\AfterFileAnalysisInterface,
     \Psalm\Plugin\Hook\AfterExpressionAnalysisInterface,
     \Psalm\Plugin\Hook\AfterMethodCallAnalysisInterface {
     /**
@@ -26,6 +27,14 @@ class TranslationStringChecker implements
     private static $allTranslationStrings = null;
 
     /**
+     * The name of the directory where the translation strings are going to be
+     * written to.
+     *
+     * @var string|null
+     */
+    private static $translationStringsDirname;
+
+    /**
      * Called after analysis is complete
      *
      * @param array<string, list<\Psalm\Internal\Analyzer\IssueData>> $issues
@@ -38,6 +47,83 @@ class TranslationStringChecker implements
         array $build_info,
         \Psalm\SourceControl\SourceControlInfo $source_control_info = null
     ) {
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/exceptions',
+            implode("\n", self::EXCEPTION_MESSAGES) . "\n"
+        );
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/problem_deployer_errors',
+            implode(
+                "\n",
+                array_values(
+                    \OmegaUp\ProblemDeployer::ERROR_MAPPING
+                )
+            ) . "\n"
+        );
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/restricted_tags',
+            implode(
+                "\n",
+                \OmegaUp\Controllers\Problem::RESTRICTED_TAG_NAMES
+            ) . "\n"
+        );
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/allowed_tags',
+            implode(
+                "\n",
+                \OmegaUp\Controllers\QualityNomination::ALLOWED_TAGS
+            ) . "\n"
+        );
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/allowed_public_tags',
+            implode(
+                "\n",
+                \OmegaUp\Controllers\QualityNomination::ALLOWED_PUBLIC_TAGS
+            ) . "\n"
+        );
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/level_tags',
+            implode(
+                "\n",
+                \OmegaUp\Controllers\QualityNomination::LEVEL_TAGS
+            ) . "\n"
+        );
+    }
+
+    /**
+     * Called after file analysis is complete
+     *
+     * @return void
+     */
+    public static function afterAnalyzeFile(
+        \Psalm\StatementsSource $statements_source,
+        \Psalm\Context $file_context,
+        \Psalm\Storage\FileStorage $file_storage,
+        \Psalm\Codebase $codebase
+    ) {
+        if (
+            !isset(
+                $file_storage->custom_metadata['omegaup-translation-strings']
+            ) ||
+            !is_array(
+                $file_storage->custom_metadata['omegaup-translation-strings']
+            )
+        ) {
+            return;
+        }
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/' . str_replace(
+                '/',
+                '_',
+                $statements_source->getFileName()
+            ),
+            implode(
+                "\n",
+                array_unique(
+                    $file_storage->custom_metadata['omegaup-translation-strings']
+                )
+            ) . "\n"
+        );
     }
 
     /**
@@ -45,6 +131,7 @@ class TranslationStringChecker implements
      * translation string name as first parameter.
      */
     private static function isSupportedConstructor(
+        \Psalm\Codebase $codebase,
         string $constructorClassName
     ): bool {
         if ($constructorClassName === 'omegaup\\translationstring') {
@@ -60,7 +147,13 @@ class TranslationStringChecker implements
             // This one class does not use translation strings.
             return false;
         }
-        return true;
+        return (
+            $constructorClassName === 'omegaup\\exceptions\\apiexception' ||
+            $codebase->classExtends(
+                $constructorClassName,
+                'omegaup\\exceptions\\apiexception'
+            )
+        );
     }
 
     /**
@@ -84,7 +177,12 @@ class TranslationStringChecker implements
             // Not something we can reason about.
             return;
         }
-        if (!self::isSupportedConstructor($expr->class->toLowerString())) {
+        if (
+            !self::isSupportedConstructor(
+                $codebase,
+                $expr->class->toLowerString()
+            )
+        ) {
             return;
         }
         if (empty($expr->args)) {
@@ -120,6 +218,19 @@ class TranslationStringChecker implements
             }
             return null;
         }
+        /** @psalm-suppress InternalMethod This should be okay */
+        $file_storage = $codebase->file_storage_provider->get(
+            $statements_source->getFilePath()
+        );
+        if (
+            !isset(
+                $file_storage->custom_metadata['omegaup-translation-strings']
+            )
+        ) {
+            $file_storage->custom_metadata['omegaup-translation-strings'] = [];
+        }
+        /** @var list<string> $file_storage->custom_metadata['omegaup-translation-strings'] */
+        $file_storage->custom_metadata['omegaup-translation-strings'][] = $translationString;
         return null;
     }
 
@@ -172,6 +283,19 @@ class TranslationStringChecker implements
             }
             return;
         }
+        /** @psalm-suppress InternalMethod This should be okay */
+        $file_storage = $codebase->file_storage_provider->get(
+            $statements_source->getFilePath()
+        );
+        if (
+            !isset(
+                $file_storage->custom_metadata['omegaup-translation-strings']
+            )
+        ) {
+            $file_storage->custom_metadata['omegaup-translation-strings'] = [];
+        }
+        /** @var list<string> $file_storage->custom_metadata['omegaup-translation-strings'] */
+        $file_storage->custom_metadata['omegaup-translation-strings'][] = $translationString;
     }
 
     /**
@@ -192,6 +316,27 @@ class TranslationStringChecker implements
             self::$allTranslationStrings = $translationFileContents;
         }
         return self::$allTranslationStrings;
+    }
+
+    /**
+     * Returns the name of the directory where the translation strings are
+     * going to be written to.
+     */
+    private static function getTranslationStringsDirname(): string {
+        if (is_null(self::$translationStringsDirname)) {
+            self::$translationStringsDirname  = dirname(
+                __DIR__,
+                3
+            ) . '/tests/runfiles/translation_strings';
+            if (!is_dir(self::$translationStringsDirname)) {
+                mkdir(
+                    self::$translationStringsDirname, /*$mode=*/
+                    0755, /*$recursive=*/
+                    true
+                );
+            }
+        }
+        return self::$translationStringsDirname;
     }
 }
 
