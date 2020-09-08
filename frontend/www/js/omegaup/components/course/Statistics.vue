@@ -192,7 +192,8 @@ export default class Statistics extends Vue {
   get verdictList() {
     let verdicts: string[] = [];
     for (const stat of this.verdicts) {
-      if (stat.verdict) verdicts.push(stat.verdict);
+      if (stat.verdict && !verdicts.includes(stat.verdict))
+        verdicts.push(stat.verdict);
     }
     return verdicts;
   }
@@ -227,7 +228,9 @@ export default class Statistics extends Vue {
     for (let i = 0; i < verdicts.length; i++) {
       for (let j = 0; j < problems.length; j++) {
         if (assignmentRuns[j])
-          runs[i][j] = (runs[i][j] / assignmentRuns[j]) * 100;
+          runs[i][j] = parseFloat(
+            ((runs[i][j] / assignmentRuns[j]) * 100).toFixed(1),
+          );
       }
     }
     for (const verdictName of verdicts) {
