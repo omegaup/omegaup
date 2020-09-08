@@ -25,12 +25,12 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a Clarification
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $message
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $username
-     *
      * @return array{clarification_id: int}
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $message
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $username
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
@@ -159,9 +159,9 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $answer
+     * @omegaup-request-param null|string $answer
      * @omegaup-request-param int $clarification_id
-     * @omegaup-request-param mixed $message
+     * @omegaup-request-param null|string $message
      * @omegaup-request-param bool|null $public
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
