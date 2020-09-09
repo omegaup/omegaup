@@ -186,21 +186,7 @@
               >
                 <omegaup-user-charts
                   v-bind:data="charts"
-                  v-bind:username="profile.username"
-                  v-bind:periodStatisticOptions="periodStatisticOptions"
-                  v-on:emit-update-period-statistics="
-                    (profileComponent, categories, data) =>
-                      onUpdatePeriodStatistics(
-                        profileComponent,
-                        categories,
-                        data,
-                      )
-                  "
-                  v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
-                  v-on:emit-update-aggregate-statistics="
-                    (profileComponent) =>
-                      onAggregateStatistics(profileComponent)
-                  "
+                  v-bind:username="profile.username"           
                   v-if="charts"
                 ></omegaup-user-charts>
               </div>
@@ -298,121 +284,6 @@ export default class UserProfile extends Vue {
       default:
         return T.profileRankUnrated;
     }
-  }
-
-  get periodStatisticOptions(): Highcharts.Options {
-    return {
-      title: {
-        text: ui.formatString(T.profileStatisticsVerdictsOf, {
-          user: this.data.profile?.username,
-        }),
-      },
-      chart: { type: 'column' },
-      xAxis: {
-        categories: [],
-        title: { text: T.profileStatisticsPeriod },
-        labels: {
-          rotation: -45,
-        },
-      },
-      yAxis: {
-        min: 0,
-        title: { text: T.profileStatisticsNumberOfSolvedProblems },
-        stackLabels: {
-          enabled: false,
-          style: {
-            fontWeight: 'bold',
-            color: 'gray',
-          },
-        },
-      },
-      legend: {
-        align: 'right',
-        x: -30,
-        verticalAlign: 'top',
-        y: 25,
-        floating: true,
-        backgroundColor: 'white',
-        borderColor: '#CCC',
-        borderWidth: 1,
-        shadow: false,
-      },
-      tooltip: {
-        headerFormat: '<b>{point.x}</b><br/>',
-        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
-      },
-      plotOptions: {
-        column: {
-          stacking: 'normal',
-          dataLabels: {
-            enabled: false,
-            color: 'white',
-          },
-        },
-      },
-      series: [],
-    };
-  }
-  get aggregateStatisticOptions(): Highcharts.Options {
-    return {
-      title: {
-        text: ui.formatString(T.profileStatisticsVerdictsOf, {
-          user: this.data.profile?.username,
-        }),
-      },
-      chart: {
-        plotShadow: false,
-        type: 'pie',
-      },
-      xAxis: {
-        title: { text: '' },
-      },
-      yAxis: {
-        title: { text: '' },
-      },
-      tooltip: { pointFormat: '{series.name}: {point.y}' },
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-            enabled: true,
-            color: '#000000',
-            connectorColor: '#000000',
-            format: '<b>{point.name}</b>: {point.percentage:.1f} % ({point.y})',
-          },
-        },
-      },
-      series: [
-        {
-          name: T.profileStatisticsRuns,
-          data: this.normalizedRunCounts,
-          type: 'pie',
-        },
-      ],
-    };
-  }
-  onUpdatePeriodStatistics(
-    e: user_Charts,
-    categories: string[],
-    data: omegaup.RunData[],
-    type: 'pie',
-  ) {
-    (<Highcharts.XAxisOptions>(
-      e.periodStatisticOptions.xAxis
-    )).categories = categories;
-    e.periodStatisticOptions.series = data.map(
-      (x) =>
-        <Highcharts.SeriesColumnOptions>{
-          data: x.data,
-          name: x.name,
-          type: 'column',
-        },
-    );
-  }
-
-  onAggregateStatistics(e: user_Charts) {
-    this.normalizedRunCounts = e.normalizedRunCounts;
   }
 }
 </script>
