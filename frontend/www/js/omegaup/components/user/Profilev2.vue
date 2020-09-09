@@ -186,7 +186,7 @@
               >
                 <omegaup-user-charts
                   v-bind:data="charts"
-                  v-bind:username="profile.username"           
+                  v-bind:username="profile.username"
                   v-if="charts"
                 ></omegaup-user-charts>
               </div>

@@ -382,9 +382,8 @@ export default class UserCharts extends Vue {
     const runs: omegaup.RunCounts = this.normalizedRunCountsForPeriod;
     const data = this.type === 'delta' ? runs.delta : runs.cumulative;
     console.log(this);
-    (<Highcharts.XAxisOptions>(
-      this.periodStatisticOptions.xAxis
-    )).categories = runs.categories;
+    (<Highcharts.XAxisOptions>this.periodStatisticOptions.xAxis).categories =
+      runs.categories;
     this.periodStatisticOptions.series = data.map(
       (x) =>
         <Highcharts.SeriesColumnOptions>{
@@ -400,6 +399,5 @@ export default class UserCharts extends Vue {
     console.log('onRenderAggregate');
     this.data_chart = this.normalizedRunCounts;
   }
-
 }
 </script>
