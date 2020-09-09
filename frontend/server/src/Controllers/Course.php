@@ -32,8 +32,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
  * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses}
- * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}
- * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>}
+ * @psalm-type CourseProblemVerdict=array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}
+ * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}
+ * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>, verdicts: list<CourseProblemVerdict>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
  * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
@@ -86,12 +87,12 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @omegaup-request-param mixed $alias
+     * @omegaup-request-param null|string $alias
      * @omegaup-request-param 'homework'|'lesson'|'test' $assignment_type
-     * @omegaup-request-param mixed $description
+     * @omegaup-request-param string $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
-     * @omegaup-request-param mixed $name
-     * @omegaup-request-param string|null $problems
+     * @omegaup-request-param string $name
+     * @omegaup-request-param null|string $problems
      * @omegaup-request-param OmegaUp\Timestamp $start_time
      * @omegaup-request-param bool|null $unlimited_duration
      */
@@ -245,8 +246,8 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates clone Courses
      *
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $name
+     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param string $name
      * @omegaup-request-param int $start_time
      */
     private static function validateClone(
@@ -276,10 +277,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
+     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param null|string $description
      * @omegaup-request-param mixed $finish_time
-     * @omegaup-request-param mixed $name
+     * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
@@ -310,10 +311,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
+     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param null|string $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
-     * @omegaup-request-param mixed $name
+     * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
@@ -363,10 +364,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
+     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param null|string $description
      * @omegaup-request-param int|null $finish_time
-     * @omegaup-request-param mixed $name
+     * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
@@ -979,7 +980,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $alias
      * @omegaup-request-param mixed $assignment_type
-     * @omegaup-request-param mixed $course_alias
+     * @omegaup-request-param string $course_alias
      * @omegaup-request-param mixed $description
      * @omegaup-request-param mixed $finish_time
      * @omegaup-request-param mixed $name
@@ -1042,8 +1043,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: 'ok'}
      *
-     * @omegaup-request-param mixed $assignment
-     * @omegaup-request-param mixed $course
+     * @omegaup-request-param string $assignment
+     * @omegaup-request-param string $course
      * @omegaup-request-param OmegaUp\Timestamp $finish_time
      * @omegaup-request-param OmegaUp\Timestamp $start_time
      * @omegaup-request-param bool|null $unlimited_duration
@@ -1140,13 +1141,13 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Adds a problem to an assignment
      *
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $commit
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param float $points
-     * @omegaup-request-param mixed $problem_alias
-     *
      * @return array{status: 'ok'}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param null|string $commit
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param float $points
+     * @omegaup-request-param string $problem_alias
      */
     public static function apiAddProblem(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1213,11 +1214,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $problems
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $problems
      */
     public static function apiUpdateProblemsOrder(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1313,10 +1314,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $assignments
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $assignments
+     * @omegaup-request-param string $course_alias
      */
     public static function apiUpdateAssignmentsOrder(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1397,10 +1398,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $problem_alias
-     *
      * @return array{identities: list<string>}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $problem_alias
      */
     public static function apiGetProblemUsers(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1444,11 +1445,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Remove a problem from an assignment
      *
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $problem_alias
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $problem_alias
      */
     public static function apiRemoveProblem(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1530,11 +1531,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * List course assignments
      *
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{assignments: list<CourseAssignment>}
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiListAssignments(\OmegaUp\Request $r) {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1590,8 +1591,9 @@ class Course extends \OmegaUp\Controllers\Controller {
      * Remove an assignment from a course
      *
      * @return array{status: string}
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course_alias
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
      */
     public static function apiRemoveAssignment(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1939,9 +1941,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * List students in a course
      *
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{students: list<CourseStudent>}
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiListStudents(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -1971,11 +1973,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $usernameOrEmail
-     *
      * @return array{problems: list<CourseProblem>}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiStudentProgress(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2068,9 +2070,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given course
      *
-     * @omegaup-request-param mixed $alias
-     *
      * @return array{assignments: AssignmentProgress}
+     *
+     * @omegaup-request-param string $alias
      */
     public static function apiMyProgress(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2109,15 +2111,15 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Add Student to Course.
      *
-     * @omegaup-request-param bool|null $accept_teacher
-     * @omegaup-request-param mixed $accept_teacher_git_object_id
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $privacy_git_object_id
-     * @omegaup-request-param mixed $share_user_information
-     * @omegaup-request-param mixed $statement_type
-     * @omegaup-request-param mixed $usernameOrEmail
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param bool|null $accept_teacher
+     * @omegaup-request-param string $accept_teacher_git_object_id
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $privacy_git_object_id
+     * @omegaup-request-param mixed $share_user_information
+     * @omegaup-request-param string $statement_type
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiAddStudent(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2254,10 +2256,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Remove Student from Course
      *
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $usernameOrEmail
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiRemoveStudent(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2310,9 +2312,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns all course administrators
      *
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{admins: list<array{role: string, username: string}>, group_admins: list<array{alias: string, name: string, role: string}>}
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiAdmins(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -2341,12 +2343,12 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Adds an admin to a course
      *
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $usernameOrEmail
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiAddAdmin(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2391,12 +2393,12 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Removes an admin from a course
      *
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $usernameOrEmail
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiRemoveAdmin(\OmegaUp\Request $r): array {
         // Authenticate logged user
@@ -2457,12 +2459,12 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Adds an group admin to a course
      *
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $group
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $group
      */
     public static function apiAddGroupAdmin(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -2507,12 +2509,12 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Removes a group admin from a course
      *
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $group
-     *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param string $group
      */
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r): array {
         // Authenticate logged user
@@ -2560,7 +2562,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{name: string, description: string, alias: string, currentUsername: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, statements: array{privacy: array{markdown: null|string, gitObjectId: null|string, statementType: null|string}, acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}}, isFirstTimeAccess: bool, shouldShowResults: bool}
      *
-     * @omegaup-request-param mixed $assignment_alias
+     * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
      */
     public static function apiIntroDetails(\OmegaUp\Request $r) {
@@ -2574,7 +2576,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
      *
-     * @omegaup-request-param mixed $assignment_alias
+     * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
      */
     public static function getCourseDetailsForSmarty(\OmegaUp\Request $r): array {
@@ -2625,11 +2627,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param bool|null $is_practice
-     *
      * @return array{inContest: bool, smartyProperties: array{payload: IntroDetailsPayload}, template: string}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
+     * @omegaup-request-param bool|null $is_practice
      */
     public static function getCourseAdminDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -2699,15 +2701,15 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $course
-     *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: string}}
+     *
+     * @omegaup-request-param string $course
      */
     public static function getCourseEditDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
 
         $courseEditDetails = self::getCourseEditDetails(
             $r['course'],
@@ -2734,16 +2736,16 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course
-     *
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: string}}
+     *
+     * @omegaup-request-param null|string $assignment_alias
+     * @omegaup-request-param string $course
      */
     public static function getCourseEditDetailsWithSelectedAssignmentForSmarty(
         \OmegaUp\Request $r
     ): array {
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'alias');
+        \OmegaUp\Validators::validateStringNonEmpty($r['course'], 'course');
         \OmegaUp\Validators::validateValidAlias(
             $r['assignment_alias'],
             'assignment_alias'
@@ -2822,7 +2824,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload, title: string}}
      *
-     * @omegaup-request-param mixed $course
+     * @omegaup-request-param string $course
      */
     public static function getCourseSubmissionsListForSmarty(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -2866,9 +2868,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $course
-     *
      * @return array{smartyProperties: array{payload: StudentsProgressPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course
      */
     public static function getStudentsInformationForSmarty(
         \OmegaUp\Request $r
@@ -2907,10 +2909,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $student
-     *
      * @return array{smartyProperties: array{payload: StudentProgressPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course
+     * @omegaup-request-param string $student
      */
     public static function getStudentProgressForSmarty(
         \OmegaUp\Request $r
@@ -3139,9 +3141,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $course
-     *
      * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course
      */
     public static function getCourseStatisticsForSmarty(
         \OmegaUp\Request $r
@@ -3167,6 +3169,10 @@ class Course extends \OmegaUp\Controllers\Controller {
                         $r->identity
                     ),
                     'problemStats' => \OmegaUp\DAO\Assignments::getAssignmentsProblemsStatistics(
+                        $course->course_id,
+                        $course->group_id
+                    ),
+                    'verdicts' => \OmegaUp\DAO\Assignments::getAssignmentVerdictDistribution(
                         $course->course_id,
                         $course->group_id
                     ),
@@ -3229,10 +3235,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      *
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param string $course_alias
-     *
      * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
      */
     public static function getIntroDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -3437,9 +3443,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiRegisterForCourse(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -3584,9 +3590,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns all details of a given Course
      *
-     * @omegaup-request-param mixed $alias
-     *
      * @return CourseDetails
+     *
+     * @omegaup-request-param string $alias
      */
     public static function apiAdminDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -3605,9 +3611,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a report with all user activity for a course.
      *
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{events: list<array{username: string, ip: int, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>}
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiActivityReport(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3784,9 +3790,9 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return array{admin: bool, alias: string, assignment_type: null|string, courseAssignments: list<CourseAssignment>, description: null|string, director: string, finish_time: \OmegaUp\Timestamp|null, name: string, problems: list<ProblemsetProblem>, problemset_id: int, start_time: \OmegaUp\Timestamp}
      *
-     * @omegaup-request-param mixed $assignment
-     * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $token
+     * @omegaup-request-param string $assignment
+     * @omegaup-request-param string $course
+     * @omegaup-request-param null|string $token
      */
     public static function apiAssignmentDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -3951,8 +3957,10 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns all runs for a course
      *
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course_alias
+     * @return array{runs: list<Run>}
+     *
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
      * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param mixed $offset
      * @omegaup-request-param null|string $problem_alias
@@ -3960,8 +3968,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param 'compiling'|'new'|'ready'|'running'|'waiting'|null $status
      * @omegaup-request-param null|string $username
      * @omegaup-request-param 'AC'|'CE'|'JE'|'MLE'|'NO-AC'|'OLE'|'PA'|'RFE'|'RTE'|'TLE'|'VE'|'WA'|null $verdict
-     *
-     * @return array{runs: list<Run>}
      */
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Authenticate request
@@ -4009,8 +4015,8 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @omegaup-request-param mixed $assignment_alias
-     * @omegaup-request-param mixed $course_alias
+     * @omegaup-request-param string $assignment_alias
+     * @omegaup-request-param string $course_alias
      * @omegaup-request-param 'c11-clang'|'c11-gcc'|'cat'|'cpp11-clang'|'cpp11-gcc'|'cpp17-clang'|'cpp17-gcc'|'cs'|'hs'|'java'|'kj'|'kp'|'lua'|'pas'|'py2'|'py3'|'rb'|null $language
      * @omegaup-request-param int $offset
      * @omegaup-request-param null|string $problem_alias
@@ -4111,9 +4117,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns details of a given course
      *
-     * @omegaup-request-param mixed $alias
-     *
      * @return CourseDetails
+     *
+     * @omegaup-request-param string $alias
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
@@ -4146,10 +4152,10 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param 'private'|'public'|'registration'|null $admission_mode
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param null|string $description
      * @omegaup-request-param OmegaUp\Timestamp|null $finish_time
-     * @omegaup-request-param mixed $name
+     * @omegaup-request-param null|string $name
      * @omegaup-request-param bool|null $needs_basic_information
      * @omegaup-request-param 'no'|'optional'|'required'|null $requests_user_information
      * @omegaup-request-param int $school_id
@@ -4217,11 +4223,11 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Gets Scoreboard for an assignment
      *
-     * @omegaup-request-param mixed $assignment
-     * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $token
-     *
      * @return Scoreboard
+     *
+     * @omegaup-request-param string $assignment
+     * @omegaup-request-param string $course
+     * @omegaup-request-param null|string $token
      */
     public static function apiAssignmentScoreboard(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -4279,13 +4285,13 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns the Scoreboard events
      *
-     * @omegaup-request-param mixed $assignment
-     * @omegaup-request-param mixed $course
-     * @omegaup-request-param mixed $token
-     *
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
      * @return array{events: list<ScoreboardEvent>}
+     *
+     * @omegaup-request-param string $assignment
+     * @omegaup-request-param string $course
+     * @omegaup-request-param null|string $token
      */
     public static function apiAssignmentScoreboardEvents(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -4327,9 +4333,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems solved by users of a course
      *
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{user_problems: array<string, list<array{alias: string, title: string, username: string}>>}
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiListSolvedProblems(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -4360,9 +4366,9 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Get Problems unsolved by users of a course
      *
-     * @omegaup-request-param mixed $course_alias
-     *
      * @return array{user_problems: array<string, list<array{alias: string, title: string, username: string}>>}
+     *
+     * @omegaup-request-param string $course_alias
      */
     public static function apiListUnsolvedProblems(\OmegaUp\Request $r): array {
         $r->ensureIdentity();

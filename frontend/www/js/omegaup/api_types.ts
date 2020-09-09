@@ -877,15 +877,16 @@ export namespace types {
               return x;
             });
           })(x.runs);
-        x.solvers = ((x) => {
-          if (!Array.isArray(x)) {
-            return x;
-          }
-          return x.map((x) => {
-            x.time = ((x: number) => new Date(x * 1000))(x.time);
-            return x;
-          });
-        })(x.solvers);
+        if (x.solvers)
+          x.solvers = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              x.time = ((x: number) => new Date(x * 1000))(x.time);
+              return x;
+            });
+          })(x.solvers);
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
@@ -1739,6 +1740,7 @@ export namespace types {
   export interface CourseProblemStatistics {
     assignment_alias: string;
     average?: number;
+    avg_runs?: number;
     high_score_percentage?: number;
     low_score_percentage?: number;
     max_points: number;
@@ -1754,9 +1756,18 @@ export namespace types {
     username: string;
   }
 
+  export interface CourseProblemVerdict {
+    assignment_alias: string;
+    problem_alias: string;
+    problem_id: number;
+    runs: number;
+    verdict?: string;
+  }
+
   export interface CourseStatisticsPayload {
     course: types.CourseDetails;
     problemStats: types.CourseProblemStatistics[];
+    verdicts: types.CourseProblemVerdict[];
   }
 
   export interface CourseStudent {
@@ -2045,7 +2056,7 @@ export namespace types {
     problem: types.ProblemInfo;
     runs?: types.Run[];
     solutionStatus?: string;
-    solvers: types.BestSolvers[];
+    solvers?: types.BestSolvers[];
     user: types.UserInfoForProblem;
   }
 
@@ -2136,6 +2147,7 @@ export namespace types {
       time_limit: string;
     };
     points: number;
+    preferred_language?: string;
     problem_id: number;
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;

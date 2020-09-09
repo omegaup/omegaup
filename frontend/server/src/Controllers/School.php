@@ -121,13 +121,13 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Api to create new school
      *
-     * @omegaup-request-param mixed $country_id
-     * @omegaup-request-param mixed $name
-     * @omegaup-request-param mixed $state_id
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{school_id: int}
+     *
+     * @omegaup-request-param null|string $country_id
+     * @omegaup-request-param string $name
+     * @omegaup-request-param null|string $state_id
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureIdentity();
@@ -139,7 +139,7 @@ class School extends \OmegaUp\Controllers\Controller {
         );
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['state_id'],
-            'country_id'
+            'state_id'
         );
 
         $state = null;

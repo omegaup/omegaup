@@ -55,13 +55,13 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * New group
      *
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $name
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param string $description
+     * @omegaup-request-param string $name
      */
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
@@ -118,12 +118,12 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Add identity to group
      *
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $usernameOrEmail
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiAddUser(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -168,12 +168,12 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Remove user from group
      *
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $usernameOrEmail
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiRemoveUser(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -237,11 +237,11 @@ class Group extends \OmegaUp\Controllers\Controller {
      * Returns a list of groups that match a partial name. This returns an
      * array instead of an object since it is used by typeahead.
      *
-     * @omegaup-request-param mixed $query
-     *
      * @param \OmegaUp\Request $r
      *
      * @return list<array{label: string, value: string}>
+     *
+     * @omegaup-request-param null|string $query
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -268,11 +268,11 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Details of a group (scoreboards)
      *
-     * @omegaup-request-param mixed $group_alias
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<array{alias: string, create_time: string, description: null|string, name: string}>}
+     *
+     * @omegaup-request-param string $group_alias
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -315,11 +315,11 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Members of a group (usernames only).
      *
-     * @omegaup-request-param mixed $group_alias
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{identities: list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>}
+     *
+     * @omegaup-request-param string $group_alias
      */
     public static function apiMembers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -345,12 +345,12 @@ class Group extends \OmegaUp\Controllers\Controller {
     /**
      * Create a scoreboard set to a group
      *
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $description
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $name
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $alias
+     * @omegaup-request-param null|string $description
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param string $name
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
         $r->ensureIdentity();

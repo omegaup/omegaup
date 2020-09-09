@@ -79,10 +79,10 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $group_alias
+     * @omegaup-request-param null|string $contest_alias
+     * @omegaup-request-param null|string $group_alias
      * @omegaup-request-param bool|null $only_ac
-     * @omegaup-request-param mixed $scoreboard_alias
+     * @omegaup-request-param null|string $scoreboard_alias
      * @omegaup-request-param float $weight
      */
     public static function apiAddContest(\OmegaUp\Request $r): array {
@@ -125,13 +125,13 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Add contest to a group scoreboard
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $scoreboard_alias
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{status: string}
+     *
+     * @omegaup-request-param null|string $contest_alias
+     * @omegaup-request-param null|string $group_alias
+     * @omegaup-request-param null|string $scoreboard_alias
      */
     public static function apiRemoveContest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -178,12 +178,12 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      * Details of a scoreboard. Returns a list with all contests that belong to
      * the given scoreboard_alias
      *
-     * @omegaup-request-param mixed $group_alias
-     * @omegaup-request-param mixed $scoreboard_alias
-     *
      * @param \OmegaUp\Request $r
      *
      * @return array{ranking: list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>, scoreboard: array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}, contests: list<array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}>}
+     *
+     * @omegaup-request-param null|string $group_alias
+     * @omegaup-request-param null|string $scoreboard_alias
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -268,9 +268,9 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Details of a scoreboard
      *
-     * @omegaup-request-param mixed $group_alias
-     *
      * @return array{scoreboards: list<array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}>}
+     *
+     * @omegaup-request-param null|string $group_alias
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
