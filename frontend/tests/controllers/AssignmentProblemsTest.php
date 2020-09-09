@@ -496,7 +496,9 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'user' => $user,
             'identity' => $identities[]
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'username' => 'user0',
+        ]));
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $identities[0]
@@ -505,7 +507,9 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'user' => $user,
             'identity' => $identities[]
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'username' => 'user1',
+        ]));
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $identities[1]
@@ -599,8 +603,8 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemsData[1]['problem']->alias,
               ],
               [
-                'verdict' => 'TLE',
-                'runs' => 1,
+                'verdict' => 'CE',
+                'runs' => 2,
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[1]['problem']->problem_id,
                 'problem_alias' => $problemsData[1]['problem']->alias,
@@ -613,8 +617,8 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'problem_alias' => $problemsData[1]['problem']->alias,
               ],
               [
-                'verdict' => 'CE',
-                'runs' => 2,
+                'verdict' => 'TLE',
+                'runs' => 1,
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[1]['problem']->problem_id,
                 'problem_alias' => $problemsData[1]['problem']->alias,

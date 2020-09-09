@@ -34,7 +34,7 @@ export default class Statistics extends Vue {
   @Prop() problemStats!: types.CourseProblemStatistics[];
   @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
-  //chart options
+  // chart options
   selected = this.varianceChartOptions;
   options = [
     { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
@@ -52,7 +52,7 @@ export default class Statistics extends Vue {
     { value: this.runsChartOptions, text: T.courseStatisticsAverageRuns },
     { value: this.verdictChartOptions, text: T.courseStatisticsVerdicts },
   ];
-  //get chart options
+  // get chart options
   get varianceChartOptions() {
     return this.createChartOptions(
       T.courseStatisticsScoreVariance,
@@ -156,7 +156,7 @@ export default class Statistics extends Vue {
       series: this.verdictStats,
     };
   }
-  //helper functions
+  // helper functions
   get problems() {
     return this.problemStats.map(
       (problem) => `${problem.assignment_alias} - ${problem.problem_alias}`,
@@ -176,16 +176,23 @@ export default class Statistics extends Vue {
     }
     return max;
   }
+  get problemIndices() {
+    const indices: {
+      [assignmentAlias: string]: { [problemAlias: string]: number };
+    } = {};
+    this.problemStats.forEach((problem, index) => {
+      if (!indices.hasOwnProperty(problem.assignment_alias))
+        indices[problem.assignment_alias] = {};
+      indices[problem.assignment_alias][problem.problem_alias] = index;
+    });
+    return indices;
+  }
   get runsPerAssignment() {
     const problems: string[] = this.problems;
-    let runSum: number[] = [];
-    for (let i = 0; i < problems.length; i++) {
-      runSum.push(0);
-    }
+    let runSum: number[] = new Array(problems.length).fill(0);
     for (const stat of this.verdicts) {
-      runSum[
-        problems.indexOf(`${stat.assignment_alias} - ${stat.problem_alias}`)
-      ] += stat.runs;
+      runSum[this.problemIndices[stat.assignment_alias][stat.problem_alias]] +=
+        stat.runs;
     }
     return runSum;
   }
@@ -199,34 +206,28 @@ export default class Statistics extends Vue {
   }
   get verdictStats() {
     let verdicts: string[] = this.verdictList;
-    let runs: number[][] = [];
     const assignmentRuns: number[] = this.runsPerAssignment;
-    const problems: string[] = this.problems;
+    const problemCount: number = this.problems.length;
     let series: { name: string; data: number[] }[] = [];
-    //if no runs, return 0 for each problem
-    if (!verdicts) {
-      for (let i = 0; i < problems.length; i++) {
-        series.push({
-          name: 'WA',
-          data: [0],
-        });
-      }
-      return series;
-    }
-    //create zero-d out runs 2D array
-    for (let i = 0; i < verdicts.length; i++) {
-      runs[i] = new Array(problems.length).fill(0);
-    }
-    //fill runs with verdict runs
+    const indices = this.problemIndices;
+    const verdictIndices: { [verdict: string]: number } = {};
+    verdicts.forEach((verdict, index) => {
+      verdictIndices[verdict] = index;
+    });
+    // create zero-d out runs 2D array
+    const runs: number[][] = verdicts.map(() =>
+      new Array(problemCount).fill(0),
+    );
+    // fill runs with verdict runs
     for (const stat of this.verdicts) {
       if (!stat.verdict) break;
-      runs[verdicts.indexOf(stat.verdict)][
-        problems.indexOf(`${stat.assignment_alias} - ${stat.problem_alias}`)
+      runs[verdictIndices[stat.verdict]][
+        indices[stat.assignment_alias][stat.problem_alias]
       ] += stat.runs;
     }
-    //turn verdict run sums to percent
-    for (let i = 0; i < verdicts.length; i++) {
-      for (let j = 0; j < problems.length; j++) {
+    // turn verdict run sums to percent
+    for (let i = 0; i < runs.length; i++) {
+      for (let j = 0; j < runs[i].length; j++) {
         if (assignmentRuns[j])
           runs[i][j] = parseFloat(
             ((runs[i][j] / assignmentRuns[j]) * 100).toFixed(1),
@@ -255,10 +256,10 @@ export default class Statistics extends Vue {
       parseFloat((problem[name] || 0).toFixed(1)),
     );
   }
-  //yLabel = '{y}' or '{y} %'
-  //yName = data type (percentage, score, etc.)
-  //data = getStatistics("chart_type")
-  //yMax = get maxPoints() or getMaxStat
+  // yLabel = '{y}' or '{y} %'
+  // yName = data type (percentage, score, etc.)
+  // data = getStatistics("chart_type")
+  // yMax = get maxPoints() or getMaxStat
   createChartOptions(
     title: string,
     yLabel: string,
