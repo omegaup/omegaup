@@ -103,8 +103,7 @@ function escapeCsv(cell: any): string {
   ) {
     return cell;
   }
-  return cell;
-  //return '"' + cell.replace('"', '""') + '"';
+  return '"' + cell.replace('"', '""') + '"';
 }
 
 function escapeXml(str: string): string {
