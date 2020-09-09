@@ -1,8 +1,6 @@
 <template>
-  <form data-run-submit v-on:submit.prevent="onSubmit" v-show="showForm">
-    <div class="close-container">
-      <button class="close" v-on:click="$emit('dismiss')">❌</button>
-    </div>
+  <form data-run-submit v-on:submit.prevent="onSubmit">
+    <button class="close">❌</button>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">
         {{ T.wordsLanguage }}
@@ -10,7 +8,6 @@
       <div class="col-sm-4">
         <select class="form-control" name="language" v-model="selectedLanguage">
           <option
-            v-bind:key="key"
             v-bind:value="key"
             v-for="(language, key) in allowedLanguages"
             >{{ language }}</option
@@ -57,7 +54,7 @@
             "
             v-on:emit-finish="now = Date.now()"
           ></omegaup-countdown>
-          <span v-else>{{ T.wordsSend }}</span>
+          <span v-else="">{{ T.wordsSend }}</span>
         </button>
       </div>
     </div>
@@ -91,17 +88,12 @@ export default class ArenaRunSubmit extends Vue {
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop() preferredLanguage!: string;
-  @Prop({ default: true }) initialShowForm!: boolean;
 
   T = T;
   omegaup = omegaup;
-  selectedLanguage = this.preferredLanguage;
+  selectedLanguage = '';
   code = '';
   now: number = Date.now();
-
-  get showForm(): boolean {
-    return this.initialShowForm;
-  }
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() < this.now;

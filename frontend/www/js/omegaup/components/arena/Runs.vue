@@ -176,7 +176,6 @@
                     ? `#problems/${problemAlias}/new-run`
                     : `/arena/${contestAlias}/`
                 "
-                v-on:click="$emit('new-submission')"
                 v-else
                 >{{
                   isProblemsetOpened
@@ -313,7 +312,6 @@ caption {
   border: 1px solid #ccc;
   border-width: 1px 0;
   text-align: center;
-  padding: 0.15rem;
 }
 
 .runs tfoot td a {
@@ -400,7 +398,6 @@ export default class Runs extends Vue {
   filterVerdict: string = '';
   filterContest: string = '';
   filters: { name: string; value: string }[] = [];
-  showOverlay = false;
 
   get filteredRuns(): types.Run[] {
     if (
