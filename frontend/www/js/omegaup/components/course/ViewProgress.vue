@@ -14,6 +14,7 @@
                 <tr>
                   <th class="text-center">{{ T.wordsName }}</th>
                   <th
+                    v-bind:key="assignment.alias"
                     class="score text-center"
                     v-for="assignment in assignments"
                   >
@@ -102,7 +103,8 @@ function escapeCsv(cell: any): string {
   ) {
     return cell;
   }
-  return '"' + cell.replace('"', '""') + '"';
+  return cell;
+  //return '"' + cell.replace('"', '""') + '"';
 }
 
 function escapeXml(str: string): string {

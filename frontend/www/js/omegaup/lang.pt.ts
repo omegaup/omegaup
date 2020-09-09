@@ -1053,6 +1053,8 @@ const translations: { [key: string]: string; } = {
   statementLanguagePt: "Portugu\u00eas",
   statementNotFound: "Declara\u00e7\u00e3o do problema n\u00e3o foi encontrado.",
   studentCourseInformationDescription: "Aqui voc\u00ea encontrar\u00e1 a lista de cursos nos quais est\u00e1 matriculado.",
+  studentProgressDescription: "Ponto: %(score) of %(points) pontos poss\u00edveis.<br />Progresso: %(progress)%",
+  studentProgressTooltipDescription: "Problema: %(problem)<br />Ponto: %(score) of %(points) pontos poss\u00edveis.<br />Progresso: %(progress)%",
   submissionMemoryInMegabytes: "%(value) MiB",
   submissionRunTimeInSeconds: "%(value) s",
   submissionsListTitle: "Submiss\u00f5es realizadas nas \u00faltimas 24 horas",
