@@ -1,6 +1,8 @@
 <template>
   <form data-run-submit v-on:submit.prevent="onSubmit">
-    <button class="close">❌</button>
+    <div class="close-container">
+      <button class="close">❌</button>
+    </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">
         {{ T.wordsLanguage }}
