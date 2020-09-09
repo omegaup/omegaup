@@ -13,7 +13,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
  * @psalm-type ProblemSettings=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettings, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
- * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettings, source: null|string, statement: ProblemStatement, title: string, visibility: int}
+ * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettings, source: null|string, statement: ProblemStatement, title: string, visibility: int}
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
@@ -31,7 +31,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
  * @psalm-type ProblemDetailsPayload=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettings, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
- * @psalm-type ProblemDetailsv2Payload=array{allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers: list<BestSolvers>, user: UserInfoForProblem}
+ * @psalm-type ProblemDetailsv2Payload=array{allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers?: list<BestSolvers>, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -4476,6 +4476,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         ) === 2,
                         'commit' => $details['commit'],
                         'languages' => $details['languages'],
+                        'preferred_language' => $details['preferred_language'] ?? null,
                         'limits' => [
                             'input_limit' => (
                                 $details['input_limit'] / 1024
@@ -4505,9 +4506,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'accepts_submissions' => $details['accepts_submissions'],
                         'input_limit' => $details['input_limit'],
                     ],
-                    'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
-                        intval($problem->problem_id)
-                    ),
                     'user' => [
                         'loggedIn' => false,
                         'admin' => false,
