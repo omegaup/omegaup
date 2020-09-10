@@ -13,9 +13,9 @@ namespace OmegaUp\DAO;
  */
 class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
     /**
-     * @return list<array{alias: string, classname: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
+     * @return list<array{alias: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
      */
-    public static function GetSubmissionsForProblemset(int $problemsetId): array {
+    public static function getSubmissionsForProblemset(int $problemsetId): array {
         $sql = 'SELECT
                     i.username,
                     p.alias,
@@ -40,7 +40,8 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                                 1
                         ),
                         "user-rank-unranked"
-                    ) `classname`
+                    ) `classname`,
+                    "submit" AS eventType
                 FROM
                     Submission_Log sl
                 INNER JOIN
@@ -61,19 +62,40 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                     `time`;';
         $val = [$problemsetId];
 
-        /** @var list<array{alias: string, classname: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{alias: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
-     * @return list<array{alias: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
+     * @return list<array{alias: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
      */
-    final public static function GetSubmissionsForCourse(int $courseId): array {
+    final public static function getSubmissionsForCourse(int $courseId): array {
         $sql = 'SELECT
                     i.username,
                     p.alias,
                     sl.ip,
-                    sl.`time`
+                    sl.`time`,
+                    IFNULL(
+                        (
+                            SELECT `urc`.classname FROM
+                                `User_Rank_Cutoffs` urc
+                            WHERE
+                                `urc`.score <= (
+                                        SELECT
+                                            `ur`.`score`
+                                        FROM
+                                            `User_Rank` `ur`
+                                        WHERE
+                                            `ur`.user_id = `i`.`user_id`
+                                    )
+                            ORDER BY
+                                `urc`.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        "user-rank-unranked"
+                    ) `classname`,
+                    "submit" AS eventType
                 FROM
                     Submission_Log sl
                 INNER JOIN
@@ -96,7 +118,7 @@ class SubmissionLog extends \OmegaUp\DAO\Base\SubmissionLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        /** @var list<array{alias: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{alias: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
