@@ -2,7 +2,7 @@ ALTER TABLE
     `Tags`
 ADD COLUMN
     `icon` varchar(50) DEFAULT NULL COMMENT 'Indica el icono del tag según el tipo de problemLevel que represente';
-    
+
 UPDATE
     `Tags`
 SET
