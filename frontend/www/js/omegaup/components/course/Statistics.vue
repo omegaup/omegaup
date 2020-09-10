@@ -189,11 +189,11 @@ export default class Statistics extends Vue {
   }
   get runsPerAssignment() {
     const problems: string[] = this.problems;
+    const problemIndices = this.problemIndices();
     let runSum: number[] = new Array(problems.length).fill(0);
     for (const stat of this.verdicts) {
-      runSum[
-        this.problemIndices()[stat.assignment_alias][stat.problem_alias]
-      ] += stat.runs;
+      runSum[problemIndices[stat.assignment_alias][stat.problem_alias]] +=
+        stat.runs;
     }
     return runSum;
   }
@@ -206,11 +206,11 @@ export default class Statistics extends Vue {
     return verdicts;
   }
   get verdictStats() {
-    let verdicts: string[] = this.verdictList();
+    const verdicts: string[] = this.verdictList();
     const assignmentRuns: number[] = this.runsPerAssignment;
     const problemCount: number = this.problems.length;
     let series: { name: string; data: number[] }[] = [];
-    const indices = this.problemIndices;
+    const indices = this.problemIndices();
     const verdictIndices: { [verdict: string]: number } = {};
     verdicts.forEach((verdict, index) => {
       verdictIndices[verdict] = index;
@@ -223,7 +223,7 @@ export default class Statistics extends Vue {
     for (const stat of this.verdicts) {
       if (!stat.verdict) break;
       runs[verdictIndices[stat.verdict]][
-        indices()[stat.assignment_alias][stat.problem_alias]
+        indices[stat.assignment_alias][stat.problem_alias]
       ] += stat.runs;
     }
     // turn verdict run sums to percent
