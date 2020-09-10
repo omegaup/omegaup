@@ -131,7 +131,7 @@ export default class StudentProgress extends Vue {
     return ui.formatString(T.studentProgressDescription, {
       score: score,
       points: points,
-      progress: points != 0 ? ((score / points) * 100).toFixed(2) : 0,
+      progress: (points != 0 ? (score / points) * 100 : 0).toFixed(2),
     });
   }
 
