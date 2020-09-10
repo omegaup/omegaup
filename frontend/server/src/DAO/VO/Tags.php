@@ -19,6 +19,7 @@ class Tags extends \OmegaUp\DAO\VO\VO {
         'tag_id' => true,
         'name' => true,
         'public' => true,
+        'icon' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -46,6 +47,11 @@ class Tags extends \OmegaUp\DAO\VO\VO {
                 $data['public']
             );
         }
+        if (isset($data['icon'])) {
+            $this->icon = is_scalar(
+                $data['icon']
+            ) ? strval($data['icon']) : '';
+        }
     }
 
     /**
@@ -70,4 +76,11 @@ class Tags extends \OmegaUp\DAO\VO\VO {
      * @var bool
      */
     public $public = false;
+
+    /**
+     * Indica el icono del tag según el tipo de problemLevel que represente
+     *
+     * @var string|null
+     */
+    public $icon = null;
 }
