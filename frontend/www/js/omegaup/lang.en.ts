@@ -1055,6 +1055,8 @@ const translations: { [key: string]: string; } = {
   statementLanguagePt: "Portuguese",
   statementNotFound: "Problem statement not found.",
   studentCourseInformationDescription: "Here you will find the list of courses that you are enrolled in.",
+  studentProgressDescription: "Score: %(score) of %(points) possible points.  Progress: %(progress)%",
+  studentProgressTooltipDescription: "Problem: %(problem)  Score: %(score) of %(points) possible points.  Progress: %(progress)%",
   submissionMemoryInMegabytes: "%(value) MiB",
   submissionRunTimeInSeconds: "%(value) s",
   submissionsListTitle: "Submissions on the last 24 hours",
