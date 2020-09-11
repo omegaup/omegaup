@@ -2,49 +2,34 @@
 
 namespace OmegaUp;
 
+/**
+ *
+ * @psalm-type Event=array{name: string, problem?: string}
+ * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int, time: \OmegaUp\Timestamp, username: string}
+ *
+ */
 class ActivityReport {
     /**
-     * @param list<array{alias?: string, classname?: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $accesses
-     * @param list<array{alias?: string, classname?: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $submissions
+     * @param list<array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $accesses
+     * @param list<array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $submissions
      *
-     * @return list<array{username: string, ip: int, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>
+     * @return list<ActivityEvent>
      */
     final public static function getActivityReport(
         array $accesses,
         array $submissions
     ): array {
-        // Merge both logs.
-        $events = [];
-        $lenAccesses = count($accesses);
-        $lenSubmissions = count($submissions);
-        $iAccesses = 0;
-        $iSubmissions = 0;
+        $events = array_merge($accesses, $submissions);
 
-        while ($iAccesses < $lenAccesses && $iSubmissions < $lenSubmissions) {
-            if ($accesses[$iAccesses]['time'] < $submissions[$iSubmissions]['time']) {
-                $events[] = self::processData(
-                    $accesses[$iAccesses++]
-                );
-            } else {
-                $events[] = self::processData(
-                    $submissions[$iSubmissions++],
-                    true
-                );
-            }
-        }
-
-        while ($iAccesses < $lenAccesses) {
-            $events[] = self::processData(
-                $accesses[$iAccesses++]
-            );
-        }
-
-        while ($iSubmissions < $lenSubmissions) {
-            $events[] = self::processData(
-                $submissions[$iSubmissions++],
-                true
-            );
-        }
+        usort(
+            $events,
+            /**
+             * @param array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string} $a
+             * @param array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string} $b
+             */
+            fn (array $a, array $b) => $a['time'] <=> $b['time']
+        );
+        $events = array_map(fn ($event) => self::processData($event), $events);
 
         // Anonymize data.
         /** @var array<int, int> */
@@ -63,27 +48,22 @@ class ActivityReport {
     }
 
     /**
-     * @param array{username: string, ip: int, time: \OmegaUp\Timestamp, classname?: string, alias?: string} $data
-     * @param bool $isSubmission
-     * @return array{username: string, classname?: string, time: \OmegaUp\Timestamp, ip: int, event: array{name: string, problem?: string}}
+     * @param array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string} $data
+     * @return ActivityEvent
      */
-    private static function processData(
-        array $data,
-        bool $isSubmission = false
-    ): array {
+    private static function processData(array $data): array {
+        $event = ['name' => $data['eventType']];
+        if ($data['eventType'] === 'submit') {
+            if (isset($data['alias'])) {
+                $event['problem'] = $data['alias'];
+            }
+        }
         return [
             'username' => $data['username'],
-            'classname' => $data['classname'] ?? 'user-rank-unranked',
+            'classname' => $data['classname'],
             'time' => $data['time'],
-            'ip' => intval($data['ip']),
-            'event' => $isSubmission ?
-                [
-                    'name' => 'submit',
-                    'problem' => $data['alias'] ?? '',
-                ] :
-                [
-                    'name' => 'open',
-                ],
+            'ip' => $data['ip'],
+            'event' => $event,
         ];
     }
 }

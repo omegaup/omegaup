@@ -45,6 +45,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
+ * @psalm-type Event=array{name: string, problem?: string}
+ * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -3186,6 +3189,53 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course
+     */
+    public static function getActivityFeedDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
+                $courseAlias
+            )
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'alias' => $courseAlias,
+                    'events' => \OmegaUp\ActivityReport::getActivityReport(
+                        \OmegaUp\DAO\ProblemsetAccessLog::getAccessForCourse(
+                            $course->course_id
+                        ),
+                        \OmegaUp\DAO\SubmissionLog::getSubmissionsForCourse(
+                            $course->course_id
+                        )
+                    ),
+                    'type' => 'course',
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'wordsActivityReport'
+                ),
+            ],
+            'entrypoint' => 'activity_feed',
+        ];
+    }
+
+    /**
      * @param CoursesList $courses
      * @param list<string> $coursesTypes
      *
@@ -3635,7 +3685,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $accesses = \OmegaUp\DAO\ProblemsetAccessLog::getAccessForCourse(
             $course->course_id
         );
-        $submissions = \OmegaUp\DAO\SubmissionLog::GetSubmissionsForCourse(
+        $submissions = \OmegaUp\DAO\SubmissionLog::getSubmissionsForCourse(
             $course->course_id
         );
 

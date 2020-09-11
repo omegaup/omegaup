@@ -13,9 +13,9 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
     /**
-     * @return list<array{classname: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
+     * @return list<array{classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
      */
-    public static function GetAccessForProblemset(int $problemsetId) {
+    public static function getAccessForProblemset(int $problemsetId) {
         $sql = 'SELECT
                     i.username,
                     pal.ip,
@@ -39,7 +39,8 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                                 1
                         ),
                         "user-rank-unranked"
-                    ) `classname`
+                    ) `classname`,
+                    "open" AS eventType
                 FROM
                     Problemset_Access_Log pal
                 INNER JOIN
@@ -51,18 +52,39 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                 ORDER BY `time`;';
         $val = [$problemsetId];
 
-        /** @var list<array{classname: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $val);
     }
 
     /**
-     * @return list<array{ip: int, time: \OmegaUp\Timestamp, username: string}>
+     * @return list<array{classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
      */
     final public static function getAccessForCourse(int $courseId) {
         $sql = 'SELECT
                     i.username,
                     pal.ip,
-                    pal.`time`
+                    pal.`time`,
+                    IFNULL(
+                        (
+                            SELECT `urc`.classname FROM
+                                `User_Rank_Cutoffs` urc
+                            WHERE
+                                `urc`.score <= (
+                                        SELECT
+                                            `ur`.`score`
+                                        FROM
+                                            `User_Rank` `ur`
+                                        WHERE
+                                            `ur`.user_id = `i`.`user_id`
+                                    )
+                            ORDER BY
+                                `urc`.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        "user-rank-unranked"
+                    ) `classname`,
+                    "open" AS eventType
                 FROM
                     Problemset_Access_Log pal
                 INNER JOIN
@@ -77,7 +99,7 @@ class ProblemsetAccessLog extends \OmegaUp\DAO\Base\ProblemsetAccessLog {
                     a.course_id = ?
                 ORDER BY
                     `time`;';
-        /** @var list<array{ip: int, time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId]
