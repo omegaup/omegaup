@@ -20,7 +20,7 @@
           {{ tab.text }}
           <span
             class="clarifications-count"
-            v-bind:class="{ 'font-weight-bold': !clarificationsTabVisited }"
+            v-bind:class="{ 'font-weight-bold': hasUnreadClarifications }"
             v-if="tab.name === 'clarifications'"
             >{{ clarificationsCount }}</span
           >
@@ -262,14 +262,16 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop() initialTab!: string;
+  @Prop() activeTab!: string;
 
   T = T;
   ui = ui;
   time = time;
-  selectedTab = this.initialTab;
+  selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
-  clarificationsTabVisited = false;
+  hasUnreadClarifications =
+    this.initialClarifications.length > 0 &&
+    this.activeTab !== 'clarifications';
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -302,21 +304,24 @@ export default class ProblemDetails extends Vue {
     return `(${this.clarifications.length})`;
   }
 
-  onTabSelected(tabName: string): void {
+  @Emit('update:activeTab')
+  onTabSelected(tabName: string): string {
     if (this.selectedTab === 'clarifications') {
-      this.clarificationsTabVisited = true;
+      this.hasUnreadClarifications = false;
     }
     this.selectedTab = tabName;
-  }
-
-  @Watch('selectedTab')
-  onSelectedTabChanged(newValue: string, oldValue: string): void {
-    this.$emit('tab-selected', newValue);
+    return this.selectedTab;
   }
 
   @Watch('initialClarifications')
-  onClarificationsChanged(newValue: types.Clarification[]): void {
+  onInitialClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
+  }
+
+  @Watch('clarifications')
+  onClarificationsChanged(newValue: types.Clarification[]): void {
+    if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
+    this.hasUnreadClarifications = true;
   }
 }
 </script>
