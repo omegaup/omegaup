@@ -2572,7 +2572,9 @@ export namespace types {
 
   export interface StudentProgress {
     name?: string;
+    points: { [key: string]: { [key: string]: number } };
     progress: { [key: string]: { [key: string]: number } };
+    score: { [key: string]: { [key: string]: number } };
     username: string;
   }
 
