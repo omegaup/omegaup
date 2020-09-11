@@ -2,6 +2,7 @@ import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
+import { Arena, GetOptionsFromLocation } from '../arena/arena';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -15,6 +16,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
+          initialTab: this.initialTab,
           allRuns: payload.allRuns,
           problem: payload.problem,
           runs: payload.runs,
@@ -177,6 +179,10 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'tab-selected': (tabName: string) => {
+            arenaInstance.activeTab = tabName;
+            window.location.replace(`#${arenaInstance.activeTab}`);
+          },
         },
       });
     },
@@ -186,9 +192,14 @@ OmegaUp.on('ready', () => {
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
       allTokens: 0,
+      initialTab: window.location.hash
+        ? window.location.hash.substr(1).split('/')[0]
+        : 'problems',
     },
     components: {
       'omegaup-problem-details': problem_Details,
     },
   });
+
+  const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
 });
