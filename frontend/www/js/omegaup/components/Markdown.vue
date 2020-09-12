@@ -151,7 +151,8 @@ export default class Markdown extends Vue {
   @Prop() markdown!: string;
   @Ref() root!: HTMLElement;
   @Prop({ default: null }) imageMapping!: markdown.ImageMapping | null;
-  @Prop({ default: null }) problemSettings!: types.ProblemSettings | null;
+  @Prop({ default: null })
+  problemSettings!: types.ProblemSettingsDistrib | null;
   @Prop({ default: false }) preview!: boolean;
 
   markdownConverter = new markdown.Converter({ preview: this.preview });

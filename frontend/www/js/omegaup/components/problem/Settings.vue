@@ -150,7 +150,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
-export default class ProblemSettings extends Vue {
+export default class Settings extends Vue {
   @Prop() timeLimit!: number;
   @Prop() extraWallTime!: number;
   @Prop() memoryLimit!: number;
