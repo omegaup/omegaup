@@ -57,6 +57,16 @@
     border-radius: 6px;
     display: block;
     line-height: 125%;
+    & > button.clipboard {
+      float: right;
+      border-color: rgb(218, 224, 229);
+    }
+  }
+  & > pre > button {
+    margin-right: -16px;
+    margin-top: -16px;
+    padding: 6px;
+    font-size: 90%;
   }
 
   figure {
@@ -100,6 +110,11 @@
       border: 0px;
       padding: 0px;
       margin: inherit;
+      & > button {
+        margin-left: 2em;
+        padding: 3px;
+        font-size: 80%;
+      }
     }
   }
 
@@ -134,7 +149,10 @@
 <script lang="ts">
 import { Vue, Component, Emit, Prop, Ref, Watch } from 'vue-property-decorator';
 import * as markdown from '../markdown';
+import * as ui from '../ui';
 import { types } from '../api_types';
+
+import T from '../lang';
 
 declare global {
   interface Window {
@@ -187,6 +205,30 @@ export default class Markdown extends Vue {
   @Emit('rendered')
   private renderMathJax(): void {
     this.root.innerHTML = this.html;
+    this.root
+      .querySelectorAll(
+        '[data-markdown-statement] > pre, .sample_io > tbody > tr > td:first-of-type > pre',
+      )
+      .forEach((preElement) => {
+        if (!preElement.firstChild) {
+          return;
+        }
+        const inputValue = (<HTMLPreElement>preElement).innerText;
+
+        const clipboardButton = document.createElement('button');
+        clipboardButton.appendChild(document.createTextNode('📋'));
+        clipboardButton.title = T.wordsCopyToClipboard;
+        clipboardButton.className =
+          'glyphicon glyphicon-copy clipboard btn btn-light';
+
+        clipboardButton.addEventListener('click', (event: Event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          ui.copyToClipboard(inputValue);
+        });
+
+        preElement.insertBefore(clipboardButton, preElement.firstChild);
+      });
     if (!window.MathJax?.startup) {
       window.MathJax = {
         tex: {
