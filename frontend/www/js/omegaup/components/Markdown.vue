@@ -3,6 +3,8 @@
 </template>
 
 <style lang="scss">
+@import '../../../../../node_modules/prismjs/themes/prism.css';
+
 [data-markdown-statement] {
   display: block;
   max-width: 50em;
@@ -49,6 +51,11 @@
   }
 
   pre {
+    padding: 16px;
+    background: #eee;
+    margin: 1em 0;
+    border-radius: 6px;
+    display: block;
     line-height: 125%;
   }
 
