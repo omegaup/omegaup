@@ -233,7 +233,6 @@ const translations: { [key: string]: string; } = {
   contestWillBeginIn: "Concurso inciar\u00e1 em ",
   contestsCreateNew: "Criar um novo concurso",
   contestsJoinScoreboards: "Juntar paineis de avalia\u00e7\u00e3o",
-  copySampleCaseTooltip: "Copie esta entrada de amostra",
   courseAddContent: "Adicionar conte\u00fado",
   courseAddProblemsAdd: "Adicionar problemas",
   courseAddProblemsAddAssignmentDesc: "Adicione todos os problemas que voc\u00ea deseja incluir na tarefa. Esses problemas ser\u00e3o armazenados at\u00e9 voc\u00ea pressionar o bot\u00e3o Agendar atribui\u00e7\u00e3o. Se voc\u00ea ainda n\u00e3o decidir quais problemas usar, poder\u00e1 adicion\u00e1-los mais tarde.",

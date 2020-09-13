@@ -233,7 +233,6 @@ const translations: { [key: string]: string; } = {
   contestWillBeginIn: "This contest will begin in ",
   contestsCreateNew: "Create a new contest",
   contestsJoinScoreboards: "Merge scoreboards",
-  copySampleCaseTooltip: "Copy this sample input",
   courseAddContent: "Add content",
   courseAddProblemsAdd: "Add problems",
   courseAddProblemsAddAssignmentDesc: "Add all the problems that you want include to the assignment. These problems will be stored until you press Schedule assignment button. If you do not want to decide which problems to use right now, you can add them later.",
