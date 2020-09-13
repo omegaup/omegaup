@@ -2173,6 +2173,46 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Gets the problem settings for the problem, using the cache if needed.
+     *
+     * @return ProblemSettings
+     */
+    private static function getProblemSettings(
+        \OmegaUp\DAO\VO\Problems $problem,
+        string $commit
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::PROBLEM_SETTINGS,
+            "{$problem->alias}-{$problem->commit}",
+            fn () => \OmegaUp\Controllers\Problem::getProblemSettingsImpl([
+                'alias' => strval($problem->alias),
+                'commit' => $problem->commit,
+            ]),
+            APC_USER_CACHE_PROBLEM_STATEMENT_TIMEOUT
+        );
+    }
+
+    /**
+     * Gets the problem settings for the problem.
+     *
+     * @param array{alias: string, commit: string} $params
+     *
+     * @return ProblemSettings
+     */
+    public static function getProblemSettingsImpl(array $params): array {
+        /** @var ProblemSettings */
+        return json_decode(
+            (new \OmegaUp\ProblemArtifacts(
+                $params['alias'],
+                $params['commit']
+            ))->get(
+                'settings.json'
+            ),
+            /*assoc=*/true
+        );
+    }
+
+    /**
      * Gets the distributable problem settings for the problem, using the cache
      * if needed.
      *
