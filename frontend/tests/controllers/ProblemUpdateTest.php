@@ -314,6 +314,42 @@ class ProblemUpdateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(1, $detourGrader->getGraderCallCount());
     }
 
+    public function testUpdateValidatorTimeout() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_validator.zip',
+                'validator' => 'custom',
+            ])
+        );
+        $problemAlias = $problemData['request']['problem_alias'];
+
+        // Call API to update time limit.
+        $newTimeLimit = 12345;
+        $login = self::login($problemData['author']);
+        $response = \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'validator_time_limit' => $newTimeLimit,
+            'problem_alias' => $problemAlias,
+            'message' => 'Changed time limit',
+        ]));
+        $this->assertTrue($response['rejudged']);
+
+        // Verify problem settings were set.
+        {
+            $problemArtifacts = new \OmegaUp\ProblemArtifacts($problemAlias);
+            $problemSettings = json_decode(
+                $problemArtifacts->get(
+                    'settings.json'
+                ),
+                /*$assoc=*/true
+            );
+            $this->assertEquals(
+                ($newTimeLimit / 1000.0) . 's',
+                $problemSettings['Validator']['Limits']['TimeLimit']
+            );
+        }
+    }
+
     public function testUpdateProblemWithValidLanguages() {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
