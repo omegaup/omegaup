@@ -178,6 +178,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update:activeTab': (tabName: string) => {
+            window.location.replace(`#${tabName}`);
+          },
         },
       });
     },
