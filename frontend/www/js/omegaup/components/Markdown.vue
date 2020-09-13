@@ -4,6 +4,7 @@
 
 <style lang="scss">
 @import '../../../../../node_modules/prismjs/themes/prism.css';
+@import '../../../sass/main.scss';
 
 [data-markdown-statement] {
   display: block;
@@ -72,6 +73,17 @@
   figure {
     text-align: center;
     page-break-inside: avoid;
+  }
+
+  details {
+    padding: 16px;
+    border: 1px solid #eee;
+    summary {
+      color: $omegaup-blue;
+    }
+    &[open] > summary {
+      margin-bottom: 24px;
+    }
   }
 
   table td {

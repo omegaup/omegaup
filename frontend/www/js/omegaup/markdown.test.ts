@@ -38,6 +38,12 @@ describe('markdown', () => {
         </figure></p>`);
     });
 
+    it('Should handle details/summary tags', () => {
+      expect(
+        converter.makeHtml('<details><summary>SPOILER</summary>Hi</details>'),
+      ).toEqual('<p><details><summary>SPOILER</summary>Hi</details></p>');
+    });
+
     it('Should handle sample I/O tables', () => {
       expect(
         converter.makeHtml(`# Ejemplo
