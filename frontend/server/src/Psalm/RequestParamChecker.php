@@ -39,6 +39,26 @@ class RequestParamChecker implements
     ];
 
     /**
+     * A mapping of \OmegaUp\Validator::validateXxx() methods to the type that they
+     * are enforcing the API parameter to be.
+     */
+    const VALIDATOR_TYPE_MAPPING = [
+        'OmegaUp\\Validators::validatenumber' => 'int',
+        'OmegaUp\\Validators::validatenumberinrange' => 'int',
+        'OmegaUp\\Validators::validateoptionalnumber' => 'int|null',
+        'OmegaUp\\Validators::validateemail' => 'string',
+        'OmegaUp\\Validators::validatestringnonempty' => 'string',
+        'OmegaUp\\Validators::validatestringoflengthinrange' => 'string|null',
+        'OmegaUp\\Validators::validateoptionalstringnonempty' => 'string|null',
+        'OmegaUp\\Validators::validatevalidalias' => 'string|null',
+        'OmegaUp\\Validators::validatevalidnamespacedalias' => 'string',
+        'OmegaUp\\Validators::validatevalidusernameidentity' => 'string',
+        'OmegaUp\\Validators::validatedate' => 'string',
+        'OmegaUp\\Validators::validateoptionaldate' => 'string|null',
+        'OmegaUp\\Validators::validatetimestampinrange' => '\\OmegaUp\\Timestamp',
+    ];
+
+    /**
      * Registers the fact that $functionId expects a parameter of name
      * $parameterName to have the specified $type.
      *
@@ -444,6 +464,73 @@ class RequestParamChecker implements
                 $functionId,
                 $expr->args[0]->value->value,
                 \Psalm\Type::parseString(self::ENSURE_TYPE_MAPPING[$method_id]),
+                $codebase
+            );
+            return;
+        }
+        if (array_key_exists($method_id, self::VALIDATOR_TYPE_MAPPING)) {
+            if (!$expr->args[1]->value instanceof \PhpParser\Node\Scalar\String_) {
+                if (
+                    // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
+                    strpos($functionId, 'omegaup\\request::') !== 0 &&
+                    strpos($functionId, 'omegaup\\validators::') !== 0 &&
+                    \Psalm\IssueBuffer::accepts(
+                        new RequestAccessNotALiteralString(
+                            "{$method_id}() second argument not a literal string",
+                            new \Psalm\CodeLocation($statements_source, $expr)
+                        ),
+                        $statements_source->getSuppressedIssues()
+                    )
+                ) {
+                    // do nothing
+                }
+                return;
+            }
+            if (
+                !$expr->args[0]->value instanceof \PhpParser\Node\Expr\ArrayDimFetch ||
+                !$expr->args[0]->value->var instanceof \PhpParser\Node\Expr\Variable ||
+                $expr->args[0]->value->var->name != 'r'
+            ) {
+                // This is not a Request access.
+                return;
+            }
+            if (!$expr->args[0]->value->dim instanceof \PhpParser\Node\Scalar\String_) {
+                if (
+                    // Methods within \OmegaUp\Request or \OmegaUp\Validators are exempt
+                    strpos($functionId, 'omegaup\\request::') !== 0 &&
+                    strpos($functionId, 'omegaup\\validators::') !== 0 &&
+                    \Psalm\IssueBuffer::accepts(
+                        new RequestAccessNotALiteralString(
+                            "{$method_id}() second argument not a literal string",
+                            new \Psalm\CodeLocation($statements_source, $expr)
+                        ),
+                        $statements_source->getSuppressedIssues()
+                    )
+                ) {
+                    // do nothing
+                }
+                return;
+            }
+            if ($expr->args[0]->value->dim->value != $expr->args[1]->value->value) {
+                if (
+                    \Psalm\IssueBuffer::accepts(
+                        new RequestAccessNotALiteralString(
+                            "{$method_id}() second argument and \$r[] argument do not match",
+                            new \Psalm\CodeLocation($statements_source, $expr)
+                        ),
+                        $statements_source->getSuppressedIssues()
+                    )
+                ) {
+                    // do nothing
+                }
+                return;
+            }
+            self::processParameter(
+                $functionId,
+                $expr->args[1]->value->value,
+                \Psalm\Type::parseString(
+                    self::VALIDATOR_TYPE_MAPPING[$method_id]
+                ),
                 $codebase
             );
             return;

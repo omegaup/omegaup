@@ -185,7 +185,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         GROUP BY
             `i`.`identity_id`, `pr`.`assignment_id`, `pr`.`problem_id`, verdict
         ORDER BY
-            pr.order, pr.problem_id;
+            pr.order, pr.problem_id, `pr`.`assignment_id`, `i`.`username`, verdict;
         ';
 
         /** @var list<array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}> */

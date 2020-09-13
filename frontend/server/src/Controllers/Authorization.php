@@ -7,11 +7,11 @@
  */
 class Authorization extends \OmegaUp\Controllers\Controller {
     /**
-     * @omegaup-request-param mixed $problem_alias
+     * @return array{has_solved: bool, is_admin: bool, can_view: bool, can_edit: bool}
+     *
+     * @omegaup-request-param null|string $problem_alias
      * @omegaup-request-param string $token
      * @omegaup-request-param mixed $username
-     *
-     * @return array{has_solved: bool, is_admin: bool, can_view: bool, can_edit: bool}
      */
     public static function apiProblem(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateValidAlias(
