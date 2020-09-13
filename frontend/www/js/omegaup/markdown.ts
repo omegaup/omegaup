@@ -14,7 +14,7 @@ export interface ConverterOptions {
 
 export class Converter {
   private _converter: Markdown.Converter;
-  private _settings?: types.ProblemSettings;
+  private _settings?: types.ProblemSettingsDistrib;
   private _imageMapping?: ImageMapping;
 
   constructor(options: ConverterOptions = {}) {
@@ -424,7 +424,7 @@ export class Converter {
   public makeHtmlWithImages(
     markdown: string,
     imageMapping: ImageMapping,
-    settings?: types.ProblemSettings,
+    settings?: types.ProblemSettingsDistrib,
   ): string {
     try {
       this._imageMapping = imageMapping;

@@ -1,18 +1,29 @@
 <template>
-  <div>
-    <ul class="nav justify-content-center nav-tabs" role="tablist">
-      <li class="nav-item" v-for="tab in availableTabs" v-bind:key="tab.name">
+  <div class="mt-4">
+    <ul class="nav justify-content-center nav-tabs">
+      <li
+        class="nav-item"
+        role="tablist"
+        v-for="tab in availableTabs"
+        v-bind:key="tab.name"
+      >
         <a
-          href="#"
+          v-bind:href="`#${tab.name}`"
           class="nav-link"
           data-toggle="tab"
           role="tab"
           v-bind:aria-controls="tab.name"
           v-bind:class="{ active: selectedTab === tab.name }"
           v-bind:aria-selected="selectedTab === tab.name"
-          v-on:click="selectedTab = tab.name"
+          v-on:click="onTabSelected(tab.name)"
         >
           {{ tab.text }}
+          <span
+            class="clarifications-count"
+            v-bind:class="{ 'font-weight-bold': hasUnreadClarifications }"
+            v-if="tab.name === 'clarifications'"
+            >{{ clarificationsCount }}</span
+          >
         </a>
       </li>
     </ul>
@@ -272,14 +283,18 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
   @Prop() showNewRunWindow!: boolean;
+  @Prop() activeTab!: string;
 
   T = T;
   ui = ui;
   time = time;
-  selectedTab = 'problems';
+  selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
   showOverlay = false;
   showFormRunSubmit = false;
+  hasUnreadClarifications =
+    this.initialClarifications.length > 0 &&
+    this.activeTab !== 'clarifications';
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -307,6 +322,11 @@ export default class ProblemDetails extends Vue {
     return tabs.filter((tab) => tab.visible);
   }
 
+  get clarificationsCount(): string {
+    if (this.clarifications.length === 0) return '';
+    return `(${this.clarifications.length})`;
+  }
+
   onNewSubmission(): void {
     this.showOverlay = true;
     this.showFormRunSubmit = true;
@@ -323,8 +343,17 @@ export default class ProblemDetails extends Vue {
     this.onDismissPopup();
   }
 
+  @Emit('update:activeTab')
+  onTabSelected(tabName: string): string {
+    if (this.selectedTab === 'clarifications') {
+      this.hasUnreadClarifications = false;
+    }
+    this.selectedTab = tabName;
+    return this.selectedTab;
+  }
+
   @Watch('initialClarifications')
-  onClarificationsChanged(newValue: types.Clarification[]): void {
+  onInitialClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
   }
 
@@ -332,6 +361,12 @@ export default class ProblemDetails extends Vue {
   onShowNewRunWindowChanged(newValue: boolean): void {
     if (!newValue) return;
     this.onNewSubmission();
+  }
+
+  @Watch('clarifications')
+  onClarificationsChanged(newValue: types.Clarification[]): void {
+    if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
+    this.hasUnreadClarifications = true;
   }
 }
 </script>

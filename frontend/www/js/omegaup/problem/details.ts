@@ -16,6 +16,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
+          activeTab: this.activeTab,
           allRuns: payload.allRuns,
           problem: payload.problem,
           runs: payload.runs,
@@ -182,6 +183,9 @@ OmegaUp.on('ready', () => {
           'dismiss-popup': () => {
             window.location.replace(`#${arenaInstance.activeTab}`);
           },
+          'update:activeTab': (tabName: string) => {
+            window.location.replace(`#${tabName}`);
+          },
         },
       });
     },
@@ -192,6 +196,9 @@ OmegaUp.on('ready', () => {
       availableTokens: 0,
       allTokens: 0,
       showNewRunWindow: false,
+      activeTab: window.location.hash
+        ? window.location.hash.substr(1).split('/')[0]
+        : 'problems',
     },
     components: {
       'omegaup-problem-details': problem_Details,
