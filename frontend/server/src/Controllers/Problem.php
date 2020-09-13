@@ -456,6 +456,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ]);
 
         $problemSettings = self::getDefaultProblemSettings();
+        unset($problemSettings['Cases']);
         self::updateProblemSettings($problemSettings, $params);
         $acceptsSubmissions = $languages !== '';
 
@@ -1345,51 +1346,45 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Returns whether $a and $b are different.
      *
-     * @param array{limits: LimitsSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}} $a
-     * @param array{limits: LimitsSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}} $b
+     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $a
+     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}, Name: string, Tolerance: float}} $b
      */
     private static function diffProblemSettings(array $a, array $b): bool {
-        if (self::diffLimitsSettings($a['limits'], $b['limits'])) {
+        if (self::diffLimitsSettings($a['Limits'], $b['Limits'])) {
             return true;
         }
-        if ($a['validator']['name'] !== $b['validator']['name']) {
+        if ($a['Validator']['Name'] !== $b['Validator']['Name']) {
             return true;
         }
         if (
-            isset($a['validator']['tolerance']) !==
-            isset($b['validator']['tolerance'])
+            isset($a['Validator']['Tolerance']) !==
+            isset($b['Validator']['Tolerance'])
         ) {
             return true;
         }
         if (
-            isset($a['validator']['tolerance']) &&
-            isset($b['validator']['tolerance']) &&
-            $a['validator']['tolerance'] !== $b['validator']['tolerance']
+            isset($a['Validator']['Tolerance']) &&
+            isset($b['Validator']['Tolerance']) &&
+            $a['Validator']['Tolerance'] !== $b['Validator']['Tolerance']
         ) {
             return true;
         }
         if (
-            empty($a['validator']['custom_validator']) !==
-            empty($b['validator']['custom_validator'])
+            empty($a['Validator']['Limits']) !==
+            empty($b['Validator']['Limits'])
         ) {
             return true;
         }
         if (
-            empty($a['validator']['custom_validator']['limits']) !==
-            empty($b['validator']['custom_validator']['limits'])
-        ) {
-            return true;
-        }
-        if (
-            empty($a['validator']['custom_validator']['limits']) ||
-            empty($b['validator']['custom_validator']['limits'])
+            empty($a['Validator']['Limits']) ||
+            empty($b['Validator']['Limits'])
         ) {
             // No further checks are necessary.
             return false;
         }
         return self::diffLimitsSettings(
-            $a['validator']['custom_validator']['limits'],
-            $b['validator']['custom_validator']['limits']
+            $a['Validator']['Limits'],
+            $b['Validator']['Limits']
         );
     }
 
@@ -1449,11 +1444,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'rejudged' => false,
         ];
 
-        $problemSettings = self::getProblemSettingsDistrib(
+        $problemSettings = self::getProblemSettings(
             $problem,
             $problem->commit
         );
-        unset($problemSettings['cases']);
+        unset($problemSettings['Cases']);
         $originalProblemSettings = self::arrayDeepCopy($problemSettings);
         self::updateProblemSettings($problemSettings, $params);
         $settingsUpdated = self::diffProblemSettings(
@@ -4122,20 +4117,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Gets a Problem settings object with default values.
      *
-     * @return array{limits: LimitsSettings, validator: array{name: string, tolerance: float}} The Problem settings object.
+     * @return ProblemSettings The Problem settings object.
      */
     private static function getDefaultProblemSettings(): array {
         return [
-            'limits' => [
+            'Cases' => [],
+            'Limits' => [
                 'ExtraWallTime' => '0s',
                 'MemoryLimit' => '64MiB',
                 'OutputLimit' => '10240KiB',
                 'OverallWallTimeLimit' => '30s',
                 'TimeLimit' => '1s',
             ],
-            'validator' => [
-                'name' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
-                'tolerance' => 1e-9,
+            'Slow' => false,
+            'Validator' => [
+                'Name' => \OmegaUp\ProblemParams::VALIDATOR_TOKEN,
+                'Tolerance' => 1e-9,
             ],
         ];
     }
@@ -4143,42 +4140,39 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * Updates the Problem's settings with the values from the request.
      *
-     * @param array{limits: LimitsSettings, validator: array{name: string, tolerance?: float, custom_validator?: array{source: string, language: string, limits?: LimitsSettings}}} $problemSettings the original problem settings.
+     * @param array{Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}} $problemSettings the original problem settings.
      * @param \OmegaUp\ProblemParams $params the params
-     * @psalm-suppress ReferenceConstraintViolation for some reason, psalm cannot correctly infer the type for $problemSettings['validator']['limit']
+     * @psalm-suppress ReferenceConstraintViolation for some reason, psalm cannot correctly infer the type for $problemSettings['Validator']['Limit']
      */
     private static function updateProblemSettings(
         array &$problemSettings,
         \OmegaUp\ProblemParams $params
     ): void {
         if (!is_null($params->extraWallTime)) {
-            $problemSettings['limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
+            $problemSettings['Limits']['ExtraWallTime'] = "{$params->extraWallTime}ms";
         }
         if (!is_null($params->memoryLimit)) {
-            $problemSettings['limits']['MemoryLimit'] = "{$params->memoryLimit}KiB";
+            $problemSettings['Limits']['MemoryLimit'] = "{$params->memoryLimit}KiB";
         }
         if (!is_null($params->outputLimit)) {
-            $problemSettings['limits']['OutputLimit'] = "{$params->outputLimit}";
+            $problemSettings['Limits']['OutputLimit'] = "{$params->outputLimit}";
         }
         if (!is_null($params->memoryLimit)) {
-            $problemSettings['limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
+            $problemSettings['Limits']['OverallWallTimeLimit'] = "{$params->overallWallTimeLimit}ms";
         }
         if (!is_null($params->timeLimit)) {
-            $problemSettings['limits']['TimeLimit'] = "{$params->timeLimit}ms";
+            $problemSettings['Limits']['TimeLimit'] = "{$params->timeLimit}ms";
         }
         if (!is_null($params->validator)) {
-            $problemSettings['validator']['name'] = "{$params->validator}";
+            $problemSettings['Validator']['Name'] = "{$params->validator}";
         }
-        if ($problemSettings['validator']['name'] === 'custom') {
-            if (empty($problemSettings['validator']['custom_validator'])) {
-                $problemSettings['validator']['custom_validator'] = [];
-            }
+        if ($problemSettings['Validator']['Name'] === 'custom') {
             if (
                 empty(
-                    $problemSettings['validator']['custom_validator']['limits']
+                    $problemSettings['Validator']['Limits']
                 )
             ) {
-                $problemSettings['validator']['custom_validator']['limits'] = [
+                $problemSettings['Validator']['Limits'] = [
                     'ExtraWallTime' => '0s',
                     'MemoryLimit' => '256MiB',
                     'OutputLimit' => '10KiB',
@@ -4186,10 +4180,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'TimeLimit' => '30s',
                 ];
             }
-            $problemSettings['validator']['custom_validator']['limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
+            $problemSettings['Validator']['Limits']['TimeLimit'] = "{$params->validatorTimeLimit}ms";
         } else {
-            if (!empty($problemSettings['validator']['custom_validator'])) {
-                unset($problemSettings['validator']['custom_validator']);
+            if (!empty($problemSettings['Validator']['Limits'])) {
+                unset($problemSettings['Validator']['Limits']);
             }
         }
     }
