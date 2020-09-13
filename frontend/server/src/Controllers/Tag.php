@@ -65,4 +65,42 @@ class Tag extends \OmegaUp\Controllers\Controller {
             'problemTag'
         );
     }
+
+    public static function getFrequentTagsByLevel(
+        int $level
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TAGS_LIST,
+            "frequent",
+            fn () => \OmegaUp\DAO\Tags::getFrequentsByLevel(
+                $level
+            ),
+            APC_USER_CACHE_SESSION_TIMEOUT
+        );
+    }
+
+    /**
+     * Return most frequent public tags of a certain level
+     * 
+     * @return array{status: string}
+     */
+    public static function apiFrequentTags(\OmegaUp\Request $r): array {
+        $param = '';
+        if (is_int($r['level'])) {
+            $param = $r['level'];
+        } else {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterEmpty',
+                'level'
+            );
+        }
+
+        $response = [];
+        foreach (self::getFrequentTagsByLevel($param) as $tag) {
+            $response[] = [
+                'name' => strval($tag->name),
+            ];
+        }
+        return $response;
+    }
 }
