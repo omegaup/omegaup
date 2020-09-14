@@ -180,11 +180,13 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'dismiss-popup': () => {
-            window.location.replace(`#${arenaInstance.activeTab}`);
-          },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
+          },
+          'redirect-login-page': () => {
+            window.location.href = `/login/?redirect=${escape(
+              window.location.pathname,
+            )}`;
           },
         },
       });
@@ -204,31 +206,4 @@ OmegaUp.on('ready', () => {
       'omegaup-problem-details': problem_Details,
     },
   });
-
-  const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
-  arenaInstance.renderProblem(payload.problem);
-
-  const onlyProblemHashChanged = () => {
-    if (arenaInstance.activeTab !== 'problems') {
-      return;
-    }
-    detectNewRun();
-  };
-
-  const detectNewRun = () => {
-    if (window.location.hash.indexOf('/new-run') === -1) return;
-    if (!payload.user.loggedIn) {
-      window.location.href = `/login/?redirect=${escape(
-        window.location.pathname,
-      )}`;
-    }
-    problemDetails.showNewRunWindow = true;
-  };
-
-  window.addEventListener('hashchange', () => {
-    onlyProblemHashChanged();
-  });
-
-  // Everything is loaded
-  onlyProblemHashChanged();
 });

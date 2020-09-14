@@ -93,6 +93,7 @@
           "
         ></omegaup-quality-nomination-demotion>
         <omegaup-quality-nomination-promotion
+          v-if="this.user.loggedIn"
           v-bind:can-nominate-problem="nominationStatus.canNoominateProblem"
           v-bind:dismissed="nominationStatus.dismissed"
           v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
@@ -293,7 +294,7 @@ export default class ProblemDetails extends Vue {
   showOverlay = false;
   showFormRunSubmit = false;
   hasUnreadClarifications =
-    this.initialClarifications.length > 0 &&
+    this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
 
   get availableTabs(): Tab[] {
@@ -328,6 +329,9 @@ export default class ProblemDetails extends Vue {
   }
 
   onNewSubmission(): void {
+    if (!this.user.loggedIn) {
+      this.$emit('redirect-login-page');
+    }
     this.showOverlay = true;
     this.showFormRunSubmit = true;
   }
@@ -335,7 +339,7 @@ export default class ProblemDetails extends Vue {
   onDismissPopup(): void {
     this.showOverlay = false;
     this.showFormRunSubmit = false;
-    this.$emit('dismiss-popup');
+    this.$emit('update:activeTab', this.selectedTab);
   }
 
   onSubmitRun(code: string, selectedLanguage: string): void {
