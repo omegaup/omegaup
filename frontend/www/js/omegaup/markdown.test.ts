@@ -38,6 +38,12 @@ describe('markdown', () => {
         </figure></p>`);
     });
 
+    it('Should handle details/summary tags', () => {
+      expect(
+        converter.makeHtml('<details><summary>SPOILER</summary>Hi</details>'),
+      ).toEqual('<p><details><summary>SPOILER</summary>Hi</details></p>');
+    });
+
     it('Should handle sample I/O tables', () => {
       expect(
         converter.makeHtml(`# Ejemplo
@@ -365,14 +371,14 @@ Tags &lt;b&gt;hello&lt;/b&gt;
       expect(
         converter.makeHtml('```ruby\ndef foo(x)\n  return 3\nend\n```'),
       ).toEqual(
-        '<pre><code class="language-ruby">def foo(x)\n  return 3\nend\n</code></pre>',
+        '<pre><code class="language-ruby"><span class="token keyword">def</span> <span class="token method-definition"><span class="token function">foo</span></span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n<span class="token keyword">end</span>\n</code></pre>',
       );
       expect(
         converter.makeHtml(
           '~~~~    ruby startline=3 $%@#$\ndef foo(x)\n  return 3\nend\n~~~~~~~',
         ),
       ).toEqual(
-        '<pre><code class="language-ruby">def foo(x)\n  return 3\nend\n</code></pre>',
+        '<pre><code class="language-ruby"><span class="token keyword">def</span> <span class="token method-definition"><span class="token function">foo</span></span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n<span class="token keyword">end</span>\n</code></pre>',
       );
       // Info strings for backtick code blocks cannot contain backticks.
       expect(converter.makeHtml('``` aa ```\nfoo')).toEqual(
@@ -391,6 +397,11 @@ Tags &lt;b&gt;hello&lt;/b&gt;
         converter.makeHtml('```\n<>&\n*foo* _bar_\n[img](img)\n\\\n```'),
       ).toEqual(
         '<pre><code>&lt;&gt;&amp;\n*foo* _bar_\n[img](img)\n\\\n</code></pre>',
+      );
+      expect(
+        converter.makeHtml('```python\ndef foo(x):\n  return 3\n```'),
+      ).toEqual(
+        '<pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre>',
       );
     });
   });
