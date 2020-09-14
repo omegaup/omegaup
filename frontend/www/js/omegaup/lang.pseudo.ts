@@ -1055,6 +1055,7 @@ const translations: { [key: string]: string; } = {
   statementNotFound: "(Pr0b13m 57a73m3n7 n07 f0und.)",
   studentCourseInformationDescription: "(H3r3 y0u wi11 find 7h3 1i57 0f c0ur535 7ha7 y0u ar3 3nr0113d in.)",
   studentProgressDescription: "(Sc0r3: %(score) 0f %(points) p055ib13 p0in75.  Pr0gr355: %(progress)%)",
+  studentProgressOnlyLecturesDescription: "(Thi5 a55ignm3n7 0n1y inc1ud35 13c7ur35)",
   studentProgressTooltipDescription: "(Pr0b13m: %(problem)  Sc0r3: %(score) 0f %(points) p055ib13 p0in75.  Pr0gr355: %(progress)%)",
   submissionMemoryInMegabytes: "(%(value) MiB)",
   submissionRunTimeInSeconds: "(%(value) 5)",

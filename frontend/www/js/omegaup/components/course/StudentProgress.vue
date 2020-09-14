@@ -17,15 +17,17 @@
         <div v-if="!student.progress.hasOwnProperty(assignment.alias)">
           {{ T.wordsProblemsUnsolved }}
         </div>
-        <div v-else class="d-flex border border-dark">
+        <div
+          v-else
+          class="d-flex border border-dark"
+          v-bind:class="{ invisible: points(assignment.alias) === 0 }"
+        >
           <div
             v-bind:key="index"
             v-for="(problem, index) in Object.keys(
               student.points[assignment.alias],
             )"
-            v-bind:class="
-              getProblemColor(getProgress(assignment.alias, problem))
-            "
+            v-bind:class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
             data-placement="bottom"
             v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
@@ -128,6 +130,9 @@ export default class StudentProgress extends Vue {
   getProgressDescription(assignmentAlias: string): string {
     const score = this.score(assignmentAlias);
     const points = this.points(assignmentAlias);
+    if (points === 0) {
+      return T.studentProgressOnlyLecturesDescription;
+    }
     return ui.formatString(T.studentProgressDescription, {
       score: score,
       points: points,
@@ -135,7 +140,12 @@ export default class StudentProgress extends Vue {
     });
   }
 
-  getProblemColor(problemScore: number): string {
+  getProblemColor(assignmentAlias: string, problemAlias: string): string {
+    const points = this.getPoints(assignmentAlias, problemAlias);
+    if (points === 0) {
+      return 'invisible';
+    }
+    const problemScore = this.getProgress(assignmentAlias, problemAlias);
     if (problemScore > 70) return 'box bg-green';
     if (problemScore >= 50) return 'box bg-yellow';
     if (problemScore > 0) return 'box bg-red';
