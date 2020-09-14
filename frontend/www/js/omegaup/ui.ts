@@ -228,32 +228,6 @@ export function copyToClipboard(value: string): void {
   }
 }
 
-export function renderSampleToClipboardButton(): void {
-  document
-    .querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
-    .forEach(function (item, index) {
-      const preElement = item.querySelector('pre');
-      if (!preElement) {
-        // This can only happen if a user messed up with the markdown of a
-        // problem.
-        return;
-      }
-      const inputValue = preElement.innerHTML;
-
-      const clipboardButton = document.createElement('button');
-      clipboardButton.title = T.copySampleCaseTooltip;
-      clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
-
-      clipboardButton.addEventListener('click', (event: Event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        copyToClipboard(inputValue);
-      });
-
-      item.appendChild(clipboardButton);
-    });
-}
-
 declare global {
   interface Window {
     ga?: (command: string, ...fields: any[]) => void;

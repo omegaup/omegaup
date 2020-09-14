@@ -1884,8 +1884,6 @@ export class Arena {
   }
 
   onProblemRendered(): void {
-    ui.renderSampleToClipboardButton();
-
     const libinteractiveInterfaceNameElement = <HTMLElement>(
       this.markdownView.$el.querySelector('span.libinteractive-interface-name')
     );

@@ -15,6 +15,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
+          activeTab: this.activeTab,
           allRuns: payload.allRuns,
           problem: payload.problem,
           runs: payload.runs,
@@ -177,6 +178,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update:activeTab': (tabName: string) => {
+            window.location.replace(`#${tabName}`);
+          },
         },
       });
     },
@@ -186,6 +190,9 @@ OmegaUp.on('ready', () => {
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
       allTokens: 0,
+      activeTab: window.location.hash
+        ? window.location.hash.substr(1).split('/')[0]
+        : 'problems',
     },
     components: {
       'omegaup-problem-details': problem_Details,
