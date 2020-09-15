@@ -281,6 +281,12 @@ class UITools {
 
         if (!is_null($entrypoint)) {
             if (
+                isset($smartyProperties['title'])  &&
+                is_object($smartyProperties['title']) &&
+                is_a($smartyProperties['title'], 'OmegaUp\TranslationString')
+            ) {
+                $titleVar = $smartyProperties['title']->message;
+            } elseif (
                 !isset($smartyProperties['title']) ||
                 !is_string($smartyProperties['title'])
             ) {
