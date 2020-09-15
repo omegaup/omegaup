@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showOverlay" data-overlay v-on:click="$emit('hide-overlay')">
+  <div v-if="isOverlayShown" data-overlay v-on:click="hideOverlay">
     <slot name="popup-content"></slot>
   </div>
 </template>
@@ -20,13 +20,18 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 
 @Component
 export default class Overlay extends Vue {
   @Prop({ default: false }) showOverlay!: boolean;
 
   isOverlayShown = this.showOverlay;
+
+  @Emit('overlay-hidden')
+  hideOverlay() {
+    this.isOverlayShown = false;
+  }
 
   @Watch('showOverlay')
   overlayVisibilityChanged(newValue: boolean): void {

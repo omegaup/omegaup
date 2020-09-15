@@ -113,7 +113,7 @@
         ></omegaup-quality-nomination-promotion>
         <omegaup-overlay
           v-bind:show-overlay="showOverlay"
-          v-on:hide-overlay="onDismissPopup"
+          v-on:overlay-hidden="onPopupDismissed"
           v-if="this.user.loggedIn"
         >
           <omegaup-arena-runsubmit
@@ -121,9 +121,9 @@
             v-bind:preferred-language="problem.preferred_language"
             v-bind:languages="problem.languages"
             v-bind:initial-show-form="showFormRunSubmit"
-            v-on:dismiss="onDismissPopup"
+            v-on:dismiss="onPopupDismissed"
             v-on:submit-run="
-              (code, selectedLanguage) => onSubmitRun(code, selectedLanguage)
+              (code, selectedLanguage) => onRunSubmitted(code, selectedLanguage)
             "
           ></omegaup-arena-runsubmit>
         </omegaup-overlay>
@@ -337,15 +337,15 @@ export default class ProblemDetails extends Vue {
     this.showFormRunSubmit = true;
   }
 
-  onDismissPopup(): void {
+  onPopupDismissed(): void {
     this.showOverlay = false;
     this.showFormRunSubmit = false;
     this.$emit('update:activeTab', this.selectedTab);
   }
 
-  onSubmitRun(code: string, selectedLanguage: string): void {
+  onRunSubmitted(code: string, selectedLanguage: string): void {
     this.$emit('submit-run', code, selectedLanguage);
-    this.onDismissPopup();
+    this.onPopupDismissed();
   }
 
   @Emit('update:activeTab')
