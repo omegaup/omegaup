@@ -4947,7 +4947,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $extraInfo
                 ),
                 'title' => new \OmegaUp\TranslationString(
-                    'problemEditEditProblem'
+                    'omegaupTitleProblemEdit'
                 ),
             ],
             'entrypoint' => 'problem_edit',
@@ -5234,6 +5234,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                             ],
                             self::getCommonPayloadForSmarty()
                         ),
+                        'title' => new \OmegaUp\TranslationString(
+                            'omegaupTitleProblemNew'
+                        ),
                     ],
                     'entrypoint' => 'problem_new',
                 ];
@@ -5274,6 +5277,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     ],
                     self::getCommonPayloadForSmarty()
+                ),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleProblemNew'
                 ),
             ],
             'entrypoint' => 'problem_new',
