@@ -113,6 +113,7 @@
         ></omegaup-quality-nomination-promotion>
         <omegaup-overlay
           v-bind:show-overlay="showOverlay"
+          v-on:hide-overlay="onDismissPopup"
           v-if="this.user.loggedIn"
         >
           <omegaup-arena-runsubmit
@@ -291,8 +292,8 @@ export default class ProblemDetails extends Vue {
   time = time;
   selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
-  showOverlay = false;
-  showFormRunSubmit = false;
+  showFormRunSubmit = this.showNewRunWindow;
+  showOverlay = this.showNewRunWindow;
   hasUnreadClarifications =
     this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';

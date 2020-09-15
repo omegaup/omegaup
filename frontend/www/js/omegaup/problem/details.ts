@@ -11,6 +11,7 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
+  const locationHash = window.location.hash.substr(1).split('/');
   const problemDetails = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -197,10 +198,8 @@ OmegaUp.on('ready', () => {
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
       allTokens: 0,
-      showNewRunWindow: false,
-      activeTab: window.location.hash
-        ? window.location.hash.substr(1).split('/')[0]
-        : 'problems',
+      showNewRunWindow: locationHash.includes('new-run'),
+      activeTab: window.location.hash ? locationHash[0] : 'problems',
     },
     components: {
       'omegaup-problem-details': problem_Details,
