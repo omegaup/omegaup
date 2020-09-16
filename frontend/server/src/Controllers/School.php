@@ -301,6 +301,9 @@ class School extends \OmegaUp\Controllers\Controller {
                         []
                     ),
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleSchoolsRank'
+                )
             ],
             'entrypoint' => 'schools_rank',
         ];
@@ -338,6 +341,9 @@ class School extends \OmegaUp\Controllers\Controller {
                     'candidatesToSchoolOfTheMonth' => \OmegaUp\DAO\SchoolOfTheMonth::getCandidatesToSchoolOfTheMonth(),
                     'isMentor' => $isMentor,
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleSchoolOfTheMonth'
+                )
             ],
             'entrypoint' => 'school_of_the_month',
         ];

@@ -3391,6 +3391,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         $filter === '' ? [] : [ 'filter' => $filter ]
                     ),
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUsersRank'
+                )
             ],
             'entrypoint' => 'users_rank',
         ];
@@ -3502,6 +3505,9 @@ class User extends \OmegaUp\Controllers\Controller {
                     ] : [],
                 ],
                 'fullWidth' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCommonIndex'
+                ),
             ],
             'entrypoint' => 'common_index',
         ];
