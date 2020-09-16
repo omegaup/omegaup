@@ -698,7 +698,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'isLogged' => !is_null($r->identity),
                     'contests' => $contests,
                 ],
-                'title' => new \OmegaUp\TranslationString('wordsContests'),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContest'
+                ),
             ],
             'entrypoint' => 'arena_contest_list',
         ];
@@ -771,6 +773,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestNew'
+                )
             ],
             'entrypoint' => 'contest_new',
         ];
