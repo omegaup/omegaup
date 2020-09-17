@@ -3364,13 +3364,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             && $requestUserInformation !== 'no'
             )
         ) {
-            $needsBasicInformation = $courseDetails['needs_basic_information']
-                && (!is_null($r->identity->country_id)
-                || !is_null(
-                    $r->identity->state_id
-                ) || !is_null(
-                    $r->identity->current_identity_school_id
-                ));
+            $needsBasicInformation = (
+                $courseDetails['needs_basic_information']
+                && (
+                    is_null($r->identity->country_id)
+                    || is_null($r->identity->state_id)
+                    || is_null($r->identity->current_identity_school_id)
+                )
+            );
 
             // Privacy Statement Information
             $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(
