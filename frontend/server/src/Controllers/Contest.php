@@ -489,7 +489,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get all the properties for smarty.
      *
-     * @return array{inContest: bool, smartyProperties: array{payload: ContestIntroPayload, title: string}, template: string}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: string}}
+     * @return array{inContest: bool, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}, template: string}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
