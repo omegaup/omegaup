@@ -13,7 +13,8 @@ class Course {
         string $requestsUserInformation = 'no',
         string $showScoreboard = 'false',
         ?int $courseDuration = 120,
-        ?string $courseAlias = null
+        ?string $courseAlias = null,
+        ?bool $needsBasicInformation = false
     ): array {
         if (is_null($admin)) {
             ['identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -53,6 +54,7 @@ class Course {
             'admission_mode' => $admissionMode,
             'requests_user_information' => $requestsUserInformation,
             'show_scoreboard' => $showScoreboard,
+            'needs_basic_information' => $needsBasicInformation,
         ]);
 
         \OmegaUp\Controllers\Course::apiCreate($r);
@@ -76,7 +78,8 @@ class Course {
         int $startTimeDelay = 0,
         ?int $courseDuration = 120,
         ?int $assignmentDuration = 120,
-        ?string $courseAlias = null
+        ?string $courseAlias = null,
+        ?bool $needsBasicInformation = false
     ) {
         if (is_null($admin)) {
             ['user' => $user, 'identity' => $admin] = \OmegaUp\Test\Factories\User::createUser();
@@ -91,7 +94,8 @@ class Course {
             $requestsUserInformation,
             $showScoreboard,
             $courseDuration,
-            $courseAlias
+            $courseAlias,
+            $needsBasicInformation
         );
         $courseAlias = $courseFactoryResult['course_alias'];
         $courseStartTime = intval(
