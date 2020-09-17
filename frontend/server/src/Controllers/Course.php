@@ -2584,7 +2584,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $token
@@ -2679,7 +2679,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseNewPayload, title:string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseNewPayload, title:\OmegaUp\TranslationString}}
      */
     public static function getCourseNewDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -2701,7 +2701,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course
      */
@@ -2736,7 +2736,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course
@@ -2822,7 +2822,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course
      */
@@ -2868,7 +2868,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: StudentsProgressPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: StudentsProgressPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      */
@@ -2909,7 +2909,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: StudentProgressPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: StudentProgressPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      * @omegaup-request-param string $student
@@ -2956,7 +2956,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCourseMineDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3020,7 +3020,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCourseListDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3060,7 +3060,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCourseSummaryListDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3141,7 +3141,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      */

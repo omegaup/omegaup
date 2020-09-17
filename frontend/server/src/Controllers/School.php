@@ -57,7 +57,7 @@ class School extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: SchoolProfileDetailsPayload}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: SchoolProfileDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param int $school_id
      */
@@ -113,6 +113,9 @@ class School extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => $payload,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleSchoolProfile'
+                ),
             ],
             'entrypoint' => 'school_profile',
         ];
@@ -265,7 +268,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for historical rank of schools with pagination
      *
-     * @return array{smartyProperties: array{payload: SchoolRankPayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: SchoolRankPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -312,7 +315,7 @@ class School extends \OmegaUp\Controllers\Controller {
     /**
      * Gets all the information to be sent to smarty for the tabs
      * of School of the Month
-     * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: SchoolOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getSchoolOfTheMonthDetailsForSmarty(\OmegaUp\Request $r): array {
         try {

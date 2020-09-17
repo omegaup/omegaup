@@ -489,7 +489,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get all the properties for smarty.
      *
-     * @return array{entrypoint?: string, inContest?: bool, smartyProperties: array{payload: ContestIntroPayload, title: string}, template?: string}
+     * @return array{inContest: bool, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}, template: string}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
@@ -602,7 +602,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ContestListPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ContestListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -707,7 +707,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ContestListMinePayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ContestListMinePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -762,7 +762,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ContestNewPayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ContestNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getContestNewForSmarty(
         \OmegaUp\Request $r
@@ -4209,7 +4209,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: StatsPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: StatsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param null|string $contest_alias
      */
