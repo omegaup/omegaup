@@ -680,7 +680,6 @@ class Run extends \OmegaUp\Controllers\Controller {
                     floatval($filtered['contest_score']),
                     2
                 );
-                $result['score'] = 1;
             } else {
                 $result['contest_score'] = 0;
                 $result['score'] = 0;

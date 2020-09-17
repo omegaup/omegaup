@@ -1,3 +1,12 @@
+import * as Prism from 'prismjs';
+import 'prismjs/components/prism-c.js';
+import 'prismjs/components/prism-cpp.js';
+import 'prismjs/components/prism-csharp.js';
+import 'prismjs/components/prism-java.js';
+import 'prismjs/components/prism-pascal.js';
+import 'prismjs/components/prism-python.js';
+import 'prismjs/components/prism-ruby.js';
+
 import * as Markdown from '@/third_party/js/pagedown/Markdown.Converter.js';
 import { getSanitizingConverter } from '@/third_party/js/pagedown/Markdown.Sanitizer.js';
 
@@ -14,7 +23,7 @@ export interface ConverterOptions {
 
 export class Converter {
   private _converter: Markdown.Converter;
-  private _settings?: types.ProblemSettings;
+  private _settings?: types.ProblemSettingsDistrib;
   private _imageMapping?: ImageMapping;
 
   constructor(options: ConverterOptions = {}) {
@@ -79,7 +88,7 @@ export class Converter {
       </div>`;
     }
 
-    const whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
+    const whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
     const imageWhitelist = new RegExp(
       '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',
       'i',
@@ -271,10 +280,47 @@ export class Converter {
           infoString: string,
           contents: string,
         ) => {
-          contents = contents
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
+          let className = '';
+          let language: string | null = null;
+          infoString = infoString.trim();
+          if (infoString != '') {
+            language = infoString.split(/\s+/)[0];
+            className = ` class="language-${language}"`;
+            const languageMapping: { [key: string]: string } = {
+              c: 'c',
+              'c11-clang': 'c',
+              'c11-gcc': 'c',
+              cpp: 'cpp',
+              'cpp11-clang': 'cpp',
+              'cpp11-gcc': 'cpp',
+              'cpp17-clang': 'cpp',
+              'cpp17-gcc': 'cpp',
+              cs: 'csharp',
+              hs: 'haskell',
+              pas: 'pascal',
+              py: 'python',
+              py2: 'python',
+              py3: 'python',
+              rb: 'ruby',
+              js: 'javascript',
+            };
+            if (languageMapping.hasOwnProperty(language)) {
+              language = languageMapping[language];
+            }
+          }
+
+          if (language && Prism.languages.hasOwnProperty(language)) {
+            contents = Prism.highlight(
+              contents,
+              Prism.languages[language],
+              language,
+            );
+          } else {
+            contents = contents
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+          }
           if (indentation != '') {
             let lines = [];
             let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
@@ -287,11 +333,6 @@ export class Converter {
               /*afterBackslash=*/ false,
               /*doNotEscapeTildeAnDollar=*/ true,
             );
-          }
-          let className = '';
-          infoString = infoString.trim();
-          if (infoString != '') {
-            className = ` class="language-${infoString.split(/\s+/)[0]}"`;
           }
           return `<pre><code${className}>${contents}</code></pre>`;
         };
@@ -424,7 +465,7 @@ export class Converter {
   public makeHtmlWithImages(
     markdown: string,
     imageMapping: ImageMapping,
-    settings?: types.ProblemSettings,
+    settings?: types.ProblemSettingsDistrib,
   ): string {
     try {
       this._imageMapping = imageMapping;

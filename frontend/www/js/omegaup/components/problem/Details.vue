@@ -20,7 +20,7 @@
           {{ tab.text }}
           <span
             class="clarifications-count"
-            v-bind:class="{ 'font-weight-bold': !clarificationsTabVisited }"
+            v-bind:class="{ 'font-weight-bold': hasUnreadClarifications }"
             v-if="tab.name === 'clarifications'"
             >{{ clarificationsCount }}</span
           >
@@ -325,20 +325,23 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop() initialTab!: string;
   @Prop() showNewRunWindow!: boolean;
   @Prop() showRunDetailsWindow!: boolean;
   @Prop() runDetails!: types.RunDetails;
+  @Prop() activeTab!: string;
 
   T = T;
   ui = ui;
   time = time;
-  selectedTab = this.initialTab;
+  selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
   showOverlay = false;
   showFormRunSubmit = false;
   showFormRunDetails = false;
   clarificationsTabVisited = false;
+  hasUnreadClarifications =
+    this.initialClarifications.length > 0 &&
+    this.activeTab !== 'clarifications';
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -369,13 +372,6 @@ export default class ProblemDetails extends Vue {
   get clarificationsCount(): string {
     if (this.clarifications.length === 0) return '';
     return `(${this.clarifications.length})`;
-  }
-
-  onTabSelected(tabName: string): void {
-    if (this.selectedTab === 'clarifications') {
-      this.clarificationsTabVisited = true;
-    }
-    this.selectedTab = tabName;
   }
 
   onNewSubmission(): void {
@@ -414,8 +410,17 @@ export default class ProblemDetails extends Vue {
     this.$emit('tab-selected', newValue);
   }
 
+  @Emit('update:activeTab')
+  onTabSelected(tabName: string): string {
+    if (this.selectedTab === 'clarifications') {
+      this.hasUnreadClarifications = false;
+    }
+    this.selectedTab = tabName;
+    return this.selectedTab;
+  }
+
   @Watch('initialClarifications')
-  onClarificationsChanged(newValue: types.Clarification[]): void {
+  onInitialClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
   }
 
@@ -429,6 +434,12 @@ export default class ProblemDetails extends Vue {
   onShowRunDetailsWindowChanged(newValue: boolean): void {
     if (!newValue) return;
     //this.onShowRunDetails();
+  }
+
+  @Watch('clarifications')
+  onClarificationsChanged(newValue: types.Clarification[]): void {
+    if (this.selectedTab === 'clarifications' || newValue.length === 0) return;
+    this.hasUnreadClarifications = true;
   }
 }
 </script>

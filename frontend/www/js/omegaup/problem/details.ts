@@ -22,8 +22,8 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
-          initialTab: this.initialTab,
-          allRuns: this.allRuns,
+          activeTab: this.activeTab,
+          allRuns: payload.allRuns,
           runDetails: this.runDetails,
           problem: payload.problem,
           runs: this.runs,
@@ -224,6 +224,9 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.ignoreError);
           },
+          'update:activeTab': (tabName: string) => {
+            window.location.replace(`#${tabName}`);
+          },
         },
       });
     },
@@ -236,11 +239,11 @@ OmegaUp.on('ready', () => {
       allRuns: <types.Run[]>payload.allRuns,
       runs: <types.Run[]>payload.runs,
       runDetails: <types.RunDetails | null>null,
-      initialTab: window.location.hash
-        ? window.location.hash.substr(1).split('/')[0]
-        : 'problems',
       showNewRunWindow: false,
       showRunDetailsWindow: false,
+      activeTab: window.location.hash
+        ? window.location.hash.substr(1).split('/')[0]
+        : 'problems',
     },
     components: {
       'omegaup-problem-details': problem_Details,
