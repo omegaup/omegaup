@@ -2159,6 +2159,11 @@ export namespace types {
     visibility: number;
   }
 
+  export interface ProblemListCollection {
+    levelTags: string[];
+    problemsAmount: number;
+  }
+
   export interface ProblemListItem {
     alias: string;
     difficulty?: number;

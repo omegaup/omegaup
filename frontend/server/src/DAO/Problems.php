@@ -1152,7 +1152,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
          /** @var int */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne(
             $sql,
-            $problemLevelTag
+            [$problemLevelTag]
         );
     }
 }
