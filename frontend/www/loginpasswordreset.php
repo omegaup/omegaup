@@ -13,6 +13,9 @@ if (!isset($_GET['email']) || !isset($_GET['reset_token'])) {
                 'email' => $_GET['email'],
                 'resetToken' => $_GET['reset_token']
             ],
+            'title' => new \OmegaUp\TranslationString(
+                'passwordResetResetTitle'
+            ),
         ],
         'entrypoint' => 'login_password_reset',
     ]

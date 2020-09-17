@@ -18,7 +18,8 @@ if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
         return [
             'smartyProperties' => [
                 'scripts' => $scripts,
-                'title' => new \OmegaUp\TranslationString('omegaupTitleLogout')
+                'payload' => [],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleLogout'),
             ],
             'entrypoint' => 'logout',
         ];
