@@ -4743,6 +4743,28 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     *
+     */
+    public static function getProblemCollectionDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
+                    'problemsAmount' => \OmegaUp\DAO\Problems::getAmountOfProblems(
+                        $r['problemLevelTag']
+                    )
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCollections'
+                ),
+            ],
+            'entrypoint' => 'problem_collections',
+        ];
+    }
+
+    /**
      * @return list<\OmegaUp\DAO\VO\Tags>
      */
     private static function getAllTagsFromCache() {
