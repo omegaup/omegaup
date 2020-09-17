@@ -7,23 +7,16 @@ import * as api from '../api';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
-
-
-
-    const problemsList = new Vue({
-        el: '#main-container',
-        render: function (createElement) {
-            return createElement('omegaup-problem-list', {
-                props: {
-                  
-                },
-                on: {
-                  
-                },
-            });
-        },
-        components: {
-            'omegaup-problem-collections': problem_Collection,
-        },
-    });
+  const problemsList = new Vue({
+    el: '#main-container',
+    render: function (createElement) {
+      return createElement('omegaup-problem-list', {
+        props: {},
+        on: {},
+      });
+    },
+    components: {
+      'omegaup-problem-collections': problem_Collection,
+    },
+  });
 });
