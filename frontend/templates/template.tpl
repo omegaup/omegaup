@@ -14,7 +14,7 @@
     {/if}
 
     <script type="text/javascript" src="{version_hash src="/js/error_handler.js"}"></script>
-    <title>{if isset($title)}{$title} &ndash; {/if}omegaUp</title>
+    <title>{$title} &ndash; omegaUp</title>
     <script type="text/javascript" src="{version_hash src="/third_party/js/jquery-3.5.1.min.js"}"></script>
     <script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
