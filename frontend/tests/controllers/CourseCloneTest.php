@@ -154,6 +154,66 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Trying to create a course using blank spaces in the alias
+     */
+    public function testCreateCourseCloneWithInvalidAlias() {
+        $homeworkCount = 2;
+        $testCount = 2;
+        $problemsPerAssignment = 2;
+        $studentCount = 2;
+        $problemAssignmentsMap = [];
+
+        // Create course with assignments
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
+            'homework' => $homeworkCount,
+            'test' => $testCount
+        ]);
+
+        // Add problems to assignments
+        $adminLogin = self::login($courseData['admin']);
+        for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
+            $assignmentAlias = $courseData['assignment_aliases'][$i];
+            $problemAssignmentsMap[$assignmentAlias] = [];
+
+            for ($j = 0; $j < $problemsPerAssignment; $j++) {
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+                \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $assignmentAlias,
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                ]));
+                $problemAssignmentsMap[$assignmentAlias][] = $problemData;
+            }
+        }
+
+        // Create & add students to course
+        $studentsUsername = [];
+        $studentsData = null;
+        for ($i = 0; $i < $studentCount; $i++) {
+            $studentsData = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
+            $studentsUsername[] = $studentsData->username;
+        }
+
+        // Clone the course
+        $adminLogin = self::login($courseData['admin']);
+        try {
+            \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => 'This is not a valid alias',
+                'start_time' => \OmegaUp\Time::get()
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+    }
+
+    /**
      * Create clone of a course with problems that have been changed their
      * visibility mode from public to private
      */
