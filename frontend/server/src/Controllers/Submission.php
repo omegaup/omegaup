@@ -17,7 +17,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
     /**
      * Gets the details for the latest submissions with pagination
      *
-     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
@@ -63,7 +63,7 @@ class Submission extends \OmegaUp\Controllers\Controller {
      * Gets the details for the latest submissions of
      * a certain user with pagination
      *
-     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: SubmissionsListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
