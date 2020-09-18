@@ -1650,7 +1650,7 @@ export namespace types {
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
     progress?: types.AssignmentProgress;
-    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface CourseEditPayload {
@@ -1860,18 +1860,11 @@ export namespace types {
     needsBasicInformation: boolean;
     requestsUserInformation: string;
     shouldShowAcceptTeacher: boolean;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
     shouldShowResults: boolean;
     statements: {
-      acceptTeacher: {
-        gitObjectId?: string;
-        markdown: string;
-        statementType: string;
-      };
-      privacy: {
-        gitObjectId?: string;
-        markdown?: string;
-        statementType?: string;
-      };
+      acceptTeacher: types.PrivacyStatement;
+      privacy: types.PrivacyStatement;
     };
     userRegistrationAccepted?: boolean;
     userRegistrationAnswered?: boolean;

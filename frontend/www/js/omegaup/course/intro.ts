@@ -12,15 +12,15 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-course-intro', {
         props: {
-          name: this.name,
-          description: this.description,
-          needsBasicInformation: this.needsBasicInformation,
-          requestsUserInformation: this.requestsUserInformation,
-          shouldShowAcceptTeacher: this.shouldShowAcceptTeacher,
-          statements: this.statements,
+          name: payload.name,
+          description: payload.description,
+          needsBasicInformation: payload.needsBasicInformation,
+          requestsUserInformation: payload.requestsUserInformation,
+          shouldShowAcceptTeacher: payload.shouldShowAcceptTeacher,
+          statements: payload.statements,
           userRegistrationRequested: this.userRegistrationRequested,
-          userRegistrationAnswered: this.userRegistrationAnswered,
-          userRegistrationAccepted: this.userRegistrationAccepted,
+          userRegistrationAnswered: payload.userRegistrationAnswered,
+          userRegistrationAccepted: payload.userRegistrationAccepted,
         },
         on: {
           submit: (source: course_Intro) => {
@@ -50,15 +50,7 @@ OmegaUp.on('ready', () => {
       });
     },
     data: {
-      name: payload.name,
-      description: payload.description,
-      needsBasicInformation: payload.needsBasicInformation,
-      requestsUserInformation: payload.requestsUserInformation,
-      shouldShowAcceptTeacher: payload.shouldShowAcceptTeacher,
-      statements: payload.statements,
       userRegistrationRequested: payload.userRegistrationRequested,
-      userRegistrationAnswered: payload.userRegistrationAnswered,
-      userRegistrationAccepted: payload.userRegistrationAccepted,
     },
     components: {
       'omegaup-course-intro': course_Intro,
