@@ -8,7 +8,5 @@ import { omegaup } from '../../omegaup';
 import problem_Collection from './Collections.vue';
 
 describe('Collections.vue', () => {
-  it('Should handle empty list of problems', async () => {
-    
-  });
+  it('Should handle empty list of problems', async () => {});
 });
