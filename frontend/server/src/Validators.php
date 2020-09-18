@@ -184,6 +184,24 @@ class Validators {
     }
 
     /**
+     * Returns whether the alias is valid.
+     *
+     * @param string $alias
+     * @return boolean
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function alias(string $alias): bool {
+        if (!\OmegaUp\Validators::isValidAlias($alias)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidAlias',
+                'alias'
+            );
+        }
+        return true;
+    }
+
+    /**
      * Returns whether the alias is restricted.
      *
      * @param string $alias the alias.

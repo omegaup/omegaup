@@ -553,14 +553,8 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $newAlias = $r->ensureString(
             'alias',
-            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        if (!\OmegaUp\Validators::isValidAlias($newAlias)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                'alias'
-            );
-        }
 
         $newName = $r->ensureString(
             'name',
