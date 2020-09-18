@@ -32,7 +32,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 p.alias AS problem_alias,
                 a.publish_time_delay,
                 p.problem_id,
-                p.order as problem_order
+                pp.order as problem_order
             FROM
                 Problems p
             INNER JOIN
