@@ -29,6 +29,7 @@
           <omegaup-radio-switch
             v-bind:value.sync="acceptTeacher"
             v-bind:selected-value="acceptTeacher"
+            name="accept-teacher"
           ></omegaup-radio-switch>
         </template>
         <div class="text-center mt-3">
