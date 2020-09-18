@@ -4747,6 +4747,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: ProblemListCollection, title: string}, entrypoint: string}
      *
+     * @omegaup-request-param string $problemLevelTag
      */
     public static function getProblemCollectionDetailsForSmarty(
         \OmegaUp\Request $r
@@ -4756,7 +4757,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     'problemsAmount' => \OmegaUp\DAO\Problems::getAmountOfProblems(
-                        $r['problemLevelTag']
+                        $r->ensureString(
+                            'problem_level_tag',
+                            fn (string $problemLevelTag) => \OmegaUp\Validators::stringNonEmpty(
+                                $problemLevelTag
+                            )
+                        )
                     )
                 ],
                 'title' => new \OmegaUp\TranslationString(
