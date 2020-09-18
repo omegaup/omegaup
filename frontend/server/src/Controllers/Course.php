@@ -709,7 +709,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         false, // visbility mode validation no needed when it is a clone
                         100,
                         null,
-                        1
+                        $problem['order']
                     );
                 }
             }
