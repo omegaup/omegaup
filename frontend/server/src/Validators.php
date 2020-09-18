@@ -192,13 +192,7 @@ class Validators {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     public static function alias(string $alias): bool {
-        if (!\OmegaUp\Validators::isValidAlias($alias)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                'alias'
-            );
-        }
-        return true;
+        return \OmegaUp\Validators::isValidAlias($alias);
     }
 
     /**
