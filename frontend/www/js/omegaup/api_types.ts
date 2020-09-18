@@ -764,32 +764,8 @@ export namespace types {
     export function IntroDetailsPayload(
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
-      return ((x) => {
-        x.details = ((x) => {
-          if (x.assignments)
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
-                return x;
-              });
-            })(x.assignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.details);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
@@ -1673,7 +1649,8 @@ export namespace types {
 
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
-    progress: types.AssignmentProgress;
+    progress?: types.AssignmentProgress;
+    shouldShowFirstAssociatedIdentityRunWarning?: boolean;
   }
 
   export interface CourseEditPayload {
@@ -1875,9 +1852,30 @@ export namespace types {
   }
 
   export interface IntroDetailsPayload {
-    details: types.CourseDetails;
-    progress?: types.AssignmentProgress;
-    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    alias: string;
+    currentUsername: string;
+    description: string;
+    isFirstTimeAccess: boolean;
+    name: string;
+    needsBasicInformation: boolean;
+    requestsUserInformation: string;
+    shouldShowAcceptTeacher: boolean;
+    shouldShowResults: boolean;
+    statements: {
+      acceptTeacher: {
+        gitObjectId?: string;
+        markdown: string;
+        statementType: string;
+      };
+      privacy: {
+        gitObjectId?: string;
+        markdown?: string;
+        statementType?: string;
+      };
+    };
+    userRegistrationAccepted?: boolean;
+    userRegistrationAnswered?: boolean;
+    userRegistrationRequested?: boolean;
   }
 
   export interface LimitsSettings {
@@ -3121,29 +3119,7 @@ export namespace messages {
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
-  export type CourseIntroDetailsResponse = {
-    alias: string;
-    currentUsername: string;
-    description: string;
-    isFirstTimeAccess: boolean;
-    name: string;
-    needsBasicInformation: boolean;
-    requestsUserInformation: string;
-    shouldShowAcceptTeacher: boolean;
-    shouldShowResults: boolean;
-    statements: {
-      acceptTeacher: {
-        gitObjectId?: string;
-        markdown: string;
-        statementType: string;
-      };
-      privacy: {
-        gitObjectId?: string;
-        markdown?: string;
-        statementType?: string;
-      };
-    };
-  };
+  export type CourseIntroDetailsResponse = types.IntroDetailsPayload;
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;
   export type CourseListAssignmentsResponse = {
