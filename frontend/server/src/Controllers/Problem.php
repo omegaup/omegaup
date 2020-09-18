@@ -4747,7 +4747,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: ProblemListCollection, title: string}, entrypoint: string}
      *
-     * @omegaup-request-param string $problemLevelTag
+     * @omegaup-request-param string $problem_level_tag
      */
     public static function getProblemCollectionDetailsForSmarty(
         \OmegaUp\Request $r
