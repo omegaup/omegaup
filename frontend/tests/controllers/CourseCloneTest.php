@@ -209,7 +209,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
-            $this->assertEquals('parameterInvalid', $e->getMessage());
+            $this->assertEquals('parameterInvalidAlias', $e->getMessage());
         }
     }
 

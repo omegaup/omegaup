@@ -551,10 +551,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             'course_alias',
             fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
         );
-        $newAlias = $r->ensureString(
-            'alias',
-            fn (string $alias) => \OmegaUp\Validators::isValidAlias($alias)
-        );
+        $newAlias = $r->ensureString('alias');
+
+        \OmegaUp\Validators::validateValidAlias($newAlias, 'alias');
         $newName = $r->ensureString(
             'name',
             fn (string $name) => \OmegaUp\Validators::stringNonEmpty($name)
