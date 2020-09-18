@@ -31,7 +31,8 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
                 a.max_points,
                 p.alias AS problem_alias,
                 a.publish_time_delay,
-                p.problem_id
+                p.problem_id,
+                p.order as problem_order
             FROM
                 Problems p
             INNER JOIN
@@ -75,6 +76,7 @@ class ProblemsetProblems extends \OmegaUp\DAO\Base\ProblemsetProblems {
             $result[$assignmentAlias]['problems'][] = [
                 'problem_alias' => $assignment['problem_alias'],
                 'problem_id' => $assignment['problem_id'],
+                'order' => $assignment['problem_order'],
             ];
         }
 
