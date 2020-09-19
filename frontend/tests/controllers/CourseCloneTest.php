@@ -469,7 +469,7 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
         $courseData = \OmegaUp\Test\Factories\Course::createCourse();
         $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
 
-        // Add problems to assignment
+        // Create the problems and then reorder them
         $adminLogin = self::login($courseData['admin']);
         foreach (range(0, $problemsAssignment - 1) as $index) {
             $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
