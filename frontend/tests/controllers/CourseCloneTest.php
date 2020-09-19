@@ -520,4 +520,116 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals($e->getMessage(), 'tokenDecodeCorrupted');
         }
     }
+
+    public function testCreateCourseCloneWithProblemOrder() {
+        $problemsAssignment = 5;
+        $studentCount = 2;
+        $assignmentProblemsMap = [];
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        // Create the problems and then reorder them
+        $adminLogin = self::login($courseData['admin']);
+        foreach (range(0, $problemsAssignment - 1) as $index) {
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'title' => "problem_{$index}",
+                ])
+            );
+            $assignmentProblemsMap[]['alias'] = $problemData['problem']->alias;
+        }
+
+        $orderedProblems = [
+            $assignmentProblemsMap[2],
+            $assignmentProblemsMap[4],
+            $assignmentProblemsMap[3],
+            $assignmentProblemsMap[0],
+            $assignmentProblemsMap[1],
+        ];
+
+        // Create the assignment with problems
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'alias' => $assignmentAlias,
+            'assignment_type' => 'homework',
+            'course_alias' => $courseData['course_alias'],
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => \OmegaUp\Time::get(),
+            'finish_time' => \OmegaUp\Time::get() + (2 * 60),
+            'problems' => json_encode($orderedProblems),
+        ]));
+
+        [
+            'assignments' => $assignments,
+        ] = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'alias' => $courseData['course_alias']
+            ])
+        );
+        [$assignment] = $assignments;
+
+        [
+            'problems' => $problems,
+        ] = \OmegaUp\Controllers\Course::apiAssignmentDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'assignment' => $assignment['alias'],
+                'course' => $courseData['course_alias']
+            ])
+        );
+
+        foreach ($problems as $index => $problem) {
+            $this->assertEquals(
+                $problem['alias'],
+                $orderedProblems[$index]['alias']
+            );
+        }
+
+        $newCourseAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        $clonedCourseData = \OmegaUp\Controllers\Course::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $newCourseAlias,
+                'start_time' => \OmegaUp\Time::get(),
+            ])
+        );
+
+        $this->assertEquals($newCourseAlias, $clonedCourseData['alias']);
+
+        [
+            'assignments' => $assignments,
+        ] = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'alias' => $newCourseAlias
+            ])
+        );
+        [$assignment] = $assignments;
+
+        [
+            'problems' => $problems,
+        ] = \OmegaUp\Controllers\Course::apiAssignmentDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'assignment' => $assignment['alias'],
+                'course' => $newCourseAlias
+            ])
+        );
+
+        $this->assertEquals($problemsAssignment, count($problems));
+
+        foreach ($problems as $index => $problem) {
+            $this->assertEquals(
+                $problem['alias'],
+                $orderedProblems[$index]['alias'],
+                'Problems order should be the same as the original course'
+            );
+        }
+    }
 }
