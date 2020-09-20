@@ -230,8 +230,7 @@ export default class Markdown extends Vue {
         const clipboardButton = document.createElement('button');
         clipboardButton.appendChild(document.createTextNode('📋'));
         clipboardButton.title = T.wordsCopyToClipboard;
-        clipboardButton.className =
-          'glyphicon glyphicon-copy clipboard btn btn-light';
+        clipboardButton.className = 'clipboard btn btn-light';
 
         clipboardButton.addEventListener('click', (event: Event) => {
           event.preventDefault();
