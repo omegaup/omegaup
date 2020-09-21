@@ -21,7 +21,6 @@ describe('ViewStudent.vue', () => {
 
     expect(wrapper.text()).toContain(T.courseStudentSelectStudent);
     expect(wrapper.text()).toContain(T.courseStudentSelectAssignment);
-    expect(wrapper.text()).toContain(T.courseAssignmentProblemRunsEmpty);
   });
 
   it('Should handle runs', async () => {
@@ -62,7 +61,7 @@ describe('ViewStudent.vue', () => {
             ],
             submissions: 1,
             visits: 1,
-          } as omegaup.CourseProblem,
+          } as types.CourseProblem,
         ],
         students: [
           {
