@@ -1052,6 +1052,7 @@ const translations: { [key: string]: string; } = {
   statementNotFound: "Redacci\u00f3n no encontrada",
   studentCourseInformationDescription: "Aqu\u00ed encontrar\u00e1s la lista de los cursos en los que te has inscrito.",
   studentProgressDescription: "Puntaje: %(score) de %(points) puntos posibles.  Progreso: %(progress)%",
+  studentProgressOnlyLecturesDescription: "Esta tarea s\u00f3lo incluye lecturas",
   studentProgressTooltipDescription: "Problema: %(problem)  Puntaje: %(score) de %(points) puntos posibles.  Progreso: %(progress)%",
   submissionMemoryInMegabytes: "%(value) MiB",
   submissionRunTimeInSeconds: "%(value) s",
