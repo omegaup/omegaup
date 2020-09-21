@@ -1133,9 +1133,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return $problems;
     }
 
-    final public static function getAmountOfProblems(string $problemLevelTag): int {
+    final public static function getProblemsPerTagCount(string $problemLevelTag): int {
         $sql = 'SELECT
-                    count(Problems.problem_id) as pa
+                    COUNT(Problems.problem_id) AS pa
                 FROM
                     Problems p
                 INNER JOIN

@@ -190,7 +190,7 @@ class Validators {
      * @return boolean whether the alias is restricted.
      */
     public static function isRestrictedAlias(string $alias): bool {
-        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup'];
+        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup', 'collection'];
         return in_array(strtolower($alias), $restrictedAliases);
     }
 
