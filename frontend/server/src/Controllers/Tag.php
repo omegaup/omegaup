@@ -71,7 +71,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
-            "frequent",
+            'frequent',
             fn () => \OmegaUp\DAO\Tags::getFrequentsByLevel(
                 $level
             ),
@@ -81,7 +81,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
 
     /**
      * Return most frequent public tags of a certain level
-     * 
+     *
      * @return array{status: string}
      */
     public static function apiFrequentTags(\OmegaUp\Request $r): array {

@@ -538,6 +538,8 @@ const translations: { [key: string]: string; } = {
   omegaupTitleBadges: "Crach\u00e1s",
   omegaupTitleCodersofthemonth: "Programador do m\u00eas",
   omegaupTitleCodersofthemonthFemale: "Programador do m\u00eas feminino",
+  omegaupTitleCollectionsByAuthor: "Cole\u00e7\u00f5es por autor",
+  omegaupTitleCollectionsByLevel: "Cole\u00e7\u00f5es por n\u00edvel",
   omegaupTitleCommonIndex: "Bem-vindo",
   omegaupTitleContest: "Concurso",
   omegaupTitleContestAddAdmin: "Adicionar admin",

@@ -84,25 +84,25 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     ) {
         $sql = '
             SELECT
-                t.name 
+                t.name
             FROM
                 Problems_Tags pt
-            INNER JOIN 
+            INNER JOIN
                 Tags t ON t.tag_id = pt.tag_id
-            WHERE 
-                pt.problem_id 
+            WHERE
+                pt.problem_id
             IN (
-                SELECT 
+                SELECT
                     problem_id
-                FROM 
-                    Problems_Tags 
-                WHERE 
+                FROM
+                    Problems_Tags
+                WHERE
                     tag_id = ?
-            ) AND 
+            ) AND
                 name LIKE "problemTag%"
-            GROUP BY 
+            GROUP BY
                 t.name
-            ORDER BY 
+            ORDER BY
                 COUNT(pt.problem_id)
             ';
 
@@ -116,7 +116,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
         ) {
             $results[] = $row['name'];
         }
-    
+
         return $results;
     }
 }

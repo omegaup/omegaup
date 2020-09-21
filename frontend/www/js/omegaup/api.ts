@@ -1496,6 +1496,10 @@ export const Session = {
 };
 
 export const Tag = {
+  frequentTags: apiCall<
+    messages.TagFrequentTagsRequest,
+    messages.TagFrequentTagsResponse
+  >('/api/tag/frequentTags/'),
   list: apiCall<messages.TagListRequest, messages.TagListResponse>(
     '/api/tag/list/',
   ),

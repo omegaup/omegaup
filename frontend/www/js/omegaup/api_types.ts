@@ -3637,6 +3637,8 @@ export namespace messages {
   export type SessionGoogleLoginResponse = { [key: string]: string };
 
   // Tag
+  export type TagFrequentTagsRequest = { [key: string]: any };
+  export type TagFrequentTagsResponse = {};
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
 
@@ -4324,6 +4326,9 @@ export namespace controllers {
   }
 
   export interface Tag {
+    frequentTags: (
+      params?: messages.TagFrequentTagsRequest,
+    ) => Promise<messages.TagFrequentTagsResponse>;
     list: (
       params?: messages.TagListRequest,
     ) => Promise<messages.TagListResponse>;

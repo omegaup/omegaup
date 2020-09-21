@@ -186,6 +186,7 @@
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Tag](#tag)
+  - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -3701,6 +3702,16 @@ contestant's machine and the server.
 # Tag
 
 TagController
+
+## `/api/tag/frequentTags/`
+
+### Description
+
+Return most frequent public tags of a certain level
+
+### Returns
+
+_Nothing_
 
 ## `/api/tag/list/`
 
