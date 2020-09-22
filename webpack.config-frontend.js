@@ -33,6 +33,7 @@ module.exports = {
     authors_rank: './frontend/www/js/omegaup/user/authors_rank.ts',
     badge_details: './frontend/www/js/omegaup/badge/details.ts',
     badge_list: './frontend/www/js/omegaup/badge/list.ts',
+    certificate_details: './frontend/www/js/omegaup/certificate/details.ts',
     coder_of_the_month: './frontend/www/js/omegaup/coderofthemonth/index.ts',
     common_footer: './frontend/www/js/omegaup/common/footer.js',
     common_footer_v2: './frontend/www/js/omegaup/common/footer_v2.ts',

@@ -92,6 +92,14 @@ export namespace types {
       );
     }
 
+    export function CertificateDetailsPayload (
+      elementId: string = 'payload',
+    ): types.CertificateDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -1266,6 +1274,10 @@ export namespace types {
     runtime: number;
     time: Date;
     username: string;
+  }
+
+  export interface CertificateDetailsPayload {
+    uuid: string;
   }
 
   export interface Clarification {
