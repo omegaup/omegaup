@@ -523,15 +523,6 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
      * test for count problems whit levelTag
      */
     public function testCountProblemsWithLevelTags() {
-        // Get the problem data
-        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
-        $r = $problemData['request'];
-        $problemAuthor = $problemData['author'];
-
-        // Login user
-        $login = self::login($problemAuthor);
-        $r['auth_token'] = $login->auth_token;
-
         // Create problems by level
         $problemLevelMapping = [
             'problemLevelBasicIntroductionToProgramming' => 5,
@@ -555,10 +546,16 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         $problemsCount = [];
         $total = 0;
-        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForSmarty()['smartyProperties']['payload'];
+        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForSmarty(
+            new \OmegaUp\Request([])
+        )['smartyProperties']['payload'];
         foreach ($response['problemCount'] as $levelTag) {
-            $problemsCount[] = $levelTag['problemCount'];
-            $total += $levelTag['problemCount'];
+            $problemsCount[] = $levelTag['problems_per_tag'];
+            $total += $levelTag['problems_per_tag'];
+            $this->assertEquals(
+                problemLevelMapping[$levelTag['name']],
+                $levelTag['problems_per_tag']
+            );
         }
 
         $this->assertEquals(35, $total);
