@@ -10,6 +10,32 @@ describe('markdown', () => {
       expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');
     });
 
+    it('Should handle path-style links', () => {
+      expect(converter.makeHtml('[foo](/foo)')).toEqual(
+        '<p><a href="/foo">foo</a></p>',
+      );
+    });
+
+    it('Should handle path-style links with titles', () => {
+      expect(converter.makeHtml('[foo](/foo "foo")')).toEqual(
+        '<p><a href="/foo" title="foo">foo</a></p>',
+      );
+    });
+
+    it('Should handle mailto links', () => {
+      expect(
+        converter.makeHtml('[foo](mailto:foo@foo.com?subject=foo)'),
+      ).toEqual('<p><a href="mailto:foo@foo.com?subject=foo">foo</a></p>');
+    });
+
+    it('Should handle mailto links with titles', () => {
+      expect(
+        converter.makeHtml('[foo](mailto:foo@foo.com?subject=foo "foo")'),
+      ).toEqual(
+        '<p><a href="mailto:foo@foo.com?subject=foo" title="foo">foo</a></p>',
+      );
+    });
+
     it('Should handle invalid iframe tag', () => {
       expect(
         converter.makeHtml(
