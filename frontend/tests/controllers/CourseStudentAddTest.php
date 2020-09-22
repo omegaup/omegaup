@@ -332,4 +332,61 @@ class CourseStudentAddTest extends \OmegaUp\Test\ControllerTestCase {
         // After adding student to course, intro should not show
         $this->assertArrayNotHasKey('shouldShowAcceptTeacher', $details);
     }
+
+    public function testAddUserWithBasicInformation() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            /*$admin=*/            null,
+            /*$adminLogin=*/ null,
+            /*$admissionMode=*/ \OmegaUp\Controllers\Course::ADMISSION_MODE_PRIVATE,
+            /*$requestsUserInformation=*/ 'no',
+            /*$showScoreboard=*/ 'false',
+            /*$courseDuration=*/ 120,
+            /*$courseAlias=*/ null,
+            /*$needsBasicInformation=*/ true
+        );
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Admin adds user into the course
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseData['admin']
+        );
+        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $identity->username,
+            'course_alias' => $courseData['course_alias'],
+        ]));
+
+        // User enters the course and intro details must be shown.
+        $studentLogin = \OmegaUp\Test\ControllerTestCase::login($identity);
+        $details = \OmegaUp\Controllers\Course::apiIntroDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // At this moment needs_basic_information flag should be turned on
+        $this->assertTrue($details['needsBasicInformation']);
+
+        // Users need update their profile, at least the basic information is
+        // required (school, state and country), to join this course
+        ['school' => $school] = \OmegaUp\Test\Factories\Schools::createSchool();
+        $states = \OmegaUp\DAO\States::getByCountry('MX');
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $studentLogin->auth_token,
+            'school_id' => $school->school_id,
+            'country_id' => 'MX',
+            'state_id' => $states[0]->state_id,
+        ]));
+
+        $details = \OmegaUp\Controllers\Course::apiIntroDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $studentLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        );
+
+        // needs_basic_information flag is no longer turned on
+        $this->assertFalse($details['needsBasicInformation']);
+    }
 }
