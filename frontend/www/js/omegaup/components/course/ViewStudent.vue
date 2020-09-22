@@ -23,9 +23,13 @@
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectAssignment }}</label>
-          <select class="ml-1 form-control" v-model="selectedAssignment">
+          <select
+            class="ml-1 form-control"
+            v-model="selectedAssignment"
+            data-assignment
+          >
             <option
-              v-bind:value="assignment"
+              v-bind:value="assignment.alias"
               v-for="assignment in assignments"
               v-bind:key="assignment.alias"
             >
@@ -35,14 +39,13 @@
         </div>
       </form>
       <div v-if="selectedAssignment">
-        <p
-          class="assignment-description"
-          v-text="selectedAssignment.description"
-        ></p>
+        <omegaup-markdown
+          v-bind:markdown="getAssignmentDescription(selectedAssignment)"
+        ></omegaup-markdown>
         <hr />
         <div class="card">
           <div class="card-header">
-            <template v-if="points(selectedAssignment.alias) === 0">
+            <template v-if="points(selectedAssignment) === 0">
               {{ T.studentProgressOnlyLecturesDescription }}
             </template>
             <ul class="nav nav-pills card-header-pills" v-else>
@@ -50,7 +53,8 @@
                 class="nav-item"
                 role="presentation"
                 v-bind:class="{
-                  active: problem.alias === selectedProblem.alias,
+                  active:
+                    selectedProblem && problem.alias === selectedProblem.alias,
                 }"
                 v-for="problem in problemsWithPoints"
                 v-bind:key="problem.alias"
@@ -120,20 +124,19 @@
   <!-- card -->
 </template>
 
-<style>
-.omegaup-course-viewstudent p.assignment-description {
-  padding: 1em;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
+import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import * as time from '../../time';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
@@ -143,7 +146,7 @@ export default class CourseViewStudent extends Vue {
 
   T = T;
   time = time;
-  selectedAssignment: Partial<omegaup.Assignment> | null = null;
+  selectedAssignment: string | null = null;
   selectedProblem: Partial<types.CourseProblem> | null = null;
   selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
 
@@ -159,6 +162,13 @@ export default class CourseViewStudent extends Vue {
         accumulator + problem.points,
       0,
     );
+  }
+
+  getAssignmentDescription(assignmentAlias: string): string {
+    const assignment = this.assignments.find(
+      (assignment) => assignment.alias === assignmentAlias,
+    );
+    return assignment?.description ?? '';
   }
 
   data(): { [name: string]: any } {
@@ -220,7 +230,7 @@ export default class CourseViewStudent extends Vue {
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange(newVal: omegaup.Assignment) {
+  onSelectedAssignmentChange(newVal: string) {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
   }
 
