@@ -292,7 +292,7 @@ export default class UserCharts extends Vue {
   get renderPeriod(): omegaup.RunData[] {
     return this.type === 'delta' ? this.runs.delta : this.runs.cumulative;
   }
-  
+
   get periodStatisticOptions(): Highcharts.Options {
     return {
       title: {
