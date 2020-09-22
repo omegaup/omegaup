@@ -2161,7 +2161,7 @@ export namespace types {
 
   export interface ProblemListCollection {
     levelTags: string[];
-    problemsAmount: { name: string; problems_per_tag: number }[];
+    problemCount: { name: string; problems_per_tag: number }[];
   }
 
   export interface ProblemListItem {
