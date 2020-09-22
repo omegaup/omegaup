@@ -38,7 +38,7 @@
     <highcharts
       v-bind:options="aggregateStatisticOptions"
       v-bind:updateArgs="updateArgs"
-      v-else=""
+      v-else
     ></highcharts>
   </div>
 </template>
@@ -130,23 +130,20 @@ export default class UserCharts extends Vue {
   period: 'day' | 'week' | 'month' | 'year' = 'day';
   updateArgs = [true, true, { duration: 500 }];
   data_chart: Highcharts.PointOptionsObject[] = [];
+  data_period = this.type === 'delta' ? this.runs.delta : this.runs.cumulative;
 
   @Watch('type')
   onTypeChanged(newValue: string): void {
     if (newValue === 'total') {
-      this.onRenderAggregateStatistics();
+      this.renderAggregate;
     } else {
-      this.onRenderPeriodStatistics();
+      this.renderPeriod;
     }
   }
 
   @Watch('period')
   onPeriodChanged(): void {
-    this.onRenderPeriodStatistics();
-  }
-
-  mounted(): void {
-    this.onRenderPeriodStatistics();
+    this.renderPeriod;
   }
 
   get totalRuns(): number {
@@ -284,6 +281,18 @@ export default class UserCharts extends Vue {
     return this.normalizedPeriodRunCounts[this.period];
   }
 
+  get runs(): omegaup.RunCounts {
+    return this.normalizedRunCountsForPeriod;
+  }
+
+  get renderAggregate(): NormalizedRunCounts[] {
+    return this.normalizedRunCounts;
+  }
+
+  get renderPeriod(): omegaup.RunData[] {
+    return this.type === 'delta' ? this.runs.delta : this.runs.cumulative;
+  }
+  
   get periodStatisticOptions(): Highcharts.Options {
     return {
       title: {
@@ -293,7 +302,7 @@ export default class UserCharts extends Vue {
       },
       chart: { type: 'column' },
       xAxis: {
-        categories: [],
+        categories: this.runs.categories,
         title: { text: T.profileStatisticsPeriod },
         labels: {
           rotation: -45,
@@ -334,7 +343,14 @@ export default class UserCharts extends Vue {
           },
         },
       },
-      series: [],
+      series: this.renderPeriod.map(
+        (x) =>
+          <Highcharts.SeriesColumnOptions>{
+            data: x.data,
+            name: x.name,
+            type: 'column',
+          },
+      ),
     };
   }
 
@@ -371,33 +387,11 @@ export default class UserCharts extends Vue {
       series: [
         {
           name: T.profileStatisticsRuns,
-          data: this.data_chart,
+          data: this.normalizedRunCounts,
           type: 'pie',
         },
       ],
     };
-  }
-
-  onRenderPeriodStatistics(): void {
-    const runs: omegaup.RunCounts = this.normalizedRunCountsForPeriod;
-    const data = this.type === 'delta' ? runs.delta : runs.cumulative;
-    console.log(this);
-    (<Highcharts.XAxisOptions>this.periodStatisticOptions.xAxis).categories =
-      runs.categories;
-    this.periodStatisticOptions.series = data.map(
-      (x) =>
-        <Highcharts.SeriesColumnOptions>{
-          data: x.data,
-          name: x.name,
-          type: 'column',
-        },
-    );
-    console.log('periodStatistics');
-  }
-
-  onRenderAggregateStatistics(): void {
-    console.log('onRenderAggregate');
-    this.data_chart = this.normalizedRunCounts;
   }
 }
 </script>
