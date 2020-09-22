@@ -44,7 +44,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
- * @psalm-type IntroDetailsPayload=array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher: PrivacyStatement, privacy: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
+ * @psalm-type IntroDetailsPayload=array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  */
 class Course extends \OmegaUp\Controllers\Controller {
@@ -3385,12 +3385,11 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $requestUserInformation
             );
 
-            $privacyStatement = [
-                'markdown' => $privacyStatementMarkdown ?? '',
-                'gitObjectId' => '',
-                'statementType' => '',
-            ];
+            $statements = [];
             if (!is_null($privacyStatementMarkdown)) {
+                $privacyStatement = [
+                    'markdown' => $privacyStatementMarkdown,
+                ];
                 $statementType = "course_{$requestUserInformation}_consent";
                 $statement =
                     \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
@@ -3399,6 +3398,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $privacyStatement['statementType'] = $statementType;
                 if (!is_null($statement)) {
                     $privacyStatement['gitObjectId'] = $statement['git_object_id'];
+                    $statements['privacy'] = $privacyStatement;
                 }
             }
 
@@ -3409,7 +3409,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             $acceptTeacherStatement = [
                 'markdown' => $markdown,
                 'statementType' => 'accept_teacher',
-                'gitObjectId' => '',
             ];
             $teacherStatement =
                 \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
@@ -3417,6 +3416,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 );
             if (!is_null($teacherStatement)) {
                 $acceptTeacherStatement['gitObjectId'] = $teacherStatement['git_object_id'];
+                $statements['acceptTeacher'] = $acceptTeacherStatement;
             }
             $coursePayload = array_merge(
                 $registrationResponse,
@@ -3429,10 +3429,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'requestsUserInformation' =>
                         $courseDetails['requests_user_information'],
                     'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
-                    'statements' => [
-                        'privacy' => $privacyStatement,
-                        'acceptTeacher' => $acceptTeacherStatement,
-                    ],
+                    'statements' => $statements,
                     'isFirstTimeAccess' => !$hasSharedUserInformation,
                     'shouldShowResults' => $shouldShowIntro,
                     'shouldShowFirstAssociatedIdentityRunWarning' => false,

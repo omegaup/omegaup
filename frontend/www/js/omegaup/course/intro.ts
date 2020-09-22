@@ -29,10 +29,10 @@ OmegaUp.on('ready', () => {
               usernameOrEmail: payload.currentUsername,
               share_user_information: source.shareUserInformation,
               accept_teacher: source.acceptTeacher,
-              privacy_git_object_id: payload.statements.privacy.gitObjectId,
+              privacy_git_object_id: payload.statements.privacy?.gitObjectId,
               accept_teacher_git_object_id:
-                payload.statements.acceptTeacher.gitObjectId,
-              statement_type: payload.statements.privacy.statementType,
+                payload.statements.acceptTeacher?.gitObjectId,
+              statement_type: payload.statements.privacy?.statementType,
             })
               .then((data) => {
                 window.location.replace(`/course/${payload.alias}/`);

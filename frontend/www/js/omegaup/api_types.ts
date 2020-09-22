@@ -1863,8 +1863,8 @@ export namespace types {
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     shouldShowResults: boolean;
     statements: {
-      acceptTeacher: types.PrivacyStatement;
-      privacy: types.PrivacyStatement;
+      acceptTeacher?: types.PrivacyStatement;
+      privacy?: types.PrivacyStatement;
     };
     userRegistrationAccepted?: boolean;
     userRegistrationAnswered?: boolean;
