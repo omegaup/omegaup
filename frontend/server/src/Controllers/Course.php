@@ -554,8 +554,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $newAlias = $r->ensureString(
             'alias',
-            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+
         $newName = $r->ensureString(
             'name',
             fn (string $name) => \OmegaUp\Validators::stringNonEmpty($name)
@@ -709,7 +710,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         false, // visbility mode validation no needed when it is a clone
                         100,
                         null,
-                        1
+                        $problem['order']
                     );
                 }
             }
