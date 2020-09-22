@@ -5642,11 +5642,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $collection_type
      */
     public static function getCollectionsDetailsForSmarty(\OmegaUp\Request $r): array {
-        
         $collectionType = $r->ensureString('collection_type');
 
         $collection = null;
-        
+
         $title = new \OmegaUp\TranslationString(
             'omegaupTitleCollectionsByLevel'
         );
@@ -5663,7 +5662,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
             $title = new \OmegaUp\TranslationString(
                 'omegaupTitleCollectionsByAuthor'
-            );            
+            );
         }
 
         return [
