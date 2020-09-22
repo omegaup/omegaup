@@ -21,5 +21,6 @@ export default class CertificateDetails extends Vue {
   @Prop() uuid!: string;
 
   T = T;
+  ui = ui;
 }
 </script>
