@@ -97,7 +97,7 @@
 	"cannotAddProb": "Cannot add problem. You are not a contest admin.",
 	"cannotRemoveProblem": "Cannot remove the problem. You are not a contest admin.",
 	"cannotRemoveProblemWithSubmissions": "You cannot remove a problem that already has submissions",
-	"certificateDetailsBody": "Please send us an email to certificates@omegaup.com with the ID of the certificate in the subject to verify a certificate.",
+	"certificateDetailsBody": "Please send us an email to <a href=\"mailto:certificates@omegaup.com?subject=Verification of certificate %(uuid)\" target=\"blank\">certificates@omegaup.com</a> to verificate a certificate. Make sure to include the ID of the certificate in the subject.",
 	"certificateDetailsTitle": "Certificate Verification Process",
 	"clarificationEmailBody": "<p>Howdy!</p><p>The user <strong><a href=\"https://omegaup.com/profile/%(user_name)\">%(user_name)</a></strong> has requested a clarification for the problem <strong><a href=\"https://omegaup.com/arena/problem/%(problem_alias)\">%(problem_name)</a></strong>:</p><p><blockquote><p>%(clarification_body)</p></blockquote><p>To answer it, please visit the following link: <a href=\"%(url)\">%(url)</a>.</p><p>Thanks!,<br/>omegaUp</p>",
 	"clarificationEmailSubject": "[omegaUp] New clarification for problem %(problem_name)",
