@@ -17,7 +17,7 @@ class Certificate extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'uuid' => $r['uuid'],
+                    'uuid' => $r->ensureString('uuid'),
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCertificate'
