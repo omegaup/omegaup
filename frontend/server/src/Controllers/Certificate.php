@@ -19,7 +19,9 @@ class Certificate extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'uuid' => $r['uuid'],
                 ],
-                'title' => new \OmegaUp\TranslationString('omegaupTitleCertificate'),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCertificate'
+                ),
             ],
             'entrypoint' => 'certificate_details',
         ];

@@ -92,7 +92,7 @@ export namespace types {
       );
     }
 
-    export function CertificateDetailsPayload (
+    export function CertificateDetailsPayload(
       elementId: string = 'payload',
     ): types.CertificateDetailsPayload {
       return JSON.parse(
