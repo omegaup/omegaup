@@ -37,7 +37,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
- * @psalm-type ProblemCollectionDetails=array{collectionProblems: list<string>}
+ * @psalm-type ProblemCollectionDetails=array{collection: list<string>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -5642,33 +5642,36 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $collection_type
      */
     public static function getCollectionsDetailsForSmarty(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['collection_type'],
-            'collection_type'
+        
+        $collectionType = $r->ensureString('collection_type');
+
+        $collection = null;
+        
+        $title = new \OmegaUp\TranslationString(
+            'omegaupTitleCollectionsByLevel'
         );
 
-        $collectionProblems = null;
-        $problemsByLevel = false;
-
         if ($r->ensureString('collection_type') !== 'author') {
-            $problemsByLevel = true;
-            $collectionProblems = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
+            $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
                 $r->ensureString('collection_type')
             );
         } else {
             //Author
+            $collection = \OmegaUp\Controllers\User::getAuthorsRank(
+                1,
+                15
+            );
+            $title = new \OmegaUp\TranslationString(
+                'omegaupTitleCollectionsByAuthor'
+            );            
         }
 
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'collectionProblems' => $collectionProblems,
+                    'collection' => $collection,
                 ],
-                'title' => new \OmegaUp\TranslationString(
-                    $problemsByLevel ?
-                        'omegaupTitleCollectionsByLevel' :
-                        'omegaupTitleCollectionsByAuthor'
-                ),
+                'title' => $title,
             ],
             'entrypoint' => 'problem_collections_details',
         ];

@@ -66,6 +66,10 @@ class Tag extends \OmegaUp\Controllers\Controller {
         );
     }
 
+    /**
+     * Return most frequent public tags of a certain level
+     *
+     */
     public static function getFrequentTagsByLevel(
         string $problemLevel
     ): array {
@@ -85,22 +89,9 @@ class Tag extends \OmegaUp\Controllers\Controller {
      * @return list<array{name: string}>
      */
     public static function apiFrequentTags(\OmegaUp\Request $r): array {
-        $param = '';
-        if (is_string($r['level'])) {
-            $param = $r['level'];
-        } else {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterEmpty',
-                'level'
-            );
-        }
+        
+        $param = $r->ensureString('problemLevel');
 
-        $response = [];
-        foreach (self::getFrequentTagsByLevel($param) as $tag) {
-            $response[] = [
-                'name' => strval($tag->name),
-            ];
-        }
-        return $response;
+        return self::getFrequentTagsByLevel($param);
     }
 }

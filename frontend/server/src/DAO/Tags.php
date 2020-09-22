@@ -111,17 +111,10 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
                 COUNT(pt.problem_id)
             ';
 
-        $results = [];
-        /** @var array{name: string} row */
-        foreach (
-            \OmegaUp\MySQLConnection::getInstance()->GetAll(
-                $sql,
-                [ $problemLevel ]
-            ) as $row
-        ) {
-            $results[] = $row['name'];
-        }
-
-        return $results;
+        /** @var list<array{name: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemLevel]
+        );
     }
 }
