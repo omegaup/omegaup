@@ -82,7 +82,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return array{status: string}
+     * @return list<array{name: string}>
      */
     public static function apiFrequentTags(\OmegaUp\Request $r): array {
         $param = '';
