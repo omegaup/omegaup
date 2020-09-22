@@ -67,7 +67,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     }
 
     public static function getFrequentTagsByLevel(
-        int $problemLevel
+        string $problemLevel
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
@@ -86,7 +86,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
      */
     public static function apiFrequentTags(\OmegaUp\Request $r): array {
         $param = '';
-        if (is_int($r['level'])) {
+        if (is_string($r['level'])) {
             $param = $r['level'];
         } else {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
