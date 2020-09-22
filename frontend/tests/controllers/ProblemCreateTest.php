@@ -553,7 +553,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $problemsCount[] = $levelTag['problems_per_tag'];
             $total += $levelTag['problems_per_tag'];
             $this->assertEquals(
-                problemLevelMapping[$levelTag['name']],
+                $problemLevelMapping[$levelTag['name']],
                 $levelTag['problems_per_tag']
             );
         }
