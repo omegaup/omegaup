@@ -80,7 +80,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
      * @return list<string>
      */
     public static function getFrequentsByLevel(
-        int $level
+        string $problemLevel
     ) {
         $sql = '
             SELECT
@@ -97,7 +97,12 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
                 FROM
                     Problems_Tags
                 WHERE
-                    tag_id = ?
+                    tag_id = (
+                        SELECT
+                            tag_id
+                        FROM
+                            Tags
+                        WHERE name = ? )
             ) AND
                 name LIKE "problemTag%"
             GROUP BY
@@ -111,7 +116,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
-                [ $level ]
+                [ $problemLevel ]
             ) as $row
         ) {
             $results[] = $row['name'];

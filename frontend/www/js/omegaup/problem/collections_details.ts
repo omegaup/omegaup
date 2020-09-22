@@ -12,7 +12,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-collection-details', {
         props: {},
-        on: {}
+        on: {},
       });
     },
   });

@@ -67,13 +67,13 @@ class Tag extends \OmegaUp\Controllers\Controller {
     }
 
     public static function getFrequentTagsByLevel(
-        int $level
+        int $problemLevel
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
             'frequent',
             fn () => \OmegaUp\DAO\Tags::getFrequentsByLevel(
-                $level
+                $problemLevel
             ),
             APC_USER_CACHE_SESSION_TIMEOUT
         );

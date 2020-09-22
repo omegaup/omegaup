@@ -1974,6 +1974,10 @@ export namespace types {
     [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
+  export interface ProblemCollectionDetails {
+    collectionProblems: string[];
+  }
+
   export interface ProblemDetails {
     accepted: number;
     accepts_submissions: boolean;
