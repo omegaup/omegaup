@@ -125,12 +125,6 @@ form {
   .submit-run {
     width: 100%;
   }
-  .vue-codemirror-wrap {
-    height: 95%;
-    .CodeMirror {
-      height: 100%;
-    }
-  }
 }
 
 input[type='submit'] {
