@@ -1134,7 +1134,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return list<\OmegaUp\DAO\VO\Problems>
+     * @var list<array{name: string, problems_per_tag: int}>
      */
     final public static function getProblemsPerTagCount(): array {
         $sql = "SELECT
@@ -1154,7 +1154,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 GROUP BY
                     t.name;";
 
-        /** @var array{name: string, problems_per_tag: int} */
+        /** @var list<array{name: string, problems_per_tag: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 }
