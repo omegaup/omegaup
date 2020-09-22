@@ -3711,7 +3711,12 @@ Return most frequent public tags of a certain level
 
 ### Returns
 
-_Nothing_
+```typescript
+{
+  name: string;
+}
+[];
+```
 
 ## `/api/tag/list/`
 
