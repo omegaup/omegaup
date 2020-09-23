@@ -10,7 +10,11 @@
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectStudent }}</label>
           <select class="ml-1 form-control" v-model="selectedStudent">
-            <option v-bind:value="student" v-for="student in students">
+            <option
+              v-bind:value="student"
+              v-for="student in students"
+              v-bind:key="student.username"
+            >
               {{ student.name || student.username }}
             </option>
           </select>
@@ -19,27 +23,41 @@
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectAssignment }}</label>
-          <select class="ml-1 form-control" v-model="selectedAssignment">
-            <option v-bind:value="assignment" v-for="assignment in assignments">
+          <select
+            class="ml-1 form-control"
+            v-model="selectedAssignment"
+            data-assignment
+          >
+            <option
+              v-bind:value="assignment.alias"
+              v-for="assignment in assignments"
+              v-bind:key="assignment.alias"
+            >
               {{ assignment.name }}
             </option>
           </select>
         </div>
       </form>
       <div v-if="selectedAssignment">
-        <p
-          class="assignment-description"
-          v-text="selectedAssignment.description"
-        ></p>
+        <omegaup-markdown
+          v-bind:markdown="getAssignmentDescription(selectedAssignment)"
+        ></omegaup-markdown>
         <hr />
         <div class="card">
           <div class="card-header">
-            <ul class="nav nav-pills card-header-pills">
+            <template v-if="points(selectedAssignment) === 0">
+              {{ T.studentProgressOnlyLecturesDescription }}
+            </template>
+            <ul class="nav nav-pills card-header-pills" v-else>
               <li
                 class="nav-item"
                 role="presentation"
-                v-bind:class="{ active: problem == selectedProblem }"
-                v-for="problem in problems"
+                v-bind:class="{
+                  active:
+                    selectedProblem && problem.alias === selectedProblem.alias,
+                }"
+                v-for="problem in problemsWithPoints"
+                v-bind:key="problem.alias"
               >
                 <a
                   aria-controls="home"
@@ -58,12 +76,15 @@
               </li>
             </ul>
           </div>
-          <div v-if="!selectedProblem || selectedProblem.runs.length == 0">
+          <div v-if="!selectedProblem">
+            <div class="empty-category px-10 py-10"></div>
+          </div>
+          <div v-else-if="selectedProblem.runs.length === 0">
             <div class="empty-category px-10 py-10">
               {{ T.courseAssignmentProblemRunsEmpty }}
             </div>
           </div>
-          <template v-else="">
+          <template v-else>
             <div class="card-body pb-0">
               <h5 class="card-title">
                 {{ T.arenaCommonCode }}
@@ -83,7 +104,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="run in selectedProblem.runs">
+                  <tr
+                    v-for="(run, index) in selectedProblem.runs"
+                    v-bind:key="index"
+                  >
                     <td>{{ time.formatDateTime(run.time) }}</td>
                     <td>{{ run.verdict }}</td>
                     <td class="numeric">{{ 100 * run.score }}</td>
@@ -95,41 +119,61 @@
         </div>
       </div>
     </div>
-    <!-- panel-body -->
+    <!-- card-body -->
   </div>
-  <!-- panel -->
+  <!-- card -->
 </template>
-
-<style>
-.omegaup-course-viewstudent p.assignment-description {
-  padding: 1em;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
+import omegaup_Markdown from '../Markdown.vue';
 import T from '../../lang';
 import * as time from '../../time';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class CourseViewStudent extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
   @Prop() initialStudent!: types.StudentProgress;
-  @Prop() problems!: omegaup.CourseProblem[];
+  @Prop() problems!: types.CourseProblem[];
   @Prop() students!: types.StudentProgress[];
 
   T = T;
   time = time;
-  selectedAssignment: Partial<omegaup.Assignment> = {};
-  selectedProblem?: Partial<omegaup.CourseProblem> = undefined;
+  selectedAssignment: string | null = null;
+  selectedProblem: Partial<types.CourseProblem> | null = null;
   selectedStudent: Partial<types.StudentProgress> = this.initialStudent || {};
+
+  get problemsWithPoints(): types.CourseProblem[] {
+    return this.problems.filter(
+      (problem: types.CourseProblem) => problem.points !== 0,
+    );
+  }
+
+  points(assignmentAlias: string): number {
+    return this.problems.reduce(
+      (accumulator: number, problem: types.CourseProblem) =>
+        accumulator + problem.points,
+      0,
+    );
+  }
+
+  getAssignmentDescription(assignmentAlias: string): string {
+    const assignment = this.assignments.find(
+      (assignment) => assignment.alias === assignmentAlias,
+    );
+    return assignment?.description ?? '';
+  }
 
   data(): { [name: string]: any } {
     return {
-      selectedProblem: undefined,
+      selectedProblem: null,
     };
   }
 
@@ -186,17 +230,21 @@ export default class CourseViewStudent extends Vue {
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange(newVal: omegaup.Assignment) {
+  onSelectedAssignmentChange(newVal: string) {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
   }
 
   @Watch('problems')
-  onProblemsChange(newVal: omegaup.CourseProblem[]) {
+  onProblemsChange(newVal: types.CourseProblem[]) {
+    this.selectedProblem = null;
     if (newVal.length === 0) {
-      this.selectedProblem = undefined;
       return;
     }
-    this.selectedProblem = newVal[0];
+    const found = newVal.find((problem) => problem.points !== 0);
+    if (!found) {
+      return;
+    }
+    this.selectedProblem = found;
   }
 }
 </script>
