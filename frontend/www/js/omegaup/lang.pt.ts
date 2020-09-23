@@ -541,7 +541,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleCodersofthemonthFemale: "Programador do m\u00eas feminino",
   omegaupTitleCollections: "Cole\u00e7\u00f5es",
   omegaupTitleCollectionsByAuthor: "Cole\u00e7\u00f5es por autor",
-  omegaupTitleCollectionsByLevel: "Cole\u00e7\u00f5es por n\u00edvel",  
+  omegaupTitleCollectionsByLevel: "Cole\u00e7\u00f5es por n\u00edvel",
   omegaupTitleCommonIndex: "Bem-vindo",
   omegaupTitleContest: "Concurso",
   omegaupTitleContestAddAdmin: "Adicionar admin",

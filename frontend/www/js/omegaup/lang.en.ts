@@ -540,7 +540,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleCodersofthemonth: "Coders of the month",
   omegaupTitleCodersofthemonthFemale: "Coders of the month female",
   omegaupTitleCollections: "Collections",
-   omegaupTitleCollectionsByAuthor: "Problems by author",
+  omegaupTitleCollectionsByAuthor: "Problems by author",
   omegaupTitleCollectionsByLevel: "Problems by level",
   omegaupTitleCommonIndex: "Welcome",
   omegaupTitleContest: "Contest",
