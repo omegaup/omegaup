@@ -148,7 +148,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
         ];
     }
     /**
-     * @return array{smartyProperties: array{payload: BadgeListPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getBadgeListForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
@@ -167,7 +167,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param null|string $badge_alias
      */

@@ -17,6 +17,7 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
+  const locationHash = window.location.hash.substr(1).split('/');
   const problemDetails = new Vue({
     el: '#main-container',
     render: function (createElement) {
@@ -227,6 +228,11 @@ OmegaUp.on('ready', () => {
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
+          'redirect-login-page': () => {
+            window.location.href = `/login/?redirect=${escape(
+              window.location.pathname,
+            )}`;
+          },
         },
       });
     },
@@ -239,7 +245,7 @@ OmegaUp.on('ready', () => {
       allRuns: <types.Run[]>payload.allRuns,
       runs: <types.Run[]>payload.runs,
       runDetails: <types.RunDetails | null>null,
-      showNewRunWindow: false,
+      showNewRunWindow: locationHash.includes('new-run'),
       showRunDetailsWindow: false,
       activeTab: window.location.hash
         ? window.location.hash.substr(1).split('/')[0]

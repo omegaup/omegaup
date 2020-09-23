@@ -80,76 +80,52 @@
             }}
           </div>
         </template>
+        <omegaup-quality-nomination-review
+          v-if="user.reviewer && !nominationStatus.already_reviewed"
+          v-on:submit="
+            (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+          "
+        ></omegaup-quality-nomination-review>
+        <omegaup-quality-nomination-demotion
+          v-on:submit="
+            (qualityDemotionComponent) =>
+              $emit('submit-demotion', qualityDemotionComponent)
+          "
+        ></omegaup-quality-nomination-demotion>
+        <omegaup-quality-nomination-promotion
+          v-if="this.user.loggedIn"
+          v-bind:can-nominate-problem="nominationStatus.canNoominateProblem"
+          v-bind:dismissed="nominationStatus.dismissed"
+          v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
+          v-bind:nominated="nominationStatus.nominated"
+          v-bind:nomination-before-a-c="nominationStatus.nominationBeforeAC"
+          v-bind:solved="nominationStatus.solved"
+          v-bind:tried="nominationStatus.tried"
+          v-bind:problem-alias="problem.alias"
+          v-on:submit="
+            (qualityPromotionComponent) =>
+              $emit('submit-promotion', qualityPromotionComponent)
+          "
+          v-on:dismiss="
+            (qualityPromotionComponent) =>
+              $emit('dismiss-promotion', qualityPromotionComponent)
+          "
+        ></omegaup-quality-nomination-promotion>
         <omegaup-overlay
           v-bind:show-overlay="showOverlay"
+          v-on:overlay-hidden="onPopupDismissed"
           v-if="this.user.loggedIn"
         >
-          <omegaup-quality-nomination-review
-            slot="link-title"
-            v-if="user.reviewer && !nominationStatus.already_reviewed"
-            v-bind:value.sync="showOverlay"
-            v-on:submit="
-              (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
-            "
-            v-on:dismiss="showOverlay = false"
-          >
-            <template slot="activator">
-              {{ T.reviewerNomination }}
-            </template>
-          </omegaup-quality-nomination-review>
-          <omegaup-quality-nomination-demotion
-            slot="link-title"
-            v-bind:value.sync="showOverlay"
-            v-on:submit="
-              (qualityDemotionComponent) =>
-                $emit('submit-demotion', qualityDemotionComponent)
-            "
-            v-on:dismiss="showOverlay = false"
-          >
-            <template slot="activator">
-              {{ T.wordsReportProblem }}
-            </template>
-          </omegaup-quality-nomination-demotion>
-          <omegaup-quality-nomination-promotion
-            slot="link-title"
-            v-bind:can-nominate-problem="nominationStatus.canNominateProblem"
-            v-bind:dismissed="nominationStatus.dismissed"
-            v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
-            v-bind:nominated="nominationStatus.nominated"
-            v-bind:nomination-before-a-c="nominationStatus.nominationBeforeAC"
-            v-bind:solved="nominationStatus.solved"
-            v-bind:tried="nominationStatus.tried"
-            v-bind:problem-alias="problem.alias"
-            v-bind:value.sync="showOverlay"
-            v-on:submit="
-              (qualityPromotionComponent) =>
-                $emit('submit-promotion', qualityPromotionComponent)
-            "
-            v-on:dismiss="
-              (qualityPromotionComponent) =>
-                onDismissPromotion(qualityPromotionComponent)
-            "
-          >
-            <template slot="link-title">
-              {{ T.qualityNominationRateProblem }}
-            </template>
-          </omegaup-quality-nomination-promotion>
           <omegaup-arena-runsubmit
             slot="popup-content"
             v-bind:preferred-language="problem.preferred_language"
             v-bind:languages="problem.languages"
             v-bind:initial-show-form="showFormRunSubmit"
-            v-on:dismiss="onDismissPopup"
+            v-on:dismiss="onPopupDismissed"
             v-on:submit-run="
-              (code, selectedLanguage) => onSubmitRun(code, selectedLanguage)
+              (code, selectedLanguage) => onRunSubmitted(code, selectedLanguage)
             "
           ></omegaup-arena-runsubmit>
-          <omegaup-arena-rundetails
-            slot="popup-content"
-            v-bind:data="runDetails"
-            v-bind:initial-show-form="showFormRunDetails"
-            v-on:dismiss="onDismissPopup"
-          ></omegaup-arena-rundetails>
         </omegaup-overlay>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
@@ -340,7 +316,7 @@ export default class ProblemDetails extends Vue {
   showFormRunDetails = false;
   clarificationsTabVisited = false;
   hasUnreadClarifications =
-    this.initialClarifications.length > 0 &&
+    this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
 
   get availableTabs(): Tab[] {
@@ -375,6 +351,9 @@ export default class ProblemDetails extends Vue {
   }
 
   onNewSubmission(): void {
+    if (!this.user.loggedIn) {
+      this.$emit('redirect-login-page');
+    }
     this.showOverlay = true;
     this.showFormRunSubmit = true;
   }
@@ -393,21 +372,15 @@ export default class ProblemDetails extends Vue {
     this.$emit('dismiss-popup');
   }
 
-  onSubmitRun(code: string, selectedLanguage: string): void {
-    this.$emit('submit-run', code, selectedLanguage);
-    this.onDismissPopup();
-  }
-
-  onDismissPromotion(
-    qualityPromotionComponent: qualitynomination_Promotion,
-  ): void {
+  onPopupDismissed(): void {
     this.showOverlay = false;
-    this.$emit('dismiss-promotion', qualityPromotionComponent);
+    this.showFormRunSubmit = false;
+    this.$emit('update:activeTab', this.selectedTab);
   }
 
-  @Watch('selectedTab')
-  onSelectedTabChanged(newValue: string, oldValue: string): void {
-    this.$emit('tab-selected', newValue);
+  onRunSubmitted(code: string, selectedLanguage: string): void {
+    this.$emit('submit-run', code, selectedLanguage);
+    this.onPopupDismissed();
   }
 
   @Emit('update:activeTab')

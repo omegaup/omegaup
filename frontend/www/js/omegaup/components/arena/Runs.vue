@@ -167,18 +167,10 @@
                 >{{ T.arenaContestEndedUsePractice }}</a
               >
               <a
-                v-bind:href="
-                  isProblemsetOpened
-                    ? `#problems/${problemAlias}/new-run`
-                    : `/arena/${contestAlias}/`
-                "
-                v-on:click="onNewSubmission"
+                v-on:click="$emit('new-submission')"
+                v-bind:href="newSubmissionUrl"
                 v-else
-                >{{
-                  isProblemsetOpened
-                    ? T.wordsNewSubmissions
-                    : T.arenaContestNotOpened
-                }}</a
+                >{{ newSubmissionDescription }}</a
               >
             </td>
           </tr>
@@ -440,6 +432,20 @@ export default class Runs extends Vue {
       }
       return true;
     });
+  }
+
+  get newSubmissionUrl(): string {
+    if (this.isProblemsetOpened) {
+      return `#problems/${this.problemAlias}/new-run`;
+    }
+    return `/arena/${this.contestAlias}/`;
+  }
+
+  get newSubmissionDescription(): string {
+    if (this.isProblemsetOpened) {
+      return T.wordsNewSubmissions;
+    }
+    return T.arenaContestNotOpened;
   }
 
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
