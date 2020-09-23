@@ -1975,7 +1975,7 @@ export namespace types {
   }
 
   export interface ProblemCollectionDetails {
-    collection: string[];
+    collection: { alias: string; name?: string }[];
   }
 
   export interface ProblemDetails {
