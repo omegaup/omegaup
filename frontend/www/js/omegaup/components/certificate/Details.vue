@@ -6,7 +6,11 @@
       </h4>
     </div>
     <div class="panel-body">
-      <omegaup-markdown v-bind:markdown="ui.formatString(T.certificateDetailsBody, { uuid: urlencode(uuid) })"></omegaup-markdown>
+      <omegaup-markdown
+        v-bind:markdown="
+          ui.formatString(T.certificateDetailsBody, { uuid: urlencode(uuid) })
+        "
+      ></omegaup-markdown>
     </div>
   </div>
 </template>
