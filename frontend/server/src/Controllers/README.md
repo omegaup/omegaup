@@ -3719,7 +3719,7 @@ Return most frequent public tags of a certain level
 
 ```typescript
 {
-  name: string;
+  alias: string;
 }
 [];
 ```

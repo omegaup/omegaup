@@ -77,14 +77,14 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     }
 
     /**
-     * @return list<array{name: string}>
+     * @return list<array{alias: string}>
      */
     public static function getFrequentsByLevel(
         string $problemLevel
     ) {
         $sql = '
             SELECT
-                t.name
+                t.name AS alias
             FROM
                 Problems_Tags pt
             INNER JOIN
@@ -111,7 +111,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
                 COUNT(pt.problem_id)
             ';
 
-        /** @var list<array{name: string}> */
+        /** @var list<array{alias: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemLevel]

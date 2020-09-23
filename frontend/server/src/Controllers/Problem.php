@@ -5656,10 +5656,23 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         } else {
             //Author
-            $collection = \OmegaUp\Controllers\User::getAuthorsRank(
+            $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRank(
                 1,
                 15
-            );
+            )['ranking'];
+            $collection = [];
+            foreach ($authorsRanking as $author) {
+                if (!is_null($author['name'])) {
+                    $collection[] = [
+                        'name' => $author['name'],
+                        'alias' => $author['username'],
+                    ];
+                    continue;
+                }
+                $collection[] = [
+                    'alias' => $author['username'],
+                ];
+            }
             $title = new \OmegaUp\TranslationString(
                 'omegaupTitleCollectionsByAuthor'
             );
