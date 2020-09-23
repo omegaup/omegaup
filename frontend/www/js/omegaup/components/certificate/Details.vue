@@ -8,7 +8,9 @@
     <div class="panel-body">
       <omegaup-markdown
         v-bind:markdown="
-          ui.formatString(T.certificateDetailsBody, { uuid: uuid })
+          encodeURIComponent(
+            ui.formatString(T.certificateDetailsBody, { uuid: uuid }),
+          )
         "
       ></omegaup-markdown>
     </div>
