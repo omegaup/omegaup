@@ -2,11 +2,15 @@
   <div class="panel panel-default">
     <div class="panel-heading">
       <h4 class="panel-title">
-        {{ T.certificateDetailsTitle }}
+        T.certificateDetailsTitle
       </h4>
     </div>
     <div class="panel-body">
-      {{ ui.formatString(T.certificateDetailsBody, { uuid: this.uuid }) }}
+      <span
+        v-html="
+          ui.formatString(T.certificateDetailsBody, { uuid: this.uuid })
+        "
+      ></span>
     </div>
   </div>
 </template>
