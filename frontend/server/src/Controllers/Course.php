@@ -3387,18 +3387,17 @@ class Course extends \OmegaUp\Controllers\Controller {
 
             $statements = [];
             if (!is_null($privacyStatementMarkdown)) {
-                $privacyStatement = [
-                    'markdown' => $privacyStatementMarkdown,
-                ];
                 $statementType = "course_{$requestUserInformation}_consent";
                 $statement =
                     \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
                         $statementType
                     );
-                $privacyStatement['statementType'] = $statementType;
                 if (!is_null($statement)) {
-                    $privacyStatement['gitObjectId'] = $statement['git_object_id'];
-                    $statements['privacy'] = $privacyStatement;
+                    $statements['privacy'] = [
+                        'markdown' => $privacyStatementMarkdown,
+                        'statementType' => $statementType,
+                        'gitObjectId' => $statement['git_object_id'],
+                    ];
                 }
             }
 
@@ -3406,17 +3405,16 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity->language_id,
                 'accept_teacher'
             );
-            $acceptTeacherStatement = [
-                'markdown' => $markdown,
-                'statementType' => 'accept_teacher',
-            ];
             $teacherStatement =
                 \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
                     'accept_teacher'
                 );
             if (!is_null($teacherStatement)) {
-                $acceptTeacherStatement['gitObjectId'] = $teacherStatement['git_object_id'];
-                $statements['acceptTeacher'] = $acceptTeacherStatement;
+                $statements['acceptTeacher'] = [
+                    'markdown' => $markdown,
+                    'statementType' => 'accept_teacher',
+                    'gitObjectId' => $teacherStatement['git_object_id'],
+                ];
             }
             $coursePayload = array_merge(
                 $registrationResponse,
