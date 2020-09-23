@@ -70,7 +70,7 @@ export interface Problem {
   quality_seal: boolean;
   quality_payload?: types.ProblemQualityPayload;
   runs?: types.Run[];
-  settings?: types.ProblemSettings;
+  settings?: types.ProblemSettingsDistrib;
   source?: string;
   statement?: types.ProblemStatement;
   title: string;
@@ -311,7 +311,7 @@ export class Arena {
   markdownView: Vue & {
     markdown: string;
     imageMapping: markdown.ImageMapping;
-    problemSettings?: types.ProblemSettings;
+    problemSettings?: types.ProblemSettingsDistrib;
   };
 
   runDetailsView:
@@ -643,7 +643,7 @@ export class Arena {
       data: {
         markdown: '',
         imageMapping: <markdown.ImageMapping>{},
-        problemSettings: <types.ProblemSettings | undefined>undefined,
+        problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
       },
       components: {
         'omegaup-markdown': omegaup_Markdown,
@@ -1884,8 +1884,6 @@ export class Arena {
   }
 
   onProblemRendered(): void {
-    ui.renderSampleToClipboardButton();
-
     const libinteractiveInterfaceNameElement = <HTMLElement>(
       this.markdownView.$el.querySelector('span.libinteractive-interface-name')
     );

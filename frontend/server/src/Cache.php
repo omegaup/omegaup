@@ -209,6 +209,7 @@ class Cache {
     const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-';
     const CODERS_OF_THE_MONTH = 'coders-of-the-month';
     const CONTEST_INFO = 'contest-info-';
+    const PROBLEM_SETTINGS = 'problem-settings-json-';
     const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
     const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_SOLUTION = 'solution-';

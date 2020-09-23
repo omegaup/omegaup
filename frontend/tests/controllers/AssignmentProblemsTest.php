@@ -496,7 +496,9 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'user' => $user,
             'identity' => $identities[]
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'username' => 'user0',
+        ]));
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $identities[0]
@@ -505,7 +507,9 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
         [
             'user' => $user,
             'identity' => $identities[]
-        ] = \OmegaUp\Test\Factories\User::createUser();
+        ] = \OmegaUp\Test\Factories\User::createUser(new \OmegaUp\Test\Factories\UserParams([
+            'username' => 'user1',
+        ]));
         \OmegaUp\Test\Factories\Course::addStudentToCourse(
             $courseData,
             $identities[1]
@@ -583,7 +587,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[0]['problem']->problem_id,
                 'problem_alias' => $problemsData[0]['problem']->alias,
-
               ],
               [
                 'verdict' => 'AC',
@@ -591,6 +594,13 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[0]['problem']->problem_id,
                 'problem_alias' => $problemsData[0]['problem']->alias,
+              ],
+              [
+                'verdict' => 'AC',
+                'runs' => 1,
+                'assignment_alias' => $assignmentAlias,
+                'problem_id' => $problemsData[1]['problem']->problem_id,
+                'problem_alias' => $problemsData[1]['problem']->alias,
               ],
               [
                 'verdict' => 'CE',
@@ -608,13 +618,6 @@ class AssignmentProblemsTest extends \OmegaUp\Test\ControllerTestCase {
               ],
               [
                 'verdict' => 'TLE',
-                'runs' => 1,
-                'assignment_alias' => $assignmentAlias,
-                'problem_id' => $problemsData[1]['problem']->problem_id,
-                'problem_alias' => $problemsData[1]['problem']->alias,
-              ],
-              [
-                'verdict' => 'AC',
                 'runs' => 1,
                 'assignment_alias' => $assignmentAlias,
                 'problem_id' => $problemsData[1]['problem']->problem_id,
