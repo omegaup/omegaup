@@ -184,13 +184,25 @@ class Validators {
     }
 
     /**
+     * Returns whether the alias is valid.
+     *
+     * @param string $alias
+     * @return boolean
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
+    public static function alias(string $alias): bool {
+        return \OmegaUp\Validators::isValidAlias($alias);
+    }
+
+    /**
      * Returns whether the alias is restricted.
      *
      * @param string $alias the alias.
      * @return boolean whether the alias is restricted.
      */
     public static function isRestrictedAlias(string $alias): bool {
-        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup'];
+        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup', 'collection'];
         return in_array(strtolower($alias), $restrictedAliases);
     }
 

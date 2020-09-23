@@ -36,7 +36,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}
  * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>, verdicts: list<CourseProblemVerdict>}
  * @psalm-type CourseStudent=array{name: null|string, username: string}
- * @psalm-type StudentProgress=array{name: string|null, progress: array<string, array<string, float>>, username: string}
+ * @psalm-type StudentProgress=array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
  * @psalm-type CourseAssignmentEditPayload=array{course: CourseDetails, assignment: CourseAssignment|null}
@@ -554,8 +554,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         );
         $newAlias = $r->ensureString(
             'alias',
-            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+
         $newName = $r->ensureString(
             'name',
             fn (string $name) => \OmegaUp\Validators::stringNonEmpty($name)
@@ -709,7 +710,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                         false, // visbility mode validation no needed when it is a clone
                         100,
                         null,
-                        1
+                        $problem['order']
                     );
                 }
             }
@@ -2585,7 +2586,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseCloneDetailsPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $token
@@ -2680,7 +2681,7 @@ class Course extends \OmegaUp\Controllers\Controller {
 
     /**
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseNewPayload, title:string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseNewPayload, title:\OmegaUp\TranslationString}}
      */
     public static function getCourseNewDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
@@ -2702,7 +2703,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseEditPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course
      */
@@ -2737,7 +2738,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course
@@ -2823,7 +2824,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseSubmissionsListPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param string $course
      */
@@ -2869,7 +2870,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: StudentsProgressPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: StudentsProgressPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      */
@@ -2910,7 +2911,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: StudentProgressPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: StudentProgressPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      * @omegaup-request-param string $student
@@ -2957,7 +2958,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListMinePayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCourseMineDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3021,7 +3022,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCourseListDetailsForSmarty(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -3061,7 +3062,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      *
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: string}}
+     * @return array{entrypoint: string, smartyProperties: array{payload: CourseListPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getCourseSummaryListDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3142,7 +3143,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: CourseStatisticsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $course
      */
@@ -3403,13 +3404,14 @@ class Course extends \OmegaUp\Controllers\Controller {
             && $requestUserInformation !== 'no'
             )
         ) {
-            $needsBasicInformation = $courseDetails['needs_basic_information']
-                && (!is_null($r->identity->country_id)
-                || !is_null(
-                    $r->identity->state_id
-                ) || !is_null(
-                    $r->identity->current_identity_school_id
-                ));
+            $needsBasicInformation = (
+                $courseDetails['needs_basic_information']
+                && (
+                    is_null($r->identity->country_id)
+                    || is_null($r->identity->state_id)
+                    || is_null($r->identity->current_identity_school_id)
+                )
+            );
 
             // Privacy Statement Information
             $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(

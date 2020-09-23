@@ -258,8 +258,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * Returns a list of students within a course with their progress
-     * @return list<array{name: string|null, progress: array<string, array<string, float>>, username: string}>
+     * Returns a list of students within a course with their score and progress
+     * by problem
+     * @return list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
         int $courseId,
@@ -282,6 +283,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.problemset_id,
                             p.problem_id,
                             p.alias AS problem_alias,
+                            `psp`.`order`,
                             psp.points AS problem_points
                         FROM Assignments a
                         INNER JOIN Problemsets ps
@@ -304,7 +306,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 WHERE
                     gi.group_id = ?
                 GROUP BY
-                    i.identity_id, pr.assignment_id, pr.problem_id;';
+                    i.identity_id, pr.assignment_id, pr.problem_id
+                ORDER BY
+                    `pr`.`order`;';
 
         /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -319,6 +323,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $allProgress[$username] = [
                     'name' => $row['name'],
                     'progress' => [],
+                    'points' => [],
+                    'score' => [],
                     'username' => $username,
                 ];
             }
@@ -332,15 +338,27 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
             $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = (
                 $row['problem_points'] == 0
-            ) ? 0 :
+            ) ? 0.0 :
             floatval($row['problem_score']) / $row['problem_points'] * 100;
+
+            if (!isset($allProgress[$username]['points'][$assignmentAlias])) {
+                $allProgress[$username]['points'][$assignmentAlias] = [];
+            }
+
+            $allProgress[$username]['points'][$assignmentAlias][$problemAlias] = $row['problem_points'] ?: 0.0;
+
+            if (!isset($allProgress[$username]['score'][$assignmentAlias])) {
+                $allProgress[$username]['score'][$assignmentAlias] = [];
+            }
+
+            $allProgress[$username]['score'][$assignmentAlias][$problemAlias] = $row['problem_score'] ?: 0.0;
         }
 
         usort(
             $allProgress,
             /**
-             * @param array{name: string|null, progress: array<string, array<string, float>>, username: string} $a
-             * @param array{name: string|null, progress: array<string, array<string, float>>, username: string} $b
+             * @param array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $a
+             * @param array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $b
              */
             fn (array $a, array $b) => strcasecmp(
                 !empty($a['name']) ? $a['name'] : $a['username'],
