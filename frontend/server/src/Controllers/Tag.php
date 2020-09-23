@@ -87,6 +87,8 @@ class Tag extends \OmegaUp\Controllers\Controller {
      * Return most frequent public tags of a certain level
      *
      * @return list<array{name: string}>
+     *
+     * @omegaup-request-param string $problemLevel
      */
     public static function apiFrequentTags(\OmegaUp\Request $r): array {
         $param = $r->ensureString('problemLevel');

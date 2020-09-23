@@ -3709,6 +3709,12 @@ TagController
 
 Return most frequent public tags of a certain level
 
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `problemLevel` | `string` |             |
+
 ### Returns
 
 ```typescript
