@@ -504,7 +504,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty($courseAlias)
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
 
@@ -3198,7 +3198,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $courseAlias = $r->ensureString(
             'course',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty($courseAlias)
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
 
@@ -3287,7 +3287,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty($courseAlias)
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
