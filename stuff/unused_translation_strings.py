@@ -70,12 +70,6 @@ def _main() -> None:
             # Badge names and descriptions.
             if translation_string_name.startswith('badge_'):
                 continue
-            # Automatic title generation for the unified template.
-            if translation_string_name.startswith('omegaupTitle'):
-                continue
-            # Verdict translations and their descriptions.
-            if translation_string_name.startswith('verdict'):
-                continue
             # Verdict translations and their descriptions.
             if translation_string_name.startswith('verdict'):
                 continue

@@ -29,7 +29,19 @@ describe('StudentProgress.vue', () => {
         ],
         student: <types.StudentProgress>{
           name: 'student',
+          points: {
+            ['assignment']: {
+              ['problem1']: 100,
+              ['problem2']: 100,
+            },
+          },
           progress: {
+            ['assignment']: {
+              ['problem1']: 55,
+              ['problem2']: 44,
+            },
+          },
+          score: {
             ['assignment']: {
               ['problem1']: 55,
               ['problem2']: 44,

@@ -154,6 +154,66 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Trying to create a course using blank spaces in the alias
+     */
+    public function testCreateCourseCloneWithInvalidAlias() {
+        $homeworkCount = 2;
+        $testCount = 2;
+        $problemsPerAssignment = 2;
+        $studentCount = 2;
+        $problemAssignmentsMap = [];
+
+        // Create course with assignments
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType([
+            'homework' => $homeworkCount,
+            'test' => $testCount
+        ]);
+
+        // Add problems to assignments
+        $adminLogin = self::login($courseData['admin']);
+        for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
+            $assignmentAlias = $courseData['assignment_aliases'][$i];
+            $problemAssignmentsMap[$assignmentAlias] = [];
+
+            for ($j = 0; $j < $problemsPerAssignment; $j++) {
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+                \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
+                    'auth_token' => $adminLogin->auth_token,
+                    'course_alias' => $courseData['course_alias'],
+                    'assignment_alias' => $assignmentAlias,
+                    'problem_alias' => $problemData['request']['problem_alias'],
+                ]));
+                $problemAssignmentsMap[$assignmentAlias][] = $problemData;
+            }
+        }
+
+        // Create & add students to course
+        $studentsUsername = [];
+        $studentsData = null;
+        for ($i = 0; $i < $studentCount; $i++) {
+            $studentsData = \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData
+            );
+            $studentsUsername[] = $studentsData->username;
+        }
+
+        // Clone the course
+        $adminLogin = self::login($courseData['admin']);
+        try {
+            \OmegaUp\Controllers\Course::apiClone(new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => 'This is not a valid alias',
+                'start_time' => \OmegaUp\Time::get()
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+    }
+
+    /**
      * Create clone of a course with problems that have been changed their
      * visibility mode from public to private
      */
@@ -458,6 +518,118 @@ class CourseCloneTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('It should fail');
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             $this->assertEquals($e->getMessage(), 'tokenDecodeCorrupted');
+        }
+    }
+
+    public function testCreateCourseCloneWithProblemOrder() {
+        $problemsAssignment = 5;
+        $studentCount = 2;
+        $assignmentProblemsMap = [];
+
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+        $assignmentAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        // Create the problems and then reorder them
+        $adminLogin = self::login($courseData['admin']);
+        foreach (range(0, $problemsAssignment - 1) as $index) {
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'title' => "problem_{$index}",
+                ])
+            );
+            $assignmentProblemsMap[]['alias'] = $problemData['problem']->alias;
+        }
+
+        $orderedProblems = [
+            $assignmentProblemsMap[2],
+            $assignmentProblemsMap[4],
+            $assignmentProblemsMap[3],
+            $assignmentProblemsMap[0],
+            $assignmentProblemsMap[1],
+        ];
+
+        // Create the assignment with problems
+        \OmegaUp\Controllers\Course::apiCreateAssignment(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'alias' => $assignmentAlias,
+            'assignment_type' => 'homework',
+            'course_alias' => $courseData['course_alias'],
+            'description' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'start_time' => \OmegaUp\Time::get(),
+            'finish_time' => \OmegaUp\Time::get() + (2 * 60),
+            'problems' => json_encode($orderedProblems),
+        ]));
+
+        [
+            'assignments' => $assignments,
+        ] = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'alias' => $courseData['course_alias']
+            ])
+        );
+        [$assignment] = $assignments;
+
+        [
+            'problems' => $problems,
+        ] = \OmegaUp\Controllers\Course::apiAssignmentDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'assignment' => $assignment['alias'],
+                'course' => $courseData['course_alias']
+            ])
+        );
+
+        foreach ($problems as $index => $problem) {
+            $this->assertEquals(
+                $problem['alias'],
+                $orderedProblems[$index]['alias']
+            );
+        }
+
+        $newCourseAlias = \OmegaUp\Test\Utils::createRandomString();
+
+        $clonedCourseData = \OmegaUp\Controllers\Course::apiClone(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $newCourseAlias,
+                'start_time' => \OmegaUp\Time::get(),
+            ])
+        );
+
+        $this->assertEquals($newCourseAlias, $clonedCourseData['alias']);
+
+        [
+            'assignments' => $assignments,
+        ] = \OmegaUp\Controllers\Course::apiDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'alias' => $newCourseAlias
+            ])
+        );
+        [$assignment] = $assignments;
+
+        [
+            'problems' => $problems,
+        ] = \OmegaUp\Controllers\Course::apiAssignmentDetails(
+            new \OmegaUp\Request([
+                'auth_token' => $adminLogin->auth_token,
+                'assignment' => $assignment['alias'],
+                'course' => $newCourseAlias
+            ])
+        );
+
+        $this->assertEquals($problemsAssignment, count($problems));
+
+        foreach ($problems as $index => $problem) {
+            $this->assertEquals(
+                $problem['alias'],
+                $orderedProblems[$index]['alias'],
+                'Problems order should be the same as the original course'
+            );
         }
     }
 }

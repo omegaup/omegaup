@@ -2543,7 +2543,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * Prepare all the properties to be sent to the
      * author rank table view via smarty.
      *
-     * @return array{smartyProperties: array{payload: AuthorRankTablePayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: AuthorRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int|null $length
      * @omegaup-request-param int|null $page
@@ -3345,7 +3345,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Prepare all the properties to be sent to the rank table view via smarty
      *
-     * @return array{smartyProperties: array{payload: UserRankTablePayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: UserRankTablePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param mixed $filter
      * @omegaup-request-param int $length
@@ -3391,6 +3391,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         $filter === '' ? [] : [ 'filter' => $filter ]
                     ),
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleUsersRank'
+                )
             ],
             'entrypoint' => 'users_rank',
         ];
@@ -3445,7 +3448,7 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $category
      * @omegaup-request-param null|string $date
      *
-     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: IndexPayload}}
+     * @return array{entrypoint: string, smartyProperties: array{fullWidth: bool, payload: IndexPayload, title: \OmegaUp\TranslationString}}
      */
     public static function getIndexDetailsForSmarty(\OmegaUp\Request $r) {
         try {
@@ -3502,6 +3505,9 @@ class User extends \OmegaUp\Controllers\Controller {
                     ] : [],
                 ],
                 'fullWidth' => true,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCommonIndex'
+                ),
             ],
             'entrypoint' => 'common_index',
         ];
@@ -3512,7 +3518,7 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param mixed $category
      *
-     * @return array{smartyProperties: array{payload: CoderOfTheMonthPayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: CoderOfTheMonthPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getCoderOfTheMonthDetailsForSmarty(
         \OmegaUp\Request $r
@@ -3574,6 +3580,15 @@ class User extends \OmegaUp\Controllers\Controller {
             return [
                 'smartyProperties' => [
                     'payload' => $response,
+                    'title' => (
+                        (strval($category) === 'female') ?
+                        new \OmegaUp\TranslationString(
+                            'omegaupTitleCodersofthemonthFemale'
+                        ) :
+                        new \OmegaUp\TranslationString(
+                            'omegaupTitleCodersofthemonth'
+                        )
+                    ),
                 ],
                 'entrypoint' => 'coder_of_the_month',
             ];
