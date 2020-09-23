@@ -69,6 +69,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
+     * @return list<array{alias: string}>
      */
     public static function getFrequentTagsByLevel(
         string $problemLevel
