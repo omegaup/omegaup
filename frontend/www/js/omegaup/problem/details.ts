@@ -2,6 +2,7 @@ import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
+import { Arena, GetOptionsFromLocation } from '../arena/arena';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -10,11 +11,13 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
+  const locationHash = window.location.hash.substr(1).split('/');
   const problemDetails = new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
+          activeTab: this.activeTab,
           allRuns: payload.allRuns,
           problem: payload.problem,
           runs: payload.runs,
@@ -27,6 +30,7 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
+          showNewRunWindow: this.showNewRunWindow,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -177,6 +181,14 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update:activeTab': (tabName: string) => {
+            window.location.replace(`#${tabName}`);
+          },
+          'redirect-login-page': () => {
+            window.location.href = `/login/?redirect=${escape(
+              window.location.pathname,
+            )}`;
+          },
         },
       });
     },
@@ -186,6 +198,8 @@ OmegaUp.on('ready', () => {
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
       allTokens: 0,
+      showNewRunWindow: locationHash.includes('new-run'),
+      activeTab: window.location.hash ? locationHash[0] : 'problems',
     },
     components: {
       'omegaup-problem-details': problem_Details,

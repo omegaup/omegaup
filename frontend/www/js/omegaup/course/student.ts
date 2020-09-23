@@ -32,14 +32,11 @@ OmegaUp.on('ready', () => {
           students: payload.students,
         },
         on: {
-          update: (
-            student: types.StudentProgress,
-            assignment: types.CourseAssignment,
-          ) => {
-            if (assignment == null) return;
+          update: (student: types.StudentProgress, assignmentAlias: string) => {
+            if (assignmentAlias == null) return;
             api.Course.studentProgress({
               course_alias: payload.course.alias,
-              assignment_alias: assignment.alias,
+              assignment_alias: assignmentAlias,
               usernameOrEmail: student.username,
             })
               .then((data) => {
