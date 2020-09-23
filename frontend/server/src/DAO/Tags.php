@@ -77,7 +77,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     }
 
     /**
-     * @return list<string>
+     * @return list<array{name: string}>
      */
     public static function getFrequentsByLevel(
         string $problemLevel
