@@ -7,9 +7,7 @@
     </div>
     <div class="panel-body">
       <span
-        v-html="
-          ui.formatString(T.certificateDetailsBody, { uuid: this.uuid })
-        "
+        v-html="ui.formatString(T.certificateDetailsBody, { uuid: this.uuid })"
       ></span>
     </div>
   </div>
