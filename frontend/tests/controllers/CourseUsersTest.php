@@ -98,7 +98,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['template'], 'arena.course.intro.tpl');
+        $this->assertEquals($response['entrypoint'], 'course_intro');
     }
 
     public function testUserCanAccessToCourseDetailsWhenIsInvitedAsAdmin() {
