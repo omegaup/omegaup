@@ -146,7 +146,7 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
-            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
+            'problem_level' => $params->problemLevel,
         ]);
 
         // Set file upload context

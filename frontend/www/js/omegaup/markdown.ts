@@ -88,7 +88,7 @@ export class Converter {
       </div>`;
     }
 
-    const whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
+    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)*[\]$]+)|(?:[a-z\/_-]+))")|(?:target="[a-z\/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
     const imageWhitelist = new RegExp(
       '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',
       'i',

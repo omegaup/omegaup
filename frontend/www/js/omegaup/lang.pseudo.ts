@@ -542,6 +542,7 @@ const translations: { [key: string]: string; } = {
   omegaupTitleCertificate: "(C3r7ifica735)",
   omegaupTitleCodersofthemonth: "(C0d3r5 0f 7h3 m0n7h)",
   omegaupTitleCodersofthemonthFemale: "(C0d3r5 0f 7h3 m0n7h f3ma13)",
+  omegaupTitleCollections: "(C0113c7i0n5)",
   omegaupTitleCommonIndex: "(W31c0m3)",
   omegaupTitleContest: "(C0n7357)",
   omegaupTitleContestAddAdmin: "(Add admin)",
