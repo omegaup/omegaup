@@ -2725,7 +2725,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     ): void {
         $time = \OmegaUp\Time::get();
         $note = \OmegaUp\Translations::getInstance()->get(
-            'wordsAutoAccepted'
+            'contestRegistrationPreAcceptedDescription'
         );
         foreach ($identitiesIDs as $identityID) {
             if (

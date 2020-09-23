@@ -2126,7 +2126,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function apiAddStudent(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $r->ensureIdentity();
+        $r->ensureMainUserIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
@@ -2146,6 +2146,9 @@ class Course extends \OmegaUp\Controllers\Controller {
         $resolvedIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(
             $r['usernameOrEmail']
         );
+        if (is_null($resolvedIdentity->identity_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
         $acceptTeacher = $r->ensureOptionalBool('accept_teacher');
         $shareUserInformation = $r->ensureOptionalBool(
             'share_user_information'
@@ -2157,7 +2160,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             && ($course->admission_mode !== self::ADMISSION_MODE_PUBLIC
             || $resolvedIdentity->identity_id !== $r->identity->identity_id)
             && $course->requests_user_information == 'no'
-            && is_null($r['accept_teacher'])
+            && is_null($acceptTeacher)
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
@@ -2247,6 +2250,15 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\DAO\GroupsIdentities::replace($groupIdentity);
 
+            if ($course->admission_mode === self::ADMISSION_MODE_REGISTRATION) {
+                // Pre-accept user
+                self::preAcceptAccessRequest(
+                    $course,
+                    [$resolvedIdentity->identity_id],
+                    $r->user
+                );
+            }
+
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
@@ -2256,6 +2268,45 @@ class Course extends \OmegaUp\Controllers\Controller {
         return [
             'status' => 'ok',
         ];
+    }
+
+    /**
+     * @param list<int> $identitiesIDs
+     */
+    private static function preAcceptAccessRequest(
+        \OmegaUp\DAO\VO\Courses $course,
+        array $identitiesIDs,
+        \OmegaUp\DAO\VO\Users $admin
+    ): void {
+        $time = \OmegaUp\Time::get();
+        $note = \OmegaUp\Translations::getInstance()->get(
+            'courseRegistrationPreAcceptedDescription'
+        );
+        foreach ($identitiesIDs as $identityID) {
+            if (
+                \OmegaUp\DAO\CourseIdentityRequest::replace(
+                    new \OmegaUp\DAO\VO\CourseIdentityRequest([
+                        'identity_id' => $identityID,
+                        'course_id' => $course->course_id,
+                        'request_time' => $time,
+                        'last_update' => $time,
+                        'accepted' => true,
+                        'extra_note' => $note,
+                    ])
+                ) > 0
+            ) {
+                // Save this action in the history
+                \OmegaUp\DAO\CourseIdentityRequestHistory::create(
+                    new \OmegaUp\DAO\VO\CourseIdentityRequestHistory([
+                        'identity_id' => $identityID,
+                        'course_id' => $course->course_id,
+                        'time' => $time,
+                        'admin_id' => $admin->user_id,
+                        'accepted' => true,
+                    ])
+                );
+            }
+        }
     }
 
     /**
@@ -4172,18 +4223,26 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $r->ensureIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['alias'],
-            'alias'
+        $r->ensureMainUserIdentity();
+        $alias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $updateRequests = $r->ensureOptionalEnum(
+            'admission_mode',
+            [
+                self::ADMISSION_MODE_PUBLIC,
+                self::ADMISSION_MODE_REGISTRATION,
+                self::ADMISSION_MODE_PRIVATE,
+            ]
+        ) === self::ADMISSION_MODE_REGISTRATION;
 
-        $originalCourse = self::validateUpdate($r, $r['alias']);
+        $course = self::validateUpdate($r, $alias);
 
         if (
             !\OmegaUp\Authorization::isCourseAdmin(
                 $r->identity,
-                $originalCourse
+                $course
             )
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
@@ -4205,22 +4264,55 @@ class Course extends \OmegaUp\Controllers\Controller {
             'requests_user_information',
             'admission_mode',
         ];
-        self::updateValueProperties($r, $originalCourse, $valueProperties);
+        $originalAdmissionMode = $course->admission_mode;
+        self::updateValueProperties($r, $course, $valueProperties);
         $unlimitedDuration = $r->ensureOptionalBool(
             'unlimited_duration'
         ) ?? false;
 
         // Set null finish time if required
         if ($unlimitedDuration) {
-            $originalCourse->finish_time = null;
+            $course->finish_time = null;
         }
 
-        // Push changes
-        \OmegaUp\DAO\Courses::update($originalCourse);
+        try {
+            // Begin a new transaction
+            \OmegaUp\DAO\DAO::transBegin();
 
+            // Push changes
+            \OmegaUp\DAO\Courses::update($course);
+
+            if ($updateRequests) {
+                // Get the list of contestants
+                $identities = \OmegaUp\DAO\GroupsIdentities::getGroupIdentities(
+                    new \OmegaUp\DAO\VO\Groups([
+                        'group_id' => $course->group_id,
+                    ])
+                );
+                // Extract IDs
+                $identitiesIDs = array_map(
+                    /**
+                     * @param array{identity_id: int} $identity
+                     */
+                    function ($identity): int {
+                        return $identity['identity_id'];
+                    },
+                    $identities
+                );
+                self::preAcceptAccessRequest(
+                    $course,
+                    $identitiesIDs,
+                    $r->user
+                );
+            }
+        } catch (\Exception $e) {
+            // Operation failed in the data layer, rollback transaction
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
         // TODO: Expire cache
 
-        self::$log->info("Course updated (alias): {$r['alias']}");
+        self::$log->info("Course updated (alias): {$alias}");
         return [
             'status' => 'ok',
         ];

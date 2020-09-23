@@ -271,6 +271,9 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.courseEditCourseEdited);
+                if (admissionMode === 'registration') {
+                  this.refreshStudentList();
+                }
               })
               .catch(ui.apiError);
           },
