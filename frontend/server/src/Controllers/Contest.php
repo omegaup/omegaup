@@ -1484,17 +1484,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::getAccessForProblemset(
-            $response['contest']->problemset_id
-        );
-        $submissions = \OmegaUp\DAO\SubmissionLog::getSubmissionsForProblemset(
-            $response['contest']->problemset_id
-        );
-
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                $accesses,
-                $submissions
+                \OmegaUp\DAO\Contests::getActivityReport($response['contest'])
             ),
         ];
     }
@@ -1510,9 +1502,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $alias = $r->ensureString(
             'contest',
-            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty(
-                $alias
-            )
+            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
         );
         ['contest' => $contest] = self::validateBasicDetails($alias);
 
@@ -1531,12 +1521,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'alias' => $alias,
                     'events' => \OmegaUp\ActivityReport::getActivityReport(
-                        \OmegaUp\DAO\ProblemsetAccessLog::getAccessForProblemset(
-                            $contest->problemset_id
-                        ),
-                        \OmegaUp\DAO\SubmissionLog::getSubmissionsForProblemset(
-                            $contest->problemset_id
-                        )
+                        \OmegaUp\DAO\Contests::getActivityReport($contest)
                     ),
                     'type' => 'contest',
                 ],

@@ -10,25 +10,11 @@ namespace OmegaUp;
  */
 class ActivityReport {
     /**
-     * @param list<array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $accesses
-     * @param list<array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $submissions
+     * @param list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $events
      *
      * @return list<ActivityEvent>
      */
-    final public static function getActivityReport(
-        array $accesses,
-        array $submissions
-    ): array {
-        $events = array_merge($accesses, $submissions);
-
-        usort(
-            $events,
-            /**
-             * @param array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string} $a
-             * @param array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string} $b
-             */
-            fn (array $a, array $b) => $a['time'] <=> $b['time']
-        );
+    final public static function getActivityReport(array $events): array {
         $events = array_map(fn ($event) => self::processData($event), $events);
 
         // Anonymize data.
@@ -48,13 +34,13 @@ class ActivityReport {
     }
 
     /**
-     * @param array{alias?: string, classname: string, eventType: string, ip: int, time: \OmegaUp\Timestamp, username: string} $data
+     * @param array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string} $data
      * @return ActivityEvent
      */
     private static function processData(array $data): array {
-        $event = ['name' => $data['eventType']];
-        if ($data['eventType'] === 'submit') {
-            if (isset($data['alias'])) {
+        $event = ['name' => $data['event_type']];
+        if ($data['event_type'] === 'submit') {
+            if (!is_null($data['alias'])) {
                 $event['problem'] = $data['alias'];
             }
         }

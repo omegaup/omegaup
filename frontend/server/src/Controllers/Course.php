@@ -504,9 +504,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $courseAlias
-            )
+            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
 
@@ -3199,9 +3197,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $courseAlias = $r->ensureString(
             'course',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $courseAlias
-            )
+            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
 
@@ -3218,12 +3214,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'alias' => $courseAlias,
                     'events' => \OmegaUp\ActivityReport::getActivityReport(
-                        \OmegaUp\DAO\ProblemsetAccessLog::getAccessForCourse(
-                            $course->course_id
-                        ),
-                        \OmegaUp\DAO\SubmissionLog::getSubmissionsForCourse(
-                            $course->course_id
-                        )
+                        \OmegaUp\DAO\Courses::getActivityReport($course)
                     ),
                     'type' => 'course',
                 ],
@@ -3295,9 +3286,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $courseAlias
-            )
+            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
@@ -3682,17 +3671,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::getAccessForCourse(
-            $course->course_id
-        );
-        $submissions = \OmegaUp\DAO\SubmissionLog::getSubmissionsForCourse(
-            $course->course_id
-        );
-
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                $accesses,
-                $submissions
+                \OmegaUp\DAO\Courses::getActivityReport($course)
             ),
         ];
     }
