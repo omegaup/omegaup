@@ -38,6 +38,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
+ * @psalm-type ProblemListCollection=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -4774,6 +4775,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 ),
             ],
             'entrypoint' => 'problem_list',
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: ProblemListCollection, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getProblemCollectionDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
+                    'problemCount' => \OmegaUp\DAO\Problems::getProblemsPerTagCount()
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCollections'
+                ),
+            ],
+            'entrypoint' => 'problem_collections',
         ];
     }
 
