@@ -6,9 +6,7 @@
       </h4>
     </div>
     <div class="panel-body">
-      <span
-        v-html="ui.formatString(T.certificateDetailsBody, { uuid: this.uuid })"
-      ></span>
+      <omegaup-markdown v-bind:markdown="ui.formatString(T.certificateDetailsBody, { uuid: urlencode(uuid) })"></omegaup-markdown>
     </div>
   </div>
 </template>
@@ -18,7 +16,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class CertificateDetails extends Vue {
   @Prop() uuid!: string;
 
