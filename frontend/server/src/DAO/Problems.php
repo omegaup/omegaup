@@ -1132,4 +1132,29 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
         return $problems;
     }
+
+    /**
+     * @return list<array{name: string, problems_per_tag: int}>
+     */
+    final public static function getProblemsPerTagCount(): array {
+        $sql = "SELECT
+                    t.name, COUNT(p.problem_id) AS problems_per_tag
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
+                WHERE
+                    t.name LIKE CONCAT('problemLevel','%')
+                GROUP BY
+                    t.name;";
+
+        /** @var list<array{name: string, problems_per_tag: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+    }
 }

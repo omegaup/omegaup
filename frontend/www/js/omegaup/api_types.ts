@@ -111,6 +111,14 @@ export namespace types {
       );
     }
 
+    export function CertificateDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CertificateDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CoderOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.CoderOfTheMonthPayload {
@@ -783,32 +791,8 @@ export namespace types {
     export function IntroDetailsPayload(
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
-      return ((x) => {
-        x.details = ((x) => {
-          if (x.assignments)
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
-                return x;
-              });
-            })(x.assignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.details);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
@@ -1245,7 +1229,7 @@ export namespace types {
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     runs?: types.Run[];
-    settings?: types.ProblemSettings;
+    settings?: types.ProblemSettingsDistrib;
     source?: string;
     statement?: types.ProblemStatement;
     title: string;
@@ -1299,6 +1283,10 @@ export namespace types {
     runtime: number;
     time: Date;
     username: string;
+  }
+
+  export interface CertificateDetailsPayload {
+    uuid: string;
   }
 
   export interface Clarification {
@@ -1706,7 +1694,8 @@ export namespace types {
 
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
-    progress: types.AssignmentProgress;
+    progress?: types.AssignmentProgress;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface CourseEditPayload {
@@ -1906,7 +1895,7 @@ export namespace types {
     userRank: types.CoderOfTheMonth[];
   }
 
-  export interface InteractiveSettings {
+  export interface InteractiveSettingsDistrib {
     idl: string;
     language: string;
     main_source: string;
@@ -1915,9 +1904,23 @@ export namespace types {
   }
 
   export interface IntroDetailsPayload {
-    details: types.CourseDetails;
-    progress?: types.AssignmentProgress;
+    alias: string;
+    currentUsername: string;
+    description: string;
+    isFirstTimeAccess: boolean;
+    name: string;
+    needsBasicInformation: boolean;
+    requestsUserInformation: string;
+    shouldShowAcceptTeacher: boolean;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    shouldShowResults: boolean;
+    statements: {
+      acceptTeacher?: types.PrivacyStatement;
+      privacy?: types.PrivacyStatement;
+    };
+    userRegistrationAccepted?: boolean;
+    userRegistrationAnswered?: boolean;
+    userRegistrationRequested?: boolean;
   }
 
   export interface LimitsSettings {
@@ -2035,7 +2038,7 @@ export namespace types {
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
-    settings: types.ProblemSettings;
+    settings: types.ProblemSettingsDistrib;
     show_diff: string;
     solvers?: types.BestSolvers[];
     source?: string;
@@ -2074,7 +2077,7 @@ export namespace types {
     quality_seal: boolean;
     runs?: types.Run[];
     score: number;
-    settings: types.ProblemSettings;
+    settings: types.ProblemSettingsDistrib;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
     solution_status?: string;
     solvers?: types.BestSolvers[];
@@ -2192,11 +2195,16 @@ export namespace types {
     problemsetter?: types.ProblemsetterInfo;
     quality_seal: boolean;
     sample_input?: string;
-    settings: types.ProblemSettings;
+    settings: types.ProblemSettingsDistrib;
     source?: string;
     statement: types.ProblemStatement;
     title: string;
     visibility: number;
+  }
+
+  export interface ProblemListCollection {
+    levelTags: string[];
+    problemCount: { name: string; problems_per_tag: number }[];
   }
 
   export interface ProblemListItem {
@@ -2244,8 +2252,20 @@ export namespace types {
   }
 
   export interface ProblemSettings {
+    Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Limits: types.LimitsSettings;
+    Slow: boolean;
+    Validator: {
+      Lang?: string;
+      Limits?: types.LimitsSettings;
+      Name: string;
+      Tolerance: number;
+    };
+  }
+
+  export interface ProblemSettingsDistrib {
     cases: { [key: string]: { in: string; out: string; weight?: number } };
-    interactive?: types.InteractiveSettings;
+    interactive?: types.InteractiveSettingsDistrib;
     limits: types.LimitsSettings;
     validator: {
       custom_validator?: {
@@ -2612,7 +2632,9 @@ export namespace types {
 
   export interface StudentProgress {
     name?: string;
+    points: { [key: string]: { [key: string]: number } };
     progress: { [key: string]: { [key: string]: number } };
+    score: { [key: string]: { [key: string]: number } };
     username: string;
   }
 
@@ -3147,29 +3169,7 @@ export namespace messages {
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
-  export type CourseIntroDetailsResponse = {
-    alias: string;
-    currentUsername: string;
-    description: string;
-    isFirstTimeAccess: boolean;
-    name: string;
-    needsBasicInformation: boolean;
-    requestsUserInformation: string;
-    shouldShowAcceptTeacher: boolean;
-    shouldShowResults: boolean;
-    statements: {
-      acceptTeacher: {
-        gitObjectId?: string;
-        markdown: string;
-        statementType: string;
-      };
-      privacy: {
-        gitObjectId?: string;
-        markdown?: string;
-        statementType?: string;
-      };
-    };
-  };
+  export type CourseIntroDetailsResponse = types.IntroDetailsPayload;
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;
   export type CourseListAssignmentsResponse = {

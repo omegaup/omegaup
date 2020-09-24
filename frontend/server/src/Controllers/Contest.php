@@ -492,7 +492,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     /**
      * Get all the properties for smarty.
      *
-     * @return array{entrypoint?: string, inContest?: bool, smartyProperties: array{payload: ContestIntroPayload, title: string}, template?: string}
+     * @return array{inContest: bool, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}, template: string}|array{entrypoint: string, smartyProperties: array{payload: ContestIntroPayload, title: \OmegaUp\TranslationString}}
      *
      * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $contest_alias
@@ -605,7 +605,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ContestListPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ContestListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -701,14 +701,16 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'isLogged' => !is_null($r->identity),
                     'contests' => $contests,
                 ],
-                'title' => new \OmegaUp\TranslationString('wordsContests'),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContest'
+                ),
             ],
             'entrypoint' => 'arena_contest_list',
         ];
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ContestListMinePayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ContestListMinePayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -763,7 +765,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ContestNewPayload}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ContestNewPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getContestNewForSmarty(
         \OmegaUp\Request $r
@@ -774,6 +776,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'languages' => \OmegaUp\Controllers\Run::SUPPORTED_LANGUAGES,
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleContestNew'
+                )
             ],
             'entrypoint' => 'contest_new',
         ];
@@ -1484,17 +1489,9 @@ class Contest extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::getAccessForProblemset(
-            $response['contest']->problemset_id
-        );
-        $submissions = \OmegaUp\DAO\SubmissionLog::getSubmissionsForProblemset(
-            $response['contest']->problemset_id
-        );
-
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                $accesses,
-                $submissions
+                \OmegaUp\DAO\Contests::getActivityReport($response['contest'])
             ),
         ];
     }
@@ -1510,9 +1507,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $alias = $r->ensureString(
             'contest',
-            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty(
-                $alias
-            )
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         ['contest' => $contest] = self::validateBasicDetails($alias);
 
@@ -1531,12 +1526,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'alias' => $alias,
                     'events' => \OmegaUp\ActivityReport::getActivityReport(
-                        \OmegaUp\DAO\ProblemsetAccessLog::getAccessForProblemset(
-                            $contest->problemset_id
-                        ),
-                        \OmegaUp\DAO\SubmissionLog::getSubmissionsForProblemset(
-                            $contest->problemset_id
-                        )
+                        \OmegaUp\DAO\Contests::getActivityReport($contest)
                     ),
                     'type' => 'contest',
                 ],
@@ -4256,7 +4246,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: StatsPayload, title: string}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: StatsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param null|string $contest_alias
      */

@@ -258,8 +258,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * Returns a list of students within a course with their progress
-     * @return list<array{name: string|null, progress: array<string, array<string, float>>, username: string}>
+     * Returns a list of students within a course with their score and progress
+     * by problem
+     * @return list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
         int $courseId,
@@ -282,6 +283,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.problemset_id,
                             p.problem_id,
                             p.alias AS problem_alias,
+                            `psp`.`order`,
                             psp.points AS problem_points
                         FROM Assignments a
                         INNER JOIN Problemsets ps
@@ -304,7 +306,9 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 WHERE
                     gi.group_id = ?
                 GROUP BY
-                    i.identity_id, pr.assignment_id, pr.problem_id;';
+                    i.identity_id, pr.assignment_id, pr.problem_id
+                ORDER BY
+                    `pr`.`order`;';
 
         /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
@@ -319,6 +323,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 $allProgress[$username] = [
                     'name' => $row['name'],
                     'progress' => [],
+                    'points' => [],
+                    'score' => [],
                     'username' => $username,
                 ];
             }
@@ -332,15 +338,27 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
             $allProgress[$username]['progress'][$assignmentAlias][$problemAlias] = (
                 $row['problem_points'] == 0
-            ) ? 0 :
+            ) ? 0.0 :
             floatval($row['problem_score']) / $row['problem_points'] * 100;
+
+            if (!isset($allProgress[$username]['points'][$assignmentAlias])) {
+                $allProgress[$username]['points'][$assignmentAlias] = [];
+            }
+
+            $allProgress[$username]['points'][$assignmentAlias][$problemAlias] = $row['problem_points'] ?: 0.0;
+
+            if (!isset($allProgress[$username]['score'][$assignmentAlias])) {
+                $allProgress[$username]['score'][$assignmentAlias] = [];
+            }
+
+            $allProgress[$username]['score'][$assignmentAlias][$problemAlias] = $row['problem_score'] ?: 0.0;
         }
 
         usort(
             $allProgress,
             /**
-             * @param array{name: string|null, progress: array<string, array<string, float>>, username: string} $a
-             * @param array{name: string|null, progress: array<string, array<string, float>>, username: string} $b
+             * @param array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $a
+             * @param array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string} $b
              */
             fn (array $a, array $b) => strcasecmp(
                 !empty($a['name']) ? $a['name'] : $a['username'],
@@ -748,6 +766,104 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$course->acl_id]
+        );
+    }
+
+    /**
+     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
+     */
+    public static function getActivityReport(\OmegaUp\DAO\VO\Courses $course) {
+        $sql = '(
+            SELECT
+                i.username,
+                NULL AS alias,
+                pal.ip,
+                pal.`time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "open" AS event_type
+            FROM
+                Problemset_Access_Log pal
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = pal.identity_id
+            INNER JOIN
+                Assignments a
+            ON
+                a.problemset_id = pal.problemset_id
+            WHERE
+                a.course_id = ?
+        ) UNION (
+            SELECT
+                i.username,
+                p.alias,
+                sl.ip,
+                sl.`time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "submit" AS event_type
+            FROM
+                Submission_Log sl
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = sl.identity_id
+            INNER JOIN
+                Submissions s
+            ON
+                s.submission_id = sl.submission_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            INNER JOIN
+                Assignments a
+            ON
+                a.problemset_id = sl.problemset_id
+            WHERE
+                a.course_id = ?
+        ) ORDER BY time;';
+        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$course->course_id, $course->course_id]
         );
     }
 }

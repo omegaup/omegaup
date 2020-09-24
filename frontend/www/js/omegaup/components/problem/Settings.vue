@@ -13,6 +13,7 @@
           <option
             v-for="(languageText, languageIndex) in validLanguages"
             v-bind:value="languageIndex"
+            v-bind:key="languageIndex"
           >
             {{ languageText }}</option
           >
@@ -31,6 +32,7 @@
           <option
             v-for="(validatorText, validatorIndex) in validatorTypes"
             v-bind:value="validatorIndex"
+            v-bind:key="validatorIndex"
           >
             {{ validatorText }}</option
           >
@@ -45,7 +47,7 @@
         <input
           name="validator_time_limit"
           v-bind:value="validatorTimeLimit"
-          v-bind:disabled="languages === ''"
+          v-bind:disabled="languages === '' || validator !== 'custom'"
           type="text"
           class="form-control"
           v-bind:class="{
@@ -148,7 +150,7 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
-export default class ProblemSettings extends Vue {
+export default class Settings extends Vue {
   @Prop() timeLimit!: number;
   @Prop() extraWallTime!: number;
   @Prop() memoryLimit!: number;
@@ -160,7 +162,7 @@ export default class ProblemSettings extends Vue {
   @Prop() validLanguages!: Array<string>;
   @Prop() initialValidator!: string;
   @Prop() validatorTypes!: Array<string>;
-  @Prop() errors!: string[];
+  @Prop() errors!: Array<string>;
 
   T = T;
 

@@ -258,7 +258,7 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template?: string, entrypoint?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array{fullWidth?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string}|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, entrypoint?: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
@@ -281,6 +281,12 @@ class UITools {
 
         if (!is_null($entrypoint)) {
             if (
+                isset($smartyProperties['title'])  &&
+                is_object($smartyProperties['title']) &&
+                is_a($smartyProperties['title'], 'OmegaUp\TranslationString')
+            ) {
+                $titleVar = $smartyProperties['title']->message;
+            } elseif (
                 !isset($smartyProperties['title']) ||
                 !is_string($smartyProperties['title'])
             ) {

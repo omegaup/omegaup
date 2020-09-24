@@ -520,6 +520,48 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * test for count problems whit levelTag
+     */
+    public function testCountProblemsWithLevelTags() {
+        // Create problems by level
+        $problemLevelMapping = [
+            'problemLevelBasicIntroductionToProgramming' => 5,
+            'problemLevelIntermediateMathsInProgramming' => 5,
+            'problemLevelIntermediateDataStructuresAndAlgorithms' => 5,
+            'problemLevelIntermediateAnalysisAndDesignOfAlgorithms' => 5,
+            'problemLevelAdvancedCompetitiveProgramming' => 5,
+            'problemLevelAdvancedSpecializedTopics' => 5,
+            'problemLevelBasicKarel' => 5,
+        ];
+        $problemData = [];
+        foreach ($problemLevelMapping as $level => $numberOfProblems) {
+            foreach (range(0, $numberOfProblems - 1) as $_) {
+                $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+                    new \OmegaUp\Test\Factories\ProblemParams([
+                        'problem_level' => $level,
+                    ])
+                );
+            }
+        }
+
+        $problemsCount = [];
+        $total = 0;
+        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForSmarty(
+            new \OmegaUp\Request([])
+        )['smartyProperties']['payload'];
+        foreach ($response['problemCount'] as $levelTag) {
+            $problemsCount[] = $levelTag['problems_per_tag'];
+            $total += $levelTag['problems_per_tag'];
+            $this->assertEquals(
+                $problemLevelMapping[$levelTag['name']],
+                $levelTag['problems_per_tag']
+            );
+        }
+
+        $this->assertEquals(35, $total);
+    }
+
+    /**
      * Basic test for creating a problem with wrong attribute
      */
     public function testCreateProblemTagsWithWrongAttribute() {
