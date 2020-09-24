@@ -76,8 +76,8 @@ class Tag extends \OmegaUp\Controllers\Controller {
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
-            'frequent',
-            fn () => \OmegaUp\DAO\Tags::getFrequentsByLevel(
+            "level-{$problemLevel}",
+            fn () => \OmegaUp\DAO\Tags::getFrequentTagsByLevel(
                 $problemLevel
             ),
             APC_USER_CACHE_SESSION_TIMEOUT

@@ -5706,18 +5706,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getCollectionsDetailsForSmarty(\OmegaUp\Request $r): array {
         $collectionType = $r->ensureString('collection_type');
 
-        $collection = null;
+        $collection = [];
 
         $title = new \OmegaUp\TranslationString(
             'omegaupTitleCollectionsByLevel'
         );
 
-        if ($r->ensureString('collection_type') !== 'author') {
+        if ($collectionType !== 'author') {
             $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
                 $r->ensureString('collection_type')
             );
         } else {
-            //Author
+            // Author
             $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRank(
                 1,
                 15

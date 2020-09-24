@@ -79,7 +79,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     /**
      * @return list<array{alias: string}>
      */
-    public static function getFrequentsByLevel(
+    public static function getFrequentTagsByLevel(
         string $problemLevel
     ) {
         $sql = '
