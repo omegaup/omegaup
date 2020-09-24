@@ -37,6 +37,25 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
+    export function ActivityFeedPayload(
+      elementId: string = 'payload',
+    ): types.ActivityFeedPayload {
+      return ((x) => {
+        x.events = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.events);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function AuthorRankTablePayload(
       elementId: string = 'payload',
     ): types.AuthorRankTablePayload {
@@ -1174,6 +1193,20 @@ export namespace types {
     }
   }
 
+  export interface ActivityEvent {
+    classname: string;
+    event: types.Event;
+    ip: number;
+    time: Date;
+    username: string;
+  }
+
+  export interface ActivityFeedPayload {
+    alias: string;
+    events: types.ActivityEvent[];
+    type: string;
+  }
+
   export interface AddedProblem {
     alias: string;
     commit?: string;
@@ -1787,6 +1820,11 @@ export namespace types {
     admin: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
+  }
+
+  export interface Event {
+    name: string;
+    problem?: string;
   }
 
   export interface FilteredCourse {

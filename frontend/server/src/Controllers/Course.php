@@ -46,6 +46,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroDetailsPayload=array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
+ * @psalm-type Event=array{name: string, problem?: string}
+ * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -502,9 +505,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $courseAlias
-            )
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
 
@@ -3191,6 +3192,46 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course
+     */
+    public static function getActivityFeedDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'alias' => $courseAlias,
+                    'events' => \OmegaUp\ActivityReport::getActivityReport(
+                        \OmegaUp\DAO\Courses::getActivityReport($course)
+                    ),
+                    'type' => 'course',
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'wordsActivityReport'
+                ),
+            ],
+            'entrypoint' => 'activity_feed',
+        ];
+    }
+
+    /**
      * @param CoursesList $courses
      * @param list<string> $coursesTypes
      *
@@ -3250,9 +3291,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $courseAlias
-            )
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
@@ -3638,17 +3677,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::getAccessForCourse(
-            $course->course_id
-        );
-        $submissions = \OmegaUp\DAO\SubmissionLog::GetSubmissionsForCourse(
-            $course->course_id
-        );
-
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                $accesses,
-                $submissions
+                \OmegaUp\DAO\Courses::getActivityReport($course)
             ),
         ];
     }
