@@ -55,7 +55,6 @@
           role="tabpanel"
           aria-labelledby="report-tab"
           v-bind:class="{
-            show: showTab === 'report',
             active: showTab === 'report',
           }"
           v-show="showTab === 'report'"
@@ -97,7 +96,6 @@
           role="tabpanel"
           aria-labelledby="users-tab"
           v-bind:class="{
-            show: showTab === 'users',
             active: showTab === 'users',
           }"
           v-show="showTab === 'users'"
@@ -138,7 +136,6 @@
           role="tabpanel"
           aria-labelledby="origins-tab"
           v-bind:class="{
-            show: showTab === 'origins',
             active: showTab === 'origins',
           }"
           v-show="showTab === 'origins'"
