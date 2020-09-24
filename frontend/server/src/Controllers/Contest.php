@@ -1507,7 +1507,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $alias = $r->ensureString(
             'contest',
-            fn (string $alias) => \OmegaUp\Validators::stringNonEmpty($alias)
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         ['contest' => $contest] = self::validateBasicDetails($alias);
 
