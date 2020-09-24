@@ -2126,7 +2126,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     public static function apiAddStudent(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        $r->ensureMainUserIdentity();
+        $r->ensureIdentity();
 
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['course_alias'],
@@ -2250,7 +2250,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\DAO\GroupsIdentities::replace($groupIdentity);
 
-            if ($course->admission_mode === self::ADMISSION_MODE_REGISTRATION) {
+            if (
+                $course->admission_mode === self::ADMISSION_MODE_REGISTRATION
+                && !is_null($r->user)
+            ) {
                 // Pre-accept user
                 self::preAcceptAccessRequest(
                     $course,
