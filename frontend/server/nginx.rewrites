@@ -74,6 +74,7 @@ rewrite ^/nomination/([0-9]+)/?$ /qualitynomination/details.php?qualitynominatio
 rewrite ^/nomination/mine/?$ /qualitynomination/my_list.php last;
 rewrite ^/permissions/?$ /permissions.php last;
 rewrite ^/problem/?$ /problems/list.php last;
+rewrite ^/problem/collection/?$ /problems/collection.php last;
 rewrite ^/problem/list/?$ /problems/list.php last;
 rewrite ^/problem/mine/?$ /problems/mine.php last;
 rewrite ^/problem/new/?$ /problems/new.php last;

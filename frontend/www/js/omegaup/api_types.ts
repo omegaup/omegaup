@@ -947,6 +947,14 @@ export namespace types {
       );
     }
 
+    export function ProblemListCollectionPayload(
+      elementId: string = 'payload',
+    ): types.ProblemListCollectionPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemListPayload(
       elementId: string = 'payload',
     ): types.ProblemListPayload {
@@ -2159,7 +2167,7 @@ export namespace types {
     visibility: number;
   }
 
-  export interface ProblemListCollection {
+  export interface ProblemListCollectionPayload {
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
   }
