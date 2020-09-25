@@ -1,19 +1,17 @@
 <template>
-  <div>
-    <h1 class="card-title">{{ T.collectionTitle }}</h1>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-header">{{ T.collectionTitle }}</h5>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
-import { types } from '../../api_types';
-import * as ui from '../../ui';
 
-export default class problemCollection extends Vue {
+@Component
+export default class Collection extends Vue {
   T = T;
-  ui = ui;
-  omegaup = omegaup;
 }
 </script>
