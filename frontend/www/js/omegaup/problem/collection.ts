@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import problem_Collection from '../components/problem/Collection.vue';
+import problem_collections from '../components/problem/Collection.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import T from '../lang';
@@ -13,13 +13,13 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-problem-collection', {
         props: {
-            level_Tags: payload.levelTags,
-            problemCount: payload.problemCount,
+          level_Tags: payload.levelTags,
+          problemCount: payload.problemCount,
         },
       });
     },
     components: {
-      'omegaup-problem-collections': problem_Collection,
+      'omegaup-problem-collection': problem_collections,
     },
   });
 });

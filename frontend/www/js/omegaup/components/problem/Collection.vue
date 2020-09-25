@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <h1 class="card-title"></h1>
-    </div>
+  <div>
+    <h1 class="card-title">{{ T.collectionTitle }}</h1>
+  </div>
 </template>
 
 <script lang="ts">
@@ -11,12 +11,9 @@ import T from '../../lang';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 
-
-T = T;
-ui = ui;
-omegaup = omegaup;
-
-
-
-
+export default class problemCollection extends Vue {
+  T = T;
+  ui = ui;
+  omegaup = omegaup;
+}
 </script>

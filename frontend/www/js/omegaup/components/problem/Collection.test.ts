@@ -5,13 +5,10 @@ import Vue from 'vue';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
 
-import problem_Collection from './Collection.vue';
+import problem_collections from './Collection.vue';
 
 describe('Collection.vue', () => {
   it('Should handle empty list of problems', async () => {
-    const wrapper = shallowMount(problem_Collection, {
-      
-    });
-
+    const wrapper = shallowMount(problem_collections, {});
   });
 });
