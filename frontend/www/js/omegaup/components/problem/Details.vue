@@ -116,16 +116,19 @@
           v-on:overlay-hidden="onPopupDismissed"
           v-if="this.user.loggedIn"
         >
-          <omegaup-arena-runsubmit
-            slot="popup-content"
-            v-bind:preferred-language="problem.preferred_language"
-            v-bind:languages="problem.languages"
-            v-bind:initial-show-form="showFormRunSubmit"
-            v-on:dismiss="onPopupDismissed"
-            v-on:submit-run="
-              (code, selectedLanguage) => onRunSubmitted(code, selectedLanguage)
-            "
-          ></omegaup-arena-runsubmit>
+          <omegaup-overlay-popup slot="popup">
+            <omegaup-arena-runsubmit
+              slot="popup-content"
+              v-bind:preferred-language="problem.preferred_language"
+              v-bind:languages="problem.languages"
+              v-bind:initial-show-form="showFormRunSubmit"
+              v-on:dismiss="onPopupDismissed"
+              v-on:submit-run="
+                (code, selectedLanguage) =>
+                  onRunSubmitted(code, selectedLanguage)
+              "
+            ></omegaup-arena-runsubmit>
+          </omegaup-overlay-popup>
         </omegaup-overlay>
         <omegaup-arena-runs
           v-bind:problem-alias="problem.alias"
@@ -225,6 +228,7 @@ import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
+import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -257,6 +261,7 @@ interface Tab {
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
+    'omegaup-overlay-popup': omegaup_OverlayPopup,
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,

@@ -234,12 +234,6 @@
   background: rgb(245, 245, 245);
   border-radius: 5px;
 }
-.vue-codemirror-wrap {
-  height: 95%;
-  .CodeMirror {
-    height: 100%;
-  }
-}
 
 #run-details .compile_error {
   display: none;

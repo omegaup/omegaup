@@ -29,7 +29,7 @@
     <div class="form-group row">
       <label class="col-sm-7 col-form-label">{{ T.arenaRunSubmitPaste }}</label>
     </div>
-    <div class="code-view form-group">
+    <div class="code-view">
       <omegaup-arena-code-view
         v-bind:language="selectedLanguage"
         v-bind:readonly="false"
@@ -72,39 +72,14 @@
   padding: 0px 35px;
 }
 
-form {
-  background: #eee;
-  width: 80%;
-  height: 90%;
-  margin: auto;
-  border: 2px solid #ccc;
-  padding: 1em;
-  position: absolute;
-  overflow-y: auto;
-  overflow-x: hidden;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  .close-container {
-    width: 100%;
-    .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: $omegaup-white;
-      border: 1px solid #ccc;
-      border-width: 0 0 1px 1px;
-      font-size: 110%;
-      width: 25px;
-      height: 25px;
-      &:hover {
-        background-color: #eee;
-      }
-    }
+.vue-codemirror-wrap {
+  height: 95%;
+  .CodeMirror {
+    height: 100%;
   }
+}
+
+[data-run-submit] {
   .languages {
     width: 100%;
   }

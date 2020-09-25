@@ -1,6 +1,6 @@
 <template>
   <div v-if="isOverlayShown" data-overlay v-on:click="hideOverlay">
-    <slot name="popup-content"></slot>
+    <slot name="popup"></slot>
   </div>
 </template>
 
