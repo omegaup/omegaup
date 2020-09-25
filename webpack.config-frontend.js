@@ -18,7 +18,7 @@ module.exports = {
       './frontend/www/js/omegaup/polyfills.js',
       './frontend/www/js/omegaup/omegaup.js',
     ],
-    activity_feed: './frontend/www/js/omegaup/activity/feed.js',
+    activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
     admin_support: './frontend/www/js/omegaup/admin/support.js',
     admin_user: './frontend/www/js/omegaup/admin/user.js',
