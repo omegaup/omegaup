@@ -3,7 +3,6 @@ import expect from 'expect';
 import Vue from 'vue';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 
 import activity_Feed from './Feed.vue';
 
