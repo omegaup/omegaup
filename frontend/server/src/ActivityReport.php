@@ -5,12 +5,12 @@ namespace OmegaUp;
 /**
  *
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string, result?: string}
- * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  *
  */
 class ActivityReport {
     /**
-     * @param list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> $events
+     * @param list<array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> $events
      *
      * @return list<ActivityEvent>
      */
@@ -21,6 +21,10 @@ class ActivityReport {
         /** @var array<int, int> */
         $ipMapping = [];
         foreach ($events as &$entry) {
+            if (is_null($entry['ip'])) {
+                $entry['ip'] = '';
+                continue;
+            }
             if (
                 !isset($ipMapping[$entry['ip']]) ||
                 !array_key_exists($entry['ip'], $ipMapping)
@@ -34,7 +38,7 @@ class ActivityReport {
     }
 
     /**
-     * @param array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string} $data
+     * @param array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string} $data
      * @return ActivityEvent
      */
     private static function processData(array $data): array {

@@ -770,7 +770,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}>
+     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}>
      */
     public static function getActivityReport(\OmegaUp\DAO\VO\Courses $course) {
         $sql = '(
@@ -912,7 +912,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 ccl.course_id = ?
         ) ORDER BY time;';
-        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> */
+        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null|string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$course->course_id, $course->course_id, $course->course_id]
