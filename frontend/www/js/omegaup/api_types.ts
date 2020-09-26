@@ -37,6 +37,25 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
+    export function ActivityFeedPayload(
+      elementId: string = 'payload',
+    ): types.ActivityFeedPayload {
+      return ((x) => {
+        x.events = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.events);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function AuthorRankTablePayload(
       elementId: string = 'payload',
     ): types.AuthorRankTablePayload {
@@ -89,6 +108,14 @@ export namespace types {
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CertificateDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CertificateDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
@@ -764,32 +791,8 @@ export namespace types {
     export function IntroDetailsPayload(
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
-      return ((x) => {
-        x.details = ((x) => {
-          if (x.assignments)
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
-                return x;
-              });
-            })(x.assignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.details);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
@@ -1198,6 +1201,20 @@ export namespace types {
     }
   }
 
+  export interface ActivityEvent {
+    classname: string;
+    event: types.Event;
+    ip: number;
+    time: Date;
+    username: string;
+  }
+
+  export interface ActivityFeedPayload {
+    alias: string;
+    events: types.ActivityEvent[];
+    type: string;
+  }
+
   export interface AddedProblem {
     alias: string;
     commit?: string;
@@ -1274,6 +1291,10 @@ export namespace types {
     runtime: number;
     time: Date;
     username: string;
+  }
+
+  export interface CertificateDetailsPayload {
+    uuid: string;
   }
 
   export interface Clarification {
@@ -1681,7 +1702,8 @@ export namespace types {
 
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
-    progress: types.AssignmentProgress;
+    progress?: types.AssignmentProgress;
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
 
   export interface CourseEditPayload {
@@ -1808,6 +1830,11 @@ export namespace types {
     student: types.FilteredCourse[];
   }
 
+  export interface Event {
+    name: string;
+    problem?: string;
+  }
+
   export interface FilteredCourse {
     accept_teacher?: boolean;
     admission_mode: string;
@@ -1874,6 +1901,18 @@ export namespace types {
     userRank: types.CoderOfTheMonth[];
   }
 
+  export interface InteractiveInterface {
+    ExecutableDescription: { Args: string[]; Env: { [key: string]: string } };
+    Files: { [key: string]: string };
+    MakefileRules: {
+      Compiler: string;
+      Debug: boolean;
+      Params: string;
+      Requisites: string[];
+      Targets: string[];
+    }[];
+  }
+
   export interface InteractiveSettingsDistrib {
     idl: string;
     language: string;
@@ -1883,9 +1922,23 @@ export namespace types {
   }
 
   export interface IntroDetailsPayload {
-    details: types.CourseDetails;
-    progress?: types.AssignmentProgress;
+    alias: string;
+    currentUsername: string;
+    description: string;
+    isFirstTimeAccess: boolean;
+    name: string;
+    needsBasicInformation: boolean;
+    requestsUserInformation: string;
+    shouldShowAcceptTeacher: boolean;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
+    shouldShowResults: boolean;
+    statements: {
+      acceptTeacher?: types.PrivacyStatement;
+      privacy?: types.PrivacyStatement;
+    };
+    userRegistrationAccepted?: boolean;
+    userRegistrationAnswered?: boolean;
+    userRegistrationRequested?: boolean;
   }
 
   export interface LimitsSettings {
@@ -2218,6 +2271,16 @@ export namespace types {
 
   export interface ProblemSettings {
     Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Interactive?: {
+      Interfaces: {
+        [key: string]: { [key: string]: types.InteractiveInterface };
+      };
+      LibinteractiveVersion: string;
+      Main: string;
+      ModuleName: string;
+      ParentLang: string;
+      Templates: { [key: string]: string };
+    };
     Limits: types.LimitsSettings;
     Slow: boolean;
     Validator: {
@@ -3134,29 +3197,7 @@ export namespace messages {
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
-  export type CourseIntroDetailsResponse = {
-    alias: string;
-    currentUsername: string;
-    description: string;
-    isFirstTimeAccess: boolean;
-    name: string;
-    needsBasicInformation: boolean;
-    requestsUserInformation: string;
-    shouldShowAcceptTeacher: boolean;
-    shouldShowResults: boolean;
-    statements: {
-      acceptTeacher: {
-        gitObjectId?: string;
-        markdown: string;
-        statementType: string;
-      };
-      privacy: {
-        gitObjectId?: string;
-        markdown?: string;
-        statementType?: string;
-      };
-    };
-  };
+  export type CourseIntroDetailsResponse = types.IntroDetailsPayload;
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;
   export type CourseListAssignmentsResponse = {
