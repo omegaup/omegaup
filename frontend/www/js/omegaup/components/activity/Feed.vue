@@ -55,7 +55,6 @@
           role="tabpanel"
           aria-labelledby="report-tab"
           v-bind:class="{
-            show: showTab === 'report',
             active: showTab === 'report',
           }"
           v-show="showTab === 'report'"
@@ -105,7 +104,6 @@
           role="tabpanel"
           aria-labelledby="users-tab"
           v-bind:class="{
-            show: showTab === 'users',
             active: showTab === 'users',
           }"
           v-show="showTab === 'users'"
@@ -146,7 +144,6 @@
           role="tabpanel"
           aria-labelledby="origins-tab"
           v-bind:class="{
-            show: showTab === 'origins',
             active: showTab === 'origins',
           }"
           v-show="showTab === 'origins'"
@@ -189,7 +186,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';

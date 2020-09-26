@@ -950,6 +950,14 @@ export namespace types {
       );
     }
 
+    export function ProblemListCollectionPayload(
+      elementId: string = 'payload',
+    ): types.ProblemListCollectionPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemListPayload(
       elementId: string = 'payload',
     ): types.ProblemListPayload {
@@ -1895,6 +1903,18 @@ export namespace types {
     userRank: types.CoderOfTheMonth[];
   }
 
+  export interface InteractiveInterface {
+    ExecutableDescription: { Args: string[]; Env: { [key: string]: string } };
+    Files: { [key: string]: string };
+    MakefileRules: {
+      Compiler: string;
+      Debug: boolean;
+      Params: string;
+      Requisites: string[];
+      Targets: string[];
+    }[];
+  }
+
   export interface InteractiveSettingsDistrib {
     idl: string;
     language: string;
@@ -2202,7 +2222,7 @@ export namespace types {
     visibility: number;
   }
 
-  export interface ProblemListCollection {
+  export interface ProblemListCollectionPayload {
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
   }
@@ -2253,6 +2273,16 @@ export namespace types {
 
   export interface ProblemSettings {
     Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Interactive?: {
+      Interfaces: {
+        [key: string]: { [key: string]: types.InteractiveInterface };
+      };
+      LibinteractiveVersion: string;
+      Main: string;
+      ModuleName: string;
+      ParentLang: string;
+      Templates: { [key: string]: string };
+    };
     Limits: types.LimitsSettings;
     Slow: boolean;
     Validator: {
