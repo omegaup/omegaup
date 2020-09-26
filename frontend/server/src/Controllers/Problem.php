@@ -1452,6 +1452,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->commit
         );
         unset($problemSettings['Cases']);
+        unset($problemSettings['Interactive']);
         $originalProblemSettings = self::arrayDeepCopy($problemSettings);
         self::updateProblemSettings($problemSettings, $params);
         $settingsUpdated = self::diffProblemSettings(
