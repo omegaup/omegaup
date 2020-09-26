@@ -911,7 +911,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
     }
 
     /**
-     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
+     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null|string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}>
      */
     public static function getActivityReport(
         \OmegaUp\DAO\VO\Contests $contest
@@ -942,7 +942,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ),
                     "user-rank-unranked"
                 ) `classname`,
-                "open" AS event_type
+                "open" AS event_type,
+                NULL AS result,
+                NULL AS token_payload,
+                NULL AS name
             FROM
                 Problemset_Access_Log pal
             INNER JOIN
@@ -977,7 +980,10 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
                     ),
                     "user-rank-unranked"
                 ) `classname`,
-                "submit" AS event_type
+                "submit" AS event_type,
+                NULL AS result,
+                NULL AS token_payload,
+                NULL AS name
             FROM
                 Submission_Log sl
             INNER JOIN
@@ -995,7 +1001,7 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
             WHERE
                 sl.problemset_id = ?
         ) ORDER BY time;';
-        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null|string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$contest->problemset_id, $contest->problemset_id]

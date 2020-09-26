@@ -10,7 +10,7 @@ namespace OmegaUp;
  */
 class ActivityReport {
     /**
-     * @param list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $events
+     * @param list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> $events
      *
      * @return list<ActivityEvent>
      */
@@ -34,7 +34,7 @@ class ActivityReport {
     }
 
     /**
-     * @param array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string} $data
+     * @param array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string} $data
      * @return ActivityEvent
      */
     private static function processData(array $data): array {
@@ -44,13 +44,13 @@ class ActivityReport {
                 $event['problem'] = $data['alias'];
             }
         } elseif ($data['event_type'] === 'clone') {
-            if (isset($data['alias'])) {
+            if (!is_null($data['alias'])) {
                 $event['courseAlias'] = $data['alias'];
             }
-            if (isset($data['name'])) {
+            if (!is_null($data['name'])) {
                 $event['courseName'] = $data['name'];
             }
-            if (isset($data['result'])) {
+            if (!is_null($data['result'])) {
                 $event['result'] = $data['result'];
             }
         }

@@ -770,7 +770,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}>
+     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}>
      */
     public static function getActivityReport(\OmegaUp\DAO\VO\Courses $course) {
         $sql = '(
@@ -799,7 +799,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     ),
                     "user-rank-unranked"
                 ) `classname`,
-                "open" AS event_type
+                "open" AS event_type,
+                NULL AS result,
+                NULL AS token_payload,
+                NULL AS name
             FROM
                 Problemset_Access_Log pal
             INNER JOIN
@@ -838,7 +841,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     ),
                     "user-rank-unranked"
                 ) `classname`,
-                "submit" AS event_type
+                "submit" AS event_type,
+                NULL AS result,
+                NULL AS token_payload,
+                NULL AS name
             FROM
                 Submission_Log sl
             INNER JOIN
@@ -859,11 +865,57 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 a.problemset_id = sl.problemset_id
             WHERE
                 a.course_id = ?
+        ) UNION (
+            SELECT
+                i.username,
+                c.alias,
+                INET_ATON(ccl.ip) AS `ip`,
+                ccl.`timestamp` AS `time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "clone" AS event_type,
+                ccl.result,
+                ccl.token_payload,
+                c.name
+            FROM
+            Course_Clone_Log ccl
+            INNER JOIN
+                Users u
+            ON
+                u.user_id = ccl.user_id
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = u.main_identity_id
+            LEFT JOIN
+                Courses c
+            ON
+                c.course_id = ccl.new_course_id
+            WHERE
+                ccl.course_id = ?
         ) ORDER BY time;';
-        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$course->course_id, $course->course_id]
+            [$course->course_id, $course->course_id, $course->course_id]
         );
     }
 }
