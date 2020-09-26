@@ -1893,6 +1893,18 @@ export namespace types {
     userRank: types.CoderOfTheMonth[];
   }
 
+  export interface InteractiveInterface {
+    ExecutableDescription: { Args: string[]; Env: { [key: string]: string } };
+    Files: { [key: string]: string };
+    MakefileRules: {
+      Compiler: string;
+      Debug: boolean;
+      Params: string;
+      Requisites: string[];
+      Targets: string[];
+    }[];
+  }
+
   export interface InteractiveSettingsDistrib {
     idl: string;
     language: string;
@@ -2251,6 +2263,16 @@ export namespace types {
 
   export interface ProblemSettings {
     Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Interactive?: {
+      Interfaces: {
+        [key: string]: { [key: string]: types.InteractiveInterface };
+      };
+      LibinteractiveVersion: string;
+      Main: string;
+      ModuleName: string;
+      ParentLang: string;
+      Templates: { [key: string]: string };
+    };
     Limits: types.LimitsSettings;
     Slow: boolean;
     Validator: {
