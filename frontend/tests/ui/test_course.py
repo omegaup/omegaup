@@ -401,7 +401,8 @@ def enter_course(driver, course_alias, assignment_alias, *, first_time=True):
         with driver.page_transition(target_url=driver.browser.current_url):
             accept_teacher_element = driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.CSS_SELECTOR, 'input[name="accept-teacher"]')))
+                    (By.CSS_SELECTOR,
+                     'input[name="accept-teacher"][value="true"]')))
             for _ in range(10):
                 accept_teacher_element.click()
                 if accept_teacher_element.is_selected():
