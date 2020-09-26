@@ -43,7 +43,6 @@ describe('RunSubmit.vue', () => {
           { java: 'Java' },
         ],
         nextSubmissionTimestamp: new Date(),
-        preferredLanguage: 'es',
       },
     });
 

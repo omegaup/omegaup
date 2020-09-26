@@ -96,7 +96,6 @@ describe('Details.vue', () => {
         clarifications: <types.Clarification[]>[],
         solutionStatus: 'not_found',
         histogram: histogram,
-        showNewRunWindow: false,
       },
     });
 
