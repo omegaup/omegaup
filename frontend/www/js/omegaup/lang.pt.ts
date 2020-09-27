@@ -124,6 +124,7 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthListCandidate: "Lista de candidatos ao codificador do m\u00eas",
   codersOfTheMonthRank: "Os melhores 100 codificadores do m\u00eas anterior",
   codersOfTheMonthUser: "Usu\u00e1rio",
+  collectionTitle: "Cole\u00e7\u00f5es de problemas",
   contentOrderUpdated: "A ordem do conte\u00fado foi atualizada",
   contestAddgroupAddGroup: "Adicionar grupo",
   contestAddproblemChooseVersion: "Vers\u00e3o",
