@@ -406,17 +406,6 @@ export namespace omegaup {
     name: string;
   }
 
-  export interface Report {
-    classname: string;
-    event: {
-      name: string;
-      problem: string;
-    };
-    ip: string;
-    time: string;
-    username: string;
-  }
-
   export interface Role {
     name: string;
   }
