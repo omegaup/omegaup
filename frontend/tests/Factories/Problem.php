@@ -69,7 +69,7 @@ class ProblemParams {
     public $validator;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, validator?: string} $params
+     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
