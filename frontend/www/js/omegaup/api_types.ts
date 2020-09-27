@@ -1204,7 +1204,7 @@ export namespace types {
   export interface ActivityEvent {
     classname: string;
     event: types.Event;
-    ip: number;
+    ip?: number;
     time: Date;
     username: string;
   }
@@ -1831,6 +1831,8 @@ export namespace types {
   }
 
   export interface Event {
+    courseAlias?: string;
+    courseName?: string;
     name: string;
     problem?: string;
   }
@@ -2892,7 +2894,7 @@ export namespace messages {
     events: {
       alias?: string;
       classname?: string;
-      ip: number;
+      ip?: number;
       time: Date;
       username: string;
     }[];
@@ -3138,7 +3140,7 @@ export namespace messages {
     events: {
       alias?: string;
       classname?: string;
-      ip: number;
+      ip?: number;
       time: Date;
       username: string;
     }[];
