@@ -91,8 +91,8 @@
                       event.event.courseName
                     }}</a>
                   </span>
-                  <span v-if="event.event.result">{{
-                    event.event.result
+                  <span v-if="event.event.cloneResult">{{
+                    event.event.cloneResult
                   }}</span>
                 </td>
               </tr>

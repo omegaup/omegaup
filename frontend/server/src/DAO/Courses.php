@@ -770,7 +770,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * @return list<array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}>
+     * @return list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null| string, time: \OmegaUp\Timestamp, username: string}>
      */
     public static function getActivityReport(\OmegaUp\DAO\VO\Courses $course) {
         $sql = '(
@@ -800,8 +800,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     "user-rank-unranked"
                 ) `classname`,
                 "open" AS event_type,
-                NULL AS result,
-                NULL AS token_payload,
+                NULL AS clone_result,
+                NULL AS clone_token_payload,
                 NULL AS name
             FROM
                 Problemset_Access_Log pal
@@ -842,8 +842,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     "user-rank-unranked"
                 ) `classname`,
                 "submit" AS event_type,
-                NULL AS result,
-                NULL AS token_payload,
+                NULL AS clone_result,
+                NULL AS clone_token_payload,
                 NULL AS name
             FROM
                 Submission_Log sl
@@ -892,8 +892,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     "user-rank-unranked"
                 ) `classname`,
                 "clone" AS event_type,
-                ccl.result,
-                ccl.token_payload,
+                ccl.result AS clone_result,
+                ccl.token_payload AS clone_token_payload,
                 c.name
             FROM
             Course_Clone_Log ccl
@@ -912,7 +912,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             WHERE
                 ccl.course_id = ?
         ) ORDER BY time;';
-        /** @var list<array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null|string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> */
+        /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$course->course_id, $course->course_id, $course->course_id]

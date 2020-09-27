@@ -4,13 +4,13 @@ namespace OmegaUp;
 
 /**
  *
- * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string, result?: string}
+ * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string, cloneResult?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  *
  */
 class ActivityReport {
     /**
-     * @param list<array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string}> $events
+     * @param list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null| string, time: \OmegaUp\Timestamp, username: string}> $events
      *
      * @return list<ActivityEvent>
      */
@@ -22,7 +22,6 @@ class ActivityReport {
         $ipMapping = [];
         foreach ($events as &$entry) {
             if (is_null($entry['ip'])) {
-                $entry['ip'] = '';
                 continue;
             }
             if (
@@ -38,7 +37,7 @@ class ActivityReport {
     }
 
     /**
-     * @param array{alias: null|string, classname: string, event_type: string, ip: int|null, name: null| string, result: null|string, time: \OmegaUp\Timestamp, token_payload: null|string, username: string} $data
+     * @param array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null| string, time: \OmegaUp\Timestamp, username: string} $data
      * @return ActivityEvent
      */
     private static function processData(array $data): array {
@@ -54,8 +53,8 @@ class ActivityReport {
             if (!is_null($data['name'])) {
                 $event['courseName'] = $data['name'];
             }
-            if (!is_null($data['result'])) {
-                $event['result'] = $data['result'];
+            if (!is_null($data['clone_result'])) {
+                $event['cloneResult'] = $data['clone_result'];
             }
         }
         return [
