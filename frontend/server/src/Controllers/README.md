@@ -1387,10 +1387,10 @@ Add Student to Course.
 | `accept_teacher_git_object_id` | `string`    |             |
 | `course_alias`                 | `string`    |             |
 | `privacy_git_object_id`        | `string`    |             |
+| `share_user_information`       | `bool`      |             |
 | `statement_type`               | `string`    |             |
 | `usernameOrEmail`              | `string`    |             |
 | `accept_teacher`               | `bool|null` |             |
-| `share_user_information`       | `mixed`     |             |
 
 ### Returns
 
@@ -1663,18 +1663,9 @@ Show course intro only on public courses when user is not yet registered
 
 ### Returns
 
-| Name                      | Type                                                                                                                                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `alias`                   | `string`                                                                                                                                                            |
-| `currentUsername`         | `string`                                                                                                                                                            |
-| `description`             | `string`                                                                                                                                                            |
-| `isFirstTimeAccess`       | `boolean`                                                                                                                                                           |
-| `name`                    | `string`                                                                                                                                                            |
-| `needsBasicInformation`   | `boolean`                                                                                                                                                           |
-| `requestsUserInformation` | `string`                                                                                                                                                            |
-| `shouldShowAcceptTeacher` | `boolean`                                                                                                                                                           |
-| `shouldShowResults`       | `boolean`                                                                                                                                                           |
-| `statements`              | `{ acceptTeacher: { gitObjectId: string; markdown: string; statementType: string; }; privacy: { gitObjectId: string; markdown: string; statementType: string; }; }` |
+```typescript
+types.IntroDetailsPayload;
+```
 
 ## `/api/course/listAssignments/`
 
