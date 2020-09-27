@@ -1,10 +1,9 @@
 <?php
 
 class TagListTest extends \OmegaUp\Test\ControllerTestCase {
-
     public function testValidParameter(): array {
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
-        
+
         $login = self::login($identity);
         try {
             \OmegaUp\Controllers\Tag::apiFrequentTags(new \OmegaUp\Request([
