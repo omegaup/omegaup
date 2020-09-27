@@ -326,15 +326,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $params->selectedTagsAsJSON,
                 /*$assoc=*/true
             ) : null;
-            if (!empty($selectedTags)) {
-                foreach ($selectedTags as $tag) {
-                    if (empty($tag['tagname'])) {
-                        throw new \OmegaUp\Exceptions\InvalidParameterException(
-                            'parameterEmpty',
-                            'tagname'
-                        );
-                    }
+            if (empty($selectedTags)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'problemEditTagPublicRequired',
+                    'public_tags'
+                );
+            }
+            $hasPublicTags = false;
+            foreach ($selectedTags as $tag) {
+                if (!$hasPublicTags) {
+                    $hasPublicTags = boolval($tag['public']);
                 }
+                if (empty($tag['tagname'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'tagname'
+                    );
+                }
+            }
+            if (!$hasPublicTags) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'problemEditTagPublicRequired',
+                    'public_tags'
+                );
             }
         }
 

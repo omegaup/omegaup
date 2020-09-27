@@ -677,6 +677,7 @@ const translations: { [key: string]: string; } = {
   problemEditGoToProblem: "(G0 70 pr0b13m)",
   problemEditSolution: "(Edi7 S01u7i0n)",
   problemEditSource: "(Pr0b13m 50urc3)",
+  problemEditTagPublicRequired: "(I7'5 r3quir3d 70 5313c7 a7 13a57 0n3 pub1ic 7ag)",
   problemEditUpdatedSuccessfully: "(Pr0b13m upda73d 5ucc35fu11y!)",
   problemHasBeenUsedInContestOrCourse: "(Pr0b13m can n07 b3 d31373d, b3cau53 i7 ha5 b33n u53d in a c0n7357 0r a c0ur53)",
   problemIsBanned: "(Thi5 pr0b13m ha5 b33n bann3d.)",
