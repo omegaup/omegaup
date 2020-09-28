@@ -39,7 +39,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
- * @psalm-type ProblemCollectionDetails=array{collection: list<array{alias: string, name?: string}>}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
@@ -5698,59 +5697,5 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } finally {
             \OmegaUp\FileHandler::deleteDirRecursively($dirname);
         }
-    }
-
-    /**
-     *
-     * @return array{smartyProperties: array{payload: ProblemCollectionDetails, title: \OmegaUp\TranslationString}, entrypoint: string}
-     *
-     * @omegaup-request-param string $collection_type
-     */
-    public static function getCollectionsDetailsForSmarty(\OmegaUp\Request $r): array {
-        $collectionType = $r->ensureString('collection_type');
-
-        $collection = [];
-
-        $title = new \OmegaUp\TranslationString(
-            'omegaupTitleCollectionsByLevel'
-        );
-
-        if ($collectionType !== 'author') {
-            $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
-                $r->ensureString('collection_type')
-            );
-        } else {
-            // Author
-            $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRank(
-                1,
-                15
-            )['ranking'];
-            $collection = [];
-            foreach ($authorsRanking as $author) {
-                if (!is_null($author['name'])) {
-                    $collection[] = [
-                        'name' => $author['name'],
-                        'alias' => $author['username'],
-                    ];
-                    continue;
-                }
-                $collection[] = [
-                    'alias' => $author['username'],
-                ];
-            }
-            $title = new \OmegaUp\TranslationString(
-                'omegaupTitleCollectionsByAuthor'
-            );
-        }
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'collection' => $collection,
-                ],
-                'title' => $title,
-            ],
-            'entrypoint' => 'problem_collections_details',
-        ];
     }
 }

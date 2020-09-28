@@ -2037,10 +2037,6 @@ export namespace types {
     [key: string]: { contestantOutput?: string; in: string; out: string };
   }
 
-  export interface ProblemCollectionDetails {
-    collection: { alias: string; name?: string }[];
-  }
-
   export interface ProblemDetails {
     accepted: number;
     accepts_submissions: boolean;
