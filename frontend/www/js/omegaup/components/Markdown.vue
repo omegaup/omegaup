@@ -139,7 +139,8 @@
     display: inline-block;
     float: right;
   }
-  code.libinteractive-download {
+  code.libinteractive-download,
+  code.output-only-download {
     background: #eee;
     color: #ccc;
     margin: 1em 0;

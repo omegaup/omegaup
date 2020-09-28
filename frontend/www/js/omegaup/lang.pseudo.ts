@@ -586,6 +586,7 @@ const translations: { [key: string]: string; } = {
   openInKarelJs: "(Y0u can u53 kar31.j5 70 501v3 7hi5 pr0b13m.)",
   originalContestHasNotEnded: "(Th3 0rigina1 c0n7357 ha5 n07 y37 3nd3d)",
   outputOnly: "(Ou7pu7 0n1y)",
+  outputOnlyDownloadInput: "(D0wn10ad .zip wi7h inpu75)",
   overallCompletedPercentage: "(Ov3ra11 c0mp1373d p3rc3n7ag3)",
   parameterDateTooLarge: "(Param373r i5 1arg3r 7han 7h3 maximum da73 0f %(upp3r_b0und!7im357amp))",
   parameterDateTooSmall: "(Param373r i5 5ma113r 7han 7h3 minimum da73 0f %(10w3r_b0und!7im357amp))",

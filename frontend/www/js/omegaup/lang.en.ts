@@ -586,6 +586,7 @@ const translations: { [key: string]: string; } = {
   openInKarelJs: "You can use karel.js to solve this problem.",
   originalContestHasNotEnded: "The original contest has not yet ended",
   outputOnly: "Output only",
+  outputOnlyDownloadInput: "Download .zip with inputs",
   overallCompletedPercentage: "Overall completed percentage",
   parameterDateTooLarge: "Parameter is larger than the maximum date of %(upper_bound!timestamp)",
   parameterDateTooSmall: "Parameter is smaller than the minimum date of %(lower_bound!timestamp)",
