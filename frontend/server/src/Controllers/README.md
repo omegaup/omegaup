@@ -3708,12 +3708,9 @@ Return most frequent public tags of a certain level
 
 ### Returns
 
-```typescript
-{
-  alias: string;
-}
-[];
-```
+| Name            | Type                   |
+| --------------- | ---------------------- |
+| `frequent_tags` | `{ alias: string; }[]` |
 
 ## `/api/tag/list/`
 
