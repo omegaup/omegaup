@@ -586,6 +586,7 @@ const translations: { [key: string]: string; } = {
   openInKarelJs: "Voc\u00ea pode usar karel.js para resolver este problema",
   originalContestHasNotEnded: "O concurso original ainda n\u00e3o terminou",
   outputOnly: "Somente sa\u00edda",
+  outputOnlyDownloadInput: "Baixar .zip com casos de entrada",
   overallCompletedPercentage: "Porcentagem de conclus\u00e3o geral",
   parameterDateTooLarge: "Data \u00e9 maior que a data m\u00e1xima de %(upper_bound!timestamp)",
   parameterDateTooSmall: "Data \u00e9 menor que a data m\u00ednima de %(lower_bound!timestamp)",
