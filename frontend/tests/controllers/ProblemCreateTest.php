@@ -732,6 +732,60 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    /**
+     * Test that we are able to generate the input .zip of a problem that
+     * admits an output-only solution.
+     */
+    public function testGenerateInputZip() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
+            'languages' => 'cat',
+        ]));
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+
+        $problem = \OmegaUp\DAO\Problems::getByTitle($r['title'])[0];
+
+        $filename = "{$problem->alias}-input.zip";
+        \OmegaUp\Controllers\Problem::generateInputZip(
+            $problem,
+            $problem->commit,
+            $filename
+        );
+
+        // Verify that the templates were generated.
+        $zipPath = INPUTS_PATH . "{$problem->alias}/{$problem->commit}/{$filename}";
+        $this->assertTrue(file_exists($zipPath));
+
+        $zipArchive = new \ZipArchive();
+        try {
+            /** @var true|int */
+            $err = $zipArchive->open($zipPath, \ZipArchive::RDONLY);
+            $this->assertTrue($err);
+
+            /** @var list<string> */
+            $filenames = [];
+            for ($i = 0; $i < $zipArchive->numFiles; ++$i) {
+                $filenames[] = $zipArchive->getNameIndex($i);
+            }
+            $this->assertEqualsCanonicalizing(
+                $filenames,
+                ['1.in', '2.in', '3.in', '4.in']
+            );
+        } finally {
+            $zipArchive->close();
+        }
+    }
+
     public function testProblemParams() {
         $problemParams = new \OmegaUp\ProblemParams([
             'problem_alias' => \OmegaUp\Test\Utils::createRandomString(),
