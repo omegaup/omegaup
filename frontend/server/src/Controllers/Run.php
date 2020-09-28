@@ -1052,7 +1052,7 @@ class Run extends \OmegaUp\Controllers\Controller {
     /**
      * @return list<array{mode: int, type: string, id: string, size: int, path: string}>
      */
-    private static function getProblemCasesMetadata(
+    public static function getProblemCasesMetadata(
         string $directory,
         string $problemAlias,
         string $revision
