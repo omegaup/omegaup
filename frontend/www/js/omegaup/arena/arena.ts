@@ -659,7 +659,7 @@ export class Arena {
     this.navbarAssignments = null;
   }
 
-  installLibinteractiveHooks(): void {
+  installProblemArtifactHooks(): void {
     $('.libinteractive-download form').on('submit', (e: Event) => {
       e.preventDefault();
 
@@ -687,6 +687,11 @@ export class Arena {
         .find('.libinteractive-extension')
         .html(<string>$(<HTMLElement>e.target).val());
     });
+
+    $('.output-only-download a').attr(
+      'href',
+      `/probleminput/${this.currentProblem.alias}/${this.currentProblem.commit}/${this.currentProblem.alias}-input.zip`,
+    );
   }
 
   connectSocket(): boolean {
@@ -1896,7 +1901,7 @@ export class Arena {
         '',
       );
     }
-    this.installLibinteractiveHooks();
+    this.installProblemArtifactHooks();
 
     this.updateAllowedLanguages(this.currentProblem.languages);
 

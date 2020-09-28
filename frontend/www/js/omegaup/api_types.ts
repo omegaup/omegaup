@@ -37,6 +37,25 @@ export namespace dao {
 // Type aliases
 export namespace types {
   export namespace payloadParsers {
+    export function ActivityFeedPayload(
+      elementId: string = 'payload',
+    ): types.ActivityFeedPayload {
+      return ((x) => {
+        x.events = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.time = ((x: number) => new Date(x * 1000))(x.time);
+            return x;
+          });
+        })(x.events);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function AuthorRankTablePayload(
       elementId: string = 'payload',
     ): types.AuthorRankTablePayload {
@@ -89,6 +108,14 @@ export namespace types {
         return x;
       })(
         JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function CertificateDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CertificateDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
       );
     }
 
@@ -923,6 +950,14 @@ export namespace types {
       );
     }
 
+    export function ProblemListCollectionPayload(
+      elementId: string = 'payload',
+    ): types.ProblemListCollectionPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemListPayload(
       elementId: string = 'payload',
     ): types.ProblemListPayload {
@@ -1166,6 +1201,20 @@ export namespace types {
     }
   }
 
+  export interface ActivityEvent {
+    classname: string;
+    event: types.Event;
+    ip?: number;
+    time: Date;
+    username: string;
+  }
+
+  export interface ActivityFeedPayload {
+    alias: string;
+    events: types.ActivityEvent[];
+    type: string;
+  }
+
   export interface AddedProblem {
     alias: string;
     commit?: string;
@@ -1242,6 +1291,10 @@ export namespace types {
     runtime: number;
     time: Date;
     username: string;
+  }
+
+  export interface CertificateDetailsPayload {
+    uuid: string;
   }
 
   export interface Clarification {
@@ -1777,6 +1830,13 @@ export namespace types {
     student: types.FilteredCourse[];
   }
 
+  export interface Event {
+    courseAlias?: string;
+    courseName?: string;
+    name: string;
+    problem?: string;
+  }
+
   export interface FilteredCourse {
     accept_teacher?: boolean;
     admission_mode: string;
@@ -1841,6 +1901,18 @@ export namespace types {
       score: number;
     }[];
     userRank: types.CoderOfTheMonth[];
+  }
+
+  export interface InteractiveInterface {
+    ExecutableDescription: { Args: string[]; Env: { [key: string]: string } };
+    Files: { [key: string]: string };
+    MakefileRules: {
+      Compiler: string;
+      Debug: boolean;
+      Params: string;
+      Requisites: string[];
+      Targets: string[];
+    }[];
   }
 
   export interface InteractiveSettingsDistrib {
@@ -2150,7 +2222,7 @@ export namespace types {
     visibility: number;
   }
 
-  export interface ProblemListCollection {
+  export interface ProblemListCollectionPayload {
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
   }
@@ -2201,6 +2273,16 @@ export namespace types {
 
   export interface ProblemSettings {
     Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Interactive?: {
+      Interfaces: {
+        [key: string]: { [key: string]: types.InteractiveInterface };
+      };
+      LibinteractiveVersion: string;
+      Main: string;
+      ModuleName: string;
+      ParentLang: string;
+      Templates: { [key: string]: string };
+    };
     Limits: types.LimitsSettings;
     Slow: boolean;
     Validator: {
@@ -2812,7 +2894,7 @@ export namespace messages {
     events: {
       alias?: string;
       classname?: string;
-      ip: number;
+      ip?: number;
       time: Date;
       username: string;
     }[];
@@ -3058,7 +3140,7 @@ export namespace messages {
     events: {
       alias?: string;
       classname?: string;
-      ip: number;
+      ip?: number;
       time: Date;
       username: string;
     }[];

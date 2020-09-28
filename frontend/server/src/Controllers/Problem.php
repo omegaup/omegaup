@@ -11,7 +11,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
  * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
- * @psalm-type ProblemSettings=array{Cases: list<array{Cases: list<array{Name: string, Weight: float}>, Name: string}>, Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}}
+ * @psalm-type InteractiveInterface=array{MakefileRules: list<array{Targets: list<string>, Requisites: list<string>, Compiler: string, Params: string, Debug: bool}>, ExecutableDescription: array{Args: list<string>, Env: array<string, string>}, Files: array<string, string>}
+ * @psalm-type ProblemSettings=array{Cases: list<array{Cases: list<array{Name: string, Weight: float}>, Name: string}>, Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}, Interactive?: array{Interfaces: array<string, array<string, InteractiveInterface>>, Templates: array<string, string>, Main: string, ModuleName: string, ParentLang: string, LibinteractiveVersion: string}}
  * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
  * @psalm-type ProblemsetterInfo=array{classname: string, creation_date: \OmegaUp\Timestamp|null, name: string, username: string}
  * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
@@ -38,7 +39,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
- * @psalm-type ProblemListCollection=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
+ * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -325,15 +326,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $params->selectedTagsAsJSON,
                 /*$assoc=*/true
             ) : null;
-            if (!empty($selectedTags)) {
-                foreach ($selectedTags as $tag) {
-                    if (empty($tag['tagname'])) {
-                        throw new \OmegaUp\Exceptions\InvalidParameterException(
-                            'parameterEmpty',
-                            'tagname'
-                        );
-                    }
+            if (empty($selectedTags)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'problemEditTagPublicRequired',
+                    'public_tags'
+                );
+            }
+            $hasPublicTags = false;
+            foreach ($selectedTags as $tag) {
+                if (!$hasPublicTags) {
+                    $hasPublicTags = boolval($tag['public']);
                 }
+                if (empty($tag['tagname'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'tagname'
+                    );
+                }
+            }
+            if (!$hasPublicTags) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'problemEditTagPublicRequired',
+                    'public_tags'
+                );
             }
         }
 
@@ -458,6 +473,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $problemSettings = self::getDefaultProblemSettings();
         unset($problemSettings['Cases']);
+        unset($problemSettings['Interactive']);
         self::updateProblemSettings($problemSettings, $params);
         $acceptsSubmissions = $languages !== '';
 
@@ -1450,6 +1466,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $problem->commit
         );
         unset($problemSettings['Cases']);
+        unset($problemSettings['Interactive']);
         $originalProblemSettings = self::arrayDeepCopy($problemSettings);
         self::updateProblemSettings($problemSettings, $params);
         $settingsUpdated = self::diffProblemSettings(
@@ -4779,7 +4796,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: ProblemListCollection, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: ProblemListCollectionPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getProblemCollectionDetailsForSmarty(
         \OmegaUp\Request $r
@@ -5466,6 +5483,122 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
         $problemDeployer->generateLibinteractiveTemplates($commit);
+    }
+
+    /**
+     * @omegaup-request-param string $commit
+     * @omegaup-request-param string $filename
+     * @omegaup-request-param string $problem_alias
+     */
+    public static function apiInput(\OmegaUp\Request $r): void {
+        $commit = $r->ensureString(
+            'commit',
+            fn (string $commit) => preg_match(
+                '/^[0-9a-f]{40}$/',
+                $commit
+            ) === 1
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $r->ensureString(
+                'problem_alias',
+                fn (string $problemAlias) => \OmegaUp\Validators::alias(
+                    $problemAlias
+                )
+            )
+        );
+        if (is_null($problem) || is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $filename = $r->ensureString('filename');
+
+        self::generateInputZip($problem, $commit, $filename);
+
+        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
+        header(
+            'Location: ' . INPUTS_URL_PATH . "{$problem->alias}/{$commit}/{$filename}?noredirect=1"
+        );
+        header('HTTP/1.1 303 See Other');
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
+    }
+
+    public static function generateInputZip(
+        \OmegaUp\DAO\VO\Problems $problem,
+        string $commit,
+        string $filename
+    ): void {
+        if ($filename != "{$problem->alias}-input.zip") {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        if (!in_array('cat', explode(',', $problem->languages))) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        if (is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $problemCases = \OmegaUp\Controllers\Run::getProblemCasesMetadata(
+            'cases',
+            $problem->alias,
+            $commit
+        );
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problem->alias,
+            $commit
+        );
+
+        $tmpDir = \OmegaUp\FileHandler::tempDir(
+            '/tmp',
+            'InputZip',
+            0755
+        );
+
+        try {
+            $tmpPath = "{$tmpDir}/{$problem->alias}-input.zip";
+            $zipArchive = new \ZipArchive();
+            /** @var true|int */
+            $err = $zipArchive->open(
+                $tmpPath,
+                \ZipArchive::CREATE
+            );
+            if ($err !== true) {
+                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    $err
+                );
+            }
+
+            foreach ($problemCases as $file) {
+                if (pathinfo($file['path'], PATHINFO_EXTENSION) !== 'in') {
+                    continue;
+                }
+                $zipArchive->addFromString(
+                    basename($file['path']),
+                    $problemArtifacts->get($file['path'])
+                );
+            }
+            $zipArchive->close();
+
+            $zipPath = INPUTS_PATH . "{$problem->alias}/{$commit}/{$problem->alias}-input.zip";
+            @mkdir(dirname($zipPath), 0755, true);
+            rename($tmpPath, $zipPath);
+        } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to create input .zip for {$problem->alias}",
+                $e
+            );
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'problemDeployerLibinteractiveValidationError',
+                $e->getMessage()
+            );
+        } finally {
+            \OmegaUp\FileHandler::deleteDirRecursively($tmpDir);
+        }
     }
 
     /**

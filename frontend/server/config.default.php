@@ -84,6 +84,11 @@ try_define(
 );
 try_define('IMAGES_URL_PATH', '/img/');
 try_define(
+    'INPUTS_PATH',
+    sprintf('%s/www/probleminput/', strval(OMEGAUP_ROOT))
+);
+try_define('INPUTS_URL_PATH', '/probleminput/');
+try_define(
     'TEMPLATES_PATH',
     sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
 );
