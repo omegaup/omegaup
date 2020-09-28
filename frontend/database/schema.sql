@@ -200,6 +200,7 @@ CREATE TABLE `Course_Identity_Request` (
   `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se realizó el request',
   `last_update` timestamp NULL DEFAULT NULL COMMENT 'Última fecha de actualización del request',
   `accepted` tinyint(1) DEFAULT NULL COMMENT 'Indica si la respuesta del request fue aceptada',
+  `extra_note` mediumtext COMMENT 'Indica una descripción con el motivo de aceptar o rechazar un usuario al curso',
   PRIMARY KEY (`identity_id`,`course_id`),
   KEY `course_id` (`course_id`),
   KEY `identity_id` (`identity_id`),
