@@ -126,6 +126,28 @@ location ~ '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/([a-zA-Z0-9_.-]+)$' {
   rewrite '^/templates/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/(.*)$' /problems/template.php?problem_alias=$1&commit=$2&filename=$3? last;
 }
 
+# output-only inputs.
+location ~ '^/probleminput/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/([a-zA-Z0-9_.-]+)$' {
+  if (-f $request_filename) {
+    # Normal case: file is found and nginx can handle it natively.
+    break;
+  }
+  if (-d $document_root/probleminput/$1/$2) {
+    # Directory was found, but file was not. That means that the
+    # re-generation process was already run, so we will never be
+    # able to find that file.
+    return 404;
+  }
+  if ($args != '') {
+    # The re-generation process was already run, and we still
+    # could not find that file. Give up to avoid infinitely
+    # redirecting.
+    return 404;
+  }
+  # Try re-generating the template. Once this is done, it will cause a redirect to nginx.
+  rewrite '^/probleminput/([a-zA-Z0-9_-]+)/([0-9a-f]{40})/(.*)$' /problems/input.php?problem_alias=$1&commit=$2&filename=$3 last;
+}
+
 # problem images
 location ~ '^/img/([a-zA-Z0-9_-]+)/([0-9a-f]{40})\.([a-zA-Z0-9._-]+)$' {
   if (-f $request_filename) {

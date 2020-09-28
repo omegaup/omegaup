@@ -67,6 +67,7 @@ frontend/www/img/
 frontend/www/phpminiadmin/
 frontend/www/pmamini.php
 frontend/www/templates/
+frontend/www/probleminput/
 frontend/www/tests/index.html
 
 # Ignore sublime sftp config

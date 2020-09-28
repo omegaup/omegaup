@@ -86,6 +86,14 @@
                       event.event.problem
                     }}</a>
                   </span>
+                  <span v-if="event.event.courseAlias" class="mr-2">
+                    <a v-bind:href="`/course/${event.event.courseAlias}/`">{{
+                      event.event.courseName
+                    }}</a>
+                  </span>
+                  <span v-if="event.event.cloneResult">{{
+                    event.event.cloneResult
+                  }}</span>
                 </td>
               </tr>
             </tbody>
