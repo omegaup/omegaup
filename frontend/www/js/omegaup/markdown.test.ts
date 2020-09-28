@@ -4,10 +4,19 @@ import * as markdown from './markdown';
 
 describe('markdown', () => {
   describe('Converter', () => {
-    const converter = new markdown.Converter();
+    const converter = new markdown.Converter({ preview: true });
 
     it('Should handle trivial inputs', () => {
       expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');
+    });
+
+    it('Should handle templates', () => {
+      expect(converter.makeHtml('{{libinteractive:download}}')).toEqual(
+        '<p><code class="libinteractive-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+      );
+      expect(converter.makeHtml('{{output-only:download}}')).toEqual(
+        '<p><code class="output-only-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+      );
     });
 
     it('Should handle path-style links', () => {

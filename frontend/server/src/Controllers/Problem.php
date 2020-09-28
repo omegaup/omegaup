@@ -326,15 +326,29 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $params->selectedTagsAsJSON,
                 /*$assoc=*/true
             ) : null;
-            if (!empty($selectedTags)) {
-                foreach ($selectedTags as $tag) {
-                    if (empty($tag['tagname'])) {
-                        throw new \OmegaUp\Exceptions\InvalidParameterException(
-                            'parameterEmpty',
-                            'tagname'
-                        );
-                    }
+            if (empty($selectedTags)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'problemEditTagPublicRequired',
+                    'public_tags'
+                );
+            }
+            $hasPublicTags = false;
+            foreach ($selectedTags as $tag) {
+                if (!$hasPublicTags) {
+                    $hasPublicTags = boolval($tag['public']);
                 }
+                if (empty($tag['tagname'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterEmpty',
+                        'tagname'
+                    );
+                }
+            }
+            if (!$hasPublicTags) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'problemEditTagPublicRequired',
+                    'public_tags'
+                );
             }
         }
 
@@ -5469,6 +5483,122 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
         $problemDeployer = new \OmegaUp\ProblemDeployer($problem->alias);
         $problemDeployer->generateLibinteractiveTemplates($commit);
+    }
+
+    /**
+     * @omegaup-request-param string $commit
+     * @omegaup-request-param string $filename
+     * @omegaup-request-param string $problem_alias
+     */
+    public static function apiInput(\OmegaUp\Request $r): void {
+        $commit = $r->ensureString(
+            'commit',
+            fn (string $commit) => preg_match(
+                '/^[0-9a-f]{40}$/',
+                $commit
+            ) === 1
+        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias(
+            $r->ensureString(
+                'problem_alias',
+                fn (string $problemAlias) => \OmegaUp\Validators::alias(
+                    $problemAlias
+                )
+            )
+        );
+        if (is_null($problem) || is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $filename = $r->ensureString('filename');
+
+        self::generateInputZip($problem, $commit, $filename);
+
+        //The noredirect=1 part lets nginx know to not call us again if the file is not found.
+        header(
+            'Location: ' . INPUTS_URL_PATH . "{$problem->alias}/{$commit}/{$filename}?noredirect=1"
+        );
+        header('HTTP/1.1 303 See Other');
+
+        // Since all the headers and response have been sent, make the API
+        // caller to exit quietly.
+        throw new \OmegaUp\Exceptions\ExitException();
+    }
+
+    public static function generateInputZip(
+        \OmegaUp\DAO\VO\Problems $problem,
+        string $commit,
+        string $filename
+    ): void {
+        if ($filename != "{$problem->alias}-input.zip") {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        if (!in_array('cat', explode(',', $problem->languages))) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+        if (is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+        $problemCases = \OmegaUp\Controllers\Run::getProblemCasesMetadata(
+            'cases',
+            $problem->alias,
+            $commit
+        );
+        $problemArtifacts = new \OmegaUp\ProblemArtifacts(
+            $problem->alias,
+            $commit
+        );
+
+        $tmpDir = \OmegaUp\FileHandler::tempDir(
+            '/tmp',
+            'InputZip',
+            0755
+        );
+
+        try {
+            $tmpPath = "{$tmpDir}/{$problem->alias}-input.zip";
+            $zipArchive = new \ZipArchive();
+            /** @var true|int */
+            $err = $zipArchive->open(
+                $tmpPath,
+                \ZipArchive::CREATE
+            );
+            if ($err !== true) {
+                throw new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                    'problemDeployerInternalError',
+                    $err
+                );
+            }
+
+            foreach ($problemCases as $file) {
+                if (pathinfo($file['path'], PATHINFO_EXTENSION) !== 'in') {
+                    continue;
+                }
+                $zipArchive->addFromString(
+                    basename($file['path']),
+                    $problemArtifacts->get($file['path'])
+                );
+            }
+            $zipArchive->close();
+
+            $zipPath = INPUTS_PATH . "{$problem->alias}/{$commit}/{$problem->alias}-input.zip";
+            @mkdir(dirname($zipPath), 0755, true);
+            rename($tmpPath, $zipPath);
+        } catch (\Exception $e) {
+            self::$log->error(
+                "Failed to create input .zip for {$problem->alias}",
+                $e
+            );
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'problemDeployerLibinteractiveValidationError',
+                $e->getMessage()
+            );
+        } finally {
+            \OmegaUp\FileHandler::deleteDirRecursively($tmpDir);
+        }
     }
 
     /**

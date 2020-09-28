@@ -35,6 +35,9 @@ export class Converter {
       templates['libinteractive:download'] =
         '<code class="libinteractive-download">' +
         '<i class="glyphicon glyphicon-download-alt"></i></code>';
+      templates['output-only:download'] =
+        '<code class="output-only-download">' +
+        '<i class="glyphicon glyphicon-download-alt"></i></code>';
     } else {
       templates[
         'libinteractive:download'
@@ -80,6 +83,28 @@ export class Converter {
                   <button type="submit" class="btn btn-primary active">
                     ${T.libinteractiveDownload}
                   </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>`;
+      templates[
+        'output-only:download'
+      ] = `<div class="output-only-download panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            ${T.outputOnlyDownloadInput}
+          </h3>
+        </div>
+        <div class="panel-body">
+          <form role="form">
+            <div class="form-horizontal">
+              <div class="form-group row">
+                <div class="col-12 text-center">
+                  <a class="btn btn-primary">
+                    ${T.outputOnlyDownloadInput}
+                  </a>
                 </div>
               </div>
             </div>
@@ -138,7 +163,7 @@ export class Converter {
     this._converter.hooks.chain('postSpanGamut', (text: string): string => {
       // Templates.
       text = text.replace(
-        /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g,
+        /^\s*\{\{([a-z0-9_:-]+)\}\}\s*$/g,
         (wholematch: string, m1: string): string => {
           if (templates.hasOwnProperty(m1)) {
             return templates[m1];
