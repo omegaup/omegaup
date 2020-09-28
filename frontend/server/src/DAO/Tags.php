@@ -109,6 +109,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
                 t.name
             ORDER BY
                 COUNT(pt.problem_id)
+            DESC
             ';
 
         /** @var list<array{alias: string}> */
