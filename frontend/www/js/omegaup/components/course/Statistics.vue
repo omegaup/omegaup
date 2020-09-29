@@ -35,7 +35,7 @@ export default class Statistics extends Vue {
   @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   // chart options
-  selected = this.varianceChartOptions;
+  selected = this.verdictChartOptions;
   options = [
     { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
@@ -142,6 +142,9 @@ export default class Statistics extends Vue {
         title: T.wordsRuns,
       },
       tooltip: {},
+      legend: {
+        reversed: true,
+      },
       plotOptions: {
         series: {
           stacking: 'normal',
@@ -153,7 +156,7 @@ export default class Statistics extends Vue {
           },
         },
       },
-      series: this.verdictStats,
+      series: this.verdictStats.reverse(),
     };
   }
   // helper functions
@@ -235,12 +238,67 @@ export default class Statistics extends Vue {
           );
       }
     }
-    for (const verdictName of verdicts) {
+    if (verdicts.includes('AC'))
       series.push({
-        name: verdictName,
-        data: runs[verdicts.indexOf(verdictName)],
+        name: 'AC',
+        data: runs[verdicts.indexOf('AC')],
       });
-    }
+    if (verdicts.includes('PA'))
+      series.push({
+        name: 'PA',
+        data: runs[verdicts.indexOf('PA')],
+      });
+    if (verdicts.includes('WA'))
+      series.push({
+        name: 'WA',
+        data: runs[verdicts.indexOf('WA')],
+      });
+    if (verdicts.includes('RTE'))
+      series.push({
+        name: 'RTE',
+        data: runs[verdicts.indexOf('RTE')],
+      });
+    if (verdicts.includes('RFE'))
+      series.push({
+        name: 'RFE',
+        data: runs[verdicts.indexOf('RFE')],
+      });
+    if (verdicts.includes('CE'))
+      series.push({
+        name: 'CE',
+        data: runs[verdicts.indexOf('CE')],
+      });
+    if (verdicts.includes('PE'))
+      series.push({
+        name: 'PE',
+        data: runs[verdicts.indexOf('PE')],
+      });
+    if (verdicts.includes('TLE'))
+      series.push({
+        name: 'TLE',
+        data: runs[verdicts.indexOf('TLE')],
+      });
+    if (verdicts.includes('OLE'))
+      series.push({
+        name: 'OLE',
+        data: runs[verdicts.indexOf('OLE')],
+      });
+    if (verdicts.includes('MLE'))
+      series.push({
+        name: 'MLE',
+        data: runs[verdicts.indexOf('MLE')],
+      });
+    if (verdicts.includes('JE'))
+      series.push({
+        name: 'JE',
+        data: runs[verdicts.indexOf('JE')],
+      });
+    if (verdicts.includes('VE'))
+      series.push({
+        name: 'VE',
+        data: runs[verdicts.indexOf('VE')],
+      });
+
     return series;
   }
   getStatistic(
