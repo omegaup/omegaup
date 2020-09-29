@@ -66,13 +66,13 @@
   </form>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 .CodeMirror pre.CodeMirror-line {
   padding: 0px 35px;
 }
 
-form {
+form[data-run-submit] {
   background: #eee;
   width: 80%;
   height: 90%;
