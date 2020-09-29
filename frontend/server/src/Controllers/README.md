@@ -186,6 +186,7 @@
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Tag](#tag)
+  - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -3692,6 +3693,24 @@ contestant's machine and the server.
 # Tag
 
 TagController
+
+## `/api/tag/frequentTags/`
+
+### Description
+
+Return most frequent public tags of a certain level
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `problemLevel` | `string` |             |
+
+### Returns
+
+| Name            | Type                   |
+| --------------- | ---------------------- |
+| `frequent_tags` | `{ alias: string; }[]` |
 
 ## `/api/tag/list/`
 
