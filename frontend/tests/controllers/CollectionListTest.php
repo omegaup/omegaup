@@ -1,7 +1,6 @@
 <?php
 
 class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
-
     public function setUp(): void {
         parent::setUp();
 
@@ -14,8 +13,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test for the most frequent tags of a level with a level parameter in a request
      */
-    public function testCollectionTags(){
-
+    public function testCollectionTags() {
         $problemsTagsMapping = [
             [
                 'title' => 'problem_1',
@@ -91,16 +89,15 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     /**
      * Test for the authors rank with a by a request
      */
-    public function testCollectionAuthors(){
-
+    public function testCollectionAuthors() {
         $identities = [];
         $problems = [];
 
         // Create 4 user with 2 problems each
-        for ($i=0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; $i++) {
             ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
-            for ($j=0; $j < 2; $j++) { 
+            for ($j = 0; $j < 2; $j++) {
                 $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
                     $identities[$i]
                 );
@@ -149,7 +146,6 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Utils::runAggregateFeedback();
         \OmegaUp\Test\Utils::runUpdateRanks();
-
 
         // Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();

@@ -5830,12 +5830,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
     }
 
-	/**
+    /**
      *
      * @return array{smartyProperties: array{payload: CollectionDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $collection_type
-     */    
+     */
     public static function getCollectionsDetailsForSmarty(\OmegaUp\Request $r): array {
         $collectionType = $r->ensureString('collection_type');
 
