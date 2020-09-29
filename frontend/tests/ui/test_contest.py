@@ -358,7 +358,7 @@ def update_scoreboard_for_contest(driver, contest_alias):
 
 @util.annotate
 def create_clarification_user(driver, problem, question):
-    '''Makes the user can post a question in an specific contest and problem'''
+    '''Makes the user post a question in an specific contest and problem'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
@@ -389,7 +389,7 @@ def create_clarification_user(driver, problem, question):
 
 @util.annotate
 def answer_clarification_admin(driver, answer):
-    ''' Makes the admin course can answer users' clarifications '''
+    '''Makes the admin course answer users' clarifications'''
 
     driver.wait.until(
         EC.element_to_be_clickable(
