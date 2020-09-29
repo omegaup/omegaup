@@ -75,4 +75,47 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
 
         return $results;
     }
+
+    /**
+     * @return list<array{alias: string}>
+     */
+    public static function getFrequentTagsByLevel(
+        string $problemLevel
+    ) {
+        $sql = '
+            SELECT
+                t.name AS alias
+            FROM
+                Problems_Tags pt
+            INNER JOIN
+                Tags t ON t.tag_id = pt.tag_id
+            WHERE
+                pt.problem_id
+            IN (
+                SELECT
+                    problem_id
+                FROM
+                    Problems_Tags
+                WHERE
+                    tag_id = (
+                        SELECT
+                            tag_id
+                        FROM
+                            Tags
+                        WHERE name = ? )
+            ) AND
+                name LIKE "problemTag%"
+            GROUP BY
+                t.name
+            ORDER BY
+                COUNT(pt.problem_id)
+            DESC
+            ';
+
+        /** @var list<array{alias: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$problemLevel]
+        );
+    }
 }
