@@ -52,6 +52,7 @@ describe('Details.vue', () => {
     source: 'omegaUp classics',
     statement: {
       images: {},
+      sources: {},
       language: 'es',
       markdown: '# test',
     },
