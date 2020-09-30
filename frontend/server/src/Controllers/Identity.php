@@ -303,7 +303,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['group_alias'],
             'group_alias'
         );
-        $group = \OmegaUp\Controllers\Group::validateGroup(
+        $group = \OmegaUp\Controllers\Group::validateGroupAndOwner(
             $r['group_alias'],
             $r->identity
         );
@@ -555,7 +555,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['group_alias'],
             'group_alias'
         );
-        \OmegaUp\Controllers\Group::validateGroup(
+        \OmegaUp\Controllers\Group::validateGroupAndOwner(
             $r['group_alias'],
             $r->identity
         );
