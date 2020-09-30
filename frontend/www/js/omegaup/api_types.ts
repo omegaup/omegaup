@@ -2317,6 +2317,7 @@ export namespace types {
     images: { [key: string]: string };
     language: string;
     markdown: string;
+    sources: { [key: string]: string };
   }
 
   export interface ProblemVersion {
