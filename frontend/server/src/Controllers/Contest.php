@@ -2825,12 +2825,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $group = $r->ensureString(
+        $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $group = \OmegaUp\DAO\Groups::findByAlias($group);
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
@@ -2877,12 +2877,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $group = $r->ensureString(
+        $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $group = \OmegaUp\DAO\Groups::findByAlias($group);
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
@@ -3017,12 +3017,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $group = $r->ensureString(
+        $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $group = \OmegaUp\DAO\Groups::findByAlias($group);
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
@@ -3058,12 +3058,12 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $group = $r->ensureString(
+        $groupAlias = $r->ensureString(
             'group',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $group = \OmegaUp\DAO\Groups::findByAlias($group);
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
