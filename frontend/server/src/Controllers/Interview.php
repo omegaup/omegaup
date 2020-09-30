@@ -24,9 +24,9 @@ class Interview extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['alias'],
-            'alias'
+        $interviewAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['title'],
@@ -42,7 +42,7 @@ class Interview extends \OmegaUp\Controllers\Controller {
             'owner_id' => $r->user->user_id,
         ]);
         $interview = new \OmegaUp\DAO\VO\Interviews([
-            'alias' => $r['alias'],
+            'alias' => $interviewAlias,
             'title' => $r['title'],
             'description' => $r['description'] ?? $r['title'],
             'window_length' => $r['duration'],
@@ -103,13 +103,11 @@ class Interview extends \OmegaUp\Controllers\Controller {
         // Authenticate logged user
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['interview_alias'],
-            'interview_alias'
+        $interviewAlias = $r->ensureString(
+            'interview_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $interview = \OmegaUp\DAO\Interviews::getByAlias(
-            $r['interview_alias']
-        );
+        $interview = \OmegaUp\DAO\Interviews::getByAlias($interviewAlias);
         if (is_null($interview)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'interviewNotFound'
@@ -305,13 +303,11 @@ class Interview extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $contest_alias
      */
     public static function showIntro(\OmegaUp\Request $r): bool {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['contest_alias'],
-            'contest_alias'
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $contest = \OmegaUp\Controllers\Contest::validateContest(
-            $r['contest_alias']
-        );
+        $contest = \OmegaUp\Controllers\Contest::validateContest($contestAlias);
         try {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {

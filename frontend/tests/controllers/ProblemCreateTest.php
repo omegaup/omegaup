@@ -83,6 +83,26 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->difficulty);
     }
 
+    public function testCreateWithInvlaidAlias() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['problem_alias'] = 'Invalid alias';
+
+        // Call the API
+        try {
+            \OmegaUp\Controllers\Problem::apiCreate($r);
+            $this->fail('Problem creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+        }
+    }
+
     /**
      * Basic test for slow problems
      */
