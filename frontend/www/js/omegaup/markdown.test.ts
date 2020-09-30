@@ -4,10 +4,45 @@ import * as markdown from './markdown';
 
 describe('markdown', () => {
   describe('Converter', () => {
-    const converter = new markdown.Converter();
+    const converter = new markdown.Converter({ preview: true });
 
     it('Should handle trivial inputs', () => {
       expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');
+    });
+
+    it('Should handle templates', () => {
+      expect(converter.makeHtml('{{libinteractive:download}}')).toEqual(
+        '<p><code class="libinteractive-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+      );
+      expect(converter.makeHtml('{{output-only:download}}')).toEqual(
+        '<p><code class="output-only-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+      );
+    });
+
+    it('Should handle path-style links', () => {
+      expect(converter.makeHtml('[foo](/foo)')).toEqual(
+        '<p><a href="/foo">foo</a></p>',
+      );
+    });
+
+    it('Should handle path-style links with titles', () => {
+      expect(converter.makeHtml('[foo](/foo "foo")')).toEqual(
+        '<p><a href="/foo" title="foo">foo</a></p>',
+      );
+    });
+
+    it('Should handle mailto links', () => {
+      expect(
+        converter.makeHtml('[foo](mailto:foo@foo.com?subject=foo)'),
+      ).toEqual('<p><a href="mailto:foo@foo.com?subject=foo">foo</a></p>');
+    });
+
+    it('Should handle mailto links with titles', () => {
+      expect(
+        converter.makeHtml('[foo](mailto:foo@foo.com?subject=foo "foo")'),
+      ).toEqual(
+        '<p><a href="mailto:foo@foo.com?subject=foo" title="foo">foo</a></p>',
+      );
     });
 
     it('Should handle invalid iframe tag', () => {
@@ -402,6 +437,28 @@ Tags &lt;b&gt;hello&lt;/b&gt;
         converter.makeHtml('```python\ndef foo(x):\n  return 3\n```'),
       ).toEqual(
         '<pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre>',
+      );
+    });
+
+    it('Should handle file transclusions', () => {
+      expect(
+        converter.makeHtmlWithImages(
+          '{{sample.py}}',
+          {},
+          { 'sample.py': 'def foo(x):\n  return 3\n' },
+        ),
+      ).toEqual(
+        '<p><pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre></p>',
+      );
+      // All Markdown special characters should be escaped.
+      expect(
+        converter.makeHtmlWithImages(
+          '{{sample.in}}',
+          {},
+          { 'sample.in': '<>&\n*foo* _bar_\n[img](img)\n\\\n' },
+        ),
+      ).toEqual(
+        '<p><pre><code class="language-in">&lt;&gt;&amp;\n*foo* _bar_\n[img](img)\n\\\n</code></pre></p>',
       );
     });
   });

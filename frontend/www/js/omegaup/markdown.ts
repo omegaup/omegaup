@@ -13,6 +13,10 @@ import { getSanitizingConverter } from '@/third_party/js/pagedown/Markdown.Sanit
 import T from './lang';
 import { types } from './api_types';
 
+export type SourceMapping = {
+  [filename: string]: string;
+};
+
 export type ImageMapping = {
   [url: string]: string;
 };
@@ -21,9 +25,29 @@ export interface ConverterOptions {
   preview?: boolean;
 }
 
+const languageMapping: { [key: string]: string } = {
+  c: 'c',
+  'c11-clang': 'c',
+  'c11-gcc': 'c',
+  cpp: 'cpp',
+  'cpp11-clang': 'cpp',
+  'cpp11-gcc': 'cpp',
+  'cpp17-clang': 'cpp',
+  'cpp17-gcc': 'cpp',
+  cs: 'csharp',
+  hs: 'haskell',
+  pas: 'pascal',
+  py: 'python',
+  py2: 'python',
+  py3: 'python',
+  rb: 'ruby',
+  js: 'javascript',
+};
+
 export class Converter {
   private _converter: Markdown.Converter;
   private _settings?: types.ProblemSettingsDistrib;
+  private _sourceMapping?: SourceMapping;
   private _imageMapping?: ImageMapping;
 
   constructor(options: ConverterOptions = {}) {
@@ -34,6 +58,9 @@ export class Converter {
     if (options.preview) {
       templates['libinteractive:download'] =
         '<code class="libinteractive-download">' +
+        '<i class="glyphicon glyphicon-download-alt"></i></code>';
+      templates['output-only:download'] =
+        '<code class="output-only-download">' +
         '<i class="glyphicon glyphicon-download-alt"></i></code>';
     } else {
       templates[
@@ -86,9 +113,31 @@ export class Converter {
           </form>
         </div>
       </div>`;
+      templates[
+        'output-only:download'
+      ] = `<div class="output-only-download panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            ${T.outputOnlyDownloadInput}
+          </h3>
+        </div>
+        <div class="panel-body">
+          <form role="form">
+            <div class="form-horizontal">
+              <div class="form-group row">
+                <div class="col-12 text-center">
+                  <a class="btn btn-primary">
+                    ${T.outputOnlyDownloadInput}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>`;
     }
 
-    const whitelist = /^<\/?(a(?: (target|class|href)="[a-z/_-]+")*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)( class="[a-zA-Z0-9 _-]+")?>$/i;
+    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)*[\]$]+)|(?:[a-z\/_-]+))")|(?:target="[a-z\/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
     const imageWhitelist = new RegExp(
       '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',
       'i',
@@ -138,16 +187,44 @@ export class Converter {
     this._converter.hooks.chain('postSpanGamut', (text: string): string => {
       // Templates.
       text = text.replace(
-        /^\s*\{\{([a-z0-9_:]+)\}\}\s*$/g,
+        /^\s*\{\{([a-z0-9_-]+:[a-z0-9_-]+)\}\}\s*$/g,
         (wholematch: string, m1: string): string => {
           if (templates.hasOwnProperty(m1)) {
             return templates[m1];
           }
-          return (
-            '<strong style="color: red">Unrecognized template name: ' +
-            m1 +
-            '</strong>'
-          );
+          return `<span class="alert alert-danger" role="alert">Unrecognized template name: ${m1}</span>`;
+        },
+      );
+      // File transclusion.
+      const sourceMapping: ImageMapping = this._sourceMapping || {};
+      text = text.replace(
+        /^\s*\{\{([a-z0-9_-]+\.[a-z]{1,4})\}\}\s*$/g,
+        (wholematch: string, m1: string): string => {
+          if (!sourceMapping.hasOwnProperty(m1)) {
+            return `<span class="alert alert-danger" role="alert">Unrecognized source filename: ${m1}</span>`;
+          }
+
+          const extension = m1.split('.')[1];
+          let language = extension;
+          if (languageMapping.hasOwnProperty(language)) {
+            language = languageMapping[language];
+          }
+          const className = ` class="language-${language}"`;
+          let contents = sourceMapping[m1];
+
+          if (Prism.languages.hasOwnProperty(language)) {
+            contents = Prism.highlight(
+              contents,
+              Prism.languages[language],
+              language,
+            );
+          } else {
+            contents = contents
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+          }
+          return `<pre><code${className}>${contents}</code></pre>`;
         },
       );
       // Images.
@@ -286,24 +363,6 @@ export class Converter {
           if (infoString != '') {
             language = infoString.split(/\s+/)[0];
             className = ` class="language-${language}"`;
-            const languageMapping: { [key: string]: string } = {
-              c: 'c',
-              'c11-clang': 'c',
-              'c11-gcc': 'c',
-              cpp: 'cpp',
-              'cpp11-clang': 'cpp',
-              'cpp11-gcc': 'cpp',
-              'cpp17-clang': 'cpp',
-              'cpp17-gcc': 'cpp',
-              cs: 'csharp',
-              hs: 'haskell',
-              pas: 'pascal',
-              py: 'python',
-              py2: 'python',
-              py3: 'python',
-              rb: 'ruby',
-              js: 'javascript',
-            };
             if (languageMapping.hasOwnProperty(language)) {
               language = languageMapping[language];
             }
@@ -465,10 +524,12 @@ export class Converter {
   public makeHtmlWithImages(
     markdown: string,
     imageMapping: ImageMapping,
+    sourceMapping: SourceMapping,
     settings?: types.ProblemSettingsDistrib,
   ): string {
     try {
       this._imageMapping = imageMapping;
+      this._sourceMapping = sourceMapping;
       this._settings = settings;
       return this._converter.makeHtml(markdown);
     } finally {

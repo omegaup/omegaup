@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount, shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 import Vue from 'vue';
 
@@ -21,21 +21,20 @@ describe('ViewStudent.vue', () => {
 
     expect(wrapper.text()).toContain(T.courseStudentSelectStudent);
     expect(wrapper.text()).toContain(T.courseStudentSelectAssignment);
-    expect(wrapper.text()).toContain(T.courseAssignmentProblemRunsEmpty);
   });
 
   it('Should handle runs', async () => {
     const expectedDate = new Date('1/1/2020, 12:00:00 AM');
-    const wrapper = shallowMount(course_ViewStudent, {
+    const wrapper = mount(course_ViewStudent, {
       propsData: {
         course: {
           alias: 'hello',
         },
-        assignment: [
+        assignments: [
           {
             alias: 'assignment',
             assignment_type: 'homework',
-            description: 'Assignment',
+            description: 'Assignment description',
             start_time: new Date(0),
             finish_time: new Date(),
             name: 'Assignment',
@@ -61,8 +60,9 @@ describe('ViewStudent.vue', () => {
               } as omegaup.CourseProblemRun,
             ],
             submissions: 1,
+            title: 'problem_1',
             visits: 1,
-          } as omegaup.CourseProblem,
+          } as types.CourseProblem,
         ],
         students: [
           {
@@ -82,6 +82,15 @@ describe('ViewStudent.vue', () => {
         } as types.CourseStudent,
       },
     });
+
+    const assignments = <HTMLInputElement>(
+      wrapper.find('select[data-assignment]').element
+    );
+    assignments.value = 'assignment';
+    await assignments.dispatchEvent(new Event('change'));
+    expect(wrapper.find('div[data-markdown-statement]').text()).toBe(
+      'Assignment description',
+    );
     await wrapper.find('a[data-problem-alias="problem"]').trigger('click');
 
     expect(wrapper.find('table tbody td').text()).toBe(

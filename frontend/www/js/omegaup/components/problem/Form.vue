@@ -173,6 +173,7 @@
             v-bind:selected-private-tags="selectedPrivateTags"
             v-bind:selected-public-tags="selectedPublicTags"
             v-bind:can-add-new-tags="true"
+            v-bind:errors="errors"
           ></omegaup-problem-tags>
           <input
             name="selected_tags"

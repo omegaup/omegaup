@@ -139,7 +139,8 @@
     display: inline-block;
     float: right;
   }
-  code.libinteractive-download {
+  code.libinteractive-download,
+  code.output-only-download {
     background: #eee;
     color: #ccc;
     margin: 1em 0;
@@ -188,6 +189,7 @@ export default class Markdown extends Vue {
   @Prop() markdown!: string;
   @Ref() root!: HTMLElement;
   @Prop({ default: null }) imageMapping!: markdown.ImageMapping | null;
+  @Prop({ default: null }) sourceMapping!: markdown.SourceMapping | null;
   @Prop({ default: null })
   problemSettings!: types.ProblemSettingsDistrib | null;
   @Prop({ default: false }) preview!: boolean;
@@ -199,6 +201,7 @@ export default class Markdown extends Vue {
       return this.markdownConverter.makeHtmlWithImages(
         this.markdown,
         this.imageMapping || {},
+        this.sourceMapping || {},
         this.problemSettings || undefined,
       );
     }

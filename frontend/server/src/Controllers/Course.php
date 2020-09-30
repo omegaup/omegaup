@@ -22,7 +22,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
  * @psalm-type FilteredCourse=array{accept_teacher: bool|null, admission_mode: string, alias: string, assignments: list<CourseAssignment>, counts: array<string, int>, finish_time: \OmegaUp\Timestamp|null, is_open: bool, name: string, progress?: float, school_name: null|string, start_time: \OmegaUp\Timestamp}
  * @psalm-type CoursesList=array{admin: list<FilteredCourse>, public: list<FilteredCourse>, student: list<FilteredCourse>}
- * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress: AssignmentProgress}
  * @psalm-type CourseCloneDetailsPayload=array{creator: array{classname: string, username: string}, details: CourseDetails, token: string}
  * @psalm-type CoursesByTimeType=array{courses: list<FilteredCourse>, timeType: string}
  * @psalm-type CoursesByAccessMode=array{accessMode: string, activeTab: string, filteredCourses: array{current: CoursesByTimeType, past: CoursesByTimeType}}
@@ -43,8 +42,13 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
- * @psalm-type IntroDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
+ * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
+ * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
+ * @psalm-type IntroDetailsPayload=array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
+ * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
+ * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type ActivityFeedPayload=array{alias: string, events: list<ActivityEvent>, type: string}
  */
 class Course extends \OmegaUp\Controllers\Controller {
     // Admision mode constants
@@ -501,9 +505,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureMainUserIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $courseAlias
-            )
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
 
@@ -2118,7 +2120,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $accept_teacher_git_object_id
      * @omegaup-request-param string $course_alias
      * @omegaup-request-param string $privacy_git_object_id
-     * @omegaup-request-param mixed $share_user_information
+     * @omegaup-request-param bool $share_user_information
      * @omegaup-request-param string $statement_type
      * @omegaup-request-param string $usernameOrEmail
      */
@@ -2146,6 +2148,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r['usernameOrEmail']
         );
         $acceptTeacher = $r->ensureOptionalBool('accept_teacher');
+        $shareUserInformation = $r->ensureOptionalBool(
+            'share_user_information'
+        );
 
         // Only course admins or users adding themselves when the course is public
         if (
@@ -2161,7 +2166,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $groupIdentity = new \OmegaUp\DAO\VO\GroupsIdentities([
             'group_id' => $course->group_id,
             'identity_id' => $resolvedIdentity->identity_id,
-            'share_user_information' => $r['share_user_information'],
+            'share_user_information' => $shareUserInformation,
         ]);
 
         if (!is_null($acceptTeacher)) {
@@ -2561,7 +2566,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException Course not found or trying to directly access a private course.
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{name: string, description: string, alias: string, currentUsername: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, statements: array{privacy: array{markdown: null|string, gitObjectId: null|string, statementType: null|string}, acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}}, isFirstTimeAccess: bool, shouldShowResults: bool}
+     * @return IntroDetailsPayload
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -2575,7 +2580,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{inContest: bool, showRanking: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -2628,7 +2633,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{inContest: bool, smartyProperties: array{payload: IntroDetailsPayload}, template: string}
+     * @return array{inContest: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -3187,6 +3192,46 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * @return array{smartyProperties: array{payload: ActivityFeedPayload, title: string}, entrypoint: string}
+     *
+     * @omegaup-request-param string $course
+     */
+    public static function getActivityFeedDetailsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        $r->ensureMainUserIdentity();
+        $courseAlias = $r->ensureString(
+            'course',
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+
+        if (!\OmegaUp\Authorization::isCourseAdmin($r->identity, $course)) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'alias' => $courseAlias,
+                    'events' => \OmegaUp\ActivityReport::getActivityReport(
+                        \OmegaUp\DAO\Courses::getActivityReport($course)
+                    ),
+                    'type' => 'course',
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'wordsActivityReport'
+                ),
+            ],
+            'entrypoint' => 'activity_feed',
+        ];
+    }
+
+    /**
      * @param CoursesList $courses
      * @param list<string> $coursesTypes
      *
@@ -3236,7 +3281,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Refactor of apiIntroDetails in order to be called from php files and APIs
      *
-     * @return array{inContest: bool, smartyProperties: array{coursePayload?: array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowResults: bool, statements: array{acceptTeacher: array{gitObjectId: null|string, markdown: string, statementType: string}, privacy: array{gitObjectId: null|string, markdown: null|string, statementType: null|string}}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}, payload?: IntroDetailsPayload, showRanking?: bool}, template: string}|array{smartyProperties: array{payload: CourseDetailsPayload, title: string}, entrypoint: string}
+     * @return array{entrypoint: string, inContest?: bool, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: CourseDetailsPayload|IntroDetailsPayload, title: \OmegaUp\TranslationString}}|array{inContest: bool, showRanking: bool, smartyProperties: array{payload: CourseDetailsPayload}, template: string}
      *
      * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
@@ -3246,9 +3291,7 @@ class Course extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $courseAlias = $r->ensureString(
             'course_alias',
-            fn (string $courseAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $courseAlias
-            )
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
         );
         $course = self::validateCourseExists($courseAlias);
         if (is_null($course->course_id)) {
@@ -3381,20 +3424,19 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $requestUserInformation
             );
 
-            $privacyStatement = [
-                'markdown' => $privacyStatementMarkdown,
-                'gitObjectId' => null,
-                'statementType' => null,
-            ];
+            $statements = [];
             if (!is_null($privacyStatementMarkdown)) {
                 $statementType = "course_{$requestUserInformation}_consent";
                 $statement =
                     \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
                         $statementType
                     );
-                $privacyStatement['statementType'] = $statementType;
                 if (!is_null($statement)) {
-                    $privacyStatement['gitObjectId'] = $statement['git_object_id'];
+                    $statements['privacy'] = [
+                        'markdown' => $privacyStatementMarkdown,
+                        'statementType' => $statementType,
+                        'gitObjectId' => $statement['git_object_id'],
+                    ];
                 }
             }
 
@@ -3402,42 +3444,43 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $r->identity->language_id,
                 'accept_teacher'
             );
-            $acceptTeacherStatement = [
-                'markdown' => $markdown,
-                'statementType' => 'accept_teacher',
-                'gitObjectId' => null,
-            ];
             $teacherStatement =
                 \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
                     'accept_teacher'
                 );
             if (!is_null($teacherStatement)) {
-                $acceptTeacherStatement['gitObjectId'] = $teacherStatement['git_object_id'];
+                $statements['acceptTeacher'] = [
+                    'markdown' => $markdown,
+                    'statementType' => 'accept_teacher',
+                    'gitObjectId' => $teacherStatement['git_object_id'],
+                ];
             }
+            $coursePayload = array_merge(
+                $registrationResponse,
+                [
+                    'name' => $courseDetails['name'],
+                    'description' => $courseDetails['description'],
+                    'alias' => $courseDetails['alias'],
+                    'currentUsername' => $r->identity->username,
+                    'needsBasicInformation' => $needsBasicInformation,
+                    'requestsUserInformation' =>
+                        $courseDetails['requests_user_information'],
+                    'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
+                    'statements' => $statements,
+                    'isFirstTimeAccess' => !$hasSharedUserInformation,
+                    'shouldShowResults' => $shouldShowIntro,
+                    'shouldShowFirstAssociatedIdentityRunWarning' => false,
+                ]
+            );
             return [
                 'smartyProperties' => [
-                    'coursePayload' => array_merge(
-                        $registrationResponse,
-                        [
-                            'name' => $courseDetails['name'],
-                            'description' => $courseDetails['description'],
-                            'alias' => $courseDetails['alias'],
-                            'currentUsername' => $r->identity->username,
-                            'needsBasicInformation' => $needsBasicInformation,
-                            'requestsUserInformation' =>
-                                $courseDetails['requests_user_information'],
-                            'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
-                            'statements' => [
-                                'privacy' => $privacyStatement,
-                                'acceptTeacher' => $acceptTeacherStatement,
-                            ],
-                            'isFirstTimeAccess' => !$hasSharedUserInformation,
-                            'shouldShowResults' => $shouldShowIntro,
-                        ]
+                    'payload' => $coursePayload,
+                    'coursePayload' => $coursePayload,
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleCourseIntro'
                     ),
                 ],
-                'template' => 'arena.course.intro.tpl',
-                'inContest' => false,
+                'entrypoint' => 'course_intro',
             ];
         }
 
@@ -3613,7 +3656,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a report with all user activity for a course.
      *
-     * @return array{events: list<array{username: string, ip: int, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>}
+     * @return array{events: list<array{username: string, ip: int|null, time: \OmegaUp\Timestamp, classname?: string, alias?: string}>}
      *
      * @omegaup-request-param string $course_alias
      */
@@ -3634,17 +3677,9 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        $accesses = \OmegaUp\DAO\ProblemsetAccessLog::getAccessForCourse(
-            $course->course_id
-        );
-        $submissions = \OmegaUp\DAO\SubmissionLog::GetSubmissionsForCourse(
-            $course->course_id
-        );
-
         return [
             'events' => \OmegaUp\ActivityReport::getActivityReport(
-                $accesses,
-                $submissions
+                \OmegaUp\DAO\Courses::getActivityReport($course)
             ),
         ];
     }

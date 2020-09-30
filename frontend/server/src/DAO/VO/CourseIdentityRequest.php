@@ -21,6 +21,7 @@ class CourseIdentityRequest extends \OmegaUp\DAO\VO\VO {
         'request_time' => true,
         'last_update' => true,
         'accepted' => true,
+        'extra_note' => true,
     ];
 
     public function __construct(?array $data = null) {
@@ -74,6 +75,11 @@ class CourseIdentityRequest extends \OmegaUp\DAO\VO\VO {
                 $data['accepted']
             );
         }
+        if (isset($data['extra_note'])) {
+            $this->extra_note = is_scalar(
+                $data['extra_note']
+            ) ? strval($data['extra_note']) : '';
+        }
     }
 
     /**
@@ -112,4 +118,11 @@ class CourseIdentityRequest extends \OmegaUp\DAO\VO\VO {
      * @var bool|null
      */
     public $accepted = null;
+
+    /**
+     * Indica una descripción con el motivo de aceptar o rechazar un usuario al curso
+     *
+     * @var string|null
+     */
+    public $extra_note = null;
 }

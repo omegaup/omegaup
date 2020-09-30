@@ -1,63 +1,38 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h2 class="panel-title">{{ T.courseDetails }}</h2>
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">{{ T.courseDetails }}</h2>
     </div>
-    <div class="panel-body text-center">
+    <div class="card-body text-center">
       <h2 name="name">{{ name }}</h2>
       <omegaup-markdown v-bind:markdown="description"></omegaup-markdown>
       <template
         v-if="userRegistrationRequested === null || userRegistrationAccepted"
       >
-        <p
-          v-html="T.courseBasicInformationNeeded"
+        <omegaup-markdown
+          v-bind:markdown="T.courseBasicInformationNeeded"
           v-if="needsBasicInformation"
-        ></p>
+        ></omegaup-markdown>
         <template v-if="requestsUserInformation != 'no'">
           <omegaup-markdown
             v-bind:markdown="statements.privacy.markdown || ''"
           ></omegaup-markdown>
-          <label
-            ><input
-              type="radio"
-              v-bind:value="true"
-              v-model="shareUserInformation"
-            />
-            {{ T.wordsYes }}</label
-          >
-          <label
-            ><input
-              type="radio"
-              v-bind:value="false"
-              v-model="shareUserInformation"
-            />
-            {{ T.wordsNo }}</label
-          >
+          <omegaup-radio-switch
+            v-bind:value.sync="shareUserInformation"
+            v-bind:selected-value="shareUserInformation"
+          ></omegaup-radio-switch>
         </template>
         <template v-if="shouldShowAcceptTeacher">
           <omegaup-markdown
             v-bind:markdown="statements.acceptTeacher.markdown || ''"
           ></omegaup-markdown>
-          <label
-            ><input
-              name="accept-teacher"
-              type="radio"
-              v-bind:value="true"
-              v-model="acceptTeacher"
-            />
-            {{ T.wordsYes }}</label
-          >
-          <label
-            ><input
-              name="reject-teacher"
-              type="radio"
-              v-bind:value="false"
-              v-model="acceptTeacher"
-            />
-            {{ T.wordsNo }}</label
-          >
+          <omegaup-radio-switch
+            v-bind:value.sync="acceptTeacher"
+            v-bind:selected-value="acceptTeacher"
+            name="accept-teacher"
+          ></omegaup-radio-switch>
         </template>
-        <div class="text-center">
+        <div class="text-center mt-3">
           <form v-on:submit.prevent="onSubmit">
             <button
               class="btn btn-primary btn-lg"
@@ -70,21 +45,26 @@
           </form>
         </div>
       </template>
-      <template v-else="">
+      <template v-else>
         <form
           v-if="!userRegistrationRequested"
           v-on:submit.prevent="$emit('request-access-course')"
         >
-          <p v-html="T.mustRegisterToJoinCourse"></p>
+          <omegaup-markdown
+            v-bind:markdown="T.mustRegisterToJoinCourse"
+          ></omegaup-markdown>
           <button type="submit" class="btn btn-primary btn-lg">
             {{ T.registerForCourse }}
           </button>
         </form>
-        <p
+        <omegaup-markdown
           v-else-if="!userRegistrationAnswered"
-          v-html="T.registrationPendingCourse"
-        ></p>
-        <p v-else="" v-html="T.registrationDenied"></p>
+          v-bind:markdown="T.registrationPendingCourse"
+        ></omegaup-markdown>
+        <omegaup-markdown
+          v-else
+          v-bind:markdown="T.registrationDenied"
+        ></omegaup-markdown>
       </template>
     </div>
   </div>
@@ -95,6 +75,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_RadioSwitch from '../RadioSwitch.vue';
 
 interface Statement {
   [name: string]: {
@@ -107,6 +88,7 @@ interface Statement {
 @Component({
   components: {
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-radio-switch': omegaup_RadioSwitch,
   },
 })
 export default class CourseIntro extends Vue {

@@ -186,6 +186,7 @@
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Tag](#tag)
+  - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -1386,10 +1387,10 @@ Add Student to Course.
 | `accept_teacher_git_object_id` | `string`    |             |
 | `course_alias`                 | `string`    |             |
 | `privacy_git_object_id`        | `string`    |             |
+| `share_user_information`       | `bool`      |             |
 | `statement_type`               | `string`    |             |
 | `usernameOrEmail`              | `string`    |             |
 | `accept_teacher`               | `bool|null` |             |
-| `share_user_information`       | `mixed`     |             |
 
 ### Returns
 
@@ -1662,18 +1663,9 @@ Show course intro only on public courses when user is not yet registered
 
 ### Returns
 
-| Name                      | Type                                                                                                                                                                |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `alias`                   | `string`                                                                                                                                                            |
-| `currentUsername`         | `string`                                                                                                                                                            |
-| `description`             | `string`                                                                                                                                                            |
-| `isFirstTimeAccess`       | `boolean`                                                                                                                                                           |
-| `name`                    | `string`                                                                                                                                                            |
-| `needsBasicInformation`   | `boolean`                                                                                                                                                           |
-| `requestsUserInformation` | `string`                                                                                                                                                            |
-| `shouldShowAcceptTeacher` | `boolean`                                                                                                                                                           |
-| `shouldShowResults`       | `boolean`                                                                                                                                                           |
-| `statements`              | `{ acceptTeacher: { gitObjectId: string; markdown: string; statementType: string; }; privacy: { gitObjectId: string; markdown: string; statementType: string; }; }` |
+```typescript
+types.IntroDetailsPayload;
+```
 
 ## `/api/course/listAssignments/`
 
@@ -3701,6 +3693,24 @@ contestant's machine and the server.
 # Tag
 
 TagController
+
+## `/api/tag/frequentTags/`
+
+### Description
+
+Return most frequent public tags of a certain level
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `problemLevel` | `string` |             |
+
+### Returns
+
+| Name            | Type                   |
+| --------------- | ---------------------- |
+| `frequent_tags` | `{ alias: string; }[]` |
 
 ## `/api/tag/list/`
 

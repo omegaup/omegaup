@@ -260,6 +260,45 @@ def check_ranking(driver, problem, user, *, scores):
     assert ranking_problem.text in scores, ranking_problem
 
 
+@util.no_javascript_errors()
+@util.annotate
+def test_user_clarifications_contest(driver):
+    '''Tests creating a contest and adding a clarification.'''
+
+    run_id = driver.generate_id()
+    contest_alias = 'utrank_contest_%s' % run_id
+    problem = 'sumas'
+    user1 = 'ut_rank_user_1_%s' % run_id
+    password = 'P@55w0rd'
+
+    driver.register_user(user1, password)
+
+    create_contest_admin(driver, contest_alias, problem, [user1],
+                         driver.user_username)
+
+    with driver.login(user1, password):
+        enter_contest(driver, contest_alias)
+        create_clarification_user(driver, problem, 'question 1')
+
+    with driver.login_admin():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'a[data-nav-contests]'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
+
+        with driver.page_transition():
+            select_contests_list(driver, 'data-list-current')
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, '.contest-list a[href="/arena/%s/"]' %
+                     contest_alias))).click()
+
+        answer_clarification_admin(driver, 'no')
+
+
 # pylint: disable=too-many-arguments
 @util.annotate
 def create_contest_admin(driver, contest_alias, problem, users, user,
@@ -315,6 +354,62 @@ def update_scoreboard_for_contest(driver, contest_alias):
         urllib.parse.quote(contest_alias, safe=''))
     driver.browser.get(scoreboard_refresh_url)
     assert '"status":"ok"' in driver.browser.page_source
+
+
+@util.annotate
+def create_clarification_user(driver, problem, question):
+    '''Makes the user post a question in an specific contest and problem'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "#clarifications"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#clarifications')))
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "#clarifications/new"]'))).click()
+
+    Select(driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//select[@name = "problem"]')))).select_by_value(problem)
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//textarea[@name = "message"]'))).send_keys(question)
+
+    driver.browser.find_element_by_id('clarification').submit()
+
+    clarifications = driver.browser.find_elements_by_class_name('inserted')
+
+    assert len(clarifications) == 1, len(clarifications)
+
+
+@util.annotate
+def answer_clarification_admin(driver, answer):
+    '''Makes the admin course answer users' clarifications'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "#clarifications"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#clarifications')))
+
+    Select(driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             '.inserted .create-response-canned')))).select_by_value(answer)
+
+    driver.browser.find_element_by_css_selector(
+        '.inserted .create-response-form').submit()
+
+    resolved = driver.wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, '.inserted')))
+
+    assert 'resolved' in resolved.get_attribute('class').split(), resolved
 
 
 @util.annotate
