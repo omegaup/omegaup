@@ -163,11 +163,11 @@ export default class CourseViewProgress extends Vue {
     student: types.StudentProgress,
     assignment: omegaup.Assignment,
   ): number {
-    if (!student.progress.hasOwnProperty(assignment.alias)) {
+    if (!student.score.hasOwnProperty(assignment.alias)) {
       return 0;
     }
 
-    return Object.values(student.progress[assignment.alias]).reduce(
+    return Object.values(student.score[assignment.alias]).reduce(
       (accumulator: number, currentValue: number) => accumulator + currentValue,
       0,
     );
