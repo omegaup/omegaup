@@ -259,10 +259,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     ): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         $r->ensureInt('start_time');
-        $r->ensureString(
-            'alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
         if (
             is_null($r->identity)
             || (
