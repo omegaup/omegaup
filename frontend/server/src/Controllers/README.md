@@ -2194,13 +2194,13 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type          | Description |
-| ------------------ | ------------- | ----------- |
-| `weight`           | `float`       |             |
-| `contest_alias`    | `null|string` |             |
-| `group_alias`      | `null|string` |             |
-| `only_ac`          | `bool|null`   |             |
-| `scoreboard_alias` | `null|string` |             |
+| Name               | Type        | Description |
+| ------------------ | ----------- | ----------- |
+| `contest_alias`    | `string`    |             |
+| `group_alias`      | `string`    |             |
+| `scoreboard_alias` | `string`    |             |
+| `weight`           | `float`     |             |
+| `only_ac`          | `bool|null` |             |
 
 ### Returns
 
@@ -2254,11 +2254,11 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type          | Description |
-| ------------------ | ------------- | ----------- |
-| `contest_alias`    | `null|string` |             |
-| `group_alias`      | `null|string` |             |
-| `scoreboard_alias` | `null|string` |             |
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `contest_alias`    | `string` |             |
+| `group_alias`      | `string` |             |
+| `scoreboard_alias` | `string` |             |
 
 ### Returns
 
