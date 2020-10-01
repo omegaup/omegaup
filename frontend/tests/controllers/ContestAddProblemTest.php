@@ -82,7 +82,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => 'this problem doesnt exists',
+                'problem_alias' => 'this_problem_does_not_exist',
                 'points' => 100,
                 'order_in_contest' => 1,
             ]));
@@ -110,7 +110,7 @@ class ContestAddProblemTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\Contest::apiAddProblem(new \OmegaUp\Request([
                 'auth_token' => $directorLogin->auth_token,
-                'contest_alias' => 'invalid problem',
+                'contest_alias' => 'invalid_problem',
                 'problem_alias' => $problemData['problem']->alias,
                 'points' => 100,
                 'order_in_contest' => 1,
