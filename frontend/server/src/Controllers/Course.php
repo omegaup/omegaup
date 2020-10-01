@@ -249,7 +249,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     /**
      * Validates clone Courses
      *
-     * @omegaup-request-param string $alias
      * @omegaup-request-param string $name
      * @omegaup-request-param int $start_time
      */
