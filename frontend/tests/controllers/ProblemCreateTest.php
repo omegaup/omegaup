@@ -423,6 +423,45 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Test that source files (for statements / solutions) work.
+     */
+    public function testSources() {
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_sources.zip'
+        ]));
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+
+        // Check that the sources are there.
+        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $r['problem_alias'],
+        ]));
+        $this->assertEquals(
+            $response['statement']['sources'],
+            [
+                'plantilla.py' => '#!/usr/bin/python3
+
+def _main() -> None:
+    n = int(input().strip())
+    aristas = map(int, input().strip().split())
+
+if __name__ == \'__main__\':
+    _main()
+',
+            ]
+        );
+    }
+
+    /**
      * Test that we can produce a valid alias from the title
      */
     public function testConstructAliasFromTitle() {
