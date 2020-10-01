@@ -156,11 +156,9 @@ export default class Statistics extends Vue {
         min: 0,
         max: 100,
         title: T.wordsRuns,
+        reversedStacks: false,
       },
       tooltip: {},
-      legend: {
-        reversed: true,
-      },
       plotOptions: {
         series: {
           stacking: 'normal',
@@ -172,7 +170,7 @@ export default class Statistics extends Vue {
           },
         },
       },
-      series: this.verdictStats.reverse(),
+      series: this.verdictStats,
     };
   }
   // helper functions
