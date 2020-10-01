@@ -60,7 +60,6 @@ describe('CardsList.vue', () => {
       propsData: coursesListProps,
     });
 
-    expect(wrapper.text()).toContain(T.navAllCourses);
     expect(wrapper.text()).toContain(T.courseCardAboutCourses);
     expect(wrapper.text()).toContain(
       T.courseCardDescriptionCourses.split(
