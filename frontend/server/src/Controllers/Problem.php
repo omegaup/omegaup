@@ -5845,12 +5845,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'omegaupTitleCollectionsByLevel'
         );
 
-        if ($collectionType !== 'author') {
-            $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
-                $r->ensureString('collection_type')
-            );
-        } else {
-            // Author
+        if ($collectionType === 'author') {
             $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRank(
                 1,
                 15
@@ -5870,6 +5865,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $title = new \OmegaUp\TranslationString(
                 'omegaupTitleCollectionsByAuthor'
+            );
+        } else {
+            $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
+                $r->ensureString('collection_type')
             );
         }
 
