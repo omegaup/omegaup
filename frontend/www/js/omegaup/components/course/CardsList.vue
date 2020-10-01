@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1 class="card-title">{{ T.navAllCourses }}</h1>
     <div class="card-header mb-3">
       <h1>{{ T.courseCardAboutCourses }}</h1>
       <p v-html="T.courseCardDescriptionCourses"></p>
