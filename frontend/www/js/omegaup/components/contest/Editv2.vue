@@ -146,9 +146,7 @@
         <omegaup-common-publish
           v-bind:initial-admission-mode="details.admission_mode"
           v-bind:should-show-public-option="true"
-          v-bind:admission-mode-description="
-            T.contestNewFormAdmissionModeDescription
-          "
+          v-bind:admission-mode-description="T.contestAdmissionModeDescription"
           v-on:emit-update-admission-mode="
             (admissionMode) => $emit('update-admission-mode', admissionMode)
           "
