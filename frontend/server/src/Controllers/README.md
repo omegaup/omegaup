@@ -3330,11 +3330,11 @@ Marks a problem of a nomination (only the demotion type supported for now) as (r
 
 | Name                   | Type                                   | Description |
 | ---------------------- | -------------------------------------- | ----------- |
+| `problem_alias`        | `string`                               |             |
 | `qualitynomination_id` | `int`                                  |             |
 | `rationale`            | `string`                               |             |
 | `status`               | `'banned'|'open'|'resolved'|'warning'` |             |
 | `all`                  | `bool|null`                            |             |
-| `problem_alias`        | `null|string`                          |             |
 
 ### Returns
 
@@ -3640,7 +3640,7 @@ Returns a list of contests
 
 | Name           | Type          | Description |
 | -------------- | ------------- | ----------- |
-| `alias`        | `null|string` |             |
+| `alias`        | `string`      |             |
 | `course_alias` | `null|string` |             |
 | `token`        | `mixed`       |             |
 
