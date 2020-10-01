@@ -130,6 +130,29 @@ class VirtualContestTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testCreateVirtualContestWithInvalidAlias() {
+        // Create a real contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Create a new contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $login = self::login($identity);
+        $r = new \OmegaUp\Request([
+            'alias' => 'wrong alias',
+            'auth_token' => $login->auth_token
+        ]);
+
+        \OmegaUp\Time::setTimeForTesting(\OmegaUp\Time::get() - 100);
+
+        try {
+            $response = \OmegaUp\Controllers\Contest::apiCreateVirtual($r);
+            $this->fail('Should have thrown a InvalidParameterException');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+        }
+    }
+
     public function testVirtualContestRestrictedApiAddProblem() {
         // Create a real contest
         $contestData = \OmegaUp\Test\Factories\Contest::createContest();
