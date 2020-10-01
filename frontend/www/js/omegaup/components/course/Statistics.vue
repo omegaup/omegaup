@@ -24,6 +24,22 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+
+const ORDERED_VERDICTS = [
+  'AC',
+  'PA',
+  'WA',
+  'RTE',
+  'RFE',
+  'CE',
+  'PE',
+  'TLE',
+  'OLE',
+  'MLE',
+  'JE',
+  'VE',
+];
+
 @Component({
   components: {
     highcharts: Chart,
@@ -238,66 +254,16 @@ export default class Statistics extends Vue {
           );
       }
     }
-    if (verdicts.includes('AC'))
+
+    for (const verdictName of ORDERED_VERDICTS) {
+      if (!verdicts.includes(verdictName)) {
+        continue;
+      }
       series.push({
-        name: 'AC',
-        data: runs[verdicts.indexOf('AC')],
+        name: verdictName,
+        data: runs[verdicts.indexOf(verdictName)],
       });
-    if (verdicts.includes('PA'))
-      series.push({
-        name: 'PA',
-        data: runs[verdicts.indexOf('PA')],
-      });
-    if (verdicts.includes('WA'))
-      series.push({
-        name: 'WA',
-        data: runs[verdicts.indexOf('WA')],
-      });
-    if (verdicts.includes('RTE'))
-      series.push({
-        name: 'RTE',
-        data: runs[verdicts.indexOf('RTE')],
-      });
-    if (verdicts.includes('RFE'))
-      series.push({
-        name: 'RFE',
-        data: runs[verdicts.indexOf('RFE')],
-      });
-    if (verdicts.includes('CE'))
-      series.push({
-        name: 'CE',
-        data: runs[verdicts.indexOf('CE')],
-      });
-    if (verdicts.includes('PE'))
-      series.push({
-        name: 'PE',
-        data: runs[verdicts.indexOf('PE')],
-      });
-    if (verdicts.includes('TLE'))
-      series.push({
-        name: 'TLE',
-        data: runs[verdicts.indexOf('TLE')],
-      });
-    if (verdicts.includes('OLE'))
-      series.push({
-        name: 'OLE',
-        data: runs[verdicts.indexOf('OLE')],
-      });
-    if (verdicts.includes('MLE'))
-      series.push({
-        name: 'MLE',
-        data: runs[verdicts.indexOf('MLE')],
-      });
-    if (verdicts.includes('JE'))
-      series.push({
-        name: 'JE',
-        data: runs[verdicts.indexOf('JE')],
-      });
-    if (verdicts.includes('VE'))
-      series.push({
-        name: 'VE',
-        data: runs[verdicts.indexOf('VE')],
-      });
+    }
 
     return series;
   }
