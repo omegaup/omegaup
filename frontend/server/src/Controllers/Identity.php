@@ -299,12 +299,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        \OmegaUp\Validators::validateValidAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $group = \OmegaUp\Controllers\Group::validateGroup(
-            $r['group_alias'],
+            $groupAlias,
             $r->identity
         );
         if (is_null($group)) {
@@ -420,9 +420,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['gender'],
             'gender'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['school_name'],
@@ -453,7 +453,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['name'],
             $state,
             $r['gender'],
-            $r['group_alias'],
+            $groupAlias,
             $originalIdentity
         );
 
@@ -551,12 +551,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Controllers\Group::validateGroup(
-            $r['group_alias'],
+            $groupAlias,
             $r->identity
         );
         if (
