@@ -122,7 +122,7 @@
           "
         ></omegaup-contest-new-form>
       </div>
-      <div class="tab-pane active problems" v-if="showTab === 'problems'">
+      <div class="tab-pane active" v-if="showTab === 'problems'">
         <omegaup-contest-add-problem
           v-bind:contest-alias="details.alias"
           v-bind:initial-points="details.partial_score ? 100 : 1"
@@ -141,6 +141,16 @@
           "
         >
         </omegaup-contest-add-problem>
+      </div>
+      <div class="tab-pane active" v-if="showTab === 'publish'">
+        <omegaup-common-publish
+          v-bind:initial-admission-mode="details.admission_mode"
+          v-bind:should-show-public-option="true"
+          v-bind:admission-mode-description="T.contestAdmissionModeDescription"
+          v-on:emit-update-admission-mode="
+            (admissionMode) => $emit('update-admission-mode', admissionMode)
+          "
+        ></omegaup-common-publish>
       </div>
     </div>
   </div>
@@ -161,7 +171,7 @@ import contest_Groups from './Groups.vue';
 import contest_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Links from './Links.vue';
 import contest_NewForm from './NewForm.vue';
-import common_Publish from '../common/Publish.vue';
+import common_Publish from '../common/Publishv2.vue';
 
 @Component({
   components: {
