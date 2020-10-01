@@ -108,7 +108,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
-                'problem_alias' => 'this problem does not exist'
+                'problem_alias' => 'this_problem_does_not_exist'
             ]));
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
@@ -140,7 +140,7 @@ class ContestRemoveProblemTest extends \OmegaUp\Test\ControllerTestCase {
         try {
             \OmegaUp\Controllers\Contest::apiRemoveProblem(new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'contest_alias' => 'this contest does not exist',
+                'contest_alias' => 'this_contest_does_not_exist',
                 'problem_alias' => $problemData['problem']->alias,
             ]));
             $this->fail('Should have failed');
