@@ -141,6 +141,7 @@ const translations: { [key: string]: string; } = {
   contestAdduserAddUsers: "Agregar usuarios",
   contestAdduserRegisteredUserDelete: "Eliminar",
   contestAdduserRegisteredUserTime: "Tiempo de primer acceso",
+  contestAdmissionModeDescription: "Selecciona el modo de acceso del concurso. Existen tres modalidades distintas:\n\n- **Privado:** El concurso no sale en ninguna lista y los usuarios no pueden acceder a \u00e9l a menos que hayan sido invitados expl\u00edcitamente.\n\n- **Registro/abierto:** Cualquiera puede participar despu\u00e9s de haberse registrado, pero s\u00f3lo las personas previamente admitidas pueden participar oficialmente en el concurso.\n\n- **P\u00fablico:** Todos pueden participar.",
   contestBasicInformationNeeded: "Para unirte al concurso debes completar tu informaci\u00f3n b\u00e1sica. Ir a <a href=\"/profile/edit/\">Mi perfil</a>",
   contestDetailsGoToContest: "Ir al concurso",
   contestDownloadListOfUsersInContest: "Descargar lista de usuarios en el concurso",
