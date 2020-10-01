@@ -1,8 +1,6 @@
 <template>
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-header">{{ data.title }}</h5>
-    </div>
+  <div>
+    <h1 class="card-title">{{ T.collectionTitle }}</h1>
   </div>
 </template>
 
