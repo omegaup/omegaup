@@ -2124,8 +2124,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
             } elseif (in_array($extension, self::SOURCE_EXTENSIONS)) {
-                if ($file['size'] > 1024) {
-                    // File too big. Skip.
+                if ($file['size'] > 8192) {
+                    // File is too big. Add an error message.
+                    $result['sources'][$file['name']] = "File exceeded the 8192-byte limit: {$file['size']} bytes";
                     continue;
                 }
                 $result['sources'][$file['name']] = mb_convert_encoding(
