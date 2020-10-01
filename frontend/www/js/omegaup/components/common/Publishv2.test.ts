@@ -13,7 +13,7 @@ describe('Publish.vue', () => {
       propsData: {
         initialAdmissionMode: 'public',
         shouldShowPublicOption: true,
-        admissionModeDescription: T.contestNewFormAdmissionModeDescription
+        admissionModeDescription: T.contestNewFormAdmissionModeDescription,
       },
     });
 
