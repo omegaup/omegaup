@@ -439,5 +439,27 @@ Tags &lt;b&gt;hello&lt;/b&gt;
         '<pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre>',
       );
     });
+
+    it('Should handle file transclusions', () => {
+      expect(
+        converter.makeHtmlWithImages(
+          '{{sample.py}}',
+          {},
+          { 'sample.py': 'def foo(x):\n  return 3\n' },
+        ),
+      ).toEqual(
+        '<p><pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre></p>',
+      );
+      // All Markdown special characters should be escaped.
+      expect(
+        converter.makeHtmlWithImages(
+          '{{sample.in}}',
+          {},
+          { 'sample.in': '<>&\n*foo* _bar_\n[img](img)\n\\\n' },
+        ),
+      ).toEqual(
+        '<p><pre><code class="language-in">&lt;&gt;&amp;\n*foo* _bar_\n[img](img)\n\\\n</code></pre></p>',
+      );
+    });
   });
 });
