@@ -3,11 +3,21 @@ import expect from 'expect';
 import T from '../../lang';
 import { omegaup } from '../../omegaup';
 
-import course_ViewProgress from './ViewProgress.vue';
+import course_ViewProgress, {
+  escapeCsv,
+  escapeXml,
+  toOds,
+  toCsv,
+} from './ViewProgress.vue';
 import { types } from '../../api_types';
 
 describe('ViewProgress.vue', () => {
-  Object.defineProperty(window.URL, 'createObjectURL', {});
+  if (typeof window.URL.createObjectURL === 'undefined') {
+    Object.defineProperty(window.URL, 'createObjectURL', {
+      value: (obj: any) => '',
+      writable: true,
+    });
+  }
   it('Should handle scores', async () => {
     const wrapper = shallowMount(course_ViewProgress, {
       propsData: {
@@ -40,7 +50,7 @@ describe('ViewProgress.vue', () => {
               ['assignment']: { ['problem1']: 55, ['problem2']: 44 },
             },
             username: 'student',
-          },
+          } as types.StudentProgress,
         ],
       },
     });

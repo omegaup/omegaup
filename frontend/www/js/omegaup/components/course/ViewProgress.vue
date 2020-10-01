@@ -86,7 +86,7 @@ import StudentProgress from './StudentProgress.vue';
 
 Vue.use(AsyncComputedPlugin);
 
-function escapeCsv(cell: any): string {
+export function escapeCsv(cell: undefined | number | string): string {
   if (typeof cell === 'undefined') {
     return '';
   }
@@ -106,9 +106,9 @@ function escapeCsv(cell: any): string {
   return '"' + cell.replace('"', '""') + '"';
 }
 
-function escapeXml(str: string): string {
-  if (str === null) return '';
-  return str
+export function escapeXml(cell: undefined | string | null): string {
+  if (typeof cell !== 'string') return '';
+  return cell
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -116,32 +116,28 @@ function escapeXml(str: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function toCsv(table: string[][]): string {
+export function toCsv(table: (number | string)[][]): string {
   return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
 }
 
-function toOds(courseName: string, table: string[][]): string {
-  let result = '<table:table table:name="' + escapeXml(courseName) + '">\n';
-  result +=
-    '<table:table-column table:number-columns-repeated="' +
-    table[0].length +
-    '"/>\n';
-  for (let row of table) {
+export function toOds(
+  courseName: string,
+  table: (number | string)[][],
+): string {
+  let result = `<table:table table:name="${escapeXml(courseName)}">\n`;
+  result += `<table:table-column table:number-columns-repeated="${table[0].length}"/>\n`;
+  for (const row of table) {
     result += '<table:table-row>\n';
-    for (let cell of row) {
+    for (const cell of row) {
       if (typeof cell === 'number') {
-        let num: number = cell;
-        result +=
-          '<table:table-cell office:value-type="float" office:value="' +
-          cell +
-          '"><text:p>' +
-          num.toPrecision(2) +
-          '</text:p></table:table-cell>';
+        const num: number = cell;
+        result += `<table:table-cell office:value-type="float" office:value="${num}"><text:p>${num.toPrecision(
+          2,
+        )}</text:p></table:table-cell>`;
       } else {
-        result +=
-          '<table:table-cell office:value-type="string"><text:p>' +
-          escapeXml(cell) +
-          '</text:p></table:table-cell>';
+        result += `<table:table-cell office:value-type="string"><text:p>${escapeXml(
+          cell,
+        )}</text:p></table:table-cell>`;
       }
     }
     result += '</table:table-row>\n';
@@ -149,6 +145,7 @@ function toOds(courseName: string, table: string[][]): string {
   result += '</table:table>';
   return result;
 }
+
 @Component({
   components: { 'omegaup-student-progress': StudentProgress },
 })
@@ -181,18 +178,18 @@ export default class CourseViewProgress extends Vue {
     return `/course/${this.course.alias}/`;
   }
 
-  get progressTable(): string[][] {
-    let table: string[][] = [];
-    let header = [T.profileUsername, T.wordsName];
-    for (let assignment of this.assignments) {
+  get progressTable(): (number | string)[][] {
+    const table: (number | string)[][] = [];
+    const header = [T.profileUsername, T.wordsName];
+    for (const assignment of this.assignments) {
       header.push(assignment.name);
     }
     table.push(header);
-    for (let student of this.students) {
-      let row: string[] = [student.username, student.name || ''];
+    for (const student of this.students) {
+      const row: (number | string)[] = [student.username, student.name || ''];
 
-      for (let assignment of this.assignments) {
-        row.push(String(this.score(student, assignment)));
+      for (const assignment of this.assignments) {
+        row.push(this.score(student, assignment));
       }
 
       table.push(row);
