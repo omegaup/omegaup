@@ -4130,7 +4130,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Check filter by problem, is optional
         $problem = null;
-        $problemAlias = $r->ensureOptionalString('problem_alias');
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            /*$required=*/false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
         if (!is_null($problemAlias)) {
             $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
             if (is_null($problem)) {

@@ -257,11 +257,11 @@ AuthorizationController
 
 ### Parameters
 
-| Name            | Type          | Description |
-| --------------- | ------------- | ----------- |
-| `token`         | `string`      |             |
-| `problem_alias` | `null|string` |             |
-| `username`      | `mixed`       |             |
+| Name            | Type     | Description |
+| --------------- | -------- | ----------- |
+| `problem_alias` | `string` |             |
+| `token`         | `string` |             |
+| `username`      | `mixed`  |             |
 
 ### Returns
 
