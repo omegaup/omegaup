@@ -1,35 +1,34 @@
 <template>
   <div>
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-header">{{ T.collectionTitle }}</h5>
+    <div class="row mb-2">
+      <div class="col-md-7">
+        <h1 class="card-title">{{ T.collectionTitle }}</h1>
+      </div>
+      <div class="col-md-5 text-right align-self-end">
+        <a href="/problem/" data-nav-problems-all>{{ T.navAllProblems }}</a>
       </div>
     </div>
     <div class="card panel panel-default">
       <div class="card-header panel-heading">
-        <h4 class="card-title panel-title">
-          {{problemCollectionEducationLevel}}
-        </h4>
+        <h5 class="card-title panel-title">
+          {{ T.problemCollectionEducationLevel }}
+        </h5>
       </div>
       <div class="card-body panel-body">
         <div class="container-fluid">
-          <div class="row">
-            
-          </div>
+          <div class="row"></div>
         </div>
       </div>
     </div>
     <div class="card panel panel-default">
       <div class="card-header panel-heading">
-        <h4 class="card-title panel-title">
-          {{problemCollectionOthers}}
-        </h4>
+        <h5 class="card-title panel-title">
+          {{ T.problemCollectionOthers }}
+        </h5>
       </div>
       <div class="card-body panel-body">
         <div class="container-fluid">
-          <div class="row">
-            
-          </div>
+          <div class="row"></div>
         </div>
       </div>
     </div>
