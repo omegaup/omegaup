@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * QualityNominationController
  *
- * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type NominationListItem=array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
  *
@@ -633,9 +633,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         // Validate request
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         /**
@@ -648,7 +648,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'contents'
             );
         }
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -674,7 +674,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @return array{status: string}
      *
      * @omegaup-request-param bool|null $all
-     * @omegaup-request-param null|string $problem_alias
+     * @omegaup-request-param string $problem_alias
      * @omegaup-request-param int $qualitynomination_id
      * @omegaup-request-param string $rationale
      * @omegaup-request-param 'banned'|'open'|'resolved'|'warning' $status
@@ -715,9 +715,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             return ['status' => 'ok'];
         }
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         if (is_null($qualitynomination->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -782,7 +782,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
-            'problem_alias' => $r['problem_alias'],
+            'problem_alias' => $problemAlias,
         ], /*$isRequired=*/ false);
 
         try {

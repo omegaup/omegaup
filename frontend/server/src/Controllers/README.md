@@ -186,6 +186,7 @@
   - [`/api/session/currentSession/`](#apisessioncurrentsession)
   - [`/api/session/googleLogin/`](#apisessiongooglelogin)
 - [Tag](#tag)
+  - [`/api/tag/frequentTags/`](#apitagfrequenttags)
   - [`/api/tag/list/`](#apitaglist)
 - [Time](#time)
   - [`/api/time/get/`](#apitimeget)
@@ -715,10 +716,10 @@ _Nothing_
 
 ### Parameters
 
-| Name         | Type          | Description |
-| ------------ | ------------- | ----------- |
-| `start_time` | `int`         |             |
-| `alias`      | `null|string` |             |
+| Name         | Type     | Description |
+| ------------ | -------- | ----------- |
+| `alias`      | `string` |             |
+| `start_time` | `int`    |             |
 
 ### Returns
 
@@ -2193,13 +2194,13 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type          | Description |
-| ------------------ | ------------- | ----------- |
-| `weight`           | `float`       |             |
-| `contest_alias`    | `null|string` |             |
-| `group_alias`      | `null|string` |             |
-| `only_ac`          | `bool|null`   |             |
-| `scoreboard_alias` | `null|string` |             |
+| Name               | Type        | Description |
+| ------------------ | ----------- | ----------- |
+| `contest_alias`    | `string`    |             |
+| `group_alias`      | `string`    |             |
+| `scoreboard_alias` | `string`    |             |
+| `weight`           | `float`     |             |
+| `only_ac`          | `bool|null` |             |
 
 ### Returns
 
@@ -2253,11 +2254,11 @@ Add contest to a group scoreboard
 
 ### Parameters
 
-| Name               | Type          | Description |
-| ------------------ | ------------- | ----------- |
-| `contest_alias`    | `null|string` |             |
-| `group_alias`      | `null|string` |             |
-| `scoreboard_alias` | `null|string` |             |
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `contest_alias`    | `string` |             |
+| `group_alias`      | `string` |             |
+| `scoreboard_alias` | `string` |             |
 
 ### Returns
 
@@ -3329,11 +3330,11 @@ Marks a problem of a nomination (only the demotion type supported for now) as (r
 
 | Name                   | Type                                   | Description |
 | ---------------------- | -------------------------------------- | ----------- |
+| `problem_alias`        | `string`                               |             |
 | `qualitynomination_id` | `int`                                  |             |
 | `rationale`            | `string`                               |             |
 | `status`               | `'banned'|'open'|'resolved'|'warning'` |             |
 | `all`                  | `bool|null`                            |             |
-| `problem_alias`        | `null|string`                          |             |
 
 ### Returns
 
@@ -3639,7 +3640,7 @@ Returns a list of contests
 
 | Name           | Type          | Description |
 | -------------- | ------------- | ----------- |
-| `alias`        | `null|string` |             |
+| `alias`        | `string`      |             |
 | `course_alias` | `null|string` |             |
 | `token`        | `mixed`       |             |
 
@@ -3692,6 +3693,24 @@ contestant's machine and the server.
 # Tag
 
 TagController
+
+## `/api/tag/frequentTags/`
+
+### Description
+
+Return most frequent public tags of a certain level
+
+### Parameters
+
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `problemLevel` | `string` |             |
+
+### Returns
+
+| Name            | Type                   |
+| --------------- | ---------------------- |
+| `frequent_tags` | `{ alias: string; }[]` |
 
 ## `/api/tag/list/`
 

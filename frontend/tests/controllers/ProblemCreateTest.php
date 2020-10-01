@@ -83,6 +83,26 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->difficulty);
     }
 
+    public function testCreateWithInvlaidAlias() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['problem_alias'] = 'Invalid alias';
+
+        // Call the API
+        try {
+            \OmegaUp\Controllers\Problem::apiCreate($r);
+            $this->fail('Problem creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+        }
+    }
+
     /**
      * Basic test for slow problems
      */
@@ -420,6 +440,45 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFileExists(IMAGES_PATH . $imagePath);
         $actualImageHash = sha1(file_get_contents(IMAGES_PATH . $imagePath));
         $this->assertEquals($expectedImageHash, $actualImageHash);
+    }
+
+    /**
+     * Test that source files (for statements / solutions) work.
+     */
+    public function testSources() {
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_sources.zip'
+        ]));
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+
+        // Check that the sources are there.
+        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $r['problem_alias'],
+        ]));
+        $this->assertEquals(
+            $response['statement']['sources'],
+            [
+                'plantilla.py' => '#!/usr/bin/python3
+
+def _main() -> None:
+    n = int(input().strip())
+    aristas = map(int, input().strip().split())
+
+if __name__ == \'__main__\':
+    _main()
+',
+            ]
+        );
     }
 
     /**

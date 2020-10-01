@@ -191,6 +191,23 @@ class Validators {
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
+    public static function namespacedAlias(string $alias): bool {
+        return preg_match(
+            '/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/',
+            $alias
+        ) === 1 && !self::isRestrictedAlias(
+            $alias
+        );
+    }
+
+    /**
+     * Returns whether the alias is valid.
+     *
+     * @param string $alias
+     * @return boolean
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     */
     public static function alias(string $alias): bool {
         return \OmegaUp\Validators::isValidAlias($alias);
     }
