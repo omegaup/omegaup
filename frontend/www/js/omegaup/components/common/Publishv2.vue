@@ -20,7 +20,9 @@
             </option>
           </select>
           <p class="form-text text-muted">
-            <span v-html="admissionModeDescription"></span>
+            <omegaup-markdown
+              v-bind:markdown="admissionModeDescription"
+            ></omegaup-markdown>
           </p>
         </div>
         <button class="btn btn-primary change-admission-mode" type="submit">
@@ -36,7 +38,13 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class Publish extends Vue {
   @Prop() initialAdmissionMode!: omegaup.AdmissionMode;
   @Prop() admissionModeDescription!: string;
