@@ -33,7 +33,7 @@ jobs:
 
       - name: Download gitserver
         run: |
-          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.15/omegaup-gitserver.tar.xz'
+          DOWNLOAD_URL='https://github.com/omegaup/gitserver/releases/download/v1.4.16/omegaup-gitserver.tar.xz'
           curl --location "${DOWNLOAD_URL}" | sudo tar -xJv -C /
 
           # omegaup-gitserver depends on libinteractive.
@@ -173,7 +173,7 @@ jobs:
           MYSQL_DATABASE: omegaup
 
       frontend:
-        image: omegaup/dev-php:20200830
+        image: omegaup/dev-php:20200930
         ports:
           - 8001:8001
         volumes:
@@ -183,7 +183,7 @@ jobs:
           CI: true
 
       gitserver:
-        image: omegaup/dev-gitserver:20200808
+        image: omegaup/dev-gitserver:20200930
         volumes:
           - omegaupdata:/var/lib/omegaup
 

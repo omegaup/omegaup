@@ -197,6 +197,7 @@ export default class ProblemStatementEdit extends Vue {
     return {
       images: this.statement.images,
       language: this.statement.language,
+      sources: this.statement.sources,
       markdown: newMarkdown,
     };
   }
