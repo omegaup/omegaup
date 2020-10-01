@@ -10,7 +10,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
- * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type InteractiveInterface=array{MakefileRules: list<array{Targets: list<string>, Requisites: list<string>, Compiler: string, Params: string, Debug: bool}>, ExecutableDescription: array{Args: list<string>, Env: array<string, string>}, Files: array<string, string>}
  * @psalm-type ProblemSettings=array{Cases: list<array{Cases: list<array{Name: string, Weight: float}>, Name: string}>, Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}, Interactive?: array{Interfaces: array<string, array<string, InteractiveInterface>>, Templates: array<string, string>, Main: string, ModuleName: string, ParentLang: string, LibinteractiveVersion: string}}
  * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
@@ -90,6 +90,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
     const IMAGE_EXTENSIONS = [
         'bmp', 'gif', 'ico', 'jpe', 'jpeg', 'jpg', 'png', 'svg',
         'svgz', 'tif', 'tiff',
+    ];
+
+    const SOURCE_EXTENSIONS = [
+        'py', 'cpp', 'c', 'java', 'kp', 'kj', 'in', 'out',
     ];
 
     // Number of rows shown in problems list
@@ -2079,6 +2083,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $result = [
             'language' => $params['language'],
             'images' => [],
+            'sources' => [],
         ];
         try {
             $result['markdown'] = mb_convert_encoding(
@@ -2101,22 +2106,32 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $statementFiles = $problemArtifacts->lsTree($params['directory']);
         foreach ($statementFiles as $file) {
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            if (!in_array($extension, self::IMAGE_EXTENSIONS)) {
-                continue;
-            }
-            $result['images'][$file['name']] = (
-                IMAGES_URL_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
-            );
-            $imagePath = (
-                IMAGES_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
-            );
-            if (!@file_exists($imagePath)) {
-                @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
-                file_put_contents(
-                    $imagePath,
+            if (in_array($extension, self::IMAGE_EXTENSIONS)) {
+                $result['images'][$file['name']] = (
+                    IMAGES_URL_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+                );
+                $imagePath = (
+                    IMAGES_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+                );
+                if (!@file_exists($imagePath)) {
+                    @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
+                    file_put_contents(
+                        $imagePath,
+                        $problemArtifacts->get(
+                            "{$params['directory']}/{$file['name']}"
+                        )
+                    );
+                }
+            } elseif (in_array($extension, self::SOURCE_EXTENSIONS)) {
+                if ($file['size'] > 1024) {
+                    // File too big. Skip.
+                    continue;
+                }
+                $result['sources'][$file['name']] = mb_convert_encoding(
                     $problemArtifacts->get(
                         "{$params['directory']}/{$file['name']}"
-                    )
+                    ),
+                    'utf-8'
                 );
             }
         }

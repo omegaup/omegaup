@@ -16,6 +16,7 @@ import omegaup_Markdown from '../components/Markdown.vue';
         props: {
           markdown: problemDetails.statement.markdown,
           imageMapping: problemDetails.statement.images,
+          sourceMapping: problemDetails.statement.sources,
           problemSettings: problemDetails.settings,
         },
       });

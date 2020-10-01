@@ -716,10 +716,10 @@ _Nothing_
 
 ### Parameters
 
-| Name         | Type          | Description |
-| ------------ | ------------- | ----------- |
-| `start_time` | `int`         |             |
-| `alias`      | `null|string` |             |
+| Name         | Type     | Description |
+| ------------ | -------- | ----------- |
+| `alias`      | `string` |             |
+| `start_time` | `int`    |             |
 
 ### Returns
 
