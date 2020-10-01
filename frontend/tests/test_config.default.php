@@ -62,6 +62,7 @@ try_define(
 );
 try_define('OMEGAUP_SSLCERT_URL', "{$_omegaUpRoot}/omegaup.pem");
 try_define('TEMPLATES_PATH', OMEGAUP_TEST_ROOT . '/templates/');
+try_define('INPUTS_PATH', OMEGAUP_TEST_ROOT . '/probleminput/');
 
 # #########################
 # CACHE CONFIG

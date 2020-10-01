@@ -24,7 +24,7 @@ RUN apt-get update -y && \
 RUN curl -sL https://getcomposer.org/download/1.10.10/composer.phar -o /usr/bin/composer
 RUN chmod +x /usr/bin/composer
 
-RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.15/omegaup-gitserver.tar.xz | tar xJ -C /
+RUN curl -sL https://github.com/omegaup/gitserver/releases/download/v1.4.16/omegaup-gitserver.tar.xz | tar xJ -C /
 RUN curl -sL https://github.com/omegaup/libinteractive/releases/download/v2.0.27/libinteractive.jar -o /usr/share/java/libinteractive.jar
 
 RUN useradd --create-home --shell=/bin/bash ubuntu

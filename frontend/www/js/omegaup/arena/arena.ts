@@ -311,6 +311,7 @@ export class Arena {
   markdownView: Vue & {
     markdown: string;
     imageMapping: markdown.ImageMapping;
+    sourceMapping: markdown.SourceMapping;
     problemSettings?: types.ProblemSettingsDistrib;
   };
 
@@ -631,6 +632,7 @@ export class Arena {
           props: {
             markdown: this.markdown,
             imageMapping: this.imageMapping,
+            sourceMapping: this.sourceMapping,
             problemSettings: this.problemSettings,
           },
           on: {
@@ -643,6 +645,7 @@ export class Arena {
       data: {
         markdown: '',
         imageMapping: <markdown.ImageMapping>{},
+        sourceMapping: <markdown.SourceMapping>{},
         problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
       },
       components: {
@@ -659,7 +662,7 @@ export class Arena {
     this.navbarAssignments = null;
   }
 
-  installLibinteractiveHooks(): void {
+  installProblemArtifactHooks(): void {
     $('.libinteractive-download form').on('submit', (e: Event) => {
       e.preventDefault();
 
@@ -687,6 +690,11 @@ export class Arena {
         .find('.libinteractive-extension')
         .html(<string>$(<HTMLElement>e.target).val());
     });
+
+    $('.output-only-download a').attr(
+      'href',
+      `/probleminput/${this.currentProblem.alias}/${this.currentProblem.commit}/${this.currentProblem.alias}-input.zip`,
+    );
   }
 
   connectSocket(): boolean {
@@ -1871,6 +1879,7 @@ export class Arena {
     if (problem.statement) {
       this.markdownView.markdown = problem.statement.markdown;
       this.markdownView.imageMapping = problem.statement.images;
+      this.markdownView.sourceMapping = problem.statement.sources;
       this.markdownView.problemSettings = problem.settings;
     }
     const creationDateElement = <HTMLElement>(
@@ -1896,7 +1905,7 @@ export class Arena {
         '',
       );
     }
-    this.installLibinteractiveHooks();
+    this.installProblemArtifactHooks();
 
     this.updateAllowedLanguages(this.currentProblem.languages);
 

@@ -950,6 +950,14 @@ export namespace types {
       );
     }
 
+    export function ProblemListCollectionPayload(
+      elementId: string = 'payload',
+    ): types.ProblemListCollectionPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemListPayload(
       elementId: string = 'payload',
     ): types.ProblemListPayload {
@@ -1196,7 +1204,7 @@ export namespace types {
   export interface ActivityEvent {
     classname: string;
     event: types.Event;
-    ip: number;
+    ip?: number;
     time: Date;
     username: string;
   }
@@ -1823,6 +1831,8 @@ export namespace types {
   }
 
   export interface Event {
+    courseAlias?: string;
+    courseName?: string;
     name: string;
     problem?: string;
   }
@@ -1891,6 +1901,18 @@ export namespace types {
       score: number;
     }[];
     userRank: types.CoderOfTheMonth[];
+  }
+
+  export interface InteractiveInterface {
+    ExecutableDescription: { Args: string[]; Env: { [key: string]: string } };
+    Files: { [key: string]: string };
+    MakefileRules: {
+      Compiler: string;
+      Debug: boolean;
+      Params: string;
+      Requisites: string[];
+      Targets: string[];
+    }[];
   }
 
   export interface InteractiveSettingsDistrib {
@@ -2200,7 +2222,7 @@ export namespace types {
     visibility: number;
   }
 
-  export interface ProblemListCollection {
+  export interface ProblemListCollectionPayload {
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
   }
@@ -2251,6 +2273,16 @@ export namespace types {
 
   export interface ProblemSettings {
     Cases: { Cases: { Name: string; Weight: number }[]; Name: string }[];
+    Interactive?: {
+      Interfaces: {
+        [key: string]: { [key: string]: types.InteractiveInterface };
+      };
+      LibinteractiveVersion: string;
+      Main: string;
+      ModuleName: string;
+      ParentLang: string;
+      Templates: { [key: string]: string };
+    };
     Limits: types.LimitsSettings;
     Slow: boolean;
     Validator: {
@@ -2285,6 +2317,7 @@ export namespace types {
     images: { [key: string]: string };
     language: string;
     markdown: string;
+    sources: { [key: string]: string };
   }
 
   export interface ProblemVersion {
@@ -2862,7 +2895,7 @@ export namespace messages {
     events: {
       alias?: string;
       classname?: string;
-      ip: number;
+      ip?: number;
       time: Date;
       username: string;
     }[];
@@ -3108,7 +3141,7 @@ export namespace messages {
     events: {
       alias?: string;
       classname?: string;
-      ip: number;
+      ip?: number;
       time: Date;
       username: string;
     }[];
@@ -3675,6 +3708,8 @@ export namespace messages {
   export type SessionGoogleLoginResponse = { [key: string]: string };
 
   // Tag
+  export type TagFrequentTagsRequest = { [key: string]: any };
+  export type TagFrequentTagsResponse = { frequent_tags: { alias: string }[] };
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
 
@@ -4362,6 +4397,9 @@ export namespace controllers {
   }
 
   export interface Tag {
+    frequentTags: (
+      params?: messages.TagFrequentTagsRequest,
+    ) => Promise<messages.TagFrequentTagsResponse>;
     list: (
       params?: messages.TagListRequest,
     ) => Promise<messages.TagListResponse>;

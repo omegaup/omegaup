@@ -1,53 +1,59 @@
 @media all {
-	div.problem {
-		page-break-before: always;
-	}
+  div.problem {
+    page-break-before: always;
+  }
 
-	.title h1.problem-title {
-		text-align: center;
-	}
-	.title .data {
-		margin: 0 auto 1em auto;
-	}
-	.title .data tr:nth-child(even) {
-		background-color: transparent;
-	}
+  .title h1.problem-title {
+    text-align: center;
+  }
+  .title .data {
+    margin: 0 auto 1em auto;
+  }
+  .title .data tr:nth-child(even) {
+    background-color: transparent;
+  }
 
-	h1, h2, h3, h4, h5, h6 {
-		page-break-after: avoid;
-		page-break-inside: avoid;
-	}
-	h1 {
-		font-size: 1.5em;
-	}
-	h2 {
-		font-size: 1.3em;
-	}
-	h3 {
-		font-size: 1.15em;
-	}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+  h1 {
+    font-size: 1.5em;
+  }
+  h2 {
+    font-size: 1.3em;
+  }
+  h3 {
+    font-size: 1.15em;
+  }
 
-	table {
-		page-break-inside: avoid;
-	}
-	table td {
-		border: 1px solid #000;
-		padding: 0.2em;
-	}
-	tr:nth-child(even) {
-		background-color: #eee;
-	}
-	td.numeric {
-		text-align: right;
-	}
+  table {
+    page-break-inside: avoid;
+  }
+  table td {
+    border: 1px solid #000;
+    padding: 0.2em;
+  }
+  tr:nth-child(even) {
+    background-color: #eee;
+  }
+  td.numeric {
+    text-align: right;
+  }
 
-	div.libinteractive-download {
-		display: none;
-	}
+  div.libinteractive-download,
+  div.output-only-download {
+    display: none;
+  }
 }
 
 @media print {
-	@page {
-		margin: 1in;
-	}
+  @page {
+    margin: 1in;
+  }
 }

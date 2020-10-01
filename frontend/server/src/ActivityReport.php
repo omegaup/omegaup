@@ -4,13 +4,13 @@ namespace OmegaUp;
 
 /**
  *
- * @psalm-type Event=array{name: string, problem?: string}
- * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int, time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string, cloneResult?: string}
+ * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
  *
  */
 class ActivityReport {
     /**
-     * @param list<array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string}> $events
+     * @param list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null| string, time: \OmegaUp\Timestamp, username: string}> $events
      *
      * @return list<ActivityEvent>
      */
@@ -21,6 +21,9 @@ class ActivityReport {
         /** @var array<int, int> */
         $ipMapping = [];
         foreach ($events as &$entry) {
+            if (is_null($entry['ip'])) {
+                continue;
+            }
             if (
                 !isset($ipMapping[$entry['ip']]) ||
                 !array_key_exists($entry['ip'], $ipMapping)
@@ -34,7 +37,7 @@ class ActivityReport {
     }
 
     /**
-     * @param array{alias: null|string, classname: string, event_type: string, ip: int, time: \OmegaUp\Timestamp, username: string} $data
+     * @param array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null| string, time: \OmegaUp\Timestamp, username: string} $data
      * @return ActivityEvent
      */
     private static function processData(array $data): array {
@@ -42,6 +45,16 @@ class ActivityReport {
         if ($data['event_type'] === 'submit') {
             if (!is_null($data['alias'])) {
                 $event['problem'] = $data['alias'];
+            }
+        } elseif ($data['event_type'] === 'clone') {
+            if (!is_null($data['alias'])) {
+                $event['courseAlias'] = $data['alias'];
+            }
+            if (!is_null($data['name'])) {
+                $event['courseName'] = $data['name'];
+            }
+            if (!is_null($data['clone_result'])) {
+                $event['cloneResult'] = $data['clone_result'];
             }
         }
         return [

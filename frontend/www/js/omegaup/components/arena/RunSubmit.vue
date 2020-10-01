@@ -66,7 +66,7 @@
   </form>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 .CodeMirror pre.CodeMirror-line {
   padding: 0px 35px;
@@ -76,6 +76,41 @@
   height: 95%;
   .CodeMirror {
     height: 100%;
+  }
+}
+
+form[data-run-submit] {
+  background: #eee;
+  width: 80%;
+  height: 90%;
+  margin: auto;
+  border: 2px solid #ccc;
+  padding: 1em;
+  position: absolute;
+  overflow-y: auto;
+  overflow-x: hidden;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  .close-container {
+    width: 100%;
+    .close {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: $omegaup-white;
+      border: 1px solid #ccc;
+      border-width: 0 0 1px 1px;
+      font-size: 110%;
+      width: 25px;
+      height: 25px;
+      &:hover {
+        background-color: #eee;
+      }
+    }
   }
 }
 
