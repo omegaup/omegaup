@@ -532,6 +532,24 @@ class CourseCreateTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
+    public function testCreateCourseWithInvalidAlias() {
+        $login = self::login(self::$curatorIdentity);
+        try {
+            \OmegaUp\Controllers\Course::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => 'wrong alias',
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+                'start_time' => (\OmegaUp\Time::get() + 60),
+                'finish_time' => (\OmegaUp\Time::get() + 120),
+                'admission_mode' => \OmegaUp\Controllers\Course::ADMISSION_MODE_PUBLIC,
+            ]));
+            $this->fail('Should have thrown exception');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+    }
+
     /**
      * Only curators can make Public courses
      */
