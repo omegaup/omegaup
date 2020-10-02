@@ -3239,7 +3239,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'type' => 'course',
                 ],
                 'title' => new \OmegaUp\TranslationString(
-                    'wordsActivityReport'
+                    'activityReport'
                 ),
             ],
             'entrypoint' => 'activity_feed',

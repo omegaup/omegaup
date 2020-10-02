@@ -148,7 +148,7 @@
                   v-bind:href="`/contest/${contest.alias}/activity/`"
                 >
                   <font-awesome-icon
-                    v-bind:title="T.wordsActivityReport"
+                    v-bind:title="T.activityReport"
                     v-bind:icon="['fas', 'clock']"
                   />
                 </a>
