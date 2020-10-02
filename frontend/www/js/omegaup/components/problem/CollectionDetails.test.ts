@@ -7,8 +7,14 @@ import collection_Details from './CollectionDetails.vue';
 
 describe('CollectionDetails.vue', () => {
   it('Should handle empty details of problem collection', async () => {
-    const wrapper = shallowMount(collection_Details, {});
+    const wrapper = shallowMount(collection_Details, {
+      propsData: {
+        data: {
+          type: 'author',
+        },
+      },
+    });
 
-    expect(wrapper.text()).toContain(T.collectionTitle);
+    expect(wrapper.text()).toContain(T.omegaupTitleCollectionsByAuthor);
   });
 });

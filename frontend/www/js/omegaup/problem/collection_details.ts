@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-collection-details', {
         props: {
-          collection: payload.collection,
+          data: payload,
         },
       });
     },
