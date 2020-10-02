@@ -24,6 +24,22 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+
+const ORDERED_VERDICTS = [
+  'AC',
+  'PA',
+  'WA',
+  'RTE',
+  'RFE',
+  'CE',
+  'PE',
+  'TLE',
+  'OLE',
+  'MLE',
+  'JE',
+  'VE',
+];
+
 @Component({
   components: {
     highcharts: Chart,
@@ -35,7 +51,7 @@ export default class Statistics extends Vue {
   @Prop() verdicts!: types.CourseProblemVerdict[];
   T = T;
   // chart options
-  selected = this.varianceChartOptions;
+  selected = this.verdictChartOptions;
   options = [
     { value: this.varianceChartOptions, text: T.courseStatisticsVariance },
     { value: this.averageChartOptions, text: T.courseStatisticsAverageScore },
@@ -140,6 +156,7 @@ export default class Statistics extends Vue {
         min: 0,
         max: 100,
         title: T.wordsRuns,
+        reversedStacks: false,
       },
       tooltip: {},
       plotOptions: {
@@ -235,12 +252,17 @@ export default class Statistics extends Vue {
           );
       }
     }
-    for (const verdictName of verdicts) {
+
+    for (const verdictName of ORDERED_VERDICTS) {
+      if (!verdicts.includes(verdictName)) {
+        continue;
+      }
       series.push({
         name: verdictName,
         data: runs[verdicts.indexOf(verdictName)],
       });
     }
+
     return series;
   }
   getStatistic(

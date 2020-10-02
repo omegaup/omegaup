@@ -127,6 +127,14 @@ export namespace types {
       );
     }
 
+    export function CollectionDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CommonPayload(
       elementId: string = 'payload',
     ): types.CommonPayload {
@@ -1356,6 +1364,10 @@ export namespace types {
     codersOfPreviousMonth: types.CoderOfTheMonthList;
     isMentor: boolean;
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
+  }
+
+  export interface CollectionDetailsPayload {
+    collection: { alias: string; name?: string }[];
   }
 
   export interface CommitRunsDiff {
