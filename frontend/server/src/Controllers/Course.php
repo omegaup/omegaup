@@ -2245,6 +2245,32 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\DAO\GroupsIdentities::replace($groupIdentity);
 
+            if (
+                $resolvedIdentity->identity_id !== $r->identity->identity_id
+                && !is_null($resolvedIdentity->user_id)
+            ) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $resolvedIdentity->user_id,
+                        'contents' =>  json_encode(
+                            [
+                                'type' => \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_MANUAL,
+                                'body' => [
+                                    'localizationString' => new \OmegaUp\TranslationString(
+                                        'notificationCourseRegistrationManual'
+                                    ),
+                                    'localizationParams' => [
+                                        'courseName' => $course->name,
+                                    ],
+                                    'url' => "/course/{$course->alias}/",
+                                    'iconUrl' => '/media/info.png',
+                                ],
+                            ]
+                        ),
+                    ])
+                );
+            }
+
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();

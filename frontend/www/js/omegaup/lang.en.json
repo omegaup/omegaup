@@ -542,6 +542,7 @@
 	"nominationsRangeHeader": "Problem reports (from %(lowCount) to %(highCount))",
 	"notProblemLevelTag": "The tag sent is not a level tag.",
 	"notificationCourseRegistrationAccepted": "Your registration request for course %(courseName) has been **accepted**.",
+	"notificationCourseRegistrationManual": "You have been invited to join the course %(courseName).",
 	"notificationCourseRegistrationRejected": "Your registration request for course %(courseName) has been **rejected**.",
 	"notificationCourseRegistrationRequest": "The user **%(username)** has requested access to course %(courseName).",
 	"notificationNewBadge": "You have received a new badge: **%(badgeName)**.",
