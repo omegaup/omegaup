@@ -896,11 +896,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r): array {
         // Authenticate logged user
         $r->ensureIdentity();
-        $groupAlias = $r->ensureString(
+        $problemAlias = $r->ensureString(
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($groupAlias);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
