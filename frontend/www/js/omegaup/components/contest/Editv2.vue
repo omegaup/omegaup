@@ -152,20 +152,35 @@
           "
         ></omegaup-common-publish>
       </div>
+      <div class="tab-pane active" v-if="showTab === 'contestants'">
+        <omegaup-contest-add-contestant
+          v-bind:contest="details"
+          v-bind:initial-users="users"
+          v-on:emit-add-user="
+            (contestants, contestant) =>
+              $emit('add-user', contestants, contestant)
+          "
+          v-on:emit-remove-user="
+            (contestant) => $emit('remove-user', contestant)
+          "
+          v-on:emit-save-end-time="(user) => $emit('save-end-time', user)"
+        ></omegaup-contest-add-contestant>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup, OmegaUp } from '../../omegaup';
+
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+
 import contest_AddProblem from './AddProblemv2.vue';
+import contest_AddContestant from './AddContestant.vue';
 import contest_Admins from '../common/Admins.vue';
 import contest_Clone from './Clone.vue';
-import contest_Contestant from './Contestant.vue';
 import common_Requests from '../common/Requests.vue';
 import contest_Groups from './Groups.vue';
 import contest_GroupAdmins from '../common/GroupAdmins.vue';
@@ -178,7 +193,7 @@ import common_Publish from '../common/Publishv2.vue';
     'omegaup-contest-add-problem': contest_AddProblem,
     'omegaup-contest-admins': contest_Admins,
     'omegaup-contest-clone': contest_Clone,
-    'omegaup-contest-contestant': contest_Contestant,
+    'omegaup-contest-add-contestant': contest_AddContestant,
     'omegaup-common-requests': common_Requests,
     'omegaup-contest-groups': contest_Groups,
     'omegaup-contest-group-admins': contest_GroupAdmins,
