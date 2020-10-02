@@ -623,7 +623,7 @@ const translations: { [key: string]: string; } = {
   privateTagsPlaceholder: "Ex. university, 2019, class-2020",
   problemAliasExists: "Problem alias already exists. Please try a different one.",
   problemCollectionEducationLevel: "By educational level",
-  problemCollectionOthers: "others",
+  problemCollectionOthers: "Other collections",
   problemDeployerChangeMissingSettingsJson: "The problem is missing a 'settings.json' file.",
   problemDeployerConfigBadLayout: "The commit to 'refs/meta/config' has the wrong layout.",
   problemDeployerConfigInvalidPublishingMode: "The chosen publishing mode is not supported.",

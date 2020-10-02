@@ -623,7 +623,7 @@ const translations: { [key: string]: string; } = {
   privateTagsPlaceholder: "Ex. faculdade, 2019, aulas-2020",
   problemAliasExists: "J\u00e1 existe este alias de problema. Por favor, tente um diferente.",
   problemCollectionEducationLevel: "Por n\u00edvel educacional",
-  problemCollectionOthers: "Outros",
+  problemCollectionOthers: "Outras cole\u00e7\u00f5es",
   problemDeployerChangeMissingSettingsJson: "O problema precisa ter um arquivo 'settings.json'.",
   problemDeployerConfigBadLayout: "O commit para 'refs/meta/config' tem uma estrutura incorreta.",
   problemDeployerConfigInvalidPublishingMode: "O modo de publica\u00e7\u00e3o escolhido n\u00e3o \u00e9 suportado.",
