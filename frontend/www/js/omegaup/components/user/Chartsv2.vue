@@ -121,29 +121,25 @@ const emptyPeriodRunCount = {
 export default class UserCharts extends Vue {
   @Prop() data!: Data;
   @Prop() username!: string;
-  //@Prop() periodStatisticOptions!: Highcharts.Options;
-  //@Prop() aggregateStatisticOptions!: Highcharts.Options;
 
   T = T;
   ui = ui;
   type = 'delta';
   period: 'day' | 'week' | 'month' | 'year' = 'day';
   updateArgs = [true, true, { duration: 500 }];
-  data_chart: Highcharts.PointOptionsObject[] = [];
-  data_period = this.type === 'delta' ? this.runs.delta : this.runs.cumulative;
 
   @Watch('type')
   onTypeChanged(newValue: string): void {
     if (newValue === 'total') {
-      this.renderAggregate;
+      this.normalizedRunCounts;
     } else {
-      this.renderPeriod;
+      this.runsForPeriod;
     }
   }
 
   @Watch('period')
   onPeriodChanged(): void {
-    this.renderPeriod;
+    this.runsForPeriod;
   }
 
   get totalRuns(): number {
@@ -285,11 +281,7 @@ export default class UserCharts extends Vue {
     return this.normalizedRunCountsForPeriod;
   }
 
-  get renderAggregate(): NormalizedRunCounts[] {
-    return this.normalizedRunCounts;
-  }
-
-  get renderPeriod(): omegaup.RunData[] {
+  get runsForPeriod(): omegaup.RunData[] {
     return this.type === 'delta' ? this.runs.delta : this.runs.cumulative;
   }
 
@@ -343,7 +335,7 @@ export default class UserCharts extends Vue {
           },
         },
       },
-      series: this.renderPeriod.map(
+      series: this.runsForPeriod.map(
         (x) =>
           <Highcharts.SeriesColumnOptions>{
             data: x.data,

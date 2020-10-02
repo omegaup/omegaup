@@ -49,7 +49,7 @@
                 }}
               </h5>
               <p>
-                <small>{{ T.wordsProgrammingLanguage }}</small>
+                <small>{{ T.userEditPreferredProgrammingLanguage }}</small>
               </p>
             </div>
           </div>
@@ -94,7 +94,7 @@
                 class="nav-item nav-link"
                 data-toggle="tab"
                 v-on:click="selectedTab = 'data'"
-                >{{ T.wordsPersonalData }}</a
+                >{{ T.profilePersonalData }}</a
               >
               <a
                 class="nav-item nav-link"
