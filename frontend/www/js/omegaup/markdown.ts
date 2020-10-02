@@ -259,12 +259,12 @@ export class Converter {
         return text.replace(
           /^( {0,3}\|\| *(?:input|examplefile) *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
           (whole: string, inner: string): string => {
-            var matches = inner.split(
+            const matches = inner.split(
               / {0,3}\|\| *(examplefile|input|output|description) *\n/,
             );
-            var result = '';
-            var description_column = false;
-            for (var i = 1; i < matches.length; i += 2) {
+            let result = '';
+            let description_column = false;
+            for (let i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
                 description_column = true;
                 break;
@@ -276,66 +276,75 @@ export class Converter {
             if (description_column) {
               result += `<th>${T.wordsDescription}</th>`;
             }
-            result += '</tr></thead>';
-            var first_row = true;
-            var columns = 0;
+            result += '</tr></thead>\n';
+            let first_row = true;
+            let columns = 0;
             result += '<tbody>';
-            for (var i = 1; i < matches.length; i += 2) {
+            const escapeSample = (
+              contents: string,
+              doNotEscapeTildeAndDollar: boolean = false,
+            ): string =>
+              escapeCharacters(
+                contents
+                  .replace(/\s+$/, '')
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;'),
+                ' \t*_{}[]()<>#+=.!|`-',
+                /*afterBackslash=*/ false,
+                doNotEscapeTildeAndDollar,
+              );
+            for (let i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
                 result += '<td>' + blockGamut(matches[i + 1]) + '</td>';
                 columns++;
-              } else {
-                if (matches[i] == 'input' || matches[i] == 'examplefile') {
-                  if (!first_row) {
-                    while (columns < (description_column ? 3 : 2)) {
-                      result += '<td></td>';
-                      columns++;
-                    }
-                    result += '</tr>';
-                  }
-                  first_row = false;
-                  result += '<tr>';
-                  columns = 0;
-                }
+                continue;
+              }
 
-                if (matches[i] == 'examplefile') {
-                  let exampleFilename = matches[i + 1].trim();
-                  let exampleFile = {
-                    in: `{{examples/${exampleFilename}.in}}`,
-                    out: `{{examples/${exampleFilename}.out}}`,
-                  };
-                  if (settings?.cases.hasOwnProperty(exampleFilename)) {
-                    exampleFile = settings.cases[exampleFilename];
+              if (matches[i] == 'input' || matches[i] == 'examplefile') {
+                if (!first_row) {
+                  while (columns < (description_column ? 3 : 2)) {
+                    result += '<td></td>';
+                    columns++;
                   }
-                  result += `<td><pre>${exampleFile['in'].replace(
-                    /\s+$/,
-                    '',
-                  )}</pre></td>`;
-                  result += `<td><pre>${exampleFile.out.replace(
-                    /\s+$/,
-                    '',
-                  )}</pre></td>`;
-                  columns += 2;
-                } else {
-                  result += `<td><pre>${escapeCharacters(
-                    matches[i + 1]
-                      .replace(/\s+$/, '')
-                      .replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;'),
-                    ' \t*_{}[]()<>#+=.!|`-',
-                    /*afterBackslash=*/ false,
-                    /*doNotEscapeTildeAnDollar=*/ true,
-                  )}</pre></td>`;
-                  columns++;
+                  result += '</tr>\n';
                 }
+                first_row = false;
+                result += '<tr>';
+                columns = 0;
+              }
+
+              if (matches[i] == 'examplefile') {
+                const exampleFilename = matches[i + 1].trim();
+                let exampleFile = {
+                  in: `{{examples/${exampleFilename}.in}}`,
+                  out: `{{examples/${exampleFilename}.out}}`,
+                };
+                if (settings?.cases.hasOwnProperty(exampleFilename)) {
+                  exampleFile = settings.cases[exampleFilename];
+                }
+                result += `<td><pre>${escapeSample(
+                  exampleFile['in'],
+                )}</pre></td>`;
+                result += `<td><pre>${escapeSample(
+                  exampleFile.out,
+                )}</pre></td>`;
+                columns += 2;
+              } else {
+                // Since the match has already gone through escaping, we need
+                // to unescape its contents.
+                result += `<td><pre>${escapeSample(
+                  matches[i + 1],
+                  /*doNotEscapeTildeAndDollar=*/ true,
+                )}</pre></td>`;
+                columns++;
               }
             }
             while (columns < (description_column ? 3 : 2)) {
               result += '<td></td>';
               columns++;
             }
-            result += '</tr></tbody>';
+            result += '</tr>\n</tbody>';
 
             return '<table class="sample_io">\n' + result + '\n</table>\n';
           },
