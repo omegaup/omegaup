@@ -2820,7 +2820,9 @@ class User extends \OmegaUp\Controllers\Controller {
                         'tokens' => $tokens,
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
-                        'contest_alias'
+                        'contest_alias',
+                        /*$required=*/false,
+                        fn (string $alias) => \OmegaUp\Validators::alias($alias)
                     );
                     if (
                         !empty($contestAlias) &&
