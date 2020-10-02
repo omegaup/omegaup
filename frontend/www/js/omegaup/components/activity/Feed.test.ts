@@ -31,8 +31,8 @@ describe('Feed.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.wordsActivityReportSummaryContest);
-    expect(wrapper.text()).not.toContain(T.wordsActivityReportSummaryCourse);
+    expect(wrapper.text()).toContain(T.activityReportSummaryContest);
+    expect(wrapper.text()).not.toContain(T.activityReportSummaryCourse);
   });
 
   it('Should handle course activity report', async () => {
@@ -59,7 +59,7 @@ describe('Feed.vue', () => {
       },
     });
 
-    expect(wrapper.text()).not.toContain(T.wordsActivityReportSummaryContest);
-    expect(wrapper.text()).toContain(T.wordsActivityReportSummaryCourse);
+    expect(wrapper.text()).not.toContain(T.activityReportSummaryContest);
+    expect(wrapper.text()).toContain(T.activityReportSummaryCourse);
   });
 });

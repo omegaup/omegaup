@@ -40,7 +40,7 @@
                 data-button-activity-report
                 class="dropdown-item"
                 v-bind:href="`/course/${course.alias}/activity/`"
-                >{{ T.wordsActivityReport }}</a
+                >{{ T.activityReport }}</a
               >
               <a
                 data-button-activity-report

@@ -146,7 +146,7 @@
             <a
               class="glyphicon glyphicon-time"
               v-bind:href="'/contest/' + contest.alias + '/activity/'"
-              v-bind:title="T.wordsActivityReport"
+              v-bind:title="T.activityReport"
             ></a>
           </td>
           <td v-if="isAdmin">
