@@ -18,7 +18,7 @@
             </td>
             <td>
               <a v-bind:href="`/contest/${contest.alias}/activity/`">{{
-                T.wordsActivityReport
+                T.activityReport
               }}</a>
             </td>
             <td>

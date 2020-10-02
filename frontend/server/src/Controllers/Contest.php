@@ -1517,7 +1517,7 @@ class Contest extends \OmegaUp\Controllers\Controller {
                     'type' => 'contest',
                 ],
                 'title' => new \OmegaUp\TranslationString(
-                    'wordsActivityReport'
+                    'activityReport'
                 ),
             ],
             'entrypoint' => 'activity_feed',

@@ -91,7 +91,7 @@
                     <td>
                       <a
                         v-bind:href="`/course/${course.alias}/activity/`"
-                        v-bind:title="T.wordsActivityReport"
+                        v-bind:title="T.activityReport"
                       >
                         <font-awesome-icon icon="clock" />
                       </a>

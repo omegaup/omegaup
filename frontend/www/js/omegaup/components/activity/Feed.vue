@@ -3,7 +3,7 @@
     <div class="copy">
       <h1>
         <a v-bind:href="`/${type}/${alias}/`">{{ alias }}</a> —
-        {{ T.wordsActivityReport }}
+        {{ T.activityReport }}
       </h1>
       <p>{{ wordsReportSummary }}</p>
       <!-- Nav tabs -->
@@ -18,7 +18,7 @@
             aria-selected="true"
             v-on:click="showTab = 'report'"
             v-bind:class="{ active: showTab === 'report' }"
-            >{{ T.wordsActivityReportReport }}</a
+            >{{ T.activityReportReport }}</a
           >
         </li>
         <li class="nav-item" role="presentation">
@@ -31,7 +31,7 @@
             aria-selected="false"
             v-on:click="showTab = 'users'"
             v-bind:class="{ active: showTab === 'users' }"
-            >{{ T.wordsActivityReportUsers }}</a
+            >{{ T.activityReportUsers }}</a
           >
         </li>
         <li class="nav-item" role="presentation">
@@ -44,7 +44,7 @@
             aria-selected="false"
             v-on:click="showTab = 'origins'"
             v-bind:class="{ active: showTab === 'origins' }"
-            >{{ T.wordsActivityReportOrigins }}</a
+            >{{ T.activityReportOrigins }}</a
           >
         </li>
       </ul>
@@ -64,8 +64,8 @@
               <tr>
                 <th>{{ T.profileUsername }}</th>
                 <th>{{ T.wordsTime }}</th>
-                <th>{{ T.wordsActivityReportOrigin }}</th>
-                <th colspan="2">{{ T.wordsActivityReportEvent }}</th>
+                <th>{{ T.activityReportOrigin }}</th>
+                <th colspan="2">{{ T.activityReportEvent }}</th>
               </tr>
             </thead>
             <tbody>
@@ -109,18 +109,18 @@
           v-show="showTab === 'users'"
         >
           <p v-if="users.length &lt;= 0">
-            {{ T.wordsActivityReportNoDuplicatesForUsers }}
+            {{ T.activityReportNoDuplicatesForUsers }}
           </p>
           <table class="table" v-else>
             <caption>
               {{
-                T.wordsActivityReportDuplicatesForUsersDescription
+                T.activityReportDuplicatesForUsersDescription
               }}
             </caption>
             <thead>
               <tr>
                 <th>{{ T.profileUsername }}</th>
-                <th>{{ T.wordsActivityReportOrigin }}</th>
+                <th>{{ T.activityReportOrigin }}</th>
               </tr>
             </thead>
             <tbody>
@@ -149,17 +149,17 @@
           v-show="showTab === 'origins'"
         >
           <p v-if="origins.length &lt;= 0">
-            {{ T.wordsActivityReportNoDuplicatesForOrigins }}
+            {{ T.activityReportNoDuplicatesForOrigins }}
           </p>
           <table class="table" v-else>
             <caption>
               {{
-                T.wordsActivityReportDuplicatesForOriginsDescription
+                T.activityReportDuplicatesForOriginsDescription
               }}
             </caption>
             <thead>
               <tr>
-                <th>{{ T.wordsActivityReportOrigin }}</th>
+                <th>{{ T.activityReportOrigin }}</th>
                 <th>{{ T.profileUsername }}</th>
               </tr>
             </thead>
@@ -235,8 +235,8 @@ export default class ActivityFeed extends Vue {
 
   get wordsReportSummary(): string {
     return this.type == 'contest'
-      ? T.wordsActivityReportSummaryContest
-      : T.wordsActivityReportSummaryCourse;
+      ? T.activityReportSummaryContest
+      : T.activityReportSummaryCourse;
   }
 
   get classByUser(): { [key: string]: string } {
