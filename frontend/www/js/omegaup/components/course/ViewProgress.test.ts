@@ -115,7 +115,7 @@ office:value-type="float" office:value="${score}"><text:p>${score}</text:p>\
 
     const csvContent = toCsv(wrapper.vm.progressTable);
     expect(csvContent)
-      .toBe(`${T.profileUsername},${T.wordsName},${assignment.name}
+      .toBe(`${T.profileUsername},${T.wordsName},${assignment.name}\r
 ${student.username},${student.name},${score}`);
   });
 });
