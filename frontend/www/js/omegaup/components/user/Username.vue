@@ -17,12 +17,12 @@
       <a
         v-bind:class="classname"
         v-bind:title="username"
-        v-else=""
+        v-else
         v-bind:href="`/profile/${username}/`"
         >{{ name || username }}</a
       >
     </template>
-    <template v-else=""> {{ name || username }}</template>
+    <template v-else> {{ name || username }}</template>
   </span>
 </template>
 

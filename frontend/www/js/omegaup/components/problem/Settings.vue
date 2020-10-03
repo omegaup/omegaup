@@ -15,8 +15,8 @@
             v-bind:value="languageIndex"
             v-bind:key="languageIndex"
           >
-            {{ languageText }}</option
-          >
+            {{ languageText }}
+          </option>
         </select>
       </div>
       <div class="form-group col-md-6">
@@ -34,8 +34,8 @@
             v-bind:value="validatorIndex"
             v-bind:key="validatorIndex"
           >
-            {{ validatorText }}</option
-          >
+            {{ validatorText }}
+          </option>
         </select>
       </div>
     </div>

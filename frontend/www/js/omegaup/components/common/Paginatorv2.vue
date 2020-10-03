@@ -15,7 +15,7 @@
           >{{ page.label }}</a
         >
         <a
-          v-else=""
+          v-else
           class="page-link"
           v-bind:class="{ disabled: page.class !== 'active' }"
           v-on:click.prevent="$emit('page-changed', page.page)"

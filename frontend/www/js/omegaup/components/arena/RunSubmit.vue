@@ -15,8 +15,9 @@
             v-bind:key="key"
             v-bind:value="key"
             v-for="(language, key) in allowedLanguages"
-            >{{ language }}</option
           >
+            {{ language }}
+          </option>
         </select>
       </div>
     </div>

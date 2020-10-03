@@ -84,7 +84,7 @@
     <div class="card-footer" v-if="isIndex">
       <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
-    <div class="card-footer" v-else="">
+    <div class="card-footer" v-else>
       <omegaup-common-paginator
         v-bind:pagerItems="pagerItems"
       ></omegaup-common-paginator>

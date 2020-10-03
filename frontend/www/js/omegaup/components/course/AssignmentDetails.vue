@@ -193,7 +193,7 @@
             <template v-if="update">
               {{ T.courseAssignmentNewFormUpdate }}
             </template>
-            <template v-else="">
+            <template v-else>
               {{ T.courseAssignmentNewFormSchedule }}
             </template>
           </button>

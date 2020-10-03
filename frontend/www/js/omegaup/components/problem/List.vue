@@ -204,7 +204,7 @@
                   {{ QUALITY_TAGS[Math.round(problem.quality)] }}
                 </span>
               </td>
-              <td class="text-right" v-else="">—</td>
+              <td class="text-right" v-else>—</td>
               <td class="text-center" v-if="problem.difficulty !== null">
                 <span
                   v-tooltip="
@@ -216,7 +216,7 @@
                   {{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}
                 </span>
               </td>
-              <td class="text-center" v-else="">—</td>
+              <td class="text-center" v-else>—</td>
               <td class="text-right">
                 {{ (100.0 * problem.ratio).toFixed(2) }}%
               </td>

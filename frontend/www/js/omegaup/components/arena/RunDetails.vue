@@ -21,14 +21,14 @@
               <th class="text-center" v-if="element.verdict">
                 {{ element.verdict }}
               </th>
-              <th colspan="2" v-else="">
+              <th colspan="2" v-else>
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
                   <font-awesome-icon
                     v-if="groupVisible[element.group]"
                     v-bind:icon="['fas', 'chevron-circle-up']"
                   />
                   <font-awesome-icon
-                    v-else=""
+                    v-else
                     v-bind:icon="['fas', 'chevron-circle-down']"
                   />
                 </div>
@@ -88,7 +88,7 @@
                       "
                     ></omegaup-arena-diff-view>
                   </td>
-                  <td colspan="6" v-else="" class="empty-table-message">
+                  <td colspan="6" v-else class="empty-table-message">
                     {{ EMPTY_FIELD }}
                   </td>
                 </tr>

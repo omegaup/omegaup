@@ -14,7 +14,7 @@
           type="button"
           v-bind:class="{ active: active == name }"
           v-bind:title="name"
-          v-else=""
+          v-else
           v-for="(item, name) in zip.files"
           v-on:click="select(item)"
         >

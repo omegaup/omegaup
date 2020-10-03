@@ -12,7 +12,7 @@
         >
           <em>Empty</em>
         </button>
-        <template v-bind:title="name" v-else="" v-for="group in groups">
+        <template v-bind:title="name" v-else v-for="group in groups">
           <div
             class="list-group-item list-group-item-secondary"
             v-if="group.explicit"

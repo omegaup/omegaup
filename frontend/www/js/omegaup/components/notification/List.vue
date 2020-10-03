@@ -26,7 +26,7 @@
           {{ T.notificationsNoNewNotifications }}
         </div>
         <a
-          v-else=""
+          v-else
           class="dropdown-item"
           href="#"
           v-on:click="$emit('read', notifications, null)"

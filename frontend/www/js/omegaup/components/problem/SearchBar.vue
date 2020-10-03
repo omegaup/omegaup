@@ -26,8 +26,8 @@
           {{ T.wordsFilterByLanguage }}
           <select name="language" class="ml-1 form-control" v-model="language">
             <option v-for="language in languages" v-bind:value="language">
-              {{ getLanguageText(language) }}</option
-            >
+              {{ getLanguageText(language) }}
+            </option>
           </select>
         </label>
       </div>

@@ -9,8 +9,9 @@
               v-bind:markdown-contents.sync="currentMarkdown"
               v-bind:value="language"
               v-for="language in languages"
-              >{{ getLanguageNameText(language) }}</option
             >
+              {{ getLanguageNameText(language) }}
+            </option>
           </select>
         </div>
         <div

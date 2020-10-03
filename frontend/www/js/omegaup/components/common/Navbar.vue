@@ -57,7 +57,7 @@
               </template>
             </ul>
           </li>
-          <li v-bind:class="{ active: navbarSection === 'contests' }" v-else="">
+          <li v-bind:class="{ active: navbarSection === 'contests' }" v-else>
             <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
           </li>
           <li
@@ -84,7 +84,7 @@
               </template>
             </ul>
           </li>
-          <li v-bind:class="{ active: navbarSection === 'courses' }" v-else="">
+          <li v-bind:class="{ active: navbarSection === 'courses' }" v-else>
             <a href="/course/">{{ T.navCourses }}</a>
           </li>
           <li
@@ -167,14 +167,14 @@
             </ul>
           </li>
         </ul>
-        <ul class="nav navbar-nav" v-else=""></ul>
+        <ul class="nav navbar-nav" v-else></ul>
         <!-- in lockdown or contest mode there is no left navbar -->
         <ul class="nav navbar-nav navbar-right" v-if="!isLoggedIn">
           <li>
             <a v-bind:href="formattedLoginURL">{{ T.navLogIn }}</a>
           </li>
         </ul>
-        <ul class="nav navbar-nav navbar-right" v-else="">
+        <ul class="nav navbar-nav navbar-right" v-else>
           <omegaup-notifications-clarifications
             v-bind:initialClarifications="initialClarifications"
             v-if="inContest"

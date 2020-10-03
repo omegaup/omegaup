@@ -42,7 +42,7 @@
     <div class="card-footer" v-if="showHeader">
       <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
-    <div class="card-footer" v-else="">
+    <div class="card-footer" v-else>
       <omegaup-common-paginator
         v-bind:pagerItems="pagerItems"
       ></omegaup-common-paginator>

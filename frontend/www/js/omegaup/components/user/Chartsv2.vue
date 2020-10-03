@@ -38,7 +38,7 @@
     <highcharts
       v-bind:options="aggregateStatisticOptions"
       v-bind:updateArgs="updateArgs"
-      v-else=""
+      v-else
     ></highcharts>
   </div>
 </template>

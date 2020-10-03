@@ -99,7 +99,7 @@
               <button
                 type="button"
                 class="close"
-                style="float: none;"
+                style="float: none"
                 v-on:click="filterProblem = ''"
               >
                 &times;
@@ -117,7 +117,7 @@
               <button
                 type="button"
                 class="close"
-                style="float: none;"
+                style="float: none"
                 v-on:click="filterUsername = ''"
               >
                 &times;

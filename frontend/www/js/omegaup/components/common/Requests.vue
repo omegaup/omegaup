@@ -23,30 +23,30 @@
           <td v-else-if="request.accepted">
             {{ T.wordAccepted }}
           </td>
-          <td v-else="">{{ T.wordsDenied }}</td>
+          <td v-else>{{ T.wordsDenied }}</td>
           <td v-if="request.last_update !== null">
             {{ time.formatTimestamp(request.last_update) }} ({{
               request.admin.username
             }})
           </td>
-          <td v-else=""></td>
+          <td v-else></td>
           <td v-if="!request.accepted">
             <button
               class="close"
-              style="color: red;"
+              style="color: red"
               v-on:click="onDenyRequest(request.username)"
             >
               ×
             </button>
             <button
               class="close"
-              style="color: green;"
+              style="color: green"
               v-on:click="onAcceptRequest(request.username)"
             >
               ✓
             </button>
           </td>
-          <td v-else=""></td>
+          <td v-else></td>
         </tr>
       </tbody>
     </table>

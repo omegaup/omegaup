@@ -92,7 +92,7 @@
           <td v-else-if="contest.admission_mode == 'registration'">
             {{ T.wordsRegistration }}
           </td>
-          <td v-else=""></td>
+          <td v-else></td>
           <td v-if="isAdmin">
             <a
               class="glyphicon glyphicon-link"

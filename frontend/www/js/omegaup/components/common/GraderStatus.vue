@@ -13,7 +13,7 @@
     </li>
     <li class="grader grader-broadcaster-sockets" v-else-if="error !== null">
       API api/grader/status call failed:
-      <pre style="width: 40em;">{{ error }}</pre>
+      <pre style="width: 40em">{{ error }}</pre>
     </li>
     <li class="grader grader-embedded-runner" v-if="status === 'ok'">
       Embedded runner:
@@ -22,7 +22,7 @@
     <li class="grader grader-queues" v-if="status === 'ok'">
       Queues:
       <pre
-        style="width: 50em;"
+        style="width: 50em"
         v-if="graderInfo !== null"
         v-html="ui.prettyPrintJSON(graderInfo.queue)"
       ></pre>

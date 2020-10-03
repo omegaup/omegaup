@@ -187,7 +187,7 @@
           />
         </template>
 
-        <div class="row" v-else="">
+        <div class="row" v-else>
           <div class="form-group col-md-6">
             <label>{{ T.wordsShowCasesDiff }}</label>
             <select
