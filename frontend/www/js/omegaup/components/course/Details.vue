@@ -226,7 +226,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
@@ -271,6 +270,7 @@ export default class CourseDetails extends Vue {
   get overallCompletedPercentage(): string {
     let score = 0;
     let maxScore = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [assignment, progress] of Object.entries(this.progress)) {
       score += progress.score;
       maxScore += progress.max_score;

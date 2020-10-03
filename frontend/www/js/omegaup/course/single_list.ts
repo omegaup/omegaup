@@ -6,7 +6,7 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseListPayload();
   const headerPayload = types.payloadParsers.CommonPayload();
-  const courseList = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-course-list', {

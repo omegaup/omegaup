@@ -26,7 +26,7 @@ OmegaUp.on('ready', () => {
               return;
             }
             api.Problem.details({ problem_alias: alias }, { quiet: true })
-              .then((data) => {
+              .then(() => {
                 problemNew.errors.push('problem_alias');
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {

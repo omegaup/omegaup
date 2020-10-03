@@ -67,9 +67,8 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import * as time from '../../time';

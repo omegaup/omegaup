@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex from 'vuex';
 import * as Highcharts from 'highcharts/highstock';
 
 import * as api from '../api';
@@ -1215,11 +1215,8 @@ export class Arena {
       currentRankingState[username] = { place: rank.place ?? 0 };
 
       // Update problem scores.
-      let totalRuns = 0;
       for (const alias of Object.keys(order)) {
         const problem = rank.problems[order[alias]];
-        totalRuns += problem.runs;
-
         if (
           this.problems[alias] &&
           rank.username == OmegaUp.username &&
@@ -1857,7 +1854,7 @@ export class Arena {
                 nomination: 'dismissal',
                 contents: JSON.stringify(contents),
               })
-                .then((data) => {
+                .then(() => {
                   ui.info(T.qualityNominationRateProblemDesc);
                   ui.reportEvent('quality-nomination', 'dismiss');
                 })
@@ -2061,8 +2058,8 @@ export class Arena {
 
         const currentProblem = this.problems[this.currentProblem.alias];
         if (!this.options.isOnlyProblem) {
-          this.problems[this.currentProblem.alias].lastSubmission = new Date();
-          this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
+          currentProblem.lastSubmission = new Date();
+          currentProblem.nextSubmissionTimestamp =
             response.nextSubmissionTimestamp;
         }
         const run = {
@@ -2109,8 +2106,6 @@ export class Arena {
   }
 
   displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
-    const problemAdmin = data.admin;
-
     let sourceHTML,
       sourceLink = false;
     if (data.source?.indexOf('data:') === 0) {
@@ -2378,7 +2373,7 @@ export class EventsSocket {
         const socket = new WebSocket(this.uri, 'com.omegaup.events');
 
         socket.onmessage = (message) => this.onmessage(message);
-        socket.onopen = (e: Event) => {
+        socket.onopen = () => {
           this.shouldRetry = true;
           this.arena.elements.socketStatus.html('&bull;').css('color', '#080');
           this.socketKeepalive = setInterval(
@@ -2424,6 +2419,7 @@ export class EventsSocket {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onclose(e: Event) {
     this.socket = null;
     if (this.socketKeepalive) {

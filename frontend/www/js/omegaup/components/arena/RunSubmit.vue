@@ -228,7 +228,7 @@ export default class ArenaRunSubmit extends Vue {
     this.selectedLanguage = newValue;
   }
 
-  onSubmit(ev: Event): void {
+  onSubmit(): void {
     if (!this.canSubmit) {
       alert(
         ui.formatString(T.arenaRunSubmitWaitBetweenUploads, {

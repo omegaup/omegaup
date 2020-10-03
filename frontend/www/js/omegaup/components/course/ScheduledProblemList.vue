@@ -155,7 +155,7 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   @Watch('problems')
-  onProblemsChange(newVal: types.AddedProblem): void {
+  onProblemsChange(): void {
     this.reset();
   }
 

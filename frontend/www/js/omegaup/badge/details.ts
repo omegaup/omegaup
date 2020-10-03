@@ -5,7 +5,7 @@ import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.BadgeDetailsPayload();
-  const badgeDetails = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-badge-details', {

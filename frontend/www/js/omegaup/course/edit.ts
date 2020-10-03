@@ -32,7 +32,7 @@ OmegaUp.on('ready', () => {
         },
         on: {
           'submit-edit-course': (source: course_Form) => {
-            new Promise<number | null>((accept, reject) => {
+            new Promise<number | null>((accept) => {
               if (source.school_id !== undefined) {
                 accept(source.school_id);
               } else if (source.school_name) {
@@ -156,7 +156,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               assignment_alias: assignment.alias,
             })
-              .then((data) => {
+              .then(() => {
                 ui.success(T.courseAssignmentDeleted);
                 this.refreshAssignmentsList();
               })
@@ -236,7 +236,7 @@ OmegaUp.on('ready', () => {
               problem_alias: problem.alias,
               assignment_alias: assignment.alias,
             })
-              .then((response) => {
+              .then(() => {
                 ui.success(T.courseAssignmentProblemRemoved);
                 this.refreshProblemList(assignment);
               })
@@ -258,7 +258,7 @@ OmegaUp.on('ready', () => {
           },
           'tags-problems': (tags: string[]) => {
             api.Problem.list({ tag: tags.join() })
-              .then((data) => {
+              .then(() => {
                 //this.data.taggedProblems = data.results;
               })
               .catch(ui.apiError);
@@ -319,7 +319,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               usernameOrEmail: student.username,
             })
-              .then((data) => {
+              .then(() => {
                 this.refreshStudentList();
                 ui.success(T.courseStudentRemoved);
               })
@@ -334,7 +334,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               usernameOrEmail: useradmin,
             })
-              .then((data) => {
+              .then(() => {
                 ui.success(T.adminAdded);
                 this.refreshCourseAdmins();
               })
@@ -345,7 +345,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               usernameOrEmail: username,
             })
-              .then((data) => {
+              .then(() => {
                 this.refreshCourseAdmins();
                 ui.success(T.adminRemoved);
               })
@@ -356,7 +356,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               group: groupAlias,
             })
-              .then((data) => {
+              .then(() => {
                 ui.success(T.groupAdminAdded);
                 this.refreshCourseAdmins();
               })
@@ -367,7 +367,7 @@ OmegaUp.on('ready', () => {
               course_alias: courseAlias,
               group: groupAlias,
             })
-              .then((data) => {
+              .then(() => {
                 this.refreshCourseAdmins();
                 ui.success(T.groupAdminRemoved);
               })
@@ -380,7 +380,7 @@ OmegaUp.on('ready', () => {
               alias: alias,
               start_time: startTime.getTime() / 1000,
             })
-              .then((data) => {
+              .then(() => {
                 ui.success(
                   ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: alias,
@@ -454,7 +454,7 @@ OmegaUp.on('ready', () => {
           resolution: resolution,
           note: '',
         })
-          .then((response) => {
+          .then(() => {
             ui.success(T.successfulOperation);
             courseEdit.refreshStudentList();
           })

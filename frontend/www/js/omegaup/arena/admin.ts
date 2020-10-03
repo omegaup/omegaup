@@ -9,9 +9,7 @@ OmegaUp.on('ready', () => {
   const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
   const adminInstance = new ArenaAdmin(arenaInstance);
 
-  window.addEventListener('hashchange', (e: Event) =>
-    arenaInstance.onHashChanged(),
-  );
+  window.addEventListener('hashchange', () => arenaInstance.onHashChanged());
 
   if (arenaInstance.options.contestAlias === 'admin') {
     $('#runs').show();

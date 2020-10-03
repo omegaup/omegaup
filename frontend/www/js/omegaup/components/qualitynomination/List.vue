@@ -123,8 +123,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import common_Paginator from '../common/Paginatorv2.vue';

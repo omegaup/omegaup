@@ -124,7 +124,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 
 import arena_Clarification from './Clarification.vue';
 

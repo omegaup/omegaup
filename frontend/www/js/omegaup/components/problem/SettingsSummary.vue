@@ -82,7 +82,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as ui from '../../ui';
 import { types } from '../../api_types';
 
 @Component

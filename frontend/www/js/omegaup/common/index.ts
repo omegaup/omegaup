@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
     problems_solved: user.problems_solved,
   }));
 
-  const commonIndex = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-homepage', {

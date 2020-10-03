@@ -362,12 +362,12 @@ export default class QualityNominationPopup extends Vue {
   }
 
   @Watch('dismissed')
-  onDismissedChange(newValue: boolean, oldValue: boolean) {
+  onDismissedChange(newValue: boolean) {
     this.localDismissed = newValue;
   }
 
   @Watch('nominated')
-  onNominatedChange(newValue: boolean, oldValue: boolean) {
+  onNominatedChange(newValue: boolean) {
     this.localNominated = newValue;
   }
 }

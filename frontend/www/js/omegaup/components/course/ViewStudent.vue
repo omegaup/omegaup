@@ -156,6 +156,7 @@ export default class CourseViewStudent extends Vue {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   points(assignmentAlias: string): number {
     return this.problems.reduce(
       (accumulator: number, problem: types.CourseProblem) =>
@@ -230,7 +231,7 @@ export default class CourseViewStudent extends Vue {
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange(newVal: string) {
+  onSelectedAssignmentChange() {
     this.$emit('update', this.selectedStudent, this.selectedAssignment);
   }
 

@@ -209,8 +209,6 @@ interface Origin {
   }[];
 }
 
-const availableTabs = ['report', 'users', 'origins'];
-
 @Component({
   components: {
     'omegaup-user-username': user_Username,

@@ -156,8 +156,6 @@
 </template>
 
 <script>
-import * as Util from './util';
-
 export default {
   props: {
     store: Object,

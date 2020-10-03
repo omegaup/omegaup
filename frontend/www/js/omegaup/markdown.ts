@@ -430,8 +430,8 @@ export class Converter {
         // GitHub-flavored Markdown table.
         return text.replace(
           /^ {0,3}\|[^\n]*\|[ \t]*(\n {0,3}\|[^\n]*\|[ \t]*)+$/gm,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           (whole: string, inner: string): string => {
-            // eslint-disable-line @typescript-eslint/no-unused-vars
             let cells = whole
               .trim()
               .split('\n')

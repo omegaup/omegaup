@@ -77,7 +77,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 import testimonialsConfig from '../../testimonials.config';
 

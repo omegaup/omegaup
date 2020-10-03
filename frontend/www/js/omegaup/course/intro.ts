@@ -34,7 +34,7 @@ OmegaUp.on('ready', () => {
                 payload.statements.acceptTeacher?.gitObjectId,
               statement_type: payload.statements.privacy?.statementType,
             })
-              .then((data) => {
+              .then(() => {
                 window.location.replace(`/course/${payload.alias}/`);
               })
               .catch(ui.apiError);

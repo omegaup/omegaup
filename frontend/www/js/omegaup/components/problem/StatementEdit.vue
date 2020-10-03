@@ -107,7 +107,6 @@
 
 <script lang="ts">
 import { Vue, Component, Emit, Prop, Watch, Ref } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -191,10 +190,7 @@ export default class ProblemStatementEdit extends Vue {
 
   @Emit('update:statement')
   @Watch('currentMarkdown')
-  onCurrentMarkdownChange(
-    newMarkdown: string,
-    oldMarkdown: string,
-  ): types.ProblemStatement {
+  onCurrentMarkdownChange(newMarkdown: string): types.ProblemStatement {
     return {
       images: this.statement.images,
       language: this.statement.language,

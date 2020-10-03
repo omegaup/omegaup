@@ -146,10 +146,7 @@ export default class Clarifications extends Vue {
   clarifications: types.Clarification[] = this.initialClarifications;
 
   @Watch('initialClarifications')
-  onPropertyChanged(
-    newValue: types.Clarification[],
-    oldValue: types.Clarification[],
-  ): void {
+  onPropertyChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
     const audio = <HTMLMediaElement>(
       document.getElementById('notification-audio')
@@ -160,10 +157,7 @@ export default class Clarifications extends Vue {
   }
 
   @Watch('clarifications')
-  onPropertyChange(
-    newValue: types.Clarification[],
-    oldValue: types.Clarification[],
-  ): void {
+  onPropertyChange(newValue: types.Clarification[]): void {
     if (newValue.length > 0) {
       if (this.flashInterval) return;
       this.flashInterval = setInterval(this.flashTitle, 1000);

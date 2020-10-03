@@ -48,7 +48,7 @@ export default class ArenaAdmin {
                 return;
               }
               api.Run.disqualify({ run_alias: run.guid })
-                .then((data) => {
+                .then(() => {
                   run.type = 'disqualified';
                   arena.updateRunFallback(run.guid);
                 })
@@ -59,7 +59,7 @@ export default class ArenaAdmin {
             },
             rejudge: (run: types.Run) => {
               api.Run.rejudge({ run_alias: run.guid, debug: false })
-                .then((data) => {
+                .then(() => {
                   run.status = 'rejudging';
                   self.arena.updateRunFallback(run.guid);
                 })
@@ -93,7 +93,7 @@ export default class ArenaAdmin {
       this.refreshClarifications();
     });
 
-    this.arena.elements.clarification.on('submit', (e: Event) => {
+    this.arena.elements.clarification.on('submit', () => {
       $('input', this.arena.elements.clarification).attr(
         'disabled',
         'disabled',
@@ -113,7 +113,7 @@ export default class ArenaAdmin {
           this.arena.elements.clarification,
         ).val(),
       })
-        .then((response) => {
+        .then(() => {
           this.arena.hideOverlay();
           this.refreshClarifications();
         })

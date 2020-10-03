@@ -254,7 +254,6 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import T from '../../lang';
-import * as ui from '../../ui';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 
@@ -364,6 +363,7 @@ export default class ProblemForm extends Vue {
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   removeTag(alias: string, tagname: string, isPublic: boolean): void {
     this.selectedTags = this.selectedTags.filter(
       (tag) => tag.tagname !== tagname,

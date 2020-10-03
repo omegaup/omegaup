@@ -51,7 +51,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { OmegaUp } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import user_Username from '../user/Username.vue';

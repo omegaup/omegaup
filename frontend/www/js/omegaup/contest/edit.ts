@@ -4,7 +4,6 @@ import Vue from 'vue';
 import T from '../lang';
 import contest_Edit from '../components/contest/Editv2.vue';
 import contest_AddProblem from '../components/contest/AddProblemv2.vue';
-import problem_Versions from '../components/problem/Versions.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 

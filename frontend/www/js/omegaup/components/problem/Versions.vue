@@ -254,12 +254,12 @@ export default class ProblemVersions extends Vue {
   }
 
   @Watch('value')
-  onValueChange(newValue: omegaup.Commit, oldValue: omegaup.Commit) {
+  onValueChange(newValue: omegaup.Commit) {
     this.selectedRevision = newValue;
   }
 
   @Watch('selectedRevision')
-  onSelectedRevisionChange(newValue: omegaup.Commit, oldValue: omegaup.Commit) {
+  onSelectedRevisionChange(newValue: omegaup.Commit) {
     this.$emit('input', this.selectedRevision);
     if (!newValue || this.runsDiff.hasOwnProperty(newValue.version)) {
       return;
