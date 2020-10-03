@@ -2,10 +2,7 @@
   <div>
     <div class="card">
       <div class="card-body">
-        <form
-          class="form"
-          v-on:submit.prevent="$emit('emit-add-user', contestants, contestant)"
-        >
+        <form class="form" v-on:submit.prevent="onSubmit">
           <div class="form-group">
             <label>{{ T.wordsUser }}</label>
             <omegaup-autocomplete
@@ -120,6 +117,22 @@ export default class Contestant extends Vue {
   contestant = '';
   contestants = '';
   users = this.initialUsers;
+
+  onSubmit(): void {
+    let users: string[] = [];
+    if (this.contestants !== '') {
+      users = this.contestants.split(',');
+    }
+    if (this.contestant !== '') {
+      users.push(this.contestant);
+    }
+    if (this.users.length) {
+      this.$emit(
+        'emit-add-user',
+        users.map((user) => user.trim()),
+      );
+    }
+  }
 
   @Watch('initialUsers')
   onInitialUsersChange(newUsers: types.ContestUser[]): void {

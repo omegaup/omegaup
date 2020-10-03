@@ -114,19 +114,12 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'add-user': (contestants: string, contestant: string) => {
-            let users: string[] = [];
-            if (contestants !== '') {
-              users = contestants.split(',');
-            }
-            if (contestant !== '') {
-              users.push(contestant);
-            }
+          'add-user': (contestants: string[]) => {
             Promise.allSettled(
-              users.map((user: string) =>
+              contestants.map((user: string) =>
                 api.Contest.addUser({
                   contest_alias: payload.details.alias,
-                  usernameOrEmail: user.trim(),
+                  usernameOrEmail: user,
                 }),
               ),
             )
