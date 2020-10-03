@@ -10,7 +10,7 @@
       <div class="empty-table-message" v-if="problems.length == 0">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
-      <div v-else="">
+      <div v-else>
         <table class="table table-striped">
           <thead>
             <tr>

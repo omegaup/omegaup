@@ -10,7 +10,7 @@
           {{ T.wordsTotal }}:<span
             v-if="contestantData.hasOwnProperty('total') &amp;&amp; contestantData.total.hasOwnProperty('points')"
             >{{ contestantData.total.points }}</span
-          ><span v-else="">0</span>
+          ><span v-else>0</span>
         </h3>
         <div v-for="item in contestantData.problems">
           <h3>{{ T.wordsProblem }}: {{ item.alias }}</h3>

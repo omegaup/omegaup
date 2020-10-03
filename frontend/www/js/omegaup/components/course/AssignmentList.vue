@@ -9,7 +9,7 @@
           {{ T.courseContentEmpty }}
         </div>
       </div>
-      <table class="table table-striped" v-else="">
+      <table class="table table-striped" v-else>
         <thead>
           <tr>
             <td></td>
@@ -37,7 +37,7 @@
                 <font-awesome-icon icon="chalkboard-teacher" />
                 <span class="ml-2">{{ T.wordsLesson }}</span>
               </template>
-              <template v-else="">
+              <template v-else>
                 <font-awesome-icon icon="list-alt" />
                 <span class="ml-2">{{ T.wordsExam }}</span>
               </template>
@@ -70,7 +70,7 @@
               />
               <button
                 class="btn btn-link"
-                v-else=""
+                v-else
                 v-bind:title="T.courseAssignmentDelete"
                 v-on:click="$emit('emit-delete', assignment)"
               >

@@ -75,7 +75,7 @@
 
             <!-- Must register -->
             <form
-              v-else=""
+              v-else
               v-on:submit.prevent="$emit('request-access', contest.alias)"
             >
               <template v-if="!contest.user_registration_requested">
@@ -96,7 +96,7 @@
           </div>
         </template>
 
-        <template v-else="">
+        <template v-else>
           <!-- Must login to do anything -->
           <div class="card">
             <div class="card-body">

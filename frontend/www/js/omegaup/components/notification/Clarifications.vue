@@ -19,7 +19,7 @@
       <li class="empty" v-if="!clarifications || clarifications.length === 0">
         {{ T.notificationsNoNewNotifications }}
       </li>
-      <li v-else="">
+      <li v-else>
         <ul class="notification-drawer">
           <li v-for="clarification in clarifications">
             <button

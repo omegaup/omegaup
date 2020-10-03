@@ -64,9 +64,7 @@
                 }})
               </div>
             </template>
-            <template v-else="">
-              -
-            </template>
+            <template v-else> - </template>
           </td>
           <td>
             <div class="points">

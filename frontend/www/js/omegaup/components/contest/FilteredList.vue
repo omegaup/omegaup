@@ -2,7 +2,7 @@
   <div v-if="contests.length === 0">
     <div class="empty-category">{{ T.contestListEmpty }}</div>
   </div>
-  <div v-else="">
+  <div v-else>
     <h5 v-if="recommended">{{ T.arenaPageRecommendedContestsText }}</h5>
     <div class="card-body">
       <table class="contest-list table">

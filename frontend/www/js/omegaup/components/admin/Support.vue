@@ -48,7 +48,7 @@
                 <span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
                 {{ T.userVerified }}
               </template>
-              <template v-else="">
+              <template v-else>
                 {{ T.userVerify }}
               </template>
             </button>
@@ -62,7 +62,7 @@
                   })
                 }}
               </template>
-              <template v-else="">
+              <template v-else>
                 {{ T.userNeverLoggedIn }}
               </template></label
             >

@@ -37,8 +37,8 @@
               v-bind:value="response.value"
               v-bind:key="response.value"
             >
-              {{ response.text }}</option
-            >
+              {{ response.text }}
+            </option>
           </select>
         </div>
         <div

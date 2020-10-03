@@ -38,8 +38,8 @@
                     v-bind:value="problem.alias"
                     v-bind:key="problem.alias"
                   >
-                    {{ problem.title }}</option
-                  >
+                    {{ problem.title }}
+                  </option>
                 </select>
               </label>
               <textarea

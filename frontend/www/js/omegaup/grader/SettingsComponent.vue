@@ -80,21 +80,11 @@
         <!-- id-lint off -->
         <select class="form-control" id="inputValidator" v-model="validator">
           <!-- id-lint on -->
-          <option value="custom">
-            Custom
-          </option>
-          <option value="literal">
-            Literal
-          </option>
-          <option value="token">
-            Token
-          </option>
-          <option value="token-caseless">
-            Token (Caseless)
-          </option>
-          <option value="token-numeric">
-            Token (Numeric)
-          </option>
+          <option value="custom">Custom</option>
+          <option value="literal">Literal</option>
+          <option value="token">Token</option>
+          <option value="token-caseless">Token (Caseless)</option>
+          <option value="token-numeric">Token (Numeric)</option>
         </select>
       </div>
       <div class="form-group col-md-6" v-if="validator == 'token-numeric'">
@@ -119,12 +109,8 @@
           v-model="validatorLanguage"
         >
           <!-- id-lint on -->
-          <option value="cpp17-gcc">
-            C++17
-          </option>
-          <option value="py3">
-            Python 3.6
-          </option>
+          <option value="cpp17-gcc">C++17</option>
+          <option value="py3">Python 3.6</option>
         </select>
       </div>
     </div>
@@ -138,12 +124,8 @@
           v-model="interactive"
         >
           <!-- id-lint on -->
-          <option v-bind:value="false">
-            No
-          </option>
-          <option v-bind:value="true">
-            Yes
-          </option>
+          <option v-bind:value="false">No</option>
+          <option v-bind:value="true">Yes</option>
         </select>
       </div>
       <div class="form-group col-md-4" v-if="interactive">
@@ -165,12 +147,8 @@
           v-model="interactiveLanguage"
         >
           <!-- id-lint on -->
-          <option value="cpp17-gcc">
-            C++17
-          </option>
-          <option value="py3">
-            Python
-          </option>
+          <option value="cpp17-gcc">C++17</option>
+          <option value="py3">Python</option>
         </select>
       </div>
     </div>

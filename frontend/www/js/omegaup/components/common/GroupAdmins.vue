@@ -26,7 +26,7 @@
         {{ T.courseEditGroupAdminsEmpty }}
       </div>
     </div>
-    <table class="table table-striped" v-else="">
+    <table class="table table-striped" v-else>
       <thead>
         <tr>
           <th>{{ T.contestEditRegisteredGroupAdminName }}</th>

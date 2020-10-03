@@ -62,7 +62,7 @@
         </tr>
       </table>
 
-      <table class="merged-scoreboard" v-else="">
+      <table class="merged-scoreboard" v-else>
         <tr>
           <td></td>
           <td>

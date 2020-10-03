@@ -46,7 +46,7 @@
           {{ T.courseStudentsEmpty }}
         </div>
       </div>
-      <table class="table table-striped table-over" v-else="">
+      <table class="table table-striped table-over" v-else>
         <thead>
           <tr>
             <th>{{ T.wordsUser }}</th>

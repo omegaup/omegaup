@@ -40,7 +40,7 @@
         {{ T.courseEditAdminsEmpty }}
       </div>
     </div>
-    <table class="table table-striped" v-else="">
+    <table class="table table-striped" v-else>
       <thead>
         <tr>
           <th>{{ T.contestEditRegisteredAdminUsername }}</th>

@@ -9,8 +9,8 @@
               v-for="(columnText, columnIndex) in columns"
               v-bind:value="columnIndex"
             >
-              {{ columnText }}</option
-            >
+              {{ columnText }}
+            </option>
           </select>
         </div>
         <div class="col-md-4">

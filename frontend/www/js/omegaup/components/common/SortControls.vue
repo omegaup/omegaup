@@ -10,7 +10,7 @@
       <font-awesome-icon
         v-bind:icon="['fas', iconDisplayed]"
         color="black"
-        v-else=""
+        v-else
       />
     </a>
   </span>

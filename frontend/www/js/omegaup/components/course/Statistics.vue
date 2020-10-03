@@ -7,9 +7,9 @@
     <div>
       <div class="d-flex justify-content-center">
         <select v-model="selected" class="text-center">
-          <option v-for="option in options" v-bind:value="option.value">{{
-            option.text
-          }}</option>
+          <option v-for="option in options" v-bind:value="option.value">
+            {{ option.text }}
+          </option>
         </select>
       </div>
       <highcharts v-bind:options="selected"></highcharts>

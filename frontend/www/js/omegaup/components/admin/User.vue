@@ -18,7 +18,7 @@
               <span v-if="verified"
                 ><span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
                 {{ T.userVerified }}</span
-              ><span v-else="">{{ T.userVerify }}</span>
+              ><span v-else>{{ T.userVerify }}</span>
             </button>
           </div>
         </div>
