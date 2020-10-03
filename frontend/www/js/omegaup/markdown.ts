@@ -198,7 +198,7 @@ export class Converter {
       // File transclusion.
       const sourceMapping: ImageMapping = this._sourceMapping || {};
       text = text.replace(
-        /^\s*\{\{([a-z0-9_-]+\.[a-z]{1,4})\}\}\s*$/g,
+        /^\s*\{\{([a-z0-9_-]+\.[a-z]{1,4})\}\}\s*$/gi,
         (wholematch: string, m1: string): string => {
           if (!sourceMapping.hasOwnProperty(m1)) {
             return `<span class="alert alert-danger" role="alert">Unrecognized source filename: ${m1}</span>`;
