@@ -258,7 +258,6 @@ export default class AddProblem extends Vue {
   onInitialProblemsChange(newValue: types.ContestProblem[]): void {
     this.problems = newValue;
     this.alias = '';
-    this.points = this.points;
     this.order = newValue.length + 1;
   }
 

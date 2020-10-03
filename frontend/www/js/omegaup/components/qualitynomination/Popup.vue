@@ -330,11 +330,10 @@ export default class QualityNominationPopup extends Vue {
   }
 
   get suggestLink(): string {
-    let self = this;
-    if (!self.problemAlias) {
+    if (!this.problemAlias) {
       return '#';
     }
-    return `#problems/${self.problemAlias}`;
+    return `#problems/${this.problemAlias}`;
   }
 
   onHide(isDismissed: boolean): void {

@@ -233,7 +233,6 @@ export default class AddProblem extends Vue {
   @Watch('problems')
   onProblemsChange(newValue: omegaup.Problem[]): void {
     this.alias = '';
-    this.points = this.points;
     this.order = newValue.length + 1;
   }
 

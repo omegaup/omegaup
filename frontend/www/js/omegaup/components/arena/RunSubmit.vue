@@ -244,7 +244,7 @@ export default class ArenaRunSubmit extends Vue {
       alert(T.arenaRunSubmitMissingLanguage);
       return;
     }
-    const file = this.inputFile.files![0];
+    const file = this.inputFile.files?.[0];
     if (file) {
       const reader = new FileReader();
 

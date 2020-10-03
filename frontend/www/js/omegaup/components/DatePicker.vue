@@ -39,17 +39,16 @@ export default class DatePicker extends Vue {
   }
 
   private mountedFallback() {
-    let self = this;
-    self.usedFallback = true;
-    $(self.$el)
+    this.usedFallback = true;
+    $(this.$el)
       .datepicker({
         weekStart: 1,
-        format: self.format,
+        format: this.format,
       })
       .on('changeDate', (ev) => {
-        self.$emit('input', ev.date);
+        this.$emit('input', ev.date);
       })
-      .datepicker('setValue', self.value);
+      .datepicker('setValue', this.value);
   }
 
   @Watch('stringValue')

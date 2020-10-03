@@ -247,10 +247,9 @@ export default class ActivityFeed extends Vue {
   }
 
   get users(): User[] {
-    let self = this;
     let userMapping: Mapping = {};
     for (let evt of this.report) {
-      self.addMapping(userMapping, evt.username, String(evt.ip));
+      this.addMapping(userMapping, evt.username, String(evt.ip));
     }
     let users: User[] = [];
     let sortedUsers = Object.keys(userMapping);
@@ -261,7 +260,7 @@ export default class ActivityFeed extends Vue {
       ips.sort();
       users.push({
         username: user,
-        classname: self.classByUser[user],
+        classname: this.classByUser[user],
         ips: ips,
       });
     }
@@ -269,10 +268,9 @@ export default class ActivityFeed extends Vue {
   }
 
   get origins(): Origin[] {
-    let self = this;
     let originMapping: Mapping = {};
     for (let evt of this.report) {
-      self.addMapping(originMapping, String(evt.ip), evt.username);
+      this.addMapping(originMapping, String(evt.ip), evt.username);
     }
     let origins: Origin[] = [];
     let sortedOrigins = Object.keys(originMapping);
@@ -284,7 +282,7 @@ export default class ActivityFeed extends Vue {
       origins.push({
         origin: origin,
         usernames: users.map((u) => {
-          return { username: u, classname: self.classByUser[u] };
+          return { username: u, classname: this.classByUser[u] };
         }),
       });
     }
