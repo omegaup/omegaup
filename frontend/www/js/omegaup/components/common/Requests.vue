@@ -1,5 +1,5 @@
 <template>
-  <div class="panel panel-primary" v-if="requests.length !== 0">
+  <div v-if="requests.length !== 0" class="panel panel-primary">
     <div class="panel-body">
       {{ T.pendingRegistrations }}
     </div>

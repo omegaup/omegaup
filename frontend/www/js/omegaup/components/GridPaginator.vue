@@ -5,20 +5,20 @@
         {{ title }} <span class="badge">{{ items.length }}</span>
       </h2>
     </div>
-    <div class="panel-body text-center" v-if="sortOptions.length > 0">
+    <div v-if="sortOptions.length > 0" class="panel-body text-center">
       <div class="form-check form-check-inline">
         <label v-for="sortOption in sortOptions" class="radio-inline">
           <input
+            v-model="currentSortOption"
             name="sort-selector"
             type="radio"
             v-bind:value="sortOption.value"
-            v-model="currentSortOption"
           />
           {{ sortOption.title }}
         </label>
       </div>
     </div>
-    <table class="table table-striped" v-if="items.length &gt; 0">
+    <table v-if="items.length &gt; 0" class="table table-striped">
       <slot name="table-header"></slot>
       <tbody>
         <tr v-for="(group, index) in paginatedItems">
@@ -32,13 +32,13 @@
               </a>
             </slot>
           </td>
-          <td class="numericColumn" v-if="!group[0].getBadge().isEmpty()">
+          <td v-if="!group[0].getBadge().isEmpty()" class="numericColumn">
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="panel-footer text-center" v-if="items.length &gt; 0">
+    <div v-if="items.length &gt; 0" class="panel-footer text-center">
       <div class="btn-group" role="group">
         <button
           class="btn btn-primary"

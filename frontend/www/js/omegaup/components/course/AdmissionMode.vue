@@ -12,9 +12,9 @@
             <img src="/media/question.png" />
           </a>
           <select
+            v-model="admissionMode"
             class="form-control"
             name="admission-mode"
-            v-model="admissionMode"
           >
             <option value="private">
               {{ T.admissionModeManualOnly }}
@@ -22,11 +22,11 @@
             <option value="registration">
               {{ T.admissionModeShareURL }}
             </option>
-            <option value="public" v-if="shouldShowPublicOption">
+            <option v-if="shouldShowPublicOption" value="public">
               {{ T.admissionModePublic }}
             </option>
           </select>
-          <div class="form-group" v-show="admissionMode === 'registration'">
+          <div v-show="admissionMode === 'registration'" class="form-group">
             <input
               class="form-control mb-2 mt-2"
               type="text"
@@ -35,14 +35,14 @@
             />
             <div class="form-inline">
               <button
+                v-clipboard="courseURL"
                 class="btn btn-primary"
                 type="button"
                 v-on:click="copiedToClipboard = true"
-                v-clipboard="courseURL"
               >
                 {{ T.wordsCopyToClipboard }}
               </button>
-              <span class="ml-3" v-if="copiedToClipboard === true">
+              <span v-if="copiedToClipboard === true" class="ml-3">
                 <font-awesome-icon
                   icon="check-circle"
                   size="2x"

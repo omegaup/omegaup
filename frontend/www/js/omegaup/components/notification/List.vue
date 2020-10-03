@@ -10,8 +10,8 @@
     >
       <font-awesome-icon v-bind:icon="['fas', 'bell']" />
       <span
-        class="badge badge-danger count-badge"
         v-show="!!notifications.length"
+        class="badge badge-danger count-badge"
         >{{ notifications.length }}</span
       ></a
     >
@@ -22,7 +22,7 @@
         TODO: Try another way to allow this behaviour.
       -->
       <form>
-        <div class="text-center" v-if="notifications.length === 0">
+        <div v-if="notifications.length === 0" class="text-center">
           {{ T.notificationsNoNewNotifications }}
         </div>
         <a
@@ -35,9 +35,9 @@
         </a>
         <transition-group name="list"
           ><omegaup-notification
+            v-for="notification in notifications"
             v-bind:key="notification.notification_id"
             v-bind:notification="notification"
-            v-for="notification in notifications"
             v-on:remove="readSingleNotification"
           ></omegaup-notification
         ></transition-group>

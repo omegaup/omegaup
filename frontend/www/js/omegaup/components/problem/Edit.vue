@@ -106,7 +106,7 @@
     </ul>
 
     <div class="tab-content">
-      <div class="tab-pane active" v-if="showTab === 'edit'">
+      <div v-if="showTab === 'edit'" class="tab-pane active">
         <omegaup-problem-form
           v-bind:data="data"
           v-bind:original-visibility="data.originalVisibility"
@@ -114,7 +114,7 @@
         ></omegaup-problem-form>
       </div>
 
-      <div class="tab-pane active" v-if="showTab === 'markdown'">
+      <div v-if="showTab === 'markdown'" class="tab-pane active">
         <omegaup-problem-statementedit
           v-bind:statement="data.statement"
           markdown-type="statements"
@@ -135,7 +135,7 @@
         ></omegaup-problem-statementedit>
       </div>
 
-      <div class="tab-pane active" v-if="showTab === 'version'">
+      <div v-if="showTab === 'version'" class="tab-pane active">
         <omegaup-problem-versions
           v-bind:log="data.log"
           v-bind:published-revision="data.publishedRevision"
@@ -152,7 +152,7 @@
         ></omegaup-problem-versions>
       </div>
 
-      <div class="tab-pane active" v-if="showTab === 'solution'">
+      <div v-if="showTab === 'solution'" class="tab-pane active">
         <omegaup-problem-statementedit
           v-bind:statement="
             data.solution || { markdown: '', language: 'es', images: {} }
@@ -172,7 +172,7 @@
         ></omegaup-problem-statementedit>
       </div>
 
-      <div class="tab-pane active" v-if="showTab === 'admins'">
+      <div v-if="showTab === 'admins'" class="tab-pane active">
         <omegaup-problem-admins
           v-bind:initial-admins="initialAdmins"
           v-bind:has-parent-component="true"
@@ -199,7 +199,7 @@
         ></omegaup-problem-groupadmins>
       </div>
 
-      <div class="tab-pane active" v-if="showTab === 'tags'">
+      <div v-if="showTab === 'tags'" class="tab-pane active">
         <omegaup-problem-tags
           v-bind:alias="data.alias"
           v-bind:title="data.title"
@@ -228,7 +228,7 @@
         ></omegaup-problem-tags>
       </div>
 
-      <div class="tab-pane active" v-if="showTab === 'download'">
+      <div v-if="showTab === 'download'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
             <form class="form" v-on:submit.prevent="onDownload">
@@ -242,7 +242,7 @@
         </div>
       </div>
 
-      <div class="tab-pane active" v-if="showTab === 'delete'">
+      <div v-if="showTab === 'delete'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
             <form class="form" v-on:submit.prevent="$emit('remove', alias)">

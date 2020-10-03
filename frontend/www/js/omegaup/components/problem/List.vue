@@ -16,10 +16,10 @@
     </a>
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
     <omegaup-problem-finder
+      v-show="showFinderWizard"
       v-bind:possible-tags="wizardTags"
       v-on:close="showFinderWizard = false"
       v-on:search-problems="wizardSearch"
-      v-show="showFinderWizard"
     ></omegaup-problem-finder>
     <div class="card">
       <h5 class="card-header">
@@ -109,9 +109,9 @@
                 ></span>
               </th>
               <th
+                v-if="loggedIn"
                 scope="col"
                 class="text-right align-middle text-nowrap"
-                v-if="loggedIn"
               >
                 <span
                   >{{ T.wordsMyScore }}
@@ -157,27 +157,28 @@
                   problem.title
                 }}</a>
                 <font-awesome-icon
-                  v-bind:title="T.wordsHighQualityProblem"
                   v-if="problem.qualitySeal || problem.visibility === 3"
+                  v-bind:title="T.wordsHighQualityProblem"
                   v-bind:icon="['fas', 'medal']"
                   color="gold"
                 />
                 <font-awesome-icon
-                  v-bind:title="T.wordsWarningProblem"
                   v-else-if="problem.visibility === -1"
+                  v-bind:title="T.wordsWarningProblem"
                   v-bind:icon="['fas', 'exclamation-triangle']"
                 />
                 <font-awesome-icon
-                  v-bind:title="T.wordsBannedProblem"
                   v-else-if="problem.visibility <= -3"
+                  v-bind:title="T.wordsBannedProblem"
                   v-bind:icon="['fas', 'ban']"
                 />
                 <font-awesome-icon
-                  v-bind:title="T.wordsPrivate"
                   v-else-if="problem.visibility === 0"
+                  v-bind:title="T.wordsPrivate"
                   v-bind:icon="['fas', 'eye-slash']"
                 />
                 <a
+                  v-for="tag in problem.tags"
                   v-bind:class="`badge custom-badge custom-badge-${
                     tag.source
                   } ${
@@ -186,13 +187,12 @@
                       : ''
                   } m-1 p-2`"
                   v-bind:href="hrefForProblemTag(currentTags, tag.name)"
-                  v-for="tag in problem.tags"
                   >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a
                 >
               </td>
               <td
-                class="text-center tooltip_column"
                 v-if="problem.quality !== null"
+                class="text-center tooltip_column"
               >
                 <span
                   v-tooltip="
@@ -204,8 +204,8 @@
                   {{ QUALITY_TAGS[Math.round(problem.quality)] }}
                 </span>
               </td>
-              <td class="text-right" v-else>—</td>
-              <td class="text-center" v-if="problem.difficulty !== null">
+              <td v-else class="text-right">—</td>
+              <td v-if="problem.difficulty !== null" class="text-center">
                 <span
                   v-tooltip="
                     `${ui.formatString(T.wordsOutOf4, {
@@ -216,11 +216,11 @@
                   {{ DIFFICULTY_TAGS[Math.round(problem.difficulty)] }}
                 </span>
               </td>
-              <td class="text-center" v-else>—</td>
+              <td v-else class="text-center">—</td>
               <td class="text-right">
                 {{ (100.0 * problem.ratio).toFixed(2) }}%
               </td>
-              <td class="text-right" v-if="loggedIn">
+              <td v-if="loggedIn" class="text-right">
                 {{ problem.score.toFixed(2) }}
               </td>
               <td class="text-right">{{ problem.points.toFixed(2) }}</td>

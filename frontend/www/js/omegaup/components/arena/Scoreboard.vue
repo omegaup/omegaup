@@ -5,9 +5,9 @@
     <!-- id-lint on -->
     <label v-if="this.showInvitedUsersFilter">
       <input
+        v-model="onlyShowExplicitlyInvited"
         class="toggle-contestants"
         type="checkbox"
-        v-model="onlyShowExplicitlyInvited"
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
@@ -29,9 +29,9 @@
       </thead>
       <tbody>
         <tr
-          v-bind:class="user.username"
           v-for="(user, userIndex) in ranking"
           v-if="showUser(user.is_invited)"
+          v-bind:class="user.username"
         >
           <td
             class="legend"
@@ -41,18 +41,18 @@
           <td class="user">
             {{ ui.rankingUsername(user) }}
             <img
+              v-if="user.country"
               alt=""
               height="11"
               v-bind:src="`/media/flags/${user.country.toLowerCase()}.png`"
               v-bind:title="user.country"
-              v-if="user.country"
               width="16"
             />
           </td>
 
           <td
-            v-bind:class="problemClass(problem, problems[problemIndex].alias)"
             v-for="(problem, problemIndex) in user.problems"
+            v-bind:class="problemClass(problem, problems[problemIndex].alias)"
           >
             <template v-if="problem.runs &gt; 0">
               <div class="points">

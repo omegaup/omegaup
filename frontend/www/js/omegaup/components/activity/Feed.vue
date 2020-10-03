@@ -16,8 +16,8 @@
             role="tab"
             aria-controls="report"
             aria-selected="true"
-            v-on:click="showTab = 'report'"
             v-bind:class="{ active: showTab === 'report' }"
+            v-on:click="showTab = 'report'"
             >{{ T.activityReportReport }}</a
           >
         </li>
@@ -29,8 +29,8 @@
             role="tab"
             aria-controls="users"
             aria-selected="false"
-            v-on:click="showTab = 'users'"
             v-bind:class="{ active: showTab === 'users' }"
+            v-on:click="showTab = 'users'"
             >{{ T.activityReportUsers }}</a
           >
         </li>
@@ -42,8 +42,8 @@
             role="tab"
             aria-controls="origins"
             aria-selected="false"
-            v-on:click="showTab = 'origins'"
             v-bind:class="{ active: showTab === 'origins' }"
+            v-on:click="showTab = 'origins'"
             >{{ T.activityReportOrigins }}</a
           >
         </li>
@@ -51,13 +51,13 @@
       <!-- Tab panes -->
       <div class="tab-content mt-2">
         <div
+          v-show="showTab === 'report'"
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="report-tab"
           v-bind:class="{
             active: showTab === 'report',
           }"
-          v-show="showTab === 'report'"
         >
           <table class="table">
             <thead>
@@ -100,18 +100,18 @@
           </table>
         </div>
         <div
+          v-show="showTab === 'users'"
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="users-tab"
           v-bind:class="{
             active: showTab === 'users',
           }"
-          v-show="showTab === 'users'"
         >
           <p v-if="users.length &lt;= 0">
             {{ T.activityReportNoDuplicatesForUsers }}
           </p>
-          <table class="table" v-else>
+          <table v-else class="table">
             <caption>
               {{
                 T.activityReportDuplicatesForUsersDescription
@@ -140,18 +140,18 @@
           </table>
         </div>
         <div
+          v-show="showTab === 'origins'"
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="origins-tab"
           v-bind:class="{
             active: showTab === 'origins',
           }"
-          v-show="showTab === 'origins'"
         >
           <p v-if="origins.length &lt;= 0">
             {{ T.activityReportNoDuplicatesForOrigins }}
           </p>
-          <table class="table" v-else>
+          <table v-else class="table">
             <caption>
               {{
                 T.activityReportDuplicatesForOriginsDescription

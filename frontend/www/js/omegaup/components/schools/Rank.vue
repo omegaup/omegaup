@@ -21,7 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(school, index) in rank">
+        <tr v-for="(school, index) in rank" v-bind:key="index">
           <th scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
@@ -39,10 +39,10 @@
         </tr>
       </tbody>
     </table>
-    <div class="card-footer" v-if="showHeader">
+    <div v-if="showHeader" class="card-footer">
       <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
-    <div class="card-footer" v-else>
+    <div v-else class="card-footer">
       <omegaup-common-paginator
         v-bind:pagerItems="pagerItems"
       ></omegaup-common-paginator>

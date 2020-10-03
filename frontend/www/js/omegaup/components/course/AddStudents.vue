@@ -18,8 +18,8 @@
             v-bind:title="T.courseEditAddStudentsTooltip"
           ></span>
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
             v-model="participant"
+            v-bind:init="(el) => typeahead.userTypeahead(el)"
           ></omegaup-autocomplete>
         </div>
         <div class="form-group pull-right">
@@ -30,9 +30,9 @@
         <div class="form-group">
           <label>{{ T.wordsMultipleUser }}</label>
           <textarea
+            v-model="participants"
             class="form-control pariticipants"
             rows="4"
-            v-model="participants"
           ></textarea>
         </div>
         <div class="form-group pull-right">
@@ -46,7 +46,7 @@
           {{ T.courseStudentsEmpty }}
         </div>
       </div>
-      <table class="table table-striped table-over" v-else>
+      <table v-else class="table table-striped table-over">
         <thead>
           <tr>
             <th>{{ T.wordsUser }}</th>

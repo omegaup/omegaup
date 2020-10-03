@@ -28,7 +28,7 @@
             </div>
           </div>
         </li>
-        <li class="fbSettingsListItem clearfix uiListItem" v-if="profile.email">
+        <li v-if="profile.email" class="fbSettingsListItem clearfix uiListItem">
           <div class="pvm phs fbSettingsListLink clearfix">
             <div class="pls fbSettingsListItemLabel">
               <strong>{{ T.profileEmail }}</strong>

@@ -10,8 +10,8 @@
       </div>
       <br />
       <div
-        class="panel panel-default no-bottom-margin"
         v-show="identities.length &gt; 0"
+        class="panel panel-default no-bottom-margin"
       >
         <div class="panel-heading">
           <h3 class="panel-title">{{ T.wordsIdentities }}</h3>

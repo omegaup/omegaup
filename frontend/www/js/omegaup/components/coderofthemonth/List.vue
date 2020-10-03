@@ -65,37 +65,37 @@
           </th>
           <th scope="col" class="text-center">{{ T.codersOfTheMonthUser }}</th>
           <th
+            v-if="selectedTab == 'codersOfTheMonth'"
             scope="col"
             class="text-center"
-            v-if="selectedTab == 'codersOfTheMonth'"
           >
             {{ T.codersOfTheMonthDate }}
           </th>
           <th
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
             scope="col"
             class="text-right"
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
           >
             {{ T.profileStatisticsNumberOfSolvedProblems }}
           </th>
           <th
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
             scope="col"
             class="text-right"
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
           >
             {{ T.rankScore }}
           </th>
           <th
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
             scope="col"
             class="text-center"
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
           >
             {{ T.wordsActions }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(coder, index) in visibleCoders">
+        <tr v-for="(coder, index) in visibleCoders" v-bind:key="index">
           <td class="text-center">
             <img v-bind:src="coder.gravatar_32" />
           </td>
@@ -115,24 +115,24 @@
             {{ coder.date }}
           </td>
           <td
-            class="text-right"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+            class="text-right"
           >
             {{ coder.problems_solved }}
           </td>
           <td
-            class="text-right"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+            class="text-right"
           >
             {{ coder.score }}
           </td>
           <td
-            class="text-center"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
+            class="text-center"
           >
             <button
-              class="btn btn-sm btn-primary"
               v-if="canChooseCoder && !coderIsSelected"
+              class="btn btn-sm btn-primary"
               v-on:click="$emit('select-coder', coder.username, category)"
             >
               {{

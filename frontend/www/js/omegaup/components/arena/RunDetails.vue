@@ -2,7 +2,7 @@
   <form data-run-details-view>
     <div v-if="data">
       <button class="close">❌</button>
-      <div class="cases" v-if="data.groups">
+      <div v-if="data.groups" class="cases">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
         <table>
@@ -18,10 +18,10 @@
           <tbody v-for="element in data.groups">
             <tr class="group">
               <th class="center">{{ element.group }}</th>
-              <th class="text-center" v-if="element.verdict">
+              <th v-if="element.verdict" class="text-center">
                 {{ element.verdict }}
               </th>
-              <th colspan="2" v-else>
+              <th v-else colspan="2">
                 <div class="dropdown-cases" v-on:click="toggle(element.group)">
                   <font-awesome-icon
                     v-if="groupVisible[element.group]"
@@ -80,7 +80,7 @@
                   <td colspan="6">{{ T.wordsDifference }}</td>
                 </tr>
                 <tr>
-                  <td colspan="6" v-if="data.cases">
+                  <td v-if="data.cases" colspan="6">
                     <omegaup-arena-diff-view
                       v-bind:left="data.cases[problem_case.name].out"
                       v-bind:right="
@@ -88,7 +88,7 @@
                       "
                     ></omegaup-arena-diff-view>
                   </td>
-                  <td colspan="6" v-else class="empty-table-message">
+                  <td v-else colspan="6" class="empty-table-message">
                     {{ EMPTY_FIELD }}
                   </td>
                 </tr>
@@ -99,22 +99,22 @@
       </div>
       <h3>{{ T.wordsSource }}</h3>
       <a
+        v-if="data.source_link"
         download="data.zip"
         v-bind:href="data.source"
-        v-if="data.source_link"
         >{{ T.wordsDownload }}</a
       >
       <omegaup-arena-code-view
+        v-else
         v-bind:language="data.language"
         v-bind:readonly="true"
         v-bind:value="data.source"
-        v-else
       ></omegaup-arena-code-view>
-      <div class="compile_error" v-if="data.compile_error">
+      <div v-if="data.compile_error" class="compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
         <pre class="compile_error" v-text="data.compile_error"></pre>
       </div>
-      <div class="logs" v-if="data.logs">
+      <div v-if="data.logs" class="logs">
         <h3>{{ T.wordsLogs }}</h3>
         <pre v-text="data.logs"></pre>
       </div>
@@ -131,23 +131,23 @@
           </li>
           <li>
             <a
+              v-if="data.admin"
               class="output"
               v-bind:href="`/api/run/download/run_alias/${data.guid}/`"
-              v-if="data.admin"
               >{{ T.wordsDownloadOutput }}</a
             >
           </li>
           <li>
             <a
+              v-if="data.admin"
               class="details"
               v-bind:href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
-              v-if="data.admin"
               >{{ T.wordsDownloadDetails }}</a
             >
           </li>
         </ul>
       </div>
-      <div class="judged_by" v-if="data.judged_by">
+      <div v-if="data.judged_by" class="judged_by">
         <h3>{{ T.wordsJudgedBy }}</h3>
         <pre v-text="data.judged_by"></pre>
       </div>

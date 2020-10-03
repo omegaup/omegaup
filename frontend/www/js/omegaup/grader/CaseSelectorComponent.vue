@@ -6,16 +6,16 @@
     <div class="filenames">
       <div class="list-group">
         <button
+          v-if="!groups"
           class="list-group-item list-group-item-action disabled"
           type="button"
-          v-if="!groups"
         >
           <em>Empty</em>
         </button>
-        <template v-bind:title="name" v-else v-for="group in groups">
+        <template v-for="group in groups" v-else v-bind:title="name">
           <div
-            class="list-group-item list-group-item-secondary"
             v-if="group.explicit"
+            class="list-group-item list-group-item-secondary"
           >
             <div>
               <span
@@ -31,13 +31,13 @@
             </div>
           </div>
           <button
+            v-for="item in group.cases"
             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
             type="button"
             v-bind:class="{
               'in-group': group.explicit,
               active: currentCase == item.name,
             }"
-            v-for="item in group.cases"
             v-on:click="selectCase(item.name)"
           >
             <div class="case-item">
@@ -53,10 +53,10 @@
               <span v-bind:title="item.name">{{ item.name }}</span>
             </div>
             <button
+              v-if="item.name != 'sample'"
               aria-label="Close"
               class="close"
               type="button"
-              v-if="item.name != 'sample'"
               v-on:click.prevent.stop="removeCase(item.name)"
             >
               <span aria-hidden="true">×</span>
@@ -68,11 +68,11 @@
     <form v-on:submit.prevent="createCase()">
       <div class="input-group">
         <input
+          v-model="newCaseWeight"
           class="form-control case-weight"
           type="text"
-          v-model="newCaseWeight"
         />
-        <input class="form-control" type="text" v-model="newCaseName" />
+        <input v-model="newCaseName" class="form-control" type="text" />
         <div class="input-group-append">
           <button
             class="btn btn-secondary"

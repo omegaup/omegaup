@@ -5,39 +5,39 @@
       v-bind:markdown="solution.markdown"
       v-bind:image-mapping="solution.images"
     ></omegaup-markdown>
-    <div class="interstitial" v-else>
+    <div v-else class="interstitial">
       <p v-html="statusMessage"></p>
       <p
+        v-show="allTokens !== null && availableTokens !== null"
         v-html="
           ui.formatString(T.solutionTokens, {
             available: availableTokens,
             total: allTokens,
           })
         "
-        v-show="allTokens !== null && availableTokens !== null"
       ></p>
       <div class="text-center">
         <button
-          class="btn btn-primary btn-md"
           v-if="status === 'unlocked'"
+          class="btn btn-primary btn-md"
           v-on:click="$emit('get-solution')"
         >
           {{ T.wordsSeeSolution }}
         </button>
         <button
-          class="btn btn-primary btn-md"
           v-else-if="
             status === 'locked' &&
             allTokens === null &&
             availableTokens === null
           "
+          class="btn btn-primary btn-md"
           v-on:click="$emit('get-tokens')"
         >
           {{ T.solutionViewCurrentTokens }}
         </button>
         <button
-          class="btn btn-primary btn-md"
           v-else-if="status === 'locked' && availableTokens &gt; 0"
+          class="btn btn-primary btn-md"
           v-on:click="$emit('unlock-solution')"
         >
           {{ T.wordsUnlockSolution }}

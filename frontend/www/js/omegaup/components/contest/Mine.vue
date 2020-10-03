@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-      class="alert alert-info alert-dismissable fade show"
       v-if="privateContestsAlert"
+      class="alert alert-info alert-dismissable fade show"
       role="alert"
     >
       {{ T.messageMakeYourContestsPublic }}
@@ -22,9 +22,9 @@
           <div class="form-check col-7">
             <label class="form-check-label">
               <input
+                v-model="shouldShowAllContests"
                 class="form-check-input"
                 type="checkbox"
-                v-model="shouldShowAllContests"
                 v-on:change.prevent="
                   $emit('change-show-all-contests', shouldShowAllContests)
                 "
@@ -33,8 +33,8 @@
             </label>
           </div>
           <select
-            class="custom-select col-5"
             v-model="allContestsVisibilityOption"
+            class="custom-select col-5"
             v-on:change="onChangeAdmissionMode"
           >
             <option selected value="none">{{ T.forSelectedItems }}</option>
@@ -72,8 +72,8 @@
             <tr v-for="contest in contests">
               <td class="d-flex align-items-center">
                 <input
-                  type="checkbox"
                   v-model="selectedContests"
+                  type="checkbox"
                   v-bind:value="contest.alias"
                 />
                 <div class="d-inline-block ml-2">
@@ -99,8 +99,8 @@
               </td>
               <td>
                 <a
-                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
                   v-if="contest.scoreboard_url"
+                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
                 >
                   <font-awesome-icon
                     v-bind:title="T.contestScoreboardLink"
@@ -108,9 +108,9 @@
                   />{{ T.wordsPublic }}
                 </a>
                 <a
+                  v-if="contest.scoreboard_url_admin"
                   class="ml-1"
                   v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
-                  v-if="contest.scoreboard_url_admin"
                 >
                   <font-awesome-icon
                     v-bind:title="T.contestScoreboardAdminLink"

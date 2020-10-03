@@ -12,26 +12,26 @@
             })
       }}
     </h5>
-    <div class="card-body" v-if="!isIndex">
+    <div v-if="!isIndex" class="card-body">
       <label
         ><omegaup-autocomplete
+          v-model="searchedUsername"
           class="form-control"
           v-bind:init="(el) => typeahead.userTypeahead(el)"
-          v-model="searchedUsername"
         ></omegaup-autocomplete
       ></label>
       <button class="btn btn-primary" type="button" v-on:click="onSubmit">
         {{ T.searchUser }}
       </button>
       <template v-if="Object.keys(availableFilters).length &gt; 0">
-        <select class="filter" v-model="filter" v-on:change="onFilterChange">
+        <select v-model="filter" class="filter" v-on:change="onFilterChange">
           <option value="">
             {{ T.wordsSelectFilter }}
           </option>
           <option
+            v-for="(item, key, index) in availableFilters"
             v-bind:key="index"
             v-bind:value="key"
-            v-for="(item, key, index) in availableFilters"
           >
             {{ item }}
           </option>
@@ -52,13 +52,13 @@
           <th scope="col">#</th>
           <th scope="col">{{ T.wordsUser }}</th>
           <th scope="col" class="text-right">{{ T.rankScore }}</th>
-          <th scope="col" class="text-right" v-if="!isIndex">
+          <th v-if="!isIndex" scope="col" class="text-right">
             {{ T.rankSolved }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(user, index) in ranking">
+        <tr v-for="(user, index) in ranking" v-bind:key="index">
           <th scope="row">{{ user.rank }}</th>
           <td>
             <omegaup-countryflag
@@ -75,16 +75,16 @@
             >
           </td>
           <td class="text-right">{{ user.score }}</td>
-          <td class="text-right" v-if="!isIndex">
+          <td v-if="!isIndex" class="text-right">
             {{ user.problems_solved }}
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="card-footer" v-if="isIndex">
+    <div v-if="isIndex" class="card-footer">
       <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
-    <div class="card-footer" v-else>
+    <div v-else class="card-footer">
       <omegaup-common-paginator
         v-bind:pagerItems="pagerItems"
       ></omegaup-common-paginator>

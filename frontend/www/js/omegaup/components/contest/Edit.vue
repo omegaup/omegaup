@@ -16,18 +16,18 @@
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li
-        v-bind:class="{ active: !virtual }"
         v-if="!virtual"
+        v-bind:class="{ active: !virtual }"
         v-on:click="showTab = 'new_form'"
       >
         <a data-toggle="tab">{{ T.contestEdit }}</a>
       </li>
-      <li class="problems" v-if="!virtual" v-on:click="showTab = 'problems'">
+      <li v-if="!virtual" class="problems" v-on:click="showTab = 'problems'">
         <a data-toggle="tab">{{ T.wordsAddProblem }}</a>
       </li>
       <li
-        class="admission-mode"
         v-if="!virtual"
+        class="admission-mode"
         v-on:click="showTab = 'publish'"
       >
         <a data-toggle="tab">{{ T.contestNewFormAdmissionMode }}</a>
@@ -50,7 +50,7 @@
       </li>
     </ul>
     <div class="tab-content">
-      <div class="tab-pane active" v-if="showTab === 'new_form'">
+      <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
           v-bind:initial-alias="contest.alias"
           v-bind:initial-title="contest.title"
@@ -80,7 +80,7 @@
           "
         ></omegaup-contest-new-form>
       </div>
-      <div class="tab-pane active problems" v-if="showTab === 'problems'">
+      <div v-if="showTab === 'problems'" class="tab-pane active problems">
         <omegaup-contest-add-problem
           v-bind:contest-alias="contest.alias"
           v-bind:initialPoints="contest.partial_score ? 100 : 1"
@@ -103,7 +103,7 @@
         >
         </omegaup-contest-add-problem>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'publish'">
+      <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
           v-bind:initialAdmissionMode="contest.admission_mode"
           v-bind:shouldShowPublicOption="true"
@@ -116,7 +116,7 @@
           "
         ></omegaup-common-publish>
       </div>
-      <div class="tab-pane active contestants" v-if="showTab === 'contestants'">
+      <div v-if="showTab === 'contestants'" class="tab-pane active contestants">
         <omegaup-contest-contestant
           v-bind:contest="contest"
           v-bind:data="users"
@@ -143,8 +143,8 @@
           "
         ></omegaup-common-requests>
         <omegaup-contest-groups
-          v-bind:data="groups"
           v-if="isIdentitiesExperimentEnabled"
+          v-bind:data="groups"
           v-on:emit-add-group="
             (groupsComponent) => $emit('add-group', groupsComponent)
           "
@@ -153,7 +153,7 @@
           "
         ></omegaup-contest-groups>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'admins'">
+      <div v-if="showTab === 'admins'" class="tab-pane active">
         <omegaup-contest-admins
           v-bind:initial-admins="admins"
           v-bind:has-parent-component="true"
@@ -177,10 +177,10 @@
           "
         ></omegaup-contest-group-admins>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'links'">
+      <div v-if="showTab === 'links'" class="tab-pane active">
         <omegaup-contest-links v-bind:data="contest"></omegaup-contest-links>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'clone'">
+      <div v-if="showTab === 'clone'" class="tab-pane active">
         <omegaup-contest-clone
           v-on:emit-clone="
             (cloneComponent) => $emit('clone-contest', cloneComponent)

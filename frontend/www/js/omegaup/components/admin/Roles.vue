@@ -10,8 +10,8 @@
           <tr v-for="role in roles">
             <td>
               <input
-                type="checkbox"
                 v-model="role.value"
+                type="checkbox"
                 v-on:change.prevent="onChangeRole($event, role)"
               />
             </td>
@@ -26,8 +26,8 @@
           <tr v-for="group in groups">
             <td>
               <input
-                type="checkbox"
                 v-model="group.value"
+                type="checkbox"
                 v-on:change.prevent="onChangeGroup($event, group)"
               />
             </td>

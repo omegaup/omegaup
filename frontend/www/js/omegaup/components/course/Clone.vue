@@ -8,7 +8,7 @@
         <div class="form-group col-md-6">
           <label
             >{{ T.wordsName }}
-            <input class="form-control" type="text" v-model="name"
+            <input v-model="name" class="form-control" type="text"
           /></label>
         </div>
         <div class="form-group col-md-3">
@@ -17,7 +17,7 @@
             <font-awesome-icon
               v-bind:title="T.courseNewFormShortTitle_alias_Desc"
               icon="info-circle" />
-            <input class="form-control" type="text" v-model="alias"
+            <input v-model="alias" class="form-control" type="text"
           /></label>
         </div>
         <div class="form-group col-md-3">

@@ -16,18 +16,18 @@
         <a class="navbar-brand" href="/"
           ><img alt="omegaUp" src="/media/omegaup_curves.png" />
           <img
+            v-show="omegaUpLockDown"
             alt="lockdown"
             title="lockdown"
             v-bind:src="lockDownImage"
-            v-show="omegaUpLockDown"
         /></a>
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
-        <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
+        <ul v-if="!omegaUpLockDown && !inContest" class="nav navbar-nav">
           <li
+            v-if="isLoggedIn"
             class="dropdown nav-contests"
             v-bind:class="{ active: navbarSection === 'contests' }"
-            v-if="isLoggedIn"
           >
             <a
               class="dropdown-toggle"
@@ -57,13 +57,13 @@
               </template>
             </ul>
           </li>
-          <li v-bind:class="{ active: navbarSection === 'contests' }" v-else>
+          <li v-else v-bind:class="{ active: navbarSection === 'contests' }">
             <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
           </li>
           <li
+            v-if="isLoggedIn"
             class="dropdown nav-courses"
             v-bind:class="{ active: navbarSection === 'courses' }"
-            v-if="isLoggedIn"
           >
             <a class="dropdown-toogle" data-toggle="dropdown" data-nav-courses
               ><span>{{ T.navCourses }}</span
@@ -84,7 +84,7 @@
               </template>
             </ul>
           </li>
-          <li v-bind:class="{ active: navbarSection === 'courses' }" v-else>
+          <li v-else v-bind:class="{ active: navbarSection === 'courses' }">
             <a href="/course/">{{ T.navCourses }}</a>
           </li>
           <li
@@ -167,17 +167,17 @@
             </ul>
           </li>
         </ul>
-        <ul class="nav navbar-nav" v-else></ul>
+        <ul v-else class="nav navbar-nav"></ul>
         <!-- in lockdown or contest mode there is no left navbar -->
-        <ul class="nav navbar-nav navbar-right" v-if="!isLoggedIn">
+        <ul v-if="!isLoggedIn" class="nav navbar-nav navbar-right">
           <li>
             <a v-bind:href="formattedLoginURL">{{ T.navLogIn }}</a>
           </li>
         </ul>
-        <ul class="nav navbar-nav navbar-right" v-else>
+        <ul v-else class="nav navbar-nav navbar-right">
           <omegaup-notifications-clarifications
-            v-bind:initialClarifications="initialClarifications"
             v-if="inContest"
+            v-bind:initialClarifications="initialClarifications"
           ></omegaup-notifications-clarifications>
           <li
             class="dropdown nav-user"

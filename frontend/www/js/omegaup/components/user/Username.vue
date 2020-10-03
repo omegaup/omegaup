@@ -1,23 +1,23 @@
 <template>
   <span v-bind:class="classname" v-bind:title="username">
     <omegaup-countryflag
-      v-bind:country="country"
       v-if="country != null"
+      v-bind:country="country"
     ></omegaup-countryflag>
 
     <template v-if="linkify">
       <a
+        v-if="!!$listeners['emit-click']"
         href="#"
         v-bind:class="classname"
         v-bind:title="username"
-        v-if="!!$listeners['emit-click']"
         v-on:click="$emit('emit-click', username)"
         >{{ name || username }}</a
       >
       <a
+        v-else
         v-bind:class="classname"
         v-bind:title="username"
-        v-else
         v-bind:href="`/profile/${username}/`"
         >{{ name || username }}</a
       >

@@ -9,7 +9,7 @@
     <div class="my-4 markdown">
       <omegaup-markdown v-bind:markdown="course.description"></omegaup-markdown>
     </div>
-    <div class="mb-5" v-if="course.is_admin">
+    <div v-if="course.is_admin" class="mb-5">
       <span>{{
         ui.formatString(T.courseStudentCountLabel, {
           student_count: course.student_count,
@@ -82,7 +82,7 @@
         </div>
       </div>
     </div>
-    <div class="text-center align-middle" v-else>
+    <div v-else class="text-center align-middle">
       <span>
         {{ T.overallCompletedPercentage }}:
         <progress
@@ -100,11 +100,11 @@
             <tr>
               <th class="text-center" scope="col">{{ T.wordsContentType }}</th>
               <th class="text-center" scope="col">{{ T.wordsName }}</th>
-              <th class="text-center" scope="col" v-if="!course.is_admin">
+              <th v-if="!course.is_admin" class="text-center" scope="col">
                 {{ T.wordsCompletedPercentage }}
               </th>
               <th class="text-center" scope="col">{{ T.wordsDueDate }}</th>
-              <th class="text-center" scope="col" v-if="course.is_admin">
+              <th v-if="course.is_admin" class="text-center" scope="col">
                 {{ T.wordsActions }}
               </th>
             </tr>
@@ -116,9 +116,9 @@
               </td>
             </tr>
             <tr
+              v-for="assignment in course.assignments"
               v-else
               v-bind:key="assignment.alias"
-              v-for="assignment in course.assignments"
               v-bind:data-content-alias="assignment.alias"
             >
               <td class="text-center">
@@ -145,13 +145,13 @@
                   {{ assignment.name }}
                 </a>
               </td>
-              <td class="text-center" v-if="!course.is_admin">
+              <td v-if="!course.is_admin" class="text-center">
                 {{ getAssignmentProgress(progress[assignment.alias]) }}
               </td>
               <td class="text-center">
                 {{ getFormattedTime(assignment.finish_time) }}
               </td>
-              <td class="text-center" v-if="course.is_admin">
+              <td v-if="course.is_admin" class="text-center">
                 <a
                   class="mr-2"
                   v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
@@ -182,9 +182,9 @@
     </div>
 
     <div
+      v-if="course.admission_mode === 'public'"
       class="accordion"
       data-accordion-clone
-      v-if="course.admission_mode === 'public'"
     >
       <div class="card">
         <div class="card-header" data-heading-clone>

@@ -4,7 +4,7 @@
       <div class="form-row mb-3">
         <label class="col-form-label">{{ T.wordsSearchBy }}</label>
         <div class="col-md-4">
-          <select name="column" class="form-control" v-model="selectColumn">
+          <select v-model="selectColumn" name="column" class="form-control">
             <option
               v-for="(columnText, columnIndex) in columns"
               v-bind:value="columnIndex"
@@ -15,21 +15,21 @@
         </div>
         <div class="col-md-4">
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.problemTypeahead(el)"
+            v-show="selectColumn == 'problem_alias'"
             v-model="queryProblem"
+            v-bind:init="(el) => typeahead.problemTypeahead(el)"
             v-bind:placeholder="T.wordsKeyword"
             class="form-control"
-            v-show="selectColumn == 'problem_alias'"
           ></omegaup-autocomplete>
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
-            v-model="queryUsername"
-            v-bind:placeholder="T.wordsKeyword"
-            class="form-control"
             v-show="
               selectColumn == 'nominator_username' ||
               selectColumn == 'author_username'
             "
+            v-model="queryUsername"
+            v-bind:init="(el) => typeahead.userTypeahead(el)"
+            v-bind:placeholder="T.wordsKeyword"
+            class="form-control"
           ></omegaup-autocomplete>
         </div>
       </div>
@@ -55,11 +55,11 @@
         <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
           {{ T.addUsersToReviewerGroup }}
         </a>
-        <div class="pull-right" v-if="!myView">
+        <div v-if="!myView" class="pull-right">
           <label>
             <input
-              type="checkbox"
               v-model="showAll"
+              type="checkbox"
               v-on:change="
                 $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
               "

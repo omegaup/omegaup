@@ -1,47 +1,47 @@
 <template>
   <div class="card">
-    <h5 class="card-header" v-if="title">
+    <h5 v-if="title" class="card-header">
       {{ title }} <span class="badge badge-secondary">{{ items.length }}</span>
     </h5>
-    <div class="card-body text-center" v-if="sortOptions.length > 0">
+    <div v-if="sortOptions.length > 0" class="card-body text-center">
       <div class="form-check form-check-inline">
         <label
-          v-bind:key="index"
           v-for="(sortOption, index) in sortOptions"
+          v-bind:key="index"
           class="form-check-label mr-4"
         >
           <input
+            v-model="currentSortOption"
             class="form-check-input m-0"
             name="sort-selector"
             type="radio"
             v-bind:value="sortOption.value"
-            v-model="currentSortOption"
           />
           {{ sortOption.title }}
         </label>
       </div>
     </div>
-    <table class="table table-striped mb-0" v-if="items.length > 0">
+    <table v-if="items.length > 0" class="table table-striped mb-0">
       <slot name="table-header"></slot>
       <tbody>
-        <tr v-bind:key="index" v-for="(group, index) in paginatedItems">
-          <th scope="row" v-if="showPageOffset" class="text-center">
+        <tr v-for="(group, index) in paginatedItems" v-bind:key="index">
+          <th v-if="showPageOffset" scope="row" class="text-center">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </th>
-          <td v-bind:key="itemIndex" v-for="(item, itemIndex) in group">
+          <td v-for="(item, itemIndex) in group" v-bind:key="itemIndex">
             <slot name="item-data" v-bind:item="item">
               <a v-bind:href="item.getUrl()">
                 {{ item.toString() }}
               </a>
             </slot>
           </td>
-          <td class="text-right" v-if="!group[0].getBadge().isEmpty()">
+          <td v-if="!group[0].getBadge().isEmpty()" class="text-right">
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="card-footer text-center" v-if="items.length > 0">
+    <div v-if="items.length > 0" class="card-footer text-center">
       <div class="btn-group" role="group">
         <button
           class="btn btn-primary"

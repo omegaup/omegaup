@@ -2,10 +2,10 @@
   <div class="card-body tab-container">
     <ul class="nav nav-tabs">
       <li
-        class="nav-item"
-        v-if="filteredCourses.courses"
-        v-on:click="showTab = filteredCourses.timeType"
         v-for="filteredCourses in courses.filteredCourses"
+        v-if="filteredCourses.courses"
+        class="nav-item"
+        v-on:click="showTab = filteredCourses.timeType"
       >
         <a
           data-toggle="tab"
@@ -19,9 +19,9 @@
 
     <div class="tab-content">
       <div
-        class="tab-pane active"
-        v-if="showTab === filteredCourses.timeType"
         v-for="filteredCourses in courses.filteredCourses"
+        v-if="showTab === filteredCourses.timeType"
+        class="tab-pane active"
       >
         <div class="panel">
           <div class="panel-body">
@@ -35,7 +35,7 @@
                   <th>{{ T.wordsDueDate }}</th>
                   <th>{{ T.wordsNumHomeworks }}</th>
                   <th>{{ T.wordsNumTests }}</th>
-                  <th colspan="3" v-if="courses.accessMode === 'admin'">
+                  <th v-if="courses.accessMode === 'admin'" colspan="3">
                     {{ T.wordsActions }}
                   </th>
                 </tr>

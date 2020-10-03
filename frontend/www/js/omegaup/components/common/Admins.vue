@@ -10,9 +10,9 @@
               icon="info-circle"
             />
             <omegaup-autocomplete
+              v-model="username"
               class="form-control"
               v-bind:init="(el) => typeahead.userTypeahead(el)"
-              v-model="username"
             ></omegaup-autocomplete>
           </label>
         </div>
@@ -25,9 +25,9 @@
           <div class="toggle-container col-md-6">
             <label class="font-weight-bold">
               <input
+                v-model="showSiteAdmins"
                 type="checkbox"
                 name="toggle-site-admins"
-                v-model="showSiteAdmins"
               />
               {{ T.wordsShowSiteAdmins }}
             </label>
@@ -40,7 +40,7 @@
         {{ T.courseEditAdminsEmpty }}
       </div>
     </div>
-    <table class="table table-striped" v-else>
+    <table v-else class="table table-striped">
       <thead>
         <tr>
           <th>{{ T.contestEditRegisteredAdminUsername }}</th>
@@ -62,9 +62,9 @@
           <td>{{ admin.role }}</td>
           <td>
             <button
+              v-if="admin.role === 'admin'"
               type="button"
               class="close"
-              v-if="admin.role === 'admin'"
               v-on:click="onRemove(admin)"
             >
               &times;

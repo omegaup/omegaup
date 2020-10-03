@@ -6,8 +6,8 @@
           <div class="form-group col-md-6">
             <label>{{ T.wordsProblem }}</label>
             <omegaup-autocomplete
-              v-bind:init="(el) => typeahead.problemTypeahead(el)"
               v-model="alias"
+              v-bind:init="(el) => typeahead.problemTypeahead(el)"
             ></omegaup-autocomplete>
           </div>
           <div class="form-group col-md-6">
@@ -18,10 +18,10 @@
               <div class="form-check form-check-inline">
                 <label class="form-check-label">
                   <input
+                    v-model="useLatestVersion"
                     class="form-check-input"
                     type="radio"
                     name="use-latest-version"
-                    v-model="useLatestVersion"
                     v-bind:value="true"
                   />
                   {{ T.contestAddproblemLatestVersion }}
@@ -30,10 +30,10 @@
               <div class="form-check form-check-inline">
                 <label class="form-check-label">
                   <input
+                    v-model="useLatestVersion"
                     class="form-check-input"
                     type="radio"
                     name="use-latest-version"
-                    v-model="useLatestVersion"
                     v-bind:value="false"
                   />
                   {{ T.contestAddproblemOtherVersion }}
@@ -46,23 +46,23 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestAddproblemProblemPoints }}</label>
             <input
+              v-model="points"
               class="form-control problem-points"
               size="3"
-              v-model="points"
             />
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestAddproblemContestOrder }}</label>
             <input
+              v-model="order"
               class="form-control"
               max="100"
               size="2"
               type="number"
-              v-model="order"
             />
           </div>
         </div>
-        <div class="form-group" v-show="!useLatestVersion">
+        <div v-show="!useLatestVersion" class="form-group">
           <button
             class="btn btn-primary get-versions"
             type="submit"
@@ -76,19 +76,19 @@
           </small>
         </div>
         <omegaup-problem-versions
+          v-show="!useLatestVersion"
+          v-model="selectedRevision"
           v-bind:log="versionLog"
           v-bind:published-revision="publishedRevision"
           v-bind:show-footer="false"
-          v-model="selectedRevision"
           v-on:runs-diff="onRunsDiff"
-          v-show="!useLatestVersion"
         ></omegaup-problem-versions>
         <div class="form-group">
           <button
             class="btn btn-primary add-problem"
             type="submit"
-            v-on:click.prevent="onAddProblem"
             v-bind:disabled="addProblemButtonDisabled"
+            v-on:click.prevent="onAddProblem"
           >
             {{ addProblemButtonLabel }}
           </button>
@@ -106,7 +106,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="problem.alias" v-for="problem in problems">
+        <tr v-for="problem in problems" v-bind:key="problem.alias">
           <td>
             <button
               class="btn btn-default"

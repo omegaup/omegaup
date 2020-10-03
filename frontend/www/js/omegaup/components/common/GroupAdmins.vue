@@ -26,7 +26,7 @@
         {{ T.courseEditGroupAdminsEmpty }}
       </div>
     </div>
-    <table class="table table-striped" v-else>
+    <table v-else class="table table-striped">
       <thead>
         <tr>
           <th>{{ T.contestEditRegisteredGroupAdminName }}</th>
@@ -44,9 +44,9 @@
           <td>{{ groupAdmin.role }}</td>
           <td>
             <button
+              v-if="groupAdmin.name !== 'admin'"
               class="close"
               type="button"
-              v-if="groupAdmin.name !== 'admin'"
               v-on:click="onRemove(groupAdmin)"
             >
               &times;

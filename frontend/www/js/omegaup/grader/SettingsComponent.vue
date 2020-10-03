@@ -5,13 +5,13 @@
         <label for="inputTimeLimit">Time Limit</label>
         <!-- id-lint off -->
         <input
-          class="form-control"
           id="inputTimeLimit"
+          v-model="timeLimit"
+          class="form-control"
           max="5.0"
           min="0.1"
           step="0.1"
           type="number"
-          v-model="timeLimit"
         />
         <!-- id-lint on -->
       </div>
@@ -19,13 +19,13 @@
         <label for="inputOverallWallTimeLimit">Overall Wall Time Limit</label>
         <!-- id-lint off -->
         <input
-          class="form-control"
           id="inputOverallWallTimeLimit"
+          v-model="overallWallTimeLimit"
+          class="form-control"
           max="5.0"
           min="0.1"
           step="0.1"
           type="number"
-          v-model="overallWallTimeLimit"
         />
         <!-- id-lint on -->
       </div>
@@ -33,13 +33,13 @@
         <label for="inputExtraWallTime">Extra Wall Time</label>
         <!-- id-lint off -->
         <input
-          class="form-control"
           id="inputExtraWallTime"
+          v-model="extraWallTime"
+          class="form-control"
           max="5.0"
           min="0.0"
           step="0.1"
           type="number"
-          v-model="extraWallTime"
         />
         <!-- id-lint on -->
       </div>
@@ -49,13 +49,13 @@
         <label for="inputMemoryLimit">Memory Limit</label>
         <!-- id-lint off -->
         <input
-          class="form-control"
           id="inputMemoryLimit"
+          v-model="memoryLimit"
+          class="form-control"
           max="1073741824"
           min="33554432"
           step="1048576"
           type="number"
-          v-model="memoryLimit"
         />
         <!-- id-lint on -->
       </div>
@@ -63,13 +63,13 @@
         <label for="inputOutputLimit">Output Limit</label>
         <!-- id-lint off -->
         <input
-          class="form-control"
           id="inputOutputLimit"
+          v-model="outputLimit"
+          class="form-control"
           max="104857600"
           min="0"
           step="1024"
           type="number"
-          v-model="outputLimit"
         />
         <!-- id-lint on -->
       </div>
@@ -78,7 +78,7 @@
       <div class="form-group col-md-6">
         <label for="inputValidator">Validator</label>
         <!-- id-lint off -->
-        <select class="form-control" id="inputValidator" v-model="validator">
+        <select id="inputValidator" v-model="validator" class="form-control">
           <!-- id-lint on -->
           <option value="custom">Custom</option>
           <option value="literal">Literal</option>
@@ -87,26 +87,26 @@
           <option value="token-numeric">Token (Numeric)</option>
         </select>
       </div>
-      <div class="form-group col-md-6" v-if="validator == 'token-numeric'">
+      <div v-if="validator == 'token-numeric'" class="form-group col-md-6">
         <label for="inputTolerance">Tolerance</label>
         <!-- id-lint off -->
         <input
-          class="form-control"
           id="inputTolerance"
+          v-model="tolerance"
+          class="form-control"
           max="1"
           min="0"
           type="number"
-          v-model="tolerance"
         />
         <!-- id-lint on -->
       </div>
-      <div class="form-group col-md-6" v-if="validator == 'custom'">
+      <div v-if="validator == 'custom'" class="form-group col-md-6">
         <label for="inputValidatorLanguage">Language</label>
         <!-- id-lint off -->
         <select
-          class="form-control"
           id="inputValidatorLanguage"
           v-model="validatorLanguage"
+          class="form-control"
         >
           <!-- id-lint on -->
           <option value="cpp17-gcc">C++17</option>
@@ -119,32 +119,32 @@
         <label for="inputInteractive">Interactive</label>
         <!-- id-lint off -->
         <select
-          class="form-control"
           id="inputInteractive"
           v-model="interactive"
+          class="form-control"
         >
           <!-- id-lint on -->
           <option v-bind:value="false">No</option>
           <option v-bind:value="true">Yes</option>
         </select>
       </div>
-      <div class="form-group col-md-4" v-if="interactive">
+      <div v-if="interactive" class="form-group col-md-4">
         <label for="inputInteractiveModuleName">Module Name</label>
         <!-- id-lint off -->
         <input
-          class="form-control"
           id="inputInteractiveModuleName"
           v-model="interactiveModuleName"
+          class="form-control"
         />
         <!-- id-lint on -->
       </div>
-      <div class="form-group col-md-4" v-if="interactive">
+      <div v-if="interactive" class="form-group col-md-4">
         <label for="inputInteractiveLanguage">Language</label>
         <!-- id-lint off -->
         <select
-          class="form-control"
           id="inputInteractiveLanguage"
           v-model="interactiveLanguage"
+          class="form-control"
         >
           <!-- id-lint on -->
           <option value="cpp17-gcc">C++17</option>

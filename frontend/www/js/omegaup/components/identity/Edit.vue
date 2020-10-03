@@ -22,11 +22,11 @@
               <div class="input-group">
                 <span class="input-group-addon">{{ groupName }}:</span>
                 <input
+                  v-model="identityName"
                   class="form-control"
                   name="username"
                   size="30"
                   type="text"
-                  v-model="identityName"
                 />
               </div>
             </div>
@@ -37,11 +37,11 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="identity.name"
                 class="form-control"
                 name="name"
                 size="30"
                 type="text"
-                v-model="identity.name"
               />
             </div>
           </div>
@@ -51,13 +51,13 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <select
+                v-model="selectedCountry"
                 class="form-control"
                 name="countryId"
-                v-model="selectedCountry"
               >
                 <option
-                  v-bind:value="country.country_id"
                   v-for="country in countries"
+                  v-bind:value="country.country_id"
                 >
                   {{ country.name }}
                 </option>
@@ -70,13 +70,13 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <select
+                v-model="selectedState"
                 class="form-control"
                 name="stateId"
-                v-model="selectedState"
               >
                 <option
-                  v-bind:value="code.split('-')[1]"
                   v-for="[code, state] in Object.entries(countryStates)"
+                  v-bind:value="code.split('-')[1]"
                 >
                   {{ state.name }}
                 </option>
@@ -89,11 +89,11 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="identity.school"
                 class="form-control"
                 name="school"
                 size="20"
                 type="text"
-                v-model="identity.school"
               />
             </div>
             <input

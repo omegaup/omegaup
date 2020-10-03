@@ -17,13 +17,13 @@
             />
             <div class="input-group-append">
               <button
+                v-clipboard="() => cloneCourseURL"
                 class="btn btn-outline-secondary"
                 type="button"
-                v-on:click="copiedToClipboard = true"
-                v-clipboard="() => cloneCourseURL"
                 v-bind:disabled="!cloneCourseURL"
                 v-bind:title="T.wordsCopyToClipboard"
                 data-copy-to-clipboard
+                v-on:click="copiedToClipboard = true"
               >
                 <font-awesome-icon icon="clipboard" />
               </button>

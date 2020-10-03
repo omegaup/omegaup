@@ -52,9 +52,9 @@
           <th scope="col" class="text-center">{{ T.wordsCountryRegion }}</th>
           <th scope="col" class="text-center">{{ T.wordsSchool }}</th>
           <th
+            v-if="selectedTab === 'allSchoolsOfTheMonth'"
             scope="col"
             class="text-center"
-            v-if="selectedTab === 'allSchoolsOfTheMonth'"
           >
             {{ T.wordsDate }}
           </th>
@@ -62,14 +62,14 @@
             <th scope="col" class="text-right">
               {{ T.rankScore }}
             </th>
-            <th scope="col" class="text-center" v-if="isMentor">
+            <th v-if="isMentor" scope="col" class="text-center">
               {{ T.wordsActions }}
             </th>
           </template>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(school, index) in visibleSchools">
+        <tr v-for="(school, index) in visibleSchools" v-bind:key="index">
           <td class="text-center">
             <omegaup-country-flag
               v-bind:country="school.country_id"
@@ -80,17 +80,17 @@
               school.name
             }}</a>
           </td>
-          <td class="text-center" v-if="selectedTab === 'allSchoolsOfTheMonth'">
+          <td v-if="selectedTab === 'allSchoolsOfTheMonth'" class="text-center">
             {{ school.time }}
           </td>
           <template v-else-if="selectedTab === 'candidatesToSchoolOfTheMonth'">
             <td class="text-right">
               {{ school.score }}
             </td>
-            <td class="text-center" v-if="isMentor">
+            <td v-if="isMentor" class="text-center">
               <button
-                class="btn btn-sm btn-primary"
                 v-if="canChooseSchool && !schoolIsSelected"
+                class="btn btn-sm btn-primary"
                 v-on:click="$emit('select-school', school.school_id)"
               >
                 {{ T.schoolOfTheMonthChooseAsSchool }}

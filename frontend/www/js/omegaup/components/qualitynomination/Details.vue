@@ -73,16 +73,16 @@
             }"
           >
             <textarea
+              v-model="rationale"
               class="form-control"
               name="rationale"
               type="text"
-              v-model="rationale"
             ></textarea>
           </div>
         </div>
         <div
-          class="row"
           v-if="this.nomination == 'demotion' && this.reviewer == true"
+          class="row"
         >
           <div class="col-sm-3">
             <strong>{{ T.wordsVerdict }}</strong>

@@ -11,9 +11,9 @@
     </div>
     <div class="container">
       <div
-        class="row"
         v-for="(typeCourses, accessMode) in courses"
         v-if="typeCourses.activeTab !== ''"
+        class="row"
       >
         <div class="col-lg-5 p-3 d-flex" v-bind:class="accessMode">
           <h3 class="flex-grow-1">{{ getDescription(accessMode) }}</h3>

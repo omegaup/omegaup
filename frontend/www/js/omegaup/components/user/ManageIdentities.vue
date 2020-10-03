@@ -18,21 +18,21 @@
             v-bind:title="T.profileAddIdentitiesTooltip"
           ></span>
           <input
+            v-model="username"
             autocomplete="off"
             class="form-control username-input"
             size="20"
             type="text"
-            v-model="username"
           />
         </div>
         <div class="form-group">
           <label>{{ T.loginPassword }}</label>
           <input
+            v-model="password"
             autocomplete="off"
             class="form-control password-input"
             size="20"
             type="password"
-            v-model="password"
           />
         </div>
         <div class="form-group pull-right">
@@ -46,7 +46,7 @@
           {{ T.profileIdentitiesEmpty }}
         </div>
       </div>
-      <table class="table table-striped table-over" v-else>
+      <table v-else class="table table-striped table-over">
         <thead>
           <tr>
             <th>{{ T.wordsIdentity }}</th>

@@ -10,18 +10,18 @@
       <div class="container-fluid">
         <div class="row">
           <omegaup-badge
-            v-bind:badge="badge"
-            v-bind:key="idx"
             v-for="(badge, idx) in badges"
+            v-bind:key="idx"
+            v-bind:badge="badge"
           ></omegaup-badge>
         </div>
       </div>
     </div>
-    <div class="card-footer panel-footer" v-if="this.showAllBadgesLink">
+    <div v-if="this.showAllBadgesLink" class="card-footer panel-footer">
       <a
+        v-if="this.showAllBadgesLink"
         class="badges-link"
         href="/badge/list/"
-        v-if="this.showAllBadgesLink"
         >{{ T.wordsBadgesSeeAll }}</a
       >
     </div>

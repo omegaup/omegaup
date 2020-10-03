@@ -6,7 +6,7 @@
     </h2>
     <div class="row mb-4">
       <div class="col-md-4">
-        <ul class="list-group mb-3" v-if="country">
+        <ul v-if="country" class="list-group mb-3">
           <li class="list-group-item">
             <strong>{{ T.wordsCountry }}:</strong>
             {{ country.name }}
@@ -14,7 +14,7 @@
               v-bind:country="country.id"
             ></omegaup-country-flag>
           </li>
-          <li class="list-group-item" v-if="stateName">
+          <li v-if="stateName" class="list-group-item">
             <strong>{{ T.profileState }}:</strong> {{ stateName }}
           </li>
         </ul>

@@ -16,7 +16,7 @@
     </div>
     <hr class="ml-3 mr-3" />
     <div class="m-3">
-      <div class="float-right" v-if="progress > 0">
+      <div v-if="progress > 0" class="float-right">
         {{ T.wordsProgress }}:
         <progress
           v-bind:title="`${progress}%`"
@@ -24,7 +24,7 @@
           max="100"
         ></progress>
       </div>
-      <div class="float-left align-middle" v-if="showTopics">
+      <div v-if="showTopics" class="float-left align-middle">
         <details>
           <summary>{{ T.courseCardShowTopics }}</summary>
           <ul>

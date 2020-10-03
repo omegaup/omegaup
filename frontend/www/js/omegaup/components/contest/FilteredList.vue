@@ -12,7 +12,7 @@
             <th v-if="showTimes">{{ T.wordsStartTime }}</th>
             <th v-if="showTimes">{{ T.wordsEndTime }}</th>
             <th v-if="showTimes">{{ T.wordsDuration }}</th>
-            <th colspan="2" v-if="showPractice"></th>
+            <th v-if="showPractice" colspan="2"></th>
             <th v-if="showVirtual"></th>
             <th v-if="showPublicUpdated">
               {{ T.wordsPublicUpdated }}
@@ -26,9 +26,9 @@
                 <a v-bind:href="`/arena/${contest.alias}/`">
                   <span>{{ ui.contestTitle(contest) }}</span>
                   <span
+                    v-if="contest.recommended"
                     class="glyphicon glyphicon-ok"
                     aria-hidden="true"
-                    v-if="contest.recommended"
                   ></span>
                 </a>
               </td>
@@ -74,11 +74,11 @@
         <tfoot>
           <tr v-if="hasNext || hasPrevious" align="center">
             <td class="no-wrap" v-bind:colspan="pagerColumns">
-              <a v-if="hasPrevious" v-on:click="previous" href="#">{{
+              <a v-if="hasPrevious" href="#" v-on:click="previous">{{
                 T.wordsPrevPage
               }}</a>
               <span class="page-num">{{ pageNumber }}</span>
-              <a v-if="hasNext" v-on:click="next" href="#">{{
+              <a v-if="hasNext" href="#" v-on:click="next">{{
                 T.wordsNextPage
               }}</a>
             </td>

@@ -25,7 +25,6 @@ module.exports = {
     'no-prototype-builtins': 'off',
     'no-undef': 'off',
     'vue/attribute-hyphenation': 'off',
-    'vue/attributes-order': 'off',
     'vue/component-tags-order': 'off',
     'vue/custom-event-name-casing': 'off',
     'vue/no-deprecated-dollar-listeners-api': 'off',

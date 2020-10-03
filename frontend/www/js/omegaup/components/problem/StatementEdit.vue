@@ -1,14 +1,14 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="row" v-if="showEditControls">
+      <div v-if="showEditControls" class="row">
         <div class="form-group col-md-6">
           <label class="font-weight-bold">{{ T.statementLanguage }}</label>
-          <select class="form-control" v-model="currentLanguage">
+          <select v-model="currentLanguage" class="form-control">
             <option
+              v-for="language in languages"
               v-bind:markdown-contents="currentMarkdown"
               v-bind:value="language"
-              v-for="language in languages"
             >
               {{ getLanguageNameText(language) }}
             </option>
@@ -19,16 +19,16 @@
           v-bind:class="{ 'has-error': errors.includes('message') }"
         >
           <label class="control-label">{{ T.problemEditCommitMessage }}</label>
-          <input class="form-control" v-model="commitMessage" />
+          <input v-model="commitMessage" class="form-control" />
         </div>
       </div>
       <div class="row">
         <div class="col-md-6">
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
-            class="wmd-input"
             ref="markdownInput"
             v-model="currentMarkdown"
+            class="wmd-input"
           ></textarea>
         </div>
         <div class="col-md-6">
@@ -63,7 +63,7 @@
         </div>
       </div>
     </div>
-    <div class="card-footer" v-if="showEditControls">
+    <div v-if="showEditControls" class="card-footer">
       <form
         class="row"
         enctype="multipart/form-data"

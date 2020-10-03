@@ -1,8 +1,8 @@
 <template>
   <div class="mb-3">
     <form action="/problem/" method="GET" class="form-inline">
-      <div class="form-group mr-2" v-if="tags.length !== 0">
-        <div class="mr-1" v-for="tag in tags">
+      <div v-if="tags.length !== 0" class="form-group mr-2">
+        <div v-for="tag in tags" class="mr-1">
           <input type="hidden" name="tag[]" v-bind:value="tag" />
           <span class="badge badge-secondary m-1 p-2">{{
             T[tag] ? T[tag] : tag
@@ -14,9 +14,9 @@
       </div>
       <div class="form-group mr-2 mt-1">
         <omegaup-autocomplete
+          v-model="keyword"
           class="form-control"
           v-bind:init="(el) => typeahead.problemTypeahead(el)"
-          v-model="keyword"
           v-bind:placeholder="T.wordsKeywordSearch"
           name="query"
         ></omegaup-autocomplete>
@@ -24,7 +24,7 @@
       <div class="form-group mr-2 mt-1">
         <label>
           {{ T.wordsFilterByLanguage }}
-          <select name="language" class="ml-1 form-control" v-model="language">
+          <select v-model="language" name="language" class="ml-1 form-control">
             <option v-for="language in languages" v-bind:value="language">
               {{ getLanguageText(language) }}
             </option>

@@ -1,5 +1,6 @@
 <template>
   <input
+    v-model="stringValue"
     class="form-control"
     v-bind:class="{ 'is-invalid': isInvalid }"
     required="required"
@@ -9,7 +10,6 @@
     v-bind:max="finish ? time.formatDateTimeLocal(finish) : null"
     v-bind:min="start ? time.formatDateTimeLocal(start) : null"
     v-bind:readonly="readonly || usedFallback"
-    v-model="stringValue"
   />
 </template>
 

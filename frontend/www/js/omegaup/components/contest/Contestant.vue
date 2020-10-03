@@ -6,8 +6,8 @@
           <div class="form-group">
             <label>{{ T.wordsUser }}</label>
             <omegaup-autocomplete
-              v-bind:init="(el) => typeahead.userTypeahead(el)"
               v-model="contestant"
+              v-bind:init="(el) => typeahead.userTypeahead(el)"
             ></omegaup-autocomplete>
           </div>
           <button class="btn btn-primary user-add-single" type="submit">
@@ -17,9 +17,9 @@
           <div class="form-group">
             <label>{{ T.wordsMultipleUser }}</label>
             <textarea
+              v-model="contestants"
               class="form-control contestants"
               rows="4"
-              v-model="contestants"
             ></textarea>
           </div>
           <button class="btn btn-primary user-add-bulk" type="submit">
@@ -52,12 +52,12 @@
               </template>
             </td>
             <td v-if="contest.window_length !== null">
-              <div class="row" v-if="user.end_time">
+              <div v-if="user.end_time" class="row">
                 <div class="col-xs-10">
                   <omegaup-datetimepicker
+                    v-model="user.end_time"
                     v-bind:finish="contest.finish_time"
                     v-bind:start="contest.start_time"
-                    v-model="user.end_time"
                   ></omegaup-datetimepicker>
                 </div>
                 <div class="col-xs-2">

@@ -26,15 +26,15 @@
           {{ T.reviewerNominationCategory }}
           <ul class="tag-select">
             <li
-              class="tag-select"
               v-for="problemTopic in slotProps.sortedProblemTags"
               v-bind:key="problemTopic.value"
+              class="tag-select"
             >
               <label class="tag-select"
                 ><input
+                  v-model="tag"
                   type="radio"
                   v-bind:value="problemTopic.value"
-                  v-model="tag"
                 />
                 {{ problemTopic.text }}</label
               >

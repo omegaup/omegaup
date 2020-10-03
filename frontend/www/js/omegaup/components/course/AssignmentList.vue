@@ -4,12 +4,12 @@
       <h3>{{ T.wordsCourseContent }}</h3>
     </div>
     <div class="card-body">
-      <div class="card-body" v-if="content.length === 0">
+      <div v-if="content.length === 0" class="card-body">
         <div class="empty-table-message">
           {{ T.courseContentEmpty }}
         </div>
       </div>
-      <table class="table table-striped" v-else>
+      <table v-else class="table table-striped">
         <thead>
           <tr>
             <td></td>
@@ -19,7 +19,7 @@
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortContent }">
-          <tr v-bind:key="assignment.alias" v-for="assignment in content">
+          <tr v-for="assignment in content" v-bind:key="assignment.alias">
             <td>
               <button
                 class="btn btn-link"
@@ -63,14 +63,14 @@
                 <font-awesome-icon icon="list-alt" />
               </button>
               <font-awesome-icon
+                v-if="assignment.has_runs"
                 v-bind:title="T.assignmentRemoveAlreadyHasRuns"
                 icon="trash"
-                v-if="assignment.has_runs"
                 class="disabled"
               />
               <button
-                class="btn btn-link"
                 v-else
+                class="btn btn-link"
                 v-bind:title="T.courseAssignmentDelete"
                 v-on:click="$emit('emit-delete', assignment)"
               >
@@ -82,8 +82,8 @@
       </table>
       <div>
         <button
-          class="btn btn-primary"
           v-if="content.length > 1"
+          class="btn btn-primary"
           v-bind:class="{ disabled: !contentOrderChanged }"
           role="button"
           v-on:click="saveNewOrder"

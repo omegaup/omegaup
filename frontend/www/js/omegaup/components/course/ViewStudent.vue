@@ -9,11 +9,11 @@
       <form>
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectStudent }}</label>
-          <select class="ml-1 form-control" v-model="selectedStudent">
+          <select v-model="selectedStudent" class="ml-1 form-control">
             <option
-              v-bind:value="student"
               v-for="student in students"
               v-bind:key="student.username"
+              v-bind:value="student"
             >
               {{ student.name || student.username }}
             </option>
@@ -24,14 +24,14 @@
         <div class="form-group col-md-3">
           <label>{{ T.courseStudentSelectAssignment }}</label>
           <select
-            class="ml-1 form-control"
             v-model="selectedAssignment"
+            class="ml-1 form-control"
             data-assignment
           >
             <option
-              v-bind:value="assignment.alias"
               v-for="assignment in assignments"
               v-bind:key="assignment.alias"
+              v-bind:value="assignment.alias"
             >
               {{ assignment.name }}
             </option>
@@ -48,16 +48,16 @@
             <template v-if="points(selectedAssignment) === 0">
               {{ T.studentProgressOnlyLecturesDescription }}
             </template>
-            <ul class="nav nav-pills card-header-pills" v-else>
+            <ul v-else class="nav nav-pills card-header-pills">
               <li
+                v-for="problem in problemsWithPoints"
+                v-bind:key="problem.alias"
                 class="nav-item"
                 role="presentation"
                 v-bind:class="{
                   active:
                     selectedProblem && problem.alias === selectedProblem.alias,
                 }"
-                v-for="problem in problemsWithPoints"
-                v-bind:key="problem.alias"
               >
                 <a
                   aria-controls="home"

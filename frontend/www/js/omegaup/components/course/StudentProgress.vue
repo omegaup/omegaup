@@ -6,9 +6,9 @@
       </a>
     </td>
     <td
-      class="score flex-column justify-content-center align-items-center"
       v-for="assignment in assignments"
       v-bind:key="assignment.alias"
+      class="score flex-column justify-content-center align-items-center"
     >
       <omegaup-markdown
         v-bind:markdown="getProgressDescription(assignment.alias)"
@@ -23,14 +23,14 @@
           v-bind:class="{ invisible: points(assignment.alias) === 0 }"
         >
           <div
-            v-bind:key="index"
             v-for="(problem, index) in Object.keys(
               student.points[assignment.alias],
             )"
+            v-bind:key="index"
+            v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
             v-bind:class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
             data-placement="bottom"
-            v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
           ></div>
         </div>
       </div>
