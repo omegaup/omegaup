@@ -7,7 +7,6 @@ import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
 import * as time from '../time';
-import * as typeahead from '../typeahead';
 import * as ui from '../ui';
 import JSZip from 'jszip';
 import * as markdown from '../markdown';
@@ -18,13 +17,11 @@ import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue'
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import arena_RunSubmit from '../components/arena/RunSubmit.vue';
-import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
 import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
-import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 
 import ArenaAdmin from './admin_arena';
