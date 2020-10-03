@@ -14,9 +14,6 @@ OmegaUp.on('ready', () => {
   if (payload.statusSuccess) {
     ui.success(T.problemEditUpdatedSuccessfully);
   }
-  const statements: types.Statements = {
-    [payload.statement.language]: payload.statement.markdown,
-  };
   const solutions: types.Statements = {
     [payload.statement?.language || 'es']: payload.solution?.markdown || '',
   };
@@ -44,7 +41,7 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.alias,
               level_tag: levelTag,
             })
-              .then((response) => {
+              .then(() => {
                 ui.success(T.problemLevelUpdated);
                 this.problemLevel = levelTag;
               })
@@ -167,7 +164,7 @@ OmegaUp.on('ready', () => {
               allow_user_add_tags: allowTags,
               message: `${T.problemEditFormAllowUserAddTags}: ${allowTags}`,
             })
-              .then((response) => {
+              .then(() => {
                 ui.success(T.problemEditUpdatedSuccessfully);
               })
               .catch(ui.apiError);
@@ -225,7 +222,7 @@ OmegaUp.on('ready', () => {
               commit: selectedRevision.commit,
               update_published: updatePublished,
             })
-              .then((response) => {
+              .then(() => {
                 problemEdit.publishedRevision = selectedRevision;
                 ui.success(T.problemVersionUpdated);
               })
@@ -250,7 +247,7 @@ OmegaUp.on('ready', () => {
           },
           remove: (problemAlias: string) => {
             api.Problem.delete({ problem_alias: problemAlias })
-              .then((response) => {
+              .then(() => {
                 window.location.href = '/problem/mine/';
               })
               .catch(ui.apiError);

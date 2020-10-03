@@ -103,7 +103,7 @@ export default class CourseAdmissionMode extends Vue {
   }
 
   @Watch('copiedToClipboard')
-  onPropertyChanged(newValue: boolean): void {
+  onPropertyChanged(): void {
     setTimeout(() => (this.copiedToClipboard = false), 5000);
   }
 

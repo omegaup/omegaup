@@ -297,7 +297,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 import arena_DiffView from './DiffView.vue';

@@ -32,7 +32,7 @@ OmegaUp.on('ready', () => {
               token: token,
               start_time: startTime.getTime() / 1000,
             })
-              .then((data) => {
+              .then(() => {
                 ui.success(
                   ui.formatString(T.courseEditCourseClonedSuccessfully, {
                     course_alias: alias,

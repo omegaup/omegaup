@@ -137,7 +137,7 @@ export default class IdentityEdit extends Vue {
   T = T;
 
   @Watch('selectedCountry')
-  onPropertyChanged(newContry: string, oldCountry: string) {
+  onPropertyChanged(newContry: string) {
     if (this.identity.country_id == newContry) {
       this.selectedState = this.identity.state_id;
     } else {

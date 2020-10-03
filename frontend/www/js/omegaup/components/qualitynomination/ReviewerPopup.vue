@@ -64,11 +64,10 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import Popup from './Popup.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import T from '../../lang';
-import * as ui from '../../ui';
 
 @Component({
   components: {

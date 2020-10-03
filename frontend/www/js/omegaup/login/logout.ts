@@ -27,11 +27,13 @@ OmegaUp.on('ready', () => {
       (auth: gapi.auth2.GoogleAuth) => {
         auth.signOut()['then'](
           () => redirect(),
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           (error: Promise<string>) => {
             redirect();
           },
         );
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       (error: { error: string; details: string }) => {
         redirect();
       },

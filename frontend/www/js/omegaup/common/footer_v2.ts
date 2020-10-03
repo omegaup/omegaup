@@ -6,7 +6,7 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload();
 
-  const commonFooter = new Vue({
+  new Vue({
     el: '#common-footer',
     render: function (createElement) {
       return createElement('omegaup-common-footer', {

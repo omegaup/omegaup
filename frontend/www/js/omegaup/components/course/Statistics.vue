@@ -20,10 +20,9 @@
 
 <script lang="ts">
 import { Chart } from 'highcharts-vue';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as ui from '../../ui';
 
 const ORDERED_VERDICTS = [
   'AC',

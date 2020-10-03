@@ -303,7 +303,7 @@ export default class CourseProblemList extends Vue {
   }
 
   @Watch('problems')
-  onProblemsChange(newVal: types.AddedProblem): void {
+  onProblemsChange(): void {
     this.reset();
   }
 

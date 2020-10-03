@@ -46,7 +46,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
-import * as Highcharts from 'highcharts';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -157,7 +156,6 @@ export default class UserCharts extends Vue {
   }
 
   get normalizedRunCounts(): NormalizedRunCounts[] {
-    const total = this.totalRuns;
     const stats = this.data.runs;
     const runs = stats.reduce(
       (total: omegaup.Run, amount: omegaup.RunInfo) => {

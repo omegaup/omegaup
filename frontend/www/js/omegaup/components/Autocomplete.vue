@@ -43,7 +43,7 @@ export default class Autocomplete extends Vue {
   }
 
   @Watch('value')
-  onPropertyChanged(newValue: string, oldValue: string) {
+  onPropertyChanged(newValue: string) {
     this.input.value = newValue;
   }
 }

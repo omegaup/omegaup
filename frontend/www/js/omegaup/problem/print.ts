@@ -9,7 +9,7 @@ import omegaup_Markdown from '../components/Markdown.vue';
     JSON.parse((<HTMLElement>document.getElementById('payload')).innerText)
   );
 
-  const contestIntro = new Vue({
+  new Vue({
     el: <HTMLElement>document.querySelector('div.statement'),
     render: function (createElement) {
       return createElement('omegaup-markdown', {

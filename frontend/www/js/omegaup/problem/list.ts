@@ -2,8 +2,6 @@ import Vue from 'vue';
 import problem_List from '../components/problem/List.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
-import T from '../lang';
-import * as api from '../api';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
@@ -40,7 +38,7 @@ OmegaUp.on('ready', () => {
       }
     }
   }
-  const problemsList = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-problem-list', {

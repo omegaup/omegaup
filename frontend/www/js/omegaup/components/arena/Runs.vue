@@ -348,6 +348,7 @@ library.add(faExternalLinkAlt);
 library.add(faTimes);
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface JQuery {
     popover(action: string): JQuery;
   }
@@ -584,7 +585,7 @@ export default class Runs extends Vue {
   }
 
   @Watch('username')
-  onUsernameChanged(newValue: string | null, oldValue: string | null) {
+  onUsernameChanged(newValue: string | null) {
     if (!newValue) {
       this.filterUsername = '';
     } else {
@@ -593,7 +594,7 @@ export default class Runs extends Vue {
   }
 
   @Watch('problemAlias')
-  onProblemAliasChanged(newValue: string | null, oldValue: string | null) {
+  onProblemAliasChanged(newValue: string | null) {
     if (!newValue) {
       this.filterProblem = '';
     } else {
@@ -602,32 +603,32 @@ export default class Runs extends Vue {
   }
 
   @Watch('filterLanguage')
-  onFilterLanguageChanged(newValue: string, oldValue: string) {
+  onFilterLanguageChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'language');
   }
 
   @Watch('filterOffset')
-  onFilterOffsetChanged(newValue: number, oldValue: number) {
+  onFilterOffsetChanged() {
     this.$emit('filter-changed');
   }
 
   @Watch('filterProblem')
-  onFilterProblemChanged(newValue: string, oldValue: number) {
+  onFilterProblemChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'problem');
   }
 
   @Watch('filterStatus')
-  onFilterStatusChanged(newValue: string, oldValue: number) {
+  onFilterStatusChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'status');
   }
 
   @Watch('filterUsername')
-  onFilterUsernameChanged(newValue: string, oldValue: number) {
+  onFilterUsernameChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'username');
   }
 
   @Watch('filterVerdict')
-  onFilterVerdictChanged(newValue: string, oldValue: number) {
+  onFilterVerdictChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'verdict');
   }
 

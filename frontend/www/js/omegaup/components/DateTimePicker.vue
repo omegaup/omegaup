@@ -55,7 +55,7 @@ export default class DateTimePicker extends Vue {
         defaultDate: self.value,
         locale: T.locale,
       })
-      .on('change', (ev) => {
+      .on('change', () => {
         self.$emit('input', $(self.$el).data('datetimepicker').getDate());
       });
 

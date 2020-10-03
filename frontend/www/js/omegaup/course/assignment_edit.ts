@@ -1,5 +1,5 @@
 import { omegaup, OmegaUp } from '../omegaup';
-import { messages, types } from '../api_types';
+import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
@@ -9,7 +9,7 @@ import course_AssignmentDetails from '../components/course/AssignmentDetails.vue
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseAssignmentEditPayload();
   const courseAlias = payload.course.alias;
-  const courseEdit = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-course-edit', {

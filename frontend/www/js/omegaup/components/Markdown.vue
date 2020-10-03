@@ -213,7 +213,7 @@ export default class Markdown extends Vue {
   }
 
   @Watch('markdown')
-  onMarkdownChanged(val: string, oldVal: string) {
+  onMarkdownChanged() {
     this.renderMathJax();
   }
 

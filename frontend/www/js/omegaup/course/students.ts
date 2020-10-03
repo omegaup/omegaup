@@ -7,7 +7,7 @@ import Vue from 'vue';
 OmegaUp.on('ready', function () {
   const payload = types.payloadParsers.StudentsProgressPayload();
 
-  const viewProgress = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-course-viewprogress', {

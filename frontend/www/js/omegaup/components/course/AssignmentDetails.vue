@@ -314,7 +314,7 @@ export default class CourseAssignmentDetails extends Vue {
   }
 
   @Watch('show')
-  onShowChanged(newValue: boolean): void {
+  onShowChanged(): void {
     this.reset();
   }
 
