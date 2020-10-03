@@ -284,9 +284,9 @@ export default class ArenaRunSubmit extends Vue {
         }
         reader.readAsText(file, 'UTF-8');
       } else {
-        // 100kB _must_ be enough for anybody.
-        if (file.size >= 100 * 1024) {
-          alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '100kB' }));
+        // 512kiB _must_ be enough for anybody.
+        if (file.size >= 512 * 1024) {
+          alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }));
           return;
         }
         reader.readAsDataURL(file);
