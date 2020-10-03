@@ -7,7 +7,7 @@ import course_Intro from '../components/course/Intro.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IntroDetailsPayload();
-  let courseIntro = new Vue({
+  const courseIntro = new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-course-intro', {
@@ -49,9 +49,9 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       userRegistrationRequested: payload.userRegistrationRequested,
-    },
+    }),
     components: {
       'omegaup-course-intro': course_Intro,
     },

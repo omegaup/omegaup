@@ -131,7 +131,7 @@ export default class ArenaAdmin {
   refreshRuns(): void {
     const runsListComponent = <arena_Runs>this.runsList.$children[0];
 
-    var options = {
+    const options = {
       assignment_alias: <string | undefined>undefined,
       contest_alias: <string | undefined>undefined,
       course_alias: <string | undefined>undefined,

@@ -30,7 +30,7 @@ OmegaUp.on('ready', () => {
   };
 
   const normalizeRunCounts = (stats: types.StatsPayload) => {
-    let result = [];
+    const result = [];
     for (const verdict in stats.verdict_counts) {
       if (!stats.verdict_counts.hasOwnProperty(verdict)) continue;
       if (verdict === 'NO-AC') continue;
@@ -71,7 +71,7 @@ OmegaUp.on('ready', () => {
     return categoriesDistributionValues;
   };
 
-  let statsChart = new Vue({
+  const statsChart = new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-common-stats', {
@@ -97,7 +97,7 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       stats: payload,
       verdictChartOptions: {
         chart: {
@@ -205,7 +205,7 @@ OmegaUp.on('ready', () => {
           useUTC: true,
         },
       },
-    },
+    }),
     components: {
       'omegaup-common-stats': common_Stats,
     },

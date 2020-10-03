@@ -367,11 +367,11 @@ export class Arena {
           },
         });
       },
-      data: {
+      data: () => ({
         isContestFinished: false,
         isProblemsetOpened: true,
         problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
-      },
+      }),
       components: { 'omegaup-arena-runs': arena_Runs },
     });
     const myRunsListElement = document.querySelector('#problem table.runs');
@@ -403,13 +403,13 @@ export class Arena {
             },
           });
         },
-        data: {
+        data: () => ({
           graderInfo: null,
           graderQueueLength: -1,
           errorMessage: null,
           initialClarifications: [],
           notifications: [],
-        },
+        }),
         components: {
           'omegaup-common-navbar': common_Navbar,
         },
@@ -476,10 +476,10 @@ export class Arena {
             },
           });
         },
-        data: {
+        data: () => ({
           problems: [],
           activeProblem: '',
-        },
+        }),
         components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
     }
@@ -504,10 +504,10 @@ export class Arena {
             },
           });
         },
-        data: {
+        data: () => ({
           showRanking: navbarPayload,
           users: [],
-        },
+        }),
         components: {
           'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
         },
@@ -530,12 +530,12 @@ export class Arena {
             },
           });
         },
-        data: {
+        data: () => ({
           problems: [],
           ranking: [],
           lastUpdated: new Date(0),
           showPenalty: true,
-        },
+        }),
         components: {
           'omegaup-arena-scoreboard': arena_Scoreboard,
         },
@@ -553,7 +553,9 @@ export class Arena {
             },
           });
         },
-        data: { data: null },
+        data: () => ({
+          data: null,
+        }),
         components: {
           'omegaup-arena-rundetails': arena_RunDetails,
         },
@@ -579,11 +581,11 @@ export class Arena {
             ref: 'component',
           });
         },
-        data: {
+        data: () => ({
           languages: [],
           preferredLanguage: '',
           nextSubmissionTimestamp: new Date(0),
-        },
+        }),
         components: {
           'omegaup-arena-runsubmit': arena_RunSubmit,
         },
@@ -603,7 +605,7 @@ export class Arena {
           },
         });
       },
-      data: {
+      data: () => ({
         contest: {
           start_time: new Date(),
           finish_time: null,
@@ -612,7 +614,7 @@ export class Arena {
           title: '',
           director: '',
         },
-      },
+      }),
       components: {
         'omegaup-arena-contestsummary': arena_ContestSummary,
       },
@@ -639,12 +641,12 @@ export class Arena {
           },
         });
       },
-      data: {
+      data: () => ({
         markdown: '',
         imageMapping: <markdown.ImageMapping>{},
         sourceMapping: <markdown.SourceMapping>{},
         problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
-      },
+      }),
       components: {
         'omegaup-markdown': omegaup_Markdown,
       },
@@ -1649,7 +1651,9 @@ export class Arena {
             components: {
               'omegaup-problem-settings-summary': problem_SettingsSummary,
             },
-            data: { problem: problem },
+            data: () => ({
+              problem: problem,
+            }),
           });
         }
         this.renderProblem(problem);
@@ -1862,9 +1866,9 @@ export class Arena {
           },
         });
       },
-      data: {
+      data: () => ({
         qualityPayload: qualityPayload,
-      },
+      }),
       components: {
         'qualitynomination-popup': qualitynomination_Popup,
       },

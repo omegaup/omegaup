@@ -52,12 +52,12 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       notifications: <types.Notification[]>[],
       graderInfo: <types.GraderStatus | null>null,
       graderQueueLength: -1,
       errorMessage: <string | null>null,
-    },
+    }),
     components: {
       'omegaup-common-navbar': common_NavbarV2,
     },

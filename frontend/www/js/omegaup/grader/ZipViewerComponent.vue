@@ -22,7 +22,7 @@
         </button>
       </div>
     </div>
-    <textarea class="editor" readonly>{{ contents }}</textarea>
+    <textarea class="editor" readonly v-model="contents"></textarea>
   </div>
 </template>
 
@@ -30,13 +30,11 @@
 import * as Util from './util';
 
 export default {
-  data: function () {
-    return {
-      zip: null,
-      active: null,
-      contents: '',
-    };
-  },
+  data: () => ({
+    zip: null,
+    active: null,
+    contents: '',
+  }),
   methods: {
     select: function (item) {
       this.active = item.name;

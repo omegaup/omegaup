@@ -62,10 +62,10 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       problems: <types.ProblemListItem[]>[],
       pagerItems: <types.PageItem[]>[],
-    },
+    }),
     components: {
       'omegaup-problem-mine': problem_Mine,
     },

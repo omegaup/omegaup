@@ -117,11 +117,11 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       details: payload.details,
       problems: payload.problems,
       requests: payload.requests,
-    },
+    }),
     components: {
       'omegaup-contest-edit': contest_Edit,
     },

@@ -268,7 +268,7 @@ OmegaUp.on('ready', () => {
           .catch(ui.apiError);
       },
     },
-    data: {
+    data: () => ({
       initialAdmins: payload.admins,
       initialGroups: payload.groupAdmins,
       publishedRevision: payload.publishedRevision,
@@ -281,7 +281,7 @@ OmegaUp.on('ready', () => {
       problemLevel: payload.problemLevel,
       selectedPublicTags: payload.selectedPublicTags,
       selectedPrivateTags: payload.selectedPrivateTags,
-    },
+    }),
     components: {
       'omegaup-problem-edit': problem_Edit,
     },

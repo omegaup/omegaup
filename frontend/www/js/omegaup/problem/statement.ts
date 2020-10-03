@@ -46,7 +46,7 @@ OmegaUp.on('ready', () => {
   const markdownStatement =
     localStorage.getItem('wmdinput') || defaultStatement;
 
-  const problemDetails = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-problem-statementedit', {

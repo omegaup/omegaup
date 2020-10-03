@@ -49,7 +49,9 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: { errors: payload.parameter ? [payload.parameter] : [] },
+    data: () => ({
+      errors: payload.parameter ? [payload.parameter] : [],
+    }),
     components: {
       'omegaup-problem-new': problem_New,
     },

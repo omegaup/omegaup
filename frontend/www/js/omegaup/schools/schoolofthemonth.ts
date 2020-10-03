@@ -8,7 +8,7 @@ import schoolOfTheMonth_List from '../components/schoolofthemonth/List.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolOfTheMonthPayload();
-  let schoolOfTheMonthList = new Vue({
+  const schoolOfTheMonthList = new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('school-of-the-month-list', {
@@ -37,10 +37,10 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       schoolIsSelected:
         payload.isMentor && payload.options && payload.options.schoolIsSelected,
-    },
+    }),
     components: {
       'school-of-the-month-list': schoolOfTheMonth_List,
     },

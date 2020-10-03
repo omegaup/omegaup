@@ -51,6 +51,18 @@
 				".*js/omegaup/lang\\..*"
 			]
 		},
+		"eslint": {
+			"allowlist": [
+				"frontend/www/.*\\.ts$",
+				"frontend/www/.*\\.vue$"
+			],
+			"denylist": [
+				".*js/omegaup/lang\\..*",
+				".*third_party.*",
+				"frontend/www/.*\\.d\\.ts$",
+				"frontend/www/js/omegaup/api_types.ts"
+			]
+		},
 		"typescript": {
 			"extra_js_linters": [
 				"yarn run refactor"
