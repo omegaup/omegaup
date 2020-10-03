@@ -9,7 +9,7 @@ export class Experiments {
 
   constructor(experimentList: Array<string>) {
     if (!experimentList) return;
-    for (let experiment of experimentList)
+    for (const experiment of experimentList)
       this.enabledExperiments[experiment] = true;
   }
 
@@ -43,12 +43,12 @@ export class EventListenerList {
 
   constructor(listenerList: Array<() => void>) {
     if (!listenerList) return;
-    for (let listener of listenerList) this.listenerList.push(listener);
+    for (const listener of listenerList) this.listenerList.push(listener);
   }
 
   notify(): void {
     this.ready = true;
-    for (let listener of this.listenerList) listener();
+    for (const listener of this.listenerList) listener();
     this.listenerList = [];
   }
 
@@ -252,10 +252,6 @@ export namespace omegaup {
     source: string;
     time: Date;
     verdict: string;
-  }
-
-  interface CourseProgress {
-    [assignment: string]: number;
   }
 
   export interface DetailsGroup {

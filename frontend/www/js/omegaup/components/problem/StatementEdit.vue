@@ -6,7 +6,7 @@
           <label class="font-weight-bold">{{ T.statementLanguage }}</label>
           <select class="form-control" v-model="currentLanguage">
             <option
-              v-bind:markdown-contents.sync="currentMarkdown"
+              v-bind:markdown-contents="currentMarkdown"
               v-bind:value="language"
               v-for="language in languages"
             >
@@ -180,7 +180,7 @@ export default class ProblemStatementEdit extends Vue {
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
-    if (!!oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
+    if (oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
     this.$emit(
       'emit-update-markdown-contents',
       this.statements,

@@ -86,12 +86,12 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       status: payload.solution_status || 'not_logged_in',
       solution: <types.ProblemStatement | null>null,
       allTokens: 0,
       availableTokens: 0,
-    },
+    }),
     components: {
       'omegaup-problem-solution': problem_Solution,
     },

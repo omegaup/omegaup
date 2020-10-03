@@ -15,7 +15,7 @@ OmegaUp.on('ready', () => {
     score: user.score,
     problems_solved: user.problems_solved,
   }));
-  const rankTable = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-user-rank', {

@@ -80,7 +80,7 @@ OmegaUp.on('ready', () => {
                   'data:text/csv;charset=utf-8,' +
                   CSV.serialize(dataToSerialize, dialect);
                 const encodedUri = encodeURI(csvContent);
-                let link = document.createElement('a');
+                const link = document.createElement('a');
                 link.setAttribute('href', encodedUri);
                 link.setAttribute('download', `users_${contestAlias}.csv`);
                 document.body.appendChild(link); // Required for FF
@@ -92,9 +92,9 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       contests: payload.contests,
-    },
+    }),
     components: {
       'omegaup-contest-mine': contest_Mine,
     },

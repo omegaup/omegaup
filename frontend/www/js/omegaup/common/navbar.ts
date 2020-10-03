@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       omegaUpLockDown: payload.omegaUpLockDown,
       inContest: payload.inContest,
       isLoggedIn: payload.isLoggedIn,
@@ -61,7 +61,7 @@ OmegaUp.on('ready', () => {
       graderQueueLength: -1,
       errorMessage: <string | null>null,
       initialClarifications: [],
-    },
+    }),
     components: {
       'omegaup-common-navbar': payload.bootstrap4
         ? common_NavbarV2

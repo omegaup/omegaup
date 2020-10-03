@@ -38,7 +38,9 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: { invalidParameterName: <null | string>null },
+    data: () => ({
+      invalidParameterName: <null | string>null,
+    }),
     components: {
       'omegaup-contest-new': contest_NewForm,
     },

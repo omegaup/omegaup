@@ -30,11 +30,11 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       initialQuery: payload.query,
       isLogged: payload.isLogged,
       contests: payload.contests,
-    },
+    }),
     components: { 'omegaup-arena-contestlist': arena_ContestList },
   });
 });

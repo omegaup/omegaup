@@ -62,9 +62,9 @@ OmegaUp.on('ready', () => {
         arenaInstance.initProblemsetId(contest);
         arenaInstance.initProblems(contest);
         arenaInstance.initClock(contest.start_time, contest.finish_time, null);
-        for (var idx in contest.problems) {
-          var problem = contest.problems[idx];
-          var problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
+        for (const idx in contest.problems) {
+          const problem = contest.problems[idx];
+          const problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
           arenaInstance.problems[problem.alias] = {
             ...problem,
@@ -94,9 +94,9 @@ OmegaUp.on('ready', () => {
           contest_alias: arenaInstance.options.contestAlias,
         })
           .then((data) => {
-            for (var ind in data.users) {
-              var user = data.users[ind];
-              var receiver = user.is_owner
+            for (const ind in data.users) {
+              const user = data.users[ind];
+              const receiver = user.is_owner
                 ? T.wordsPublic
                 : ui.escape(user.username);
               $('#clarification select[name=user]').append(

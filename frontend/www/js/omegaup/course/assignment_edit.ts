@@ -56,9 +56,9 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       invalidParameterName: <string | null>null,
-    },
+    }),
     components: {
       'omegaup-course-edit': course_AssignmentDetails,
     },

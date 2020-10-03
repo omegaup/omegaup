@@ -11,7 +11,7 @@ OmegaUp.on('ready', () => {
     (<HTMLElement>document.getElementById('payload')).innerText,
   );
 
-  let loginPaswwordRecover = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-login-password-reset', {

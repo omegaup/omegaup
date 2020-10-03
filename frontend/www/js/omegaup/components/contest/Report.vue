@@ -55,9 +55,9 @@
                   <th>{{ T.wordsGroup }}</th>
                   <th>{{ T.rankScore }}</th>
                 </tr>
-                <tr v-for="group in item.run_details.details.groups">
-                  <td>{{ group.group }}</td>
-                  <td>{{ group.score }}</td>
+                <tr v-for="groupDetails in item.run_details.details.groups">
+                  <td>{{ groupDetails.group }}</td>
+                  <td>{{ groupDetails.score }}</td>
                 </tr>
               </table>
 

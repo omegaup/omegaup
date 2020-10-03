@@ -5,7 +5,7 @@ import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.AuthorRankTablePayload();
-  const authorsRank = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-author-rank', {

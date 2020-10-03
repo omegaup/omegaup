@@ -137,7 +137,7 @@ export class Converter {
       </div>`;
     }
 
-    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)*[\]$]+)|(?:[a-z\/_-]+))")|(?:target="[a-z\/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
+    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#/%?=~_|!:,.;()*[\]$]+)|(?:[a-z/_-]+))")|(?:target="[a-z/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
     const imageWhitelist = new RegExp(
       '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',
       'i',
@@ -159,7 +159,7 @@ export class Converter {
     ): string => {
       // First we have to escape the escape characters so that
       // we can build a character class out of them
-      let regexString = `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
+      let regexString = `([${charsToEscape.replace(/([[\]\\])/g, '\\$1')}])`;
 
       if (afterBackslash) {
         regexString = `\\\\${regexString}`;
@@ -355,8 +355,8 @@ export class Converter {
       'preBlockGamut',
       (
         text: string,
-        blockGamut: (text: string) => string,
-        spanGamut: (text: string) => string,
+        blockGamut: (text: string) => string, // eslint-disable-line @typescript-eslint/no-unused-vars
+        spanGamut: (text: string) => string, // eslint-disable-line @typescript-eslint/no-unused-vars
       ): string => {
         // GitHub-flavored fenced code blocks
         const fencedCodeBlock = (
@@ -390,9 +390,9 @@ export class Converter {
               .replace(/>/g, '&gt;');
           }
           if (indentation != '') {
-            let lines = [];
-            let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
-            for (let line of contents.split('\n')) {
+            const lines = [];
+            const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+            for (const line of contents.split('\n')) {
               lines.push(line.replace(stripPrefix, ''));
             }
             contents = escapeCharacters(
@@ -431,6 +431,7 @@ export class Converter {
         return text.replace(
           /^ {0,3}\|[^\n]*\|[ \t]*(\n {0,3}\|[^\n]*\|[ \t]*)+$/gm,
           (whole: string, inner: string): string => {
+            // eslint-disable-line @typescript-eslint/no-unused-vars
             let cells = whole
               .trim()
               .split('\n')

@@ -192,7 +192,7 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       initialClarifications: payload.clarifications,
       solutionStatus: payload.solutionStatus,
       solution: <types.ProblemStatement | null>null,
@@ -200,7 +200,7 @@ OmegaUp.on('ready', () => {
       allTokens: 0,
       showNewRunWindow: locationHash.includes('new-run'),
       activeTab: window.location.hash ? locationHash[0] : 'problems',
-    },
+    }),
     components: {
       'omegaup-problem-details': problem_Details,
     },

@@ -27,7 +27,7 @@ OmegaUp.on('ready', () => {
       (auth: gapi.auth2.GoogleAuth) => {
         auth.signOut()['then'](
           () => redirect(),
-          (error: Promise<String>) => {
+          (error: Promise<string>) => {
             redirect();
           },
         );

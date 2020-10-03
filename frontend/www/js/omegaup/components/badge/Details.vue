@@ -96,7 +96,7 @@ export default class BadgeDetails extends Vue {
   }
 
   get ownedMessage(): string {
-    return !!this.badge.assignation_time
+    return this.badge.assignation_time
       ? `<span class="badge-text-icon">😁</span> ${T.badgeAssignationTimeMessage}`
       : `<span class="badge-text-icon">😞</span> ${T.badgeNotAssignedMessage}`;
   }
@@ -108,7 +108,7 @@ export default class BadgeDetails extends Vue {
   }
 
   get assignationDate(): string {
-    return !!this.badge.assignation_time
+    return this.badge.assignation_time
       ? time.formatDate(this.badge.assignation_time)
       : '';
   }

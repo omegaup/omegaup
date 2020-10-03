@@ -295,7 +295,7 @@ OmegaUp.on('ready', () => {
               ),
             )
               .then((results) => {
-                let participantsWithError: string[] = [];
+                const participantsWithError: string[] = [];
                 results.forEach((result) => {
                   if (result.status === 'rejected') {
                     participantsWithError.push(result.reason.userEmail);
@@ -461,14 +461,14 @@ OmegaUp.on('ready', () => {
           .catch(ui.apiError);
       },
     },
-    data: {
+    data: () => ({
       data: payload,
       initialTab: window.location.hash
         ? window.location.hash.substr(1)
         : 'course',
       invalidParameterName: '',
       token: '',
-    },
+    }),
     components: {
       'omegaup-course-edit': course_Edit,
     },

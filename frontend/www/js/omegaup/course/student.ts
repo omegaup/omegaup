@@ -47,9 +47,9 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
+    data: () => ({
       problems: <types.CourseProblem[]>[],
-    },
+    }),
     components: {
       'omegaup-course-viewstudent': course_ViewStudent,
     },

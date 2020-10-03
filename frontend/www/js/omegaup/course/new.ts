@@ -84,7 +84,9 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: { invalidParameterName: '' },
+    data: () => ({
+      invalidParameterName: '',
+    }),
     components: {
       'omegaup-course-form': course_Form,
     },
