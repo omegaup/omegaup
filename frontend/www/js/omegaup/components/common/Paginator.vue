@@ -3,17 +3,17 @@
     <div class="pager-bar">
       <center>
         <ul class="pagination">
-          <li v-for="page in pagerItems" v-bind:class="page.class">
+          <li v-for="page in pagerItems" :class="page.class">
             <a
               v-if="page.url"
-              v-bind:href="page.url"
-              v-bind:class="{ disabled: page.class !== 'active' }"
+              :href="page.url"
+              :class="{ disabled: page.class !== 'active' }"
               >{{ page.label }}</a
             >
             <a
               v-else
-              v-bind:class="{ disabled: page.class !== 'active' }"
-              v-on:click.prevent="$emit('page-changed', page.page)"
+              :class="{ disabled: page.class !== 'active' }"
+              @click.prevent="$emit('page-changed', page.page)"
               >{{ page.label }}</a
             >
           </li>

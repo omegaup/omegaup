@@ -5,13 +5,13 @@
         <li
           v-if="filteredCourses.courses"
           class="nav-item"
-          v-on:click="showTab = filteredCourses.timeType"
+          @click="showTab = filteredCourses.timeType"
         >
           <a
             data-toggle="tab"
             class="nav-link"
             href="#"
-            v-bind:class="{ active: activeTab === filteredCourses.timeType }"
+            :class="{ active: activeTab === filteredCourses.timeType }"
             >{{ getTabName(filteredCourses.timeType) }}</a
           >
         </li>
@@ -44,7 +44,7 @@
                 <tbody>
                   <tr v-for="course in filteredCourses.courses">
                     <td>
-                      <a v-bind:href="`/course/${course.alias}/`">{{
+                      <a :href="`/course/${course.alias}/`">{{
                         course.name
                       }}</a>
                     </td>
@@ -75,24 +75,24 @@
                     <template v-if="courses.accessMode === 'admin'">
                       <td>
                         <a
-                          v-bind:href="`/course/${course.alias}/edit/`"
-                          v-bind:title="T.omegaupTitleCourseEdit"
+                          :href="`/course/${course.alias}/edit/`"
+                          :title="T.omegaupTitleCourseEdit"
                         >
                           <font-awesome-icon icon="edit" />
                         </a>
                       </td>
                       <td>
                         <a
-                          v-bind:href="`/course/${course.alias}/list/`"
-                          v-bind:title="T.courseListSubmissionsByGroup"
+                          :href="`/course/${course.alias}/list/`"
+                          :title="T.courseListSubmissionsByGroup"
                         >
                           <font-awesome-icon icon="list-alt" />
                         </a>
                       </td>
                       <td>
                         <a
-                          v-bind:href="`/course/${course.alias}/activity/`"
-                          v-bind:title="T.activityReport"
+                          :href="`/course/${course.alias}/activity/`"
+                          :title="T.activityReport"
                         >
                           <font-awesome-icon icon="clock" />
                         </a>

@@ -19,12 +19,9 @@
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortContent }">
-          <tr v-for="assignment in content" v-bind:key="assignment.alias">
+          <tr v-for="assignment in content" :key="assignment.alias">
             <td>
-              <button
-                class="btn btn-link"
-                v-bind:title="T.courseAssignmentReorder"
-              >
+              <button class="btn btn-link" :title="T.courseAssignmentReorder">
                 <font-awesome-icon icon="arrows-alt" />
               </button>
             </td>
@@ -43,36 +40,34 @@
               </template>
             </td>
             <td class="align-middle">
-              <a v-bind:href="assignmentUrl(assignment)">{{
-                assignment.name
-              }}</a>
+              <a :href="assignmentUrl(assignment)">{{ assignment.name }}</a>
             </td>
             <td class="text-center">
               <button
                 class="btn btn-link"
-                v-bind:title="T.courseAssignmentEdit"
-                v-on:click="$emit('emit-edit', assignment)"
+                :title="T.courseAssignmentEdit"
+                @click="$emit('emit-edit', assignment)"
               >
                 <font-awesome-icon icon="edit" />
               </button>
               <button
                 class="btn btn-link"
-                v-bind:title="T.courseAddProblemsAdd"
-                v-on:click="$emit('emit-add-problems', assignment)"
+                :title="T.courseAddProblemsAdd"
+                @click="$emit('emit-add-problems', assignment)"
               >
                 <font-awesome-icon icon="list-alt" />
               </button>
               <font-awesome-icon
                 v-if="assignment.has_runs"
-                v-bind:title="T.assignmentRemoveAlreadyHasRuns"
+                :title="T.assignmentRemoveAlreadyHasRuns"
                 icon="trash"
                 class="disabled"
               />
               <button
                 v-else
                 class="btn btn-link"
-                v-bind:title="T.courseAssignmentDelete"
-                v-on:click="$emit('emit-delete', assignment)"
+                :title="T.courseAssignmentDelete"
+                @click="$emit('emit-delete', assignment)"
               >
                 <font-awesome-icon icon="trash" />
               </button>
@@ -84,9 +79,9 @@
         <button
           v-if="content.length > 1"
           class="btn btn-primary"
-          v-bind:class="{ disabled: !contentOrderChanged }"
+          :class="{ disabled: !contentOrderChanged }"
           role="button"
-          v-on:click="saveNewOrder"
+          @click="saveNewOrder"
         >
           {{ T.wordsSaveNewOrder }}
         </button>
@@ -101,7 +96,7 @@
                 v-if="assignmentFormMode === AssignmentFormMode.Default"
                 class="btn btn-primary"
                 type="submit"
-                v-on:click.prevent="$emit('emit-new')"
+                @click.prevent="$emit('emit-new')"
               >
                 {{ T.courseAddContent }}
               </button>

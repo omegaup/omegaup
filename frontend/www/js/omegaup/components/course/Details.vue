@@ -2,12 +2,12 @@
   <div>
     <h3 class="text-center">
       {{ course.name }}
-      <a v-if="course.is_admin" v-bind:href="`/course/${course.alias}/edit/`">
-        <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+      <a v-if="course.is_admin" :href="`/course/${course.alias}/edit/`">
+        <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
     <div class="my-4 markdown">
-      <omegaup-markdown v-bind:markdown="course.description"></omegaup-markdown>
+      <omegaup-markdown :markdown="course.description"></omegaup-markdown>
     </div>
     <div v-if="course.is_admin" class="mb-5">
       <span>{{
@@ -33,19 +33,19 @@
               <a
                 data-button-progress-students
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/students/`"
+                :href="`/course/${course.alias}/students/`"
                 >{{ T.courseStudentsProgress }}</a
               >
               <a
                 data-button-activity-report
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/activity/`"
+                :href="`/course/${course.alias}/activity/`"
                 >{{ T.activityReport }}</a
               >
               <a
                 data-button-activity-report
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/statistics/`"
+                :href="`/course/${course.alias}/statistics/`"
                 >{{ T.omegaupTitleCourseStatistics }}</a
               >
             </div>
@@ -68,13 +68,13 @@
               <a
                 data-button-manage-students
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/edit/#students`"
+                :href="`/course/${course.alias}/edit/#students`"
                 >{{ T.wordsAddStudent }}</a
               >
               <a
                 data-button-manage-content
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/edit/#content`"
+                :href="`/course/${course.alias}/edit/#content`"
                 >{{ T.courseAddContent }}</a
               >
             </div>
@@ -87,8 +87,8 @@
         {{ T.overallCompletedPercentage }}:
         <progress
           max="100"
-          v-bind:value="overallCompletedPercentage"
-          v-bind:title="`${overallCompletedPercentage} %`"
+          :value="overallCompletedPercentage"
+          :title="`${overallCompletedPercentage} %`"
         ></progress>
       </span>
     </div>
@@ -118,8 +118,8 @@
             <tr
               v-for="assignment in course.assignments"
               v-else
-              v-bind:key="assignment.alias"
-              v-bind:data-content-alias="assignment.alias"
+              :key="assignment.alias"
+              :data-content-alias="assignment.alias"
             >
               <td class="text-center">
                 <template v-if="assignment.assignment_type === 'homework'">
@@ -138,7 +138,7 @@
               <td>
                 <a
                   class="text-center"
-                  v-bind:href="`/course/${course.alias}/assignment/${
+                  :href="`/course/${course.alias}/assignment/${
                     assignment.alias
                   }/${course.is_admin ? 'admin/' : ''}`"
                 >
@@ -154,24 +154,24 @@
               <td v-if="course.is_admin" class="text-center">
                 <a
                   class="mr-2"
-                  v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                  <font-awesome-icon :icon="['fas', 'link']" />{{
                     T.wordsPublic
                   }}</a
                 >
                 <a
                   class="mr-2"
-                  v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/edit/`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/edit/`"
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+                  <font-awesome-icon :icon="['fas', 'edit']" />
                   {{ T.wordsEdit }}
                 </a>
                 <a
                   class="mr-2"
-                  v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/admin/#runs`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/admin/#runs`"
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'tachometer-alt']" />
+                  <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
                   {{ T.wordsRuns }}
                 </a>
               </td>
@@ -210,9 +210,9 @@
         >
           <div class="card-body">
             <omegaup-course-clone
-              v-bind:initial-alias="course.alias"
-              v-bind:initial-name="course.name"
-              v-on:clone="
+              :initial-alias="course.alias"
+              :initial-name="course.name"
+              @clone="
                 (alias, name, startTime) =>
                   $emit('clone', alias, name, startTime)
               "

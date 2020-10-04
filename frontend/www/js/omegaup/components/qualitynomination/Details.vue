@@ -18,9 +18,9 @@
             <strong>{{ T.wordsNominator }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ nominator.name }} (<a
-              v-bind:href="userUrl(nominator.username)"
-              >{{ nominator.username }}</a
+            {{ nominator.name }} (<a :href="userUrl(nominator.username)">{{
+              nominator.username
+            }}</a
             >)
           </div>
         </div>
@@ -29,7 +29,7 @@
             <strong>{{ T.wordsProblem }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ problem.title }} (<a v-bind:href="problemUrl(problem.alias)">{{
+            {{ problem.title }} (<a :href="problemUrl(problem.alias)">{{
               problem.alias
             }}</a
             >)
@@ -40,7 +40,7 @@
             <strong>{{ T.wordsAuthor }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ author.name }} (<a v-bind:href="userUrl(author.username)">{{
+            {{ author.name }} (<a :href="userUrl(author.username)">{{
               author.username
             }}</a
             >)
@@ -62,12 +62,12 @@
               class="glyphicon glyphicon-info-sign"
               data-placement="top"
               data-toggle="tooltip"
-              v-bind:title="T.banProblemFormComments"
+              :title="T.banProblemFormComments"
             ></span>
           </div>
           <div
             class="col-sm-8"
-            v-bind:class="{
+            :class="{
               'has-error': !rationale,
               'has-success': rationale,
             }"
@@ -87,22 +87,22 @@
           <div class="col-sm-8 text-center">
             <button
               class="btn btn-danger"
-              v-bind:disabled="!rationale"
-              v-on:click="showConfirmationDialog('banned')"
+              :disabled="!rationale"
+              @click="showConfirmationDialog('banned')"
             >
               {{ T.wordsBanProblem }}
             </button>
             <button
               class="btn btn-success"
-              v-bind:disabled="!rationale"
-              v-on:click="showConfirmationDialog('resolved')"
+              :disabled="!rationale"
+              @click="showConfirmationDialog('resolved')"
             >
               {{ T.wordsKeepProblem }}
             </button>
             <button
               class="btn btn-warning"
-              v-bind:disabled="!rationale"
-              v-on:click="showConfirmationDialog('warning')"
+              :disabled="!rationale"
+              @click="showConfirmationDialog('warning')"
             >
               {{ T.wordsWarningProblem }}
             </button>
@@ -112,12 +112,12 @@
     </div>
     <omegaup-common-confirmation
       v-if="showConfirmation"
-      v-bind:question="T.demotionProblemMultipleQuestion"
-      v-bind:answer-yes="T.demotionProblemMultipleAnswerYes"
-      v-bind:answer-no="T.demotionProblemMultipleAnswerNo"
-      v-on:close="showConfirmation = false"
-      v-on:yes="markResolution(true)"
-      v-on:no="markResolution(false)"
+      :question="T.demotionProblemMultipleQuestion"
+      :answer-yes="T.demotionProblemMultipleAnswerYes"
+      :answer-no="T.demotionProblemMultipleAnswerNo"
+      @close="showConfirmation = false"
+      @yes="markResolution(true)"
+      @no="markResolution(false)"
     ></omegaup-common-confirmation>
   </div>
 </template>

@@ -15,7 +15,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-1"
-            v-bind:style="`width:${barsWidth[0]}%`"
+            :style="`width:${barsWidth[0]}%`"
           >
             {{ `${customHistogram[0]}` }}
           </div>
@@ -26,7 +26,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-2"
-            v-bind:style="`width:${barsWidth[1]}%`"
+            :style="`width:${barsWidth[1]}%`"
           >
             {{ `${customHistogram[1]}` }}
           </div>
@@ -37,7 +37,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-3"
-            v-bind:style="`width:${barsWidth[2]}%`"
+            :style="`width:${barsWidth[2]}%`"
           >
             {{ `${customHistogram[2]}` }}
           </div>
@@ -48,7 +48,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-4"
-            v-bind:style="`width:${barsWidth[3]}%`"
+            :style="`width:${barsWidth[3]}%`"
           >
             {{ `${customHistogram[3]}` }}
           </div>
@@ -59,7 +59,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-5"
-            v-bind:style="`width:${barsWidth[4]}%`"
+            :style="`width:${barsWidth[4]}%`"
           >
             {{ `${customHistogram[4]}` }}
           </div>

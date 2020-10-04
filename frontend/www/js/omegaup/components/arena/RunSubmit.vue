@@ -1,9 +1,7 @@
 <template>
-  <form data-run-submit v-on:submit.prevent="onSubmit">
+  <form data-run-submit @submit.prevent="onSubmit">
     <div class="close-container">
-      <button type="button" class="close" v-on:click="$emit('dismiss')">
-        ❌
-      </button>
+      <button type="button" class="close" @click="$emit('dismiss')">❌</button>
     </div>
     <div class="form-group row">
       <label class="col-sm-2 col-form-label">
@@ -13,8 +11,8 @@
         <select v-model="selectedLanguage" class="form-control" name="language">
           <option
             v-for="(language, key) in allowedLanguages"
-            v-bind:key="key"
-            v-bind:value="key"
+            :key="key"
+            :value="key"
           >
             {{ language }}
           </option>
@@ -33,8 +31,8 @@
     <div class="code-view form-group">
       <omegaup-arena-code-view
         v-model="code"
-        v-bind:language="selectedLanguage"
-        v-bind:readonly="false"
+        :language="selectedLanguage"
+        :readonly="false"
       ></omegaup-arena-code-view>
     </div>
     <div class="form-group row">
@@ -47,18 +45,14 @@
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button
-          type="submit"
-          class="btn btn-primary"
-          v-bind:disabled="!canSubmit"
-        >
+        <button type="submit" class="btn btn-primary" :disabled="!canSubmit">
           <omegaup-countdown
             v-if="!canSubmit"
-            v-bind:target-time="nextSubmissionTimestamp"
-            v-bind:countdown-format="
+            :target-time="nextSubmissionTimestamp"
+            :countdown-format="
               omegaup.CountdownFormat.WaitBetweenUploadsSeconds
             "
-            v-on:emit-finish="now = Date.now()"
+            @emit-finish="now = Date.now()"
           ></omegaup-countdown>
           <span v-else>{{ T.wordsSend }}</span>
         </button>

@@ -8,11 +8,7 @@
       </h1>
     </div>
     <div class="panel-body">
-      <form
-        class="form-horizontal"
-        role="form"
-        v-on:submit.prevent="onEditMember"
-      >
+      <form class="form-horizontal" role="form" @submit.prevent="onEditMember">
         <div class="row">
           <div class="form-group">
             <label class="col-md-4 col-sm-4 control-label" for="username">{{
@@ -57,7 +53,7 @@
               >
                 <option
                   v-for="country in countries"
-                  v-bind:value="country.country_id"
+                  :value="country.country_id"
                 >
                   {{ country.name }}
                 </option>
@@ -76,7 +72,7 @@
               >
                 <option
                   v-for="[code, state] in Object.entries(countryStates)"
-                  v-bind:value="code.split('-')[1]"
+                  :value="code.split('-')[1]"
                 >
                   {{ state.name }}
                 </option>
@@ -96,11 +92,7 @@
                 type="text"
               />
             </div>
-            <input
-              name="schoolId"
-              type="hidden"
-              v-bind:value="identity.school_id"
-            />
+            <input name="schoolId" type="hidden" :value="identity.school_id" />
           </div>
         </div>
         <div class="form-group pull-right">
@@ -110,7 +102,7 @@
           <button
             class="btn btn-secundary"
             type="reset"
-            v-on:click="$emit('emit-cancel')"
+            @click="$emit('emit-cancel')"
           >
             {{ T.wordsCancel }}
           </button>

@@ -3,17 +3,17 @@
     <template v-for="(typeCourses, accessMode) in courses">
       <div
         v-if="typeCourses.activeTab !== ''"
-        v-bind:key="accessMode"
+        :key="accessMode"
         class="card mb-4"
-        v-bind:class="accessMode"
+        :class="accessMode"
       >
         <div class="card-header">
           <h3 class="card-title">{{ getDescription(accessMode) }}</h3>
         </div>
 
         <omegaup-course-filtered-list
-          v-bind:courses="typeCourses"
-          v-bind:activeTab="typeCourses.activeTab"
+          :courses="typeCourses"
+          :activeTab="typeCourses.activeTab"
         ></omegaup-course-filtered-list>
       </div>
     </template>

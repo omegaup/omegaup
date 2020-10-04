@@ -7,8 +7,8 @@
           <select v-model="currentLanguage" class="form-control">
             <option
               v-for="language in languages"
-              v-bind:markdown-contents="currentMarkdown"
-              v-bind:value="language"
+              :markdown-contents="currentMarkdown"
+              :value="language"
             >
               {{ getLanguageNameText(language) }}
             </option>
@@ -16,7 +16,7 @@
         </div>
         <div
           class="form-group col-md-6"
-          v-bind:class="{ 'has-error': errors.includes('message') }"
+          :class="{ 'has-error': errors.includes('message') }"
         >
           <label class="control-label">{{ T.problemEditCommitMessage }}</label>
           <input v-model="commitMessage" class="form-control" />
@@ -34,8 +34,8 @@
         <div class="col-md-6">
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
-            v-bind:markdown="currentMarkdown"
-            v-bind:image-mapping="statement.images"
+            :markdown="currentMarkdown"
+            :image-mapping="statement.images"
             preview="true"
           ></omegaup-markdown>
           <template v-if="markdownType === 'statements'">
@@ -52,9 +52,9 @@
                 <a class="problemsetter">
                   <omegaup-user-username
                     v-if="problemsetter"
-                    v-bind:classname="problemsetter.classname"
-                    v-bind:linkify="true"
-                    v-bind:username="problemsetter.username"
+                    :classname="problemsetter.classname"
+                    :linkify="true"
+                    :username="problemsetter.username"
                   ></omegaup-user-username>
                 </a>
               </em>
@@ -68,13 +68,13 @@
         class="row"
         enctype="multipart/form-data"
         method="post"
-        v-on:submit="onSubmit"
+        @submit="onSubmit"
       >
         <div class="col-md-12">
           <button
             class="btn btn-primary"
             type="submit"
-            v-bind:disabled="commitMessage === ''"
+            :disabled="commitMessage === ''"
           >
             {{
               markdownType === 'solutions'
@@ -83,14 +83,14 @@
             }}
           </button>
         </div>
-        <input type="hidden" name="message" v-bind:value="commitMessage" />
+        <input type="hidden" name="message" :value="commitMessage" />
         <input
           type="hidden"
           name="contents"
-          v-bind:value="JSON.stringify(statements)"
+          :value="JSON.stringify(statements)"
         />
-        <input type="hidden" name="directory" v-bind:value="markdownType" />
-        <input type="hidden" name="problem_alias" v-bind:value="alias" />
+        <input type="hidden" name="directory" :value="markdownType" />
+        <input type="hidden" name="problem_alias" :value="alias" />
         <input type="hidden" name="request" value="markdown" />
       </form>
     </div>

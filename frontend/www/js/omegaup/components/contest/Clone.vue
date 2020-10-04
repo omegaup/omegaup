@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-primary">
     <div class="panel-body">
-      <form class="clone_contest_form" v-on:submit.prevent="onSubmit">
+      <form class="clone_contest_form" @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsTitle }}</label>

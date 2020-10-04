@@ -5,7 +5,7 @@
         <div class="omegaup-course-viewprogress card">
           <div class="card-header">
             <h2>
-              <a v-bind:href="courseUrl">{{ course.name }}</a>
+              <a :href="courseUrl">{{ course.name }}</a>
             </h2>
           </div>
           <div class="card-body table-responsive">
@@ -15,7 +15,7 @@
                   <th class="text-center">{{ T.wordsName }}</th>
                   <th
                     v-for="assignment in assignments"
-                    v-bind:key="assignment.alias"
+                    :key="assignment.alias"
                     class="score text-center"
                   >
                     {{ assignment.name }}
@@ -25,10 +25,10 @@
               <tbody>
                 <omegaup-student-progress
                   v-for="student in students"
-                  v-bind:key="student.username"
-                  v-bind:student="student"
-                  v-bind:assignments="assignments"
-                  v-bind:course="course"
+                  :key="student.username"
+                  :student="student"
+                  :assignments="assignments"
+                  :course="course"
                 >
                 </omegaup-student-progress>
               </tbody>
@@ -46,14 +46,14 @@
           <div class="card-body">
             <a
               class="btn btn-primary btn-sm mr-1"
-              v-bind:download="csvFilename"
-              v-bind:href="csvDataUrl"
+              :download="csvFilename"
+              :href="csvDataUrl"
               >.csv</a
             >
             <a
               class="btn btn-primary btn-sm"
-              v-bind:download="odsFilename"
-              v-bind:href="odsDataUrl"
+              :download="odsFilename"
+              :href="odsDataUrl"
               >.ods</a
             >
           </div>

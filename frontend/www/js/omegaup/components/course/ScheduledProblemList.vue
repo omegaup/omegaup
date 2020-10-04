@@ -26,8 +26,8 @@
               <td class="button-column align-middle">
                 <button
                   class="btn btn-link"
-                  v-bind:title="T.courseAssignmentProblemRemove"
-                  v-on:click.prevent="onRemoveProblem(problem)"
+                  :title="T.courseAssignmentProblemRemove"
+                  @click.prevent="onRemoveProblem(problem)"
                 >
                   <font-awesome-icon icon="trash" />
                 </button>
@@ -48,7 +48,7 @@
                   <omegaup-autocomplete
                     v-model="problemAlias"
                     class="form-control"
-                    v-bind:init="(el) => typeahead.problemTypeahead(el)"
+                    :init="(el) => typeahead.problemTypeahead(el)"
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
@@ -67,8 +67,8 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                v-bind:disabled="problemAlias.length == 0"
-                v-on:click.prevent="
+                :disabled="problemAlias.length == 0"
+                @click.prevent="
                   onAddProblem({ alias: problemAlias, points: points })
                 "
               >

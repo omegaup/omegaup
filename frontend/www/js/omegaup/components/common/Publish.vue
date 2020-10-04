@@ -1,7 +1,7 @@
 <template>
   <div class="panel panel-primary">
     <div class="panel-body">
-      <form class="publish-form" v-on:submit.prevent="onSubmit">
+      <form class="publish-form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
           <select

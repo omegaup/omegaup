@@ -7,9 +7,9 @@
       <h4 v-if="!includeUser && submissions.length > 0">
         {{ T.wordsBy }}
         <omegaup-username
-          v-bind:username="submissions[0].username"
-          v-bind:classname="submissions[0].classname"
-          v-bind:linkify="true"
+          :username="submissions[0].username"
+          :classname="submissions[0].classname"
+          :linkify="true"
         ></omegaup-username>
       </h4>
     </div>
@@ -27,13 +27,13 @@
           ><omegaup-autocomplete
             v-model="searchedUsername"
             class="form-control"
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
+            :init="(el) => typeahead.userTypeahead(el)"
           ></omegaup-autocomplete
         ></label>
         <a
           class="btn btn-primary"
           type="button"
-          v-bind:href="`/submissions/${encodeURIComponent(searchedUsername)}/`"
+          :href="`/submissions/${encodeURIComponent(searchedUsername)}/`"
         >
           {{ T.searchUser }}
         </a>
@@ -48,7 +48,7 @@
               </th>
               <th scope="col" class="text-center">{{ T.wordsProblem }}</th>
               <th
-                v-bind:class="{ 'fixed-width-column': includeUser }"
+                :class="{ 'fixed-width-column': includeUser }"
                 class="text-center"
                 scope="col"
               >
@@ -62,33 +62,33 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(submission, index) in submissions" v-bind:key="index">
+            <tr v-for="(submission, index) in submissions" :key="index">
               <td class="text-center">
                 {{ time.formatDateTime(submission.time) }}
               </td>
               <td v-if="includeUser" class="text-center">
                 <omegaup-username
-                  v-bind:username="submission.username"
-                  v-bind:classname="submission.classname"
-                  v-bind:linkify="true"
+                  :username="submission.username"
+                  :classname="submission.classname"
+                  :linkify="true"
                 >
                 </omegaup-username>
                 <br />
                 <a
                   class="school-text"
-                  v-bind:href="`/schools/profile/${submission.school_id}/`"
+                  :href="`/schools/profile/${submission.school_id}/`"
                   >{{ submission.school_name }}</a
                 >
               </td>
               <td class="text-center">
-                <a v-bind:href="`/arena/problem/${submission.alias}/`">{{
+                <a :href="`/arena/problem/${submission.alias}/`">{{
                   submission.title
                 }}</a>
               </td>
               <td class="text-center">{{ submission.language }}</td>
               <td
                 class="text-center verdict"
-                v-bind:class="`verdict-${submission.verdict}`"
+                :class="`verdict-${submission.verdict}`"
               >
                 {{ T[`verdict${submission.verdict}`] }}
               </td>
@@ -121,7 +121,7 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          v-bind:pagerItems="pagerItems"
+          :pagerItems="pagerItems"
         ></omegaup-common-paginator>
       </div>
     </div>

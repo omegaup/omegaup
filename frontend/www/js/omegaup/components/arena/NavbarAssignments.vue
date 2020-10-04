@@ -2,10 +2,10 @@
   <div class="navbar-assignments">
     <button
       class="btn btn-primary col-md-12 col-sm-12 col-xs-12"
-      v-bind:disabled="previousAssignment === null"
-      v-bind:title="previousAssignment !== null ? previousAssignment.name : ''"
+      :disabled="previousAssignment === null"
+      :title="previousAssignment !== null ? previousAssignment.name : ''"
       role="button"
-      v-on:click="$emit('navigate-to-assignment', previousAssignment.alias)"
+      @click="$emit('navigate-to-assignment', previousAssignment.alias)"
     >
       <span
         v-if="previousAssignment !== null"
@@ -16,10 +16,10 @@
     </button>
     <button
       class="btn btn-primary col-md-12 col-sm-12 col-xs-12"
-      v-bind:disabled="nextAssignment === null"
-      v-bind:title="nextAssignment !== null ? nextAssignment.name : ''"
+      :disabled="nextAssignment === null"
+      :title="nextAssignment !== null ? nextAssignment.name : ''"
       role="button"
-      v-on:click="$emit('navigate-to-assignment', nextAssignment.alias)"
+      @click="$emit('navigate-to-assignment', nextAssignment.alias)"
     >
       {{ nextAssignment !== null ? nextAssignment.name : '-'
       }}<span

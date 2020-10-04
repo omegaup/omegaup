@@ -5,7 +5,7 @@
         <div class="panel-heading">
           <div v-html="T.groupsCsvHelp"></div>
           {{ T.groupsUploadCsvFile }}
-          <input name="identities" type="file" v-on:change="readCsv" />
+          <input name="identities" type="file" @change="readCsv" />
         </div>
       </div>
       <br />
@@ -46,7 +46,7 @@
           <button
             class="btn btn-primary"
             name="create-identities"
-            v-on:click.prevent="$emit('bulk-identities', identities)"
+            @click.prevent="$emit('bulk-identities', identities)"
           >
             {{ T.groupCreateIdentities }}
           </button>
@@ -54,7 +54,7 @@
         <div class="panel-footer">
           <button
             class="btn"
-            v-on:click.prevent="$emit('download-identities', identities)"
+            @click.prevent="$emit('download-identities', identities)"
           >
             <span
               class="glyphicon glyphicon-download-alt"

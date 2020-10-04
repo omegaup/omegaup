@@ -3,20 +3,18 @@
     <div v-if="inAssignment" class="active" data-breadcrumbs>
       <span>
         <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
-        <a class="breadcrumbs-link" v-bind:href="urlAssignment">{{
-          courseName
-        }}</a>
+        <a class="breadcrumbs-link" :href="urlAssignment">{{ courseName }}</a>
         <template v-if="currentAssignment">
           > <span class="breadcrumbs-link">{{ currentAssignment.name }}</span>
         </template>
       </span>
     </div>
-    <div class="summary" v-bind:class="{ active: !activeProblem }">
+    <div class="summary" :class="{ active: !activeProblem }">
       <a class="name" href="#problems">{{ T.wordsSummary }}</a>
     </div>
     <div
       v-for="problem in problems"
-      v-bind:class="{ active: problem.alias === activeProblem }"
+      :class="{ active: problem.alias === activeProblem }"
       data-navbar-problem
     >
       <div class="row">
@@ -38,18 +36,18 @@
           <font-awesome-icon
             v-if="problem.bestScore == problem.maxScore"
             icon="check"
-            v-bind:style="{ color: 'green' }"
+            :style="{ color: 'green' }"
           />
           <font-awesome-icon
             v-else-if="problem.hasRuns"
             icon="times"
-            v-bind:style="{ color: 'red' }"
+            :style="{ color: 'red' }"
           />
         </div>
       </div>
       <div class="row">
         <div class="col-xs-12">
-          <a class="name" v-on:click="onNavigateToProblem(problem)">{{
+          <a class="name" @click="onNavigateToProblem(problem)">{{
             problem.text
           }}</a>
         </div>

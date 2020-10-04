@@ -25,7 +25,7 @@
               <button
                 class="btn btn-primary"
                 type="button"
-                v-on:click.prevent="$emit('submit', email)"
+                @click.prevent="$emit('submit', email)"
               >
                 {{ T.wordsSaveChanges }}
               </button>

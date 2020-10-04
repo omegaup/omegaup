@@ -1,13 +1,13 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsProblem }}</label>
             <omegaup-autocomplete
               v-model="alias"
-              v-bind:init="(el) => typeahead.problemTypeahead(el)"
+              :init="(el) => typeahead.problemTypeahead(el)"
             ></omegaup-autocomplete>
           </div>
           <div class="form-group col-md-6">
@@ -22,7 +22,7 @@
                     class="form-check-input"
                     type="radio"
                     name="use-latest-version"
-                    v-bind:value="true"
+                    :value="true"
                   />
                   {{ T.contestAddproblemLatestVersion }}
                 </label>
@@ -34,7 +34,7 @@
                     class="form-check-input"
                     type="radio"
                     name="use-latest-version"
-                    v-bind:value="false"
+                    :value="false"
                   />
                   {{ T.contestAddproblemOtherVersion }}
                 </label>
@@ -66,8 +66,8 @@
           <button
             class="btn btn-primary get-versions"
             type="submit"
-            v-bind:disabled="alias == ''"
-            v-on:click.prevent="onSubmit"
+            :disabled="alias == ''"
+            @click.prevent="onSubmit"
           >
             {{ T.wordsGetVersions }}
           </button>
@@ -78,17 +78,17 @@
         <omegaup-problem-versions
           v-show="!useLatestVersion"
           v-model="selectedRevision"
-          v-bind:log="versionLog"
-          v-bind:published-revision="publishedRevision"
-          v-bind:show-footer="false"
-          v-on:runs-diff="onRunsDiff"
+          :log="versionLog"
+          :published-revision="publishedRevision"
+          :show-footer="false"
+          @runs-diff="onRunsDiff"
         ></omegaup-problem-versions>
         <div class="form-group">
           <button
             class="btn btn-primary add-problem"
             type="submit"
-            v-bind:disabled="addProblemButtonDisabled"
-            v-on:click.prevent="onAddProblem"
+            :disabled="addProblemButtonDisabled"
+            @click.prevent="onAddProblem"
           >
             {{ addProblemButtonLabel }}
           </button>
@@ -106,13 +106,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="problem in problems" v-bind:key="problem.alias">
+        <tr v-for="problem in problems" :key="problem.alias">
           <td>
             <button
               class="btn btn-default"
               type="button"
-              v-bind:aria-label="T.wordsEdit"
-              v-on:click.prevent="onEdit(problem)"
+              :aria-label="T.wordsEdit"
+              @click.prevent="onEdit(problem)"
             >
               <span
                 aria-hidden="true"
@@ -122,13 +122,13 @@
           </td>
           <td>{{ problem.order }}</td>
           <td>
-            <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+            <a :href="`/arena/problem/${problem.alias}/`">{{
               problem.alias
             }}</a>
           </td>
           <td>{{ problem.points }}</td>
           <td>
-            <button class="close" v-on:click="onRemove(problem)">×</button>
+            <button class="close" @click="onRemove(problem)">×</button>
           </td>
         </tr>
       </tbody>

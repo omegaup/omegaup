@@ -1,10 +1,10 @@
 <template>
   <codemirror-editor
     ref="cm-wrapper"
-    v-bind:options="editorOptions"
-    v-bind:value="value"
-    v-on:change="onChange"
-    v-on:input="onInput"
+    :options="editorOptions"
+    :value="value"
+    @change="onChange"
+    @input="onInput"
   ></codemirror-editor>
 </template>
 

@@ -4,7 +4,7 @@
       <h3 class="card-title">{{ T.courseNew }}</h3>
     </div>
     <div class="card-body">
-      <form class="form" data-course-form v-on:submit.prevent="onSubmit">
+      <form class="form" data-course-form @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
             <label class="faux-label"
@@ -12,7 +12,7 @@
               <input
                 v-model="name"
                 class="form-control"
-                v-bind:class="{ 'is-invalid': invalidParameterName === 'name' }"
+                :class="{ 'is-invalid': invalidParameterName === 'name' }"
                 data-course-new-name
                 type="text"
                 required="required"
@@ -22,17 +22,17 @@
             <label class="faux-label"
               >{{ T.courseNewFormShortTitle_alias_ }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormShortTitle_alias_Desc"
+                :title="T.courseNewFormShortTitle_alias_Desc"
                 icon="info-circle" />
               <input
                 v-model="alias"
                 class="form-control"
-                v-bind:class="{
+                :class="{
                   'is-invalid': invalidParameterName === 'alias',
                 }"
                 type="text"
                 data-course-new-alias
-                v-bind:disabled="update"
+                :disabled="update"
                 required="required"
             /></label>
           </div>
@@ -40,13 +40,13 @@
             <span class="faux-label"
               >{{ T.courseNewFormShowScoreboard }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormShowScoreboardDesc"
+                :title="T.courseNewFormShowScoreboardDesc"
                 icon="info-circle"
               />
             </span>
             <omegaup-radio-switch
-              v-bind:value.sync="showScoreboard"
-              v-bind:selected-value="showScoreboard"
+              :value.sync="showScoreboard"
+              :selected-value="showScoreboard"
               name="show-scoreboard"
             ></omegaup-radio-switch>
           </div>
@@ -56,7 +56,7 @@
             <label class="faux-label"
               >{{ T.courseNewFormStartDate }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormStartDateDesc"
+                :title="T.courseNewFormStartDateDesc"
                 icon="info-circle" />
               <omegaup-datepicker v-model="startTime"></omegaup-datepicker
             ></label>
@@ -65,25 +65,25 @@
             <span class="faux-label"
               >{{ T.courseNewFormUnlimitedDuration }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormUnlimitedDurationDesc"
+                :title="T.courseNewFormUnlimitedDurationDesc"
                 icon="info-circle"
               />
             </span>
             <omegaup-radio-switch
-              v-bind:value.sync="unlimitedDuration"
-              v-bind:selected-value="unlimitedDuration"
+              :value.sync="unlimitedDuration"
+              :selected-value="unlimitedDuration"
             ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
             <label class="faux-label"
               >{{ T.courseNewFormEndDate }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormEndDateDesc"
+                :title="T.courseNewFormEndDateDesc"
                 icon="info-circle" />
               <omegaup-datepicker
                 v-model="finishTime"
-                v-bind:enabled="!unlimitedDuration"
-                v-bind:is-invalid="invalidParameterName === 'finish_time'"
+                :enabled="!unlimitedDuration"
+                :is-invalid="invalidParameterName === 'finish_time'"
               ></omegaup-datepicker
             ></label>
           </div>
@@ -97,7 +97,7 @@
                 autocomplete="off"
                 class="form-control typeahead school"
                 type="text"
-                v-on:change="onChange" /><input
+                @change="onChange" /><input
                 v-model="school_id"
                 class="school_id"
                 type="hidden"
@@ -107,20 +107,20 @@
             <span class="faux-label"
               >{{ T.courseNewFormBasicInformationRequired }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormBasicInformationRequiredDesc"
+                :title="T.courseNewFormBasicInformationRequiredDesc"
                 icon="info-circle"
               />
             </span>
             <omegaup-radio-switch
-              v-bind:value.sync="needsBasicInformation"
-              v-bind:selected-value="needsBasicInformation"
+              :value.sync="needsBasicInformation"
+              :selected-value="needsBasicInformation"
             ></omegaup-radio-switch>
           </div>
           <div class="form-group col-md-4">
             <span class="faux-label"
               >{{ T.courseNewFormUserInformationRequired }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormUserInformationRequiredDesc"
+                :title="T.courseNewFormUserInformationRequiredDesc"
                 icon="info-circle"
               />
             </span>
@@ -142,7 +142,7 @@
               <textarea
                 v-model="description"
                 class="form-control"
-                v-bind:class="{
+                :class="{
                   'is-invalid': invalidParameterName === 'description',
                 }"
                 cols="30"

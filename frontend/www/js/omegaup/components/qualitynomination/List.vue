@@ -7,7 +7,7 @@
           <select v-model="selectColumn" name="column" class="form-control">
             <option
               v-for="(columnText, columnIndex) in columns"
-              v-bind:value="columnIndex"
+              :value="columnIndex"
             >
               {{ columnText }}
             </option>
@@ -17,8 +17,8 @@
           <omegaup-autocomplete
             v-show="selectColumn == 'problem_alias'"
             v-model="queryProblem"
-            v-bind:init="(el) => typeahead.problemTypeahead(el)"
-            v-bind:placeholder="T.wordsKeyword"
+            :init="(el) => typeahead.problemTypeahead(el)"
+            :placeholder="T.wordsKeyword"
             class="form-control"
           ></omegaup-autocomplete>
           <omegaup-autocomplete
@@ -27,15 +27,15 @@
               selectColumn == 'author_username'
             "
             v-model="queryUsername"
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
-            v-bind:placeholder="T.wordsKeyword"
+            :init="(el) => typeahead.userTypeahead(el)"
+            :placeholder="T.wordsKeyword"
             class="form-control"
           ></omegaup-autocomplete>
         </div>
       </div>
       <button
         class="btn btn-primary"
-        v-on:click.prevent="
+        @click.prevent="
           $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
         "
       >
@@ -60,7 +60,7 @@
             <input
               v-model="showAll"
               type="checkbox"
-              v-on:change="
+              @change="
                 $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
               "
             />
@@ -83,17 +83,17 @@
         <tbody>
           <tr v-for="nomination in nominations">
             <td>
-              <a v-bind:href="problemUrl(nomination.problem.alias)">{{
+              <a :href="problemUrl(nomination.problem.alias)">{{
                 nomination.problem.title
               }}</a>
             </td>
             <td v-if="!myView">
-              <a v-bind:href="userUrl(nomination.nominator.username)">{{
+              <a :href="userUrl(nomination.nominator.username)">{{
                 nomination.nominator.username
               }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.author.username)">{{
+              <a :href="userUrl(nomination.author.username)">{{
                 nomination.author.username
               }}</a>
             </td>
@@ -102,9 +102,7 @@
             <td class="text-center">{{ nomination.status }}</td>
             <td>
               <a
-                v-bind:href="
-                  nominationDetailsUrl(nomination.qualitynomination_id)
-                "
+                :href="nominationDetailsUrl(nomination.qualitynomination_id)"
                 >{{ T.wordsDetails }}</a
               >
             </td>
@@ -112,8 +110,8 @@
         </tbody>
       </table>
       <omegaup-common-paginator
-        v-bind:pager-items="pagerItems"
-        v-on:page-changed="
+        :pager-items="pagerItems"
+        @page-changed="
           (page) =>
             $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
         "

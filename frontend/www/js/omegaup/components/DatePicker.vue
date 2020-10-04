@@ -2,12 +2,12 @@
   <input
     v-model="stringValue"
     class="form-control"
-    v-bind:class="{ 'is-invalid': isInvalid }"
+    :class="{ 'is-invalid': isInvalid }"
     required="required"
     size="16"
     type="date"
-    v-bind:disabled="!enabled"
-    v-bind:readonly="usedFallback"
+    :disabled="!enabled"
+    :readonly="usedFallback"
   />
 </template>
 

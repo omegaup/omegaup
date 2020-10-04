@@ -3,7 +3,7 @@
     <div class="card-body">
       <form
         class="form"
-        v-on:submit.prevent="
+        @submit.prevent="
           $emit('emit-add-student', { participant, participants })
         "
       >
@@ -15,11 +15,11 @@
             class="glyphicon glyphicon-info-sign"
             data-placement="top"
             data-toggle="tooltip"
-            v-bind:title="T.courseEditAddStudentsTooltip"
+            :title="T.courseEditAddStudentsTooltip"
           ></span>
           <omegaup-autocomplete
             v-model="participant"
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
+            :init="(el) => typeahead.userTypeahead(el)"
           ></omegaup-autocomplete>
         </div>
         <div class="form-group pull-right">
@@ -58,7 +58,7 @@
         <tbody>
           <tr v-for="student in students">
             <td>
-              <a v-bind:href="studentProgressUrl(student)">{{
+              <a :href="studentProgressUrl(student)">{{
                 student.name || student.username
               }}</a>
             </td>
@@ -66,7 +66,7 @@
               <button
                 class="close"
                 type="button"
-                v-on:click="$emit('emit-remove-student', student)"
+                @click="$emit('emit-remove-student', student)"
               >
                 ×
               </button>
@@ -76,14 +76,12 @@
       </table>
     </div>
     <omegaup-common-requests
-      v-bind:data="identityRequests"
-      v-bind:text-add-participant="T.wordsAddStudent"
-      v-on:emit-accept-request="
+      :data="identityRequests"
+      :text-add-participant="T.wordsAddStudent"
+      @emit-accept-request="
         (_, username) => $emit('emit-accept-request', username)
       "
-      v-on:emit-deny-request="
-        (_, username) => $emit('emit-deny-request', username)
-      "
+      @emit-deny-request="(_, username) => $emit('emit-deny-request', username)"
     ></omegaup-common-requests>
   </div>
 </template>

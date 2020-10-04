@@ -8,9 +8,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="allSchoolsOfTheMonth"
-          v-bind:class="{ active: selectedTab === 'allSchoolsOfTheMonth' }"
-          v-bind:aria-selected="selectedTab === 'allSchoolsOfTheMonth'"
-          v-on:click="selectedTab = 'allSchoolsOfTheMonth'"
+          :class="{ active: selectedTab === 'allSchoolsOfTheMonth' }"
+          :aria-selected="selectedTab === 'allSchoolsOfTheMonth'"
+          @click="selectedTab = 'allSchoolsOfTheMonth'"
         >
           {{ T.schoolsOfTheMonth }}
         </a>
@@ -22,9 +22,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="schoolsOfPreviousMonth"
-          v-bind:class="{ active: selectedTab === 'schoolsOfPreviousMonth' }"
-          v-bind:aria-selected="selectedTab === 'schoolsOfPreviousMonth'"
-          v-on:click="selectedTab = 'schoolsOfPreviousMonth'"
+          :class="{ active: selectedTab === 'schoolsOfPreviousMonth' }"
+          :aria-selected="selectedTab === 'schoolsOfPreviousMonth'"
+          @click="selectedTab = 'schoolsOfPreviousMonth'"
         >
           {{ T.schoolsOfTheMonthRank }}
         </a>
@@ -36,11 +36,11 @@
           data-toggle="tab"
           role="tab"
           aria-controls="candidatesToSchoolOfTheMonth"
-          v-bind:class="{
+          :class="{
             active: selectedTab === 'candidatesToSchoolOfTheMonth',
           }"
-          v-bind:aria-selected="selectedTab === 'candidatesToSchoolOfTheMonth'"
-          v-on:click="selectedTab = 'candidatesToSchoolOfTheMonth'"
+          :aria-selected="selectedTab === 'candidatesToSchoolOfTheMonth'"
+          @click="selectedTab = 'candidatesToSchoolOfTheMonth'"
         >
           {{ T.schoolsOfTheMonthCandidates }}
         </a>
@@ -69,14 +69,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(school, index) in visibleSchools" v-bind:key="index">
+        <tr v-for="(school, index) in visibleSchools" :key="index">
           <td class="text-center">
             <omegaup-country-flag
-              v-bind:country="school.country_id"
+              :country="school.country_id"
             ></omegaup-country-flag>
           </td>
           <td class="text-center">
-            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+            <a :href="`/schools/profile/${school.school_id}/`">{{
               school.name
             }}</a>
           </td>
@@ -91,7 +91,7 @@
               <button
                 v-if="canChooseSchool && !schoolIsSelected"
                 class="btn btn-sm btn-primary"
-                v-on:click="$emit('select-school', school.school_id)"
+                @click="$emit('select-school', school.school_id)"
               >
                 {{ T.schoolOfTheMonthChooseAsSchool }}
               </button>

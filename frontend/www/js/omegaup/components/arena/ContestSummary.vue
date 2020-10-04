@@ -4,7 +4,7 @@
     <!-- id-lint on -->
     <h1>{{ ui.contestTitle(contest) }}</h1>
     <omegaup-markdown
-      v-bind:markdown="(contest && contest.description) || ''"
+      :markdown="(contest && contest.description) || ''"
     ></omegaup-markdown>
     <table>
       <tr v-if="showDeadlines">
@@ -57,9 +57,7 @@
           <strong>{{ T.arenaContestOrganizer }}</strong>
         </td>
         <td>
-          <a v-bind:href="`/profile/${contest.director}/`">{{
-            contest.director
-          }}</a>
+          <a :href="`/profile/${contest.director}/`">{{ contest.director }}</a>
         </td>
       </tr>
     </table>

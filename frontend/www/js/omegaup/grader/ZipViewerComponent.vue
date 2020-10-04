@@ -14,9 +14,9 @@
           v-else
           class="list-group-item list-group-item-action"
           type="button"
-          v-bind:class="{ active: active == name }"
-          v-bind:title="name"
-          v-on:click="select(item)"
+          :class="{ active: active == name }"
+          :title="name"
+          @click="select(item)"
         >
           {{ name }}
         </button>

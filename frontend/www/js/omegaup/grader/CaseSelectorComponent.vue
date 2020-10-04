@@ -12,7 +12,7 @@
         >
           <em>Empty</em>
         </button>
-        <template v-for="group in groups" v-else v-bind:title="name">
+        <template v-for="group in groups" v-else :title="name">
           <div
             v-if="group.explicit"
             class="list-group-item list-group-item-secondary"
@@ -20,44 +20,44 @@
             <div>
               <span
                 class="verdict"
-                v-bind:class="verdictClass(groupResult(group.name))"
-                v-bind:title="verdictTooltip(groupResult(group.name))"
+                :class="verdictClass(groupResult(group.name))"
+                :title="verdictTooltip(groupResult(group.name))"
                 >{{ verdictLabel(groupResult(group.name))
                 }}<span class="score">{{
                   score(groupResult(group.name))
                 }}</span></span
               >
-              <span v-bind:title="group.name">{{ group.name }}</span>
+              <span :title="group.name">{{ group.name }}</span>
             </div>
           </div>
           <button
             v-for="item in group.cases"
             class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
             type="button"
-            v-bind:class="{
+            :class="{
               'in-group': group.explicit,
               active: currentCase == item.name,
             }"
-            v-on:click="selectCase(item.name)"
+            @click="selectCase(item.name)"
           >
             <div class="case-item">
               <span
                 class="verdict"
-                v-bind:class="verdictClass(item.name)"
-                v-bind:title="verdictTooltip(caseResult(item.name))"
+                :class="verdictClass(item.name)"
+                :title="verdictTooltip(caseResult(item.name))"
                 >{{ verdictLabel(caseResult(item.name))
                 }}<span class="score">{{
                   score(caseResult(item.name))
                 }}</span></span
               >
-              <span v-bind:title="item.name">{{ item.name }}</span>
+              <span :title="item.name">{{ item.name }}</span>
             </div>
             <button
               v-if="item.name != 'sample'"
               aria-label="Close"
               class="close"
               type="button"
-              v-on:click.prevent.stop="removeCase(item.name)"
+              @click.prevent.stop="removeCase(item.name)"
             >
               <span aria-hidden="true">×</span>
             </button>
@@ -65,7 +65,7 @@
         </template>
       </div>
     </div>
-    <form v-on:submit.prevent="createCase()">
+    <form @submit.prevent="createCase()">
       <div class="input-group">
         <input
           v-model="newCaseWeight"
@@ -77,8 +77,8 @@
           <button
             class="btn btn-secondary"
             type="submit"
-            v-bind:disabled="newCaseName.length == 1"
-            v-on:click="createCase()"
+            :disabled="newCaseName.length == 1"
+            @click="createCase()"
           >
             +
           </button>

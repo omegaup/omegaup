@@ -61,7 +61,7 @@
               href="https://github.com/omegaup/omegaup/issues/new"
               target="_blank"
               rel="nofollow"
-              v-on:click="$event.target.href = reportAnIssueURL()"
+              @click="$event.target.href = reportAnIssueURL()"
               >{{ T.reportAnIssue }}</a
             >
           </li>

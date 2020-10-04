@@ -8,9 +8,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="codersOfTheMonth"
-          v-bind:class="{ active: selectedTab === 'codersOfTheMonth' }"
-          v-bind:aria-selected="selectedTab === 'codersOfTheMonth'"
-          v-on:click="selectedTab = 'codersOfTheMonth'"
+          :class="{ active: selectedTab === 'codersOfTheMonth' }"
+          :aria-selected="selectedTab === 'codersOfTheMonth'"
+          @click="selectedTab = 'codersOfTheMonth'"
         >
           {{
             category == 'all' ? T.codersOfTheMonth : T.codersOfTheMonthFemale
@@ -24,9 +24,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="codersOfPreviousMonth"
-          v-bind:class="{ active: selectedTab === 'codersOfPreviousMonth' }"
-          v-bind:aria-selected="selectedTab === 'codersOfPreviousMonth'"
-          v-on:click="selectedTab = 'codersOfPreviousMonth'"
+          :class="{ active: selectedTab === 'codersOfPreviousMonth' }"
+          :aria-selected="selectedTab === 'codersOfPreviousMonth'"
+          @click="selectedTab = 'codersOfPreviousMonth'"
         >
           {{
             category == 'all'
@@ -42,11 +42,11 @@
           data-toggle="tab"
           role="tab"
           aria-controls="candidatesToCoderOfTheMonth"
-          v-bind:class="{
+          :class="{
             active: selectedTab === 'candidatesToCoderOfTheMonth',
           }"
-          v-bind:aria-selected="selectedTab === 'candidatesToCoderOfTheMonth'"
-          v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'"
+          :aria-selected="selectedTab === 'candidatesToCoderOfTheMonth'"
+          @click="selectedTab = 'candidatesToCoderOfTheMonth'"
         >
           {{
             category == 'all'
@@ -95,20 +95,20 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(coder, index) in visibleCoders" v-bind:key="index">
+        <tr v-for="(coder, index) in visibleCoders" :key="index">
           <td class="text-center">
-            <img v-bind:src="coder.gravatar_32" />
+            <img :src="coder.gravatar_32" />
           </td>
           <td class="text-center">
             <omegaup-countryflag
-              v-bind:country="coder.country_id"
+              :country="coder.country_id"
             ></omegaup-countryflag>
           </td>
           <td class="text-center">
             <omegaup-user-username
-              v-bind:classname="coder.classname"
-              v-bind:linkify="true"
-              v-bind:username="coder.username"
+              :classname="coder.classname"
+              :linkify="true"
+              :username="coder.username"
             ></omegaup-user-username>
           </td>
           <td v-if="selectedTab == 'codersOfTheMonth'" class="text-center">
@@ -133,7 +133,7 @@
             <button
               v-if="canChooseCoder && !coderIsSelected"
               class="btn btn-sm btn-primary"
-              v-on:click="$emit('select-coder', coder.username, category)"
+              @click="$emit('select-coder', coder.username, category)"
             >
               {{
                 category == 'all'

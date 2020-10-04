@@ -11,24 +11,20 @@
     </div>
     <div class="container">
       <template v-for="(typeCourses, accessMode) in courses">
-        <div
-          v-if="typeCourses.activeTab !== ''"
-          v-bind:key="accessMode"
-          class="row"
-        >
-          <div class="col-lg-5 p-3 d-flex" v-bind:class="accessMode">
+        <div v-if="typeCourses.activeTab !== ''" :key="accessMode" class="row">
+          <div class="col-lg-5 p-3 d-flex" :class="accessMode">
             <h3 class="flex-grow-1">{{ getDescription(accessMode) }}</h3>
             <div
               class="d-inline-block"
               tabindex="0"
               data-toggle="tooltip"
-              v-bind:title="T[`${accessMode}CourseInformationDescription`]"
+              :title="T[`${accessMode}CourseInformationDescription`]"
             >
               <font-awesome-icon icon="info-circle" />
             </div>
           </div>
           <div class="col-lg-7 text-right align-middle">
-            <a v-bind:href="`/course/list/${accessMode}/`">{{
+            <a :href="`/course/list/${accessMode}/`">{{
               T.courseListSeeAllCourses
             }}</a>
           </div>
@@ -39,17 +35,17 @@
               <template v-if="timeType !== 'past'">
                 <omegaup-course-card
                   v-for="course in filteredCourses.courses"
-                  v-bind:key="course.alias"
-                  v-bind:course-name="course.name"
-                  v-bind:course-alias="course.alias"
-                  v-bind:school-name="course.school_name"
-                  v-bind:finish-time="course.finish_time"
-                  v-bind:progress="course.progress"
-                  v-bind:content="
+                  :key="course.alias"
+                  :course-name="course.name"
+                  :course-alias="course.alias"
+                  :school-name="course.school_name"
+                  :finish-time="course.finish_time"
+                  :progress="course.progress"
+                  :content="
                     course.admission_mode !== 'public' ? [] : course.assignments
                   "
-                  v-bind:is-open="course.is_open"
-                  v-bind:show-topics="
+                  :is-open="course.is_open"
+                  :show-topics="
                     course.admission_mode === 'public' &&
                     accessMode !== 'student'
                   "

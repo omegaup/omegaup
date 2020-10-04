@@ -1,11 +1,11 @@
 <template>
   <div class="qualitynomination-demotionpopup">
-    <a href="#" v-on:click="onReportInappropriateProblem">{{
+    <a href="#" @click="onReportInappropriateProblem">{{
       T.wordsReportProblem
     }}</a>
     <form v-show="showReportDialog" class="popup h-auto w-auto">
       <template v-if="currentView == 'question'">
-        <button class="close" type="button" v-on:click="onHide">×</button>
+        <button class="close" type="button" @click="onHide">×</button>
         <div class="form-group">
           <div class="question-text">
             {{ T.reportProblemFormQuestion }}
@@ -59,8 +59,8 @@
           <button
             class="col-md-4 btn btn-primary"
             type="submit"
-            v-bind:disabled="!selectedReason || (!rationale &amp;&amp; selectedReason == 'other') || (!original &amp;&amp; selectedReason == 'duplicate')"
-            v-on:click.prevent="onSubmit"
+            :disabled="!selectedReason || (!rationale &amp;&amp; selectedReason == 'other') || (!original &amp;&amp; selectedReason == 'duplicate')"
+            @click.prevent="onSubmit"
           >
             {{ T.wordsSend }}
           </button>

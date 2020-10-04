@@ -1,17 +1,17 @@
 <template>
   <tr>
     <td class="text-center align-middle">
-      <a v-bind:href="studentProgressUrl">
+      <a :href="studentProgressUrl">
         {{ student.name || student.username }}
       </a>
     </td>
     <td
       v-for="assignment in assignments"
-      v-bind:key="assignment.alias"
+      :key="assignment.alias"
       class="score flex-column justify-content-center align-items-center"
     >
       <omegaup-markdown
-        v-bind:markdown="getProgressDescription(assignment.alias)"
+        :markdown="getProgressDescription(assignment.alias)"
       ></omegaup-markdown>
       <div class="d-flex justify-content-center">
         <div v-if="!student.progress.hasOwnProperty(assignment.alias)">
@@ -20,15 +20,15 @@
         <div
           v-else
           class="d-flex border border-dark"
-          v-bind:class="{ invisible: points(assignment.alias) === 0 }"
+          :class="{ invisible: points(assignment.alias) === 0 }"
         >
           <div
             v-for="(problem, index) in Object.keys(
               student.points[assignment.alias],
             )"
-            v-bind:key="index"
+            :key="index"
             v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
-            v-bind:class="getProblemColor(assignment.alias, problem)"
+            :class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
             data-placement="bottom"
           ></div>

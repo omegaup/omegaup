@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
           <select
@@ -21,7 +21,7 @@
           </select>
           <p class="form-text text-muted">
             <omegaup-markdown
-              v-bind:markdown="admissionModeDescription"
+              :markdown="admissionModeDescription"
             ></omegaup-markdown>
           </p>
         </div>

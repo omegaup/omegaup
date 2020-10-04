@@ -5,24 +5,24 @@
     <ol class="carousel-indicators">
       <li
         v-for="(_, index) in slides"
-        v-bind:key="index"
+        :key="index"
         data-target="#carousel-display"
-        v-bind:data-slide-to="index"
-        v-bind:class="{ active: !index }"
+        :data-slide-to="index"
+        :class="{ active: !index }"
       ></li>
     </ol>
     <div class="carousel-inner text-center py-5 py-md-0">
       <div
         v-for="(slide, index) in slides"
-        v-bind:key="index"
+        :key="index"
         class="carousel-item"
-        v-bind:class="{ active: !index }"
+        :class="{ active: !index }"
       >
         <omegaup-homepage-slide
-          v-bind:title="slide.title[T.locale]"
-          v-bind:description="slide.description[T.locale]"
-          v-bind:image-src="slide.image"
-          v-bind:button="slide.button"
+          :title="slide.title[T.locale]"
+          :description="slide.description[T.locale]"
+          :image-src="slide.image"
+          :button="slide.button"
         ></omegaup-homepage-slide>
       </div>
     </div>

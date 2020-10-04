@@ -8,7 +8,7 @@
           (coderOfTheMonthFemale &&
             coderOfTheMonthFemale.username == currentUserInfo.username))
       "
-      v-bind:coderUsername="currentUserInfo.username"
+      :coderUsername="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
     <omegaup-carousel></omegaup-carousel>
     <div
@@ -27,8 +27,8 @@
           class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
         >
           <omegaup-coder-of-the-month
-            v-bind:category="'female'"
-            v-bind:coder-of-the-month="coderOfTheMonthFemale"
+            :category="'female'"
+            :coder-of-the-month="coderOfTheMonthFemale"
           ></omegaup-coder-of-the-month>
         </div>
         <div
@@ -36,17 +36,15 @@
           class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
         >
           <omegaup-coder-of-the-month
-            v-bind:category="'all'"
-            v-bind:coder-of-the-month="coderOfTheMonth"
+            :category="'all'"
+            :coder-of-the-month="coderOfTheMonth"
           ></omegaup-coder-of-the-month>
         </div>
         <div
           v-if="schoolOfTheMonth"
           class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
         >
-          <omegaup-school-of-the-month
-            v-bind:school-of-the-month="schoolOfTheMonth"
-          >
+          <omegaup-school-of-the-month :school-of-the-month="schoolOfTheMonth">
           </omegaup-school-of-the-month>
         </div>
       </div>
@@ -56,14 +54,14 @@
           class="col-xs-10 col-md-6 mb-3 mb-md-0"
         >
           <omegaup-user-rank
-            v-bind:page="rankTable.page"
-            v-bind:length="rankTable.length"
-            v-bind:isIndex="rankTable.isIndex"
-            v-bind:isLogged="rankTable.isLogged"
-            v-bind:availableFilters="rankTable.availableFilters"
-            v-bind:filter="rankTable.filter"
-            v-bind:ranking="rankTable.ranking"
-            v-bind:resultTotal="rankTable.resultTotal"
+            :page="rankTable.page"
+            :length="rankTable.length"
+            :isIndex="rankTable.isIndex"
+            :isLogged="rankTable.isLogged"
+            :availableFilters="rankTable.availableFilters"
+            :filter="rankTable.filter"
+            :ranking="rankTable.ranking"
+            :resultTotal="rankTable.resultTotal"
           ></omegaup-user-rank>
         </div>
         <div
@@ -71,11 +69,11 @@
           class="col-xs-10 col-md-6 mb-3 mb-md-0"
         >
           <omegaup-school-rank
-            v-bind:page="schoolsRank.page"
-            v-bind:length="schoolsRank.length"
-            v-bind:showHeader="schoolsRank.showHeader"
-            v-bind:totalRows="schoolsRank.totalRows"
-            v-bind:rank="schoolsRank.rank"
+            :page="schoolsRank.page"
+            :length="schoolsRank.length"
+            :showHeader="schoolsRank.showHeader"
+            :totalRows="schoolsRank.totalRows"
+            :rank="schoolsRank.rank"
           ></omegaup-school-rank>
         </div>
       </div>
@@ -83,32 +81,32 @@
     <omegaup-testimonials></omegaup-testimonials>
     <div class="container-lg py-5">
       <omegaup-section
-        v-bind:title="T.homepageCompeteSectionTitle"
-        v-bind:description="T.homepageCompeteSectionDescription"
-        v-bind:buttons="[
+        :title="T.homepageCompeteSectionTitle"
+        :description="T.homepageCompeteSectionDescription"
+        :buttons="[
           {
             text: T.buttonGoToContests,
             href: '/arena/',
           },
         ]"
-        v-bind:image-src="'/media/homepage/contests_section.svg'"
+        :image-src="'/media/homepage/contests_section.svg'"
       ></omegaup-section>
       <omegaup-section
-        v-bind:title="T.homepageTrainSectionTitle"
-        v-bind:description="T.homepageTrainSectionDescription"
-        v-bind:buttons="[
+        :title="T.homepageTrainSectionTitle"
+        :description="T.homepageTrainSectionDescription"
+        :buttons="[
           {
             text: T.buttonGoToProblems,
             href: '/problem/',
           },
         ]"
-        v-bind:image-src="'/media/homepage/problems_section.svg'"
-        v-bind:image-to-right="true"
+        :image-src="'/media/homepage/problems_section.svg'"
+        :image-to-right="true"
       ></omegaup-section>
       <omegaup-section
-        v-bind:title="T.homepageCreateSectionTitle"
-        v-bind:description="T.homepageCreateSectionDescription"
-        v-bind:buttons="[
+        :title="T.homepageCreateSectionTitle"
+        :description="T.homepageCreateSectionDescription"
+        :buttons="[
           {
             text: T.buttonCreateProblem,
             href: '/problem/new/',
@@ -118,19 +116,19 @@
             href: '/contest/new/',
           },
         ]"
-        v-bind:image-src="'/media/homepage/create_section.svg'"
+        :image-src="'/media/homepage/create_section.svg'"
       ></omegaup-section>
       <omegaup-section
-        v-bind:title="T.homepageTeachSectionTitle"
-        v-bind:description="T.homepageTeachSectionDescription"
-        v-bind:buttons="[
+        :title="T.homepageTeachSectionTitle"
+        :description="T.homepageTeachSectionDescription"
+        :buttons="[
           {
             text: T.buttonGoToCourses,
             href: '/course/',
           },
         ]"
-        v-bind:image-src="'/media/homepage/courses_section.svg'"
-        v-bind:image-to-right="true"
+        :image-src="'/media/homepage/courses_section.svg'"
+        :image-to-right="true"
       ></omegaup-section>
     </div>
   </div>

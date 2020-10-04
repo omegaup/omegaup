@@ -10,19 +10,17 @@
           <li class="list-group-item">
             <strong>{{ T.wordsCountry }}:</strong>
             {{ country.name }}
-            <omegaup-country-flag
-              v-bind:country="country.id"
-            ></omegaup-country-flag>
+            <omegaup-country-flag :country="country.id"></omegaup-country-flag>
           </li>
           <li v-if="stateName" class="list-group-item">
             <strong>{{ T.profileState }}:</strong> {{ stateName }}
           </li>
         </ul>
         <omegaup-grid-paginator
-          v-bind:columns="1"
-          v-bind:items="codersOfTheMonth"
-          v-bind:items-per-page="5"
-          v-bind:title="T.codersOfTheMonth"
+          :columns="1"
+          :items="codersOfTheMonth"
+          :items-per-page="5"
+          :title="T.codersOfTheMonth"
         >
           <template slot="table-header">
             <thead>
@@ -37,7 +35,7 @@
       <div class="col-md-8">
         <div class="card">
           <div class="card-body">
-            <highcharts v-bind:options="chartOptions"></highcharts>
+            <highcharts :options="chartOptions"></highcharts>
           </div>
         </div>
       </div>
@@ -45,13 +43,13 @@
     <div class="row">
       <div class="col-md-12">
         <omegaup-grid-paginator
-          v-bind:columns="1"
-          v-bind:show-page-offset="true"
-          v-bind:items="schoolUsers"
-          v-bind:items-per-page="30"
-          v-bind:title="T.schoolUsers"
-          v-bind:sort-options="sortOptions"
-          v-on:sort-option-change="updateUsers"
+          :columns="1"
+          :show-page-offset="true"
+          :items="schoolUsers"
+          :items-per-page="30"
+          :title="T.schoolUsers"
+          :sort-options="sortOptions"
+          @sort-option-change="updateUsers"
         >
           <template slot="table-header">
             <thead>
@@ -66,9 +64,9 @@
           </template>
           <template slot="item-data" slot-scope="slotProps">
             <omegaup-username
-              v-bind:username="slotProps.item.toString()"
-              v-bind:classname="slotProps.item.classname"
-              v-bind:linkify="true"
+              :username="slotProps.item.toString()"
+              :classname="slotProps.item.classname"
+              :linkify="true"
             ></omegaup-username>
           </template>
         </omegaup-grid-paginator>

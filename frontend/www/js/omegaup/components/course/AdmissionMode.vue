@@ -1,13 +1,13 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="publish-form" v-on:submit.prevent="onSubmit">
+      <form class="publish-form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionModeSelect }}</label>
           <a
             data-toggle="tooltip"
             rel="tooltip"
-            v-bind:title="T.courseEditAdmissionModeDescription"
+            :title="T.courseEditAdmissionModeDescription"
           >
             <img src="/media/question.png" />
           </a>
@@ -31,14 +31,14 @@
               class="form-control mb-2 mt-2"
               type="text"
               readonly
-              v-bind:value="courseURL"
+              :value="courseURL"
             />
             <div class="form-inline">
               <button
                 v-clipboard="courseURL"
                 class="btn btn-primary"
                 type="button"
-                v-on:click="copiedToClipboard = true"
+                @click="copiedToClipboard = true"
               >
                 {{ T.wordsCopyToClipboard }}
               </button>
@@ -46,7 +46,7 @@
                 <font-awesome-icon
                   icon="check-circle"
                   size="2x"
-                  v-bind:style="{ color: 'green' }"
+                  :style="{ color: 'green' }"
                 />
                 {{ T.passwordResetLinkCopiedToClipboard }}
               </span>

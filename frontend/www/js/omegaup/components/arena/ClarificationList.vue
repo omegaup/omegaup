@@ -35,8 +35,8 @@
                 <select v-model="newClarification.problemAlias">
                   <option
                     v-for="problem in contestProblems"
-                    v-bind:key="problem.alias"
-                    v-bind:value="problem.alias"
+                    :key="problem.alias"
+                    :value="problem.alias"
                   >
                     {{ problem.title }}
                   </option>
@@ -46,7 +46,7 @@
                 v-model="newClarification.message"
                 class="w-100"
                 maxlength="200"
-                v-bind:placeholder="T.arenaClarificationCreateMaxLength"
+                :placeholder="T.arenaClarificationCreateMaxLength"
               ></textarea>
             </div>
             <div class="modal-footer">
@@ -60,7 +60,7 @@
               <button
                 type="button"
                 class="btn btn-primary"
-                v-on:click.prevent="sendClarification"
+                @click.prevent="sendClarification"
               >
                 {{ T.wordsSend }}
               </button>
@@ -88,10 +88,10 @@
         <tbody>
           <omegaup-clarification
             v-for="clarification in clarifications"
-            v-bind:key="clarification.clarification_id"
-            v-bind:in-contest="inContest"
-            v-bind:clarification="clarification"
-            v-on:clarification-response="
+            :key="clarification.clarification_id"
+            :in-contest="inContest"
+            :clarification="clarification"
+            @clarification-response="
               (id, responseText, isPublic) =>
                 $emit('clarification-response', id, responseText, isPublic)
             "

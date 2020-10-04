@@ -5,40 +5,40 @@
     </div>
     <div class="card-body text-center">
       <h2 name="name">{{ name }}</h2>
-      <omegaup-markdown v-bind:markdown="description"></omegaup-markdown>
+      <omegaup-markdown :markdown="description"></omegaup-markdown>
       <template
         v-if="userRegistrationRequested === null || userRegistrationAccepted"
       >
         <omegaup-markdown
           v-if="needsBasicInformation"
-          v-bind:markdown="T.courseBasicInformationNeeded"
+          :markdown="T.courseBasicInformationNeeded"
         ></omegaup-markdown>
         <template v-if="requestsUserInformation != 'no'">
           <omegaup-markdown
-            v-bind:markdown="statements.privacy.markdown || ''"
+            :markdown="statements.privacy.markdown || ''"
           ></omegaup-markdown>
           <omegaup-radio-switch
-            v-bind:value.sync="shareUserInformation"
-            v-bind:selected-value="shareUserInformation"
+            :value.sync="shareUserInformation"
+            :selected-value="shareUserInformation"
           ></omegaup-radio-switch>
         </template>
         <template v-if="shouldShowAcceptTeacher">
           <omegaup-markdown
-            v-bind:markdown="statements.acceptTeacher.markdown || ''"
+            :markdown="statements.acceptTeacher.markdown || ''"
           ></omegaup-markdown>
           <omegaup-radio-switch
-            v-bind:value.sync="acceptTeacher"
-            v-bind:selected-value="acceptTeacher"
+            :value.sync="acceptTeacher"
+            :selected-value="acceptTeacher"
             name="accept-teacher"
           ></omegaup-radio-switch>
         </template>
         <div class="text-center mt-3">
-          <form v-on:submit.prevent="onSubmit">
+          <form @submit.prevent="onSubmit">
             <button
               class="btn btn-primary btn-lg"
               name="start-course-submit"
               type="submit"
-              v-bind:disabled="isButtonDisabled"
+              :disabled="isButtonDisabled"
             >
               {{ T.startCourse }}
             </button>
@@ -48,10 +48,10 @@
       <template v-else>
         <form
           v-if="!userRegistrationRequested"
-          v-on:submit.prevent="$emit('request-access-course')"
+          @submit.prevent="$emit('request-access-course')"
         >
           <omegaup-markdown
-            v-bind:markdown="T.mustRegisterToJoinCourse"
+            :markdown="T.mustRegisterToJoinCourse"
           ></omegaup-markdown>
           <button type="submit" class="btn btn-primary btn-lg">
             {{ T.registerForCourse }}
@@ -59,11 +59,11 @@
         </form>
         <omegaup-markdown
           v-else-if="!userRegistrationAnswered"
-          v-bind:markdown="T.registrationPendingCourse"
+          :markdown="T.registrationPendingCourse"
         ></omegaup-markdown>
         <omegaup-markdown
           v-else
-          v-bind:markdown="T.registrationDenied"
+          :markdown="T.registrationDenied"
         ></omegaup-markdown>
       </template>
     </div>

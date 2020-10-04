@@ -34,14 +34,14 @@
             <button
               class="close"
               style="color: red"
-              v-on:click="onDenyRequest(request.username)"
+              @click="onDenyRequest(request.username)"
             >
               ×
             </button>
             <button
               class="close"
               style="color: green"
-              v-on:click="onAcceptRequest(request.username)"
+              @click="onAcceptRequest(request.username)"
             >
               ✓
             </button>

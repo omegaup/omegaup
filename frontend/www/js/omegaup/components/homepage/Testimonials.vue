@@ -10,10 +10,10 @@
     <ol class="carousel-indicators">
       <li
         v-for="(_, index) in testimonials"
-        v-bind:key="index"
+        :key="index"
         data-target="#testimonials-carousel-display"
-        v-bind:data-slide-to="index"
-        v-bind:class="{ active: !index }"
+        :data-slide-to="index"
+        :class="{ active: !index }"
       ></li>
     </ol>
     <div
@@ -21,16 +21,16 @@
     >
       <div
         v-for="(testimonial, index) in testimonials"
-        v-bind:key="index"
+        :key="index"
         class="carousel-item"
-        v-bind:class="{ active: !index }"
+        :class="{ active: !index }"
       >
         <div class="container-lg py-4 px-5">
           <blockquote class="blockquote text-center">
             <p class="mb-0">{{ testimonial.text[T.locale] }}</p>
             <footer class="blockquote-footer mt-2">
               {{ testimonial.author.name }},
-              <cite v-bind:title="testimonial.author.title[T.locale]">{{
+              <cite :title="testimonial.author.title[T.locale]">{{
                 testimonial.author.title[T.locale]
               }}</cite>
             </footer>

@@ -11,8 +11,8 @@
             <div class="fbSettingsListItemContent fcg">
               https://omegaup.com/profile/<strong
                 ><omegaup-user-username
-                  v-bind:classname="profile.classname"
-                  v-bind:username="profile.username"
+                  :classname="profile.classname"
+                  :username="profile.username"
                 ></omegaup-user-username></strong
               >/
             </div>
@@ -65,7 +65,7 @@
               <strong>{{ T.profileSchool }}</strong>
             </div>
             <div class="fbSettingsListItemContent fcg">
-              <a v-bind:href="`/schools/profile/${profile.school_id}/`"
+              <a :href="`/schools/profile/${profile.school_id}/`"
                 ><strong>{{ profile.school }}</strong></a
               >
             </div>
@@ -92,8 +92,8 @@
             <div class="fbSettingsListItemContent fcg">
               <strong
                 ><omegaup-user-username
-                  v-bind:classname="profile.classname"
-                  v-bind:username="rank"
+                  :classname="profile.classname"
+                  :username="rank"
                 ></omegaup-user-username
               ></strong>
             </div>
@@ -113,10 +113,7 @@
         </li>
       </ul>
     </div>
-    <a
-      v-if="!profile.is_private"
-      v-bind:href="`/submissions/${profile.username}/`"
-    >
+    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
       {{ T.wordsSeeLatestSubmissions }}
     </a>
   </div>

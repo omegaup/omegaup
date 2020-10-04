@@ -21,7 +21,7 @@
             <tr v-for="group in groups">
               <td>
                 <strong
-                  ><a v-bind:href="groupScoreboardUrl(group)">{{
+                  ><a :href="groupScoreboardUrl(group)">{{
                     group.name
                   }}</a></strong
                 >
@@ -29,8 +29,8 @@
               <td>
                 <a
                   class="glyphicon glyphicon-edit"
-                  v-bind:href="groupEditUrl(group)"
-                  v-bind:title="T.wordsEdit"
+                  :href="groupEditUrl(group)"
+                  :title="T.wordsEdit"
                 ></a>
               </td>
             </tr>

@@ -18,25 +18,23 @@
           <th><!-- position --></th>
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
-            <a
-              v-bind:href="'#problems/' + problem.alias"
-              v-bind:title="problem.alias"
-              >{{ ui.columnName(index) }}</a
-            >
+            <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
+              ui.columnName(index)
+            }}</a>
           </th>
-          <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
+          <th :colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
       </thead>
       <tbody>
         <template v-for="(user, userIndex) in ranking">
           <tr
             v-if="showUser(user.is_invited)"
-            v-bind:key="user.username"
-            v-bind:class="user.username"
+            :key="user.username"
+            :class="user.username"
           >
             <td
               class="legend"
-              v-bind:style="{ backgroundColor: legendColor(userIndex) }"
+              :style="{ backgroundColor: legendColor(userIndex) }"
             ></td>
             <td class="position">{{ user.place || '—' }}</td>
             <td class="user">
@@ -45,15 +43,15 @@
                 v-if="user.country"
                 alt=""
                 height="11"
-                v-bind:src="`/media/flags/${user.country.toLowerCase()}.png`"
-                v-bind:title="user.country"
+                :src="`/media/flags/${user.country.toLowerCase()}.png`"
+                :title="user.country"
                 width="16"
               />
             </td>
 
             <td
               v-for="(problem, problemIndex) in user.problems"
-              v-bind:class="problemClass(problem, problems[problemIndex].alias)"
+              :class="problemClass(problem, problems[problemIndex].alias)"
             >
               <template v-if="problem.runs > 0">
                 <div class="points">

@@ -13,9 +13,9 @@
         <td class="position">{{ user.position }}</td>
         <td class="user">
           <omegaup-user-username
-            v-bind:classname="user.classname"
-            v-bind:username="user.username"
-            v-bind:country="user.country"
+            :classname="user.classname"
+            :username="user.username"
+            :country="user.country"
           >
           </omegaup-user-username>
         </td>

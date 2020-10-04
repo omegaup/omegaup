@@ -1,17 +1,13 @@
 <template>
   <span class="ml-1">
-    <a href="#" v-on:click="$emit('emit-apply-filter', column, toggleSort)">
+    <a href="#" @click="$emit('emit-apply-filter', column, toggleSort)">
       <font-awesome-icon
         v-if="!selected"
-        v-bind:icon="['fas', 'exchange-alt']"
+        :icon="['fas', 'exchange-alt']"
         color="lightgray"
         rotation="90"
       />
-      <font-awesome-icon
-        v-else
-        v-bind:icon="['fas', iconDisplayed]"
-        color="black"
-      />
+      <font-awesome-icon v-else :icon="['fas', iconDisplayed]" color="black" />
     </a>
   </span>
 </template>

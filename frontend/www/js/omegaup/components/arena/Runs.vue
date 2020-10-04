@@ -19,17 +19,11 @@
             T.wordsSubmissions
           }}
           <div v-if="showPager">
-            <button
-              v-bind:disabled="filterOffset <= 0"
-              v-on:click="filterOffset--"
-            >
+            <button :disabled="filterOffset <= 0" @click="filterOffset--">
               &lt;
             </button>
             {{ filterOffset + 1 }}
-            <button
-              v-bind:disabled="runs.length < rowCount"
-              v-on:click="filterOffset++"
-            >
+            <button :disabled="runs.length < rowCount" @click="filterOffset++">
               &gt;
             </button>
 
@@ -93,14 +87,14 @@
                 >{{ T.wordsProblem }}:
                 <omegaup-autocomplete
                   v-model="filterProblem"
-                  v-bind:init="initProblemAutocomplete"
+                  :init="initProblemAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
                 type="button"
                 class="close"
                 style="float: none"
-                v-on:click="filterProblem = ''"
+                @click="filterProblem = ''"
               >
                 &times;
               </button>
@@ -111,14 +105,14 @@
                 >{{ T.wordsUser }}:
                 <omegaup-autocomplete
                   v-model="filterUsername"
-                  v-bind:init="initUserAutocomplete"
+                  :init="initUserAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
                 type="button"
                 class="close"
                 style="float: none"
-                v-on:click="filterUsername = ''"
+                @click="filterUsername = ''"
               >
                 &times;
               </button>
@@ -128,17 +122,17 @@
               <div v-if="filters.length > 0" class="col-sm col-12">
                 <span
                   v-for="filter in filters"
-                  v-bind:key="filter.name"
+                  :key="filter.name"
                   class="btn btn-secondary mr-3"
                 >
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
                   >
-                  <a v-on:click="onRemoveFilter(filter.name)">
-                    <font-awesome-icon v-bind:icon="['fas', 'times']" />
+                  <a @click="onRemoveFilter(filter.name)">
+                    <font-awesome-icon :icon="['fas', 'times']" />
                   </a>
                 </span>
-                <a href="#" v-on:click="onRemoveFilter('all')">
+                <a href="#" @click="onRemoveFilter('all')">
                   <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
                 </a>
               </div>
@@ -167,62 +161,62 @@
             <td colspan="10">
               <a
                 v-if="isContestFinished"
-                v-bind:href="`/arena/${contestAlias}/practice/`"
+                :href="`/arena/${contestAlias}/practice/`"
                 >{{ T.arenaContestEndedUsePractice }}</a
               >
               <a
                 v-else
-                v-bind:href="newSubmissionUrl"
-                v-on:click="$emit('new-submission')"
+                :href="newSubmissionUrl"
+                @click="$emit('new-submission')"
                 >{{ newSubmissionDescription }}</a
               >
             </td>
           </tr>
         </tfoot>
         <tbody>
-          <tr v-for="run in filteredRuns" v-bind:key="run.guid">
+          <tr v-for="run in filteredRuns" :key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
-              <acronym v-bind:title="run.guid">
+              <acronym :title="run.guid">
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
             <td v-if="showUser">
               <omegaup-user-username
-                v-bind:classname="run.classname"
-                v-bind:username="run.username"
-                v-bind:country="run.country_id"
-                v-bind:linkify="true"
-                v-on:emit-click="(username) => (filterUsername = username)"
+                :classname="run.classname"
+                :username="run.username"
+                :country="run.country_id"
+                :linkify="true"
+                @emit-click="(username) => (filterUsername = username)"
               ></omegaup-user-username>
-              <a v-bind:href="`/profile/${run.username}/`" class="ml-2">
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              <a :href="`/profile/${run.username}/`" class="ml-2">
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
             <td v-if="showContest">
               <a
                 href="#"
-                v-on:click="onEmitFilterChanged(run.contest_alias, 'contest')"
+                @click="onEmitFilterChanged(run.contest_alias, 'contest')"
                 >{{ run.contest_alias }}</a
               >
               <a
                 v-if="run.contest_alias"
-                v-bind:href="`/arena/${run.contest_alias}/`"
+                :href="`/arena/${run.contest_alias}/`"
                 class="ml-2"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
             <td v-if="showProblem">
-              <a href="#" v-on:click.prevent="filterProblem = run.alias">{{
+              <a href="#" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
-              <a v-bind:href="`/arena/problem/${run.alias}/`" class="ml-2">
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
             <td
-              v-bind:style="{ backgroundColor: statusColor(run) }"
+              :style="{ backgroundColor: statusColor(run) }"
               data-run-status
               class="text-center"
             >
@@ -231,13 +225,13 @@
               <button
                 v-if="!!statusHelp(run)"
                 type="button"
-                v-bind:data-content="statusHelp(run)"
+                :data-content="statusHelp(run)"
                 data-toggle="popover"
                 data-trigger="focus"
                 class="btn btn-outline-dark btn-sm"
-                v-on:click="showVerdictHelp"
+                @click="showVerdictHelp"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'question-circle']" />
+                <font-awesome-icon :icon="['fas', 'question-circle']" />
               </button>
             </td>
             <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
@@ -249,21 +243,21 @@
             <td v-if="showRejudge">
               <button
                 type="button"
-                v-bind:title="T.wordsRejudge"
+                :title="T.wordsRejudge"
                 class="btn btn-outline-dark btn-sm"
-                v-on:click="$emit('rejudge', run)"
+                @click="$emit('rejudge', run)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'redo-alt']" />
+                <font-awesome-icon :icon="['fas', 'redo-alt']" />
               </button>
             </td>
             <td v-if="showDisqualify">
               <button
                 type="button"
-                v-bind:title="T.wordsDisqualify"
+                :title="T.wordsDisqualify"
                 class="btn btn-outline-dark btn-sm"
-                v-on:click="$emit('disqualify', run)"
+                @click="$emit('disqualify', run)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'ban']" />
+                <font-awesome-icon :icon="['fas', 'ban']" />
               </button>
             </td>
             <td v-if="showDetails">
@@ -271,9 +265,9 @@
                 type="button"
                 data-run-details
                 class="details btn btn-outline-dark btn-sm"
-                v-on:click="$emit('details', run)"
+                @click="$emit('details', run)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'search-plus']" />
+                <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
             </td>
           </tr>
