@@ -2803,6 +2803,9 @@ class User extends \OmegaUp\Controllers\Controller {
                     );
                     if ($contestResponse['contest_admin']) {
                         $response['contest_admin'][] = $contestResponse['contest_alias'];
+                        $response['problemset_admin'][] = intval(
+                            $contestResponse['contest']->problemset_id
+                        );
                     }
                     break;
                 case 'problemset':
@@ -2829,6 +2832,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
+                        $response['problemset_admin'][] = intval($tokens[2]);
                     }
                     break;
                 case 'problem':
