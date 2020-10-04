@@ -201,7 +201,7 @@
               <span class="caret"></span
             ></a>
             <ul class="dropdown-menu">
-              <template v-show="!omegaUpLockDown && !inContest">
+              <template v-if="!omegaUpLockDown && !inContest">
                 <li>
                   <a href="/profile/" data-nav-profile
                     ><span class="glyphicon glyphicon-user"></span>

@@ -43,55 +43,54 @@
               </th>
               <th>{{ element.max_score ? element.max_score : '' }}</th>
             </tr>
-            <template
-              v-for="problem_case in element.cases"
-              v-if="groupVisible[element.group]"
-            >
-              <tr>
-                <td></td>
-                <td class="text-center">{{ problem_case.name }}</td>
-                <td class="text-center">{{ problem_case.verdict }}</td>
-                <td class="score">
-                  {{
-                    problem_case.contest_score
-                      ? problem_case.contest_score
-                      : problem_case.score
-                  }}
-                </td>
-                <td class="center" width="10">
-                  {{ problem_case.max_score ? '/' : '' }}
-                </td>
-                <td>
-                  {{ problem_case.max_score ? problem_case.max_score : '' }}
-                </td>
-              </tr>
-              <template v-if="shouldShowDiffs(problem_case.name)">
+            <template v-if="groupVisible[element.group]">
+              <template v-for="problem_case in element.cases">
                 <tr>
-                  <td colspan="6">{{ T.wordsInput }}</td>
-                </tr>
-                <tr>
-                  <td colspan="6">
-                    <pre>{{
-                      showDataCase(data.cases, problem_case.name, 'in')
-                    }}</pre>
+                  <td></td>
+                  <td class="text-center">{{ problem_case.name }}</td>
+                  <td class="text-center">{{ problem_case.verdict }}</td>
+                  <td class="score">
+                    {{
+                      problem_case.contest_score
+                        ? problem_case.contest_score
+                        : problem_case.score
+                    }}
+                  </td>
+                  <td class="center" width="10">
+                    {{ problem_case.max_score ? '/' : '' }}
+                  </td>
+                  <td>
+                    {{ problem_case.max_score ? problem_case.max_score : '' }}
                   </td>
                 </tr>
-                <tr>
-                  <td colspan="6">{{ T.wordsDifference }}</td>
-                </tr>
-                <tr>
-                  <td v-if="data.cases" colspan="6">
-                    <omegaup-arena-diff-view
-                      v-bind:left="data.cases[problem_case.name].out"
-                      v-bind:right="
-                        getContestantOutput(data.cases, problem_case.name)
-                      "
-                    ></omegaup-arena-diff-view>
-                  </td>
-                  <td v-else colspan="6" class="empty-table-message">
-                    {{ EMPTY_FIELD }}
-                  </td>
-                </tr>
+                <template v-if="shouldShowDiffs(problem_case.name)">
+                  <tr>
+                    <td colspan="6">{{ T.wordsInput }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="6">
+                      <pre>{{
+                        showDataCase(data.cases, problem_case.name, 'in')
+                      }}</pre>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colspan="6">{{ T.wordsDifference }}</td>
+                  </tr>
+                  <tr>
+                    <td v-if="data.cases" colspan="6">
+                      <omegaup-arena-diff-view
+                        v-bind:left="data.cases[problem_case.name].out"
+                        v-bind:right="
+                          getContestantOutput(data.cases, problem_case.name)
+                        "
+                      ></omegaup-arena-diff-view>
+                    </td>
+                    <td v-else colspan="6" class="empty-table-message">
+                      {{ EMPTY_FIELD }}
+                    </td>
+                  </tr>
+                </template>
               </template>
             </template>
           </tbody>
