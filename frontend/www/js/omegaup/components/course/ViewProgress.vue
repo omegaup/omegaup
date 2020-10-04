@@ -150,7 +150,9 @@ export default class CourseViewProgress extends Vue {
     student: types.StudentProgress,
     assignment: omegaup.Assignment,
   ): number {
-    if (!student.score.hasOwnProperty(assignment.alias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(student.score, assignment.alias)
+    ) {
       return 0;
     }
 

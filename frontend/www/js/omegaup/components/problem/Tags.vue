@@ -36,7 +36,9 @@
           <tr v-for="tag in selectedPublicTags" :key="tag">
             <td class="align-middle">
               <a :href="`/problem/?tag[]=${tag}`">
-                {{ T.hasOwnProperty(tag) ? T[tag] : tag }}
+                {{
+                  Object.prototype.hasOwnProperty.call(T, tag) ? T[tag] : tag
+                }}
               </a>
             </td>
             <td class="text-center">
@@ -234,7 +236,7 @@ export default class ProblemTags extends Vue {
   }
 
   publicTagsSerializer(tagname: string): string {
-    if (T.hasOwnProperty(tagname)) {
+    if (Object.prototype.hasOwnProperty.call(T, tagname)) {
       return T[tagname];
     }
     return tagname;

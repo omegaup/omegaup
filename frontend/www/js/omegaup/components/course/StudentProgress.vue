@@ -14,7 +14,14 @@
         :markdown="getProgressDescription(assignment.alias)"
       ></omegaup-markdown>
       <div class="d-flex justify-content-center">
-        <div v-if="!student.progress.hasOwnProperty(assignment.alias)">
+        <div
+          v-if="
+            !Object.prototype.hasOwnProperty.call(
+              student.progress,
+              assignment.alias,
+            )
+          "
+        >
           {{ T.wordsProblemsUnsolved }}
         </div>
         <div
@@ -64,7 +71,12 @@ export default class StudentProgress extends Vue {
   T = T;
 
   progress(assignmentAlias: string): number {
-    if (!this.student.progress.hasOwnProperty(assignmentAlias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        this.student.progress,
+        assignmentAlias,
+      )
+    ) {
       return 0;
     }
     return (
@@ -79,7 +91,9 @@ export default class StudentProgress extends Vue {
   }
 
   score(assignmentAlias: string): number {
-    if (!this.student.score.hasOwnProperty(assignmentAlias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(this.student.score, assignmentAlias)
+    ) {
       return 0;
     }
     return Math.round(
@@ -92,7 +106,12 @@ export default class StudentProgress extends Vue {
   }
 
   points(assignmentAlias: string): number {
-    if (!this.student.points.hasOwnProperty(assignmentAlias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        this.student.points,
+        assignmentAlias,
+      )
+    ) {
       return 0;
     }
     return Object.values(this.student.points[assignmentAlias]).reduce(

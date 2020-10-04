@@ -189,7 +189,7 @@ export class Converter {
       text = text.replace(
         /^\s*\{\{([a-z0-9_-]+:[a-z0-9_-]+)\}\}\s*$/g,
         (wholematch: string, m1: string): string => {
-          if (templates.hasOwnProperty(m1)) {
+          if (Object.prototype.hasOwnProperty.call(templates, m1)) {
             return templates[m1];
           }
           return `<span class="alert alert-danger" role="alert">Unrecognized template name: ${m1}</span>`;
@@ -200,19 +200,19 @@ export class Converter {
       text = text.replace(
         /^\s*\{\{([a-z0-9_-]+\.[a-z]{1,4})\}\}\s*$/gi,
         (wholematch: string, m1: string): string => {
-          if (!sourceMapping.hasOwnProperty(m1)) {
+          if (!Object.prototype.hasOwnProperty.call(sourceMapping, m1)) {
             return `<span class="alert alert-danger" role="alert">Unrecognized source filename: ${m1}</span>`;
           }
 
           const extension = m1.split('.')[1];
           let language = extension;
-          if (languageMapping.hasOwnProperty(language)) {
+          if (Object.prototype.hasOwnProperty.call(languageMapping, language)) {
             language = languageMapping[language];
           }
           const className = ` class="language-${language}"`;
           let contents = sourceMapping[m1];
 
-          if (Prism.languages.hasOwnProperty(language)) {
+          if (Object.prototype.hasOwnProperty.call(Prism.languages, language)) {
             contents = Prism.highlight(
               contents,
               Prism.languages[language],
@@ -233,7 +233,10 @@ export class Converter {
         /<img src="([^"]+)"\s*([^>]+)>/g,
         (wholeMatch: string, url: string, attributes: string): string => {
           url = unescapeCharacters(url);
-          if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
+          if (
+            url.indexOf('/') != -1 ||
+            !Object.prototype.hasOwnProperty.call(imageMapping, url)
+          ) {
             return wholeMatch;
           }
           return `<img src="${escapeCharacters(
@@ -320,6 +323,7 @@ export class Converter {
                   in: `{{examples/${exampleFilename}.in}}`,
                   out: `{{examples/${exampleFilename}.out}}`,
                 };
+                // eslint-disable-next-line no-prototype-builtins
                 if (settings?.cases.hasOwnProperty(exampleFilename)) {
                   exampleFile = settings.cases[exampleFilename];
                 }
@@ -372,12 +376,17 @@ export class Converter {
           if (infoString != '') {
             language = infoString.split(/\s+/)[0];
             className = ` class="language-${language}"`;
-            if (languageMapping.hasOwnProperty(language)) {
+            if (
+              Object.prototype.hasOwnProperty.call(languageMapping, language)
+            ) {
               language = languageMapping[language];
             }
           }
 
-          if (language && Prism.languages.hasOwnProperty(language)) {
+          if (
+            language &&
+            Object.prototype.hasOwnProperty.call(Prism.languages, language)
+          ) {
             contents = Prism.highlight(
               contents,
               Prism.languages[language],

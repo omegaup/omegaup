@@ -89,7 +89,7 @@ export const runsStore = new Vuex.Store<RunsState>({
   },
   mutations: {
     addRun(state, run: types.Run) {
-      if (state.index.hasOwnProperty(run.guid)) {
+      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
           state.index[run.guid],
@@ -114,7 +114,7 @@ const myRunsStore = new Vuex.Store<RunsState>({
   },
   mutations: {
     addRun(state, run: types.Run) {
-      if (state.index.hasOwnProperty(run.guid)) {
+      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
           state.index[run.guid],
@@ -928,7 +928,8 @@ export class Arena {
     this.currentProblemset = problemset;
     this.problemsetAdmin = problemset.admin ?? false;
     this.myRunsList.isProblemsetOpened =
-      !problemset.hasOwnProperty('opened') || (problemset.opened ?? false);
+      !Object.prototype.hasOwnProperty.call(problemset, 'opened') ||
+      (problemset.opened ?? false);
     const problemsetProblems = problemset.problems ?? [];
     for (const problemsetProblem of problemsetProblems) {
       const alias = problemsetProblem.alias;
@@ -1076,7 +1077,7 @@ export class Arena {
 
     events.forEach((evt) => {
       const key = evt.username;
-      if (!originalContestRanking.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(originalContestRanking, key)) {
         originalContestRanking[key] = {
           country: evt.country,
           name: evt.name,

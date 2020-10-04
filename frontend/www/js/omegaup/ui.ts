@@ -54,7 +54,7 @@ export function formatString(
 ): string {
   const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
   return template.replace(re, (match, key, modifier) => {
-    if (!values.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(values, key)) {
       // If the array does not provide a replacement for the key, just return
       // the original substring.
       return match;
