@@ -1,5 +1,5 @@
 <template>
-  <span class="grader-count badge" v-bind:class="graderBadgeClass">{{
+  <span class="grader-count badge" :class="graderBadgeClass">{{
     graderCounter
   }}</span>
 </template>

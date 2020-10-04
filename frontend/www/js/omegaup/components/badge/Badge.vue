@@ -1,14 +1,14 @@
 <template>
-  <figure class="col-md-3 col-sm-3 badge-container" v-tooltip="description">
-    <a class="badge-icon" v-bind:href="`/badge/${this.badge.badge_alias}/`"
+  <figure v-tooltip="description" class="col-md-3 col-sm-3 badge-container">
+    <a class="badge-icon" :href="`/badge/${badge.badge_alias}/`"
       ><img
-        v-bind:class="{ 'badge-gray': !this.badge.unlocked }"
-        v-bind:src="this.iconUrl"
+        :class="{ 'badge-gray': !badge.unlocked }"
+        :src="iconUrl"
         class="img-fluid"
     /></a>
 
     <figcaption class="badge-name">
-      {{ this.name }}
+      {{ name }}
     </figcaption>
   </figure>
 </template>

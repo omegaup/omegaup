@@ -11,6 +11,15 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsPayload();
   const problemSolution = new Vue({
     el: '#problem-solution',
+    components: {
+      'omegaup-problem-solution': problem_Solution,
+    },
+    data: () => ({
+      status: payload.solution_status || 'not_logged_in',
+      solution: <types.ProblemStatement | null>null,
+      allTokens: 0,
+      availableTokens: 0,
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-solution', {
         props: {
@@ -85,15 +94,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      status: payload.solution_status || 'not_logged_in',
-      solution: <types.ProblemStatement | null>null,
-      allTokens: 0,
-      availableTokens: 0,
-    },
-    components: {
-      'omegaup-problem-solution': problem_Solution,
     },
   });
 });

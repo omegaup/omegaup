@@ -1,9 +1,9 @@
 <template>
   <div class="root d-flex flex-row h-100">
     <textarea
-      class="col px-0"
-      v-bind:disabled="readOnly"
       v-model="contents"
+      class="col px-0"
+      :disabled="readOnly"
     ></textarea>
   </div>
 </template>

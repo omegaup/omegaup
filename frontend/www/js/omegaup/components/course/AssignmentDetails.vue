@@ -1,23 +1,23 @@
 <template>
-  <div class="omegaup-course-assignmentdetails card" v-show="show">
+  <div v-show="show" class="omegaup-course-assignmentdetails card">
     <slot name="page-header">
       <div class="card-header">
         <h1>{{ T.wordsContentEdit }} {{ assignment.name }}</h1>
       </div>
     </slot>
     <div class="card-body">
-      <form class="form schedule" v-on:submit.prevent="onSubmit">
+      <form class="form schedule" @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-4">
             <label
               >{{ T.wordsTitle }}
               <input
                 ref="name"
+                v-model="name"
                 class="form-control name"
-                v-bind:class="{ 'is-invalid': invalidParameterName === 'name' }"
+                :class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
                 type="text"
-                v-model="name"
                 required
             /></label>
           </div>
@@ -25,16 +25,16 @@
             <label
               >{{ T.courseNewFormShortTitle_alias_ }}
               <font-awesome-icon
-                v-bind:title="T.courseAssignmentNewFormShortTitle_alias_Desc"
+                :title="T.courseAssignmentNewFormShortTitle_alias_Desc"
                 icon="info-circle" />
               <input
+                v-model="alias"
                 class="form-control alias"
-                v-bind:class="{
+                :class="{
                   'is-invalid': invalidParameterName === 'alias',
                 }"
                 type="text"
-                v-bind:disabled="update"
-                v-model="alias"
+                :disabled="update"
                 required
             /></label>
           </div>
@@ -42,15 +42,15 @@
             <label
               >{{ T.wordsContentType }}
               <font-awesome-icon
-                v-bind:title="T.courseContentNewFormTypeDesc"
+                :title="T.courseContentNewFormTypeDesc"
                 icon="info-circle"
               />
               <select
+                v-model="assignmentType"
                 class="form-control"
-                v-bind:class="{
+                :class="{
                   'is-invalid': invalidParameterName === 'assignment_type',
                 }"
-                v-model="assignmentType"
                 required
               >
                 <option value="lesson">
@@ -71,14 +71,14 @@
             <label
               >{{ T.courseNewFormStartDate }}
               <font-awesome-icon
-                v-bind:title="T.courseAssignmentNewFormStartDateDesc"
+                :title="T.courseAssignmentNewFormStartDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
-                v-bind:enabled="!assignment.has_runs"
                 v-model="startTime"
-                v-bind:finish="finishTimeCourse"
-                v-bind:start="startTimeCourse"
-                v-bind:is-invalid="invalidParameterName === 'start_time'"
+                :enabled="!assignment.has_runs"
+                :finish="finishTimeCourse"
+                :start="startTimeCourse"
+                :is-invalid="invalidParameterName === 'start_time'"
               ></omegaup-datetimepicker
             ></label>
           </div>
@@ -86,30 +86,30 @@
             <span class="faux-label"
               >{{ T.courseNewFormUnlimitedDuration }}
               <font-awesome-icon
-                v-bind:title="T.courseNewFormUnlimitedDurationDesc"
+                :title="T.courseNewFormUnlimitedDurationDesc"
                 icon="info-circle"
               />
             </span>
             <div
               class="form-control container-fluid"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'unlimited_duration',
               }"
             >
               <label class="radio-inline"
                 ><input
-                  type="radio"
-                  v-bind:value="true"
                   v-model="unlimitedDuration"
-                  v-bind:disabled="!unlimitedDurationCourse"
+                  type="radio"
+                  :value="true"
+                  :disabled="!unlimitedDurationCourse"
                 />{{ T.wordsYes }}</label
               >
               <label class="radio-inline"
                 ><input
-                  type="radio"
-                  v-bind:value="false"
                   v-model="unlimitedDuration"
-                  v-bind:disabled="!unlimitedDurationCourse"
+                  type="radio"
+                  :value="false"
+                  :disabled="!unlimitedDurationCourse"
                 />{{ T.wordsNo }}</label
               >
             </div>
@@ -118,15 +118,15 @@
             <label
               >{{ T.courseNewFormEndDate }}
               <font-awesome-icon
-                v-bind:title="T.courseAssignmentNewFormEndDateDesc"
+                :title="T.courseAssignmentNewFormEndDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
-                v-bind:enabled="!unlimitedDuration"
-                v-bind:readonly="false"
                 v-model="finishTime"
-                v-bind:finish="finishTimeCourse"
-                v-bind:start="startTimeCourse"
-                v-bind:is-invalid="invalidParameterName === 'finish_time'"
+                :enabled="!unlimitedDuration"
+                :readonly="false"
+                :finish="finishTimeCourse"
+                :start="startTimeCourse"
+                :is-invalid="invalidParameterName === 'finish_time'"
               ></omegaup-datetimepicker
             ></label>
           </div>
@@ -136,13 +136,13 @@
             <label
               >{{ T.courseNewFormDescription }}
               <textarea
+                v-model="description"
                 class="form-control"
-                v-bind:class="{
+                :class="{
                   'is-invalid': invalidParameterName === 'description',
                 }"
                 cols="30"
                 rows="5"
-                v-model="description"
                 required
               ></textarea>
             </label>
@@ -150,35 +150,35 @@
         </div>
         <template v-if="shouldAddProblems">
           <omegaup-course-scheduled-problem-list
-            ref="scheduled-problem-list"
             v-if="assignmentFormMode === AssignmentFormMode.New"
-            v-bind:assignment-problems="assignmentProblems"
-            v-bind:tagged-problems="taggedProblems"
-            v-bind:selected-assignment="assignment"
-            v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
+            ref="scheduled-problem-list"
+            :assignment-problems="assignmentProblems"
+            :tagged-problems="taggedProblems"
+            :selected-assignment="assignment"
+            @emit-tags="(tags) => $emit('tags-problems', tags)"
           ></omegaup-course-scheduled-problem-list>
           <omegaup-course-problem-list
             v-else
-            v-bind:assignment-problems="assignmentProblems"
-            v-bind:tagged-problems="taggedProblems"
-            v-bind:selected-assignment="assignment"
-            v-bind:assignment-form-mode.sync="assignmentFormMode"
-            v-on:save-problem="
+            :assignment-problems="assignmentProblems"
+            :tagged-problems="taggedProblems"
+            :selected-assignment="assignment"
+            :assignment-form-mode.sync="assignmentFormMode"
+            @save-problem="
               (assignment, problem) => $emit('add-problem', assignment, problem)
             "
-            v-on:emit-remove-problem="
+            @emit-remove-problem="
               (assignment, problem) =>
                 $emit('remove-problem', assignment, problem)
             "
-            v-on:emit-select-assignment="
+            @emit-select-assignment="
               (assignment) => $emit('select-assignment', assignment)
             "
-            v-on:emit-sort="
+            @emit-sort="
               (assignmentAlias, problemsAlias) =>
                 $emit('sort-problems', assignmentAlias, problemsAlias)
             "
-            v-on:emit-tags="(tags) => $emit('tags-problems', tags)"
-            v-on:change-alias="
+            @emit-tags="(tags) => $emit('tags-problems', tags)"
+            @change-alias="
               (addProblemComponent, newProblemAlias) =>
                 $emit('get-versions', newProblemAlias, addProblemComponent)
             "
@@ -193,7 +193,7 @@
             <template v-if="update">
               {{ T.courseAssignmentNewFormUpdate }}
             </template>
-            <template v-else="">
+            <template v-else>
               {{ T.courseAssignmentNewFormSchedule }}
             </template>
           </button>
@@ -201,7 +201,7 @@
             <button
               class="btn btn-secondary"
               type="reset"
-              v-on:click.prevent="onCancel"
+              @click.prevent="onCancel"
             >
               {{ T.wordsBack }}
             </button>
@@ -314,7 +314,7 @@ export default class CourseAssignmentDetails extends Vue {
   }
 
   @Watch('show')
-  onShowChanged(newValue: boolean): void {
+  onShowChanged(): void {
     this.reset();
   }
 

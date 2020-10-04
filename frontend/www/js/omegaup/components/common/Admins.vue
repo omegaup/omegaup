@@ -1,18 +1,18 @@
 <template>
   <div class="card mb-3 panel panel-primary">
     <div class="card-body panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label class="font-weight-bold"
             >{{ T.wordsAdmin }}
             <font-awesome-icon
-              v-bind:title="T.courseEditAddAdminsTooltip"
+              :title="T.courseEditAddAdminsTooltip"
               icon="info-circle"
             />
             <omegaup-autocomplete
-              class="form-control"
-              v-bind:init="(el) => typeahead.userTypeahead(el)"
               v-model="username"
+              class="form-control"
+              :init="(el) => typeahead.userTypeahead(el)"
             ></omegaup-autocomplete>
           </label>
         </div>
@@ -25,9 +25,9 @@
           <div class="toggle-container col-md-6">
             <label class="font-weight-bold">
               <input
+                v-model="showSiteAdmins"
                 type="checkbox"
                 name="toggle-site-admins"
-                v-model="showSiteAdmins"
               />
               {{ T.wordsShowSiteAdmins }}
             </label>
@@ -40,7 +40,7 @@
         {{ T.courseEditAdminsEmpty }}
       </div>
     </div>
-    <table class="table table-striped" v-else="">
+    <table v-else class="table table-striped">
       <thead>
         <tr>
           <th>{{ T.contestEditRegisteredAdminUsername }}</th>
@@ -49,28 +49,30 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="admin in admins"
-          v-if="admin.role !== 'site-admin' || showSiteAdmins"
-        >
-          <td>
-            <omegaup-user-username
-              v-bind:linkify="true"
-              v-bind:username="admin.username"
-            ></omegaup-user-username>
-          </td>
-          <td>{{ admin.role }}</td>
-          <td>
-            <button
-              type="button"
-              class="close"
-              v-if="admin.role === 'admin'"
-              v-on:click="onRemove(admin)"
-            >
-              &times;
-            </button>
-          </td>
-        </tr>
+        <template v-for="admin in admins">
+          <tr
+            v-if="admin.role !== 'site-admin' || showSiteAdmins"
+            :key="admin.username"
+          >
+            <td>
+              <omegaup-user-username
+                :linkify="true"
+                :username="admin.username"
+              ></omegaup-user-username>
+            </td>
+            <td>{{ admin.role }}</td>
+            <td>
+              <button
+                v-if="admin.role === 'admin'"
+                type="button"
+                class="close"
+                @click="onRemove(admin)"
+              >
+                &times;
+              </button>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
   </div>

@@ -1,12 +1,12 @@
 <template>
   <input
-    class="typeahead form-control"
     ref="input"
+    class="typeahead form-control"
     autocomplete="off"
-    v-on:change="onUpdateInput"
-    v-bind:placeholder="placeholder"
-    v-bind:name="name"
-    v-bind:value="value"
+    :placeholder="placeholder"
+    :name="name"
+    :value="value"
+    @change="onUpdateInput"
   />
 </template>
 
@@ -43,7 +43,7 @@ export default class Autocomplete extends Vue {
   }
 
   @Watch('value')
-  onPropertyChanged(newValue: string, oldValue: string) {
+  onPropertyChanged(newValue: string) {
     this.input.value = newValue;
   }
 }

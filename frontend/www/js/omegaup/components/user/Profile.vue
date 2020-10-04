@@ -4,7 +4,7 @@
       <div class="panel panel-default">
         <div class="panel-body">
           <div class="thumbnail bottom-margin">
-            <img v-bind:src="profile.gravatar_92" />
+            <img :src="profile.gravatar_92" />
           </div>
           <div v-if="profile.email">
             <a class="btn btn-default" href="/profile/edit/">{{
@@ -21,28 +21,28 @@
             {{ profile.rankinfo.rank &gt; 0 ? `#${profile.rankinfo.rank} - `:
           '' }}
             <omegaup-user-username
-              v-bind:classname="profile.classname"
-              v-bind:username="profile.username"
+              :classname="profile.classname"
+              :username="profile.username"
             ></omegaup-user-username>
             <img
-              height="11"
-              v-bind:src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
-              v-bind:title="profile.country_id"
               v-if="profile.country_id"
+              height="11"
+              :src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
+              :title="profile.country_id"
               width="16"
             />
           </h2>
         </div>
         <omegaup-user-basicinfo
-          v-bind:profile="profile"
-          v-bind:rank="rank"
+          :profile="profile"
+          :rank="rank"
         ></omegaup-user-basicinfo>
       </div>
       <omegaup-grid-paginator
-        v-bind:columns="1"
-        v-bind:items="contests"
-        v-bind:items-per-page="15"
-        v-bind:title="T.profileContests"
+        :columns="1"
+        :items="contests"
+        :items-per-page="15"
+        :title="T.profileContests"
       >
         <template slot="table-header">
           <thead>
@@ -54,37 +54,39 @@
         </template>
       </omegaup-grid-paginator>
       <omegaup-grid-paginator
-        v-bind:columns="3"
-        v-bind:items="createdProblems"
-        v-bind:items-per-page="30"
-        v-bind:title="T.profileCreatedProblems"
+        :columns="3"
+        :items="createdProblems"
+        :items-per-page="30"
+        :title="T.profileCreatedProblems"
       ></omegaup-grid-paginator>
       <omegaup-grid-paginator
-        v-bind:columns="3"
-        v-bind:items="solvedProblems"
-        v-bind:items-per-page="30"
-        v-bind:title="T.profileSolvedProblems"
+        :columns="3"
+        :items="solvedProblems"
+        :items-per-page="30"
+        :title="T.profileSolvedProblems"
       ></omegaup-grid-paginator>
       <omegaup-grid-paginator
-        v-bind:columns="3"
-        v-bind:items="unsolvedProblems"
-        v-bind:items-per-page="30"
-        v-bind:title="T.profileUnsolvedProblems"
+        :columns="3"
+        :items="unsolvedProblems"
+        :items-per-page="30"
+        :title="T.profileUnsolvedProblems"
       ></omegaup-grid-paginator>
       <omegaup-badge-list
-        v-bind:all-badges="profileBadges"
-        v-bind:show-all-badges-link="true"
-        v-bind:visitor-badges="visitorBadges"
+        :all-badges="profileBadges"
+        :show-all-badges-link="true"
+        :visitor-badges="visitorBadges"
       ></omegaup-badge-list>
       <div class="panel panel-default no-bottom-margin">
         <div class="panel-heading">
           <h2 class="panel-title">{{ T.profileStatistics }}</h2>
         </div>
         <omegaup-user-charts
-          v-bind:data="charts"
-          v-bind:username="profile.username"
-          v-bind:periodStatisticOptions="periodStatisticOptions"
-          v-on:emit-update-period-statistics="
+          v-if="charts"
+          :data="charts"
+          :username="profile.username"
+          :periodStatisticOptions="periodStatisticOptions"
+          :aggregateStatisticOptions="aggregateStatisticOptions"
+          @emit-update-period-statistics="
             (profileComponent, categories, data) =>
               $emit(
                 'update-period-statistics',
@@ -93,12 +95,10 @@
                 data,
               )
           "
-          v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
-          v-on:emit-update-aggregate-statistics="
+          @emit-update-aggregate-statistics="
             (profileComponent) =>
               $emit('update-aggregate-statistics', profileComponent)
           "
-          v-if="charts"
         ></omegaup-user-charts>
       </div>
     </div>

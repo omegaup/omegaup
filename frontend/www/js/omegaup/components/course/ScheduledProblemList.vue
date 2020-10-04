@@ -7,10 +7,10 @@
       <span>{{ T.courseAddProblemsAddAssignmentDesc }}</span>
     </div>
     <div class="card-body">
-      <div class="empty-table-message" v-if="problems.length == 0">
+      <div v-if="problems.length == 0" class="empty-table-message">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
-      <div v-else="">
+      <div v-else>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -26,8 +26,8 @@
               <td class="button-column align-middle">
                 <button
                   class="btn btn-link"
-                  v-bind:title="T.courseAssignmentProblemRemove"
-                  v-on:click.prevent="onRemoveProblem(problem)"
+                  :title="T.courseAssignmentProblemRemove"
+                  @click.prevent="onRemoveProblem(problem)"
                 >
                   <font-awesome-icon icon="trash" />
                 </button>
@@ -46,9 +46,9 @@
                 <label
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
-                    class="form-control"
-                    v-bind:init="(el) => typeahead.problemTypeahead(el)"
                     v-model="problemAlias"
+                    class="form-control"
+                    :init="(el) => typeahead.problemTypeahead(el)"
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
@@ -58,7 +58,7 @@
               <div class="form-group col-md-4">
                 <label
                   >{{ T.wordsPoints }}
-                  <input type="number" class="form-control" v-model="points" />
+                  <input v-model="points" type="number" class="form-control" />
                 </label>
               </div>
             </div>
@@ -67,8 +67,8 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                v-bind:disabled="problemAlias.length == 0"
-                v-on:click.prevent="
+                :disabled="problemAlias.length == 0"
+                @click.prevent="
                   onAddProblem({ alias: problemAlias, points: points })
                 "
               >
@@ -155,7 +155,7 @@ export default class CourseScheduledProblemList extends Vue {
   }
 
   @Watch('problems')
-  onProblemsChange(newVal: types.AddedProblem): void {
+  onProblemsChange(): void {
     this.reset();
   }
 

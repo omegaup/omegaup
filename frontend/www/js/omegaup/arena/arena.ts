@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex from 'vuex';
 import * as Highcharts from 'highcharts/highstock';
 
 import * as api from '../api';
@@ -7,7 +7,6 @@ import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
 import * as time from '../time';
-import * as typeahead from '../typeahead';
 import * as ui from '../ui';
 import JSZip from 'jszip';
 import * as markdown from '../markdown';
@@ -18,13 +17,11 @@ import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue'
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import arena_RunSubmit from '../components/arena/RunSubmit.vue';
-import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
 import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
-import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 
 import ArenaAdmin from './admin_arena';
@@ -311,6 +308,7 @@ export class Arena {
   markdownView: Vue & {
     markdown: string;
     imageMapping: markdown.ImageMapping;
+    sourceMapping: markdown.SourceMapping;
     problemSettings?: types.ProblemSettingsDistrib;
   };
 
@@ -343,11 +341,18 @@ export class Arena {
   rankingChart: Highcharts.Chart | null = null;
 
   constructor(options: ArenaOptions) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.options = options;
 
     // All runs in this contest/problem.
     this.myRunsList = new Vue({
+      components: { 'omegaup-arena-runs': arena_Runs },
+      data: () => ({
+        isContestFinished: false,
+        isProblemsetOpened: true,
+        problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
+      }),
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -369,12 +374,6 @@ export class Arena {
           },
         });
       },
-      data: {
-        isContestFinished: false,
-        isProblemsetOpened: true,
-        problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
-      },
-      components: { 'omegaup-arena-runs': arena_Runs },
     });
     const myRunsListElement = document.querySelector('#problem table.runs');
     if (myRunsListElement) {
@@ -385,6 +384,16 @@ export class Arena {
     if (document.getElementById('common-navbar')) {
       const commonNavbar = (this.commonNavbar = new Vue({
         el: '#common-navbar',
+        components: {
+          'omegaup-common-navbar': common_Navbar,
+        },
+        data: () => ({
+          graderInfo: null,
+          graderQueueLength: -1,
+          errorMessage: null,
+          initialClarifications: [],
+          notifications: [],
+        }),
         render: function (createElement) {
           return createElement('omegaup-common-navbar', {
             props: {
@@ -404,16 +413,6 @@ export class Arena {
               initialClarifications: this.initialClarifications,
             },
           });
-        },
-        data: {
-          graderInfo: null,
-          graderQueueLength: -1,
-          errorMessage: null,
-          initialClarifications: [],
-          notifications: [],
-        },
-        components: {
-          'omegaup-common-navbar': common_Navbar,
         },
       }));
 
@@ -460,6 +459,11 @@ export class Arena {
     if (document.getElementById('arena-navbar-problems') !== null) {
       this.navbarProblems = new Vue({
         el: '#arena-navbar-problems',
+        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
+        data: () => ({
+          problems: [],
+          activeProblem: '',
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-navbar-problems', {
             props: {
@@ -478,11 +482,6 @@ export class Arena {
             },
           });
         },
-        data: {
-          problems: [],
-          activeProblem: '',
-        },
-        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
     }
 
@@ -498,6 +497,13 @@ export class Arena {
     ) {
       this.navbarMiniRanking = new Vue({
         el: '#arena-navbar-miniranking',
+        components: {
+          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
+        },
+        data: () => ({
+          showRanking: navbarPayload,
+          users: [],
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-navbar-miniranking', {
             props: {
@@ -506,19 +512,21 @@ export class Arena {
             },
           });
         },
-        data: {
-          showRanking: navbarPayload,
-          users: [],
-        },
-        components: {
-          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
-        },
       });
     }
 
     if (this.elements.ranking.length) {
       this.scoreboard = new Vue({
         el: this.elements.ranking[0],
+        components: {
+          'omegaup-arena-scoreboard': arena_Scoreboard,
+        },
+        data: () => ({
+          problems: [],
+          ranking: [],
+          lastUpdated: new Date(0),
+          showPenalty: true,
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
@@ -532,15 +540,6 @@ export class Arena {
             },
           });
         },
-        data: {
-          problems: [],
-          ranking: [],
-          lastUpdated: new Date(0),
-          showPenalty: true,
-        },
-        components: {
-          'omegaup-arena-scoreboard': arena_Scoreboard,
-        },
       });
     }
 
@@ -548,16 +547,18 @@ export class Arena {
     if (document.getElementById('run-details') != null) {
       this.runDetailsView = new Vue({
         el: '#run-details',
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+        data: () => ({
+          data: null,
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-rundetails', {
             props: {
               data: this.data,
             },
           });
-        },
-        data: { data: null },
-        components: {
-          'omegaup-arena-rundetails': arena_RunDetails,
         },
       });
     }
@@ -566,6 +567,14 @@ export class Arena {
     if (document.getElementById('run-submit') !== null) {
       self.runSubmitView = new Vue({
         el: '#run-submit',
+        components: {
+          'omegaup-arena-runsubmit': arena_RunSubmit,
+        },
+        data: () => ({
+          languages: [],
+          preferredLanguage: '',
+          nextSubmissionTimestamp: new Date(0),
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-runsubmit', {
             props: {
@@ -581,14 +590,6 @@ export class Arena {
             ref: 'component',
           });
         },
-        data: {
-          languages: [],
-          preferredLanguage: '',
-          nextSubmissionTimestamp: new Date(0),
-        },
-        components: {
-          'omegaup-arena-runsubmit': arena_RunSubmit,
-        },
       });
     }
 
@@ -597,15 +598,10 @@ export class Arena {
 
     // Contest summary view model
     this.summaryView = new Vue({
-      render: function (createElement) {
-        return createElement('omegaup-arena-contestsummary', {
-          props: {
-            contest: this.contest,
-            showRanking: !options.isPractice,
-          },
-        });
+      components: {
+        'omegaup-arena-contestsummary': arena_ContestSummary,
       },
-      data: {
+      data: () => ({
         contest: {
           start_time: new Date(),
           finish_time: null,
@@ -614,9 +610,14 @@ export class Arena {
           title: '',
           director: '',
         },
-      },
-      components: {
-        'omegaup-arena-contestsummary': arena_ContestSummary,
+      }),
+      render: function (createElement) {
+        return createElement('omegaup-arena-contestsummary', {
+          props: {
+            contest: this.contest,
+            showRanking: !options.isPractice,
+          },
+        });
       },
     });
     const summaryElement = document.getElementById('summary');
@@ -626,11 +627,21 @@ export class Arena {
 
     // Markdown view.
     this.markdownView = new Vue({
+      components: {
+        'omegaup-markdown': omegaup_Markdown,
+      },
+      data: () => ({
+        markdown: '',
+        imageMapping: <markdown.ImageMapping>{},
+        sourceMapping: <markdown.SourceMapping>{},
+        problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
+      }),
       render: function (createElement) {
         return createElement('omegaup-markdown', {
           props: {
             markdown: this.markdown,
             imageMapping: this.imageMapping,
+            sourceMapping: this.sourceMapping,
             problemSettings: this.problemSettings,
           },
           on: {
@@ -639,14 +650,6 @@ export class Arena {
             },
           },
         });
-      },
-      data: {
-        markdown: '',
-        imageMapping: <markdown.ImageMapping>{},
-        problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
-      },
-      components: {
-        'omegaup-markdown': omegaup_Markdown,
       },
     });
     const problemStatementElement = document.querySelector(
@@ -899,6 +902,9 @@ export class Arena {
       const courseAlias = this.options.courseAlias;
       this.navbarAssignments = new Vue({
         el: '#arena-navbar-assignments',
+        components: {
+          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
+        },
         render: function (createElement) {
           return createElement('omegaup-arena-navbar-assignments', {
             props: {
@@ -913,9 +919,6 @@ export class Arena {
               },
             },
           });
-        },
-        components: {
-          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
         },
       });
     }
@@ -1213,11 +1216,8 @@ export class Arena {
       currentRankingState[username] = { place: rank.place ?? 0 };
 
       // Update problem scores.
-      let totalRuns = 0;
       for (const alias of Object.keys(order)) {
         const problem = rank.problems[order[alias]];
-        totalRuns += problem.runs;
-
         if (
           this.problems[alias] &&
           rank.username == OmegaUp.username &&
@@ -1610,7 +1610,7 @@ export class Arena {
       window.history.replaceState({}, '', `#${this.activeTab}`);
     }
 
-    const problemMatch = /#problems\/([^\/]+)(\/new-run)?/.exec(
+    const problemMatch = /#problems\/([^/]+)(\/new-run)?/.exec(
       window.location.hash,
     );
     // Check if we were already viewing this problem to avoid reloading
@@ -1641,15 +1641,17 @@ export class Arena {
         } else if (document.getElementById('problem-settings-summary')) {
           this.problemSettingsSummary = new Vue({
             el: '#problem-settings-summary',
+            components: {
+              'omegaup-problem-settings-summary': problem_SettingsSummary,
+            },
+            data: () => ({
+              problem: problem,
+            }),
             render: function (createElement) {
               return createElement('omegaup-problem-settings-summary', {
                 props: { problem: this.problem },
               });
             },
-            components: {
-              'omegaup-problem-settings-summary': problem_SettingsSummary,
-            },
-            data: { problem: problem },
           });
         }
         this.renderProblem(problem);
@@ -1807,6 +1809,12 @@ export class Arena {
     }
     this.qualityNominationForm = new Vue({
       el: '#qualitynomination-popup',
+      components: {
+        'qualitynomination-popup': qualitynomination_Popup,
+      },
+      data: () => ({
+        qualityPayload: qualityPayload,
+      }),
       mounted: () => {
         ui.reportEvent('quality-nomination', 'shown');
       },
@@ -1853,7 +1861,7 @@ export class Arena {
                 nomination: 'dismissal',
                 contents: JSON.stringify(contents),
               })
-                .then((data) => {
+                .then(() => {
                   ui.info(T.qualityNominationRateProblemDesc);
                   ui.reportEvent('quality-nomination', 'dismiss');
                 })
@@ -1861,12 +1869,6 @@ export class Arena {
             },
           },
         });
-      },
-      data: {
-        qualityPayload: qualityPayload,
-      },
-      components: {
-        'qualitynomination-popup': qualitynomination_Popup,
       },
     });
   }
@@ -1876,6 +1878,7 @@ export class Arena {
     if (problem.statement) {
       this.markdownView.markdown = problem.statement.markdown;
       this.markdownView.imageMapping = problem.statement.images;
+      this.markdownView.sourceMapping = problem.statement.sources;
       this.markdownView.problemSettings = problem.settings;
     }
     const creationDateElement = <HTMLElement>(
@@ -2056,8 +2059,8 @@ export class Arena {
 
         const currentProblem = this.problems[this.currentProblem.alias];
         if (!this.options.isOnlyProblem) {
-          this.problems[this.currentProblem.alias].lastSubmission = new Date();
-          this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
+          currentProblem.lastSubmission = new Date();
+          currentProblem.nextSubmissionTimestamp =
             response.nextSubmissionTimestamp;
         }
         const run = {
@@ -2104,8 +2107,6 @@ export class Arena {
   }
 
   displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
-    const problemAdmin = data.admin;
-
     let sourceHTML,
       sourceLink = false;
     if (data.source?.indexOf('data:') === 0) {
@@ -2320,12 +2321,12 @@ export function GetOptionsFromLocation(
 
   if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
     options.isOnlyProblem = true;
-    const match = /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    const match = /\/arena\/problem\/([^/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.onlyProblemAlias = match[1];
     }
   } else {
-    const match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    const match = /\/arena\/([^/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];
     }
@@ -2373,7 +2374,7 @@ export class EventsSocket {
         const socket = new WebSocket(this.uri, 'com.omegaup.events');
 
         socket.onmessage = (message) => this.onmessage(message);
-        socket.onopen = (e: Event) => {
+        socket.onopen = () => {
           this.shouldRetry = true;
           this.arena.elements.socketStatus.html('&bull;').css('color', '#080');
           this.socketKeepalive = setInterval(
@@ -2419,6 +2420,7 @@ export class EventsSocket {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onclose(e: Event) {
     this.socket = null;
     if (this.socketKeepalive) {

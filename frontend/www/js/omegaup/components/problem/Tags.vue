@@ -5,15 +5,13 @@
         <label class="font-weight-bold">{{ T.wordsPublicTags }}</label>
         <vue-typeahead-bootstrap
           v-if="canAddNewTags"
-          v-bind:data="publicTags"
-          v-bind:serializer="publicTagsSerializer"
-          v-on:hit="addPublicTag"
-          v-bind:auto-close="true"
-          v-bind:placeholder="T.publicTagsPlaceholder"
-          v-bind:required="true"
-          v-bind:input-class="
-            errors.includes('public_tags') ? 'is-invalid' : ''
-          "
+          :data="publicTags"
+          :serializer="publicTagsSerializer"
+          :auto-close="true"
+          :placeholder="T.publicTagsPlaceholder"
+          :required="true"
+          :input-class="errors.includes('public_tags') ? 'is-invalid' : ''"
+          @hit="addPublicTag"
         >
         </vue-typeahead-bootstrap>
       </div>
@@ -28,16 +26,16 @@
               <a
                 data-toggle="tooltip"
                 rel="tooltip"
-                v-bind:title="T.problemEditTagPublicRequired"
+                :title="T.problemEditTagPublicRequired"
                 ><img src="/media/question.png"
               /></a>
             </th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="tag in selectedPublicTags" v-bind:key="tag">
+          <tr v-for="tag in selectedPublicTags" :key="tag">
             <td class="align-middle">
-              <a v-bind:href="`/problem/?tag[]=${tag}`">
+              <a :href="`/problem/?tag[]=${tag}`">
                 {{ T.hasOwnProperty(tag) ? T[tag] : tag }}
               </a>
             </td>
@@ -45,10 +43,10 @@
               <button
                 type="button"
                 class="btn btn-danger"
-                v-on:click="removeTag(tag, /*public=*/ true)"
-                v-bind:disabled="selectedPublicTags.length < 2"
+                :disabled="selectedPublicTags.length < 2"
+                @click="removeTag(tag, /*public=*/ true)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'trash']" />
+                <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
             </td>
           </tr>
@@ -58,17 +56,17 @@
         <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
         <div class="input-group">
           <input
+            v-model="newPrivateTag"
             type="text"
             class="form-control"
-            v-model="newPrivateTag"
-            v-bind:placeholder="T.privateTagsPlaceholder"
+            :placeholder="T.privateTagsPlaceholder"
           />
           <div class="input-group-append">
             <button
               class="btn btn-outline-primary"
               type="button"
-              v-bind:disabled="newPrivateTag === ''"
-              v-on:click.prevent="addPrivateTag"
+              :disabled="newPrivateTag === ''"
+              @click.prevent="addPrivateTag"
             >
               {{ T.wordsAddTag }}
             </button>
@@ -87,9 +85,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="tag in selectedPrivateTags" v-bind:key="tag">
+          <tr v-for="tag in selectedPrivateTags" :key="tag">
             <td class="align-middle">
-              <a v-bind:href="`/problem/?tag[]=${tag}`">
+              <a :href="`/problem/?tag[]=${tag}`">
                 {{ tag }}
               </a>
             </td>
@@ -97,9 +95,9 @@
               <button
                 type="button"
                 class="btn btn-danger"
-                v-on:click="removeTag(tag, false /* public */)"
+                @click="removeTag(tag, false /* public */)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'trash']" />
+                <font-awesome-icon :icon="['fas', 'trash']" />
               </button>
             </td>
           </tr>
@@ -109,13 +107,13 @@
         <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
           <select
+            v-model="problemLevelTag"
             required
             class="form-control"
             name="problem-level"
-            v-model="problemLevelTag"
-            v-on:change="onSelectProblemLevel"
+            @change="onSelectProblemLevel"
           >
-            <option v-for="levelTag in levelTags" v-bind:value="levelTag">
+            <option v-for="levelTag in levelTags" :value="levelTag">
               {{ T[levelTag] }}
             </option>
           </select>
@@ -124,18 +122,16 @@
             <button
               type="button"
               class="btn btn-primary"
-              v-bind:disabled="
-                !problemLevelTag || problemLevel === problemLevelTag
-              "
-              v-on:click.prevent="onUpdateProblemLevel"
+              :disabled="!problemLevelTag || problemLevel === problemLevelTag"
+              @click.prevent="onUpdateProblemLevel"
             >
               {{ T.updateProblemLevel }}
             </button>
             <button
               type="button"
               class="btn btn-danger ml-1"
-              v-bind:disabled="!problemLevel"
-              v-on:click.prevent="onDeleteProblemLevel"
+              :disabled="!problemLevel"
+              @click.prevent="onDeleteProblemLevel"
             >
               {{ T.deleteProblemLevel }}
             </button>
@@ -145,7 +141,7 @@
       <div class="form-group">
         <label class="switch-container font-weight-bold">
           <div class="switch">
-            <input type="checkbox" v-model="allowTags" />
+            <input v-model="allowTags" type="checkbox" />
             <span class="slider round"></span>
           </div>
           <span class="switch-text">
@@ -155,10 +151,10 @@
       </div>
     </div>
     <input
+      v-if="!canAddNewTags"
       type="hidden"
       name="allow_user_add_tags"
-      v-bind:value="allowTags"
-      v-if="!canAddNewTags"
+      :value="allowTags"
     />
   </div>
 </template>
@@ -244,18 +240,13 @@ input:checked + .slider:before {
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import { types } from '../../api_types';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 library.add(faTrash);
-
-import 'v-tooltip/dist/v-tooltip.css';
-import { VTooltip } from 'v-tooltip';
 
 @Component({
   components: {

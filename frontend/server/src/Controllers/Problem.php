@@ -10,7 +10,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
- * @psalm-type ProblemStatement=array{images: array<string, string>, language: string, markdown: string}
+ * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
  * @psalm-type InteractiveInterface=array{MakefileRules: list<array{Targets: list<string>, Requisites: list<string>, Compiler: string, Params: string, Debug: bool}>, ExecutableDescription: array{Args: list<string>, Env: array<string, string>}, Files: array<string, string>}
  * @psalm-type ProblemSettings=array{Cases: list<array{Cases: list<array{Name: string, Weight: float}>, Name: string}>, Limits: LimitsSettings, Slow: bool, Validator: array{Lang?: string, Limits?: LimitsSettings, Name: string, Tolerance: float}, Interactive?: array{Interfaces: array<string, array<string, InteractiveInterface>>, Templates: array<string, string>, Main: string, ModuleName: string, ParentLang: string, LibinteractiveVersion: string}}
  * @psalm-type ProblemSettingsDistrib=array{cases: array<string, array{in: string, out: string, weight?: float}>, interactive?: InteractiveSettingsDistrib, limits: LimitsSettings, validator: array{custom_validator?: array{language: string, limits?: LimitsSettings, source: string}, name: string, tolerance?: float}}
@@ -40,6 +40,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
+ * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -92,6 +93,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         'svgz', 'tif', 'tiff',
     ];
 
+    const SOURCE_EXTENSIONS = [
+        'py', 'cpp', 'c', 'java', 'kp', 'kj', 'in', 'out',
+    ];
+
     // Number of rows shown in problems list
     const PAGE_SIZE = 100;
 
@@ -125,9 +130,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $params = [
             'problem_alias' => $r->ensureString(
                 'problem_alias',
-                fn (string $problemAlias) => \OmegaUp\Validators::stringNonEmpty(
-                    $problemAlias
-                )
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
             ),
         ];
         if (!is_null($r['email_clarifications'])) {
@@ -315,7 +318,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'aliasInUse'
                 );
             }
-            if (!\OmegaUp\Validators::isValidAlias($params->problemAlias)) {
+            if (!\OmegaUp\Validators::alias($params->problemAlias)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalidAlias',
                     'problem_alias'
@@ -594,9 +597,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check problem_alias
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['usernameOrEmail'],
@@ -608,7 +611,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -640,15 +643,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Authenticate logged user
         $r->ensureIdentity();
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString('problem_alias')
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $group = \OmegaUp\DAO\Groups::findByAlias($r->ensureString('group'));
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group) || is_null($group->group_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
@@ -671,9 +679,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $problem_alias
      */
     public static function apiUpdateProblemLevel(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['level_tag'],
@@ -682,7 +690,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $r->ensureIdentity();
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -732,17 +740,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiAddTag(\OmegaUp\Request $r): array {
         // Check problem_alias
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
+        $tagName = $r->ensureString(
+            'name',
+            fn (string $name) => \OmegaUp\Validators::alias($name)
+        );
 
         // Authenticate logged user
         $r->ensureIdentity();
-        $r->ensureOptionalBool('public');
+        $isPublic = $r->ensureOptionalBool('public') ?? false;
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -751,10 +762,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        self::addTag($r['name'], $r['public'] || false, $problem);
+        self::addTag($tagName, $isPublic, $problem);
 
         return [
-            'name' => $r['name'],
+            'name' => $tagName,
         ];
     }
 
@@ -832,9 +843,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check problem_alias
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['usernameOrEmail'],
@@ -848,7 +859,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -886,25 +897,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r): array {
         // Authenticate logged user
         $r->ensureIdentity();
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString(
-                'problem_alias',
-                fn (string $problemAlias) => \OmegaUp\Validators::isValidAlias(
-                    $problemAlias
-                )
-            )
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $group = \OmegaUp\DAO\Groups::findByAlias(
-            $r->ensureString(
-                'group',
-                fn (string $group) => \OmegaUp\Validators::isValidAlias($group)
-            )
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $group) => \OmegaUp\Validators::alias($group)
         );
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group) || is_null($group->group_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
@@ -939,18 +945,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check whether problem exists
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
+        $tagName = $r->ensureString(
+            'name',
+            fn (string $name) => \OmegaUp\Validators::alias($name)
+        );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $tag = \OmegaUp\DAO\Tags::getByName($r['name']);
+        $tag = \OmegaUp\DAO\Tags::getByName($tagName);
         if (is_null($tag)) {
             throw new \OmegaUp\Exceptions\NotFoundException('tagNotFound');
         }
@@ -990,12 +999,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Check whether problem exists
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1028,12 +1037,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1062,12 +1071,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Authenticate request
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $includeVoted = ($r['include_voted'] == 'true');
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1093,11 +1102,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRejudge(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1765,12 +1774,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r,
             /*$isRequired=*/ false
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
@@ -2081,6 +2090,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $result = [
             'language' => $params['language'],
             'images' => [],
+            'sources' => [],
         ];
         try {
             $result['markdown'] = mb_convert_encoding(
@@ -2103,22 +2113,33 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $statementFiles = $problemArtifacts->lsTree($params['directory']);
         foreach ($statementFiles as $file) {
             $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-            if (!in_array($extension, self::IMAGE_EXTENSIONS)) {
-                continue;
-            }
-            $result['images'][$file['name']] = (
-                IMAGES_URL_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
-            );
-            $imagePath = (
-                IMAGES_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
-            );
-            if (!@file_exists($imagePath)) {
-                @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
-                file_put_contents(
-                    $imagePath,
+            if (in_array($extension, self::IMAGE_EXTENSIONS)) {
+                $result['images'][$file['name']] = (
+                    IMAGES_URL_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+                );
+                $imagePath = (
+                    IMAGES_PATH . "{$params['alias']}/{$file['id']}.{$extension}"
+                );
+                if (!@file_exists($imagePath)) {
+                    @mkdir(IMAGES_PATH . $params['alias'], 0755, true);
+                    file_put_contents(
+                        $imagePath,
+                        $problemArtifacts->get(
+                            "{$params['directory']}/{$file['name']}"
+                        )
+                    );
+                }
+            } elseif (in_array($extension, self::SOURCE_EXTENSIONS)) {
+                if ($file['size'] > 8192) {
+                    // File is too big. Add an error message.
+                    $result['sources'][$file['name']] = "File exceeded the 8192-byte limit: {$file['size']} bytes";
+                    continue;
+                }
+                $result['sources'][$file['name']] = mb_convert_encoding(
                     $problemArtifacts->get(
                         "{$params['directory']}/{$file['name']}"
-                    )
+                    ),
+                    'utf-8'
                 );
             }
         }
@@ -2281,14 +2302,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Validate request
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problem = self::validateDownload(
-            $r->identity,
-            $r['problem_alias']
-        );
+        $problem = self::validateDownload($r->identity, $problemAlias);
 
         header('Pragma: public');
         header('Expires: 0');
@@ -2429,13 +2447,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $contestAlias = $r->ensureOptionalString(
             'contest_alias',
             /*$required=*/false,
-            fn (string $contestAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $contestAlias
-            )
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         try {
             $r->ensureIdentity();
@@ -2452,7 +2468,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ] = self::getValidProblemAndProblemset(
             $r->identity,
             $contestAlias,
-            $r['problem_alias'],
+            $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
@@ -2762,16 +2778,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiSolution(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $contestAlias = $r->ensureOptionalString(
+            'contest_alias',
+            /*$required=*/ false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         // Validate request
         $response = self::validateDetails(
             $r->identity,
-            $r->ensureOptionalString('contest_alias'),
-            $r['problem_alias'],
+            $contestAlias,
+            $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
@@ -2862,12 +2883,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiVersions(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -2974,9 +2995,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiSelectVersion(\OmegaUp\Request $r): array {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
@@ -3006,7 +3027,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $updatePublished = $r['update_published'];
         }
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -3149,13 +3170,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRunsDiff(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['version'], 'version');
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -3259,11 +3280,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Get user
         $r->ensureIdentity();
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
 
         // Validate request
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString('problem_alias')
-        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -3344,11 +3367,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         // Get user
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -3386,11 +3409,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Validate request
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -3407,11 +3430,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
 
         // Validate request
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -3419,7 +3442,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => array_merge(
                     [
-                        'alias' => $r['problem_alias'],
+                        'alias' => $problemAlias,
                         'entity_type' => 'problem',
                     ],
                     self::getStats($problem, $r->identity)
@@ -4002,17 +4025,21 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function apiBestScore(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         // Uses same params as apiDetails, except for lang, which is optional
-        $contestAlias = $r->ensureOptionalString('contest_alias');
+        $contestAlias = $r->ensureOptionalString(
+            'contest_alias',
+            /*$required=*/ false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
         $problem = self::validateDetails(
             $r->identity,
             $contestAlias,
-            $r['problem_alias'],
+            $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
@@ -4275,13 +4302,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $contestAlias = $r->ensureOptionalString(
             'contest_alias',
             /*$required=*/false,
-            fn (string $contestAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $contestAlias
-            )
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         [
             'problem' => $problem,
@@ -4289,7 +4314,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ] = self::getValidProblemAndProblemset(
             $r->identity,
             $contestAlias,
-            $r['problem_alias'],
+            $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
@@ -4463,13 +4488,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $contestAlias = $r->ensureOptionalString(
             'contest_alias',
             /*$required=*/false,
-            fn (string $contestAlias) => \OmegaUp\Validators::stringNonEmpty(
-                $contestAlias
-            )
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         [
             'problem' => $problem,
@@ -4477,7 +4500,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ] = self::getValidProblemAndProblemset(
             $r->identity,
             $contestAlias,
-            $r['problem_alias'],
+            $problemAlias,
             $r->ensureOptionalString('statement_type') ?? '',
             !is_null($r['problemset_id']) ? intval($r['problemset_id']) : null
         );
@@ -5146,6 +5169,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: ProblemFormPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param bool|null $allow_user_add_tags
+     * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param bool|null $email_clarifications
      * @omegaup-request-param null|string $extra_wall_time
      * @omegaup-request-param null|string $input_limit
@@ -5210,6 +5234,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                         /*$assoc=*/true
                     );
                 }
+                $contestAlias = $r->ensureOptionalString(
+                    'contest_alias',
+                    /*$required=*/ false,
+                    fn (string $alias) => \OmegaUp\Validators::alias($alias)
+                );
                 return [
                     'smartyProperties' => [
                         'payload' => array_merge(
@@ -5217,9 +5246,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                 'title' => $r->ensureOptionalString(
                                     'title'
                                 ) ?? '',
-                                'alias' => $r->ensureOptionalString(
-                                    'problem_alias'
-                                ) ?? '',
+                                'alias' => $contestAlias ?? '',
                                 'emailClarifications' => $r->ensureOptionalBool(
                                     'email_clarifications'
                                 ) ?? false,
@@ -5419,9 +5446,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $problem_alias
      */
     public static function apiTemplate(\OmegaUp\Request $r): void {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['commit'],
@@ -5456,11 +5483,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        self::regenerateTemplates($r['problem_alias'], $r['commit']);
+        self::regenerateTemplates($problemAlias, $r['commit']);
 
         //The noredirect=1 part lets nginx know to not call us again if the file is not found.
         header(
-            'Location: ' . TEMPLATES_URL_PATH . "{$r['problem_alias']}/{$r['commit']}/{$r['filename']}?noredirect=1"
+            'Location: ' . TEMPLATES_URL_PATH . "{$problemAlias}/{$r['commit']}/{$r['filename']}?noredirect=1"
         );
         header('HTTP/1.1 303 See Other');
 
@@ -5498,14 +5525,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $commit
             ) === 1
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString(
-                'problem_alias',
-                fn (string $problemAlias) => \OmegaUp\Validators::alias(
-                    $problemAlias
-                )
-            )
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
@@ -5607,9 +5631,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $problem_alias
      */
     public static function apiImage(\OmegaUp\Request $r): void {
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringOfLengthInRange(
             $r['object_id'],
@@ -5634,14 +5658,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         self::regenerateImage(
-            $r['problem_alias'],
+            $problemAlias,
             $r['object_id'],
             $extension
         );
 
         //The noredirect=1 part lets nginx know to not call us again if the file is not found.
         header(
-            'Location: ' . IMAGES_URL_PATH . "{$r['problem_alias']}/{$r['object_id']}.{$extension}?noredirect=1"
+            'Location: ' . IMAGES_URL_PATH . "{$problemAlias}/{$r['object_id']}.{$extension}?noredirect=1"
         );
         header('HTTP/1.1 303 See Other');
 
@@ -5703,9 +5727,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'os',
                 ['unix', 'windows']
             );
-            \OmegaUp\Validators::validateValidAlias(
-                $r['name'],
-                'name'
+            $name = $r->ensureString(
+                'name',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
             );
             \OmegaUp\Validators::validateStringNonEmpty(
                 $r['idl'],
@@ -5727,13 +5751,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'libinteractive'
         );
         try {
-            file_put_contents("{$dirname}/{$r['name']}.idl", $r['idl']);
+            file_put_contents("{$dirname}/{$name}.idl", $r['idl']);
             $args = [
                 '/usr/bin/java',
                 '-jar',
                 '/usr/share/java/libinteractive.jar',
                 'generate',
-                "{$r['name']}.idl",
+                "{$name}.idl",
                 $language,
                 $language,
                 '--makefile',
@@ -5807,7 +5831,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             header('Content-Type: application/zip');
             header(
-                "Content-Disposition: attachment; filename={$r['name']}.zip"
+                "Content-Disposition: attachment; filename={$name}.zip"
             );
             readfile("{$dirname}/interactive.zip");
             \OmegaUp\FileHandler::deleteDirRecursively($dirname);
@@ -5827,5 +5851,58 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } finally {
             \OmegaUp\FileHandler::deleteDirRecursively($dirname);
         }
+    }
+
+    /**
+     *
+     * @return array{smartyProperties: array{payload: CollectionDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param string $collection_type
+     */
+    public static function getCollectionsDetailsForSmarty(\OmegaUp\Request $r): array {
+        $collectionType = $r->ensureString('collection_type');
+
+        $collection = [];
+
+        $title = new \OmegaUp\TranslationString(
+            'omegaupTitleCollectionsByLevel'
+        );
+
+        if ($collectionType === 'author') {
+            $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRank(
+                1,
+                15
+            )['ranking'];
+            $collection = [];
+            foreach ($authorsRanking as $author) {
+                if (!is_null($author['name'])) {
+                    $collection[] = [
+                        'name' => $author['name'],
+                        'alias' => $author['username'],
+                    ];
+                    continue;
+                }
+                $collection[] = [
+                    'alias' => $author['username'],
+                ];
+            }
+            $title = new \OmegaUp\TranslationString(
+                'omegaupTitleCollectionsByAuthor'
+            );
+        } else {
+            $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
+                $r->ensureString('collection_type')
+            );
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'collection' => $collection,
+                ],
+                'title' => $title,
+            ],
+            'entrypoint' => 'problem_collections_details',
+        ];
     }
 }

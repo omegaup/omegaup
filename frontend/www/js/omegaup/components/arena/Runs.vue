@@ -19,17 +19,11 @@
             T.wordsSubmissions
           }}
           <div v-if="showPager">
-            <button
-              v-bind:disabled="filterOffset <= 0"
-              v-on:click="filterOffset--"
-            >
+            <button :disabled="filterOffset <= 0" @click="filterOffset--">
               &lt;
             </button>
             {{ filterOffset + 1 }}
-            <button
-              v-bind:disabled="runs.length < rowCount"
-              v-on:click="filterOffset++"
-            >
+            <button :disabled="runs.length < rowCount" @click="filterOffset++">
               &gt;
             </button>
 
@@ -92,15 +86,15 @@
               <label
                 >{{ T.wordsProblem }}:
                 <omegaup-autocomplete
-                  v-bind:init="initProblemAutocomplete"
                   v-model="filterProblem"
+                  :init="initProblemAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
                 type="button"
                 class="close"
-                style="float: none;"
-                v-on:click="filterProblem = ''"
+                style="float: none"
+                @click="filterProblem = ''"
               >
                 &times;
               </button>
@@ -110,35 +104,35 @@
               <label
                 >{{ T.wordsUser }}:
                 <omegaup-autocomplete
-                  v-bind:init="initUserAutocomplete"
                   v-model="filterUsername"
+                  :init="initUserAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
                 type="button"
                 class="close"
-                style="float: none;"
-                v-on:click="filterUsername = ''"
+                style="float: none"
+                @click="filterUsername = ''"
               >
                 &times;
               </button>
             </template>
 
             <div class="row">
-              <div class="col-sm col-12" v-if="filters.length > 0">
+              <div v-if="filters.length > 0" class="col-sm col-12">
                 <span
-                  class="btn btn-secondary mr-3"
                   v-for="filter in filters"
-                  v-bind:key="filter.name"
+                  :key="filter.name"
+                  class="btn btn-secondary mr-3"
                 >
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
                   >
-                  <a v-on:click="onRemoveFilter(filter.name)">
-                    <font-awesome-icon v-bind:icon="['fas', 'times']" />
+                  <a @click="onRemoveFilter(filter.name)">
+                    <font-awesome-icon :icon="['fas', 'times']" />
                   </a>
                 </span>
-                <a v-on:click="onRemoveFilter('all')" href="#">
+                <a href="#" @click="onRemoveFilter('all')">
                   <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
                 </a>
               </div>
@@ -166,85 +160,78 @@
           <tr>
             <td colspan="10">
               <a
-                v-bind:href="`/arena/${contestAlias}/practice/`"
                 v-if="isContestFinished"
+                :href="`/arena/${contestAlias}/practice/`"
                 >{{ T.arenaContestEndedUsePractice }}</a
               >
               <a
-                v-bind:href="
-                  isProblemsetOpened
-                    ? `#problems/${problemAlias}/new-run`
-                    : `/arena/${contestAlias}/`
-                "
                 v-else
-                >{{
-                  isProblemsetOpened
-                    ? T.wordsNewSubmissions
-                    : T.arenaContestNotOpened
-                }}</a
+                :href="newSubmissionUrl"
+                @click="$emit('new-submission')"
+                >{{ newSubmissionDescription }}</a
               >
             </td>
           </tr>
         </tfoot>
         <tbody>
-          <tr v-for="run in filteredRuns" v-bind:key="run.guid">
+          <tr v-for="run in filteredRuns" :key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
-              <acronym v-bind:title="run.guid">
+              <acronym :title="run.guid">
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
             <td v-if="showUser">
               <omegaup-user-username
-                v-bind:classname="run.classname"
-                v-bind:username="run.username"
-                v-bind:country="run.country_id"
-                v-bind:linkify="true"
-                v-on:emit-click="(username) => (filterUsername = username)"
+                :classname="run.classname"
+                :username="run.username"
+                :country="run.country_id"
+                :linkify="true"
+                @emit-click="(username) => (filterUsername = username)"
               ></omegaup-user-username>
-              <a v-bind:href="`/profile/${run.username}/`" class="ml-2">
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              <a :href="`/profile/${run.username}/`" class="ml-2">
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
             <td v-if="showContest">
               <a
                 href="#"
-                v-on:click="onEmitFilterChanged(run.contest_alias, 'contest')"
+                @click="onEmitFilterChanged(run.contest_alias, 'contest')"
                 >{{ run.contest_alias }}</a
               >
               <a
-                v-bind:href="`/arena/${run.contest_alias}/`"
                 v-if="run.contest_alias"
+                :href="`/arena/${run.contest_alias}/`"
                 class="ml-2"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
             <td v-if="showProblem">
-              <a href="#" v-on:click.prevent="filterProblem = run.alias">{{
+              <a href="#" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
-              <a v-bind:href="`/arena/problem/${run.alias}/`" class="ml-2">
-                <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+              <a :href="`/arena/problem/${run.alias}/`" class="ml-2">
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
             <td
-              v-bind:style="{ backgroundColor: statusColor(run) }"
+              :style="{ backgroundColor: statusColor(run) }"
               data-run-status
               class="text-center"
             >
               <span>{{ status(run) }}</span>
 
               <button
-                type="button"
                 v-if="!!statusHelp(run)"
-                v-bind:data-content="statusHelp(run)"
-                v-on:click="showVerdictHelp"
+                type="button"
+                :data-content="statusHelp(run)"
                 data-toggle="popover"
                 data-trigger="focus"
                 class="btn btn-outline-dark btn-sm"
+                @click="showVerdictHelp"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'question-circle']" />
+                <font-awesome-icon :icon="['fas', 'question-circle']" />
               </button>
             </td>
             <td v-if="showPoints" class="numeric">{{ points(run) }}</td>
@@ -256,31 +243,31 @@
             <td v-if="showRejudge">
               <button
                 type="button"
-                v-bind:title="T.wordsRejudge"
-                v-on:click="$emit('rejudge', run)"
+                :title="T.wordsRejudge"
                 class="btn btn-outline-dark btn-sm"
+                @click="$emit('rejudge', run)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'redo-alt']" />
+                <font-awesome-icon :icon="['fas', 'redo-alt']" />
               </button>
             </td>
             <td v-if="showDisqualify">
               <button
                 type="button"
-                v-bind:title="T.wordsDisqualify"
-                v-on:click="$emit('disqualify', run)"
+                :title="T.wordsDisqualify"
                 class="btn btn-outline-dark btn-sm"
+                @click="$emit('disqualify', run)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'ban']" />
+                <font-awesome-icon :icon="['fas', 'ban']" />
               </button>
             </td>
             <td v-if="showDetails">
               <button
                 type="button"
                 data-run-details
-                v-on:click="$emit('details', run)"
                 class="details btn btn-outline-dark btn-sm"
+                @click="$emit('details', run)"
               >
-                <font-awesome-icon v-bind:icon="['fas', 'search-plus']" />
+                <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
             </td>
           </tr>
@@ -355,6 +342,7 @@ library.add(faExternalLinkAlt);
 library.add(faTimes);
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface JQuery {
     popover(action: string): JQuery;
   }
@@ -437,6 +425,20 @@ export default class Runs extends Vue {
       }
       return true;
     });
+  }
+
+  get newSubmissionUrl(): string {
+    if (this.isProblemsetOpened) {
+      return `#problems/${this.problemAlias}/new-run`;
+    }
+    return `/arena/${this.contestAlias}/`;
+  }
+
+  get newSubmissionDescription(): string {
+    if (this.isProblemsetOpened) {
+      return T.wordsNewSubmissions;
+    }
+    return T.arenaContestNotOpened;
   }
 
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
@@ -577,7 +579,7 @@ export default class Runs extends Vue {
   }
 
   @Watch('username')
-  onUsernameChanged(newValue: string | null, oldValue: string | null) {
+  onUsernameChanged(newValue: string | null) {
     if (!newValue) {
       this.filterUsername = '';
     } else {
@@ -586,7 +588,7 @@ export default class Runs extends Vue {
   }
 
   @Watch('problemAlias')
-  onProblemAliasChanged(newValue: string | null, oldValue: string | null) {
+  onProblemAliasChanged(newValue: string | null) {
     if (!newValue) {
       this.filterProblem = '';
     } else {
@@ -595,32 +597,32 @@ export default class Runs extends Vue {
   }
 
   @Watch('filterLanguage')
-  onFilterLanguageChanged(newValue: string, oldValue: string) {
+  onFilterLanguageChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'language');
   }
 
   @Watch('filterOffset')
-  onFilterOffsetChanged(newValue: number, oldValue: number) {
+  onFilterOffsetChanged() {
     this.$emit('filter-changed');
   }
 
   @Watch('filterProblem')
-  onFilterProblemChanged(newValue: string, oldValue: number) {
+  onFilterProblemChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'problem');
   }
 
   @Watch('filterStatus')
-  onFilterStatusChanged(newValue: string, oldValue: number) {
+  onFilterStatusChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'status');
   }
 
   @Watch('filterUsername')
-  onFilterUsernameChanged(newValue: string, oldValue: number) {
+  onFilterUsernameChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'username');
   }
 
   @Watch('filterVerdict')
-  onFilterVerdictChanged(newValue: string, oldValue: number) {
+  onFilterVerdictChanged(newValue: string) {
     this.onEmitFilterChanged(newValue, 'verdict');
   }
 

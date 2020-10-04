@@ -1,28 +1,28 @@
 <template>
   <!-- id-lint off -->
-  <div class="carousel slide" data-ride="carousel" id="carousel-display">
+  <div id="carousel-display" class="carousel slide" data-ride="carousel">
     <!-- id-lint on -->
     <ol class="carousel-indicators">
       <li
-        data-target="#carousel-display"
-        v-bind:key="index"
-        v-bind:data-slide-to="index"
-        v-bind:class="{ active: !index }"
         v-for="(_, index) in slides"
+        :key="index"
+        data-target="#carousel-display"
+        :data-slide-to="index"
+        :class="{ active: !index }"
       ></li>
     </ol>
     <div class="carousel-inner text-center py-5 py-md-0">
       <div
-        class="carousel-item"
-        v-bind:class="{ active: !index }"
-        v-bind:key="index"
         v-for="(slide, index) in slides"
+        :key="index"
+        class="carousel-item"
+        :class="{ active: !index }"
       >
         <omegaup-homepage-slide
-          v-bind:title="slide.title[T.locale]"
-          v-bind:description="slide.description[T.locale]"
-          v-bind:image-src="slide.image"
-          v-bind:button="slide.button"
+          :title="slide.title[T.locale]"
+          :description="slide.description[T.locale]"
+          :image-src="slide.image"
+          :button="slide.button"
         ></omegaup-homepage-slide>
       </div>
     </div>
@@ -57,7 +57,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 import homepageSlide from './Slide.vue';
 import carouselConfig from '../../carousel.config';

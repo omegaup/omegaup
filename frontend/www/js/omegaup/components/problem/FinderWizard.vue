@@ -2,65 +2,65 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-container">
-        <button class="close" v-on:click="$emit('close')">❌</button>
+        <button class="close" @click="$emit('close')">❌</button>
         <form-wizard
           color="#678DD7"
-          v-bind:back-button-text="T.wordsBack"
-          v-bind:finish-button-text="T.wordsConfirm"
-          v-bind:next-button-text="T.wordsNext"
-          v-bind:subtitle="T.wizardDescription"
-          v-bind:title="T.wizardTitle"
-          v-on:on-complete="searchProblems"
-          ><tab-content v-bind:title="T.wizardStepOne"
+          :back-button-text="T.wordsBack"
+          :finish-button-text="T.wordsConfirm"
+          :next-button-text="T.wordsNext"
+          :subtitle="T.wizardDescription"
+          :title="T.wizardTitle"
+          @on-complete="searchProblems"
+          ><tab-content :title="T.wizardStepOne"
             ><toggle-button
-              v-bind:color="{ checked: '#678DD7', unchecked: '#343a40' }"
-              v-bind:font-size="12"
-              v-bind:height="35"
-              v-bind:labels="{
+              v-model="karel"
+              :color="{ checked: '#678DD7', unchecked: '#343a40' }"
+              :font-size="12"
+              :height="35"
+              :labels="{
                 checked: `${T.wordsKarel}`,
                 unchecked: `${T.wordsAnyLanguage}`,
               }"
-              v-bind:value="karel"
-              v-bind:width="160"
-              v-model="karel"
+              :value="karel"
+              :width="160"
             ></toggle-button>
             <tags-input
-              element-id="tags"
-              v-bind:existing-tags="tagObjects"
-              v-bind:only-existing-tags="true"
-              v-bind:placeholder="T.wordsAddTag"
-              v-bind:typeahead="true"
               v-model="selectedTags"
+              element-id="tags"
+              :existing-tags="tagObjects"
+              :only-existing-tags="true"
+              :placeholder="T.wordsAddTag"
+              :typeahead="true"
             ></tags-input
           ></tab-content>
-          <tab-content v-bind:title="T.wizardStepTwo"
+          <tab-content :title="T.wizardStepTwo"
             ><vue-slider
-              tooltip="none"
-              v-bind:adsorb="true"
-              v-bind:dot-size="18"
-              v-bind:enable-cross="false"
-              v-bind:included="true"
-              v-bind:marks="SLIDER_MARKS"
-              v-bind:max="4"
-              v-bind:min="0"
               v-model="difficultyRange"
+              tooltip="none"
+              :adsorb="true"
+              :dot-size="18"
+              :enable-cross="false"
+              :included="true"
+              :marks="SLIDER_MARKS"
+              :max="4"
+              :min="0"
             ></vue-slider
           ></tab-content>
-          <tab-content v-bind:title="T.wizardStepThree">
+          <tab-content :title="T.wizardStepThree">
             <div class="tab-select">
               <label
+                v-for="priority in PRIORITIES"
                 class="tab-select-el"
-                v-bind:class="{
+                :class="{
                   'tab-select-el-active': priority.type === selectedPriority,
                 }"
-                v-for="priority in PRIORITIES"
                 >{{ priority.text }}
                 <input
+                  v-model="selectedPriority"
                   class="hidden-radio"
                   name="priority"
                   type="radio"
-                  v-bind:value="priority.type"
-                  v-model="selectedPriority"
+                  :value="priority.type"
               /></label>
             </div> </tab-content
         ></form-wizard>

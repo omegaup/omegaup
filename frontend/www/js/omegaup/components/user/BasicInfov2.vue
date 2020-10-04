@@ -8,8 +8,8 @@
         <div class="col-sm-9 field-data">
           https://omegaup.com/profile/<strong
             ><omegaup-user-username
-              v-bind:classname="profile.classname"
-              v-bind:username="profile.username"
+              :classname="profile.classname"
+              :username="profile.username"
             ></omegaup-user-username></strong
           >/
         </div>
@@ -57,7 +57,7 @@
             <strong>{{ T.profileSchool }}</strong>
           </div>
           <div class="col-sm-9 field-data">
-            <a v-bind:href="`/schools/profile/${profile.school_id}/`"
+            <a :href="`/schools/profile/${profile.school_id}/`"
               ><strong>{{ profile.school }}</strong></a
             >
           </div>
@@ -82,18 +82,15 @@
           <div class="col-sm-9 field-data">
             <strong
               ><omegaup-user-username
-                v-bind:classname="profile.classname"
-                v-bind:username="rank"
+                :classname="profile.classname"
+                :username="rank"
               ></omegaup-user-username
             ></strong>
           </div>
         </div>
       </div>
     </div>
-    <a
-      v-if="!profile.is_private"
-      v-bind:href="`/submissions/${profile.username}/`"
-    >
+    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
       {{ T.wordsSeeLatestSubmissions }}
     </a>
   </div>

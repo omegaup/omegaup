@@ -9,14 +9,14 @@ class Authorization extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{has_solved: bool, is_admin: bool, can_view: bool, can_edit: bool}
      *
-     * @omegaup-request-param null|string $problem_alias
+     * @omegaup-request-param string $problem_alias
      * @omegaup-request-param string $token
      * @omegaup-request-param mixed $username
      */
     public static function apiProblem(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateValidUsername(
             $r['username'],
@@ -38,7 +38,7 @@ class Authorization extends \OmegaUp\Controllers\Controller {
             $r['username']
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }

@@ -10,7 +10,7 @@
           {{ T.wordsTotal }}:<span
             v-if="contestantData.hasOwnProperty('total') &amp;&amp; contestantData.total.hasOwnProperty('points')"
             >{{ contestantData.total.points }}</span
-          ><span v-else="">0</span>
+          ><span v-else>0</span>
         </h3>
         <div v-for="item in contestantData.problems">
           <h3>{{ T.wordsProblem }}: {{ item.alias }}</h3>
@@ -55,9 +55,9 @@
                   <th>{{ T.wordsGroup }}</th>
                   <th>{{ T.rankScore }}</th>
                 </tr>
-                <tr v-for="group in item.run_details.details.groups">
-                  <td>{{ group.group }}</td>
-                  <td>{{ group.score }}</td>
+                <tr v-for="groupDetails in item.run_details.details.groups">
+                  <td>{{ groupDetails.group }}</td>
+                  <td>{{ groupDetails.score }}</td>
                 </tr>
               </table>
 

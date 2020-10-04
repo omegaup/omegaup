@@ -4,34 +4,34 @@
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img
-          src="/media/quality-badge-sm.png"
-          v-bind:title="T.wordsHighQualityProblem"
           v-if="problem.quality_seal || problem.visibility === 3"
+          src="/media/quality-badge-sm.png"
+          :title="T.wordsHighQualityProblem"
           class="mr-2"
         />
         <font-awesome-icon
-          v-bind:icon="['fas', 'exclamation-triangle']"
-          v-bind:title="T.wordsWarningProblem"
           v-if="problem.visibility === 1 || problem.visibility === -1"
+          :icon="['fas', 'exclamation-triangle']"
+          :title="T.wordsWarningProblem"
           class="mr-2"
         ></font-awesome-icon>
         <font-awesome-icon
-          v-bind:icon="['fas', 'eye-slash']"
-          v-bind:title="T.wordsPrivate"
           v-if="problem.visibility === 0 || problem.visibility === -1"
+          :icon="['fas', 'eye-slash']"
+          :title="T.wordsPrivate"
           class="mr-2"
         ></font-awesome-icon>
         <font-awesome-icon
-          v-bind:icon="['fas', 'ban']"
-          v-bind:title="T.wordsBannedProblem"
           v-if="problem.visibility <= -2"
+          :icon="['fas', 'ban']"
+          :title="T.wordsBannedProblem"
           class="mr-2"
           color="darkred"
         ></font-awesome-icon>
       </template>
 
-      <a v-if="showEditLink" v-bind:href="`/problem/${problem.alias}/edit/`">
-        <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+      <a v-if="showEditLink" :href="`/problem/${problem.alias}/edit/`">
+        <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
     <table
@@ -73,7 +73,6 @@ table td {
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as ui from '../../ui';
 import { types } from '../../api_types';
 
 import { library } from '@fortawesome/fontawesome-svg-core';

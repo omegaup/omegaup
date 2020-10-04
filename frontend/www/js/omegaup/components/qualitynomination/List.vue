@@ -4,38 +4,38 @@
       <div class="form-row mb-3">
         <label class="col-form-label">{{ T.wordsSearchBy }}</label>
         <div class="col-md-4">
-          <select name="column" class="form-control" v-model="selectColumn">
+          <select v-model="selectColumn" name="column" class="form-control">
             <option
               v-for="(columnText, columnIndex) in columns"
-              v-bind:value="columnIndex"
+              :value="columnIndex"
             >
-              {{ columnText }}</option
-            >
+              {{ columnText }}
+            </option>
           </select>
         </div>
         <div class="col-md-4">
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.problemTypeahead(el)"
-            v-model="queryProblem"
-            v-bind:placeholder="T.wordsKeyword"
-            class="form-control"
             v-show="selectColumn == 'problem_alias'"
+            v-model="queryProblem"
+            :init="(el) => typeahead.problemTypeahead(el)"
+            :placeholder="T.wordsKeyword"
+            class="form-control"
           ></omegaup-autocomplete>
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.userTypeahead(el)"
-            v-model="queryUsername"
-            v-bind:placeholder="T.wordsKeyword"
-            class="form-control"
             v-show="
               selectColumn == 'nominator_username' ||
               selectColumn == 'author_username'
             "
+            v-model="queryUsername"
+            :init="(el) => typeahead.userTypeahead(el)"
+            :placeholder="T.wordsKeyword"
+            class="form-control"
           ></omegaup-autocomplete>
         </div>
       </div>
       <button
         class="btn btn-primary"
-        v-on:click.prevent="
+        @click.prevent="
           $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
         "
       >
@@ -55,12 +55,12 @@
         <a v-if="isAdmin" href="/group/omegaup:quality-reviewer/edit/#members">
           {{ T.addUsersToReviewerGroup }}
         </a>
-        <div class="pull-right" v-if="!myView">
+        <div v-if="!myView" class="pull-right">
           <label>
             <input
-              type="checkbox"
               v-model="showAll"
-              v-on:change="
+              type="checkbox"
+              @change="
                 $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
               "
             />
@@ -83,17 +83,17 @@
         <tbody>
           <tr v-for="nomination in nominations">
             <td>
-              <a v-bind:href="problemUrl(nomination.problem.alias)">{{
+              <a :href="problemUrl(nomination.problem.alias)">{{
                 nomination.problem.title
               }}</a>
             </td>
             <td v-if="!myView">
-              <a v-bind:href="userUrl(nomination.nominator.username)">{{
+              <a :href="userUrl(nomination.nominator.username)">{{
                 nomination.nominator.username
               }}</a>
             </td>
             <td>
-              <a v-bind:href="userUrl(nomination.author.username)">{{
+              <a :href="userUrl(nomination.author.username)">{{
                 nomination.author.username
               }}</a>
             </td>
@@ -102,9 +102,7 @@
             <td class="text-center">{{ nomination.status }}</td>
             <td>
               <a
-                v-bind:href="
-                  nominationDetailsUrl(nomination.qualitynomination_id)
-                "
+                :href="nominationDetailsUrl(nomination.qualitynomination_id)"
                 >{{ T.wordsDetails }}</a
               >
             </td>
@@ -112,8 +110,8 @@
         </tbody>
       </table>
       <omegaup-common-paginator
-        v-bind:pager-items="pagerItems"
-        v-on:page-changed="
+        :pager-items="pagerItems"
+        @page-changed="
           (page) =>
             $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
         "
@@ -123,8 +121,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 import common_Paginator from '../common/Paginatorv2.vue';

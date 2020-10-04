@@ -3,24 +3,24 @@
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
+          v-model="radioValue"
           class="form-check-input"
           type="radio"
-          v-bind:name="name"
-          v-bind:value="valueForTrue"
-          v-model="radioValue"
-          v-on:change.prevent="onUpdateInput"
+          :name="name"
+          :value="valueForTrue"
+          @change.prevent="onUpdateInput"
         />{{ textForTrue }}
       </label>
     </div>
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
+          v-model="radioValue"
           class="form-check-input"
           type="radio"
-          v-bind:name="name"
-          v-bind:value="valueForFalse"
-          v-model="radioValue"
-          v-on:change.prevent="onUpdateInput"
+          :name="name"
+          :value="valueForFalse"
+          @change.prevent="onUpdateInput"
         />{{ textForFalse }}
       </label>
     </div>

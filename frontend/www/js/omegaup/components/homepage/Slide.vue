@@ -7,16 +7,16 @@
         <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
-          class="btn btn-primary mb-3"
           v-if="button"
-          v-bind:href="button.href"
+          class="btn btn-primary mb-3"
+          :href="button.href"
           role="button"
         >
           {{ button.text[T.locale] }}
         </a>
       </div>
       <div>
-        <img class="d-block" height="320" v-bind:src="imageSrc" />
+        <img class="d-block" height="320" :src="imageSrc" />
       </div>
     </div>
   </div>

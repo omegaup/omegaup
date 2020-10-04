@@ -100,13 +100,13 @@ class Run extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         // Check that problem exists
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -157,13 +157,11 @@ class Run extends \OmegaUp\Controllers\Controller {
         } elseif (!empty($r['contest_alias'])) {
             // Got a contest alias, need to fetch the problemset id.
             // Validate contest
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['contest_alias'],
-                'contest_alias'
+            $contestAlias = $r->ensureString(
+                'contest_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
             );
-            $contest = \OmegaUp\DAO\Contests::getByAlias(
-                $r['contest_alias']
-            );
+            $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
             if (is_null($contest)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterNotFound',
@@ -601,14 +599,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['run_alias'],
-            'run_alias'
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         [
             'run' => $run,
             'submission' => $submission,
-        ] = self::validateDetailsRequest($r['run_alias']);
+        ] = self::validateDetailsRequest($runAlias);
         $problem = \OmegaUp\DAO\Problems::getByPK(
             intval($submission->problem_id)
         );
@@ -700,14 +698,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['run_alias'],
-            'run_alias'
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         [
             'run' => $run,
             'submission' => $submission,
-        ] = self::validateDetailsRequest($r['run_alias']);
+        ] = self::validateDetailsRequest($runAlias);
 
         if (
             !\OmegaUp\Authorization::canEditSubmission(
@@ -766,13 +764,13 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['run_alias'],
-            'run_alias'
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         [
             'submission' => $submission,
-        ] = self::validateDetailsRequest($r['run_alias']);
+        ] = self::validateDetailsRequest($runAlias);
 
         if (
             !\OmegaUp\Authorization::canEditSubmission(
@@ -842,14 +840,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['run_alias'],
-            'run_alias'
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         [
             'run' => $run,
             'submission' => $submission,
-        ] = self::validateDetailsRequest($r['run_alias']);
+        ] = self::validateDetailsRequest($runAlias);
         if (is_null($submission->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -1087,14 +1085,14 @@ class Run extends \OmegaUp\Controllers\Controller {
         // Get the user who is calling this API
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['run_alias'],
-            'run_alias'
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         [
             'run' => $run,
             'submission' => $submission,
-        ] = self::validateDetailsRequest($r['run_alias']);
+        ] = self::validateDetailsRequest($runAlias);
 
         if (
             !\OmegaUp\Authorization::canViewSubmission(
@@ -1194,13 +1192,13 @@ class Run extends \OmegaUp\Controllers\Controller {
         $r->ensureIdentity();
         $showDiff = $r->ensureOptionalBool('show_diff') ?? false;
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['run_alias'],
-            'run_alias'
+        $runAlias = $r->ensureString(
+            'run_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         if (
             !self::downloadSubmission(
-                $r['run_alias'],
+                $runAlias,
                 $r->identity,
                 /*$passthru=*/true,
                 /*$skipAuthorization=*/$showDiff
@@ -1507,14 +1505,12 @@ class Run extends \OmegaUp\Controllers\Controller {
         /** @var null|\OmegaUp\DAO\VO\Problems */
         $problem = null;
         if (!is_null($r['problem_alias'])) {
-            \OmegaUp\Validators::validateStringNonEmpty(
-                $r['problem_alias'],
-                'problem_alias'
+            $problemAlias = $r->ensureString(
+                'problem_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
             );
 
-            $problem = \OmegaUp\DAO\Problems::getByAlias(
-                $r['problem_alias']
-            );
+            $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
             if (is_null($problem)) {
                 throw new \OmegaUp\Exceptions\NotFoundException(
                     'problemNotFound'

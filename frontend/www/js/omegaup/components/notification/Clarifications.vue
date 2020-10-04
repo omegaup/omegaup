@@ -9,28 +9,28 @@
       role="button"
       ><span class="glyphicon glyphicon-bell"></span>
       <span
-        class="notification-counter label"
-        v-bind:class="{ 'label-danger': clarifications.length > 0 }"
         v-if="clarifications && clarifications.length > 0"
+        class="notification-counter label"
+        :class="{ 'label-danger': clarifications.length > 0 }"
         >{{ clarifications.length }}</span
       ></a
     >
     <ul class="dropdown-menu">
-      <li class="empty" v-if="!clarifications || clarifications.length === 0">
+      <li v-if="!clarifications || clarifications.length === 0" class="empty">
         {{ T.notificationsNoNewNotifications }}
       </li>
-      <li v-else="">
+      <li v-else>
         <ul class="notification-drawer">
           <li v-for="clarification in clarifications">
             <button
-              v-bind:aria-label="T.wordsClose"
+              :aria-label="T.wordsClose"
               class="close"
               type="button"
-              v-on:click.prevent="onCloseClicked(clarification)"
+              @click.prevent="onCloseClicked(clarification)"
             >
               <span aria-hidden="true">×</span>
             </button>
-            <a v-bind:href="anchor(clarification)"
+            <a :href="anchor(clarification)"
               ><span>{{ clarification.problem_alias }}</span> —
               <span>{{ clarification.author }}</span>
               <pre>{{ clarification.message }}</pre>
@@ -45,7 +45,7 @@
       <template v-if="clarifications && clarifications.length > 1">
         <li class="divider" role="separator"></li>
         <li>
-          <a href="#" v-on:click.prevent="onMarkAllAsRead"
+          <a href="#" @click.prevent="onMarkAllAsRead"
             ><span class="glyphicon glyphicon-align-right"></span>
             {{ T.notificationsMarkAllAsRead }}</a
           >
@@ -146,10 +146,7 @@ export default class Clarifications extends Vue {
   clarifications: types.Clarification[] = this.initialClarifications;
 
   @Watch('initialClarifications')
-  onPropertyChanged(
-    newValue: types.Clarification[],
-    oldValue: types.Clarification[],
-  ): void {
+  onPropertyChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
     const audio = <HTMLMediaElement>(
       document.getElementById('notification-audio')
@@ -160,10 +157,7 @@ export default class Clarifications extends Vue {
   }
 
   @Watch('clarifications')
-  onPropertyChange(
-    newValue: types.Clarification[],
-    oldValue: types.Clarification[],
-  ): void {
+  onPropertyChange(newValue: types.Clarification[]): void {
     if (newValue.length > 0) {
       if (this.flashInterval) return;
       this.flashInterval = setInterval(this.flashTitle, 1000);

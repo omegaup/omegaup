@@ -18,16 +18,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-bind:key="index" v-for="(author, index) in rankingData.ranking">
+          <tr v-for="(author, index) in rankingData.ranking" :key="index">
             <th scope="row">{{ author.author_ranking || index }}</th>
             <td>
               <omegaup-countryflag
-                v-bind:country="author.country_id"
+                :country="author.country_id"
               ></omegaup-countryflag>
               <omegaup-user-username
-                v-bind:classname="author.classname"
-                v-bind:linkify="true"
-                v-bind:username="author.username"
+                :classname="author.classname"
+                :linkify="true"
+                :username="author.username"
               ></omegaup-user-username>
               <span v-if="author.name">
                 <br />
@@ -42,7 +42,7 @@
       </table>
       <div class="card-footer">
         <omegaup-common-paginator
-          v-bind:pagerItems="pagerItems"
+          :pagerItems="pagerItems"
         ></omegaup-common-paginator>
       </div>
     </div>
@@ -51,7 +51,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { OmegaUp } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import user_Username from '../user/Username.vue';

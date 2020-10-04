@@ -1,19 +1,19 @@
 <template>
   <div class="qualitynomination-demotionpopup">
-    <a href="#" v-on:click="onReportInappropriateProblem">{{
+    <a href="#" @click="onReportInappropriateProblem">{{
       T.wordsReportProblem
     }}</a>
-    <form class="popup h-auto w-auto" v-show="showReportDialog">
+    <form v-show="showReportDialog" class="popup h-auto w-auto">
       <template v-if="currentView == 'question'">
-        <button class="close" type="button" v-on:click="onHide">×</button>
+        <button class="close" type="button" @click="onHide">×</button>
         <div class="form-group">
           <div class="question-text">
             {{ T.reportProblemFormQuestion }}
           </div>
           <select
+            v-model="selectedReason"
             class="control-label"
             name="selectedReason"
-            v-model="selectedReason"
           >
             <option value="no-problem-statement">
               {{ T.reportProblemFormNotAProblemStatement }}
@@ -38,29 +38,29 @@
             </option>
           </select>
         </div>
-        <div class="form-group" v-if="selectedReason == 'duplicate'">
+        <div v-if="selectedReason == 'duplicate'" class="form-group">
           <label class="control-label">{{
             T.reportProblemFormLinkToOriginalProblem
           }}</label>
-          <input class="input-line" name="original" v-model="original" />
+          <input v-model="original" class="input-line" name="original" />
         </div>
         <div class="form-group">
           <label class="control-label">{{
             T.reportProblemFormAdditionalComments
           }}</label>
           <textarea
+            v-model="rationale"
             class="input-text"
             name="rationale"
             type="text"
-            v-model="rationale"
           ></textarea>
         </div>
         <div class="text-right">
           <button
             class="col-md-4 btn btn-primary"
             type="submit"
-            v-bind:disabled="!selectedReason || (!rationale &amp;&amp; selectedReason == 'other') || (!original &amp;&amp; selectedReason == 'duplicate')"
-            v-on:click.prevent="onSubmit"
+            :disabled="!selectedReason || (!rationale &amp;&amp; selectedReason == 'other') || (!original &amp;&amp; selectedReason == 'duplicate')"
+            @click.prevent="onSubmit"
           >
             {{ T.wordsSend }}
           </button>
@@ -125,7 +125,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
 import * as ui from '../../ui';
 

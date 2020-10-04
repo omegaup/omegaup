@@ -1,5 +1,5 @@
 <template>
-  <div class="panel panel-primary" v-if="requests.length !== 0">
+  <div v-if="requests.length !== 0" class="panel panel-primary">
     <div class="panel-body">
       {{ T.pendingRegistrations }}
     </div>
@@ -23,30 +23,30 @@
           <td v-else-if="request.accepted">
             {{ T.wordAccepted }}
           </td>
-          <td v-else="">{{ T.wordsDenied }}</td>
+          <td v-else>{{ T.wordsDenied }}</td>
           <td v-if="request.last_update !== null">
             {{ time.formatTimestamp(request.last_update) }} ({{
               request.admin.username
             }})
           </td>
-          <td v-else=""></td>
+          <td v-else></td>
           <td v-if="!request.accepted">
             <button
               class="close"
-              style="color: red;"
-              v-on:click="onDenyRequest(request.username)"
+              style="color: red"
+              @click="onDenyRequest(request.username)"
             >
               ×
             </button>
             <button
               class="close"
-              style="color: green;"
-              v-on:click="onAcceptRequest(request.username)"
+              style="color: green"
+              @click="onAcceptRequest(request.username)"
             >
               ✓
             </button>
           </td>
-          <td v-else=""></td>
+          <td v-else></td>
         </tr>
       </tbody>
     </table>

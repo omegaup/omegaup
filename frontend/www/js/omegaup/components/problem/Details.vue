@@ -2,26 +2,26 @@
   <div class="mt-4">
     <ul class="nav justify-content-center nav-tabs">
       <li
+        v-for="tab in availableTabs"
+        :key="tab.name"
         class="nav-item"
         role="tablist"
-        v-for="tab in availableTabs"
-        v-bind:key="tab.name"
       >
         <a
-          v-bind:href="`#${tab.name}`"
+          :href="`#${tab.name}`"
           class="nav-link"
           data-toggle="tab"
           role="tab"
-          v-bind:aria-controls="tab.name"
-          v-bind:class="{ active: selectedTab === tab.name }"
-          v-bind:aria-selected="selectedTab === tab.name"
-          v-on:click="onTabSelected(tab.name)"
+          :aria-controls="tab.name"
+          :class="{ active: selectedTab === tab.name }"
+          :aria-selected="selectedTab === tab.name"
+          @click="onTabSelected(tab.name)"
         >
           {{ tab.text }}
           <span
-            class="clarifications-count"
-            v-bind:class="{ 'font-weight-bold': hasUnreadClarifications }"
             v-if="tab.name === 'clarifications'"
+            class="clarifications-count"
+            :class="{ 'font-weight-bold': hasUnreadClarifications }"
             >{{ clarificationsCount }}</span
           >
         </a>
@@ -30,32 +30,32 @@
     <div class="tab-content">
       <div
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'problems' }"
+        :class="{ 'show active': selectedTab === 'problems' }"
       >
         <omegaup-problem-settings-summary
-          v-bind:problem="problem"
-          v-bind:show-visibility-indicators="true"
-          v-bind:show-edit-link="this.user.admin"
+          :problem="problem"
+          :show-visibility-indicators="true"
+          :show-edit-link="user.admin"
         ></omegaup-problem-settings-summary>
 
-        <div class="karel-js-link my-3" v-if="problem.karel_problem">
+        <div v-if="problem.karel_problem" class="karel-js-link my-3">
           <a
             class="p-3"
-            v-bind:href="`/karel.js/${
+            :href="`/karel.js/${
               problem.sample_input ? `#mundo:${problem.sample_input}` : ''
             }`"
             target="_blank"
           >
             {{ T.openInKarelJs }}
-            <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
+            <font-awesome-icon :icon="['fas', 'external-link-alt']" />
           </a>
         </div>
 
         <div class="mt-4 markdown">
           <omegaup-markdown
-            v-bind:markdown="problem.statement.markdown"
-            v-bind:image-mapping="problem.statement.images"
-            v-bind:problem-settings="problem.settings"
+            :markdown="problem.statement.markdown"
+            :image-mapping="problem.statement.images"
+            :problem-settings="problem.settings"
           ></omegaup-markdown>
         </div>
         <hr class="my-3" />
@@ -66,10 +66,10 @@
           <div>
             {{ T.wordsProblemsetter }}:
             <omegaup-username
-              v-bind:classname="problem.problemsetter.classname"
-              v-bind:username="problem.problemsetter.username"
-              v-bind:name="problem.problemsetter.name"
-              v-bind:linkify="true"
+              :classname="problem.problemsetter.classname"
+              :username="problem.problemsetter.username"
+              :name="problem.problemsetter.name"
+              :linkify="true"
             ></omegaup-username>
           </div>
           <div>
@@ -82,84 +82,102 @@
         </template>
         <omegaup-quality-nomination-review
           v-if="user.reviewer && !nominationStatus.already_reviewed"
-          v-on:submit="
+          @submit="
             (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
           "
         ></omegaup-quality-nomination-review>
         <omegaup-quality-nomination-demotion
-          v-on:submit="
+          @submit="
             (qualityDemotionComponent) =>
               $emit('submit-demotion', qualityDemotionComponent)
           "
         ></omegaup-quality-nomination-demotion>
         <omegaup-quality-nomination-promotion
-          v-bind:can-nominate-problem="nominationStatus.canNoominateProblem"
-          v-bind:dismissed="nominationStatus.dismissed"
-          v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
-          v-bind:nominated="nominationStatus.nominated"
-          v-bind:nomination-before-a-c="nominationStatus.nominationBeforeAC"
-          v-bind:solved="nominationStatus.solved"
-          v-bind:tried="nominationStatus.tried"
-          v-bind:problem-alias="problem.alias"
-          v-on:submit="
+          v-if="user.loggedIn"
+          :can-nominate-problem="nominationStatus.canNoominateProblem"
+          :dismissed="nominationStatus.dismissed"
+          :dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
+          :nominated="nominationStatus.nominated"
+          :nomination-before-a-c="nominationStatus.nominationBeforeAC"
+          :solved="nominationStatus.solved"
+          :tried="nominationStatus.tried"
+          :problem-alias="problem.alias"
+          @submit="
             (qualityPromotionComponent) =>
               $emit('submit-promotion', qualityPromotionComponent)
           "
-          v-on:dismiss="
+          @dismiss="
             (qualityPromotionComponent) =>
               $emit('dismiss-promotion', qualityPromotionComponent)
           "
         ></omegaup-quality-nomination-promotion>
+        <omegaup-overlay
+          v-if="user.loggedIn"
+          :show-overlay="showOverlay"
+          @overlay-hidden="onPopupDismissed"
+        >
+          <omegaup-arena-runsubmit
+            slot="popup-content"
+            :preferred-language="problem.preferred_language"
+            :languages="problem.languages"
+            :initial-show-form="showFormRunSubmit"
+            @dismiss="onPopupDismissed"
+            @submit-run="
+              (code, selectedLanguage) => onRunSubmitted(code, selectedLanguage)
+            "
+          ></omegaup-arena-runsubmit>
+        </omegaup-overlay>
         <omegaup-arena-runs
-          v-bind:problem-alias="problem.alias"
-          v-bind:runs="runs"
-          v-bind:show-details="true"
-          v-bind:problemset-problems="[]"
+          :problem-alias="problem.alias"
+          :runs="runs"
+          :show-details="true"
+          :problemset-problems="[]"
+          @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
-          v-bind:quality-histogram="histogram.qualityHistogram"
-          v-bind:difficulty-histogram="histogram.difficultyHistogram"
-          v-bind:quality-score="histogram.quality"
-          v-bind:difficulty-score="histogram.difficulty"
+          :quality-histogram="histogram.qualityHistogram"
+          :difficulty-histogram="histogram.difficultyHistogram"
+          :quality-score="histogram.quality"
+          :difficulty-score="histogram.difficulty"
         ></omegaup-problem-feedback>
-        <omegaup-arena-solvers v-bind:solvers="solvers"></omegaup-arena-solvers>
+        <omegaup-arena-solvers :solvers="solvers"></omegaup-arena-solvers>
       </div>
       <div
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'solution' }"
+        :class="{ 'show active': selectedTab === 'solution' }"
       >
         <omegaup-problem-solution
-          v-bind:status="solutionStatus"
-          v-bind:solution="solution"
-          v-bind:available-tokens="availableTokens"
-          v-bind:all-tokens="allTokens"
-          v-on:get-solution="$emit('get-solution')"
-          v-on:get-tokens="$emit('get-tokens')"
-          v-on:unlock-solution="$emit('unlock-solution')"
+          :status="solutionStatus"
+          :solution="solution"
+          :available-tokens="availableTokens"
+          :all-tokens="allTokens"
+          @get-solution="$emit('get-solution')"
+          @get-tokens="$emit('get-tokens')"
+          @unlock-solution="$emit('unlock-solution')"
         ></omegaup-problem-solution>
       </div>
       <div
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'runs' }"
+        :class="{ 'show active': selectedTab === 'runs' }"
       >
         <omegaup-arena-runs
-          v-bind:runs="allRuns"
-          v-bind:show-details="true"
-          v-bind:show-user="true"
-          v-bind:show-rejudge="true"
-          v-bind:show-pager="true"
-          v-bind:show-disqualify="true"
-          v-bind:problemset-problems="[]"
+          :runs="allRuns"
+          :show-details="true"
+          :show-user="true"
+          :show-rejudge="true"
+          :show-pager="true"
+          :show-disqualify="true"
+          :problemset-problems="[]"
         ></omegaup-arena-runs>
       </div>
       <div
         class="tab-pane fade p-4"
-        v-bind:class="{ 'show active': selectedTab === 'clarifications' }"
+        :class="{ 'show active': selectedTab === 'clarifications' }"
       >
         <omegaup-arena-clarification-list
-          v-bind:clarifications="clarifications"
-          v-bind:in-contest="false"
-          v-on:clarification-response="
+          :clarifications="clarifications"
+          :in-contest="false"
+          @clarification-response="
             (id, responseText, isPublic) =>
               $emit('clarification-response', id, responseText, isPublic)
           "
@@ -196,6 +214,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
+import arena_RunSubmit from '../arena/RunSubmit.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
@@ -205,6 +224,7 @@ import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
 import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
+import omegaup_Overlay from '../Overlay.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -233,8 +253,10 @@ interface Tab {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
+    'omegaup-arena-runsubmit': arena_RunSubmit,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
+    'omegaup-overlay': omegaup_Overlay,
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
@@ -262,6 +284,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
+  @Prop() showNewRunWindow!: boolean;
   @Prop() activeTab!: string;
 
   T = T;
@@ -269,8 +292,10 @@ export default class ProblemDetails extends Vue {
   time = time;
   selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
+  showFormRunSubmit = this.showNewRunWindow;
+  showOverlay = this.showNewRunWindow;
   hasUnreadClarifications =
-    this.initialClarifications.length > 0 &&
+    this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
 
   get availableTabs(): Tab[] {
@@ -304,6 +329,25 @@ export default class ProblemDetails extends Vue {
     return `(${this.clarifications.length})`;
   }
 
+  onNewSubmission(): void {
+    if (!this.user.loggedIn) {
+      this.$emit('redirect-login-page');
+    }
+    this.showOverlay = true;
+    this.showFormRunSubmit = true;
+  }
+
+  onPopupDismissed(): void {
+    this.showOverlay = false;
+    this.showFormRunSubmit = false;
+    this.$emit('update:activeTab', this.selectedTab);
+  }
+
+  onRunSubmitted(code: string, selectedLanguage: string): void {
+    this.$emit('submit-run', code, selectedLanguage);
+    this.onPopupDismissed();
+  }
+
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
     if (this.selectedTab === 'clarifications') {
@@ -316,6 +360,12 @@ export default class ProblemDetails extends Vue {
   @Watch('initialClarifications')
   onInitialClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
+  }
+
+  @Watch('showNewRunWindow')
+  onShowNewRunWindowChanged(newValue: boolean): void {
+    if (!newValue) return;
+    this.onNewSubmission();
   }
 
   @Watch('clarifications')

@@ -1,17 +1,26 @@
 <template>
   <codemirror-editor
     ref="cm-wrapper"
-    v-bind:options="editorOptions"
-    v-bind:value="value"
-    v-on:change="onChange"
-    v-on:input="onInput"
+    :options="editorOptions"
+    :value="value"
+    @change="onChange"
+    @input="onInput"
   ></codemirror-editor>
 </template>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.vue-codemirror-wrap {
+  height: 95%;
+  .CodeMirror {
+    height: 100%;
+  }
+}
+</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import * as ui from '../../ui';
 import { codemirror } from 'vue-codemirror-lite';
 
 const languageModeMap: {

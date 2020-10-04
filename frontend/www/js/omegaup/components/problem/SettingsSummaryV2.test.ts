@@ -1,6 +1,5 @@
 import { mount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -18,7 +17,7 @@ const baseSettingsSummaryProps = {
     email_clarifications: true,
     order: 'normal',
     score: 100,
-    statement: { images: {}, language: 'es', markdown: '' },
+    statement: { images: {}, sources: {}, language: 'es', markdown: '' },
     submissions: 0,
     version: '587cb50672aa364c75e16b638ec7ca7289e24b08',
     visits: 0,

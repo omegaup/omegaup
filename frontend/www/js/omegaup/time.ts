@@ -15,18 +15,18 @@ export function formatFutureDateRelative(futureDate: Date): string {
 }
 
 export function formatDelta(delta: number): string {
-  let months = delta / (30 * 24 * 60 * 60 * 1000);
+  const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
     return formatFutureDateRelative(new Date(delta + Date.now()));
   }
 
-  let days = Math.floor(delta / (24 * 60 * 60 * 1000));
+  const days = Math.floor(delta / (24 * 60 * 60 * 1000));
   delta -= days * (24 * 60 * 60 * 1000);
-  let hours = Math.floor(delta / (60 * 60 * 1000));
+  const hours = Math.floor(delta / (60 * 60 * 1000));
   delta -= hours * (60 * 60 * 1000);
-  let minutes = Math.floor(delta / (60 * 1000));
+  const minutes = Math.floor(delta / (60 * 1000));
   delta -= minutes * (60 * 1000);
-  let seconds = Math.floor(delta / 1000);
+  const seconds = Math.floor(delta / 1000);
 
   let clock = '';
 
@@ -46,7 +46,6 @@ export function toDDHHMM(durationSeconds: number): string {
   const minutes = Math.floor(
     (durationSeconds - days * 86400 - hours * 3600) / 60,
   );
-  const seconds = durationSeconds - days * 86400 - hours * 3600 - minutes * 60;
 
   let time = '';
   if (days > 0) time += `${days}d `;

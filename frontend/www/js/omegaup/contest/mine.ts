@@ -12,6 +12,12 @@ OmegaUp.on('ready', () => {
   let showAllContests = false;
   const contestMine = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-contest-mine': contest_Mine,
+    },
+    data: () => ({
+      contests: payload.contests,
+    }),
     render: function (createElement) {
       return createElement('omegaup-contest-mine', {
         props: {
@@ -80,7 +86,7 @@ OmegaUp.on('ready', () => {
                   'data:text/csv;charset=utf-8,' +
                   CSV.serialize(dataToSerialize, dialect);
                 const encodedUri = encodeURI(csvContent);
-                let link = document.createElement('a');
+                const link = document.createElement('a');
                 link.setAttribute('href', encodedUri);
                 link.setAttribute('download', `users_${contestAlias}.csv`);
                 document.body.appendChild(link); // Required for FF
@@ -91,12 +97,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      contests: payload.contests,
-    },
-    components: {
-      'omegaup-contest-mine': contest_Mine,
     },
   });
 

@@ -1,40 +1,40 @@
 <template>
   <div class="mb-3">
     <form action="/problem/" method="GET" class="form-inline">
-      <div class="form-group mr-2" v-if="tags.length !== 0">
-        <div class="mr-1" v-for="tag in tags">
-          <input type="hidden" name="tag[]" v-bind:value="tag" />
+      <div v-if="tags.length !== 0" class="form-group mr-2">
+        <div v-for="tag in tags" class="mr-1">
+          <input type="hidden" name="tag[]" :value="tag" />
           <span class="badge badge-secondary m-1 p-2">{{
             T[tag] ? T[tag] : tag
           }}</span>
         </div>
         <a class="remove-all-tags" href="/problem/">
-          <font-awesome-icon v-bind:icon="['fas', 'times']" />
+          <font-awesome-icon :icon="['fas', 'times']" />
         </a>
       </div>
       <div class="form-group mr-2 mt-1">
         <omegaup-autocomplete
-          class="form-control"
-          v-bind:init="(el) => typeahead.problemTypeahead(el)"
           v-model="keyword"
-          v-bind:placeholder="T.wordsKeywordSearch"
+          class="form-control"
+          :init="(el) => typeahead.problemTypeahead(el)"
+          :placeholder="T.wordsKeywordSearch"
           name="query"
         ></omegaup-autocomplete>
       </div>
       <div class="form-group mr-2 mt-1">
         <label>
           {{ T.wordsFilterByLanguage }}
-          <select name="language" class="ml-1 form-control" v-model="language">
-            <option v-for="language in languages" v-bind:value="language">
-              {{ getLanguageText(language) }}</option
-            >
+          <select v-model="language" name="language" class="ml-1 form-control">
+            <option v-for="language in languages" :value="language">
+              {{ getLanguageText(language) }}
+            </option>
           </select>
         </label>
       </div>
       <input
         class="btn btn-primary mt-1"
         type="submit"
-        v-bind:value="T.wordsSearch"
+        :value="T.wordsSearch"
       />
     </form>
   </div>

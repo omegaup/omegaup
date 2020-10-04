@@ -33,73 +33,73 @@
               >
               <div class="dropdown-menu">
                 <a
-                  class="dropdown-item tab-participating"
-                  v-bind:class="{ active: showTab === 'participating' }"
                   v-if="isLogged"
-                  v-on:click="showTab = 'participating'"
+                  class="dropdown-item tab-participating"
+                  :class="{ active: showTab === 'participating' }"
                   data-toggle="tab"
                   data-list-participating
                   href="#"
+                  @click="showTab = 'participating'"
                 >
                   {{ T.arenaMyActiveContests }}</a
                 >
                 <a
                   class="dropdown-item tab-recommended-current"
-                  v-bind:class="{ active: showTab === 'recommended_current' }"
-                  v-on:click="showTab = 'recommended_current'"
+                  :class="{ active: showTab === 'recommended_current' }"
                   data-toggle="tab"
                   data-list-recommended-current
                   href="#"
+                  @click="showTab = 'recommended_current'"
                 >
                   {{ T.arenaRecommendedCurrentContests }}</a
                 >
                 <a
                   class="dropdown-item tab-current"
-                  v-bind:class="{ active: showTab === 'current' }"
-                  v-on:click="showTab = 'current'"
+                  :class="{ active: showTab === 'current' }"
                   data-toggle="tab"
                   data-list-current
                   href="#"
+                  @click="showTab = 'current'"
                 >
                   {{ T.arenaCurrentContests }}</a
                 >
                 <a
                   class="dropdown-item tab-public"
-                  v-bind:class="{ active: showTab === 'public' }"
-                  v-on:click="showTab = 'public'"
+                  :class="{ active: showTab === 'public' }"
                   data-toggle="tab"
                   data-list-public
                   href="#"
+                  @click="showTab = 'public'"
                 >
                   {{ T.arenaCurrentPublicContests }}</a
                 >
                 <a
                   class="dropdown-item tab-future"
-                  v-bind:class="{ active: showTab === 'future' }"
-                  v-on:click="showTab = 'future'"
+                  :class="{ active: showTab === 'future' }"
                   data-toggle="tab"
                   data-list-future
                   href="#"
+                  @click="showTab = 'future'"
                 >
                   {{ T.arenaFutureContests }}</a
                 >
                 <a
                   class="dropdown-item tab-recommended-past"
-                  v-bind:class="{ active: showTab === 'recommended_past' }"
-                  v-on:click="showTab = 'recommended_past'"
+                  :class="{ active: showTab === 'recommended_past' }"
                   data-toggle="tab"
                   data-list-recommended-past
                   href="#"
+                  @click="showTab = 'recommended_past'"
                 >
                   {{ T.arenaRecommendedOldContests }}</a
                 >
                 <a
                   class="dropdown-item tab-past"
-                  v-bind:class="{ active: showTab === 'past' }"
-                  v-on:click="showTab = 'past'"
+                  :class="{ active: showTab === 'past' }"
                   data-toggle="tab"
                   data-list-past
                   href="#"
+                  @click="showTab = 'past'"
                 >
                   {{ T.arenaOldContests }}</a
                 >
@@ -111,18 +111,18 @@
           <form action="/arena/" method="GET">
             <div class="input-group">
               <input
+                v-model="query"
                 class="form-control"
                 type="text"
                 name="query"
                 autocomplete="off"
-                v-model="query"
-                v-bind:placeholder="T.wordsKeyword"
+                :placeholder="T.wordsKeyword"
               />
               <div class="input-group-append">
                 <input
                   class="btn btn-primary btn-md active"
                   type="submit"
-                  v-bind:value="T.wordsSearch"
+                  :value="T.wordsSearch"
                 />
               </div>
             </div>
@@ -132,82 +132,82 @@
 
       <div class="tab-content">
         <div
-          class="tab-pane active list-participating"
           v-if="showTab === 'participating'"
+          class="tab-pane active list-participating"
         >
           <omegaup-contest-filtered-list
-            v-bind:contests="contests.participating"
-            v-bind:showTimes="true"
-            v-bind:showPractice="false"
-            v-bind:showVirtual="false"
-            v-bind:showPublicUpdated="false"
-            v-bind:recommended="false"
+            :contests="contests.participating"
+            :showTimes="true"
+            :showPractice="false"
+            :showVirtual="false"
+            :showPublicUpdated="false"
+            :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
         <div
-          class="tab-pane active list-recommended-current"
           v-if="showTab === 'recommended_current'"
+          class="tab-pane active list-recommended-current"
         >
           <omegaup-contest-filtered-list
-            v-bind:contests="contests.recommended_current"
-            v-bind:showTimes="true"
-            v-bind:showPractice="false"
-            v-bind:showVirtual="false"
-            v-bind:showPublicUpdated="false"
-            v-bind:recommended="true"
+            :contests="contests.recommended_current"
+            :showTimes="true"
+            :showPractice="false"
+            :showVirtual="false"
+            :showPublicUpdated="false"
+            :recommended="true"
           ></omegaup-contest-filtered-list>
         </div>
-        <div class="tab-pane active list-current" v-if="showTab === 'current'">
+        <div v-if="showTab === 'current'" class="tab-pane active list-current">
           <omegaup-contest-filtered-list
-            v-bind:contests="contests.current"
-            v-bind:showTimes="true"
-            v-bind:showPractice="false"
-            v-bind:showVirtual="false"
-            v-bind:showPublicUpdated="false"
-            v-bind:recommended="false"
+            :contests="contests.current"
+            :showTimes="true"
+            :showPractice="false"
+            :showVirtual="false"
+            :showPublicUpdated="false"
+            :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
-        <div class="tab-pane active list-public" v-if="showTab === 'public'">
+        <div v-if="showTab === 'public'" class="tab-pane active list-public">
           <omegaup-contest-filtered-list
-            v-bind:contests="contests.public"
-            v-bind:showTimes="true"
-            v-bind:showPractice="false"
-            v-bind:showVirtual="false"
-            v-bind:showPublicUpdated="true"
-            v-bind:recommended="false"
+            :contests="contests.public"
+            :showTimes="true"
+            :showPractice="false"
+            :showVirtual="false"
+            :showPublicUpdated="true"
+            :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
-        <div class="tab-pane active list-future" v-if="showTab === 'future'">
+        <div v-if="showTab === 'future'" class="tab-pane active list-future">
           <omegaup-contest-filtered-list
-            v-bind:contests="contests.future"
-            v-bind:showTimes="true"
-            v-bind:showPractice="false"
-            v-bind:showVirtual="false"
-            v-bind:showPublicUpdated="false"
-            v-bind:recommended="false"
+            :contests="contests.future"
+            :showTimes="true"
+            :showPractice="false"
+            :showVirtual="false"
+            :showPublicUpdated="false"
+            :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
         <div
-          class="tab-pane active list-recommended-past"
           v-if="showTab === 'recommended_past'"
+          class="tab-pane active list-recommended-past"
         >
           <omegaup-contest-filtered-list
-            v-bind:contests="contests.recommended_past"
-            v-bind:showTimes="false"
-            v-bind:showPractice="true"
-            v-bind:showVirtual="true"
-            v-bind:showPublicUpdated="false"
-            v-bind:recommended="true"
+            :contests="contests.recommended_past"
+            :showTimes="false"
+            :showPractice="true"
+            :showVirtual="true"
+            :showPublicUpdated="false"
+            :recommended="true"
           ></omegaup-contest-filtered-list>
         </div>
-        <div class="tab-pane active list-past" v-if="showTab === 'past'">
+        <div v-if="showTab === 'past'" class="tab-pane active list-past">
           <omegaup-contest-filtered-list
-            v-bind:contests="contests.past"
-            v-bind:showTimes="false"
-            v-bind:showPractice="true"
-            v-bind:showVirtual="true"
-            v-bind:showPublicUpdated="false"
-            v-bind:recommended="false"
+            :contests="contests.past"
+            :showTimes="false"
+            :showPractice="true"
+            :showVirtual="true"
+            :showPublicUpdated="false"
+            :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
       </div>
@@ -225,7 +225,7 @@
 </style>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import contest_FilteredList from '../contest/FilteredList.vue';

@@ -1,5 +1,5 @@
 <template>
-  <tr v-bind:class="{ resolved: clarification.answer }">
+  <tr :class="{ resolved: clarification.answer }">
     <td class="text-center align-middle">
       {{
         inContest ? clarification.contest_alias : clarification.problem_alias
@@ -18,9 +18,9 @@
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
+              v-model="showUpdateAnswer"
               class="form-check-input"
               type="checkbox"
-              v-model="showUpdateAnswer"
             />
             {{ T.clarificationUpdateAnswer }}
           </label>
@@ -31,29 +31,28 @@
         class="form-inline justify-content-between"
       >
         <div class="form-group">
-          <select class="form-control" v-model="selectedResponse">
+          <select v-model="selectedResponse" class="form-control">
             <option
               v-for="response in responses"
-              v-bind:value="response.value"
-              v-bind:key="response.value"
+              :key="response.value"
+              :value="response.value"
             >
-              {{ response.text }}</option
-            >
+              {{ response.text }}
+            </option>
           </select>
         </div>
         <div
-          class="form-group mt-2 mt-xl-0"
           v-if="selectedResponse === 'other'"
+          class="form-group mt-2 mt-xl-0"
         >
-          <textarea v-model="message" v-bind:placeholder="T.wordsAnswer">
-          </textarea>
+          <textarea v-model="message" :placeholder="T.wordsAnswer"> </textarea>
         </div>
         <div class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
+              v-model="isPublic"
               class="form-check-input"
               type="checkbox"
-              v-model="isPublic"
             />
             {{ T.wordsPublic }}
           </label>
@@ -61,7 +60,7 @@
         <button
           class="btn btn-primary btn-sm mt-2 mt-lg-2"
           type="submit"
-          v-on:click.prevent="sendClarificationResponse"
+          @click.prevent="sendClarificationResponse"
         >
           {{ T.wordsSend }}
         </button>

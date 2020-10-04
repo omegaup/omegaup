@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import qualitynomination_List from '../components/qualitynomination/List.vue';
-import { OmegaUp, omegaup } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
 import { types, messages } from '../api_types';
@@ -13,8 +13,16 @@ OmegaUp.on('ready', function () {
     (<HTMLElement>document.getElementById('header-payload')).innerText,
   );
 
-  let nominationsList = new Vue({
+  const nominationsList = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-qualitynomination-list': qualitynomination_List,
+    },
+    data: () => ({
+      nominations: <types.NominationListItem[]>[],
+      pagerItems: <types.PageItem[]>[],
+      pages: 1,
+    }),
     render: function (createElement) {
       return createElement('omegaup-qualitynomination-list', {
         props: {
@@ -38,14 +46,6 @@ OmegaUp.on('ready', function () {
           },
         },
       });
-    },
-    data: {
-      nominations: <types.NominationListItem[]>[],
-      pagerItems: <types.PageItem[]>[],
-      pages: 1,
-    },
-    components: {
-      'omegaup-qualitynomination-list': qualitynomination_List,
     },
   });
 
