@@ -8,8 +8,14 @@ import * as monaco from 'monaco-editor';
 
 export default {
   props: {
-    store: Object,
-    storeMapping: Object,
+    store: {
+      type: Object,
+      required: true,
+    },
+    storeMapping: {
+      type: Object,
+      required: true,
+    },
     theme: {
       type: String,
       default: 'vs-dark',
