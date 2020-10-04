@@ -33,12 +33,13 @@ module.exports = {
     // TODO(#4626): Remove all uses of v-html.
     'vue/no-v-html': 'off',
 
+    // TODO(#4778): Add key to ALL v-for.
+    'vue/require-v-for-key': 'off',
+
     // TODO: Remove all these exceptions.
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
-    'vue/require-default-prop': 'off',
-    'vue/require-v-for-key': 'off',
   },
 };

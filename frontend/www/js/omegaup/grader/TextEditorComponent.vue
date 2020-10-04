@@ -13,9 +13,18 @@ import * as Util from './util';
 
 export default {
   props: {
-    store: Object,
-    storeMapping: Object,
-    extension: String,
+    store: {
+      type: Object,
+      required: true,
+    },
+    storeMapping: {
+      type: Object,
+      required: true,
+    },
+    extension: {
+      type: String,
+      required: true,
+    },
     module: {
       type: String,
       default: null,
