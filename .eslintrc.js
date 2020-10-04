@@ -27,7 +27,6 @@ module.exports = {
     'vue/attribute-hyphenation': 'off',
     'vue/component-tags-order': 'off',
     'vue/custom-event-name-casing': 'off',
-    'vue/no-deprecated-dollar-listeners-api': 'off',
     'vue/no-deprecated-slot-attribute': 'off',
     'vue/no-deprecated-slot-scope-attribute': 'off',
     'vue/no-deprecated-v-bind-sync': 'off',
