@@ -135,7 +135,7 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          :pagerItems="pagerItems"
+          :pager-items="pagerItems"
           @page-changed="(page) => $emit('go-to-page', page)"
         ></omegaup-common-paginator>
       </div>

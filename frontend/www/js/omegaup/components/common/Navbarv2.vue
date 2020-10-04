@@ -243,7 +243,7 @@
                 >
                 <omegaup-common-grader-badge
                   v-show="isAdmin"
-                  :queueLength="graderQueueLength"
+                  :queue-length="graderQueueLength"
                   :error="errorMessage !== null"
                 ></omegaup-common-grader-badge>
               </a>
@@ -304,7 +304,7 @@
                   v-show="isAdmin"
                   :status="errorMessage !== null ? 'down' : 'ok'"
                   :error="errorMessage"
-                  :graderInfo="graderInfo"
+                  :grader-info="graderInfo"
                 ></omegaup-common-grader-status>
               </div>
             </li>

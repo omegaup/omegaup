@@ -44,7 +44,7 @@
         :items-per-page="15"
         :title="T.profileContests"
       >
-        <template slot="table-header">
+        <template #table-header>
           <thead>
             <tr>
               <th>{{ T.profileContestsTableContest }}</th>
@@ -84,8 +84,8 @@
           v-if="charts"
           :data="charts"
           :username="profile.username"
-          :periodStatisticOptions="periodStatisticOptions"
-          :aggregateStatisticOptions="aggregateStatisticOptions"
+          :period-statistic-options="periodStatisticOptions"
+          :aggregate-statistic-options="aggregateStatisticOptions"
           @emit-update-period-statistics="
             (profileComponent, categories, data) =>
               $emit(

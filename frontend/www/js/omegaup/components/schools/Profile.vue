@@ -22,7 +22,7 @@
           :items-per-page="5"
           :title="T.codersOfTheMonth"
         >
-          <template slot="table-header">
+          <template #table-header>
             <thead>
               <tr>
                 <th>{{ T.codersOfTheMonthUser }}</th>
@@ -51,7 +51,7 @@
           :sort-options="sortOptions"
           @sort-option-change="updateUsers"
         >
-          <template slot="table-header">
+          <template #table-header>
             <thead>
               <tr>
                 <th scope="col" class="text-center">
@@ -62,7 +62,7 @@
               </tr>
             </thead>
           </template>
-          <template slot="item-data" slot-scope="slotProps">
+          <template #item-data="slotProps">
             <omegaup-username
               :username="slotProps.item.toString()"
               :classname="slotProps.item.classname"

@@ -137,10 +137,10 @@
         >
           <omegaup-contest-filtered-list
             :contests="contests.participating"
-            :showTimes="true"
-            :showPractice="false"
-            :showVirtual="false"
-            :showPublicUpdated="false"
+            :show-times="true"
+            :show-practice="false"
+            :show-virtual="false"
+            :show-public-updated="false"
             :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
@@ -150,40 +150,40 @@
         >
           <omegaup-contest-filtered-list
             :contests="contests.recommended_current"
-            :showTimes="true"
-            :showPractice="false"
-            :showVirtual="false"
-            :showPublicUpdated="false"
+            :show-times="true"
+            :show-practice="false"
+            :show-virtual="false"
+            :show-public-updated="false"
             :recommended="true"
           ></omegaup-contest-filtered-list>
         </div>
         <div v-if="showTab === 'current'" class="tab-pane active list-current">
           <omegaup-contest-filtered-list
             :contests="contests.current"
-            :showTimes="true"
-            :showPractice="false"
-            :showVirtual="false"
-            :showPublicUpdated="false"
+            :show-times="true"
+            :show-practice="false"
+            :show-virtual="false"
+            :show-public-updated="false"
             :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
         <div v-if="showTab === 'public'" class="tab-pane active list-public">
           <omegaup-contest-filtered-list
             :contests="contests.public"
-            :showTimes="true"
-            :showPractice="false"
-            :showVirtual="false"
-            :showPublicUpdated="true"
+            :show-times="true"
+            :show-practice="false"
+            :show-virtual="false"
+            :show-public-updated="true"
             :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
         <div v-if="showTab === 'future'" class="tab-pane active list-future">
           <omegaup-contest-filtered-list
             :contests="contests.future"
-            :showTimes="true"
-            :showPractice="false"
-            :showVirtual="false"
-            :showPublicUpdated="false"
+            :show-times="true"
+            :show-practice="false"
+            :show-virtual="false"
+            :show-public-updated="false"
             :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>
@@ -193,20 +193,20 @@
         >
           <omegaup-contest-filtered-list
             :contests="contests.recommended_past"
-            :showTimes="false"
-            :showPractice="true"
-            :showVirtual="true"
-            :showPublicUpdated="false"
+            :show-times="false"
+            :show-practice="true"
+            :show-virtual="true"
+            :show-public-updated="false"
             :recommended="true"
           ></omegaup-contest-filtered-list>
         </div>
         <div v-if="showTab === 'past'" class="tab-pane active list-past">
           <omegaup-contest-filtered-list
             :contests="contests.past"
-            :showTimes="false"
-            :showPractice="true"
-            :showVirtual="true"
-            :showPublicUpdated="false"
+            :show-times="false"
+            :show-practice="true"
+            :show-virtual="true"
+            :show-public-updated="false"
             :recommended="false"
           ></omegaup-contest-filtered-list>
         </div>

@@ -143,8 +143,8 @@
               $emit('get-versions', newProblemAlias, addProblemComponent)
           "
         >
-          <template slot="page-header"><span></span></template>
-          <template slot="cancel-button">
+          <template #page-header><span></span></template>
+          <template #cancel-button>
             <button
               class="btn btn-secondary"
               type="reset"

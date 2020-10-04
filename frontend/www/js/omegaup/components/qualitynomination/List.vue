@@ -36,7 +36,7 @@
       <button
         class="btn btn-primary"
         @click.prevent="
-          $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
+          $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
         "
       >
         {{ T.wordsSearch }}
@@ -61,7 +61,7 @@
               v-model="showAll"
               type="checkbox"
               @change="
-                $emit('goToPage', 1, getStatus(), getQuery(), selectColumn)
+                $emit('go-to-page', 1, getStatus(), getQuery(), selectColumn)
               "
             />
             {{ T.qualityNominationShowAll }}
@@ -113,7 +113,7 @@
         :pager-items="pagerItems"
         @page-changed="
           (page) =>
-            $emit('goToPage', page, getStatus(), getQuery(), selectColumn)
+            $emit('go-to-page', page, getStatus(), getQuery(), selectColumn)
         "
       ></omegaup-common-paginator>
     </div>
