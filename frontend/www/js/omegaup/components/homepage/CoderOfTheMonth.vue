@@ -20,8 +20,8 @@
       class="card-body d-flex flex-column justify-content-center text-center"
     >
       <a
-        v-bind:href="`/profile/${coderOfTheMonth.username}/`"
         v-if="!coderOfTheMonth.is_private"
+        v-bind:href="`/profile/${coderOfTheMonth.username}/`"
       >
         <img v-bind:src="coderOfTheMonth.gravatar_92" height="80" />
       </a>
@@ -37,14 +37,14 @@
         <div class="card-text">
           {{ coderOfTheMonth.name }}
         </div>
-        <div class="card-text" v-if="coderOfTheMonth.school">
+        <div v-if="coderOfTheMonth.school" class="card-text">
           <a v-bind:href="`/schools/profile/${coderOfTheMonth.school_id}/`">
             {{ coderOfTheMonth.school }}
           </a>
         </div>
         <div
-          class="card-text"
           v-if="coderOfTheMonth.state && coderOfTheMonth.country !== 'xx'"
+          class="card-text"
         >
           {{ coderOfTheMonth.state }}, {{ coderOfTheMonth.country }}
         </div>

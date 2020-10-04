@@ -3,11 +3,11 @@
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
+          v-model="radioValue"
           class="form-check-input"
           type="radio"
           v-bind:name="name"
           v-bind:value="valueForTrue"
-          v-model="radioValue"
           v-on:change.prevent="onUpdateInput"
         />{{ textForTrue }}
       </label>
@@ -15,11 +15,11 @@
     <div class="form-check form-check-inline">
       <label class="form-check-label">
         <input
+          v-model="radioValue"
           class="form-check-input"
           type="radio"
           v-bind:name="name"
           v-bind:value="valueForFalse"
-          v-model="radioValue"
           v-on:change.prevent="onUpdateInput"
         />{{ textForFalse }}
       </label>

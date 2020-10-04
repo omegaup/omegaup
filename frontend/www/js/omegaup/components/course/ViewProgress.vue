@@ -14,9 +14,9 @@
                 <tr>
                   <th class="text-center">{{ T.wordsName }}</th>
                   <th
+                    v-for="assignment in assignments"
                     v-bind:key="assignment.alias"
                     class="score text-center"
-                    v-for="assignment in assignments"
                   >
                     {{ assignment.name }}
                   </th>

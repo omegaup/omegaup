@@ -5,7 +5,7 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsTitle }}</label>
-            <input class="form-control" size="30" type="text" v-model="title" />
+            <input v-model="title" class="form-control" size="30" type="text" />
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
@@ -16,17 +16,17 @@
               data-toggle="tooltip"
               title="T.contestNewFormShortTitle_alias_Desc"
             ></span>
-            <input class="form-control" type="text" v-model="alias" />
+            <input v-model="alias" class="form-control" type="text" />
           </div>
         </div>
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormDescription }}</label>
             <textarea
+              v-model="description"
               class="form-control"
               cols="30"
               rows="10"
-              v-model="description"
             ></textarea>
           </div>
           <div class="form-group col-md-3">

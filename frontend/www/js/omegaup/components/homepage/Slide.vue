@@ -7,8 +7,8 @@
         <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
-          class="btn btn-primary mb-3"
           v-if="button"
+          class="btn btn-primary mb-3"
           v-bind:href="button.href"
           role="button"
         >

@@ -1,5 +1,6 @@
 <template>
   <input
+    v-model="stringValue"
     class="form-control"
     v-bind:class="{ 'is-invalid': isInvalid }"
     required="required"
@@ -9,7 +10,6 @@
     v-bind:max="finish ? time.formatDateTimeLocal(finish) : null"
     v-bind:min="start ? time.formatDateTimeLocal(start) : null"
     v-bind:readonly="readonly || usedFallback"
-    v-model="stringValue"
   />
 </template>
 
@@ -47,24 +47,23 @@ export default class DateTimePicker extends Vue {
   }
 
   private mountedFallback() {
-    let self = this;
-    self.usedFallback = true;
-    $(self.$el)
+    this.usedFallback = true;
+    $(this.$el)
       .datetimepicker({
-        format: self.format,
-        defaultDate: self.value,
+        format: this.format,
+        defaultDate: this.value,
         locale: T.locale,
       })
       .on('change', () => {
-        self.$emit('input', $(self.$el).data('datetimepicker').getDate());
+        this.$emit('input', $(this.$el).data('datetimepicker').getDate());
       });
 
-    $(this.$el).data('datetimepicker').setDate(self.value);
-    if (self.start !== null) {
-      $(this.$el).data('datetimepicker').setStartDate(self.start);
+    $(this.$el).data('datetimepicker').setDate(this.value);
+    if (this.start !== null) {
+      $(this.$el).data('datetimepicker').setStartDate(this.start);
     }
-    if (self.finish !== null) {
-      $(this.$el).data('datetimepicker').setEndDate(self.finish);
+    if (this.finish !== null) {
+      $(this.$el).data('datetimepicker').setEndDate(this.finish);
     }
   }
 

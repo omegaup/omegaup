@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-      class="alert alert-info alert-dismissible fade show"
       v-if="privateProblemsAlert"
+      class="alert alert-info alert-dismissible fade show"
       role="alert"
     >
       {{ T.messageMakeYourProblemsPublic }}
@@ -22,9 +22,9 @@
           <div class="form-check col-7">
             <label class="form-check-label">
               <input
+                v-model="shouldShowAllProblems"
                 class="form-check-input"
                 type="checkbox"
-                v-model="shouldShowAllProblems"
                 v-on:change.prevent="
                   $emit('change-show-all-problems', shouldShowAllProblems)
                 "
@@ -33,8 +33,8 @@
             </label>
           </div>
           <select
-            class="custom-select col-5"
             v-model="allProblemsVisibilityOption"
+            class="custom-select col-5"
             v-on:change="onChangeVisibility"
           >
             <option selected value="-1">{{ T.forSelectedItems }}</option>
@@ -58,8 +58,8 @@
             <tr v-for="problem in problems">
               <td class="align-middle">
                 <input
-                  type="checkbox"
                   v-model="selectedProblems"
+                  type="checkbox"
                   v-bind:disabled="problem.visibility === -10"
                   v-bind:value="problem"
                 />
@@ -75,30 +75,29 @@
                     >{{ problem.title }}</a
                   >
                   <font-awesome-icon
-                    v-bind:title="T.wordsWarningProblem"
                     v-if="
                       problem.visibility ==
                         visibilityStatuses['publicWarning'] ||
                       problem.visibility == visibilityStatuses['privateWarning']
                     "
+                    v-bind:title="T.wordsWarningProblem"
                     v-bind:icon="['fas', 'exclamation-triangle']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsBannedProblem"
                     v-else-if="
                       problem.visibility ==
                         visibilityStatuses['publicBanned'] ||
                       problem.visibility == visibilityStatuses['privateBanned']
                     "
+                    v-bind:title="T.wordsBannedProblem"
                     v-bind:icon="['fas', 'ban']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsDeleted"
                     v-if="problem.visibility === visibilityStatuses['deleted']"
+                    v-bind:title="T.wordsDeleted"
                     v-bind:icon="['fas', 'trash']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsPrivate"
                     v-else-if="
                       (problem.visibility <=
                         visibilityStatuses['privateBanned'] ||
@@ -107,13 +106,14 @@
                         problem.visibility == visibilityStatuses['private']) &&
                       problem.visibility > visibilityStatuses['deleted']
                     "
+                    v-bind:title="T.wordsPrivate"
                     v-bind:icon="['fas', 'eye-slash']"
                   />
-                  <div class="tags-badges" v-if="problem.tags.length">
+                  <div v-if="problem.tags.length" class="tags-badges">
                     <a
+                      v-for="tag in problem.tags"
                       v-bind:class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
                       v-bind:href="`/problem/?tag[]=${tag.name}`"
-                      v-for="tag in problem.tags"
                       >{{
                         T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name
                       }}</a

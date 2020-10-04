@@ -25,10 +25,10 @@
               v-bind:username="profile.username"
             ></omegaup-user-username>
             <img
+              v-if="profile.country_id"
               height="11"
               v-bind:src="`/media/flags/${profile.country_id.toLowerCase()}.png`"
               v-bind:title="profile.country_id"
-              v-if="profile.country_id"
               width="16"
             />
           </h2>
@@ -81,9 +81,11 @@
           <h2 class="panel-title">{{ T.profileStatistics }}</h2>
         </div>
         <omegaup-user-charts
+          v-if="charts"
           v-bind:data="charts"
           v-bind:username="profile.username"
           v-bind:periodStatisticOptions="periodStatisticOptions"
+          v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
           v-on:emit-update-period-statistics="
             (profileComponent, categories, data) =>
               $emit(
@@ -93,12 +95,10 @@
                 data,
               )
           "
-          v-bind:aggregateStatisticOptions="aggregateStatisticOptions"
           v-on:emit-update-aggregate-statistics="
             (profileComponent) =>
               $emit('update-aggregate-statistics', profileComponent)
           "
-          v-if="charts"
         ></omegaup-user-charts>
       </div>
     </div>

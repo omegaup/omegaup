@@ -1,44 +1,44 @@
 <template>
   <div class="card-body">
     <label
-      ><input type="radio" v-model="type" value="delta" />
+      ><input v-model="type" type="radio" value="delta" />
       {{ T.profileStatisticsDelta }}</label
     >
     <label
-      ><input type="radio" v-model="type" value="cumulative" />
+      ><input v-model="type" type="radio" value="cumulative" />
       {{ T.profileStatisticsCumulative }}</label
     >
     <label
-      ><input type="radio" v-model="type" value="total" />
+      ><input v-model="type" type="radio" value="total" />
       {{ T.profileStatisticsTotal }}</label
     >
-    <div class="period-group text-center" v-if="type != 'total' && type != ''">
+    <div v-if="type != 'total' && type != ''" class="period-group text-center">
       <label
-        ><input name="period" type="radio" v-model="period" value="day" />
+        ><input v-model="period" name="period" type="radio" value="day" />
         {{ T.profileStatisticsDay }}</label
       >
       <label
-        ><input name="period" type="radio" v-model="period" value="week" />
+        ><input v-model="period" name="period" type="radio" value="week" />
         {{ T.profileStatisticsWeek }}</label
       >
       <label
-        ><input name="period" type="radio" v-model="period" value="month" />
+        ><input v-model="period" name="period" type="radio" value="month" />
         {{ T.profileStatisticsMonth }}</label
       >
       <label
-        ><input name="period" type="radio" v-model="period" value="year" />
+        ><input v-model="period" name="period" type="radio" value="year" />
         {{ T.profileStatisticsYear }}</label
       >
     </div>
     <highcharts
+      v-if="type !== 'total'"
       v-bind:options="periodStatisticOptions"
       v-bind:updateArgs="updateArgs"
-      v-if="type !== 'total'"
     ></highcharts>
     <highcharts
+      v-else
       v-bind:options="aggregateStatisticOptions"
       v-bind:updateArgs="updateArgs"
-      v-else
     ></highcharts>
   </div>
 </template>

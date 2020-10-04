@@ -7,7 +7,7 @@
       <span>{{ T.courseAddProblemsAddAssignmentDesc }}</span>
     </div>
     <div class="card-body">
-      <div class="empty-table-message" v-if="problems.length == 0">
+      <div v-if="problems.length == 0" class="empty-table-message">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
       <div v-else>
@@ -46,9 +46,9 @@
                 <label
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
+                    v-model="problemAlias"
                     class="form-control"
                     v-bind:init="(el) => typeahead.problemTypeahead(el)"
-                    v-model="problemAlias"
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
@@ -58,7 +58,7 @@
               <div class="form-group col-md-4">
                 <label
                   >{{ T.wordsPoints }}
-                  <input type="number" class="form-control" v-model="points" />
+                  <input v-model="points" type="number" class="form-control" />
                 </label>
               </div>
             </div>

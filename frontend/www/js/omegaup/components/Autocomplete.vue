@@ -1,12 +1,12 @@
 <template>
   <input
-    class="typeahead form-control"
     ref="input"
+    class="typeahead form-control"
     autocomplete="off"
-    v-on:change="onUpdateInput"
     v-bind:placeholder="placeholder"
     v-bind:name="name"
     v-bind:value="value"
+    v-on:change="onUpdateInput"
   />
 </template>
 

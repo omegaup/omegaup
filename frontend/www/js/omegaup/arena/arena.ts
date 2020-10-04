@@ -341,6 +341,7 @@ export class Arena {
   rankingChart: Highcharts.Chart | null = null;
 
   constructor(options: ArenaOptions) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.options = options;
 
@@ -1609,7 +1610,7 @@ export class Arena {
       window.history.replaceState({}, '', `#${this.activeTab}`);
     }
 
-    const problemMatch = /#problems\/([^\/]+)(\/new-run)?/.exec(
+    const problemMatch = /#problems\/([^/]+)(\/new-run)?/.exec(
       window.location.hash,
     );
     // Check if we were already viewing this problem to avoid reloading
@@ -2320,12 +2321,12 @@ export function GetOptionsFromLocation(
 
   if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
     options.isOnlyProblem = true;
-    const match = /\/arena\/problem\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    const match = /\/arena\/problem\/([^/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.onlyProblemAlias = match[1];
     }
   } else {
-    const match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    const match = /\/arena\/([^/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];
     }

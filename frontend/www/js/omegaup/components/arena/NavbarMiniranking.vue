@@ -1,5 +1,5 @@
 <template>
-  <table class="mini-ranking" v-if="showRanking">
+  <table v-if="showRanking" class="mini-ranking">
     <thead>
       <tr>
         <th></th>

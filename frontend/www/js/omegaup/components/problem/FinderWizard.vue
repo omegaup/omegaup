@@ -13,6 +13,7 @@
           v-on:on-complete="searchProblems"
           ><tab-content v-bind:title="T.wizardStepOne"
             ><toggle-button
+              v-model="karel"
               v-bind:color="{ checked: '#678DD7', unchecked: '#343a40' }"
               v-bind:font-size="12"
               v-bind:height="35"
@@ -22,19 +23,19 @@
               }"
               v-bind:value="karel"
               v-bind:width="160"
-              v-model="karel"
             ></toggle-button>
             <tags-input
+              v-model="selectedTags"
               element-id="tags"
               v-bind:existing-tags="tagObjects"
               v-bind:only-existing-tags="true"
               v-bind:placeholder="T.wordsAddTag"
               v-bind:typeahead="true"
-              v-model="selectedTags"
             ></tags-input
           ></tab-content>
           <tab-content v-bind:title="T.wizardStepTwo"
             ><vue-slider
+              v-model="difficultyRange"
               tooltip="none"
               v-bind:adsorb="true"
               v-bind:dot-size="18"
@@ -43,24 +44,23 @@
               v-bind:marks="SLIDER_MARKS"
               v-bind:max="4"
               v-bind:min="0"
-              v-model="difficultyRange"
             ></vue-slider
           ></tab-content>
           <tab-content v-bind:title="T.wizardStepThree">
             <div class="tab-select">
               <label
+                v-for="priority in PRIORITIES"
                 class="tab-select-el"
                 v-bind:class="{
                   'tab-select-el-active': priority.type === selectedPriority,
                 }"
-                v-for="priority in PRIORITIES"
                 >{{ priority.text }}
                 <input
+                  v-model="selectedPriority"
                   class="hidden-radio"
                   name="priority"
                   type="radio"
                   v-bind:value="priority.type"
-                  v-model="selectedPriority"
               /></label>
             </div> </tab-content
         ></form-wizard>

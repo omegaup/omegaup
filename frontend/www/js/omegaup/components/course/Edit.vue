@@ -17,8 +17,8 @@
           href="#course"
           class="nav-link"
           data-tab-course
-          v-on:click="showTab = 'course'"
           v-bind:class="{ active: showTab === 'course' }"
+          v-on:click="showTab = 'course'"
           >{{ T.courseEdit }}</a
         >
       </li>
@@ -27,8 +27,8 @@
           href="#content"
           class="nav-link"
           data-tab-content
-          v-on:click="onSelectAssignmentTab"
           v-bind:class="{ active: showTab === 'content' }"
+          v-on:click="onSelectAssignmentTab"
           >{{ T.wordsContent }}</a
         >
       </li>
@@ -37,8 +37,8 @@
           href="#admission-mode"
           class="nav-link"
           data-tab-admission-mode
-          v-on:click="showTab = 'admission-mode'"
           v-bind:class="{ active: showTab === 'admission-mode' }"
+          v-on:click="showTab = 'admission-mode'"
           >{{ T.contestNewFormAdmissionMode }}</a
         >
       </li>
@@ -47,8 +47,8 @@
           href="#students"
           class="nav-link"
           data-tab-students
-          v-on:click="showTab = 'students'"
           v-bind:class="{ active: showTab === 'students' }"
+          v-on:click="showTab = 'students'"
           >{{ T.courseEditStudents }}</a
         >
       </li>
@@ -57,8 +57,8 @@
           href="#admins"
           class="nav-link"
           data-tab-admins
-          v-on:click="showTab = 'admins'"
           v-bind:class="{ active: showTab === 'admins' }"
+          v-on:click="showTab = 'admins'"
           >{{ T.courseEditAdmins }}</a
         >
       </li>
@@ -67,15 +67,15 @@
           href="#clone"
           class="nav-link"
           data-tab-clone
-          v-on:click="showTab = 'clone'"
           v-bind:class="{ active: showTab === 'clone' }"
+          v-on:click="showTab = 'clone'"
           >{{ T.courseEditClone }}</a
         >
       </li>
     </ul>
 
     <div class="tab-content">
-      <div class="tab-pane active" role="tabpanel" v-if="showTab === 'course'">
+      <div v-if="showTab === 'course'" class="tab-pane active" role="tabpanel">
         <omegaup-course-form
           v-bind:update="true"
           v-bind:course="data.course"
@@ -87,10 +87,10 @@
       </div>
 
       <div
+        v-if="showTab === 'content'"
         data-content-tab
         class="tab-pane active"
         role="tabpanel"
-        v-if="showTab === 'content'"
       >
         <omegaup-course-assignment-list
           v-bind:content="assignments"
@@ -116,10 +116,10 @@
           v-bind:assignment-problems="assignmentProblems"
           v-bind:tagged-problems="data.taggedProblems"
           v-bind:invalid-parameter-name="invalidParameterName"
+          v-bind:assignment-form-mode.sync="assignmentFormMode"
           v-on:add-problem="
             (assignment, problem) => $emit('add-problem', assignment, problem)
           "
-          v-bind:assignment-form-mode.sync="assignmentFormMode"
           v-on:emit-add-problem="
             (assignment, problemAlias) =>
               $emit('add-problem', assignment, problemAlias)
@@ -159,9 +159,9 @@
       </div>
 
       <div
+        v-if="showTab === 'admission-mode'"
         class="tab-pane active"
         role="tabpanel"
-        v-if="showTab === 'admission-mode'"
       >
         <omegaup-course-admision-mode
           v-bind:initial-admission-mode="data.course.admission_mode"
@@ -174,10 +174,10 @@
       </div>
 
       <div
+        v-if="showTab === 'students'"
         data-students-tab
         class="tab-pane active"
         role="tabpanel"
-        v-if="showTab === 'students'"
       >
         <omegaup-course-add-students
           v-bind:students="data.students"
@@ -197,9 +197,9 @@
       </div>
 
       <div
+        v-if="showTab === 'admins'"
         class="tab-pane active pane-admins d-flex row"
         role="tabpanel"
-        v-if="showTab === 'admins'"
       >
         <div class="col-md-6">
           <omegaup-common-admins
@@ -231,7 +231,7 @@
         </div>
       </div>
 
-      <div class="tab-pane active" role="tabpanel" v-if="showTab === 'clone'">
+      <div v-if="showTab === 'clone'" class="tab-pane active" role="tabpanel">
         <div class="card">
           <div class="card-body">
             <omegaup-course-clone

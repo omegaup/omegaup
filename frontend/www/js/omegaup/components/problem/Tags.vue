@@ -7,13 +7,13 @@
           v-if="canAddNewTags"
           v-bind:data="publicTags"
           v-bind:serializer="publicTagsSerializer"
-          v-on:hit="addPublicTag"
           v-bind:auto-close="true"
           v-bind:placeholder="T.publicTagsPlaceholder"
           v-bind:required="true"
           v-bind:input-class="
             errors.includes('public_tags') ? 'is-invalid' : ''
           "
+          v-on:hit="addPublicTag"
         >
         </vue-typeahead-bootstrap>
       </div>
@@ -45,8 +45,8 @@
               <button
                 type="button"
                 class="btn btn-danger"
-                v-on:click="removeTag(tag, /*public=*/ true)"
                 v-bind:disabled="selectedPublicTags.length < 2"
+                v-on:click="removeTag(tag, /*public=*/ true)"
               >
                 <font-awesome-icon v-bind:icon="['fas', 'trash']" />
               </button>
@@ -58,9 +58,9 @@
         <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
         <div class="input-group">
           <input
+            v-model="newPrivateTag"
             type="text"
             class="form-control"
-            v-model="newPrivateTag"
             v-bind:placeholder="T.privateTagsPlaceholder"
           />
           <div class="input-group-append">
@@ -109,10 +109,10 @@
         <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
           <select
+            v-model="problemLevelTag"
             required
             class="form-control"
             name="problem-level"
-            v-model="problemLevelTag"
             v-on:change="onSelectProblemLevel"
           >
             <option v-for="levelTag in levelTags" v-bind:value="levelTag">
@@ -145,7 +145,7 @@
       <div class="form-group">
         <label class="switch-container font-weight-bold">
           <div class="switch">
-            <input type="checkbox" v-model="allowTags" />
+            <input v-model="allowTags" type="checkbox" />
             <span class="slider round"></span>
           </div>
           <span class="switch-text">
@@ -155,10 +155,10 @@
       </div>
     </div>
     <input
+      v-if="!canAddNewTags"
       type="hidden"
       name="allow_user_add_tags"
       v-bind:value="allowTags"
-      v-if="!canAddNewTags"
     />
   </div>
 </template>

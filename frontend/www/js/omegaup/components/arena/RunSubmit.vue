@@ -10,11 +10,11 @@
         {{ T.wordsLanguage }}
       </label>
       <div class="col-sm-4">
-        <select class="form-control" name="language" v-model="selectedLanguage">
+        <select v-model="selectedLanguage" class="form-control" name="language">
           <option
+            v-for="(language, key) in allowedLanguages"
             v-bind:key="key"
             v-bind:value="key"
-            v-for="(language, key) in allowedLanguages"
           >
             {{ language }}
           </option>
@@ -32,9 +32,9 @@
     </div>
     <div class="code-view form-group">
       <omegaup-arena-code-view
+        v-model="code"
         v-bind:language="selectedLanguage"
         v-bind:readonly="false"
-        v-model="code"
       ></omegaup-arena-code-view>
     </div>
     <div class="form-group row">
@@ -42,7 +42,7 @@
         {{ T.arenaRunSubmitUpload }}
       </label>
       <div class="col-sm-7">
-        <input type="file" name="file" ref="inputFile" />
+        <input ref="inputFile" type="file" name="file" />
       </div>
     </div>
     <div class="form-group row">
@@ -244,7 +244,7 @@ export default class ArenaRunSubmit extends Vue {
       alert(T.arenaRunSubmitMissingLanguage);
       return;
     }
-    const file = this.inputFile.files![0];
+    const file = this.inputFile.files?.[0];
     if (file) {
       const reader = new FileReader();
 

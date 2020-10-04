@@ -1,17 +1,17 @@
 <template>
   <div
-    class="row omegaup-feedback-row"
     v-if="qualityHistogram || difficultyHistogram"
+    class="row omegaup-feedback-row"
   >
     <h5 class="omegaup-feedback-title">{{ T.wordsUsersFeedback }}</h5>
-    <div v-bind:class="containerClass" v-if="qualityHistogram">
+    <div v-if="qualityHistogram" v-bind:class="containerClass">
       <omegaup-problem-histogram
         v-bind:histogram="qualityHistogram"
         v-bind:score="qualityScore"
         v-bind:type="`quality`"
       ></omegaup-problem-histogram>
     </div>
-    <div v-bind:class="containerClass" v-if="difficultyHistogram">
+    <div v-if="difficultyHistogram" v-bind:class="containerClass">
       <omegaup-problem-histogram
         v-bind:histogram="difficultyHistogram"
         v-bind:score="difficultyScore"

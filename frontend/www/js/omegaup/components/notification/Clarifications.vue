@@ -9,14 +9,14 @@
       role="button"
       ><span class="glyphicon glyphicon-bell"></span>
       <span
+        v-if="clarifications && clarifications.length > 0"
         class="notification-counter label"
         v-bind:class="{ 'label-danger': clarifications.length > 0 }"
-        v-if="clarifications && clarifications.length > 0"
         >{{ clarifications.length }}</span
       ></a
     >
     <ul class="dropdown-menu">
-      <li class="empty" v-if="!clarifications || clarifications.length === 0">
+      <li v-if="!clarifications || clarifications.length === 0" class="empty">
         {{ T.notificationsNoNewNotifications }}
       </li>
       <li v-else>

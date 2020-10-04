@@ -92,8 +92,8 @@
               <label
                 >{{ T.wordsProblem }}:
                 <omegaup-autocomplete
-                  v-bind:init="initProblemAutocomplete"
                   v-model="filterProblem"
+                  v-bind:init="initProblemAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
@@ -110,8 +110,8 @@
               <label
                 >{{ T.wordsUser }}:
                 <omegaup-autocomplete
-                  v-bind:init="initUserAutocomplete"
                   v-model="filterUsername"
+                  v-bind:init="initUserAutocomplete"
                 ></omegaup-autocomplete>
               </label>
               <button
@@ -125,11 +125,11 @@
             </template>
 
             <div class="row">
-              <div class="col-sm col-12" v-if="filters.length > 0">
+              <div v-if="filters.length > 0" class="col-sm col-12">
                 <span
-                  class="btn btn-secondary mr-3"
                   v-for="filter in filters"
                   v-bind:key="filter.name"
+                  class="btn btn-secondary mr-3"
                 >
                   <span class="mr-2"
                     >{{ filter.name }}: {{ filter.value }}</span
@@ -138,7 +138,7 @@
                     <font-awesome-icon v-bind:icon="['fas', 'times']" />
                   </a>
                 </span>
-                <a v-on:click="onRemoveFilter('all')" href="#">
+                <a href="#" v-on:click="onRemoveFilter('all')">
                   <span class="mr-2">{{ T.wordsRemoveFilter }}</span>
                 </a>
               </div>
@@ -166,14 +166,14 @@
           <tr>
             <td colspan="10">
               <a
-                v-bind:href="`/arena/${contestAlias}/practice/`"
                 v-if="isContestFinished"
+                v-bind:href="`/arena/${contestAlias}/practice/`"
                 >{{ T.arenaContestEndedUsePractice }}</a
               >
               <a
-                v-on:click="$emit('new-submission')"
-                v-bind:href="newSubmissionUrl"
                 v-else
+                v-bind:href="newSubmissionUrl"
+                v-on:click="$emit('new-submission')"
                 >{{ newSubmissionDescription }}</a
               >
             </td>
@@ -206,8 +206,8 @@
                 >{{ run.contest_alias }}</a
               >
               <a
-                v-bind:href="`/arena/${run.contest_alias}/`"
                 v-if="run.contest_alias"
+                v-bind:href="`/arena/${run.contest_alias}/`"
                 class="ml-2"
               >
                 <font-awesome-icon v-bind:icon="['fas', 'external-link-alt']" />
@@ -229,13 +229,13 @@
               <span>{{ status(run) }}</span>
 
               <button
-                type="button"
                 v-if="!!statusHelp(run)"
+                type="button"
                 v-bind:data-content="statusHelp(run)"
-                v-on:click="showVerdictHelp"
                 data-toggle="popover"
                 data-trigger="focus"
                 class="btn btn-outline-dark btn-sm"
+                v-on:click="showVerdictHelp"
               >
                 <font-awesome-icon v-bind:icon="['fas', 'question-circle']" />
               </button>
@@ -250,8 +250,8 @@
               <button
                 type="button"
                 v-bind:title="T.wordsRejudge"
-                v-on:click="$emit('rejudge', run)"
                 class="btn btn-outline-dark btn-sm"
+                v-on:click="$emit('rejudge', run)"
               >
                 <font-awesome-icon v-bind:icon="['fas', 'redo-alt']" />
               </button>
@@ -260,8 +260,8 @@
               <button
                 type="button"
                 v-bind:title="T.wordsDisqualify"
-                v-on:click="$emit('disqualify', run)"
                 class="btn btn-outline-dark btn-sm"
+                v-on:click="$emit('disqualify', run)"
               >
                 <font-awesome-icon v-bind:icon="['fas', 'ban']" />
               </button>
@@ -270,8 +270,8 @@
               <button
                 type="button"
                 data-run-details
-                v-on:click="$emit('details', run)"
                 class="details btn btn-outline-dark btn-sm"
+                v-on:click="$emit('details', run)"
               >
                 <font-awesome-icon v-bind:icon="['fas', 'search-plus']" />
               </button>

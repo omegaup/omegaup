@@ -13,10 +13,10 @@
         <div class="top-margin text-center">
           <label
             ><input
+              v-model="agreed"
               name="agreed"
               type="checkbox"
               v-bind:disabled="saved"
-              v-model="agreed"
             />
             {{ T.wordsAgree }}</label
           >

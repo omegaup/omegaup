@@ -4,27 +4,27 @@
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img
+          v-if="problem.quality_seal || problem.visibility === 3"
           src="/media/quality-badge-sm.png"
           v-bind:title="T.wordsHighQualityProblem"
-          v-if="problem.quality_seal || problem.visibility === 3"
           class="mr-2"
         />
         <font-awesome-icon
+          v-if="problem.visibility === 1 || problem.visibility === -1"
           v-bind:icon="['fas', 'exclamation-triangle']"
           v-bind:title="T.wordsWarningProblem"
-          v-if="problem.visibility === 1 || problem.visibility === -1"
           class="mr-2"
         ></font-awesome-icon>
         <font-awesome-icon
+          v-if="problem.visibility === 0 || problem.visibility === -1"
           v-bind:icon="['fas', 'eye-slash']"
           v-bind:title="T.wordsPrivate"
-          v-if="problem.visibility === 0 || problem.visibility === -1"
           class="mr-2"
         ></font-awesome-icon>
         <font-awesome-icon
+          v-if="problem.visibility <= -2"
           v-bind:icon="['fas', 'ban']"
           v-bind:title="T.wordsBannedProblem"
-          v-if="problem.visibility <= -2"
           class="mr-2"
           color="darkred"
         ></font-awesome-icon>

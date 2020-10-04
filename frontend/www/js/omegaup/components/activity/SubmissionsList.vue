@@ -6,8 +6,8 @@
           <h2 class="card-title">{{ T.profileSolvedProblems }}</h2>
         </div>
         <table
-          class="table table-striped"
           v-for="(problems, user) in groupedSolvedProblems"
+          class="table table-striped"
         >
           <thead>
             <tr>
@@ -31,8 +31,8 @@
           <h2 class="card-title">{{ T.profileUnsolvedProblems }}</h2>
         </div>
         <table
-          class="table table-striped"
           v-for="(problems, user) in groupedUnsolvedProblems"
+          class="table table-striped"
         >
           <thead>
             <tr>

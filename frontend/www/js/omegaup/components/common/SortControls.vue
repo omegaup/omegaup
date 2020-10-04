@@ -2,15 +2,15 @@
   <span class="ml-1">
     <a href="#" v-on:click="$emit('emit-apply-filter', column, toggleSort)">
       <font-awesome-icon
+        v-if="!selected"
         v-bind:icon="['fas', 'exchange-alt']"
         color="lightgray"
         rotation="90"
-        v-if="!selected"
       />
       <font-awesome-icon
+        v-else
         v-bind:icon="['fas', iconDisplayed]"
         color="black"
-        v-else
       />
     </a>
   </span>

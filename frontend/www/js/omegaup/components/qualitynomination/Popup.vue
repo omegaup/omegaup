@@ -1,9 +1,9 @@
 <template>
   <div class="qualitynomination-popup">
     <a
+      v-show="showSuggestLink"
       v-bind:href="suggestLink"
       v-on:click="onShowSuggestion"
-      v-show="showSuggestLink"
     >
       <slot name="link-title">
         {{ T.qualityNominationRateProblem }}
@@ -11,9 +11,9 @@
     </a>
     <transition name="fade">
       <form
+        v-show="showForm"
         class="popup h-auto w-auto"
         v-on:submit.prevent=""
-        v-show="showForm"
       >
         <button class="close" type="button" v-on:click="onHide(true)">×</button>
         <div class="container-fluid">
@@ -37,23 +37,23 @@
                 </label>
                 <br />
                 <label class="radio-inline"
-                  ><input type="radio" v-model="difficulty" value="0" />
+                  ><input v-model="difficulty" type="radio" value="0" />
                   {{ T.qualityFormDifficultyVeryEasy }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="difficulty" value="1" />
+                  ><input v-model="difficulty" type="radio" value="1" />
                   {{ T.qualityFormDifficultyEasy }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="difficulty" value="2" />
+                  ><input v-model="difficulty" type="radio" value="2" />
                   {{ T.qualityFormDifficultyMedium }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="difficulty" value="3" />
+                  ><input v-model="difficulty" type="radio" value="3" />
                   {{ T.qualityFormDifficultyHard }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="difficulty" value="4" />
+                  ><input v-model="difficulty" type="radio" value="4" />
                   {{ T.qualityFormDifficultyVeryHard }}</label
                 >
               </div>
@@ -62,15 +62,15 @@
                   {{ T.qualityFormTags }}
                   <ul class="tag-select">
                     <li
-                      class="tag-select"
                       v-for="problemTopic in sortedProblemTags"
                       v-bind:key="problemTopic.value"
+                      class="tag-select"
                     >
                       <label class="tag-select"
                         ><input
+                          v-model="tags"
                           type="checkbox"
                           v-bind:value="problemTopic.value"
-                          v-model="tags"
                         />
                         {{ problemTopic.text }}</label
                       >
@@ -82,23 +82,23 @@
                 <label class="control-label">{{ T.qualityFormQuality }}</label
                 ><br />
                 <label class="radio-inline"
-                  ><input type="radio" v-model="quality" value="0" />
+                  ><input v-model="quality" type="radio" value="0" />
                   {{ T.qualityFormQualityVeryBad }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="quality" value="1" />
+                  ><input v-model="quality" type="radio" value="1" />
                   {{ T.qualityFormQualityBad }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="quality" value="2" />
+                  ><input v-model="quality" type="radio" value="2" />
                   {{ T.qualityFormQualityFair }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="quality" value="3" />
+                  ><input v-model="quality" type="radio" value="3" />
                   {{ T.qualityFormQualityGood }}</label
                 >
                 <label class="radio-inline"
-                  ><input type="radio" v-model="quality" value="4" />
+                  ><input v-model="quality" type="radio" value="4" />
                   {{ T.qualityFormQualityVeryGood }}</label
                 >
               </div>
@@ -330,11 +330,10 @@ export default class QualityNominationPopup extends Vue {
   }
 
   get suggestLink(): string {
-    let self = this;
-    if (!self.problemAlias) {
+    if (!this.problemAlias) {
       return '#';
     }
-    return `#problems/${self.problemAlias}`;
+    return `#problems/${this.problemAlias}`;
   }
 
   onHide(isDismissed: boolean): void {

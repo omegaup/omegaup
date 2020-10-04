@@ -35,17 +35,17 @@
                 <select v-model="newClarification.problemAlias">
                   <option
                     v-for="problem in contestProblems"
-                    v-bind:value="problem.alias"
                     v-bind:key="problem.alias"
+                    v-bind:value="problem.alias"
                   >
                     {{ problem.title }}
                   </option>
                 </select>
               </label>
               <textarea
+                v-model="newClarification.message"
                 class="w-100"
                 maxlength="200"
-                v-model="newClarification.message"
                 v-bind:placeholder="T.arenaClarificationCreateMaxLength"
               ></textarea>
             </div>
@@ -73,10 +73,10 @@
       <table class="table mb-0">
         <thead>
           <tr>
-            <th class="text-center" scope="col" v-if="inContest">
+            <th v-if="inContest" class="text-center" scope="col">
               {{ T.wordsContest }}
             </th>
-            <th class="text-center" scope="col" v-else>
+            <th v-else class="text-center" scope="col">
               {{ T.wordsProblem }}
             </th>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
@@ -88,8 +88,8 @@
         <tbody>
           <omegaup-clarification
             v-for="clarification in clarifications"
-            v-bind:in-contest="inContest"
             v-bind:key="clarification.clarification_id"
+            v-bind:in-contest="inContest"
             v-bind:clarification="clarification"
             v-on:clarification-response="
               (id, responseText, isPublic) =>

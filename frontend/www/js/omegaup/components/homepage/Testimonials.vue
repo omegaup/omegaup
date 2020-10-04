@@ -1,29 +1,29 @@
 <template>
   <!-- id-lint off -->
   <div
+    id="testimonials-carousel-display"
     class="carousel slide"
     data-ride="carousel"
     data-interval="8000"
-    id="testimonials-carousel-display"
   >
     <!-- id-lint off -->
     <ol class="carousel-indicators">
       <li
-        data-target="#testimonials-carousel-display"
+        v-for="(_, index) in testimonials"
         v-bind:key="index"
+        data-target="#testimonials-carousel-display"
         v-bind:data-slide-to="index"
         v-bind:class="{ active: !index }"
-        v-for="(_, index) in testimonials"
       ></li>
     </ol>
     <div
       class="carousel-inner text-center py-5 py-md-0 d-flex align-items-center"
     >
       <div
+        v-for="(testimonial, index) in testimonials"
+        v-bind:key="index"
         class="carousel-item"
         v-bind:class="{ active: !index }"
-        v-bind:key="index"
-        v-for="(testimonial, index) in testimonials"
       >
         <div class="container-lg py-4 px-5">
           <blockquote class="blockquote text-center">

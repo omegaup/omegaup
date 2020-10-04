@@ -38,10 +38,10 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="newPassword"
                 class="form-control"
                 size="30"
                 type="password"
-                v-model="newPassword"
               />
             </div>
           </div>
@@ -51,10 +51,10 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="newPasswordRepeat"
                 class="form-control"
                 size="30"
                 type="password"
-                v-model="newPasswordRepeat"
               />
             </div>
           </div>

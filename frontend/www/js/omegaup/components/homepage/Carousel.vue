@@ -1,22 +1,22 @@
 <template>
   <!-- id-lint off -->
-  <div class="carousel slide" data-ride="carousel" id="carousel-display">
+  <div id="carousel-display" class="carousel slide" data-ride="carousel">
     <!-- id-lint on -->
     <ol class="carousel-indicators">
       <li
-        data-target="#carousel-display"
+        v-for="(_, index) in slides"
         v-bind:key="index"
+        data-target="#carousel-display"
         v-bind:data-slide-to="index"
         v-bind:class="{ active: !index }"
-        v-for="(_, index) in slides"
       ></li>
     </ol>
     <div class="carousel-inner text-center py-5 py-md-0">
       <div
+        v-for="(slide, index) in slides"
+        v-bind:key="index"
         class="carousel-item"
         v-bind:class="{ active: !index }"
-        v-bind:key="index"
-        v-for="(slide, index) in slides"
       >
         <omegaup-homepage-slide
           v-bind:title="slide.title[T.locale]"

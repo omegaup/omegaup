@@ -16,8 +16,8 @@
     >
       <h5 class="card-title">
         <omegaup-countryflag
-          v-bind:country="schoolOfTheMonth.country_id"
           v-if="schoolOfTheMonth.country_id !== null"
+          v-bind:country="schoolOfTheMonth.country_id"
         ></omegaup-countryflag>
         <a v-bind:href="`/schools/profile/${schoolOfTheMonth.school_id}/`">{{
           schoolOfTheMonth.name
@@ -25,8 +25,8 @@
       </h5>
       <!-- TODO: agregar más información (logo, total de usuarios...) -->
       <div
-        class="card-text"
         v-if="schoolOfTheMonth.state && schoolOfTheMonth.country"
+        class="card-text"
       >
         {{ schoolOfTheMonth.state }}, {{ schoolOfTheMonth.country }}
       </div>

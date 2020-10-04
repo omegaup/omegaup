@@ -3,8 +3,8 @@
     <div class="panel-heading">
       <h3 class="panel-title">{{ title }}</h3>
     </div>
-    <div class="panel-body" v-if="isAdmin">
-      <div class="checkbox btn-group" v-if="isAdmin">
+    <div v-if="isAdmin" class="panel-body">
+      <div v-if="isAdmin" class="checkbox btn-group">
         <label
           ><input
             class="show-admin-contests"
@@ -50,18 +50,18 @@
           <th>{{ T.arenaPracticeStartTime }}</th>
           <th>{{ T.arenaPracticeEndtime }}</th>
           <th v-if="isAdmin">{{ T.contestNewFormAdmissionMode }}</th>
-          <th colspan="2" v-if="isAdmin">{{ T.wordsScoreboard }}</th>
-          <th colspan="7" v-if="isAdmin"></th>
+          <th v-if="isAdmin" colspan="2">{{ T.wordsScoreboard }}</th>
+          <th v-if="isAdmin" colspan="7"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="contest in contests">
           <td v-if="isAdmin">
             <input
-              type="checkbox"
-              v-model="selectedContests"
-              v-bind:value="contest.alias"
               v-bind:id="contest.alias"
+              v-model="selectedContests"
+              type="checkbox"
+              v-bind:value="contest.alias"
             />
           </td>
 
@@ -95,6 +95,7 @@
           <td v-else></td>
           <td v-if="isAdmin">
             <a
+              v-if="contest.scoreboard_url"
               class="glyphicon glyphicon-link"
               v-bind:href="
                 '/arena/' +
@@ -103,12 +104,12 @@
                 contest.scoreboard_url
               "
               v-bind:title="T.contestScoreboardLink"
-              v-if="contest.scoreboard_url"
               >Public</a
             >
           </td>
           <td v-if="isAdmin">
             <a
+              v-if="contest.scoreboard_url_admin"
               class="glyphicon glyphicon-link"
               v-bind:href="
                 '/arena/' +
@@ -117,7 +118,6 @@
                 contest.scoreboard_url_admin
               "
               v-bind:title="T.contestScoreboardAdminLink"
-              v-if="contest.scoreboard_url_admin"
               >Admin</a
             >
           </td>

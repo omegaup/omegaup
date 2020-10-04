@@ -4,7 +4,7 @@
       <h3 class="card-title">{{ T.courseListAdminCourses }}</h3>
     </div>
 
-    <div class="m-3" v-if="isMainUserIdentity">
+    <div v-if="isMainUserIdentity" class="m-3">
       <div class="float-right">
         <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
       </div>

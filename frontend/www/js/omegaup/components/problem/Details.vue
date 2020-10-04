@@ -2,10 +2,10 @@
   <div class="mt-4">
     <ul class="nav justify-content-center nav-tabs">
       <li
-        class="nav-item"
-        role="tablist"
         v-for="tab in availableTabs"
         v-bind:key="tab.name"
+        class="nav-item"
+        role="tablist"
       >
         <a
           v-bind:href="`#${tab.name}`"
@@ -19,9 +19,9 @@
         >
           {{ tab.text }}
           <span
+            v-if="tab.name === 'clarifications'"
             class="clarifications-count"
             v-bind:class="{ 'font-weight-bold': hasUnreadClarifications }"
-            v-if="tab.name === 'clarifications'"
             >{{ clarificationsCount }}</span
           >
         </a>
@@ -38,7 +38,7 @@
           v-bind:show-edit-link="this.user.admin"
         ></omegaup-problem-settings-summary>
 
-        <div class="karel-js-link my-3" v-if="problem.karel_problem">
+        <div v-if="problem.karel_problem" class="karel-js-link my-3">
           <a
             class="p-3"
             v-bind:href="`/karel.js/${
@@ -112,9 +112,9 @@
           "
         ></omegaup-quality-nomination-promotion>
         <omegaup-overlay
+          v-if="this.user.loggedIn"
           v-bind:show-overlay="showOverlay"
           v-on:overlay-hidden="onPopupDismissed"
-          v-if="this.user.loggedIn"
         >
           <omegaup-arena-runsubmit
             slot="popup-content"

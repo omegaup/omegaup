@@ -12,12 +12,12 @@
           <div class="col-md-4">
             <div class="input-group">
               <input
+                v-model="email"
                 class="form-control"
                 name="email"
                 type="text"
                 v-bind:disabled="username != null"
                 v-bind:placeholder="T.email"
-                v-model="email"
               />
               <span class="input-group-btn"
                 ><button
@@ -33,9 +33,9 @@
           </div>
         </form>
         <form
+          v-show="username != null"
           class="form"
           v-on:submit.prevent="onVerifyUser"
-          v-show="username != null"
         >
           <div class="col-md-4 bottom-margin">
             <button
@@ -53,7 +53,7 @@
               </template>
             </button>
           </div>
-          <div class="col-md-4 bottom-margin" v-show="username != null">
+          <div v-show="username != null" class="col-md-4 bottom-margin">
             <label>
               <template v-if="lastLogin != null">
                 {{
@@ -71,18 +71,18 @@
       </div>
       <div class="row bottom-margin">
         <form
+          v-show="username != null"
           class="form bottom-margin"
           v-on:submit.prevent="onGenerateToken"
-          v-show="username != null"
         >
           <div class="col-md-12">
             <div class="input-group bottom-margin">
               <input
+                v-model="link"
                 class="form-control"
                 name="link"
                 type="text"
                 v-bind:placeholder="T.passwordGenerateTokenDesc"
-                v-model="link"
               />
               <span class="input-group-btn"
                 ><button

@@ -3,26 +3,26 @@
     <div class="filenames">
       <div class="list-group">
         <button
+          v-if="!zip"
           class="list-group-item list-group-item-action disabled"
           type="button"
-          v-if="!zip"
         >
           <em>Empty</em>
         </button>
         <button
+          v-for="(item, name) in zip.files"
+          v-else
           class="list-group-item list-group-item-action"
           type="button"
           v-bind:class="{ active: active == name }"
           v-bind:title="name"
-          v-else
-          v-for="(item, name) in zip.files"
           v-on:click="select(item)"
         >
           {{ name }}
         </button>
       </div>
     </div>
-    <textarea class="editor" readonly v-model="contents"></textarea>
+    <textarea v-model="contents" class="editor" readonly></textarea>
   </div>
 </template>
 

@@ -10,10 +10,10 @@
             class="d-inline-block"
           />
           <img
+            v-show="omegaUpLockDown"
             alt="lockdown"
             title="lockdown"
             v-bind:src="lockDownImage"
-            v-show="omegaUpLockDown"
             v-bind:class="{ 'd-inline-block': omegaUpLockDown }"
             height="20"
           />
@@ -29,11 +29,11 @@
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse omegaup-navbar">
-          <ul class="navbar-nav mr-auto" v-if="!omegaUpLockDown && !inContest">
+          <ul v-if="!omegaUpLockDown && !inContest" class="navbar-nav mr-auto">
             <li
+              v-if="isLoggedIn"
               class="nav-item dropdown nav-contests"
               v-bind:class="{ active: navbarSection === 'contests' }"
-              v-if="isLoggedIn"
             >
               <a
                 class="nav-link px-2 dropdown-toggle"
@@ -64,15 +64,15 @@
                 </template>
               </div>
             </li>
-            <li v-bind:class="{ active: navbarSection === 'contests' }" v-else>
+            <li v-else v-bind:class="{ active: navbarSection === 'contests' }">
               <a class="nav-link px-2" href="/arena/" data-nav-contests-arena>{{
                 T.wordsContests
               }}</a>
             </li>
             <li
+              v-if="isLoggedIn"
               class="nav-item dropdown nav-courses"
               v-bind:class="{ active: navbarSection === 'courses' }"
-              v-if="isLoggedIn"
             >
               <a
                 class="nav-link px-2 dropdown-toggle"
@@ -101,9 +101,9 @@
               </div>
             </li>
             <li
+              v-else
               v-bind:class="{ active: navbarSection === 'course' }"
               data-nav-course
-              v-else
             >
               <a class="nav-link px-2" href="/course/">{{ T.navCourses }}</a>
             </li>
@@ -205,16 +205,16 @@
               </div>
             </li>
           </ul>
-          <ul class="navbar-nav mr-auto" v-else></ul>
+          <ul v-else class="navbar-nav mr-auto"></ul>
           <!-- in lockdown or contest mode there is no left navbar -->
-          <ul class="navbar-nav navbar-right" v-if="!isLoggedIn">
+          <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
             <li class="nav-item">
               <a class="nav-link px-2" v-bind:href="formattedLoginURL">{{
                 T.navLogIn
               }}</a>
             </li>
           </ul>
-          <ul class="navbar-nav navbar-right" v-else>
+          <ul v-else class="navbar-nav navbar-right">
             <!--
               TODO: Hay que darle soporte a estos dos componentes
             <omegaup-notifications-clarifications
@@ -250,14 +250,14 @@
               <div class="dropdown-menu dropdown-menu-right">
                 <template v-show="!omegaUpLockDown && !inContest">
                   <a
+                    v-show="!omegaUpLockDown && !inContest"
                     class="dropdown-item"
                     data-nav-profile
                     href="/profile/"
-                    v-show="!omegaUpLockDown && !inContest"
                   >
                     <font-awesome-icon v-bind:icon="['fas', 'user']" />
                     {{ T.navViewProfile }}
-                    <div class="progress mt-2" v-if="profileProgress !== 0">
+                    <div v-if="profileProgress !== 0" class="progress mt-2">
                       <div
                         class="progress-bar progress-bar-striped bg-info"
                         role="progressbar"

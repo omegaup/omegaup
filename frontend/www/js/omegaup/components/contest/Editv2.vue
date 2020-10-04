@@ -29,29 +29,29 @@
         >
         <div class="dropdown-menu">
           <a
+            v-if="!virtual"
             href="#"
             data-toggle="tab"
             class="dropdown-item"
             v-bind:class="{ active: showTab === 'new_form' }"
-            v-if="!virtual"
             v-on:click="showTab = 'new_form'"
             >{{ T.contestEdit }}</a
           >
           <a
+            v-if="!virtual"
             href="#"
             data-toggle="tab"
             class="dropdown-item"
             v-bind:class="{ active: showTab === 'problems' }"
-            v-if="!virtual"
             v-on:click="showTab = 'problems'"
             >{{ T.wordsAddProblem }}</a
           >
           <a
+            v-if="!virtual"
             href="#"
             data-toggle="tab"
             class="dropdown-item"
             v-bind:class="{ active: showTab === 'publish' }"
-            v-if="!virtual"
             v-on:click="showTab = 'publish'"
             >{{ T.contestNewFormAdmissionMode }}</a
           >
@@ -92,7 +92,7 @@
     </ul>
 
     <div class="tab-content">
-      <div class="tab-pane active" v-if="showTab === 'new_form'">
+      <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
           v-bind:initial-alias="details.alias"
           v-bind:initial-title="details.title"
@@ -122,7 +122,7 @@
           "
         ></omegaup-contest-new-form>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'problems'">
+      <div v-if="showTab === 'problems'" class="tab-pane active">
         <omegaup-contest-add-problem
           v-bind:contest-alias="details.alias"
           v-bind:initial-points="details.partial_score ? 100 : 1"
@@ -142,7 +142,7 @@
         >
         </omegaup-contest-add-problem>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'publish'">
+      <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
           v-bind:initial-admission-mode="details.admission_mode"
           v-bind:should-show-public-option="true"

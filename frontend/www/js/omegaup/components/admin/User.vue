@@ -25,7 +25,7 @@
       </form>
       <h4>{{ T.userEmails }}</h4>
       <ul class="list-group">
-        <li class="list-group-item" v-for="email in emails">{{ email }}</li>
+        <li v-for="email in emails" class="list-group-item">{{ email }}</li>
       </ul>
       <h4>{{ T.userRoles }}</h4>
       <table class="table">

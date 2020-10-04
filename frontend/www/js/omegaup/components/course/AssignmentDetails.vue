@@ -1,5 +1,5 @@
 <template>
-  <div class="omegaup-course-assignmentdetails card" v-show="show">
+  <div v-show="show" class="omegaup-course-assignmentdetails card">
     <slot name="page-header">
       <div class="card-header">
         <h1>{{ T.wordsContentEdit }} {{ assignment.name }}</h1>
@@ -13,11 +13,11 @@
               >{{ T.wordsTitle }}
               <input
                 ref="name"
+                v-model="name"
                 class="form-control name"
                 v-bind:class="{ 'is-invalid': invalidParameterName === 'name' }"
                 size="30"
                 type="text"
-                v-model="name"
                 required
             /></label>
           </div>
@@ -28,13 +28,13 @@
                 v-bind:title="T.courseAssignmentNewFormShortTitle_alias_Desc"
                 icon="info-circle" />
               <input
+                v-model="alias"
                 class="form-control alias"
                 v-bind:class="{
                   'is-invalid': invalidParameterName === 'alias',
                 }"
                 type="text"
                 v-bind:disabled="update"
-                v-model="alias"
                 required
             /></label>
           </div>
@@ -46,11 +46,11 @@
                 icon="info-circle"
               />
               <select
+                v-model="assignmentType"
                 class="form-control"
                 v-bind:class="{
                   'is-invalid': invalidParameterName === 'assignment_type',
                 }"
-                v-model="assignmentType"
                 required
               >
                 <option value="lesson">
@@ -74,8 +74,8 @@
                 v-bind:title="T.courseAssignmentNewFormStartDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
-                v-bind:enabled="!assignment.has_runs"
                 v-model="startTime"
+                v-bind:enabled="!assignment.has_runs"
                 v-bind:finish="finishTimeCourse"
                 v-bind:start="startTimeCourse"
                 v-bind:is-invalid="invalidParameterName === 'start_time'"
@@ -98,17 +98,17 @@
             >
               <label class="radio-inline"
                 ><input
+                  v-model="unlimitedDuration"
                   type="radio"
                   v-bind:value="true"
-                  v-model="unlimitedDuration"
                   v-bind:disabled="!unlimitedDurationCourse"
                 />{{ T.wordsYes }}</label
               >
               <label class="radio-inline"
                 ><input
+                  v-model="unlimitedDuration"
                   type="radio"
                   v-bind:value="false"
-                  v-model="unlimitedDuration"
                   v-bind:disabled="!unlimitedDurationCourse"
                 />{{ T.wordsNo }}</label
               >
@@ -121,9 +121,9 @@
                 v-bind:title="T.courseAssignmentNewFormEndDateDesc"
                 icon="info-circle" />
               <omegaup-datetimepicker
+                v-model="finishTime"
                 v-bind:enabled="!unlimitedDuration"
                 v-bind:readonly="false"
-                v-model="finishTime"
                 v-bind:finish="finishTimeCourse"
                 v-bind:start="startTimeCourse"
                 v-bind:is-invalid="invalidParameterName === 'finish_time'"
@@ -136,13 +136,13 @@
             <label
               >{{ T.courseNewFormDescription }}
               <textarea
+                v-model="description"
                 class="form-control"
                 v-bind:class="{
                   'is-invalid': invalidParameterName === 'description',
                 }"
                 cols="30"
                 rows="5"
-                v-model="description"
                 required
               ></textarea>
             </label>
@@ -150,8 +150,8 @@
         </div>
         <template v-if="shouldAddProblems">
           <omegaup-course-scheduled-problem-list
-            ref="scheduled-problem-list"
             v-if="assignmentFormMode === AssignmentFormMode.New"
+            ref="scheduled-problem-list"
             v-bind:assignment-problems="assignmentProblems"
             v-bind:tagged-problems="taggedProblems"
             v-bind:selected-assignment="assignment"

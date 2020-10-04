@@ -1,5 +1,5 @@
 <template>
-  <div data-markdown-statement ref="root" v-bind:html="html"></div>
+  <div ref="root" data-markdown-statement v-bind:html="html"></div>
 </template>
 
 <style lang="scss">

@@ -22,12 +22,12 @@
           })
         }}
       </h5>
-      <div class="card-body" v-if="includeUser">
+      <div v-if="includeUser" class="card-body">
         <label
           ><omegaup-autocomplete
+            v-model="searchedUsername"
             class="form-control"
             v-bind:init="(el) => typeahead.userTypeahead(el)"
-            v-model="searchedUsername"
           ></omegaup-autocomplete
         ></label>
         <a
@@ -45,7 +45,7 @@
           <thead>
             <tr>
               <th scope="col" class="text-center">{{ T.wordsTime }}</th>
-              <th scope="col" class="text-center" v-if="includeUser">
+              <th v-if="includeUser" scope="col" class="text-center">
                 {{ T.wordsUser }}
               </th>
               <th scope="col" class="text-center">{{ T.wordsProblem }}</th>
@@ -64,11 +64,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-bind:key="index" v-for="(submission, index) in submissions">
+            <tr v-for="(submission, index) in submissions" v-bind:key="index">
               <td class="text-center">
                 {{ time.formatDateTime(submission.time) }}
               </td>
-              <td class="text-center" v-if="includeUser">
+              <td v-if="includeUser" class="text-center">
                 <omegaup-username
                   v-bind:username="submission.username"
                   v-bind:classname="submission.classname"

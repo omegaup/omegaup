@@ -4,16 +4,16 @@
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormLanguages }}</label>
         <select
+          v-model="languages"
           name="languages"
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('languages') }"
-          v-model="languages"
           required
         >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
-            v-bind:value="languageIndex"
             v-bind:key="languageIndex"
+            v-bind:value="languageIndex"
           >
             {{ languageText }}
           </option>
@@ -22,17 +22,17 @@
       <div class="form-group col-md-6">
         <label>{{ T.problemEditFormValidatorType }}</label>
         <select
+          v-model="validator"
           name="validator"
           class="form-control"
           v-bind:class="{ 'is-invalid': errors.includes('validator') }"
-          v-model="validator"
           v-bind:disabled="languages === ''"
           required
         >
           <option
             v-for="(validatorText, validatorIndex) in validatorTypes"
-            v-bind:value="validatorIndex"
             v-bind:key="validatorIndex"
+            v-bind:value="validatorIndex"
           >
             {{ validatorText }}
           </option>

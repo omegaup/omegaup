@@ -1,6 +1,6 @@
 <template>
   <div class="problem-list">
-    <div class="active" data-breadcrumbs v-if="inAssignment">
+    <div v-if="inAssignment" class="active" data-breadcrumbs>
       <span>
         <a class="breadcrumbs-link" href="/course/">{{ T.navCourses }}</a> >
         <a class="breadcrumbs-link" v-bind:href="urlAssignment">{{
@@ -15,9 +15,9 @@
       <a class="name" href="#problems">{{ T.wordsSummary }}</a>
     </div>
     <div
+      v-for="problem in problems"
       v-bind:class="{ active: problem.alias === activeProblem }"
       data-navbar-problem
-      v-for="problem in problems"
     >
       <div class="row">
         <div class="col-xs-5 problem-type">
@@ -25,7 +25,7 @@
             getProblemTypeTitle(problem.acceptsSubmissions)
           }}</span>
         </div>
-        <div class="col-xs-7 solved" v-if="problem.acceptsSubmissions">
+        <div v-if="problem.acceptsSubmissions" class="col-xs-7 solved">
           <span
             >({{
               parseFloat(problem.bestScore).toFixed(digitsAfterDecimalPoint)
@@ -36,14 +36,14 @@
             }})</span
           >
           <font-awesome-icon
+            v-if="problem.bestScore == problem.maxScore"
             icon="check"
             v-bind:style="{ color: 'green' }"
-            v-if="problem.bestScore == problem.maxScore"
           />
           <font-awesome-icon
+            v-else-if="problem.hasRuns"
             icon="times"
             v-bind:style="{ color: 'red' }"
-            v-else-if="problem.hasRuns"
           />
         </div>
       </div>

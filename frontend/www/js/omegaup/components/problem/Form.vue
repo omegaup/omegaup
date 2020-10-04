@@ -1,6 +1,6 @@
 <template>
   <div class="card problem-form">
-    <div class="card-header" v-if="!isUpdate">
+    <div v-if="!isUpdate" class="card-header">
       <h3 class="card-title">
         {{ T.problemNew }}
       </h3>
@@ -21,9 +21,9 @@
           <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsTitle }}</label>
             <input
+              v-model="title"
               required
               name="title"
-              v-model="title"
               type="text"
               class="form-control"
               v-bind:class="{ 'is-invalid': errors.includes('title') }"
@@ -34,10 +34,10 @@
           <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsAlias }}</label>
             <input
+              ref="alias"
+              v-model="alias"
               required
               name="problem_alias"
-              v-model="alias"
-              ref="alias"
               type="text"
               class="form-control"
               v-bind:class="{ 'is-invalid': errors.includes('problem_alias') }"
@@ -67,19 +67,19 @@
             <div class="form-control">
               <label class="radio-inline">
                 <input
+                  v-model="emailClarifications"
                   type="radio"
                   name="email_clarifications"
                   v-bind:value="true"
-                  v-model="emailClarifications"
                 />
                 {{ T.wordsYes }}
               </label>
               <label class="radio-inline">
                 <input
+                  v-model="emailClarifications"
                   type="radio"
                   name="email_clarifications"
                   v-bind:value="false"
-                  v-model="emailClarifications"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -91,21 +91,21 @@
             <div class="form-control">
               <label class="radio-inline">
                 <input
+                  v-model="isPublic"
                   type="radio"
                   name="visibility"
                   v-bind:disabled="!isEditable"
                   v-bind:value="true"
-                  v-model="isPublic"
                 />
                 {{ T.wordsYes }}
               </label>
               <label class="radio-inline">
                 <input
+                  v-model="isPublic"
                   type="radio"
                   name="visibility"
                   v-bind:disabled="!isEditable"
                   v-bind:value="false"
-                  v-model="isPublic"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -117,9 +117,9 @@
           <div class="form-group col-md-6">
             <label class="control-label">{{ T.problemEditSource }}</label>
             <input
+              v-model="source"
               required
               name="source"
-              v-model="source"
               type="text"
               class="form-control"
               v-bind:class="{ 'is-invalid': errors.includes('source') }"
@@ -149,10 +149,10 @@
             <div class="form-group col-md-12">
               <label>{{ T.wordsShowCasesDiff }}</label>
               <select
+                v-model="showDiff"
                 name="show_diff"
                 class="form-control"
                 v-bind:class="{ 'is-invalid': errors.includes('show_diff') }"
-                v-model="showDiff"
               >
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
@@ -165,15 +165,15 @@
             v-bind:public-tags="data.publicTags"
             v-bind:level-tags="data.levelTags"
             v-bind:alias="data.alias"
-            v-on:emit-add-tag="addTag"
-            v-on:emit-remove-tag="removeTag"
-            v-on:select-problem-level="selectProblemLevel"
             v-bind:is-create="true"
             v-bind:problem-level="problemLevel"
             v-bind:selected-private-tags="selectedPrivateTags"
             v-bind:selected-public-tags="selectedPublicTags"
             v-bind:can-add-new-tags="true"
             v-bind:errors="errors"
+            v-on:emit-add-tag="addTag"
+            v-on:emit-remove-tag="removeTag"
+            v-on:select-problem-level="selectProblemLevel"
           ></omegaup-problem-tags>
           <input
             name="selected_tags"
@@ -187,14 +187,14 @@
           />
         </template>
 
-        <div class="row" v-else>
+        <div v-else class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsShowCasesDiff }}</label>
             <select
+              v-model="showDiff"
               name="show_diff"
               class="form-control"
               v-bind:class="{ 'is-invalid': errors.includes('show_diff') }"
-              v-model="showDiff"
             >
               <option value="none">{{ T.problemVersionDiffModeNone }}</option>
               <option value="examples">{{ T.wordsOnlyExamples }}</option>
@@ -206,21 +206,21 @@
               T.problemEditCommitMessage
             }}</label>
             <input
+              v-model="message"
               required
               class="form-control"
               v-bind:class="{ 'is-invalid': errors.includes('message') }"
               name="message"
-              v-model="message"
               type="text"
             />
           </div>
         </div>
 
         <input
+          v-if="isEditable"
           type="hidden"
           name="visibility"
           v-bind:value="visibility"
-          v-if="isEditable"
         />
         <input name="request" value="submit" type="hidden" />
 

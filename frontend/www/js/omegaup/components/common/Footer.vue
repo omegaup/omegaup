@@ -57,11 +57,11 @@
           </li>
           <li>
             <a
+              v-if="!omegaUpLockDown && isLoggedIn"
               href="https://github.com/omegaup/omegaup/issues/new"
-              v-on:click="$event.target.href = reportAnIssueURL()"
               target="_blank"
               rel="nofollow"
-              v-if="!omegaUpLockDown && isLoggedIn"
+              v-on:click="$event.target.href = reportAnIssueURL()"
               >{{ T.reportAnIssue }}</a
             >
           </li>

@@ -6,10 +6,10 @@
         <div class="form-group">
           <h5 class="card-title">{{ T.profileEmail }}</h5>
           <input
+            v-model="email"
             type="text"
             name="email"
             class="form-control"
-            v-model="email"
           />
         </div>
         <button

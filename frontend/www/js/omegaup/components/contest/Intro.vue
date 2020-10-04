@@ -23,11 +23,11 @@
 
           <div v-if="now > contest.start_time.getTime()">
             <form
-              v-on:submit.prevent="onStartContest"
               v-if="
                 contest.admission_mode !== 'registration' ||
                 contest.user_registration_accepted
               "
+              v-on:submit.prevent="onStartContest"
             >
               <p
                 v-if="
@@ -47,16 +47,16 @@
                 <p>
                   <label>
                     <input
-                      type="radio"
                       v-model="shareUserInformation"
+                      type="radio"
                       v-bind:value="true"
                     />
                     {{ T.wordsYes }}
                   </label>
                   <label>
                     <input
-                      type="radio"
                       v-model="shareUserInformation"
+                      type="radio"
                       v-bind:value="false"
                     />
                     {{ T.wordsNo }}

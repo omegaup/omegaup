@@ -4,24 +4,24 @@
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img
+          v-if="problem.quality_seal || problem.visibility === 3"
           src="/media/quality-badge-sm.png"
           v-bind:title="T.wordsHighQualityProblem"
-          v-if="problem.quality_seal || problem.visibility === 3"
         />
         <span
+          v-if="problem.visibility === 1 || problem.visibility === -1"
           class="glyphicon glyphicon-warning-sign"
           v-bind:title="T.wordsWarningProblem"
-          v-if="problem.visibility === 1 || problem.visibility === -1"
         ></span>
         <span
+          v-if="problem.visibility === 0 || problem.visibility === -1"
           class="glyphicon glyphicon-eye-close"
           v-bind:title="T.wordsPrivate"
-          v-if="problem.visibility === 0 || problem.visibility === -1"
         ></span>
         <span
+          v-if="problem.visibility <= -2"
           class="glyphicon glyphicon-ban-circle"
           v-bind:title="T.wordsBannedProblem"
-          v-if="problem.visibility <= -2"
         ></span>
       </template>
       <template v-if="showEditLink">

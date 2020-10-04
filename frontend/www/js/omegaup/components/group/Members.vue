@@ -6,9 +6,9 @@
           <label
             >{{ T.wordsMember }}
             <omegaup-autocomplete
+              v-model="searchedUsername"
               class="form-control"
               v-bind:init="(el) => typeahead.userTypeahead(el)"
-              v-model="searchedUsername"
             ></omegaup-autocomplete
           ></label>
         </div>
@@ -56,7 +56,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="identity.username" v-for="identity in identitiesCsv">
+        <tr v-for="identity in identitiesCsv" v-bind:key="identity.username">
           <td>
             <omegaup-user-username
               v-bind:classname="identity.classname"
@@ -92,18 +92,18 @@
       </tbody>
     </table>
     <omegaup-identity-edit
+      v-if="showEditForm"
       v-bind:countries="countries"
       v-bind:identity="identity"
       v-bind:selected-country="identity.country_id"
       v-bind:selected-state="identity.state_id"
       v-bind:username="username"
-      v-if="showEditForm"
       v-on:emit-cancel="onChildCancel"
       v-on:emit-edit-identity-member="onChildEditIdentityMember"
     ></omegaup-identity-edit>
     <omegaup-identity-change-password
-      v-bind:username="username"
       v-if="showChangePasswordForm"
+      v-bind:username="username"
       v-on:emit-cancel="onChildCancel"
       v-on:emit-change-password="onChildChangePasswordMember"
     ></omegaup-identity-change-password>

@@ -12,7 +12,6 @@
     ></omegaup-coder-of-the-month-notice>
     <omegaup-carousel></omegaup-carousel>
     <div
-      class="container-lg py-5"
       v-if="
         coderOfTheMonthFemale ||
         coderOfTheMonth ||
@@ -20,11 +19,12 @@
         rankTable.resultTotal ||
         schoolsRank.totalRows
       "
+      class="container-lg py-5"
     >
       <div class="row align-items-stretch justify-content-around">
         <div
-          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="coderOfTheMonthFemale"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
         >
           <omegaup-coder-of-the-month
             v-bind:category="'female'"
@@ -32,8 +32,8 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="coderOfTheMonth"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
         >
           <omegaup-coder-of-the-month
             v-bind:category="'all'"
@@ -41,8 +41,8 @@
           ></omegaup-coder-of-the-month>
         </div>
         <div
-          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
           v-if="schoolOfTheMonth"
+          class="col-xs-10 col-sm-6 col-lg-4 mb-3 mb-lg-0"
         >
           <omegaup-school-of-the-month
             v-bind:school-of-the-month="schoolOfTheMonth"
@@ -52,8 +52,8 @@
       </div>
       <div class="row align-items-stretch justify-content-around mt-4">
         <div
-          class="col-xs-10 col-md-6 mb-3 mb-md-0"
           v-if="rankTable.resultTotal"
+          class="col-xs-10 col-md-6 mb-3 mb-md-0"
         >
           <omegaup-user-rank
             v-bind:page="rankTable.page"
@@ -67,8 +67,8 @@
           ></omegaup-user-rank>
         </div>
         <div
-          class="col-xs-10 col-md-6 mb-3 mb-md-0"
           v-if="schoolsRank.totalRows"
+          class="col-xs-10 col-md-6 mb-3 mb-md-0"
         >
           <omegaup-school-rank
             v-bind:page="schoolsRank.page"

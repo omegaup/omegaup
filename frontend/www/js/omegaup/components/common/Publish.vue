@@ -5,9 +5,9 @@
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
           <select
+            v-model="admissionMode"
             class="form-control"
             name="admission-mode"
-            v-model="admissionMode"
           >
             <option value="private">
               {{ T.wordsPrivate }}
@@ -15,7 +15,7 @@
             <option value="registration">
               {{ T.wordsRegistration }}
             </option>
-            <option value="public" v-if="shouldShowPublicOption">
+            <option v-if="shouldShowPublicOption" value="public">
               {{ T.wordsPublic }}
             </option>
           </select>

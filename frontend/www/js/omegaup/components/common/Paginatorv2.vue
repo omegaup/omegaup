@@ -2,14 +2,14 @@
   <div class="d-flex justify-content-center">
     <ul class="pagination m-0">
       <li
-        v-bind:key="index"
         v-for="(page, index) in pagerItems"
+        v-bind:key="index"
         class="page-item"
         v-bind:class="page.class"
       >
         <a
-          class="page-link"
           v-if="page.url"
+          class="page-link"
           v-bind:href="page.url"
           v-bind:class="{ disabled: page.class !== 'active' }"
           >{{ page.label }}</a

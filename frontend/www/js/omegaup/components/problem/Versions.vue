@@ -14,7 +14,7 @@
       >
       <label
         >{{ T.problemVersionShowOnlyChanges }}
-        <input type="checkbox" v-model="showOnlyChanges"
+        <input v-model="showOnlyChanges" type="checkbox"
       /></label>
     </div>
     <div class="card-body no-padding">
@@ -39,17 +39,17 @@
                 >
                   <td>
                     <span
-                      v-bind:title="T.problemVersionPublishedRevision"
                       v-if="publishedRevision == revision"
+                      v-bind:title="T.problemVersionPublishedRevision"
                       >✔️</span
                     >
                   </td>
                   <td>
                     <input
+                      v-model="selectedRevision"
                       name="version"
                       type="radio"
                       v-bind:value="revision"
-                      v-model="selectedRevision"
                     />
                   </td>
 
@@ -72,18 +72,18 @@
             </table>
           </div>
           <div class="col-md-6 scrollable">
-            <ul class="list-group no-margin" v-if="diffMode == 'files'">
+            <ul v-if="diffMode == 'files'" class="list-group no-margin">
               <li
+                v-for="diffEntry in diffFiles"
                 class="list-group-item"
                 v-bind:class="diffEntry[1]"
-                v-for="diffEntry in diffFiles"
               >
                 {{ diffEntry[0] }}
               </li>
             </ul>
             <table
-              class="table table-condensed"
               v-if="diffMode == 'submissions'"
+              class="table table-condensed"
             >
               <thead>
                 <tr>
@@ -107,8 +107,8 @@
               </thead>
               <tbody>
                 <tr
-                  v-bind:class="diffEntry[1]"
                   v-for="diffEntry in diffSubmissions"
+                  v-bind:class="diffEntry[1]"
                 >
                   <td class="text-center">
                     <acronym v-bind:title="diffEntry[0].guid"
@@ -131,7 +131,7 @@
         </div>
       </div>
     </div>
-    <div class="card-footer" v-if="showFooter">
+    <div v-if="showFooter" class="card-footer">
       <form
         v-on:submit.prevent="
           $emit('emit-select-version', selectedRevision, updatePublished)

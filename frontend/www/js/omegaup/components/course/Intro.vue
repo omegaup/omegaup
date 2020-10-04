@@ -10,8 +10,8 @@
         v-if="userRegistrationRequested === null || userRegistrationAccepted"
       >
         <omegaup-markdown
-          v-bind:markdown="T.courseBasicInformationNeeded"
           v-if="needsBasicInformation"
+          v-bind:markdown="T.courseBasicInformationNeeded"
         ></omegaup-markdown>
         <template v-if="requestsUserInformation != 'no'">
           <omegaup-markdown

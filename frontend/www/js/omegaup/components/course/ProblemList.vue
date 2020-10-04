@@ -7,7 +7,7 @@
       <span>{{ T.courseAddProblemsEditAssignmentDesc }}</span>
     </div>
     <div class="card-body">
-      <div class="empty-table-message" v-if="problems.length == 0">
+      <div v-if="problems.length == 0" class="empty-table-message">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
       <div v-else>
@@ -21,7 +21,7 @@
             </tr>
           </thead>
           <tbody v-sortable="{ onUpdate: sort }">
-            <tr v-bind:key="problem.letter" v-for="problem in problems">
+            <tr v-for="problem in problems" v-bind:key="problem.letter">
               <td>
                 <button
                   class="btn btn-link"
@@ -66,9 +66,9 @@
                 <label
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
+                    v-model="problemAlias"
                     class="form-control"
                     v-bind:init="(el) => typeahead.problemTypeahead(el)"
-                    v-model="problemAlias"
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
@@ -78,7 +78,7 @@
               <div class="form-group col-md-2">
                 <label
                   >{{ T.wordsPoints }}
-                  <input type="number" class="form-control" v-model="points" />
+                  <input v-model="points" type="number" class="form-control" />
                 </label>
               </div>
               <div class="form-group col-md-5">
@@ -88,9 +88,9 @@
                     <div class="form-check form-check-inline">
                       <label class="form-check-label">
                         <input
+                          v-model="useLatestVersion"
                           class="form-check-input"
                           type="radio"
-                          v-model="useLatestVersion"
                           v-bind:value="true"
                         />{{ T.contestAddproblemLatestVersion }}
                       </label>
@@ -98,9 +98,9 @@
                     <div class="form-check form-check-inline">
                       <label class="form-check-label">
                         <input
+                          v-model="useLatestVersion"
                           class="form-check-input"
                           type="radio"
-                          v-model="useLatestVersion"
                           v-bind:value="false"
                         />{{ T.contestAddproblemOtherVersion }}
                       </label>
@@ -110,10 +110,10 @@
               </div>
               <omegaup-problem-versions
                 v-if="!useLatestVersion"
+                v-model="selectedRevision"
                 v-bind:log="versionLog"
                 v-bind:published-revision="publishedRevision"
                 v-bind:show-footer="false"
-                v-model="selectedRevision"
                 v-on:runs-diff="onRunsDiff"
               ></omegaup-problem-versions>
             </div>

@@ -15,6 +15,7 @@ export default class ArenaAdmin {
   runsList: Vue;
 
   constructor(arena: Arena) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
     this.arena = arena;

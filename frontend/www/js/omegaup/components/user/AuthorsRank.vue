@@ -18,7 +18,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-bind:key="index" v-for="(author, index) in rankingData.ranking">
+          <tr v-for="(author, index) in rankingData.ranking" v-bind:key="index">
             <th scope="row">{{ author.author_ranking || index }}</th>
             <td>
               <omegaup-countryflag
