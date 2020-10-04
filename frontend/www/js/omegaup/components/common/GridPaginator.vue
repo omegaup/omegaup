@@ -7,7 +7,7 @@
       <div class="form-check form-check-inline">
         <label
           v-for="(sortOption, index) in sortOptions"
-          v-bind:key="index"
+          :key="index"
           class="form-check-label mr-4"
         >
           <input
@@ -15,7 +15,7 @@
             class="form-check-input m-0"
             name="sort-selector"
             type="radio"
-            v-bind:value="sortOption.value"
+            :value="sortOption.value"
           />
           {{ sortOption.title }}
         </label>
@@ -24,13 +24,13 @@
     <table v-if="items.length > 0" class="table table-striped mb-0">
       <slot name="table-header"></slot>
       <tbody>
-        <tr v-for="(group, index) in paginatedItems" v-bind:key="index">
+        <tr v-for="(group, index) in paginatedItems" :key="index">
           <th v-if="showPageOffset" scope="row" class="text-center">
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </th>
-          <td v-for="(item, itemIndex) in group" v-bind:key="itemIndex">
-            <slot name="item-data" v-bind:item="item">
-              <a v-bind:href="item.getUrl()">
+          <td v-for="(item, itemIndex) in group" :key="itemIndex">
+            <slot name="item-data" :item="item">
+              <a :href="item.getUrl()">
                 {{ item.toString() }}
               </a>
             </slot>
@@ -46,18 +46,18 @@
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="totalPagesCount === 1 || currentPageNumber === 0"
-          v-on:click="previousPage"
+          :disabled="totalPagesCount === 1 || currentPageNumber === 0"
+          @click="previousPage"
         >
           {{ T.wordsPrevious }}
         </button>
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="
+          :disabled="
             totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
           "
-          v-on:click="nextPage"
+          @click="nextPage"
         >
           {{ T.wordsNext }}
         </button>

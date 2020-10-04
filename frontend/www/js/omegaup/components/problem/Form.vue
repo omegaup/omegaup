@@ -9,7 +9,7 @@
       <p class="no-bottom-margin">
         {{ T.problemEditFormFirstTimeCreatingAProblem }}
         <strong>
-          <a v-bind:href="howToWriteProblemLink" target="_blank">
+          <a :href="howToWriteProblemLink" target="_blank">
             {{ T.problemEditFormHereIsHowToWriteProblems }}
           </a>
         </strong>
@@ -26,8 +26,8 @@
               name="title"
               type="text"
               class="form-control"
-              v-bind:class="{ 'is-invalid': errors.includes('title') }"
-              v-on:blur="onGenerateAlias"
+              :class="{ 'is-invalid': errors.includes('title') }"
+              @blur="onGenerateAlias"
             />
           </div>
 
@@ -40,25 +40,25 @@
               name="problem_alias"
               type="text"
               class="form-control"
-              v-bind:class="{ 'is-invalid': errors.includes('problem_alias') }"
-              v-bind:disabled="isUpdate"
+              :class="{ 'is-invalid': errors.includes('problem_alias') }"
+              :disabled="isUpdate"
             />
           </div>
         </div>
 
         <omegaup-problem-settings
-          v-bind:errors="errors"
-          v-bind:timeLimit="timeLimit"
-          v-bind:extraWallTime="extraWallTime"
-          v-bind:memoryLimit="memoryLimit"
-          v-bind:outputLimit="outputLimit"
-          v-bind:inputLimit="inputLimit"
-          v-bind:initialValidator="validator"
-          v-bind:initialLanguage="languages"
-          v-bind:overallWallTimeLimit="overallWallTimeLimit"
-          v-bind:validatorTimeLimit="validatorTimeLimit"
-          v-bind:validLanguages="data.validLanguages"
-          v-bind:validatorTypes="data.validatorTypes"
+          :errors="errors"
+          :timeLimit="timeLimit"
+          :extraWallTime="extraWallTime"
+          :memoryLimit="memoryLimit"
+          :outputLimit="outputLimit"
+          :inputLimit="inputLimit"
+          :initialValidator="validator"
+          :initialLanguage="languages"
+          :overallWallTimeLimit="overallWallTimeLimit"
+          :validatorTimeLimit="validatorTimeLimit"
+          :validLanguages="data.validLanguages"
+          :validatorTypes="data.validatorTypes"
         ></omegaup-problem-settings>
 
         <div class="row">
@@ -70,7 +70,7 @@
                   v-model="emailClarifications"
                   type="radio"
                   name="email_clarifications"
-                  v-bind:value="true"
+                  :value="true"
                 />
                 {{ T.wordsYes }}
               </label>
@@ -79,7 +79,7 @@
                   v-model="emailClarifications"
                   type="radio"
                   name="email_clarifications"
-                  v-bind:value="false"
+                  :value="false"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -94,8 +94,8 @@
                   v-model="isPublic"
                   type="radio"
                   name="visibility"
-                  v-bind:disabled="!isEditable"
-                  v-bind:value="true"
+                  :disabled="!isEditable"
+                  :value="true"
                 />
                 {{ T.wordsYes }}
               </label>
@@ -104,8 +104,8 @@
                   v-model="isPublic"
                   type="radio"
                   name="visibility"
-                  v-bind:disabled="!isEditable"
-                  v-bind:value="false"
+                  :disabled="!isEditable"
+                  :value="false"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -122,24 +122,24 @@
               name="source"
               type="text"
               class="form-control"
-              v-bind:class="{ 'is-invalid': errors.includes('source') }"
+              :class="{ 'is-invalid': errors.includes('source') }"
             />
           </div>
 
           <div class="form-group col-md-6">
             <label class="control-label">{{ T.problemEditFormFile }}</label>
-            <a v-bind:href="howToWriteProblemLink" target="_blank">
+            <a :href="howToWriteProblemLink" target="_blank">
               <span>{{ T.problemEditFormHowToWriteProblems }}</span>
             </a>
             <input
-              v-bind:required="!isUpdate"
+              :required="!isUpdate"
               name="problem_contents"
               type="file"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': errors.includes('problem_contents'),
               }"
-              v-on:change="onUploadFile"
+              @change="onUploadFile"
             />
           </div>
         </div>
@@ -152,7 +152,7 @@
                 v-model="showDiff"
                 name="show_diff"
                 class="form-control"
-                v-bind:class="{ 'is-invalid': errors.includes('show_diff') }"
+                :class="{ 'is-invalid': errors.includes('show_diff') }"
               >
                 <option value="none">{{ T.problemVersionDiffModeNone }}</option>
                 <option value="examples">{{ T.wordsOnlyExamples }}</option>
@@ -162,29 +162,21 @@
           </div>
 
           <omegaup-problem-tags
-            v-bind:public-tags="data.publicTags"
-            v-bind:level-tags="data.levelTags"
-            v-bind:alias="data.alias"
-            v-bind:is-create="true"
-            v-bind:problem-level="problemLevel"
-            v-bind:selected-private-tags="selectedPrivateTags"
-            v-bind:selected-public-tags="selectedPublicTags"
-            v-bind:can-add-new-tags="true"
-            v-bind:errors="errors"
-            v-on:emit-add-tag="addTag"
-            v-on:emit-remove-tag="removeTag"
-            v-on:select-problem-level="selectProblemLevel"
+            :public-tags="data.publicTags"
+            :level-tags="data.levelTags"
+            :alias="data.alias"
+            :is-create="true"
+            :problem-level="problemLevel"
+            :selected-private-tags="selectedPrivateTags"
+            :selected-public-tags="selectedPublicTags"
+            :can-add-new-tags="true"
+            :errors="errors"
+            @emit-add-tag="addTag"
+            @emit-remove-tag="removeTag"
+            @select-problem-level="selectProblemLevel"
           ></omegaup-problem-tags>
-          <input
-            name="selected_tags"
-            v-bind:value="selectedTagsList"
-            type="hidden"
-          />
-          <input
-            name="problem_level"
-            v-bind:value="problemLevel"
-            type="hidden"
-          />
+          <input name="selected_tags" :value="selectedTagsList" type="hidden" />
+          <input name="problem_level" :value="problemLevel" type="hidden" />
         </template>
 
         <div v-else class="row">
@@ -194,7 +186,7 @@
               v-model="showDiff"
               name="show_diff"
               class="form-control"
-              v-bind:class="{ 'is-invalid': errors.includes('show_diff') }"
+              :class="{ 'is-invalid': errors.includes('show_diff') }"
             >
               <option value="none">{{ T.problemVersionDiffModeNone }}</option>
               <option value="examples">{{ T.wordsOnlyExamples }}</option>
@@ -209,7 +201,7 @@
               v-model="message"
               required
               class="form-control"
-              v-bind:class="{ 'is-invalid': errors.includes('message') }"
+              :class="{ 'is-invalid': errors.includes('message') }"
               name="message"
               type="text"
             />
@@ -220,7 +212,7 @@
           v-if="isEditable"
           type="hidden"
           name="visibility"
-          v-bind:value="visibility"
+          :value="visibility"
         />
         <input name="request" value="submit" type="hidden" />
 
@@ -229,7 +221,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              v-bind:title="
+              :title="
                 !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
               "
             >

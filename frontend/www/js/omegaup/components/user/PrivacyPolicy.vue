@@ -6,21 +6,21 @@
           <h3 class="panel-title">{{ T.wordsPrivacyPolicy }}</h3>
         </div>
         <div class="panel">
-          <omegaup-markdown v-bind:markdown="policyMarkdown"></omegaup-markdown>
+          <omegaup-markdown :markdown="policyMarkdown"></omegaup-markdown>
         </div>
       </div>
-      <form v-on:submit.prevent="$emit('submit', this)">
+      <form @submit.prevent="$emit('submit', this)">
         <div class="top-margin text-center">
           <label
             ><input
               v-model="agreed"
               name="agreed"
               type="checkbox"
-              v-bind:disabled="saved"
+              :disabled="saved"
             />
             {{ T.wordsAgree }}</label
           >
-          <button class="btn btn-primary" v-bind:disabled="!agreed || saved">
+          <button class="btn btn-primary" :disabled="!agreed || saved">
             {{ T.wordsSaveChanges }}
           </button>
         </div>

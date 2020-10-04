@@ -1,7 +1,7 @@
 <template>
   <div class="omegaup-course-clone card">
     <div class="card-body">
-      <form class="form" v-on:submit.prevent="$emit('generate-link', alias)">
+      <form class="form" @submit.prevent="$emit('generate-link', alias)">
         <h4>{{ T.courseCloneGenerateLinkTitle }}</h4>
         <p>{{ T.courseCloneGenerateLinkDescription }}</p>
         <div class="row">
@@ -11,19 +11,19 @@
             </button>
             <input
               class="form-control input-group-append"
-              v-bind:value="cloneCourseURL"
+              :value="cloneCourseURL"
               readonly
-              v-on:focus="$event.target.select()"
+              @focus="$event.target.select()"
             />
             <div class="input-group-append">
               <button
                 v-clipboard="() => cloneCourseURL"
                 class="btn btn-outline-secondary"
                 type="button"
-                v-bind:disabled="!cloneCourseURL"
-                v-bind:title="T.wordsCopyToClipboard"
+                :disabled="!cloneCourseURL"
+                :title="T.wordsCopyToClipboard"
                 data-copy-to-clipboard
-                v-on:click="copiedToClipboard = true"
+                @click="copiedToClipboard = true"
               >
                 <font-awesome-icon icon="clipboard" />
               </button>

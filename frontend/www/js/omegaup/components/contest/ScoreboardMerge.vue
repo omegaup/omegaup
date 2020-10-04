@@ -9,15 +9,12 @@
           multiple="multiple"
           size="10"
         >
-          <option
-            v-for="contest in availableContests"
-            v-bind:value="contest.alias"
-          >
+          <option v-for="contest in availableContests" :value="contest.alias">
             {{ ui.contestTitle(contest) }}
           </option>
         </select>
       </legend>
-      <button class="btn" type="button" v-on:click.prevent="onDisplayTable">
+      <button class="btn" type="button" @click.prevent="onDisplayTable">
         {{ T.showTotalScoreboard }}
       </button>
     </div>

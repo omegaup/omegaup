@@ -12,7 +12,7 @@
             v-model="currentSortOption"
             name="sort-selector"
             type="radio"
-            v-bind:value="sortOption.value"
+            :value="sortOption.value"
           />
           {{ sortOption.title }}
         </label>
@@ -26,8 +26,8 @@
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </td>
           <td v-for="item in group">
-            <slot name="item-data" v-bind:item="item">
-              <a v-bind:href="item.getUrl()">
+            <slot name="item-data" :item="item">
+              <a :href="item.getUrl()">
                 {{ item.toString() }}
               </a>
             </slot>
@@ -43,18 +43,18 @@
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="totalPagesCount === 1 || currentPageNumber === 0"
-          v-on:click="previousPage"
+          :disabled="totalPagesCount === 1 || currentPageNumber === 0"
+          @click="previousPage"
         >
           {{ T.wordsPrevious }}
         </button>
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="
+          :disabled="
             totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
           "
-          v-on:click="nextPage"
+          @click="nextPage"
         >
           {{ T.wordsNext }}
         </button>

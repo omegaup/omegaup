@@ -35,12 +35,12 @@
               <tbody>
                 <tr
                   v-for="revision in log"
-                  v-on:click="selectedRevision = revision"
+                  @click="selectedRevision = revision"
                 >
                   <td>
                     <span
                       v-if="publishedRevision == revision"
-                      v-bind:title="T.problemVersionPublishedRevision"
+                      :title="T.problemVersionPublishedRevision"
                       >✔️</span
                     >
                   </td>
@@ -49,20 +49,20 @@
                       v-model="selectedRevision"
                       name="version"
                       type="radio"
-                      v-bind:value="revision"
+                      :value="revision"
                     />
                   </td>
 
                   <td>
                     {{ time.formatDateTime(new Date(revision.committer.time))
                     }}<br />
-                    <acronym v-bind:title="revision.commit"
+                    <acronym :title="revision.commit"
                       ><tt>{{ revision.commit.substr(0, 8) }}</tt></acronym
                     >
                   </td>
                   <td>{{ revision.author.name }}</td>
                   <td>
-                    <acronym v-bind:title="revision.version"
+                    <acronym :title="revision.version"
                       ><tt>{{ revision.version.substr(0, 8) }}</tt></acronym
                     >
                   </td>
@@ -76,7 +76,7 @@
               <li
                 v-for="diffEntry in diffFiles"
                 class="list-group-item"
-                v-bind:class="diffEntry[1]"
+                :class="diffEntry[1]"
               >
                 {{ diffEntry[0] }}
               </li>
@@ -106,12 +106,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="diffEntry in diffSubmissions"
-                  v-bind:class="diffEntry[1]"
-                >
+                <tr v-for="diffEntry in diffSubmissions" :class="diffEntry[1]">
                   <td class="text-center">
-                    <acronym v-bind:title="diffEntry[0].guid"
+                    <acronym :title="diffEntry[0].guid"
                       ><tt>{{ diffEntry[0].guid.substr(0, 8) }}</tt></acronym
                     >
                   </td>
@@ -133,7 +130,7 @@
     </div>
     <div v-if="showFooter" class="card-footer">
       <form
-        v-on:submit.prevent="
+        @submit.prevent="
           $emit('emit-select-version', selectedRevision, updatePublished)
         "
       >

@@ -12,7 +12,7 @@
               <input
                 v-model="role.value"
                 type="checkbox"
-                v-on:change.prevent="onChangeRole($event, role)"
+                @change.prevent="onChangeRole($event, role)"
               />
             </td>
 
@@ -28,7 +28,7 @@
               <input
                 v-model="group.value"
                 type="checkbox"
-                v-on:change.prevent="onChangeGroup($event, group)"
+                @change.prevent="onChangeGroup($event, group)"
               />
             </td>
 

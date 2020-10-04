@@ -23,7 +23,7 @@
           <template v-for="contest in page">
             <tr>
               <td class="">
-                <a v-bind:href="`/arena/${contest.alias}/`">
+                <a :href="`/arena/${contest.alias}/`">
                   <span>{{ ui.contestTitle(contest) }}</span>
                   <span
                     v-if="contest.recommended"
@@ -33,12 +33,12 @@
                 </a>
               </td>
               <td v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.start_time.iso())">{{
+                <a :href="getTimeLink(contest.start_time.iso())">{{
                   contest.start_time.long()
                 }}</a>
               </td>
               <td v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.finish_time.iso())">{{
+                <a :href="getTimeLink(contest.finish_time.iso())">{{
                   contest.finish_time.long()
                 }}</a>
               </td>
@@ -46,17 +46,17 @@
                 {{ time.toDDHHMM(contest.duration) }}
               </td>
               <td v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/practice/`">
+                <a :href="`/arena/${contest.alias}/practice/`">
                   <span>{{ T.wordsPractice }}</span>
                 </a>
               </td>
               <td v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/#ranking`">
+                <a :href="`/arena/${contest.alias}/#ranking`">
                   <span>{{ T.wordsContestsResults }}</span>
                 </a>
               </td>
               <td v-if="!ui.isVirtual(contest) && showVirtual">
-                <a v-bind:href="`/arena/${contest.alias}/virtual/`">
+                <a :href="`/arena/${contest.alias}/virtual/`">
                   <span>{{ T.virtualContest }}</span>
                 </a>
               </td>
@@ -73,14 +73,12 @@
         </tbody>
         <tfoot>
           <tr v-if="hasNext || hasPrevious" align="center">
-            <td class="no-wrap" v-bind:colspan="pagerColumns">
-              <a v-if="hasPrevious" href="#" v-on:click="previous">{{
+            <td class="no-wrap" :colspan="pagerColumns">
+              <a v-if="hasPrevious" href="#" @click="previous">{{
                 T.wordsPrevPage
               }}</a>
               <span class="page-num">{{ pageNumber }}</span>
-              <a v-if="hasNext" href="#" v-on:click="next">{{
-                T.wordsNextPage
-              }}</a>
+              <a v-if="hasNext" href="#" @click="next">{{ T.wordsNextPage }}</a>
             </td>
           </tr>
         </tfoot>

@@ -2,7 +2,7 @@
   <div class="omegaup-course-viewstudent card">
     <div class="card-header">
       <h2>
-        <a v-bind:href="courseUrl">{{ course.name }}</a>
+        <a :href="courseUrl">{{ course.name }}</a>
       </h2>
     </div>
     <div class="card-body">
@@ -12,8 +12,8 @@
           <select v-model="selectedStudent" class="ml-1 form-control">
             <option
               v-for="student in students"
-              v-bind:key="student.username"
-              v-bind:value="student"
+              :key="student.username"
+              :value="student"
             >
               {{ student.name || student.username }}
             </option>
@@ -30,8 +30,8 @@
           >
             <option
               v-for="assignment in assignments"
-              v-bind:key="assignment.alias"
-              v-bind:value="assignment.alias"
+              :key="assignment.alias"
+              :value="assignment.alias"
             >
               {{ assignment.name }}
             </option>
@@ -40,7 +40,7 @@
       </form>
       <div v-if="selectedAssignment">
         <omegaup-markdown
-          v-bind:markdown="getAssignmentDescription(selectedAssignment)"
+          :markdown="getAssignmentDescription(selectedAssignment)"
         ></omegaup-markdown>
         <hr />
         <div class="card">
@@ -51,10 +51,10 @@
             <ul v-else class="nav nav-pills card-header-pills">
               <li
                 v-for="problem in problemsWithPoints"
-                v-bind:key="problem.alias"
+                :key="problem.alias"
                 class="nav-item"
                 role="presentation"
-                v-bind:class="{
+                :class="{
                   active:
                     selectedProblem && problem.alias === selectedProblem.alias,
                 }"
@@ -65,8 +65,8 @@
                   href="#home"
                   class="nav-link"
                   role="tab"
-                  v-bind:data-problem-alias="problem.alias"
-                  v-on:click="selectedProblem = problem"
+                  :data-problem-alias="problem.alias"
+                  @click="selectedProblem = problem"
                 >
                   <template v-if="problem.runs.length &gt; 0">
                     {{ bestScore(problem) * problem.points }} /
@@ -104,10 +104,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(run, index) in selectedProblem.runs"
-                    v-bind:key="index"
-                  >
+                  <tr v-for="(run, index) in selectedProblem.runs" :key="index">
                     <td>{{ time.formatDateTime(run.time) }}</td>
                     <td>{{ run.verdict }}</td>
                     <td class="numeric">{{ 100 * run.score }}</td>

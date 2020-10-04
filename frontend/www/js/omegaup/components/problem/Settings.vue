@@ -7,13 +7,13 @@
           v-model="languages"
           name="languages"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('languages') }"
+          :class="{ 'is-invalid': errors.includes('languages') }"
           required
         >
           <option
             v-for="(languageText, languageIndex) in validLanguages"
-            v-bind:key="languageIndex"
-            v-bind:value="languageIndex"
+            :key="languageIndex"
+            :value="languageIndex"
           >
             {{ languageText }}
           </option>
@@ -25,14 +25,14 @@
           v-model="validator"
           name="validator"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('validator') }"
-          v-bind:disabled="languages === ''"
+          :class="{ 'is-invalid': errors.includes('validator') }"
+          :disabled="languages === ''"
           required
         >
           <option
             v-for="(validatorText, validatorIndex) in validatorTypes"
-            v-bind:key="validatorIndex"
-            v-bind:value="validatorIndex"
+            :key="validatorIndex"
+            :value="validatorIndex"
           >
             {{ validatorText }}
           </option>
@@ -46,11 +46,11 @@
         }}</label>
         <input
           name="validator_time_limit"
-          v-bind:value="validatorTimeLimit"
-          v-bind:disabled="languages === '' || validator !== 'custom'"
+          :value="validatorTimeLimit"
+          :disabled="languages === '' || validator !== 'custom'"
           type="text"
           class="form-control"
-          v-bind:class="{
+          :class="{
             'is-invalid': errors.includes('validator_time_limit'),
           }"
           required
@@ -61,11 +61,11 @@
         <label for="time_limit">{{ T.problemEditFormTimeLimit }}</label>
         <input
           name="time_limit"
-          v-bind:value="timeLimit"
-          v-bind:disabled="languages === ''"
+          :value="timeLimit"
+          :disabled="languages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('time_limit') }"
+          :class="{ 'is-invalid': errors.includes('time_limit') }"
           required
         />
       </div>
@@ -78,11 +78,11 @@
         }}</label>
         <input
           name="overall_wall_time_limit"
-          v-bind:class="{
+          :class="{
             'is-invalid': errors.includes('overall_wall_time_limit'),
           }"
-          v-bind:value="overallWallTimeLimit"
-          v-bind:disabled="languages === ''"
+          :value="overallWallTimeLimit"
+          :disabled="languages === ''"
           type="text"
           class="form-control"
           required
@@ -93,11 +93,11 @@
         <label for="extra_wall_time">{{ T.wordsExtraWallTimeMs }}</label>
         <input
           name="extra_wall_time"
-          v-bind:value="extraWallTime"
-          v-bind:disabled="languages === ''"
+          :value="extraWallTime"
+          :disabled="languages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('extra_wall_time') }"
+          :class="{ 'is-invalid': errors.includes('extra_wall_time') }"
           required
         />
       </div>
@@ -108,11 +108,11 @@
         <label for="memory_limit">{{ T.problemEditFormMemoryLimit }}</label>
         <input
           name="memory_limit"
-          v-bind:value="memoryLimit"
-          v-bind:disabled="languages === ''"
+          :value="memoryLimit"
+          :disabled="languages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('memory_limit') }"
+          :class="{ 'is-invalid': errors.includes('memory_limit') }"
           required
         />
       </div>
@@ -121,11 +121,11 @@
         <label for="output_limit">{{ T.problemEditFormOutputLimit }}</label>
         <input
           name="output_limit"
-          v-bind:value="outputLimit"
-          v-bind:disabled="languages === ''"
+          :value="outputLimit"
+          :disabled="languages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('output_limit') }"
+          :class="{ 'is-invalid': errors.includes('output_limit') }"
           required
         />
       </div>
@@ -133,11 +133,11 @@
         <label for="input_limit">{{ T.problemEditFormInputLimit }}</label>
         <input
           name="input_limit"
-          v-bind:value="inputLimit"
-          v-bind:disabled="languages === ''"
+          :value="inputLimit"
+          :disabled="languages === ''"
           type="text"
           class="form-control"
-          v-bind:class="{ 'is-invalid': errors.includes('input_limit') }"
+          :class="{ 'is-invalid': errors.includes('input_limit') }"
           required
         />
       </div>

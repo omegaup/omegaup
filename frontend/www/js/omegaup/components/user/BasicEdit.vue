@@ -4,11 +4,7 @@
       <h2 class="panel-title">{{ T.userEditAddPassword }}</h2>
     </div>
     <div class="panel-body">
-      <form
-        class="form-horizontal"
-        role="form"
-        v-on:submit.prevent="formSubmit"
-      >
+      <form class="form-horizontal" role="form" @submit.prevent="formSubmit">
         <div class="form-group">
           <label class="col-md-3 control-label" for="username">{{
             T.profileUsername

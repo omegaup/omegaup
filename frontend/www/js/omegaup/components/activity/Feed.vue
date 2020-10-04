@@ -2,7 +2,7 @@
   <div class="post">
     <div class="copy">
       <h1>
-        <a v-bind:href="`/${type}/${alias}/`">{{ alias }}</a> —
+        <a :href="`/${type}/${alias}/`">{{ alias }}</a> —
         {{ T.activityReport }}
       </h1>
       <p>{{ wordsReportSummary }}</p>
@@ -16,8 +16,8 @@
             role="tab"
             aria-controls="report"
             aria-selected="true"
-            v-bind:class="{ active: showTab === 'report' }"
-            v-on:click="showTab = 'report'"
+            :class="{ active: showTab === 'report' }"
+            @click="showTab = 'report'"
             >{{ T.activityReportReport }}</a
           >
         </li>
@@ -29,8 +29,8 @@
             role="tab"
             aria-controls="users"
             aria-selected="false"
-            v-bind:class="{ active: showTab === 'users' }"
-            v-on:click="showTab = 'users'"
+            :class="{ active: showTab === 'users' }"
+            @click="showTab = 'users'"
             >{{ T.activityReportUsers }}</a
           >
         </li>
@@ -42,8 +42,8 @@
             role="tab"
             aria-controls="origins"
             aria-selected="false"
-            v-bind:class="{ active: showTab === 'origins' }"
-            v-on:click="showTab = 'origins'"
+            :class="{ active: showTab === 'origins' }"
+            @click="showTab = 'origins'"
             >{{ T.activityReportOrigins }}</a
           >
         </li>
@@ -55,7 +55,7 @@
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="report-tab"
-          v-bind:class="{
+          :class="{
             active: showTab === 'report',
           }"
         >
@@ -72,9 +72,9 @@
               <tr v-for="event in report">
                 <td>
                   <omegaup-user-username
-                    v-bind:classname="event.classname"
-                    v-bind:username="event.username"
-                    v-bind:linkify="true"
+                    :classname="event.classname"
+                    :username="event.username"
+                    :linkify="true"
                   ></omegaup-user-username>
                 </td>
                 <td>{{ time.formatDateTime(event.time) }}</td>
@@ -82,12 +82,12 @@
                 <td>{{ event.event.name }}</td>
                 <td>
                   <span v-if="event.event.problem">
-                    <a v-bind:href="`/arena/problem/${event.event.problem}/`">{{
+                    <a :href="`/arena/problem/${event.event.problem}/`">{{
                       event.event.problem
                     }}</a>
                   </span>
                   <span v-if="event.event.courseAlias" class="mr-2">
-                    <a v-bind:href="`/course/${event.event.courseAlias}/`">{{
+                    <a :href="`/course/${event.event.courseAlias}/`">{{
                       event.event.courseName
                     }}</a>
                   </span>
@@ -104,7 +104,7 @@
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="users-tab"
-          v-bind:class="{
+          :class="{
             active: showTab === 'users',
           }"
         >
@@ -127,9 +127,9 @@
               <tr v-for="user in users">
                 <td>
                   <omegaup-user-username
-                    v-bind:linkify="true"
-                    v-bind:classname="user.classname"
-                    v-bind:username="user.username"
+                    :linkify="true"
+                    :classname="user.classname"
+                    :username="user.username"
                   ></omegaup-user-username>
                 </td>
                 <td>
@@ -144,7 +144,7 @@
           class="tab-pane"
           role="tabpanel"
           aria-labelledby="origins-tab"
-          v-bind:class="{
+          :class="{
             active: showTab === 'origins',
           }"
         >
@@ -169,9 +169,9 @@
                 <td>
                   <span v-for="user in origin.usernames" class="mx-1">
                     <omegaup-user-username
-                      v-bind:linkify="true"
-                      v-bind:classname="user.classname"
-                      v-bind:username="user.username"
+                      :linkify="true"
+                      :classname="user.classname"
+                      :username="user.username"
                     ></omegaup-user-username
                   ></span>
                 </td>

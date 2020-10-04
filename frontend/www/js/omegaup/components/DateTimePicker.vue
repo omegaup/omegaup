@@ -2,14 +2,14 @@
   <input
     v-model="stringValue"
     class="form-control"
-    v-bind:class="{ 'is-invalid': isInvalid }"
+    :class="{ 'is-invalid': isInvalid }"
     required="required"
     size="16"
     type="datetime-local"
-    v-bind:disabled="!enabled"
-    v-bind:max="finish ? time.formatDateTimeLocal(finish) : null"
-    v-bind:min="start ? time.formatDateTimeLocal(start) : null"
-    v-bind:readonly="readonly || usedFallback"
+    :disabled="!enabled"
+    :max="finish ? time.formatDateTimeLocal(finish) : null"
+    :min="start ? time.formatDateTimeLocal(start) : null"
+    :readonly="readonly || usedFallback"
   />
 </template>
 

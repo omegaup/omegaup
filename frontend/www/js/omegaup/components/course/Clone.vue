@@ -1,9 +1,6 @@
 <template>
   <div data-course-clone>
-    <form
-      class="form"
-      v-on:submit.prevent="$emit('clone', alias, name, startTime)"
-    >
+    <form class="form" @submit.prevent="$emit('clone', alias, name, startTime)">
       <div class="row">
         <div class="form-group col-md-6">
           <label
@@ -15,7 +12,7 @@
           <label
             >{{ T.courseNewFormShortTitle_alias_ }}
             <font-awesome-icon
-              v-bind:title="T.courseNewFormShortTitle_alias_Desc"
+              :title="T.courseNewFormShortTitle_alias_Desc"
               icon="info-circle" />
             <input v-model="alias" class="form-control" type="text"
           /></label>
@@ -24,7 +21,7 @@
           <label
             >{{ T.courseNewFormStartDate }}
             <font-awesome-icon
-              v-bind:title="T.courseNewFormStartDateDesc"
+              :title="T.courseNewFormStartDateDesc"
               icon="info-circle" />
             <omegaup-datepicker v-model="startTime"></omegaup-datepicker
           ></label>

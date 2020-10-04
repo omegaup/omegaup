@@ -6,7 +6,7 @@
     <div class="panel-body add-identity-panel">
       <form
         class="form add-identity-form"
-        v-on:submit.prevent="onAddIdentity(username, password)"
+        @submit.prevent="onAddIdentity(username, password)"
       >
         <div class="form-group">
           <label>{{ T.wordsIdentity }}</label>
@@ -15,7 +15,7 @@
             class="glyphicon glyphicon-info-sign"
             data-placement="top"
             data-toggle="tooltip"
-            v-bind:title="T.profileAddIdentitiesTooltip"
+            :title="T.profileAddIdentitiesTooltip"
           ></span>
           <input
             v-model="username"

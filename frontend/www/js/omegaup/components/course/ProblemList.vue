@@ -21,12 +21,12 @@
             </tr>
           </thead>
           <tbody v-sortable="{ onUpdate: sort }">
-            <tr v-for="problem in problems" v-bind:key="problem.letter">
+            <tr v-for="problem in problems" :key="problem.letter">
               <td>
                 <button
                   class="btn btn-link"
                   type="button"
-                  v-bind:title="T.courseAssignmentProblemReorder"
+                  :title="T.courseAssignmentProblemReorder"
                 >
                   <font-awesome-icon icon="arrows-alt" />
                 </button>
@@ -36,8 +36,8 @@
               <td class="button-column">
                 <button
                   class="btn btn-link"
-                  v-bind:title="T.courseAssignmentProblemRemove"
-                  v-on:click.prevent="onRemoveProblem(assignment, problem)"
+                  :title="T.courseAssignmentProblemRemove"
+                  @click.prevent="onRemoveProblem(assignment, problem)"
                 >
                   <font-awesome-icon icon="trash" />
                 </button>
@@ -48,9 +48,9 @@
         <div>
           <button
             class="btn btn-primary"
-            v-bind:disabled="!problemsOrderChanged"
+            :disabled="!problemsOrderChanged"
             role="button"
-            v-on:click="saveNewOrder"
+            @click="saveNewOrder"
           >
             {{ T.wordsSaveNewOrder }}
           </button>
@@ -58,7 +58,7 @@
       </div>
     </div>
     <div class="card-footer">
-      <form v-on:submit.prevent="">
+      <form @submit.prevent="">
         <div class="row">
           <div class="col-md-12">
             <div class="row">
@@ -68,7 +68,7 @@
                   <omegaup-autocomplete
                     v-model="problemAlias"
                     class="form-control"
-                    v-bind:init="(el) => typeahead.problemTypeahead(el)"
+                    :init="(el) => typeahead.problemTypeahead(el)"
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
@@ -91,7 +91,7 @@
                           v-model="useLatestVersion"
                           class="form-check-input"
                           type="radio"
-                          v-bind:value="true"
+                          :value="true"
                         />{{ T.contestAddproblemLatestVersion }}
                       </label>
                     </div>
@@ -101,7 +101,7 @@
                           v-model="useLatestVersion"
                           class="form-check-input"
                           type="radio"
-                          v-bind:value="false"
+                          :value="false"
                         />{{ T.contestAddproblemOtherVersion }}
                       </label>
                     </div>
@@ -111,10 +111,10 @@
               <omegaup-problem-versions
                 v-if="!useLatestVersion"
                 v-model="selectedRevision"
-                v-bind:log="versionLog"
-                v-bind:published-revision="publishedRevision"
-                v-bind:show-footer="false"
-                v-on:runs-diff="onRunsDiff"
+                :log="versionLog"
+                :published-revision="publishedRevision"
+                :show-footer="false"
+                @runs-diff="onRunsDiff"
               ></omegaup-problem-versions>
             </div>
             <div class="form-group text-right">
@@ -122,8 +122,8 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                v-bind:disabled="problemAlias.length == 0"
-                v-on:click.prevent="
+                :disabled="problemAlias.length == 0"
+                @click.prevent="
                   onSaveProblem(assignment, {
                     alias: problemAlias,
                     points: points,
@@ -136,7 +136,7 @@
               <button
                 class="btn btn-secondary"
                 type="reset"
-                v-on:click.prevent="reset"
+                @click.prevent="reset"
               >
                 {{ T.wordsCancel }}
               </button>

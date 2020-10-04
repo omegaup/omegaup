@@ -1,28 +1,20 @@
 <template>
   <div class="qualitynomination-popup">
-    <a
-      v-show="showSuggestLink"
-      v-bind:href="suggestLink"
-      v-on:click="onShowSuggestion"
-    >
+    <a v-show="showSuggestLink" :href="suggestLink" @click="onShowSuggestion">
       <slot name="link-title">
         {{ T.qualityNominationRateProblem }}
       </slot>
     </a>
     <transition name="fade">
-      <form
-        v-show="showForm"
-        class="popup h-auto w-auto"
-        v-on:submit.prevent=""
-      >
-        <button class="close" type="button" v-on:click="onHide(true)">×</button>
+      <form v-show="showForm" class="popup h-auto w-auto" @submit.prevent="">
+        <button class="close" type="button" @click="onHide(true)">×</button>
         <div class="container-fluid">
           <template v-if="currentView === 'content'">
             <slot
               name="popup-content"
-              v-bind:onSubmit="onSubmit"
-              v-bind:sortedProblemTags="sortedProblemTags"
-              v-bind:onHide="onHide"
+              :onSubmit="onSubmit"
+              :sortedProblemTags="sortedProblemTags"
+              :onHide="onHide"
             >
               <div class="title-text">
                 {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAC }}
@@ -59,14 +51,14 @@
                   <ul class="tag-select">
                     <li
                       v-for="problemTopic in sortedProblemTags"
-                      v-bind:key="problemTopic.value"
+                      :key="problemTopic.value"
                       class="tag-select"
                     >
                       <label class="tag-select"
                         ><input
                           v-model="tags"
                           type="checkbox"
-                          v-bind:value="problemTopic.value"
+                          :value="problemTopic.value"
                         />
                         {{ problemTopic.text }}</label
                       >
@@ -102,15 +94,15 @@
                 <button
                   class="col-md-4 mr-2 btn btn-primary"
                   type="submit"
-                  v-bind:disabled="!quality && !tags.length && !difficulty"
-                  v-on:click="onSubmit"
+                  :disabled="!quality && !tags.length && !difficulty"
+                  @click="onSubmit"
                 >
                   {{ T.wordsSend }}
                 </button>
                 <button
                   class="col-md-4 btn btn-secondary"
                   type="button"
-                  v-on:click="onHide(true)"
+                  @click="onHide(true)"
                 >
                   {{ T.wordsCancel }}
                 </button>

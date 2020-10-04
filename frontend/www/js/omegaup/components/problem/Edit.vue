@@ -5,7 +5,7 @@
         <span>{{ T.problemEditEditProblem }} {{ data.title }}</span>
         <small>
           &ndash;
-          <a v-bind:href="`/arena/problem/${alias}/`">
+          <a :href="`/arena/problem/${alias}/`">
             {{ T.problemEditGoToProblem }}
           </a>
         </small>
@@ -34,8 +34,8 @@
             data-toggle="tab"
             data-tab-edit
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'edit' }"
-            v-on:click="showTab = 'edit'"
+            :class="{ active: showTab === 'edit' }"
+            @click="showTab = 'edit'"
             >{{ T.problemEditEditProblem }}</a
           >
           <a
@@ -43,8 +43,8 @@
             data-toggle="tab"
             data-tab-markdown
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'markdown' }"
-            v-on:click="showTab = 'markdown'"
+            :class="{ active: showTab === 'markdown' }"
+            @click="showTab = 'markdown'"
             >{{ T.problemEditEditMarkdown }}</a
           >
           <a
@@ -52,8 +52,8 @@
             data-toggle="tab"
             data-tab-version
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'version' }"
-            v-on:click="showTab = 'version'"
+            :class="{ active: showTab === 'version' }"
+            @click="showTab = 'version'"
             >{{ T.problemEditChooseVersion }}</a
           >
           <a
@@ -61,8 +61,8 @@
             data-toggle="tab"
             data-tab-solution
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'solution' }"
-            v-on:click="showTab = 'solution'"
+            :class="{ active: showTab === 'solution' }"
+            @click="showTab = 'solution'"
             >{{ T.problemEditSolution }}</a
           >
           <a
@@ -70,8 +70,8 @@
             data-toggle="tab"
             data-tab-admins
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'admins' }"
-            v-on:click="showTab = 'admins'"
+            :class="{ active: showTab === 'admins' }"
+            @click="showTab = 'admins'"
             >{{ T.problemEditAddAdmin }}</a
           >
           <a
@@ -79,8 +79,8 @@
             data-toggle="tab"
             data-tab-tags
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'tags' }"
-            v-on:click="showTab = 'tags'"
+            :class="{ active: showTab === 'tags' }"
+            @click="showTab = 'tags'"
             >{{ T.problemEditAddTags }}</a
           >
           <a
@@ -88,8 +88,8 @@
             data-toggle="tab"
             data-tab-download
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'download' }"
-            v-on:click="showTab = 'download'"
+            :class="{ active: showTab === 'download' }"
+            @click="showTab = 'download'"
             >{{ T.wordsDownload }}</a
           >
           <a
@@ -97,8 +97,8 @@
             data-toggle="tab"
             data-tab-delete
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'delete' }"
-            v-on:click="showTab = 'delete'"
+            :class="{ active: showTab === 'delete' }"
+            @click="showTab = 'delete'"
             >{{ T.wordsDelete }}</a
           >
         </div>
@@ -108,21 +108,21 @@
     <div class="tab-content">
       <div v-if="showTab === 'edit'" class="tab-pane active">
         <omegaup-problem-form
-          v-bind:data="data"
-          v-bind:original-visibility="data.originalVisibility"
-          v-bind:is-update="true"
+          :data="data"
+          :original-visibility="data.originalVisibility"
+          :is-update="true"
         ></omegaup-problem-form>
       </div>
 
       <div v-if="showTab === 'markdown'" class="tab-pane active">
         <omegaup-problem-statementedit
-          v-bind:statement="data.statement"
+          :statement="data.statement"
           markdown-type="statements"
-          v-bind:alias="data.alias"
-          v-bind:title="data.title"
-          v-bind:source="data.source"
-          v-bind:problemsetter="data.problemsetter"
-          v-on:emit-update-markdown-contents="
+          :alias="data.alias"
+          :title="data.title"
+          :source="data.source"
+          :problemsetter="data.problemsetter"
+          @emit-update-markdown-contents="
             (statements, newLanguage, currentMarkdown) =>
               $emit(
                 'update-markdown-contents',
@@ -137,15 +137,15 @@
 
       <div v-if="showTab === 'version'" class="tab-pane active">
         <omegaup-problem-versions
-          v-bind:log="data.log"
-          v-bind:published-revision="data.publishedRevision"
-          v-bind:value="data.publishedRevision"
-          v-bind:show-footer="true"
-          v-on:emit-select-version="
+          :log="data.log"
+          :published-revision="data.publishedRevision"
+          :value="data.publishedRevision"
+          :show-footer="true"
+          @emit-select-version="
             (selectedRevision, updatePublished) =>
               $emit('select-version', selectedRevision, updatePublished)
           "
-          v-on:emit-runs-diff="
+          @emit-runs-diff="
             (addProblemComponent, selectedCommit) =>
               $emit('runs-diff', addProblemComponent, selectedCommit)
           "
@@ -154,12 +154,12 @@
 
       <div v-if="showTab === 'solution'" class="tab-pane active">
         <omegaup-problem-statementedit
-          v-bind:statement="
+          :statement="
             data.solution || { markdown: '', language: 'es', images: {} }
           "
           markdown-type="solutions"
-          v-bind:title="data.title"
-          v-on:emit-update-markdown-contents="
+          :title="data.title"
+          @emit-update-markdown-contents="
             (solutions, newLanguage, currentMarkdown) =>
               $emit(
                 'update-markdown-contents',
@@ -174,25 +174,25 @@
 
       <div v-if="showTab === 'admins'" class="tab-pane active">
         <omegaup-problem-admins
-          v-bind:initial-admins="initialAdmins"
-          v-bind:has-parent-component="true"
-          v-on:emit-add-admin="
+          :initial-admins="initialAdmins"
+          :has-parent-component="true"
+          @emit-add-admin="
             (addAdminComponent) =>
               $emit('add-admin', addAdminComponent.username)
           "
-          v-on:emit-remove-admin="
+          @emit-remove-admin="
             (addAdminComponent) =>
               $emit('remove-admin', addAdminComponent.selected.username)
           "
         ></omegaup-problem-admins>
         <omegaup-problem-groupadmins
-          v-bind:initial-groups="initialGroups"
-          v-bind:has-parent-component="true"
-          v-on:emit-add-group-admin="
+          :initial-groups="initialGroups"
+          :has-parent-component="true"
+          @emit-add-group-admin="
             (groupAdminsComponent) =>
               $emit('add-group-admin', groupAdminsComponent.groupAlias)
           "
-          v-on:emit-remove-group-admin="
+          @emit-remove-group-admin="
             (groupAdminsComponent) =>
               $emit('remove-group-admin', groupAdminsComponent.groupAlias)
           "
@@ -201,27 +201,27 @@
 
       <div v-if="showTab === 'tags'" class="tab-pane active">
         <omegaup-problem-tags
-          v-bind:alias="data.alias"
-          v-bind:title="data.title"
-          v-bind:initial-allow-tags="data.allowUserAddTags"
-          v-bind:can-add-new-tags="true"
-          v-bind:public-tags="data.publicTags"
-          v-bind:level-tags="data.levelTags"
-          v-bind:problem-level="data.problemLevel"
-          v-bind:selected-public-tags="data.selectedPublicTags"
-          v-bind:selected-private-tags="data.selectedPrivateTags"
-          v-on:emit-update-problem-level="
+          :alias="data.alias"
+          :title="data.title"
+          :initial-allow-tags="data.allowUserAddTags"
+          :can-add-new-tags="true"
+          :public-tags="data.publicTags"
+          :level-tags="data.levelTags"
+          :problem-level="data.problemLevel"
+          :selected-public-tags="data.selectedPublicTags"
+          :selected-private-tags="data.selectedPrivateTags"
+          @emit-update-problem-level="
             (levelTag) => $emit('update-problem-level', levelTag)
           "
-          v-on:emit-add-tag="
+          @emit-add-tag="
             (alias, tagname, isPublic) =>
               $emit('add-tag', alias, tagname, isPublic)
           "
-          v-on:emit-remove-tag="
+          @emit-remove-tag="
             (alias, tagname, isPublic) =>
               $emit('remove-tag', alias, tagname, isPublic)
           "
-          v-on:emit-change-allow-user-add-tag="
+          @emit-change-allow-user-add-tag="
             (alias, title, allowTags) =>
               $emit('change-allow-user-add-tag', alias, title, allowTags)
           "
@@ -231,7 +231,7 @@
       <div v-if="showTab === 'download'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
-            <form class="form" v-on:submit.prevent="onDownload">
+            <form class="form" @submit.prevent="onDownload">
               <div class="form-group">
                 <button class="btn btn-primary" type="submit">
                   {{ T.wordsDownload }}
@@ -245,7 +245,7 @@
       <div v-if="showTab === 'delete'" class="tab-pane active">
         <div class="card">
           <div class="card-body">
-            <form class="form" v-on:submit.prevent="$emit('remove', alias)">
+            <form class="form" @submit.prevent="$emit('remove', alias)">
               <div class="form-group">
                 <div class="alert alert-danger">
                   <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>

@@ -3,7 +3,7 @@
     <textarea
       v-model="contents"
       class="col px-0"
-      v-bind:disabled="readOnly"
+      :disabled="readOnly"
     ></textarea>
   </div>
 </template>

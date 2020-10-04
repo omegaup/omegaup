@@ -6,26 +6,26 @@
         <img
           v-if="problem.quality_seal || problem.visibility === 3"
           src="/media/quality-badge-sm.png"
-          v-bind:title="T.wordsHighQualityProblem"
+          :title="T.wordsHighQualityProblem"
         />
         <span
           v-if="problem.visibility === 1 || problem.visibility === -1"
           class="glyphicon glyphicon-warning-sign"
-          v-bind:title="T.wordsWarningProblem"
+          :title="T.wordsWarningProblem"
         ></span>
         <span
           v-if="problem.visibility === 0 || problem.visibility === -1"
           class="glyphicon glyphicon-eye-close"
-          v-bind:title="T.wordsPrivate"
+          :title="T.wordsPrivate"
         ></span>
         <span
           v-if="problem.visibility <= -2"
           class="glyphicon glyphicon-ban-circle"
-          v-bind:title="T.wordsBannedProblem"
+          :title="T.wordsBannedProblem"
         ></span>
       </template>
       <template v-if="showEditLink">
-        (<a v-bind:href="`/problem/${problem.alias}/edit/`">{{ T.wordsEdit }}</a
+        (<a :href="`/problem/${problem.alias}/edit/`">{{ T.wordsEdit }}</a
         >)
       </template>
     </h1>

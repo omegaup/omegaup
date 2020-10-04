@@ -15,12 +15,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="solver in solvers" v-bind:key="solver.username">
+      <tr v-for="solver in solvers" :key="solver.username">
         <td>
           <omegaup-username
-            v-bind:classname="solver.classname"
-            v-bind:username="solver.username"
-            v-bind:linkify="true"
+            :classname="solver.classname"
+            :username="solver.username"
+            :linkify="true"
           ></omegaup-username>
         </td>
         <td>{{ solver.language }}</td>

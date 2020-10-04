@@ -11,9 +11,9 @@
     </div>
     <template v-if="courses.admin.activeTab !== ''">
       <omegaup-course-filtered-list
-        v-bind:courses="courses.admin"
-        v-bind:activeTab="courses.admin.activeTab"
-        v-bind:showPercentage="false"
+        :courses="courses.admin"
+        :activeTab="courses.admin.activeTab"
+        :showPercentage="false"
       ></omegaup-course-filtered-list>
     </template>
   </div>

@@ -17,21 +17,21 @@
         ><omegaup-autocomplete
           v-model="searchedUsername"
           class="form-control"
-          v-bind:init="(el) => typeahead.userTypeahead(el)"
+          :init="(el) => typeahead.userTypeahead(el)"
         ></omegaup-autocomplete
       ></label>
-      <button class="btn btn-primary" type="button" v-on:click="onSubmit">
+      <button class="btn btn-primary" type="button" @click="onSubmit">
         {{ T.searchUser }}
       </button>
       <template v-if="Object.keys(availableFilters).length &gt; 0">
-        <select v-model="filter" class="filter" v-on:change="onFilterChange">
+        <select v-model="filter" class="filter" @change="onFilterChange">
           <option value="">
             {{ T.wordsSelectFilter }}
           </option>
           <option
             v-for="(item, key, index) in availableFilters"
-            v-bind:key="index"
-            v-bind:value="key"
+            :key="index"
+            :value="key"
           >
             {{ item }}
           </option>
@@ -58,16 +58,14 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(user, index) in ranking" v-bind:key="index">
+        <tr v-for="(user, index) in ranking" :key="index">
           <th scope="row">{{ user.rank }}</th>
           <td>
-            <omegaup-countryflag
-              v-bind:country="user.country"
-            ></omegaup-countryflag>
+            <omegaup-countryflag :country="user.country"></omegaup-countryflag>
             <omegaup-user-username
-              v-bind:classname="user.classname"
-              v-bind:linkify="true"
-              v-bind:username="user.username"
+              :classname="user.classname"
+              :linkify="true"
+              :username="user.username"
             ></omegaup-user-username>
             <span v-if="user.name && length !== 5"
               ><br />
@@ -86,7 +84,7 @@
     </div>
     <div v-else class="card-footer">
       <omegaup-common-paginator
-        v-bind:pagerItems="pagerItems"
+        :pagerItems="pagerItems"
       ></omegaup-common-paginator>
     </div>
   </div>

@@ -1,8 +1,8 @@
 <template>
   <omegaup-popup
-    v-bind:reviewer-nomination="true"
-    v-bind:possible-tags="PROBLEM_CATEGORIES"
-    v-on:submit="$emit('submit', tag, qualitySeal)"
+    :reviewer-nomination="true"
+    :possible-tags="PROBLEM_CATEGORIES"
+    @submit="$emit('submit', tag, qualitySeal)"
   >
     <template slot="link-title">
       {{ T.reviewerNomination }}
@@ -17,8 +17,8 @@
         </label>
         <br />
         <omegaup-radio-switch
-          v-bind:value.sync="qualitySeal"
-          v-bind:selected-value="qualitySeal"
+          :value.sync="qualitySeal"
+          :selected-value="qualitySeal"
         ></omegaup-radio-switch>
       </div>
       <div class="form-group">
@@ -27,14 +27,14 @@
           <ul class="tag-select">
             <li
               v-for="problemTopic in slotProps.sortedProblemTags"
-              v-bind:key="problemTopic.value"
+              :key="problemTopic.value"
               class="tag-select"
             >
               <label class="tag-select"
                 ><input
                   v-model="tag"
                   type="radio"
-                  v-bind:value="problemTopic.value"
+                  :value="problemTopic.value"
                 />
                 {{ problemTopic.text }}</label
               >
@@ -46,15 +46,15 @@
         <button
           class="col-md-4 mr-2 btn btn-primary"
           type="submit"
-          v-bind:disabled="qualitySeal && !tag"
-          v-on:click="slotProps.onSubmit"
+          :disabled="qualitySeal && !tag"
+          @click="slotProps.onSubmit"
         >
           {{ T.wordsSend }}
         </button>
         <button
           class="col-md-4 btn btn-secondary"
           type="button"
-          v-on:click="slotProps.onHide(true)"
+          @click="slotProps.onHide(true)"
         >
           {{ T.wordsCancel }}
         </button>

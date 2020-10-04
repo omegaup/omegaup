@@ -124,8 +124,8 @@
           class="form-control"
         >
           <!-- id-lint on -->
-          <option v-bind:value="false">No</option>
-          <option v-bind:value="true">Yes</option>
+          <option :value="false">No</option>
+          <option :value="true">Yes</option>
         </select>
       </div>
       <div v-if="interactive" class="form-group col-md-4">

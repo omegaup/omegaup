@@ -19,7 +19,7 @@
             v-show="omegaUpLockDown"
             alt="lockdown"
             title="lockdown"
-            v-bind:src="lockDownImage"
+            :src="lockDownImage"
         /></a>
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
@@ -27,7 +27,7 @@
           <li
             v-if="isLoggedIn"
             class="dropdown nav-contests"
-            v-bind:class="{ active: navbarSection === 'contests' }"
+            :class="{ active: navbarSection === 'contests' }"
           >
             <a
               class="dropdown-toggle"
@@ -57,13 +57,13 @@
               </template>
             </ul>
           </li>
-          <li v-else v-bind:class="{ active: navbarSection === 'contests' }">
+          <li v-else :class="{ active: navbarSection === 'contests' }">
             <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
           </li>
           <li
             v-if="isLoggedIn"
             class="dropdown nav-courses"
-            v-bind:class="{ active: navbarSection === 'courses' }"
+            :class="{ active: navbarSection === 'courses' }"
           >
             <a class="dropdown-toogle" data-toggle="dropdown" data-nav-courses
               ><span>{{ T.navCourses }}</span
@@ -84,12 +84,12 @@
               </template>
             </ul>
           </li>
-          <li v-else v-bind:class="{ active: navbarSection === 'courses' }">
+          <li v-else :class="{ active: navbarSection === 'courses' }">
             <a href="/course/">{{ T.navCourses }}</a>
           </li>
           <li
             class="dropdown nav-problems"
-            v-bind:class="{ active: navbarSection === 'problems' }"
+            :class="{ active: navbarSection === 'problems' }"
           >
             <a
               class="dropdown-toggle"
@@ -120,7 +120,7 @@
           </li>
           <li
             class="dropdown nav-rank"
-            v-bind:class="{ active: navbarSection === 'rank' }"
+            :class="{ active: navbarSection === 'rank' }"
           >
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <span>{{ T.navRanking }}</span>
@@ -171,17 +171,17 @@
         <!-- in lockdown or contest mode there is no left navbar -->
         <ul v-if="!isLoggedIn" class="nav navbar-nav navbar-right">
           <li>
-            <a v-bind:href="formattedLoginURL">{{ T.navLogIn }}</a>
+            <a :href="formattedLoginURL">{{ T.navLogIn }}</a>
           </li>
         </ul>
         <ul v-else class="nav navbar-nav navbar-right">
           <omegaup-notifications-clarifications
             v-if="inContest"
-            v-bind:initialClarifications="initialClarifications"
+            :initialClarifications="initialClarifications"
           ></omegaup-notifications-clarifications>
           <li
             class="dropdown nav-user"
-            v-bind:class="{ active: navbarSection === 'users' }"
+            :class="{ active: navbarSection === 'users' }"
             data-nav-right
           >
             <a
@@ -189,14 +189,14 @@
               data-toggle="dropdown"
               data-nav-user
               href="#"
-              ><img v-bind:src="gravatarURL51" />
-              <span class="username" v-bind:title="currentUsername">{{
+              ><img :src="gravatarURL51" />
+              <span class="username" :title="currentUsername">{{
                 currentUsername
               }}</span>
               <omegaup-common-grader-badge
                 v-show="isAdmin"
-                v-bind:queueLength="graderQueueLength"
-                v-bind:error="errorMessage !== null"
+                :queueLength="graderQueueLength"
+                :error="errorMessage !== null"
               ></omegaup-common-grader-badge>
               <span class="caret"></span
             ></a>
@@ -239,9 +239,9 @@
               </li>
               <omegaup-common-grader-status
                 v-show="isAdmin"
-                v-bind:status="errorMessage !== null ? 'down' : 'ok'"
-                v-bind:error="errorMessage"
-                v-bind:graderInfo="graderInfo"
+                :status="errorMessage !== null ? 'down' : 'ok'"
+                :error="errorMessage"
+                :graderInfo="graderInfo"
               ></omegaup-common-grader-status>
             </ul>
           </li>

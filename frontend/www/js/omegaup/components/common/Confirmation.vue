@@ -7,7 +7,7 @@
             class="close"
             type="button"
             data-dismiss="modal"
-            v-on:click.prevent="$emit('close')"
+            @click.prevent="$emit('close')"
           >
             ×
           </button>
@@ -20,7 +20,7 @@
             type="button"
             class="btn btn-primary"
             data-dismiss="modal"
-            v-on:click.prevent="$emit('yes')"
+            @click.prevent="$emit('yes')"
           >
             {{ answerYes }}
           </button>
@@ -28,7 +28,7 @@
             type="button"
             class="btn btn-danger"
             data-dismiss="modal"
-            v-on:click.prevent="$emit('no')"
+            @click.prevent="$emit('no')"
           >
             {{ answerNo }}
           </button>

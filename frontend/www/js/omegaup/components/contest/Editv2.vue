@@ -9,7 +9,7 @@
         }}
         <small>
           &ndash;
-          <a v-bind:href="`/arena/${details.alias}/`">
+          <a :href="`/arena/${details.alias}/`">
             {{ T.contestDetailsGoToContest }}</a
           >
         </small>
@@ -33,8 +33,8 @@
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'new_form' }"
-            v-on:click="showTab = 'new_form'"
+            :class="{ active: showTab === 'new_form' }"
+            @click="showTab = 'new_form'"
             >{{ T.contestEdit }}</a
           >
           <a
@@ -42,8 +42,8 @@
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'problems' }"
-            v-on:click="showTab = 'problems'"
+            :class="{ active: showTab === 'problems' }"
+            @click="showTab = 'problems'"
             >{{ T.wordsAddProblem }}</a
           >
           <a
@@ -51,40 +51,40 @@
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'publish' }"
-            v-on:click="showTab = 'publish'"
+            :class="{ active: showTab === 'publish' }"
+            @click="showTab = 'publish'"
             >{{ T.contestNewFormAdmissionMode }}</a
           >
           <a
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            v-bind:class="{ active: virtual && showTab === 'contestants' }"
-            v-on:click="showTab = 'contestants'"
+            :class="{ active: virtual && showTab === 'contestants' }"
+            @click="showTab = 'contestants'"
             >{{ T.contestAdduserAddContestant }}</a
           >
           <a
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'admins' }"
-            v-on:click="showTab = 'admins'"
+            :class="{ active: showTab === 'admins' }"
+            @click="showTab = 'admins'"
             >{{ T.omegaupTitleContestAddAdmin }}</a
           >
           <a
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'links' }"
-            v-on:click="showTab = 'links'"
+            :class="{ active: showTab === 'links' }"
+            @click="showTab = 'links'"
             >{{ T.showLinks }}</a
           >
           <a
             href="#"
             data-toggle="tab"
             class="dropdown-item"
-            v-bind:class="{ active: showTab === 'clone' }"
-            v-on:click="showTab = 'clone'"
+            :class="{ active: showTab === 'clone' }"
+            @click="showTab = 'clone'"
             >{{ T.courseEditClone }}</a
           >
         </div>
@@ -94,48 +94,44 @@
     <div class="tab-content">
       <div v-if="showTab === 'new_form'" class="tab-pane active">
         <omegaup-contest-new-form
-          v-bind:initial-alias="details.alias"
-          v-bind:initial-title="details.title"
-          v-bind:initial-description="details.description"
-          v-bind:initial-start-time="details.start_time"
-          v-bind:initial-finish-time="details.finish_time"
-          v-bind:initial-window-length="details.window_length"
-          v-bind:initial-points-decay-factor="details.points_decay_factor"
-          v-bind:initial-submissions-gap="details.submissions_gap"
-          v-bind:initial-languages="details.languages"
-          v-bind:initial-feedback="details.feedback"
-          v-bind:initial-penalty="details.penalty"
-          v-bind:initial-scoreboard="details.scoreboard"
-          v-bind:initial-penalty-type="details.penalty_type"
-          v-bind:initial-show-scoreboard-after="details.show_scoreboard_after"
-          v-bind:initial-partial-score="details.partial_score"
-          v-bind:initial-needs-basic-information="
-            details.needs_basic_information
-          "
-          v-bind:initial-requests-user-information="
-            details.requests_user_information
-          "
-          v-bind:all-languages="details.available_languages"
-          v-bind:update="true"
-          v-on:emit-update-contest="
+          :initial-alias="details.alias"
+          :initial-title="details.title"
+          :initial-description="details.description"
+          :initial-start-time="details.start_time"
+          :initial-finish-time="details.finish_time"
+          :initial-window-length="details.window_length"
+          :initial-points-decay-factor="details.points_decay_factor"
+          :initial-submissions-gap="details.submissions_gap"
+          :initial-languages="details.languages"
+          :initial-feedback="details.feedback"
+          :initial-penalty="details.penalty"
+          :initial-scoreboard="details.scoreboard"
+          :initial-penalty-type="details.penalty_type"
+          :initial-show-scoreboard-after="details.show_scoreboard_after"
+          :initial-partial-score="details.partial_score"
+          :initial-needs-basic-information="details.needs_basic_information"
+          :initial-requests-user-information="details.requests_user_information"
+          :all-languages="details.available_languages"
+          :update="true"
+          @emit-update-contest="
             (newFormComponent) => $emit('update-contest', newFormComponent)
           "
         ></omegaup-contest-new-form>
       </div>
       <div v-if="showTab === 'problems'" class="tab-pane active">
         <omegaup-contest-add-problem
-          v-bind:contest-alias="details.alias"
-          v-bind:initial-points="details.partial_score ? 100 : 1"
-          v-bind:initial-problems="problems"
-          v-on:add-problem="(problem) => $emit('add-problem', problem)"
-          v-on:get-versions="
+          :contest-alias="details.alias"
+          :initial-points="details.partial_score ? 100 : 1"
+          :initial-problems="problems"
+          @add-problem="(problem) => $emit('add-problem', problem)"
+          @get-versions="
             (problemAlias, addProblemComponent) =>
               $emit('get-versions', problemAlias, addProblemComponent)
           "
-          v-on:remove-problem="
+          @remove-problem="
             (problemAlias) => $emit('remove-problem', problemAlias)
           "
-          v-on:runs-diff="
+          @runs-diff="
             (problemAlias, versions, selectedCommit) =>
               $emit('runs-diff', problemAlias, versions, selectedCommit)
           "
@@ -144,10 +140,10 @@
       </div>
       <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
-          v-bind:initial-admission-mode="details.admission_mode"
-          v-bind:should-show-public-option="true"
-          v-bind:admission-mode-description="T.contestAdmissionModeDescription"
-          v-on:emit-update-admission-mode="
+          :initial-admission-mode="details.admission_mode"
+          :should-show-public-option="true"
+          :admission-mode-description="T.contestAdmissionModeDescription"
+          @emit-update-admission-mode="
             (admissionMode) => $emit('update-admission-mode', admissionMode)
           "
         ></omegaup-common-publish>

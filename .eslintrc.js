@@ -34,7 +34,5 @@ module.exports = {
     'vue/no-v-html': 'off',
     'vue/require-default-prop': 'off',
     'vue/require-v-for-key': 'off',
-    'vue/v-bind-style': 'off',
-    'vue/v-on-style': 'off',
   },
 };

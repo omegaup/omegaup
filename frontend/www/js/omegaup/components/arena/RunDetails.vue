@@ -22,14 +22,14 @@
                 {{ element.verdict }}
               </th>
               <th v-else colspan="2">
-                <div class="dropdown-cases" v-on:click="toggle(element.group)">
+                <div class="dropdown-cases" @click="toggle(element.group)">
                   <font-awesome-icon
                     v-if="groupVisible[element.group]"
-                    v-bind:icon="['fas', 'chevron-circle-up']"
+                    :icon="['fas', 'chevron-circle-up']"
                   />
                   <font-awesome-icon
                     v-else
-                    v-bind:icon="['fas', 'chevron-circle-down']"
+                    :icon="['fas', 'chevron-circle-down']"
                   />
                 </div>
               </th>
@@ -80,8 +80,8 @@
                   <tr>
                     <td v-if="data.cases" colspan="6">
                       <omegaup-arena-diff-view
-                        v-bind:left="data.cases[problem_case.name].out"
-                        v-bind:right="
+                        :left="data.cases[problem_case.name].out"
+                        :right="
                           getContestantOutput(data.cases, problem_case.name)
                         "
                       ></omegaup-arena-diff-view>
@@ -97,17 +97,14 @@
         </table>
       </div>
       <h3>{{ T.wordsSource }}</h3>
-      <a
-        v-if="data.source_link"
-        download="data.zip"
-        v-bind:href="data.source"
-        >{{ T.wordsDownload }}</a
-      >
+      <a v-if="data.source_link" download="data.zip" :href="data.source">{{
+        T.wordsDownload
+      }}</a>
       <omegaup-arena-code-view
         v-else
-        v-bind:language="data.language"
-        v-bind:readonly="true"
-        v-bind:value="data.source"
+        :language="data.language"
+        :readonly="true"
+        :value="data.source"
       ></omegaup-arena-code-view>
       <div v-if="data.compile_error" class="compile_error">
         <h3>{{ T.wordsCompilerOutput }}</h3>
@@ -123,8 +120,8 @@
           <li>
             <a
               class="sourcecode"
-              v-bind:download="data.source_name"
-              v-bind:href="data.source_url"
+              :download="data.source_name"
+              :href="data.source_url"
               >{{ T.wordsDownloadCode }}</a
             >
           </li>
@@ -132,7 +129,7 @@
             <a
               v-if="data.admin"
               class="output"
-              v-bind:href="`/api/run/download/run_alias/${data.guid}/`"
+              :href="`/api/run/download/run_alias/${data.guid}/`"
               >{{ T.wordsDownloadOutput }}</a
             >
           </li>
@@ -140,7 +137,7 @@
             <a
               v-if="data.admin"
               class="details"
-              v-bind:href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
+              :href="`/api/run/download/run_alias/${data.guid}/complete/true/`"
               >{{ T.wordsDownloadDetails }}</a
             >
           </li>

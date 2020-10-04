@@ -1,18 +1,18 @@
 <template>
   <div class="container-fluid">
     <h2 class="text-center">
-      <a v-bind:href="`/course/${course.alias}/`">{{ course.name }}</a>
+      <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
     </h2>
     <br />
     <div>
       <div class="d-flex justify-content-center">
         <select v-model="selected" class="text-center">
-          <option v-for="option in options" v-bind:value="option.value">
+          <option v-for="option in options" :value="option.value">
             {{ option.text }}
           </option>
         </select>
       </div>
-      <highcharts v-bind:options="selected"></highcharts>
+      <highcharts :options="selected"></highcharts>
     </div>
   </div>
   <!-- panel -->

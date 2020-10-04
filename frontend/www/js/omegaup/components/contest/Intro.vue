@@ -15,8 +15,8 @@
             <p>
               {{ T.contestWillBeginIn }}
               <omegaup-countdown
-                v-bind:target-time="contest.start_time"
-                v-on:emit-finish="now = Date.now()"
+                :target-time="contest.start_time"
+                @emit-finish="now = Date.now()"
               ></omegaup-countdown>
             </p>
           </div>
@@ -27,7 +27,7 @@
                 contest.admission_mode !== 'registration' ||
                 contest.user_registration_accepted
               "
-              v-on:submit.prevent="onStartContest"
+              @submit.prevent="onStartContest"
             >
               <p
                 v-if="
@@ -42,14 +42,14 @@
               ></p>
               <template v-if="requestsUserInformation !== 'no'">
                 <omegaup-markdown
-                  v-bind:markdown="(statement && statement.markdown) || ''"
+                  :markdown="(statement && statement.markdown) || ''"
                 ></omegaup-markdown>
                 <p>
                   <label>
                     <input
                       v-model="shareUserInformation"
                       type="radio"
-                      v-bind:value="true"
+                      :value="true"
                     />
                     {{ T.wordsYes }}
                   </label>
@@ -57,7 +57,7 @@
                     <input
                       v-model="shareUserInformation"
                       type="radio"
-                      v-bind:value="false"
+                      :value="false"
                     />
                     {{ T.wordsNo }}
                   </label>
@@ -66,7 +66,7 @@
               <button
                 type="submit"
                 data-start-contest
-                v-bind:disabled="isButtonDisabled"
+                :disabled="isButtonDisabled"
                 class="btn btn-primary btn-lg"
               >
                 {{ T.startContest }}
@@ -76,7 +76,7 @@
             <!-- Must register -->
             <form
               v-else
-              v-on:submit.prevent="$emit('request-access', contest.alias)"
+              @submit.prevent="$emit('request-access', contest.alias)"
             >
               <template v-if="!contest.user_registration_requested">
                 <p>{{ T.mustRegisterToJoinContest }}</p>
@@ -101,7 +101,7 @@
           <div class="card">
             <div class="card-body">
               <p>{{ T.mustLoginToJoinContest }}</p>
-              <a v-bind:href="redirectURL" class="btn btn-primary">{{
+              <a :href="redirectURL" class="btn btn-primary">{{
                 T.loginHeader
               }}</a>
             </div>

@@ -13,8 +13,8 @@
             v-show="omegaUpLockDown"
             alt="lockdown"
             title="lockdown"
-            v-bind:src="lockDownImage"
-            v-bind:class="{ 'd-inline-block': omegaUpLockDown }"
+            :src="lockDownImage"
+            :class="{ 'd-inline-block': omegaUpLockDown }"
             height="20"
           />
         </a>
@@ -33,7 +33,7 @@
             <li
               v-if="isLoggedIn"
               class="nav-item dropdown nav-contests"
-              v-bind:class="{ active: navbarSection === 'contests' }"
+              :class="{ active: navbarSection === 'contests' }"
             >
               <a
                 class="nav-link px-2 dropdown-toggle"
@@ -64,7 +64,7 @@
                 </template>
               </div>
             </li>
-            <li v-else v-bind:class="{ active: navbarSection === 'contests' }">
+            <li v-else :class="{ active: navbarSection === 'contests' }">
               <a class="nav-link px-2" href="/arena/" data-nav-contests-arena>{{
                 T.wordsContests
               }}</a>
@@ -72,7 +72,7 @@
             <li
               v-if="isLoggedIn"
               class="nav-item dropdown nav-courses"
-              v-bind:class="{ active: navbarSection === 'courses' }"
+              :class="{ active: navbarSection === 'courses' }"
             >
               <a
                 class="nav-link px-2 dropdown-toggle"
@@ -102,14 +102,14 @@
             </li>
             <li
               v-else
-              v-bind:class="{ active: navbarSection === 'course' }"
+              :class="{ active: navbarSection === 'course' }"
               data-nav-course
             >
               <a class="nav-link px-2" href="/course/">{{ T.navCourses }}</a>
             </li>
             <li
               class="nav-item dropdown nav-problems"
-              v-bind:class="{ active: navbarSection === 'problems' }"
+              :class="{ active: navbarSection === 'problems' }"
             >
               <a
                 class="nav-link px-2 dropdown-toggle"
@@ -149,7 +149,7 @@
             </li>
             <li
               class="nav-item dropdown nav-rank"
-              v-bind:class="{ active: navbarSection === 'rank' }"
+              :class="{ active: navbarSection === 'rank' }"
             >
               <a
                 class="nav-link px-2 dropdown-toggle"
@@ -209,7 +209,7 @@
           <!-- in lockdown or contest mode there is no left navbar -->
           <ul v-if="!isLoggedIn" class="navbar-nav navbar-right">
             <li class="nav-item">
-              <a class="nav-link px-2" v-bind:href="formattedLoginURL">{{
+              <a class="nav-link px-2" :href="formattedLoginURL">{{
                 T.navLogIn
               }}</a>
             </li>
@@ -223,8 +223,8 @@
             ></omegaup-notifications-clarifications>
             -->
             <omegaup-notification-list
-              v-bind:notifications="notifications"
-              v-on:read="readNotifications"
+              :notifications="notifications"
+              @read="readNotifications"
             ></omegaup-notification-list>
             <li class="nav-item dropdown nav-user" data-nav-right>
               <a
@@ -236,15 +236,15 @@
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                <img v-bind:src="gravatarURL51" height="45" class="mr-2" /><span
+                <img :src="gravatarURL51" height="45" class="mr-2" /><span
                   class="username"
-                  v-bind:title="currentUsername"
+                  :title="currentUsername"
                   >{{ currentUsername }}</span
                 >
                 <omegaup-common-grader-badge
                   v-show="isAdmin"
-                  v-bind:queueLength="graderQueueLength"
-                  v-bind:error="errorMessage !== null"
+                  :queueLength="graderQueueLength"
+                  :error="errorMessage !== null"
                 ></omegaup-common-grader-badge>
               </a>
               <div class="dropdown-menu dropdown-menu-right">
@@ -255,14 +255,14 @@
                     data-nav-profile
                     href="/profile/"
                   >
-                    <font-awesome-icon v-bind:icon="['fas', 'user']" />
+                    <font-awesome-icon :icon="['fas', 'user']" />
                     {{ T.navViewProfile }}
                     <div v-if="profileProgress !== 0" class="progress mt-2">
                       <div
                         class="progress-bar progress-bar-striped bg-info"
                         role="progressbar"
-                        v-bind:style="{ width: `${profileProgress}%` }"
-                        v-bind:aria-valuenow="profileProgress"
+                        :style="{ width: `${profileProgress}%` }"
+                        :aria-valuenow="profileProgress"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       ></div>
@@ -297,14 +297,14 @@
                   }}</a>
                 </template>
                 <a class="dropdown-item" href="/logout/">
-                  <font-awesome-icon v-bind:icon="['fas', 'sign-out-alt']" />
+                  <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
                   {{ T.navLogOut }}
                 </a>
                 <omegaup-common-grader-status
                   v-show="isAdmin"
-                  v-bind:status="errorMessage !== null ? 'down' : 'ok'"
-                  v-bind:error="errorMessage"
-                  v-bind:graderInfo="graderInfo"
+                  :status="errorMessage !== null ? 'down' : 'ok'"
+                  :error="errorMessage"
+                  :graderInfo="graderInfo"
                 ></omegaup-common-grader-status>
               </div>
             </li>

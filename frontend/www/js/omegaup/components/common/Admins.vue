@@ -1,18 +1,18 @@
 <template>
   <div class="card mb-3 panel panel-primary">
     <div class="card-body panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label class="font-weight-bold"
             >{{ T.wordsAdmin }}
             <font-awesome-icon
-              v-bind:title="T.courseEditAddAdminsTooltip"
+              :title="T.courseEditAddAdminsTooltip"
               icon="info-circle"
             />
             <omegaup-autocomplete
               v-model="username"
               class="form-control"
-              v-bind:init="(el) => typeahead.userTypeahead(el)"
+              :init="(el) => typeahead.userTypeahead(el)"
             ></omegaup-autocomplete>
           </label>
         </div>
@@ -52,12 +52,12 @@
         <template v-for="admin in admins">
           <tr
             v-if="admin.role !== 'site-admin' || showSiteAdmins"
-            v-bind:key="admin.username"
+            :key="admin.username"
           >
             <td>
               <omegaup-user-username
-                v-bind:linkify="true"
-                v-bind:username="admin.username"
+                :linkify="true"
+                :username="admin.username"
               ></omegaup-user-username>
             </td>
             <td>{{ admin.role }}</td>
@@ -66,7 +66,7 @@
                 v-if="admin.role === 'admin'"
                 type="button"
                 class="close"
-                v-on:click="onRemove(admin)"
+                @click="onRemove(admin)"
               >
                 &times;
               </button>

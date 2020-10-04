@@ -25,7 +25,7 @@
           <button
             type="button"
             class="btn btn-primary form-control"
-            v-on:click.prevent="
+            @click.prevent="
               $emit(
                 'reset-password',
                 email,

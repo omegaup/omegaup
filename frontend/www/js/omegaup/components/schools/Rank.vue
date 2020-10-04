@@ -21,15 +21,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(school, index) in rank" v-bind:key="index">
+        <tr v-for="(school, index) in rank" :key="index">
           <th scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
           <td class="text-truncate">
             <omegaup-countryflag
-              v-bind:country="school.country_id"
+              :country="school.country_id"
             ></omegaup-countryflag>
-            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+            <a :href="`/schools/profile/${school.school_id}/`">{{
               school.name
             }}</a>
           </td>
@@ -44,7 +44,7 @@
     </div>
     <div v-else class="card-footer">
       <omegaup-common-paginator
-        v-bind:pagerItems="pagerItems"
+        :pagerItems="pagerItems"
       ></omegaup-common-paginator>
     </div>
   </div>

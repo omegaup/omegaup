@@ -6,9 +6,9 @@
           v-model="radioValue"
           class="form-check-input"
           type="radio"
-          v-bind:name="name"
-          v-bind:value="valueForTrue"
-          v-on:change.prevent="onUpdateInput"
+          :name="name"
+          :value="valueForTrue"
+          @change.prevent="onUpdateInput"
         />{{ textForTrue }}
       </label>
     </div>
@@ -18,9 +18,9 @@
           v-model="radioValue"
           class="form-check-input"
           type="radio"
-          v-bind:name="name"
-          v-bind:value="valueForFalse"
-          v-on:change.prevent="onUpdateInput"
+          :name="name"
+          :value="valueForFalse"
+          @change.prevent="onUpdateInput"
         />{{ textForFalse }}
       </label>
     </div>

@@ -6,8 +6,8 @@
     >
       <img
         class="col-lg-6 badge-icon"
-        v-bind:class="{ 'badge-icon-gray': !badge.assignation_time }"
-        v-bind:src="iconUrl"
+        :class="{ 'badge-icon-gray': !badge.assignation_time }"
+        :src="iconUrl"
       />
       <figcaption class="col-lg-6 p-0 mt-4 mt-lg-0 badge-description">
         {{ description }}

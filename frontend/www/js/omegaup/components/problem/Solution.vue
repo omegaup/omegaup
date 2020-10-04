@@ -2,8 +2,8 @@
   <div class="card">
     <omegaup-markdown
       v-if="showSolution"
-      v-bind:markdown="solution.markdown"
-      v-bind:image-mapping="solution.images"
+      :markdown="solution.markdown"
+      :image-mapping="solution.images"
     ></omegaup-markdown>
     <div v-else class="interstitial">
       <p v-html="statusMessage"></p>
@@ -20,7 +20,7 @@
         <button
           v-if="status === 'unlocked'"
           class="btn btn-primary btn-md"
-          v-on:click="$emit('get-solution')"
+          @click="$emit('get-solution')"
         >
           {{ T.wordsSeeSolution }}
         </button>
@@ -31,14 +31,14 @@
             availableTokens === null
           "
           class="btn btn-primary btn-md"
-          v-on:click="$emit('get-tokens')"
+          @click="$emit('get-tokens')"
         >
           {{ T.solutionViewCurrentTokens }}
         </button>
         <button
           v-else-if="status === 'locked' && availableTokens &gt; 0"
           class="btn btn-primary btn-md"
-          v-on:click="$emit('unlock-solution')"
+          @click="$emit('unlock-solution')"
         >
           {{ T.wordsUnlockSolution }}
         </button>

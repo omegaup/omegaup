@@ -3,10 +3,10 @@
     ref="input"
     class="typeahead form-control"
     autocomplete="off"
-    v-bind:placeholder="placeholder"
-    v-bind:name="name"
-    v-bind:value="value"
-    v-on:change="onUpdateInput"
+    :placeholder="placeholder"
+    :name="name"
+    :value="value"
+    @change="onUpdateInput"
   />
 </template>
 

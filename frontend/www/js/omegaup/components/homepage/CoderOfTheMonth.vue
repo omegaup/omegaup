@@ -2,7 +2,7 @@
   <div class="card h-100">
     <div
       class="d-flex justify-content-between card-header"
-      v-bind:class="`card-header-${category}`"
+      :class="`card-header-${category}`"
     >
       <h5 class="m-0">
         {{
@@ -13,7 +13,7 @@
         class="card-header-help"
         href="https://blog.omegaup.com/reglas-del-coder-del-mes/"
       >
-        <font-awesome-icon v-bind:icon="['fas', 'info-circle']" />
+        <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
     </div>
     <div
@@ -21,16 +21,16 @@
     >
       <a
         v-if="!coderOfTheMonth.is_private"
-        v-bind:href="`/profile/${coderOfTheMonth.username}/`"
+        :href="`/profile/${coderOfTheMonth.username}/`"
       >
-        <img v-bind:src="coderOfTheMonth.gravatar_92" height="80" />
+        <img :src="coderOfTheMonth.gravatar_92" height="80" />
       </a>
       <h5 class="card-title">
         <omegaup-user-username
-          v-bind:classname="coderOfTheMonth.classname"
-          v-bind:linkify="true"
-          v-bind:username="coderOfTheMonth.username"
-          v-bind:country="coderOfTheMonth.country_id"
+          :classname="coderOfTheMonth.classname"
+          :linkify="true"
+          :username="coderOfTheMonth.username"
+          :country="coderOfTheMonth.country_id"
         ></omegaup-user-username>
       </h5>
       <template v-if="!coderOfTheMonth.is_private">
@@ -38,7 +38,7 @@
           {{ coderOfTheMonth.name }}
         </div>
         <div v-if="coderOfTheMonth.school" class="card-text">
-          <a v-bind:href="`/schools/profile/${coderOfTheMonth.school_id}/`">
+          <a :href="`/schools/profile/${coderOfTheMonth.school_id}/`">
             {{ coderOfTheMonth.school }}
           </a>
         </div>
@@ -52,7 +52,7 @@
     </div>
     <div class="card-footer">
       <a
-        v-bind:href="
+        :href="
           category == 'female'
             ? '/coderofthemonth/female/'
             : '/coderofthemonth/'

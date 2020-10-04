@@ -11,8 +11,8 @@
         <div class="row">
           <omegaup-badge
             v-for="(badge, idx) in badges"
-            v-bind:key="idx"
-            v-bind:badge="badge"
+            :key="idx"
+            :badge="badge"
           ></omegaup-badge>
         </div>
       </div>

@@ -25,7 +25,7 @@
                 v-model="shouldShowAllContests"
                 class="form-check-input"
                 type="checkbox"
-                v-on:change.prevent="
+                @change.prevent="
                   $emit('change-show-all-contests', shouldShowAllContests)
                 "
               />
@@ -35,7 +35,7 @@
           <select
             v-model="allContestsVisibilityOption"
             class="custom-select col-5"
-            v-on:change="onChangeAdmissionMode"
+            @change="onChangeAdmissionMode"
           >
             <option selected value="none">{{ T.forSelectedItems }}</option>
             <option value="public">{{ T.makePublic }}</option>
@@ -74,23 +74,23 @@
                 <input
                   v-model="selectedContests"
                   type="checkbox"
-                  v-bind:value="contest.alias"
+                  :value="contest.alias"
                 />
                 <div class="d-inline-block ml-2">
-                  <a class="mr-1" v-bind:href="`/arena/${contest.alias}/`">{{
+                  <a class="mr-1" :href="`/arena/${contest.alias}/`">{{
                     ui.contestTitle(contest)
                   }}</a>
                 </div>
               </td>
               <td>
                 <a
-                  v-bind:href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`"
+                  :href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.start_time.toISOString()}`"
                   >{{ time.formatDateTime(contest.start_time) }}</a
                 >
               </td>
               <td>
                 <a
-                  v-bind:href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`"
+                  :href="`https://timeanddate.com/worldclock/fixedtime.html?iso='${contest.finish_time.toISOString()}`"
                   >{{ time.formatDateTime(contest.finish_time) }}</a
                 >
               </td>
@@ -100,72 +100,59 @@
               <td>
                 <a
                   v-if="contest.scoreboard_url"
-                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
+                  :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}/`"
                 >
                   <font-awesome-icon
-                    v-bind:title="T.contestScoreboardLink"
-                    v-bind:icon="['fas', 'link']"
+                    :title="T.contestScoreboardLink"
+                    :icon="['fas', 'link']"
                   />{{ T.wordsPublic }}
                 </a>
                 <a
                   v-if="contest.scoreboard_url_admin"
                   class="ml-1"
-                  v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
+                  :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}/`"
                 >
                   <font-awesome-icon
-                    v-bind:title="T.contestScoreboardAdminLink"
-                    v-bind:icon="['fas', 'link']"
+                    :title="T.contestScoreboardAdminLink"
+                    :icon="['fas', 'link']"
                   />{{ T.wordsAdmin }}
                 </a>
               </td>
               <td>
-                <a v-bind:href="`/contest/${contest.alias}/edit/`">
+                <a :href="`/contest/${contest.alias}/edit/`">
                   <font-awesome-icon
-                    v-bind:title="T.wordsEdit"
-                    v-bind:icon="['fas', 'edit']"
+                    :title="T.wordsEdit"
+                    :icon="['fas', 'edit']"
                   />
                 </a>
-                <a
-                  class="ml-2"
-                  v-bind:href="`/arena/${contest.alias}/admin/#runs`"
-                >
+                <a class="ml-2" :href="`/arena/${contest.alias}/admin/#runs`">
                   <font-awesome-icon
-                    v-bind:title="T.contestListSubmissions"
-                    v-bind:icon="['fas', 'tachometer-alt']"
+                    :title="T.contestListSubmissions"
+                    :icon="['fas', 'tachometer-alt']"
                   />
                 </a>
-                <a
-                  class="ml-2"
-                  v-bind:href="`/contest/${contest.alias}/stats/`"
-                >
+                <a class="ml-2" :href="`/contest/${contest.alias}/stats/`">
                   <font-awesome-icon
-                    v-bind:title="T.profileStatistics"
-                    v-bind:icon="['fas', 'chart-bar']"
+                    :title="T.profileStatistics"
+                    :icon="['fas', 'chart-bar']"
                   />
                 </a>
-                <a
-                  class="ml-2"
-                  v-bind:href="`/contest/${contest.alias}/activity/`"
-                >
+                <a class="ml-2" :href="`/contest/${contest.alias}/activity/`">
                   <font-awesome-icon
-                    v-bind:title="T.activityReport"
-                    v-bind:icon="['fas', 'clock']"
+                    :title="T.activityReport"
+                    :icon="['fas', 'clock']"
                   />
                 </a>
-                <a class="ml-2" v-bind:href="`/arena/${contest.alias}/print/`">
+                <a class="ml-2" :href="`/arena/${contest.alias}/print/`">
                   <font-awesome-icon
-                    v-bind:title="T.contestPrintableVersion"
-                    v-bind:icon="['fas', 'print']"
+                    :title="T.contestPrintableVersion"
+                    :icon="['fas', 'print']"
                   />
                 </a>
-                <a
-                  class="ml-2"
-                  href="#"
-                  v-on:click="onDownloadCsv(contest.alias)"
-                >
+                <a class="ml-2" href="#" @click="onDownloadCsv(contest.alias)">
                   <font-awesome-icon
-                    v-bind:title="T.contestDownloadListOfUsersInContest"
-                    v-bind:icon="['fas', 'file-download']"
+                    :title="T.contestDownloadListOfUsersInContest"
+                    :icon="['fas', 'file-download']"
                   />
                 </a>
               </td>

@@ -1,18 +1,18 @@
 <template>
   <div class="card panel panel-primary">
     <div class="card-body panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label class="font-weight-bold"
             >{{ T.wordsGroupAdmin }}
             <font-awesome-icon
-              v-bind:title="T.courseEditAddGroupAdminsTooltip"
+              :title="T.courseEditAddGroupAdminsTooltip"
               icon="info-circle"
             />
             <omegaup-autocomplete
               class="form-control"
-              v-bind:init="(el) => typeahead.groupTypeahead(el)"
-              v-bind:value.sync="groupAlias"
+              :init="(el) => typeahead.groupTypeahead(el)"
+              :value.sync="groupAlias"
             ></omegaup-autocomplete>
           </label>
         </div>
@@ -37,7 +37,7 @@
       <tbody>
         <tr v-for="groupAdmin in groupAdmins">
           <td>
-            <a v-bind:href="`/group/${groupAdmin.alias}/edit/`">
+            <a :href="`/group/${groupAdmin.alias}/edit/`">
               {{ groupAdmin.name }}
             </a>
           </td>
@@ -47,7 +47,7 @@
               v-if="groupAdmin.name !== 'admin'"
               class="close"
               type="button"
-              v-on:click="onRemove(groupAdmin)"
+              @click="onRemove(groupAdmin)"
             >
               &times;
             </button>

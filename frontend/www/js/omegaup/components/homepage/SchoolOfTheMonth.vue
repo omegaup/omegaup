@@ -8,7 +8,7 @@
         class="card-header-help"
         href="https://blog.omegaup.com/el-nuevo-ranking-de-escuelas-de-omegaup/"
       >
-        <font-awesome-icon v-bind:icon="['fas', 'info-circle']" />
+        <font-awesome-icon :icon="['fas', 'info-circle']" />
       </a>
     </div>
     <div
@@ -17,9 +17,9 @@
       <h5 class="card-title">
         <omegaup-countryflag
           v-if="schoolOfTheMonth.country_id !== null"
-          v-bind:country="schoolOfTheMonth.country_id"
+          :country="schoolOfTheMonth.country_id"
         ></omegaup-countryflag>
-        <a v-bind:href="`/schools/profile/${schoolOfTheMonth.school_id}/`">{{
+        <a :href="`/schools/profile/${schoolOfTheMonth.school_id}/`">{{
           schoolOfTheMonth.name
         }}</a>
       </h5>

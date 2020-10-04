@@ -11,13 +11,13 @@
         >
           <thead>
             <tr>
-              <th v-bind:colspan="NUM_COLUMNS">{{ user }}</th>
+              <th :colspan="NUM_COLUMNS">{{ user }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="groups in problems">
               <td v-for="problem in groups">
-                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+                <a :href="`/arena/problem/${problem.alias}/`">{{
                   problem.title
                 }}</a>
               </td>
@@ -36,13 +36,13 @@
         >
           <thead>
             <tr>
-              <th v-bind:colspan="NUM_COLUMNS">{{ user }}</th>
+              <th :colspan="NUM_COLUMNS">{{ user }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="groups in problems">
               <td v-for="problem in groups">
-                <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+                <a :href="`/arena/problem/${problem.alias}/`">{{
                   problem.title
                 }}</a>
               </td>

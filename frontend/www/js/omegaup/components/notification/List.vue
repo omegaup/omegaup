@@ -8,7 +8,7 @@
       href="#"
       role="button"
     >
-      <font-awesome-icon v-bind:icon="['fas', 'bell']" />
+      <font-awesome-icon :icon="['fas', 'bell']" />
       <span
         v-show="!!notifications.length"
         class="badge badge-danger count-badge"
@@ -29,16 +29,16 @@
           v-else
           class="dropdown-item"
           href="#"
-          v-on:click="$emit('read', notifications, null)"
+          @click="$emit('read', notifications, null)"
         >
           {{ T.notificationsMarkAllAsRead }} ✔️
         </a>
         <transition-group name="list"
           ><omegaup-notification
             v-for="notification in notifications"
-            v-bind:key="notification.notification_id"
-            v-bind:notification="notification"
-            v-on:remove="readSingleNotification"
+            :key="notification.notification_id"
+            :notification="notification"
+            @remove="readSingleNotification"
           ></omegaup-notification
         ></transition-group>
       </form>

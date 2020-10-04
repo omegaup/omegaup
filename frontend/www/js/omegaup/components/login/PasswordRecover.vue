@@ -14,7 +14,7 @@
         </div>
         <button
           class="btn btn-primary form-control"
-          v-on:click.prevent="$emit('forgot-password', email)"
+          @click.prevent="$emit('forgot-password', email)"
         >
           {{ T.wordsSend }}
         </button>

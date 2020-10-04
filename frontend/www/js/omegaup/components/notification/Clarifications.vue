@@ -11,7 +11,7 @@
       <span
         v-if="clarifications && clarifications.length > 0"
         class="notification-counter label"
-        v-bind:class="{ 'label-danger': clarifications.length > 0 }"
+        :class="{ 'label-danger': clarifications.length > 0 }"
         >{{ clarifications.length }}</span
       ></a
     >
@@ -23,14 +23,14 @@
         <ul class="notification-drawer">
           <li v-for="clarification in clarifications">
             <button
-              v-bind:aria-label="T.wordsClose"
+              :aria-label="T.wordsClose"
               class="close"
               type="button"
-              v-on:click.prevent="onCloseClicked(clarification)"
+              @click.prevent="onCloseClicked(clarification)"
             >
               <span aria-hidden="true">×</span>
             </button>
-            <a v-bind:href="anchor(clarification)"
+            <a :href="anchor(clarification)"
               ><span>{{ clarification.problem_alias }}</span> —
               <span>{{ clarification.author }}</span>
               <pre>{{ clarification.message }}</pre>
@@ -45,7 +45,7 @@
       <template v-if="clarifications && clarifications.length > 1">
         <li class="divider" role="separator"></li>
         <li>
-          <a href="#" v-on:click.prevent="onMarkAllAsRead"
+          <a href="#" @click.prevent="onMarkAllAsRead"
             ><span class="glyphicon glyphicon-align-right"></span>
             {{ T.notificationsMarkAllAsRead }}</a
           >
