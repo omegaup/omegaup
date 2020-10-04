@@ -278,43 +278,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-caption {
-  caption-side: top;
-}
-
-.runs {
-  width: 100%;
-  border: 1px solid #ccc;
-  margin-top: 2em;
-}
-
-.runs caption {
-  font-weight: bold;
-  font-size: 1em;
-  margin-bottom: 1em;
-}
-
-.runs td,
-.runs th {
-  border: 1px solid #ccc;
-  border-width: 1px 0;
-  text-align: center;
-}
-
-.runs tfoot td a {
-  display: block;
-  padding: 0.5em;
-  text-decoration: none;
-  color: #000;
-  background: #ccc;
-  text-align: center;
-}
-.runs tfoot td a:hover {
-  background: #fff;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
 import T from '../../lang';
@@ -682,3 +645,40 @@ export default class Runs extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+caption {
+  caption-side: top;
+}
+
+.runs {
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-top: 2em;
+}
+
+.runs caption {
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+.runs td,
+.runs th {
+  border: 1px solid #ccc;
+  border-width: 1px 0;
+  text-align: center;
+}
+
+.runs tfoot td a {
+  display: block;
+  padding: 0.5em;
+  text-decoration: none;
+  color: #000;
+  background: #ccc;
+  text-align: center;
+}
+.runs tfoot td a:hover {
+  background: #fff;
+}
+</style>

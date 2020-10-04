@@ -74,26 +74,6 @@
   </div>
 </template>
 
-<style>
-.merged-scoreboard {
-  background: white;
-}
-
-.merged-scoreboard td {
-  text-align: center;
-}
-
-.scoreboard-penalty {
-  padding-left: 0.5em;
-  opacity: 0.7;
-  color: red;
-}
-
-.post {
-  overflow-x: scroll;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -117,3 +97,23 @@ export default class ScoreboardMerge extends Vue {
   }
 }
 </script>
+
+<style>
+.merged-scoreboard {
+  background: white;
+}
+
+.merged-scoreboard td {
+  text-align: center;
+}
+
+.scoreboard-penalty {
+  padding-left: 0.5em;
+  opacity: 0.7;
+  color: red;
+}
+
+.post {
+  overflow-x: scroll;
+}
+</style>

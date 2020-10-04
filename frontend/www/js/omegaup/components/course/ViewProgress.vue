@@ -64,16 +64,6 @@
   <!-- panel -->
 </template>
 
-<style>
-.panel-body {
-  overflow: auto;
-  white-space: nowrap;
-}
-.sticky-offset {
-  top: 4rem;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -285,3 +275,13 @@ export default class CourseViewProgress extends Vue {
   }
 }
 </script>
+
+<style>
+.panel-body {
+  overflow: auto;
+  white-space: nowrap;
+}
+.sticky-offset {
+  top: 4rem;
+}
+</style>

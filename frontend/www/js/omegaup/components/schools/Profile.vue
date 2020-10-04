@@ -75,17 +75,6 @@
   </div>
 </template>
 
-<style>
-.list-group-item strong {
-  display: inline-block;
-  width: 60px;
-}
-
-.rank-number {
-  color: gray;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -162,3 +151,14 @@ export default class SchoolProfile extends Vue {
   }
 }
 </script>
+
+<style>
+.list-group-item strong {
+  display: inline-block;
+  width: 60px;
+}
+
+.rank-number {
+  color: gray;
+}
+</style>

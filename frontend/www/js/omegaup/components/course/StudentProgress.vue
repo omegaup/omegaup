@@ -38,32 +38,6 @@
   </tr>
 </template>
 
-<style lang="scss">
-@import '../../../../sass/main.scss';
-
-.box {
-  width: 20px;
-  height: 20px;
-  border: 1px solid $omegaup-dark-grey;
-}
-
-.bg-green {
-  background: $omegaup-green;
-}
-
-.bg-yellow {
-  background: yellow;
-}
-
-.bg-red {
-  background: red;
-}
-
-.bg-black {
-  background: $omegaup-grey;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -181,3 +155,29 @@ export default class StudentProgress extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+.box {
+  width: 20px;
+  height: 20px;
+  border: 1px solid $omegaup-dark-grey;
+}
+
+.bg-green {
+  background: $omegaup-green;
+}
+
+.bg-yellow {
+  background: yellow;
+}
+
+.bg-red {
+  background: red;
+}
+
+.bg-black {
+  background: $omegaup-grey;
+}
+</style>

@@ -63,19 +63,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-.card-header {
-  color: white;
-  background-color: #5588dd;
-
-  &.card-header-female {
-    background-color: #8855dd;
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -100,3 +87,16 @@ export default class CoderOfTheMonth extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.card-header {
+  color: white;
+  background-color: #5588dd;
+
+  &.card-header-female {
+    background-color: #8855dd;
+  }
+}
+</style>

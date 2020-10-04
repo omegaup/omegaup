@@ -38,6 +38,17 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+@Component
+export default class Paginator extends Vue {
+  @Prop() question!: string;
+  @Prop() answerYes!: string;
+  @Prop() answerNo!: string;
+}
+</script>
+
 <style>
 .mask {
   position: fixed;
@@ -56,14 +67,3 @@
   position: absolute;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-
-@Component
-export default class Paginator extends Vue {
-  @Prop() question!: string;
-  @Prop() answerYes!: string;
-  @Prop() answerNo!: string;
-}
-</script>

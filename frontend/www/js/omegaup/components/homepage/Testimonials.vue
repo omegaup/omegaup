@@ -59,6 +59,18 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
+import T from '../../lang';
+import testimonialsConfig from '../../testimonials.config';
+
+@Component
+export default class Testimonials extends Vue {
+  T = T;
+  testimonials = testimonialsConfig;
+}
+</script>
+
 <style lang="scss" scoped>
 .carousel-inner {
   min-height: 12rem;
@@ -75,15 +87,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import T from '../../lang';
-import testimonialsConfig from '../../testimonials.config';
-
-@Component
-export default class Testimonials extends Vue {
-  T = T;
-  testimonials = testimonialsConfig;
-}
-</script>

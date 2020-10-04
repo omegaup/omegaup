@@ -69,101 +69,6 @@
   </transition>
 </template>
 
-<style>
-.modal-mask {
-  position: fixed;
-  z-index: 99999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  transition: opacity 0.3s ease;
-}
-
-.modal-container {
-  background: #eee;
-  width: 800px;
-  margin: 2.5em auto 0;
-  border: 2px solid #ccc;
-  padding: 1em;
-  position: relative;
-  overflow: auto;
-}
-
-.close {
-  float: none;
-  text-align: right;
-  width: 100%;
-}
-
-.wizard-tab-content {
-  text-align: center;
-}
-
-.tags-input {
-  margin: 1em 0 3em;
-}
-
-.tags-input input {
-  padding-left: 0.25em;
-}
-
-.tags-input-remove {
-  width: 1rem;
-  height: 1rem;
-}
-
-.tags-input-badge {
-  font-size: 1em;
-}
-
-.typeahead-badges {
-  margin-top: 0.35em;
-}
-
-.tags-input-remove:before,
-.tags-input-remove:after,
-.tags-input-typeahead-item-highlighted-default,
-.vue-slider-process {
-  background-color: #678dd7;
-}
-
-.vue-slider {
-  margin: 1em 2em 5em;
-}
-
-.vue-slider-rail {
-  height: 12.5px;
-}
-
-.tab-select {
-  margin: 2em 3em 3em;
-  width: 90%;
-  display: flex;
-}
-
-.tab-select-el {
-  display: block;
-  cursor: pointer;
-  padding: 0.25em 1em;
-  border: 1px solid #678dd7;
-  flex: 1;
-  text-align: center;
-  color: #678dd7;
-}
-
-.tab-select-el:hover,
-.tab-select-el-active {
-  color: #fff;
-  background: #678dd7;
-}
-
-.hidden-radio {
-  display: none;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -261,3 +166,98 @@ export default class ProblemFinderWizard extends Vue {
   }
 }
 </script>
+
+<style>
+.modal-mask {
+  position: fixed;
+  z-index: 99999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease;
+}
+
+.modal-container {
+  background: #eee;
+  width: 800px;
+  margin: 2.5em auto 0;
+  border: 2px solid #ccc;
+  padding: 1em;
+  position: relative;
+  overflow: auto;
+}
+
+.close {
+  float: none;
+  text-align: right;
+  width: 100%;
+}
+
+.wizard-tab-content {
+  text-align: center;
+}
+
+.tags-input {
+  margin: 1em 0 3em;
+}
+
+.tags-input input {
+  padding-left: 0.25em;
+}
+
+.tags-input-remove {
+  width: 1rem;
+  height: 1rem;
+}
+
+.tags-input-badge {
+  font-size: 1em;
+}
+
+.typeahead-badges {
+  margin-top: 0.35em;
+}
+
+.tags-input-remove:before,
+.tags-input-remove:after,
+.tags-input-typeahead-item-highlighted-default,
+.vue-slider-process {
+  background-color: #678dd7;
+}
+
+.vue-slider {
+  margin: 1em 2em 5em;
+}
+
+.vue-slider-rail {
+  height: 12.5px;
+}
+
+.tab-select {
+  margin: 2em 3em 3em;
+  width: 90%;
+  display: flex;
+}
+
+.tab-select-el {
+  display: block;
+  cursor: pointer;
+  padding: 0.25em 1em;
+  border: 1px solid #678dd7;
+  flex: 1;
+  text-align: center;
+  color: #678dd7;
+}
+
+.tab-select-el:hover,
+.tab-select-el-active {
+  color: #fff;
+  background: #678dd7;
+}
+
+.hidden-radio {
+  display: none;
+}
+</style>

@@ -151,6 +151,68 @@
   </form>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import arena_CodeView from './CodeView.vue';
+import arena_DiffView from './DiffView.vue';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faChevronCircleUp,
+  faChevronCircleDown,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faChevronCircleUp);
+library.add(faChevronCircleDown);
+
+interface GroupVisibility {
+  [name: string]: boolean;
+}
+
+const EMPTY_FIELD = '∅';
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+    'omegaup-arena-code-view': arena_CodeView,
+    'omegaup-arena-diff-view': arena_DiffView,
+  },
+})
+export default class ArenaRunDetails extends Vue {
+  @Prop() data!: types.RunDetails;
+
+  EMPTY_FIELD = EMPTY_FIELD;
+  T = T;
+  groupVisible: GroupVisibility = {};
+
+  toggle(group: string): void {
+    const visible = this.groupVisible[group];
+    this.$set(this.groupVisible, group, !visible);
+  }
+
+  showDataCase(
+    cases: types.ProblemCasesContents,
+    caseName: string,
+    caseType: 'in' | 'out' | 'contestantOutput',
+  ): string {
+    return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
+  }
+
+  shouldShowDiffs(caseName: string): boolean {
+    return (
+      this.data.show_diff === 'all' ||
+      (caseName === 'sample' && this.data.show_diff === 'examples')
+    );
+  }
+
+  getContestantOutput(cases: types.ProblemCasesContents, name: string): string {
+    return cases[name]?.contestantOutput ?? '';
+  }
+}
+</script>
+
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
@@ -289,65 +351,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
-import T from '../../lang';
-import arena_CodeView from './CodeView.vue';
-import arena_DiffView from './DiffView.vue';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-  faChevronCircleUp,
-  faChevronCircleDown,
-} from '@fortawesome/free-solid-svg-icons';
-library.add(faChevronCircleUp);
-library.add(faChevronCircleDown);
-
-interface GroupVisibility {
-  [name: string]: boolean;
-}
-
-const EMPTY_FIELD = '∅';
-
-@Component({
-  components: {
-    FontAwesomeIcon,
-    'omegaup-arena-code-view': arena_CodeView,
-    'omegaup-arena-diff-view': arena_DiffView,
-  },
-})
-export default class ArenaRunDetails extends Vue {
-  @Prop() data!: types.RunDetails;
-
-  EMPTY_FIELD = EMPTY_FIELD;
-  T = T;
-  groupVisible: GroupVisibility = {};
-
-  toggle(group: string): void {
-    const visible = this.groupVisible[group];
-    this.$set(this.groupVisible, group, !visible);
-  }
-
-  showDataCase(
-    cases: types.ProblemCasesContents,
-    caseName: string,
-    caseType: 'in' | 'out' | 'contestantOutput',
-  ): string {
-    return cases[caseName]?.[caseType] ?? EMPTY_FIELD;
-  }
-
-  shouldShowDiffs(caseName: string): boolean {
-    return (
-      this.data.show_diff === 'all' ||
-      (caseName === 'sample' && this.data.show_diff === 'examples')
-    );
-  }
-
-  getContestantOutput(cases: types.ProblemCasesContents, name: string): string {
-    return cases[name]?.contestantOutput ?? '';
-  }
-}
-</script>

@@ -105,15 +105,6 @@
   </div>
 </template>
 
-<style>
-.badges-container {
-  display: grid;
-  justify-content: space-between;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  grid-auto-rows: 180px;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -152,3 +143,12 @@ export default class UserProfile extends Vue {
   columns = 3;
 }
 </script>
+
+<style>
+.badges-container {
+  display: grid;
+  justify-content: space-between;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-auto-rows: 180px;
+}
+</style>

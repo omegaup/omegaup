@@ -215,15 +215,6 @@
   </div>
 </template>
 
-<style>
-.empty-category {
-  text-align: center;
-  font-size: 200%;
-  margin: 1em;
-  color: #aaa;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -275,3 +266,12 @@ export default class ArenaContestList extends Vue {
   }
 }
 </script>
+
+<style>
+.empty-category {
+  text-align: center;
+  font-size: 200%;
+  margin: 1em;
+  color: #aaa;
+}
+</style>

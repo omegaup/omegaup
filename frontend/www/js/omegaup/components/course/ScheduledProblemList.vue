@@ -84,12 +84,6 @@
   <!-- card -->
 </template>
 
-<style lang="scss" scoped>
-.form-group > label {
-  width: 100%;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -180,3 +174,9 @@ export default class CourseScheduledProblemList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.form-group > label {
+  width: 100%;
+}
+</style>

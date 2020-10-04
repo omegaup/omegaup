@@ -108,16 +108,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.disabled {
-  color: lightgrey;
-}
-
-.table td {
-  vertical-align: middle;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -180,3 +170,13 @@ export default class CourseAssignmentList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.disabled {
+  color: lightgrey;
+}
+
+.table td {
+  vertical-align: middle;
+}
+</style>

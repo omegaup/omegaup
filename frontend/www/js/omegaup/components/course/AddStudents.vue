@@ -86,12 +86,6 @@
   </div>
 </template>
 
-<style>
-.omegaup-course-addstudent th.align-right {
-  text-align: right;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -128,3 +122,9 @@ export default class CourseAddStudents extends Vue {
   }
 }
 </script>
+
+<style>
+.omegaup-course-addstudent th.align-right {
+  text-align: right;
+}
+</style>

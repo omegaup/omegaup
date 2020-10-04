@@ -69,6 +69,56 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+
+@Component
+export default class ProblemHistogram extends Vue {
+  @Prop() type!: string;
+  @Prop() histogram!: number[];
+  @Prop() score!: number;
+
+  T = T;
+
+  get tags(): string[] {
+    return this.type === 'quality'
+      ? [
+          T.qualityFormQualityVeryGood,
+          T.qualityFormQualityGood,
+          T.qualityFormQualityFair,
+          T.qualityFormQualityBad,
+          T.qualityFormQualityVeryBad,
+        ]
+      : [
+          T.qualityFormDifficultyVeryEasy,
+          T.qualityFormDifficultyEasy,
+          T.qualityFormDifficultyMedium,
+          T.qualityFormDifficultyHard,
+          T.qualityFormDifficultyVeryHard,
+        ];
+  }
+
+  get title(): string {
+    return this.type === 'quality' ? T.wordsQuality : T.wordsDifficulty;
+  }
+
+  get customHistogram(): number[] {
+    return this.type === 'quality' ? this.histogram.reverse() : this.histogram;
+  }
+
+  get totalVotes(): number {
+    return this.histogram.reduce((a: number, b: number) => a + b);
+  }
+
+  get barsWidth(): number[] {
+    const maxValue = Math.max(...this.histogram);
+    if (maxValue === 0) return [0, 0, 0, 0, 0];
+    return this.histogram.map((value) => (value / maxValue) * 100);
+  }
+}
+</script>
+
 <style>
 .omegaup-histogram-container {
   margin: 50px 0;
@@ -161,53 +211,3 @@
   background-image: linear-gradient(to right, #df3e4b 50%, transparent 50%);
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-
-@Component
-export default class ProblemHistogram extends Vue {
-  @Prop() type!: string;
-  @Prop() histogram!: number[];
-  @Prop() score!: number;
-
-  T = T;
-
-  get tags(): string[] {
-    return this.type === 'quality'
-      ? [
-          T.qualityFormQualityVeryGood,
-          T.qualityFormQualityGood,
-          T.qualityFormQualityFair,
-          T.qualityFormQualityBad,
-          T.qualityFormQualityVeryBad,
-        ]
-      : [
-          T.qualityFormDifficultyVeryEasy,
-          T.qualityFormDifficultyEasy,
-          T.qualityFormDifficultyMedium,
-          T.qualityFormDifficultyHard,
-          T.qualityFormDifficultyVeryHard,
-        ];
-  }
-
-  get title(): string {
-    return this.type === 'quality' ? T.wordsQuality : T.wordsDifficulty;
-  }
-
-  get customHistogram(): number[] {
-    return this.type === 'quality' ? this.histogram.reverse() : this.histogram;
-  }
-
-  get totalVotes(): number {
-    return this.histogram.reduce((a: number, b: number) => a + b);
-  }
-
-  get barsWidth(): number[] {
-    const maxValue = Math.max(...this.histogram);
-    if (maxValue === 0) return [0, 0, 0, 0, 0];
-    return this.histogram.map((value) => (value / maxValue) * 100);
-  }
-}
-</script>

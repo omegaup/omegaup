@@ -36,15 +36,6 @@
   </div>
 </template>
 
-<style scoped>
-.form-group > label {
-  width: 100%;
-}
-.faux-label {
-  font-weight: bold;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -77,3 +68,12 @@ export default class CourseClone extends Vue {
   name = this.initialName;
 }
 </script>
+
+<style scoped>
+.form-group > label {
+  width: 100%;
+}
+.faux-label {
+  font-weight: bold;
+}
+</style>

@@ -97,14 +97,6 @@
   </div>
 </template>
 
-<style lang="scss">
-@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
-.wmd-preview,
-.wmd-button-bar {
-  background-color: #fff;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Emit, Prop, Watch, Ref } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -211,3 +203,11 @@ export default class ProblemStatementEdit extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+.wmd-preview,
+.wmd-button-bar {
+  background-color: #fff;
+}
+</style>

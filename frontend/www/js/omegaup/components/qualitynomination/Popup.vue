@@ -120,97 +120,6 @@
   </div>
 </template>
 
-<style>
-.qualitynomination-popup .popup {
-  position: fixed;
-  bottom: 10px;
-  right: 4%;
-  z-index: 9999999 !important;
-  margin: 2em auto 0 auto;
-  border: 2px solid #ccc;
-  padding: 1em;
-  overflow: auto;
-  background: #fff;
-}
-
-.qualitynomination-popup .control-label {
-  width: 100%;
-}
-
-.qualitynomination-popup .button-row {
-  margin: 4px 0;
-}
-
-.qualitynomination-popup .fade-enter-active,
-.qualitynomination-popup .fade-leave-active {
-  transition: opacity 0.5s;
-}
-
-.qualitynomination-popup .fade-enter,
-.qualitynomination-popup .fade-leave-to {
-  opacity: 0;
-}
-
-.qualitynomination-popup .required .control-label:before {
-  content: '*';
-  color: red;
-  position: absolute;
-  margin-left: -10px;
-}
-
-.qualitynomination-popup .title-text {
-  font-weight: bold;
-  font-size: 20px;
-  padding-bottom: 8px;
-  text-align: center;
-}
-
-.qualitynomination-popup .tags-container {
-  height: 148px;
-}
-
-.qualitynomination-popup .thanks-title {
-  display: block;
-  font-size: 2em;
-  font-weight: bold;
-  padding-left: 140px;
-  padding-top: 148px;
-}
-
-ul.tag-select {
-  height: 185px;
-  overflow: auto;
-  border: 1px solid #ccc;
-}
-
-ul.tag-select {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
-li.tag-select {
-  margin: 0;
-  padding: 0;
-}
-
-label.tag-select {
-  font-weight: normal;
-  display: block;
-  color: WindowText;
-  background-color: Window;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-label.tag-select:hover {
-  background-color: Highlight;
-  color: HighlightText;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
@@ -357,3 +266,94 @@ export default class QualityNominationPopup extends Vue {
   }
 }
 </script>
+
+<style>
+.qualitynomination-popup .popup {
+  position: fixed;
+  bottom: 10px;
+  right: 4%;
+  z-index: 9999999 !important;
+  margin: 2em auto 0 auto;
+  border: 2px solid #ccc;
+  padding: 1em;
+  overflow: auto;
+  background: #fff;
+}
+
+.qualitynomination-popup .control-label {
+  width: 100%;
+}
+
+.qualitynomination-popup .button-row {
+  margin: 4px 0;
+}
+
+.qualitynomination-popup .fade-enter-active,
+.qualitynomination-popup .fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.qualitynomination-popup .fade-enter,
+.qualitynomination-popup .fade-leave-to {
+  opacity: 0;
+}
+
+.qualitynomination-popup .required .control-label:before {
+  content: '*';
+  color: red;
+  position: absolute;
+  margin-left: -10px;
+}
+
+.qualitynomination-popup .title-text {
+  font-weight: bold;
+  font-size: 20px;
+  padding-bottom: 8px;
+  text-align: center;
+}
+
+.qualitynomination-popup .tags-container {
+  height: 148px;
+}
+
+.qualitynomination-popup .thanks-title {
+  display: block;
+  font-size: 2em;
+  font-weight: bold;
+  padding-left: 140px;
+  padding-top: 148px;
+}
+
+ul.tag-select {
+  height: 185px;
+  overflow: auto;
+  border: 1px solid #ccc;
+}
+
+ul.tag-select {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+li.tag-select {
+  margin: 0;
+  padding: 0;
+}
+
+label.tag-select {
+  font-weight: normal;
+  display: block;
+  color: WindowText;
+  background-color: Window;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+label.tag-select:hover {
+  background-color: Highlight;
+  color: HighlightText;
+}
+</style>

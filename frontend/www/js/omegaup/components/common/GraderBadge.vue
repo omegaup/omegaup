@@ -4,32 +4,6 @@
   }}</span>
 </template>
 
-<style>
-.grader-error {
-  color: #b94a48;
-  background-image: linear-gradient(
-    rgb(242, 222, 222) 0px,
-    rgb(231, 195, 195) 100%
-  );
-  background-color: rgb(242, 222, 222);
-}
-
-.grader-ok {
-  color: #468847;
-  background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-
-.grader-warning {
-  color: #c09853;
-  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
-  border-color: #f5e79e;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
@@ -59,3 +33,29 @@ export default class GraderCountBadge extends Vue {
   }
 }
 </script>
+
+<style>
+.grader-error {
+  color: #b94a48;
+  background-image: linear-gradient(
+    rgb(242, 222, 222) 0px,
+    rgb(231, 195, 195) 100%
+  );
+  background-color: rgb(242, 222, 222);
+}
+
+.grader-ok {
+  color: #468847;
+  background-image: linear-gradient(
+    rgb(223, 240, 216) 0px,
+    rgb(200, 229, 188) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+
+.grader-warning {
+  color: #c09853;
+  background-image: linear-gradient(to bottom, #fcf8e3 0, #f8efc0 100%);
+  border-color: #f5e79e;
+}
+</style>

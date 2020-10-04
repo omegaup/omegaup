@@ -8,16 +8,6 @@
   ></codemirror-editor>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-.vue-codemirror-wrap {
-  height: 95%;
-  .CodeMirror {
-    height: 100%;
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
@@ -115,3 +105,13 @@ export default class CodeView extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.vue-codemirror-wrap {
+  height: 95%;
+  .CodeMirror {
+    height: 100%;
+  }
+}
+</style>

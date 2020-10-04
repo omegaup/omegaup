@@ -33,24 +33,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.close {
-  font-size: inherit;
-}
-
-.notification-date {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.notification-link {
-  cursor: pointer;
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -145,3 +127,21 @@ export default class Notification extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.close {
+  font-size: inherit;
+}
+
+.notification-date {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.notification-link {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+</style>

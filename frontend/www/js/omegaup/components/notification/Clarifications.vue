@@ -55,6 +55,75 @@
   </li>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+
+@Component
+export default class Clarifications extends Vue {
+  @Prop() initialClarifications!: types.Clarification[];
+  T = T;
+
+  flashInterval: number = 0;
+  clarifications: types.Clarification[] = this.initialClarifications;
+
+  @Watch('initialClarifications')
+  onPropertyChanged(newValue: types.Clarification[]): void {
+    this.clarifications = newValue;
+    const audio = <HTMLMediaElement>(
+      document.getElementById('notification-audio')
+    );
+    if (audio !== null) {
+      audio.play();
+    }
+  }
+
+  @Watch('clarifications')
+  onPropertyChange(newValue: types.Clarification[]): void {
+    if (newValue.length > 0) {
+      if (this.flashInterval) return;
+      this.flashInterval = setInterval(this.flashTitle, 1000);
+    } else {
+      if (!this.flashInterval) return;
+      clearInterval(this.flashInterval);
+      this.flashInterval = 0;
+      if (document.title.indexOf('!') === 0) {
+        document.title = document.title.substring(2);
+      }
+    }
+  }
+
+  anchor(clarification: types.Clarification): string {
+    return `#clarifications/clarification-${clarification.clarification_id}`;
+  }
+
+  flashTitle(reset: boolean): void {
+    if (document.title.indexOf('!') === 0) {
+      document.title = document.title.substring(2);
+    } else if (!reset) {
+      document.title = `! ${document.title}`;
+    }
+  }
+
+  onCloseClicked(clarification: types.Clarification): void {
+    const id = `clarification-${clarification.clarification_id}`;
+    this.clarifications = this.clarifications.filter(
+      (element) => element.clarification_id !== clarification.clarification_id,
+    );
+    localStorage.setItem(id, Date.now().toString());
+  }
+
+  onMarkAllAsRead(): void {
+    for (const clarification of this.clarifications) {
+      const id = `clarification-${clarification.clarification_id}`;
+      localStorage.setItem(id, Date.now().toString());
+    }
+    this.clarifications = [];
+  }
+}
+</script>
+
 <style>
 .notification-button {
   padding-top: 6px !important;
@@ -131,72 +200,3 @@
   word-wrap: break-word;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { types } from '../../api_types';
-import T from '../../lang';
-
-@Component
-export default class Clarifications extends Vue {
-  @Prop() initialClarifications!: types.Clarification[];
-  T = T;
-
-  flashInterval: number = 0;
-  clarifications: types.Clarification[] = this.initialClarifications;
-
-  @Watch('initialClarifications')
-  onPropertyChanged(newValue: types.Clarification[]): void {
-    this.clarifications = newValue;
-    const audio = <HTMLMediaElement>(
-      document.getElementById('notification-audio')
-    );
-    if (audio !== null) {
-      audio.play();
-    }
-  }
-
-  @Watch('clarifications')
-  onPropertyChange(newValue: types.Clarification[]): void {
-    if (newValue.length > 0) {
-      if (this.flashInterval) return;
-      this.flashInterval = setInterval(this.flashTitle, 1000);
-    } else {
-      if (!this.flashInterval) return;
-      clearInterval(this.flashInterval);
-      this.flashInterval = 0;
-      if (document.title.indexOf('!') === 0) {
-        document.title = document.title.substring(2);
-      }
-    }
-  }
-
-  anchor(clarification: types.Clarification): string {
-    return `#clarifications/clarification-${clarification.clarification_id}`;
-  }
-
-  flashTitle(reset: boolean): void {
-    if (document.title.indexOf('!') === 0) {
-      document.title = document.title.substring(2);
-    } else if (!reset) {
-      document.title = `! ${document.title}`;
-    }
-  }
-
-  onCloseClicked(clarification: types.Clarification): void {
-    const id = `clarification-${clarification.clarification_id}`;
-    this.clarifications = this.clarifications.filter(
-      (element) => element.clarification_id !== clarification.clarification_id,
-    );
-    localStorage.setItem(id, Date.now().toString());
-  }
-
-  onMarkAllAsRead(): void {
-    for (const clarification of this.clarifications) {
-      const id = `clarification-${clarification.clarification_id}`;
-      localStorage.setItem(id, Date.now().toString());
-    }
-    this.clarifications = [];
-  }
-}
-</script>

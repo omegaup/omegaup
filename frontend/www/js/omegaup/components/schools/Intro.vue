@@ -40,6 +40,17 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
+
+import T from '../../lang';
+
+@Component
+export default class Intro extends Vue {
+  T = T;
+}
+</script>
+
 <style>
 .header-bg {
   background-image: url(/media/teacher3.jpg);
@@ -60,14 +71,3 @@ body {
   background: #fff;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-
-import T from '../../lang';
-
-@Component
-export default class Intro extends Vue {
-  T = T;
-}
-</script>

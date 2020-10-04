@@ -47,15 +47,6 @@
   </div>
 </template>
 
-<style lang="scss">
-@import '../../../../sass/main.scss';
-
-.carousel {
-  background: $omegaup-primary--darker;
-  color: $white;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import T from '../../lang';
@@ -72,3 +63,12 @@ export default class Carousel extends Vue {
   slides = carouselConfig;
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+.carousel {
+  background: $omegaup-primary--darker;
+  color: $white;
+}
+</style>
