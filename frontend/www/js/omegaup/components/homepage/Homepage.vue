@@ -8,7 +8,7 @@
           (coderOfTheMonthFemale &&
             coderOfTheMonthFemale.username == currentUserInfo.username))
       "
-      :coderUsername="currentUserInfo.username"
+      :coder-username="currentUserInfo.username"
     ></omegaup-coder-of-the-month-notice>
     <omegaup-carousel></omegaup-carousel>
     <div
@@ -56,12 +56,12 @@
           <omegaup-user-rank
             :page="rankTable.page"
             :length="rankTable.length"
-            :isIndex="rankTable.isIndex"
-            :isLogged="rankTable.isLogged"
-            :availableFilters="rankTable.availableFilters"
+            :is-index="rankTable.isIndex"
+            :is-logged="rankTable.isLogged"
+            :available-filters="rankTable.availableFilters"
             :filter="rankTable.filter"
             :ranking="rankTable.ranking"
-            :resultTotal="rankTable.resultTotal"
+            :result-total="rankTable.resultTotal"
           ></omegaup-user-rank>
         </div>
         <div
@@ -71,8 +71,8 @@
           <omegaup-school-rank
             :page="schoolsRank.page"
             :length="schoolsRank.length"
-            :showHeader="schoolsRank.showHeader"
-            :totalRows="schoolsRank.totalRows"
+            :show-header="schoolsRank.showHeader"
+            :total-rows="schoolsRank.totalRows"
             :rank="schoolsRank.rank"
           ></omegaup-school-rank>
         </div>

@@ -24,7 +24,6 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     'no-prototype-builtins': 'off',
     'no-undef': 'off',
-    'vue/attribute-hyphenation': 'off',
     'vue/component-tags-order': 'off',
     'vue/no-deprecated-slot-attribute': 'off',
     'vue/no-deprecated-slot-scope-attribute': 'off',

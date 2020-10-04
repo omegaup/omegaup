@@ -12,8 +12,8 @@
     <template v-if="courses.admin.activeTab !== ''">
       <omegaup-course-filtered-list
         :courses="courses.admin"
-        :activeTab="courses.admin.activeTab"
-        :showPercentage="false"
+        :active-tab="courses.admin.activeTab"
+        :show-percentage="false"
       ></omegaup-course-filtered-list>
     </template>
   </div>

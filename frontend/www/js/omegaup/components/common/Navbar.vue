@@ -177,7 +177,7 @@
         <ul v-else class="nav navbar-nav navbar-right">
           <omegaup-notifications-clarifications
             v-if="inContest"
-            :initialClarifications="initialClarifications"
+            :initial-clarifications="initialClarifications"
           ></omegaup-notifications-clarifications>
           <li
             class="dropdown nav-user"
@@ -195,7 +195,7 @@
               }}</span>
               <omegaup-common-grader-badge
                 v-show="isAdmin"
-                :queueLength="graderQueueLength"
+                :queue-length="graderQueueLength"
                 :error="errorMessage !== null"
               ></omegaup-common-grader-badge>
               <span class="caret"></span
@@ -241,7 +241,7 @@
                 v-show="isAdmin"
                 :status="errorMessage !== null ? 'down' : 'ok'"
                 :error="errorMessage"
-                :graderInfo="graderInfo"
+                :grader-info="graderInfo"
               ></omegaup-common-grader-status>
             </ul>
           </li>

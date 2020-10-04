@@ -42,7 +42,7 @@
       </table>
       <div class="card-footer">
         <omegaup-common-paginator
-          :pagerItems="pagerItems"
+          :pager-items="pagerItems"
         ></omegaup-common-paginator>
       </div>
     </div>

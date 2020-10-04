@@ -17,17 +17,17 @@
           <omegaup-autocomplete
             v-show="selectColumn == 'problem_alias'"
             v-model="queryProblem"
-            :init="el => typeahead.problemTypeahead(el)"
+            :init="(el) => typeahead.problemTypeahead(el)"
             :placeholder="T.wordsKeyword"
             class="form-control"
           ></omegaup-autocomplete>
           <omegaup-autocomplete
             v-show="
               selectColumn == 'nominator_username' ||
-                selectColumn == 'author_username'
+              selectColumn == 'author_username'
             "
             v-model="queryUsername"
-            :init="el => typeahead.userTypeahead(el)"
+            :init="(el) => typeahead.userTypeahead(el)"
             :placeholder="T.wordsKeyword"
             class="form-control"
           ></omegaup-autocomplete>
@@ -112,7 +112,7 @@
       <omegaup-common-paginator
         :pager-items="pagerItems"
         @page-changed="
-          page =>
+          (page) =>
             $emit('go-to-page', page, getStatus(), getQuery(), selectColumn)
         "
       ></omegaup-common-paginator>

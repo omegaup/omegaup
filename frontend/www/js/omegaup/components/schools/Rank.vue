@@ -44,7 +44,7 @@
     </div>
     <div v-else class="card-footer">
       <omegaup-common-paginator
-        :pagerItems="pagerItems"
+        :pager-items="pagerItems"
       ></omegaup-common-paginator>
     </div>
   </div>

@@ -1,9 +1,9 @@
 <template>
   <div>
     <omegaup-problem-search-bar
-      :initialLanguage="language"
+      :initial-language="language"
       :languages="languages"
-      :initialKeyword="keyword"
+      :initial-keyword="keyword"
       :tags="tags"
     ></omegaup-problem-search-bar>
     <a
@@ -228,7 +228,7 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          :pagerItems="pagerItems"
+          :pager-items="pagerItems"
         ></omegaup-common-paginator>
       </div>
     </div>

@@ -84,8 +84,8 @@
           v-if="charts"
           :data="charts"
           :username="profile.username"
-          :periodStatisticOptions="periodStatisticOptions"
-          :aggregateStatisticOptions="aggregateStatisticOptions"
+          :period-statistic-options="periodStatisticOptions"
+          :aggregate-statistic-options="aggregateStatisticOptions"
           @emit-update-period-statistics="
             (profileComponent, categories, data) =>
               $emit(
