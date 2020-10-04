@@ -185,7 +185,11 @@
                       : ''
                   } m-1 p-2`"
                   :href="hrefForProblemTag(currentTags, tag.name)"
-                  >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a
+                  >{{
+                    Object.prototype.hasOwnProperty.call(T, tag.name)
+                      ? T[tag.name]
+                      : tag.name
+                  }}</a
                 >
               </td>
               <td

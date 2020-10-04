@@ -85,7 +85,7 @@ OmegaUp.on('ready', () => {
             // solutions are the same.
             if (markdownType === 'statements') {
               problemEdit.statement.markdown = currentMarkdown;
-              if (statements.hasOwnProperty(language)) {
+              if (Object.prototype.hasOwnProperty.call(statements, language)) {
                 problemEdit.statement.markdown = statements[language];
                 return;
               }
@@ -113,7 +113,7 @@ OmegaUp.on('ready', () => {
                 });
             } else {
               problemEdit.solution.markdown = currentMarkdown;
-              if (solutions.hasOwnProperty(language)) {
+              if (Object.prototype.hasOwnProperty.call(solutions, language)) {
                 problemEdit.solution.markdown = solutions[language];
                 return;
               }

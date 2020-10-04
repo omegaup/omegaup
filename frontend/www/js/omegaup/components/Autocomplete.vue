@@ -19,6 +19,7 @@ export default class Autocomplete extends Vue {
   @Prop() value!: string;
   @Prop() placeholder!: string;
   @Prop() name!: string;
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   @Prop() init!: (el: JQuery<HTMLElement>) => void;
 
   mounted() {

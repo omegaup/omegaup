@@ -32,7 +32,8 @@ OmegaUp.on('ready', () => {
   const normalizeRunCounts = (stats: types.StatsPayload) => {
     const result = [];
     for (const verdict in stats.verdict_counts) {
-      if (!stats.verdict_counts.hasOwnProperty(verdict)) continue;
+      if (!Object.prototype.hasOwnProperty.call(stats.verdict_counts, verdict))
+        continue;
       if (verdict === 'NO-AC') continue;
       if (verdict === 'AC') {
         result.push({

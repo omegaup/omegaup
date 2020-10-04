@@ -187,7 +187,7 @@ export default class ProblemVersions extends Vue {
 
     const diff = [];
     for (const path of Object.keys(tree)) {
-      if (!parentTree.hasOwnProperty(path)) {
+      if (!Object.prototype.hasOwnProperty.call(parentTree, path)) {
         diff.push([path, 'list-group-item-success']);
         continue;
       }
@@ -200,7 +200,7 @@ export default class ProblemVersions extends Vue {
       }
     }
     for (const path of Object.keys(parentTree)) {
-      if (tree.hasOwnProperty(path)) {
+      if (Object.prototype.hasOwnProperty.call(tree, path)) {
         continue;
       }
       diff.push([path, 'list-group-item-danger']);
@@ -215,7 +215,7 @@ export default class ProblemVersions extends Vue {
       return [];
     }
     const version = this.selectedRevision.version;
-    if (!this.runsDiff.hasOwnProperty(version)) {
+    if (!Object.prototype.hasOwnProperty.call(this.runsDiff, version)) {
       return [];
     }
     const result: [types.RunsDiff, string][] = [];
@@ -247,7 +247,10 @@ export default class ProblemVersions extends Vue {
   @Watch('selectedRevision')
   onSelectedRevisionChange(newValue: omegaup.Commit) {
     this.$emit('input', this.selectedRevision);
-    if (!newValue || this.runsDiff.hasOwnProperty(newValue.version)) {
+    if (
+      !newValue ||
+      Object.prototype.hasOwnProperty.call(this.runsDiff, newValue.version)
+    ) {
       return;
     }
     if (!this.showFooter) {

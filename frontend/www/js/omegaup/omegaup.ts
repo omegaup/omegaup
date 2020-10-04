@@ -30,7 +30,7 @@ export class Experiments {
   }
 
   isEnabled(name: string): boolean {
-    return this.enabledExperiments.hasOwnProperty(name);
+    return Object.prototype.hasOwnProperty.call(this.enabledExperiments, name);
   }
 }
 
@@ -601,14 +601,16 @@ export namespace omegaup {
     }
 
     _notify(eventName: string): void {
-      if (!this._listeners.hasOwnProperty(eventName)) return;
+      if (!Object.prototype.hasOwnProperty.call(this._listeners, eventName))
+        return;
       this._listeners[eventName].notify();
     }
 
     on(events: string, handler: () => void): void {
       this._initialize();
       for (const eventName of events.split(' ')) {
-        if (!this._listeners.hasOwnProperty(eventName)) continue;
+        if (!Object.prototype.hasOwnProperty.call(this._listeners, eventName))
+          continue;
         this._listeners[eventName].add(handler);
       }
     }
@@ -621,22 +623,22 @@ export namespace omegaup {
     }
 
     convertTimes(item: { [key: string]: any }): any {
-      if (item.hasOwnProperty('time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'time')) {
         item.time = time.remoteTime(item.time * 1000);
       }
-      if (item.hasOwnProperty('end_time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'end_time')) {
         item.end_time = time.remoteTime(item.end_time * 1000);
       }
-      if (item.hasOwnProperty('start_time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'start_time')) {
         item.start_time = time.remoteTime(item.start_time * 1000);
       }
-      if (item.hasOwnProperty('finish_time')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'finish_time')) {
         item.finish_time = time.remoteTime(item.finish_time * 1000);
       }
-      if (item.hasOwnProperty('last_updated')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'last_updated')) {
         item.last_updated = time.remoteTime(item.last_updated * 1000);
       }
-      if (item.hasOwnProperty('submission_deadline')) {
+      if (Object.prototype.hasOwnProperty.call(item, 'submission_deadline')) {
         item.submission_deadline = time.remoteTime(
           item.submission_deadline * 1000,
         );

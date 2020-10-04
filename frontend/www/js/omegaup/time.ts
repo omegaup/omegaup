@@ -230,7 +230,10 @@ export function remoteTimeAdapter<T>(value: T): T {
     }
   } else if (typeof value === 'object') {
     for (const p in value) {
-      if (!(<any>value).hasOwnProperty(p) || typeof value[p] !== 'object') {
+      if (
+        !Object.prototype.hasOwnProperty.call(<any>value, p) ||
+        typeof value[p] !== 'object'
+      ) {
         continue;
       }
       value[p] = remoteTimeAdapter(value[p]);
