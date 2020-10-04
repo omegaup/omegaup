@@ -70,7 +70,7 @@ function shouldRedirect(string $url): bool {
         empty($redirectParsedUrl['scheme']) ||
         empty($redirectParsedUrl['host'])
     ) {
-        return true;
+        return $redirectParsedUrl['path'] != '/logout/';
     }
     $redirect_url = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
     if (isset($redirectParsedUrl['port'])) {
