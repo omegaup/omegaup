@@ -22,6 +22,22 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+@Component
+export default class Homepage extends Vue {
+  @Prop() title!: string;
+  @Prop() description!: string;
+  @Prop() buttons!: {
+    text: string;
+    href: string;
+  }[];
+  @Prop() imageSrc!: string;
+  @Prop({ default: false }) imageToRight!: boolean;
+}
+</script>
+
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 h3.display-4 {
@@ -42,19 +58,3 @@ a.section-link {
   color: $omegaup-white;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-
-@Component
-export default class Homepage extends Vue {
-  @Prop() title!: string;
-  @Prop() description!: string;
-  @Prop() buttons!: {
-    text: string;
-    href: string;
-  }[];
-  @Prop() imageSrc!: string;
-  @Prop({ default: false }) imageToRight!: boolean;
-}
-</script>

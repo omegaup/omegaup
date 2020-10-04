@@ -96,24 +96,6 @@
   </div>
 </template>
 
-<style>
-.fields-border > .form-group,
-.fields-border div > .form-group {
-  border-color: #e9e9e9 !important;
-  border-style: solid !important;
-  border-width: 0 0 0.05rem 0 !important;
-}
-
-.field-data {
-  color: gray;
-}
-
-.padding-field {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -131,3 +113,21 @@ export default class UserBasicInfo extends Vue {
   T = T;
 }
 </script>
+
+<style>
+.fields-border > .form-group,
+.fields-border div > .form-group {
+  border-color: #e9e9e9 !important;
+  border-style: solid !important;
+  border-width: 0 0 0.05rem 0 !important;
+}
+
+.field-data {
+  color: gray;
+}
+
+.padding-field {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+</style>

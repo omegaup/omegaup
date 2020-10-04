@@ -13,31 +13,6 @@
   </figure>
 </template>
 
-<style>
-.badge-container {
-  align-items: center;
-  text-align: center;
-}
-
-img {
-  max-height: 10rem !important;
-}
-
-.badge-icon {
-  display: block;
-  width: 100%;
-}
-.badge-icon img {
-  max-height: 100%;
-}
-.badge-name {
-  padding-top: 0.5rem;
-}
-.badge-gray {
-  filter: grayscale(100%);
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -66,3 +41,28 @@ export default class Badge extends Vue {
   }
 }
 </script>
+
+<style>
+.badge-container {
+  align-items: center;
+  text-align: center;
+}
+
+img {
+  max-height: 10rem !important;
+}
+
+.badge-icon {
+  display: block;
+  width: 100%;
+}
+.badge-icon img {
+  max-height: 100%;
+}
+.badge-name {
+  padding-top: 0.5rem;
+}
+.badge-gray {
+  filter: grayscale(100%);
+}
+</style>

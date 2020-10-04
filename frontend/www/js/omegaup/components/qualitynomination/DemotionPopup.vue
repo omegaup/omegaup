@@ -75,6 +75,41 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
+import T from '../../lang';
+import * as ui from '../../ui';
+
+@Component
+export default class QualityNominationDemotionPopup extends Vue {
+  T = T;
+  ui = ui;
+  rationale = '';
+  original = '';
+  currentView = 'question';
+  showReportDialog = false;
+  selectedReason = '';
+
+  onHide(): void {
+    this.showReportDialog = false;
+  }
+
+  onReportInappropriateProblem(): void {
+    this.showReportDialog = true;
+    this.currentView = 'question';
+    this.rationale = '';
+    this.original = '';
+    this.selectedReason = '';
+  }
+
+  onSubmit(): void {
+    this.$emit('submit', this);
+    this.currentView = 'thanks';
+    setTimeout(() => this.onHide(), 2000);
+  }
+}
+</script>
+
 <style>
 .qualitynomination-demotionpopup .popup {
   position: fixed;
@@ -123,38 +158,3 @@
   position: absolute;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import T from '../../lang';
-import * as ui from '../../ui';
-
-@Component
-export default class QualityNominationDemotionPopup extends Vue {
-  T = T;
-  ui = ui;
-  rationale = '';
-  original = '';
-  currentView = 'question';
-  showReportDialog = false;
-  selectedReason = '';
-
-  onHide(): void {
-    this.showReportDialog = false;
-  }
-
-  onReportInappropriateProblem(): void {
-    this.showReportDialog = true;
-    this.currentView = 'question';
-    this.rationale = '';
-    this.original = '';
-    this.selectedReason = '';
-  }
-
-  onSubmit(): void {
-    this.$emit('submit', this);
-    this.currentView = 'thanks';
-    setTimeout(() => this.onHide(), 2000);
-  }
-}
-</script>

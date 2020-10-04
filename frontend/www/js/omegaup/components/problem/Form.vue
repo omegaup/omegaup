@@ -234,13 +234,6 @@
   </div>
 </template>
 
-<style>
-.problem-form .languages {
-  padding: 0;
-  width: 100%;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
@@ -399,3 +392,10 @@ export default class ProblemForm extends Vue {
   }
 }
 </script>
+
+<style>
+.problem-form .languages {
+  padding: 0;
+  width: 100%;
+}
+</style>

@@ -69,26 +69,6 @@
   </tr>
 </template>
 
-<style lang="scss" scoped>
-.resolved {
-  color: rgb(70, 136, 71);
-  background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-
-.direct-message {
-  color: rgb(125, 117, 18);
-  background-image: linear-gradient(
-    rgb(253, 245, 154) 0px,
-    rgba(255, 249, 181, 0.5) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -151,3 +131,23 @@ export default class ArenaClarificationForm extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.resolved {
+  color: rgb(70, 136, 71);
+  background-image: linear-gradient(
+    rgb(223, 240, 216) 0px,
+    rgb(200, 229, 188) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+
+.direct-message {
+  color: rgb(125, 117, 18);
+  background-image: linear-gradient(
+    rgb(253, 245, 154) 0px,
+    rgba(255, 249, 181, 0.5) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+</style>

@@ -56,49 +56,6 @@
   </div>
 </template>
 
-<style>
-.problem-list .breadcrumbs-link {
-  display: inherit;
-}
-
-.problem-list > div {
-  width: 19em;
-  margin-bottom: 0.5em;
-  padding-top: 0.2em;
-  background: #ddd;
-  border: solid 1px #ccc;
-  border-width: 1px 0 1px 1px;
-  position: relative;
-}
-
-.problem-list > div a {
-  color: #5588dd;
-  display: block;
-  padding: 0.5em;
-  width: 100%;
-  cursor: pointer;
-}
-
-.problem-list > div.active {
-  background: white;
-}
-
-.problem-list > div.summary {
-  margin-bottom: 1em;
-}
-
-.problem-list > div .solved {
-  text-align: right;
-  right: 1em;
-}
-
-.problem-list .problem-type {
-  font-size: 13px;
-  color: #9a9a9a;
-  font-weight: bold;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -144,3 +101,46 @@ export default class ArenaNavbarProblems extends Vue {
   }
 }
 </script>
+
+<style>
+.problem-list .breadcrumbs-link {
+  display: inherit;
+}
+
+.problem-list > div {
+  width: 19em;
+  margin-bottom: 0.5em;
+  padding-top: 0.2em;
+  background: #ddd;
+  border: solid 1px #ccc;
+  border-width: 1px 0 1px 1px;
+  position: relative;
+}
+
+.problem-list > div a {
+  color: #5588dd;
+  display: block;
+  padding: 0.5em;
+  width: 100%;
+  cursor: pointer;
+}
+
+.problem-list > div.active {
+  background: white;
+}
+
+.problem-list > div.summary {
+  margin-bottom: 1em;
+}
+
+.problem-list > div .solved {
+  text-align: right;
+  right: 1em;
+}
+
+.problem-list .problem-type {
+  font-size: 13px;
+  color: #9a9a9a;
+  font-weight: bold;
+}
+</style>

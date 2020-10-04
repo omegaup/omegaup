@@ -26,6 +26,25 @@
   </span>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import CountryFlag from '../CountryFlag.vue';
+
+@Component({
+  components: {
+    'omegaup-countryflag': CountryFlag,
+  },
+})
+export default class Username extends Vue {
+  @Prop() username!: string;
+  @Prop({ default: null }) name!: string;
+  @Prop() classname!: string;
+  @Prop() linkify!: boolean;
+  @Prop() country!: string;
+  @Prop({ default: false }) emitClickEvent!: boolean;
+}
+</script>
+
 <style>
 .user-rank-unranked,
 .user-rank-beginner,
@@ -56,22 +75,3 @@
   color: #cb000a;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import CountryFlag from '../CountryFlag.vue';
-
-@Component({
-  components: {
-    'omegaup-countryflag': CountryFlag,
-  },
-})
-export default class Username extends Vue {
-  @Prop() username!: string;
-  @Prop({ default: null }) name!: string;
-  @Prop() classname!: string;
-  @Prop() linkify!: boolean;
-  @Prop() country!: string;
-  @Prop({ default: false }) emitClickEvent!: boolean;
-}
-</script>

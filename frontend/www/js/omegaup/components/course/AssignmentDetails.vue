@@ -212,12 +212,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.omegaup-course-assignmentdetails .form-group > label {
-  width: 100%;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit, Ref } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -328,3 +322,9 @@ export default class CourseAssignmentDetails extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.omegaup-course-assignmentdetails .form-group > label {
+  width: 100%;
+}
+</style>

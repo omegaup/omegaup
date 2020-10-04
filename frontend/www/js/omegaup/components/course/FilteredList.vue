@@ -109,12 +109,6 @@
   </div>
 </template>
 
-<style>
-.nav-tabs .nav-item {
-  margin-bottom: -2px;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -153,3 +147,9 @@ export default class CourseFilteredList extends Vue {
   }
 }
 </script>
+
+<style>
+.nav-tabs .nav-item {
+  margin-bottom: -2px;
+}
+</style>

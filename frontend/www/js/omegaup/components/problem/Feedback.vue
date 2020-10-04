@@ -21,16 +21,6 @@
   </div>
 </template>
 
-<style>
-.omegaup-feedback-row {
-  margin: 30px auto 0;
-}
-.omegaup-feedback-title {
-  font-weight: bold;
-  color: gray;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -56,3 +46,13 @@ export default class ProblemFeedback extends Vue {
   }
 }
 </script>
+
+<style>
+.omegaup-feedback-row {
+  margin: 30px auto 0;
+}
+.omegaup-feedback-title {
+  font-weight: bold;
+  color: gray;
+}
+</style>

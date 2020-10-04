@@ -315,21 +315,6 @@
   </header>
 </template>
 
-<style lang="scss">
-@import '../../../../sass/main.scss';
-nav.navbar {
-  background-color: $header-primary-color;
-
-  .navbar-brand {
-    background-color: #f2f2f2;
-  }
-
-  a.dropdown-item {
-    color: black;
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -383,3 +368,18 @@ export default class Navbar extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+nav.navbar {
+  background-color: $header-primary-color;
+
+  .navbar-brand {
+    background-color: #f2f2f2;
+  }
+
+  a.dropdown-item {
+    color: black;
+  }
+}
+</style>

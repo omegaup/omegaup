@@ -47,20 +47,6 @@
   </div>
 </template>
 
-<style>
-.interstitial {
-  padding: 2em;
-}
-
-.solution {
-  padding: 2em 7em;
-}
-
-.solution-tokens {
-  font-size: 1.25em;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -103,3 +89,17 @@ export default class ProblemSolution extends Vue {
   }
 }
 </script>
+
+<style>
+.interstitial {
+  padding: 2em;
+}
+
+.solution {
+  padding: 2em 7em;
+}
+
+.solution-tokens {
+  font-size: 1.25em;
+}
+</style>

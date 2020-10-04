@@ -30,6 +30,27 @@
   </ul>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import * as ui from '../../ui';
+
+@Component
+export default class GraderStatus extends Vue {
+  @Prop() status!: string;
+  @Prop() error!: string;
+  @Prop() graderInfo!: types.GraderStatus | null;
+
+  T = T;
+  ui = ui;
+
+  get graderStatusMessage(): string {
+    return this.status === 'ok' ? 'Grader OK' : 'Grader DOWN';
+  }
+}
+</script>
+
 <style>
 .grader-submissions,
 a.grader-submissions-link {
@@ -61,24 +82,3 @@ ul {
   list-style: none;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
-import T from '../../lang';
-import * as ui from '../../ui';
-
-@Component
-export default class GraderStatus extends Vue {
-  @Prop() status!: string;
-  @Prop() error!: string;
-  @Prop() graderInfo!: types.GraderStatus | null;
-
-  T = T;
-  ui = ui;
-
-  get graderStatusMessage(): string {
-    return this.status === 'ok' ? 'Grader OK' : 'Grader DOWN';
-  }
-}
-</script>

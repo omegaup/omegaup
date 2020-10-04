@@ -18,13 +18,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-.notice {
-  background: $omegaup-primary--darker;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -37,3 +30,10 @@ export default class CoderOfTheMonthNotice extends Vue {
   ui = ui;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+.notice {
+  background: $omegaup-primary--darker;
+}
+</style>

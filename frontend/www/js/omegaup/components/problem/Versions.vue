@@ -153,17 +153,6 @@
   </div>
 </template>
 
-<style>
-.scrollable {
-  max-height: 600px;
-  overflow-y: auto;
-}
-.controls {
-  border-bottom: 1px solid #ddd;
-  background-color: #f5f5f5;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -269,3 +258,14 @@ export default class ProblemVersions extends Vue {
   }
 }
 </script>
+
+<style>
+.scrollable {
+  max-height: 600px;
+  overflow-y: auto;
+}
+.controls {
+  border-bottom: 1px solid #ddd;
+  background-color: #f5f5f5;
+}
+</style>

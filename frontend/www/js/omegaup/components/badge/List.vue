@@ -26,13 +26,6 @@
   </div>
 </template>
 
-<style>
-a.badges-link {
-  color: #337ab7;
-  font-size: 1rem;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -82,3 +75,10 @@ export default class BadgeList extends Vue {
   }
 }
 </script>
+
+<style>
+a.badges-link {
+  color: #337ab7;
+  font-size: 1rem;
+}
+</style>

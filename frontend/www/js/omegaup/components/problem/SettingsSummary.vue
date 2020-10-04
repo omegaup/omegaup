@@ -54,31 +54,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.panel {
-  .title {
-    text-align: center;
-    font-size: 1.5em;
-    margin: 1em;
-  }
-  table {
-    width: 30em;
-    margin: 10px auto;
-    td {
-      text-align: center;
-    }
-    th[scope='row'] {
-      font-weight: bold;
-    }
-    td,
-    th[scope='row'] {
-      border: 1px solid #000;
-      padding: 2px;
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -129,3 +104,28 @@ export default class ProblemSettingsSummary extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.panel {
+  .title {
+    text-align: center;
+    font-size: 1.5em;
+    margin: 1em;
+  }
+  table {
+    width: 30em;
+    margin: 10px auto;
+    td {
+      text-align: center;
+    }
+    th[scope='row'] {
+      font-weight: bold;
+    }
+    td,
+    th[scope='row'] {
+      border: 1px solid #000;
+      padding: 2px;
+    }
+  }
+}
+</style>

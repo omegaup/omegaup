@@ -297,14 +297,6 @@
   </div>
 </template>
 
-<style lang="scss">
-@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
-
-.multiselect__tag {
-  background: #678dd7;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -461,3 +453,11 @@ export default class NewForm extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+
+.multiselect__tag {
+  background: #678dd7;
+}
+</style>

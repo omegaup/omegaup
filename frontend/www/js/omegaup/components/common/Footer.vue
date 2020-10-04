@@ -105,6 +105,21 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import { reportAnIssueURL } from '../../errors';
+
+@Component
+export default class Footer extends Vue {
+  @Prop() isLoggedIn!: boolean;
+  @Prop() omegaUpLockDown!: boolean;
+
+  T = T;
+  reportAnIssueURL = reportAnIssueURL;
+}
+</script>
+
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
@@ -218,18 +233,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-import { reportAnIssueURL } from '../../errors';
-
-@Component
-export default class Footer extends Vue {
-  @Prop() isLoggedIn!: boolean;
-  @Prop() omegaUpLockDown!: boolean;
-
-  T = T;
-  reportAnIssueURL = reportAnIssueURL;
-}
-</script>

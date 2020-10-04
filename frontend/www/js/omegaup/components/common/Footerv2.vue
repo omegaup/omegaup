@@ -126,6 +126,30 @@
   </footer>
 </template>
 
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import { reportAnIssueURL } from '../../errors';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faFacebook, faGithub } from '@fortawesome/free-brands-svg-icons';
+library.add(faFacebook, faGithub);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
+export default class Footer extends Vue {
+  @Prop() isLoggedIn!: boolean;
+  @Prop() omegaUpLockDown!: boolean;
+
+  T = T;
+  reportAnIssueURL = reportAnIssueURL;
+}
+</script>
+
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
@@ -172,27 +196,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-import { reportAnIssueURL } from '../../errors';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faFacebook, faGithub } from '@fortawesome/free-brands-svg-icons';
-library.add(faFacebook, faGithub);
-
-@Component({
-  components: {
-    FontAwesomeIcon,
-  },
-})
-export default class Footer extends Vue {
-  @Prop() isLoggedIn!: boolean;
-  @Prop() omegaUpLockDown!: boolean;
-
-  T = T;
-  reportAnIssueURL = reportAnIssueURL;
-}
-</script>

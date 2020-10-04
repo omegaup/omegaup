@@ -58,10 +58,6 @@
   </div>
 </template>
 
-<style lang="scss">
-@import '../../../../sass/main.scss';
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -119,3 +115,7 @@ export default class GroupAdmin extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+</style>

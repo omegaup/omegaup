@@ -59,23 +59,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-.student,
-.public {
-  color: $omegaup-white;
-}
-
-.public {
-  background: $omegaup-pink;
-}
-
-.student {
-  background: $omegaup-blue;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -111,3 +94,20 @@ export default class CourseList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.student,
+.public {
+  color: $omegaup-white;
+}
+
+.public {
+  background: $omegaup-pink;
+}
+
+.student {
+  background: $omegaup-blue;
+}
+</style>

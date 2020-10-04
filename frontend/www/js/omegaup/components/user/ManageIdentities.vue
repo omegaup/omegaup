@@ -62,12 +62,6 @@
   </div>
 </template>
 
-<style>
-th.align-right {
-  text-align: right;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -87,3 +81,9 @@ export default class UserManageIdentities extends Vue {
   }
 }
 </script>
+
+<style>
+th.align-right {
+  text-align: right;
+}
+</style>

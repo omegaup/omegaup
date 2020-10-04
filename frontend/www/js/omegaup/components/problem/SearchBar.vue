@@ -40,14 +40,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.form-group {
-  label {
-    font-weight: bold;
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -85,3 +77,11 @@ export default class ProblemSearchBar extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.form-group {
+  label {
+    font-weight: bold;
+  }
+}
+</style>

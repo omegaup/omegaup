@@ -50,16 +50,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-// FIXME: This prevents wrapping a table cell when the name of the school is too long.
-// So, both tables (users rank and the current one) are perfectly aligned.
-// Another solution should  be taken in the future.
-.text-truncate {
-  max-width: 250px;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
@@ -88,3 +78,13 @@ export default class SchoolRank extends Vue {
   ui = ui;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+// FIXME: This prevents wrapping a table cell when the name of the school is too long.
+// So, both tables (users rank and the current one) are perfectly aligned.
+// Another solution should  be taken in the future.
+.text-truncate {
+  max-width: 250px;
+}
+</style>

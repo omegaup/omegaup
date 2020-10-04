@@ -37,15 +37,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-.card-header {
-  color: $omegaup-white;
-  background-color: $omegaup-pink;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -69,3 +60,12 @@ export default class SchoolOfTheMonth extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.card-header {
+  color: $omegaup-white;
+  background-color: $omegaup-pink;
+}
+</style>

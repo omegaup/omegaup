@@ -251,6 +251,47 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import notifications_Clarifications from '../notification/Clarifications.vue';
+import common_GraderStatus from '../common/GraderStatus.vue';
+import common_GraderBadge from '../common/GraderBadge.vue';
+
+@Component({
+  components: {
+    'omegaup-notifications-clarifications': notifications_Clarifications,
+    'omegaup-common-grader-status': common_GraderStatus,
+    'omegaup-common-grader-badge': common_GraderBadge,
+  },
+})
+export default class Navbar extends Vue {
+  @Prop() omegaUpLockDown!: boolean;
+  @Prop() inContest!: boolean;
+  @Prop() isLoggedIn!: boolean;
+  @Prop() isReviewer!: boolean;
+  @Prop() gravatarURL51!: string;
+  @Prop() currentUsername!: string;
+  @Prop() isAdmin!: boolean;
+  @Prop() isMainUserIdentity!: boolean;
+  @Prop() lockDownImage!: string;
+  @Prop() navbarSection!: string;
+  @Prop() graderInfo!: types.GraderStatus | null;
+  @Prop() graderQueueLength!: number;
+  @Prop() errorMessage!: string | null;
+  @Prop() initialClarifications!: types.Clarification[];
+
+  notifications: types.Notification[] = [];
+  clarifications: types.Clarification[] = this.initialClarifications;
+  T = T;
+
+  get formattedLoginURL(): string {
+    return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
+  }
+}
+</script>
+
 <style lang="scss">
 @import '../../../../sass/main.scss';
 
@@ -433,44 +474,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
-import T from '../../lang';
-import notifications_Clarifications from '../notification/Clarifications.vue';
-import common_GraderStatus from '../common/GraderStatus.vue';
-import common_GraderBadge from '../common/GraderBadge.vue';
-
-@Component({
-  components: {
-    'omegaup-notifications-clarifications': notifications_Clarifications,
-    'omegaup-common-grader-status': common_GraderStatus,
-    'omegaup-common-grader-badge': common_GraderBadge,
-  },
-})
-export default class Navbar extends Vue {
-  @Prop() omegaUpLockDown!: boolean;
-  @Prop() inContest!: boolean;
-  @Prop() isLoggedIn!: boolean;
-  @Prop() isReviewer!: boolean;
-  @Prop() gravatarURL51!: string;
-  @Prop() currentUsername!: string;
-  @Prop() isAdmin!: boolean;
-  @Prop() isMainUserIdentity!: boolean;
-  @Prop() lockDownImage!: string;
-  @Prop() navbarSection!: string;
-  @Prop() graderInfo!: types.GraderStatus | null;
-  @Prop() graderQueueLength!: number;
-  @Prop() errorMessage!: string | null;
-  @Prop() initialClarifications!: types.Clarification[];
-
-  notifications: types.Notification[] = [];
-  clarifications: types.Clarification[] = this.initialClarifications;
-  T = T;
-
-  get formattedLoginURL(): string {
-    return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
-  }
-}
-</script>

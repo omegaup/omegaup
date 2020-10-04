@@ -28,6 +28,23 @@
   </table>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import user_Username from '../user/Username.vue';
+@Component({
+  components: {
+    'omegaup-user-username': user_Username,
+  },
+})
+export default class ArenaNavbarMiniranking extends Vue {
+  @Prop() showRanking!: boolean;
+  @Prop() users!: omegaup.UserRank[];
+  T = T;
+}
+</script>
+
 <style>
 .navbar .mini-ranking {
   width: 18em;
@@ -60,20 +77,3 @@
   border-left-width: 0;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
-import T from '../../lang';
-import user_Username from '../user/Username.vue';
-@Component({
-  components: {
-    'omegaup-user-username': user_Username,
-  },
-})
-export default class ArenaNavbarMiniranking extends Vue {
-  @Prop() showRanking!: boolean;
-  @Prop() users!: omegaup.UserRank[];
-  T = T;
-}
-</script>

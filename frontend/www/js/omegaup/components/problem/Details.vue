@@ -189,25 +189,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-table td {
-  padding: 0.5rem;
-}
-
-.karel-js-link {
-  border: 1px solid #eee;
-  border-left: 0;
-  border-radius: 3px;
-
-  a {
-    border-left: 5px solid #1b809e;
-    display: block;
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -377,3 +358,22 @@ export default class ProblemDetails extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+table td {
+  padding: 0.5rem;
+}
+
+.karel-js-link {
+  border: 1px solid #eee;
+  border-left: 0;
+  border-radius: 3px;
+
+  a {
+    border-left: 5px solid #1b809e;
+    display: block;
+  }
+}
+</style>
