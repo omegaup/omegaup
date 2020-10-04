@@ -4,6 +4,10 @@ module.exports = {
   parserOptions: {
     parser: '@typescript-eslint/parser',
   },
+  env: {
+    jquery: true,
+    node: true,
+  },
   plugins: ['@typescript-eslint'],
   extends: [
     'eslint:recommended',
@@ -34,7 +38,6 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
-    'no-undef': 'off',
     'vue/require-default-prop': 'off',
     'vue/require-v-for-key': 'off',
   },

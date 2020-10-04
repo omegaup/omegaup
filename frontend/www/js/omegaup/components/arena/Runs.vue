@@ -405,6 +405,7 @@ export default class Runs extends Vue {
     return T.arenaContestNotOpened;
   }
 
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
     if (this.problemsetProblems.length !== 0) {
       typeahead.problemsetProblemTypeahead(
@@ -419,6 +420,7 @@ export default class Runs extends Vue {
     }
   }
 
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initUserAutocomplete(el: JQuery<HTMLElement>) {
     if (this.problemsetProblems.length !== 0 && this.contestAlias) {
       typeahead.userContestTypeahead(el, this.contestAlias);
