@@ -34,7 +34,7 @@ OmegaUp.on('ready', function () {
           isAdmin: headerPayload.isAdmin,
         },
         on: {
-          goToPage: (
+          'go-to-page': (
             pageNumber: number,
             status: string,
             query: string,
