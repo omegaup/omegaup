@@ -12,6 +12,7 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:vue/recommended',
     'plugin:vue/vue3-recommended',
     'prettier',
     'prettier/@typescript-eslint',
@@ -37,7 +38,6 @@ module.exports = {
     'vue/require-v-for-key': 'off',
 
     // TODO: Remove all these exceptions.
-    '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
