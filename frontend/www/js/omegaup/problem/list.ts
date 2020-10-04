@@ -40,6 +40,9 @@ OmegaUp.on('ready', () => {
   }
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-list': problem_List,
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-list', {
         props: {
@@ -77,9 +80,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-problem-list': problem_List,
     },
   });
 });

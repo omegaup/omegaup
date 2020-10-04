@@ -8,6 +8,9 @@ OmegaUp.on('ready', () => {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-submissions-list': submissions_List,
+    },
     render: function (createElement) {
       return createElement('omegaup-submissions-list', {
         props: {
@@ -19,9 +22,6 @@ OmegaUp.on('ready', () => {
           totalRows: payload.totalRows,
         },
       });
-    },
-    components: {
-      'omegaup-submissions-list': submissions_List,
     },
   });
 });

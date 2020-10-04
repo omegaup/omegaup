@@ -7,15 +7,15 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CertificateDetailsPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-certificate-details': certificate_Details,
+    },
     render: function (createElement) {
       return createElement('omegaup-certificate-details', {
         props: {
           uuid: payload.uuid,
         },
       });
-    },
-    components: {
-      'omegaup-certificate-details': certificate_Details,
     },
   });
 });

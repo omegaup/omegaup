@@ -17,13 +17,10 @@
         </div>
       </div>
     </div>
-    <div v-if="this.showAllBadgesLink" class="card-footer panel-footer">
-      <a
-        v-if="this.showAllBadgesLink"
-        class="badges-link"
-        href="/badge/list/"
-        >{{ T.wordsBadgesSeeAll }}</a
-      >
+    <div v-if="showAllBadgesLink" class="card-footer panel-footer">
+      <a v-if="showAllBadgesLink" class="badges-link" href="/badge/list/">{{
+        T.wordsBadgesSeeAll
+      }}</a>
     </div>
     <div v-show="!badges"><img src="/media/wait.gif" /></div>
   </div>

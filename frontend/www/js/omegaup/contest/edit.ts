@@ -12,6 +12,43 @@ OmegaUp.on('ready', () => {
 
   const contestEdit = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-contest-edit': contest_Edit,
+    },
+    data: () => ({
+      details: payload.details,
+      problems: payload.problems,
+      requests: payload.requests,
+    }),
+    methods: {
+      refreshDetails: (): void => {
+        api.Contest.adminDetails({
+          contest: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.details = response;
+          })
+          .catch(ui.apiError);
+      },
+      refreshProblems: (): void => {
+        api.Contest.problems({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.problems = response.problems;
+          })
+          .catch(ui.apiError);
+      },
+      refreshRequests: (): void => {
+        api.Contest.requests({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.requests = response.users;
+          })
+          .catch(ui.apiError);
+      },
+    },
     render: function (createElement) {
       return createElement('omegaup-contest-edit', {
         props: {
@@ -115,43 +152,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      details: payload.details,
-      problems: payload.problems,
-      requests: payload.requests,
-    }),
-    components: {
-      'omegaup-contest-edit': contest_Edit,
-    },
-    methods: {
-      refreshDetails: (): void => {
-        api.Contest.adminDetails({
-          contest: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.details = response;
-          })
-          .catch(ui.apiError);
-      },
-      refreshProblems: (): void => {
-        api.Contest.problems({
-          contest_alias: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.problems = response.problems;
-          })
-          .catch(ui.apiError);
-      },
-      refreshRequests: (): void => {
-        api.Contest.requests({
-          contest_alias: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.requests = response.users;
-          })
-          .catch(ui.apiError);
-      },
     },
   });
 });

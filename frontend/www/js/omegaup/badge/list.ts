@@ -8,6 +8,9 @@ OmegaUp.on('ready', function () {
   const payload = types.payloadParsers.BadgeListPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-badge-list': badge_List,
+    },
     render: function (createElement) {
       return createElement('omegaup-badge-list', {
         props: {
@@ -18,9 +21,6 @@ OmegaUp.on('ready', function () {
           showAllBadgesLink: false,
         },
       });
-    },
-    components: {
-      'omegaup-badge-list': badge_List,
     },
   });
 });

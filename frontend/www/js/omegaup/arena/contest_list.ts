@@ -20,6 +20,12 @@ OmegaUp.on('ready', () => {
   }
   new Vue({
     el: '#main-container',
+    components: { 'omegaup-arena-contestlist': arena_ContestList },
+    data: () => ({
+      initialQuery: payload.query,
+      isLogged: payload.isLogged,
+      contests: payload.contests,
+    }),
     render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
@@ -29,11 +35,5 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: () => ({
-      initialQuery: payload.query,
-      isLogged: payload.isLogged,
-      contests: payload.contests,
-    }),
-    components: { 'omegaup-arena-contestlist': arena_ContestList },
   });
 });

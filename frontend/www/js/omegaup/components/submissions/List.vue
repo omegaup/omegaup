@@ -33,9 +33,7 @@
         <a
           class="btn btn-primary"
           type="button"
-          v-bind:href="`/submissions/${encodeURIComponent(
-            this.searchedUsername,
-          )}/`"
+          v-bind:href="`/submissions/${encodeURIComponent(searchedUsername)}/`"
         >
           {{ T.searchUser }}
         </a>

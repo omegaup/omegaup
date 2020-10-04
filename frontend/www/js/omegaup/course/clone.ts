@@ -10,6 +10,9 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseCloneDetailsPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-clone': course_Clone,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-clone', {
         props: {
@@ -43,9 +46,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-course-clone': course_Clone,
     },
   });
 });

@@ -87,7 +87,7 @@
         <input
           type="hidden"
           name="contents"
-          v-bind:value="JSON.stringify(this.statements)"
+          v-bind:value="JSON.stringify(statements)"
         />
         <input type="hidden" name="directory" v-bind:value="markdownType" />
         <input type="hidden" name="problem_alias" v-bind:value="alias" />

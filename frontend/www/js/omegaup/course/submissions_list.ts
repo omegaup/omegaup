@@ -7,6 +7,9 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseSubmissionsListPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-submissions-list': course_SubmissionsList,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-submissions-list', {
         props: {
@@ -14,9 +17,6 @@ OmegaUp.on('ready', () => {
           unsolvedProblems: payload.unsolvedProblems,
         },
       });
-    },
-    components: {
-      'omegaup-course-submissions-list': course_SubmissionsList,
     },
   });
 });

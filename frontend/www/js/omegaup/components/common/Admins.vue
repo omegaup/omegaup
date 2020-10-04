@@ -49,28 +49,30 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="admin in admins"
-          v-if="admin.role !== 'site-admin' || showSiteAdmins"
-        >
-          <td>
-            <omegaup-user-username
-              v-bind:linkify="true"
-              v-bind:username="admin.username"
-            ></omegaup-user-username>
-          </td>
-          <td>{{ admin.role }}</td>
-          <td>
-            <button
-              v-if="admin.role === 'admin'"
-              type="button"
-              class="close"
-              v-on:click="onRemove(admin)"
-            >
-              &times;
-            </button>
-          </td>
-        </tr>
+        <template v-for="admin in admins">
+          <tr
+            v-if="admin.role !== 'site-admin' || showSiteAdmins"
+            v-bind:key="admin.username"
+          >
+            <td>
+              <omegaup-user-username
+                v-bind:linkify="true"
+                v-bind:username="admin.username"
+              ></omegaup-user-username>
+            </td>
+            <td>{{ admin.role }}</td>
+            <td>
+              <button
+                v-if="admin.role === 'admin'"
+                type="button"
+                class="close"
+                v-on:click="onRemove(admin)"
+              >
+                &times;
+              </button>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
   </div>

@@ -10,6 +10,9 @@ OmegaUp.on('ready', () => {
   const headerPayload = types.payloadParsers.CommonPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-contest-intro': contest_Intro,
+    },
     render: function (createElement) {
       return createElement('omegaup-contest-intro', {
         props: {
@@ -37,9 +40,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-contest-intro': contest_Intro,
     },
   });
 });

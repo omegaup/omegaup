@@ -17,6 +17,9 @@ OmegaUp.on('ready', () => {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-homepage': Homepage,
+    },
     render: function (createElement) {
       return createElement('omegaup-homepage', {
         props: {
@@ -47,9 +50,6 @@ OmegaUp.on('ready', () => {
           schoolOfTheMonth: payload.schoolOfTheMonthData,
         },
       });
-    },
-    components: {
-      'omegaup-homepage': Homepage,
     },
   });
 });

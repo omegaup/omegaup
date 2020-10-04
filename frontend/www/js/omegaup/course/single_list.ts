@@ -8,6 +8,9 @@ OmegaUp.on('ready', () => {
   const headerPayload = types.payloadParsers.CommonPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-list': course_List,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-list', {
         props: {
@@ -15,9 +18,6 @@ OmegaUp.on('ready', () => {
           isMainUserIdentity: headerPayload?.isMainUserIdentity,
         },
       });
-    },
-    components: {
-      'omegaup-course-list': course_List,
     },
   });
 });

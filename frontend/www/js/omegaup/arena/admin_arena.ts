@@ -25,6 +25,7 @@ export default class ArenaAdmin {
     this.setUpPagers();
     this.runsList = new Vue({
       el: globalRuns ? '#main-container' : '#runs table.runs',
+      components: { 'omegaup-arena-runs': arena_Runs },
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -69,7 +70,6 @@ export default class ArenaAdmin {
           },
         });
       },
-      components: { 'omegaup-arena-runs': arena_Runs },
     });
   }
 

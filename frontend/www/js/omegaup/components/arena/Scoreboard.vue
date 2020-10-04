@@ -3,7 +3,7 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
-    <label v-if="this.showInvitedUsersFilter">
+    <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"
         class="toggle-contestants"
@@ -28,53 +28,55 @@
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-for="(user, userIndex) in ranking"
-          v-if="showUser(user.is_invited)"
-          v-bind:class="user.username"
-        >
-          <td
-            class="legend"
-            v-bind:style="{ backgroundColor: legendColor(userIndex) }"
-          ></td>
-          <td class="position">{{ user.place || '—' }}</td>
-          <td class="user">
-            {{ ui.rankingUsername(user) }}
-            <img
-              v-if="user.country"
-              alt=""
-              height="11"
-              v-bind:src="`/media/flags/${user.country.toLowerCase()}.png`"
-              v-bind:title="user.country"
-              width="16"
-            />
-          </td>
-
-          <td
-            v-for="(problem, problemIndex) in user.problems"
-            v-bind:class="problemClass(problem, problems[problemIndex].alias)"
+        <template v-for="(user, userIndex) in ranking">
+          <tr
+            v-if="showUser(user.is_invited)"
+            v-bind:key="user.username"
+            v-bind:class="user.username"
           >
-            <template v-if="problem.runs &gt; 0">
+            <td
+              class="legend"
+              v-bind:style="{ backgroundColor: legendColor(userIndex) }"
+            ></td>
+            <td class="position">{{ user.place || '—' }}</td>
+            <td class="user">
+              {{ ui.rankingUsername(user) }}
+              <img
+                v-if="user.country"
+                alt=""
+                height="11"
+                v-bind:src="`/media/flags/${user.country.toLowerCase()}.png`"
+                v-bind:title="user.country"
+                width="16"
+              />
+            </td>
+
+            <td
+              v-for="(problem, problemIndex) in user.problems"
+              v-bind:class="problemClass(problem, problems[problemIndex].alias)"
+            >
+              <template v-if="problem.runs > 0">
+                <div class="points">
+                  {{ renderPoints(problem) }}
+                </div>
+                <div class="penalty">
+                  <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
+                    problem.runs
+                  }})
+                </div>
+              </template>
+              <template v-else> - </template>
+            </td>
+            <td>
               <div class="points">
-                {{ renderPoints(problem) }}
+                {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
               </div>
               <div class="penalty">
-                <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
-                  problem.runs
-                }})
+                {{ user.total.penalty }} ({{ totalRuns(user) }})
               </div>
-            </template>
-            <template v-else> - </template>
-          </td>
-          <td>
-            <div class="points">
-              {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
-            </div>
-            <div class="penalty">
-              {{ user.total.penalty }} ({{ totalRuns(user) }})
-            </div>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
     <div class="footer">

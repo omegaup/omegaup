@@ -19,6 +19,33 @@ OmegaUp.on('ready', () => {
   };
   const problemEdit = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-edit': problem_Edit,
+    },
+    data: () => ({
+      initialAdmins: payload.admins,
+      initialGroups: payload.groupAdmins,
+      publishedRevision: payload.publishedRevision,
+      statement: payload.statement,
+      solution: payload.solution || {
+        language: 'es',
+        markdown: '',
+        images: {},
+      },
+      problemLevel: payload.problemLevel,
+      selectedPublicTags: payload.selectedPublicTags,
+      selectedPrivateTags: payload.selectedPrivateTags,
+    }),
+    methods: {
+      refreshProblemAdmins: (): void => {
+        api.Problem.admins({ problem_alias: payload.alias })
+          .then((data) => {
+            problemEdit.initialAdmins = data.admins;
+            problemEdit.initialGroups = data.group_admins;
+          })
+          .catch(ui.apiError);
+      },
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-edit', {
         props: {
@@ -254,33 +281,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    methods: {
-      refreshProblemAdmins: (): void => {
-        api.Problem.admins({ problem_alias: payload.alias })
-          .then((data) => {
-            problemEdit.initialAdmins = data.admins;
-            problemEdit.initialGroups = data.group_admins;
-          })
-          .catch(ui.apiError);
-      },
-    },
-    data: () => ({
-      initialAdmins: payload.admins,
-      initialGroups: payload.groupAdmins,
-      publishedRevision: payload.publishedRevision,
-      statement: payload.statement,
-      solution: payload.solution || {
-        language: 'es',
-        markdown: '',
-        images: {},
-      },
-      problemLevel: payload.problemLevel,
-      selectedPublicTags: payload.selectedPublicTags,
-      selectedPrivateTags: payload.selectedPrivateTags,
-    }),
-    components: {
-      'omegaup-problem-edit': problem_Edit,
     },
   });
 });

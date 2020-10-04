@@ -48,6 +48,9 @@ OmegaUp.on('ready', () => {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-statementedit': problem_StatementEdit,
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-statementedit', {
         props: {
@@ -73,9 +76,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-problem-statementedit': problem_StatementEdit,
     },
   });
 });

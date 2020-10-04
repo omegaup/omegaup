@@ -14,6 +14,9 @@ import omegaup_Markdown from '../components/Markdown.vue';
 
     new Vue({
       el: <HTMLElement>problem.querySelector('div.statement'),
+      components: {
+        'omegaup-markdown': omegaup_Markdown,
+      },
       render: function (createElement) {
         return createElement('omegaup-markdown', {
           props: {
@@ -23,9 +26,6 @@ import omegaup_Markdown from '../components/Markdown.vue';
             problemSettings: problemDetails.settings,
           },
         });
-      },
-      components: {
-        'omegaup-markdown': omegaup_Markdown,
       },
     });
   });

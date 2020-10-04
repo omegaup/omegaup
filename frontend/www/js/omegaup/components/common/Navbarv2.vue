@@ -248,7 +248,7 @@
                 ></omegaup-common-grader-badge>
               </a>
               <div class="dropdown-menu dropdown-menu-right">
-                <template v-show="!omegaUpLockDown && !inContest">
+                <template v-if="!omegaUpLockDown && !inContest">
                   <a
                     v-show="!omegaUpLockDown && !inContest"
                     class="dropdown-item"
