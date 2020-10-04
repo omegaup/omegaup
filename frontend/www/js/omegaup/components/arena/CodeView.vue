@@ -75,6 +75,7 @@ export default class CodeView extends Vue {
   mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
 
   refresh() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore vue-codemirror-lite does not declare `editor` as a legitimate
     // property, so TypeScript cannot know about it.
     // It's also possible for the actual editor to not have been set yet if
