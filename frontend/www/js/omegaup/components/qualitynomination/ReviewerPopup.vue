@@ -4,10 +4,10 @@
     :possible-tags="PROBLEM_CATEGORIES"
     @submit="$emit('submit', tag, qualitySeal)"
   >
-    <template slot="link-title">
+    <template #link-title>
       {{ T.reviewerNomination }}
     </template>
-    <template slot="popup-content" slot-scope="slotProps">
+    <template #popup-content="slotProps">
       <div class="title-text">
         {{ T.reviewerNominationFormTitle }}
       </div>

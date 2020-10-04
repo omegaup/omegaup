@@ -116,16 +116,18 @@
           :show-overlay="showOverlay"
           @overlay-hidden="onPopupDismissed"
         >
-          <omegaup-arena-runsubmit
-            slot="popup-content"
-            :preferred-language="problem.preferred_language"
-            :languages="problem.languages"
-            :initial-show-form="showFormRunSubmit"
-            @dismiss="onPopupDismissed"
-            @submit-run="
-              (code, selectedLanguage) => onRunSubmitted(code, selectedLanguage)
-            "
-          ></omegaup-arena-runsubmit>
+          <template #popup-content>
+            <omegaup-arena-runsubmit
+              :preferred-language="problem.preferred_language"
+              :languages="problem.languages"
+              :initial-show-form="showFormRunSubmit"
+              @dismiss="onPopupDismissed"
+              @submit-run="
+                (code, selectedLanguage) =>
+                  onRunSubmitted(code, selectedLanguage)
+              "
+            ></omegaup-arena-runsubmit>
+          </template>
         </omegaup-overlay>
         <omegaup-arena-runs
           :problem-alias="problem.alias"

@@ -44,7 +44,7 @@
         :items-per-page="15"
         :title="T.profileContests"
       >
-        <template slot="table-header">
+        <template #table-header>
           <thead>
             <tr>
               <th>{{ T.profileContestsTableContest }}</th>
