@@ -11,6 +11,12 @@ OmegaUp.on('ready', () => {
   const finishTime = new Date(startTime.getTime() + 5 * 60 * 60 * 1000);
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-contest-new': contest_NewForm,
+    },
+    data: () => ({
+      invalidParameterName: <null | string>null,
+    }),
     render: function (createElement) {
       return createElement('omegaup-contest-new', {
         props: {
@@ -36,12 +42,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      invalidParameterName: <null | string>null,
-    }),
-    components: {
-      'omegaup-contest-new': contest_NewForm,
     },
   });
 });

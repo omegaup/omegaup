@@ -19,6 +19,9 @@ OmegaUp.on('ready', () => {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-school-profile': school_Profile,
+    },
     render: function (createElement) {
       return createElement('omegaup-school-profile', {
         props: {
@@ -69,9 +72,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-school-profile': school_Profile,
     },
   });
 });

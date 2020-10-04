@@ -35,7 +35,7 @@
         <omegaup-problem-settings-summary
           v-bind:problem="problem"
           v-bind:show-visibility-indicators="true"
-          v-bind:show-edit-link="this.user.admin"
+          v-bind:show-edit-link="user.admin"
         ></omegaup-problem-settings-summary>
 
         <div v-if="problem.karel_problem" class="karel-js-link my-3">
@@ -93,7 +93,7 @@
           "
         ></omegaup-quality-nomination-demotion>
         <omegaup-quality-nomination-promotion
-          v-if="this.user.loggedIn"
+          v-if="user.loggedIn"
           v-bind:can-nominate-problem="nominationStatus.canNoominateProblem"
           v-bind:dismissed="nominationStatus.dismissed"
           v-bind:dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
@@ -112,7 +112,7 @@
           "
         ></omegaup-quality-nomination-promotion>
         <omegaup-overlay
-          v-if="this.user.loggedIn"
+          v-if="user.loggedIn"
           v-bind:show-overlay="showOverlay"
           v-on:overlay-hidden="onPopupDismissed"
         >

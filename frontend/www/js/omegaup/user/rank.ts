@@ -17,6 +17,9 @@ OmegaUp.on('ready', () => {
   }));
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-user-rank': users_Rank,
+    },
     render: function (createElement) {
       return createElement('omegaup-user-rank', {
         props: {
@@ -31,9 +34,6 @@ OmegaUp.on('ready', () => {
           pagerItems: payload.pagerItems,
         },
       });
-    },
-    components: {
-      'omegaup-user-rank': users_Rank,
     },
   });
 });

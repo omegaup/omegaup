@@ -3,7 +3,7 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
-    <label v-if="this.showInvitedUsersFilter">
+    <label v-if="showInvitedUsersFilter">
       <input
         v-model="onlyShowExplicitlyInvited"
         class="toggle-contestants"
@@ -54,7 +54,7 @@
             v-for="(problem, problemIndex) in user.problems"
             v-bind:class="problemClass(problem, problems[problemIndex].alias)"
           >
-            <template v-if="problem.runs &gt; 0">
+            <template v-if="problem.runs > 0">
               <div class="points">
                 {{ renderPoints(problem) }}
               </div>

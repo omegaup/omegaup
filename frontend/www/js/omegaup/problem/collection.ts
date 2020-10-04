@@ -7,6 +7,9 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemListCollectionPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-collection': problem_Collection,
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-collection', {
         props: {
@@ -14,9 +17,6 @@ OmegaUp.on('ready', () => {
           problemCount: payload.problemCount,
         },
       });
-    },
-    components: {
-      'omegaup-problem-collection': problem_Collection,
     },
   });
 });

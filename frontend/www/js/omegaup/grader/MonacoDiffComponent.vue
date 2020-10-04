@@ -20,6 +20,22 @@ export default {
       title: 'diff',
     };
   },
+  computed: {
+    originalContents() {
+      return Util.vuexGet(this.store, this.storeMapping.originalContents);
+    },
+    modifiedContents() {
+      return Util.vuexGet(this.store, this.storeMapping.modifiedContents);
+    },
+  },
+  watch: {
+    originalContents: function (value) {
+      this._originalModel.setValue(value);
+    },
+    modifiedContents: function (value) {
+      this._modifiedModel.setValue(value);
+    },
+  },
   mounted: function () {
     this._originalModel = monaco.editor.createModel(
       this.originalContents,
@@ -42,22 +58,6 @@ export default {
   methods: {
     onResize: function () {
       this._editor.layout();
-    },
-  },
-  computed: {
-    originalContents() {
-      return Util.vuexGet(this.store, this.storeMapping.originalContents);
-    },
-    modifiedContents() {
-      return Util.vuexGet(this.store, this.storeMapping.modifiedContents);
-    },
-  },
-  watch: {
-    originalContents: function (value) {
-      this._originalModel.setValue(value);
-    },
-    modifiedContents: function (value) {
-      this._modifiedModel.setValue(value);
     },
   },
 };

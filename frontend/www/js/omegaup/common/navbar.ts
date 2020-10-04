@@ -10,6 +10,28 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
   const commonNavbar = new Vue({
     el: '#common-navbar',
+    components: {
+      'omegaup-common-navbar': payload.bootstrap4
+        ? common_NavbarV2
+        : common_Navbar,
+    },
+    data: () => ({
+      omegaUpLockDown: payload.omegaUpLockDown,
+      inContest: payload.inContest,
+      isLoggedIn: payload.isLoggedIn,
+      isReviewer: payload.isReviewer,
+      gravatarURL51: payload.gravatarURL51,
+      currentUsername: payload.currentUsername,
+      isAdmin: payload.isAdmin,
+      isMainUserIdentity: payload.isMainUserIdentity,
+      lockDownImage: payload.lockDownImage,
+      navbarSection: payload.navbarSection,
+      notifications: <types.Notification[]>[],
+      graderInfo: <types.GraderStatus | null>null,
+      graderQueueLength: -1,
+      errorMessage: <string | null>null,
+      initialClarifications: [],
+    }),
     render: function (createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
@@ -44,28 +66,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      omegaUpLockDown: payload.omegaUpLockDown,
-      inContest: payload.inContest,
-      isLoggedIn: payload.isLoggedIn,
-      isReviewer: payload.isReviewer,
-      gravatarURL51: payload.gravatarURL51,
-      currentUsername: payload.currentUsername,
-      isAdmin: payload.isAdmin,
-      isMainUserIdentity: payload.isMainUserIdentity,
-      lockDownImage: payload.lockDownImage,
-      navbarSection: payload.navbarSection,
-      notifications: <types.Notification[]>[],
-      graderInfo: <types.GraderStatus | null>null,
-      graderQueueLength: -1,
-      errorMessage: <string | null>null,
-      initialClarifications: [],
-    }),
-    components: {
-      'omegaup-common-navbar': payload.bootstrap4
-        ? common_NavbarV2
-        : common_Navbar,
     },
   });
 

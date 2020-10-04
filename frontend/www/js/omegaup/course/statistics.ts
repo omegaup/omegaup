@@ -9,6 +9,9 @@ OmegaUp.on('ready', function () {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-statistics': course_Statistics,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-statistics', {
         props: {
@@ -18,9 +21,6 @@ OmegaUp.on('ready', function () {
           verdicts: payload.verdicts,
         },
       });
-    },
-    components: {
-      'omegaup-course-statistics': course_Statistics,
     },
   });
 });

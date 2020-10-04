@@ -11,6 +11,12 @@ OmegaUp.on('ready', () => {
   const courseAlias = payload.course.alias;
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-edit': course_AssignmentDetails,
+    },
+    data: () => ({
+      invalidParameterName: <string | null>null,
+    }),
     render: function (createElement) {
       return createElement('omegaup-course-edit', {
         props: {
@@ -55,12 +61,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      invalidParameterName: <string | null>null,
-    }),
-    components: {
-      'omegaup-course-edit': course_AssignmentDetails,
     },
   });
 });

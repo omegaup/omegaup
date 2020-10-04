@@ -9,6 +9,9 @@ OmegaUp.on('ready', () => {
   );
   new Vue({
     el: '#problem-settings-summary',
+    components: {
+      'omegaup-problem-settings-summary': problem_SettingsSummary,
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-settings-summary', {
         props: {
@@ -17,9 +20,6 @@ OmegaUp.on('ready', () => {
           showEditLink: payload.problem_admin,
         },
       });
-    },
-    components: {
-      'omegaup-problem-settings-summary': problem_SettingsSummary,
     },
   });
 });

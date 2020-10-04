@@ -10,6 +10,9 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseDetailsPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-details': course_Details,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-details', {
         props: {
@@ -35,9 +38,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-course-details': course_Details,
     },
   });
 });

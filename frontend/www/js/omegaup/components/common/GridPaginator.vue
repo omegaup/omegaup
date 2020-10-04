@@ -46,9 +46,7 @@
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="
-            this.totalPagesCount === 1 || this.currentPageNumber === 0
-          "
+          v-bind:disabled="totalPagesCount === 1 || currentPageNumber === 0"
           v-on:click="previousPage"
         >
           {{ T.wordsPrevious }}
@@ -56,7 +54,9 @@
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="this.totalPagesCount === 1 || this.currentPageNumber &gt;= this.totalPagesCount - 1"
+          v-bind:disabled="
+            totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
+          "
           v-on:click="nextPage"
         >
           {{ T.wordsNext }}

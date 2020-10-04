@@ -15,6 +15,14 @@ OmegaUp.on('ready', function () {
 
   const nominationsList = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-qualitynomination-list': qualitynomination_List,
+    },
+    data: () => ({
+      nominations: <types.NominationListItem[]>[],
+      pagerItems: <types.PageItem[]>[],
+      pages: 1,
+    }),
     render: function (createElement) {
       return createElement('omegaup-qualitynomination-list', {
         props: {
@@ -38,14 +46,6 @@ OmegaUp.on('ready', function () {
           },
         },
       });
-    },
-    data: () => ({
-      nominations: <types.NominationListItem[]>[],
-      pagerItems: <types.PageItem[]>[],
-      pages: 1,
-    }),
-    components: {
-      'omegaup-qualitynomination-list': qualitynomination_List,
     },
   });
 

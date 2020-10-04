@@ -8,6 +8,9 @@ OmegaUp.on('ready', () => {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-schools-rank': schools_Rank,
+    },
     render: function (createElement) {
       return createElement('omegaup-schools-rank', {
         props: {
@@ -19,9 +22,6 @@ OmegaUp.on('ready', () => {
           pagerItems: payload.pagerItems,
         },
       });
-    },
-    components: {
-      'omegaup-schools-rank': schools_Rank,
     },
   });
 });

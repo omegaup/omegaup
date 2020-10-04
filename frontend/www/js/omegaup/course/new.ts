@@ -14,6 +14,12 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseNewPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-form': course_Form,
+    },
+    data: () => ({
+      invalidParameterName: '',
+    }),
     render: function (createElement) {
       return createElement('omegaup-course-form', {
         props: {
@@ -82,12 +88,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      invalidParameterName: '',
-    }),
-    components: {
-      'omegaup-course-form': course_Form,
     },
   });
 });

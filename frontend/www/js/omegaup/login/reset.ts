@@ -11,6 +11,9 @@ OmegaUp.on('ready', () => {
 
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-login-password-reset': login_PasswordReset,
+    },
     render: function (createElement) {
       return createElement('omegaup-login-password-reset', {
         props: {
@@ -37,9 +40,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-login-password-reset': login_PasswordReset,
     },
   });
 });

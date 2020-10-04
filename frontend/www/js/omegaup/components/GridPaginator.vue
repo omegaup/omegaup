@@ -18,7 +18,7 @@
         </label>
       </div>
     </div>
-    <table v-if="items.length &gt; 0" class="table table-striped">
+    <table v-if="items.length > 0" class="table table-striped">
       <slot name="table-header"></slot>
       <tbody>
         <tr v-for="(group, index) in paginatedItems">
@@ -38,14 +38,12 @@
         </tr>
       </tbody>
     </table>
-    <div v-if="items.length &gt; 0" class="panel-footer text-center">
+    <div v-if="items.length > 0" class="panel-footer text-center">
       <div class="btn-group" role="group">
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="
-            this.totalPagesCount === 1 || this.currentPageNumber === 0
-          "
+          v-bind:disabled="totalPagesCount === 1 || currentPageNumber === 0"
           v-on:click="previousPage"
         >
           {{ T.wordsPrevious }}
@@ -53,7 +51,9 @@
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="this.totalPagesCount === 1 || this.currentPageNumber &gt;= this.totalPagesCount - 1"
+          v-bind:disabled="
+            totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
+          "
           v-on:click="nextPage"
         >
           {{ T.wordsNext }}

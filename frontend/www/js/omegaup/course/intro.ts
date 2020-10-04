@@ -9,6 +9,12 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IntroDetailsPayload();
   const courseIntro = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-intro': course_Intro,
+    },
+    data: () => ({
+      userRegistrationRequested: payload.userRegistrationRequested,
+    }),
     render: function (createElement) {
       return createElement('omegaup-course-intro', {
         props: {
@@ -48,12 +54,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      userRegistrationRequested: payload.userRegistrationRequested,
-    }),
-    components: {
-      'omegaup-course-intro': course_Intro,
     },
   });
 });

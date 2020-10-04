@@ -9,6 +9,15 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
   const commonNavbar = new Vue({
     el: '#common-navbar',
+    components: {
+      'omegaup-common-navbar': common_NavbarV2,
+    },
+    data: () => ({
+      notifications: <types.Notification[]>[],
+      graderInfo: <types.GraderStatus | null>null,
+      graderQueueLength: -1,
+      errorMessage: <string | null>null,
+    }),
     render: function (createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
@@ -50,15 +59,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      notifications: <types.Notification[]>[],
-      graderInfo: <types.GraderStatus | null>null,
-      graderQueueLength: -1,
-      errorMessage: <string | null>null,
-    }),
-    components: {
-      'omegaup-common-navbar': common_NavbarV2,
     },
   });
 

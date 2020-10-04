@@ -7,15 +7,15 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseListPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-cards-list': course_CardsList,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-cards-list', {
         props: {
           courses: payload.courses,
         },
       });
-    },
-    components: {
-      'omegaup-course-cards-list': course_CardsList,
     },
   });
 });

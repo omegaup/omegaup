@@ -10,7 +10,7 @@
             <strong>{{ T.qualityNominationType }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.nomination }}
+            {{ nomination }}
           </div>
         </div>
         <div class="row">
@@ -18,9 +18,9 @@
             <strong>{{ T.wordsNominator }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.nominator.name }} (<a
-              v-bind:href="userUrl(this.nominator.username)"
-              >{{ this.nominator.username }}</a
+            {{ nominator.name }} (<a
+              v-bind:href="userUrl(nominator.username)"
+              >{{ nominator.username }}</a
             >)
           </div>
         </div>
@@ -29,9 +29,9 @@
             <strong>{{ T.wordsProblem }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.problem.title }} (<a
-              v-bind:href="problemUrl(this.problem.alias)"
-              >{{ this.problem.alias }}</a
+            {{ problem.title }} (<a v-bind:href="problemUrl(problem.alias)">{{
+              problem.alias
+            }}</a
             >)
           </div>
         </div>
@@ -40,9 +40,9 @@
             <strong>{{ T.wordsAuthor }}</strong>
           </div>
           <div class="col-sm-4">
-            {{ this.author.name }} (<a
-              v-bind:href="userUrl(this.author.username)"
-              >{{ this.author.username }}</a
+            {{ author.name }} (<a v-bind:href="userUrl(author.username)">{{
+              author.username
+            }}</a
             >)
           </div>
         </div>
@@ -51,7 +51,7 @@
             <strong>{{ T.wordsDetails }}</strong>
           </div>
           <div class="col-sm-8">
-            <pre class="border rounded bg-light">{{ this.contents }}</pre>
+            <pre class="border rounded bg-light">{{ contents }}</pre>
           </div>
         </div>
         <div class="row">
@@ -80,10 +80,7 @@
             ></textarea>
           </div>
         </div>
-        <div
-          v-if="this.nomination == 'demotion' && this.reviewer == true"
-          class="row"
-        >
+        <div v-if="nomination == 'demotion' && reviewer == true" class="row">
           <div class="col-sm-3">
             <strong>{{ T.wordsVerdict }}</strong>
           </div>

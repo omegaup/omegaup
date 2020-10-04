@@ -8,6 +8,9 @@ OmegaUp.on('ready', () => {
 
   new Vue({
     el: '#common-footer',
+    components: {
+      'omegaup-common-footer': Footer,
+    },
     render: function (createElement) {
       return createElement('omegaup-common-footer', {
         props: {
@@ -15,9 +18,6 @@ OmegaUp.on('ready', () => {
           omegaUpLockDown: (payload && payload.omegaUpLockDown) || false,
         },
       });
-    },
-    components: {
-      'omegaup-common-footer': Footer,
     },
   });
 });

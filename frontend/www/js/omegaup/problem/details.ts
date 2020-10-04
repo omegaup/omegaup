@@ -13,6 +13,18 @@ OmegaUp.on('ready', () => {
   const locationHash = window.location.hash.substr(1).split('/');
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-details': problem_Details,
+    },
+    data: () => ({
+      initialClarifications: payload.clarifications,
+      solutionStatus: payload.solutionStatus,
+      solution: <types.ProblemStatement | null>null,
+      availableTokens: 0,
+      allTokens: 0,
+      showNewRunWindow: locationHash.includes('new-run'),
+      activeTab: window.location.hash ? locationHash[0] : 'problems',
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
@@ -190,18 +202,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      initialClarifications: payload.clarifications,
-      solutionStatus: payload.solutionStatus,
-      solution: <types.ProblemStatement | null>null,
-      availableTokens: 0,
-      allTokens: 0,
-      showNewRunWindow: locationHash.includes('new-run'),
-      activeTab: window.location.hash ? locationHash[0] : 'problems',
-    }),
-    components: {
-      'omegaup-problem-details': problem_Details,
     },
   });
 });

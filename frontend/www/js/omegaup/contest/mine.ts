@@ -12,6 +12,12 @@ OmegaUp.on('ready', () => {
   let showAllContests = false;
   const contestMine = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-contest-mine': contest_Mine,
+    },
+    data: () => ({
+      contests: payload.contests,
+    }),
     render: function (createElement) {
       return createElement('omegaup-contest-mine', {
         props: {
@@ -91,12 +97,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: () => ({
-      contests: payload.contests,
-    }),
-    components: {
-      'omegaup-contest-mine': contest_Mine,
     },
   });
 

@@ -25,11 +25,7 @@
               v-bind:onHide="onHide"
             >
               <div class="title-text">
-                {{
-                  this.solved
-                    ? T.qualityFormCongrats
-                    : T.qualityFormRateBeforeAC
-                }}
+                {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAC }}
               </div>
               <div class="form-group">
                 <label class="control-label">
@@ -106,9 +102,7 @@
                 <button
                   class="col-md-4 mr-2 btn btn-primary"
                   type="submit"
-                  v-bind:disabled="
-                    !this.quality && !this.tags.length && !this.difficulty
-                  "
+                  v-bind:disabled="!quality && !tags.length && !difficulty"
                   v-on:click="onSubmit"
                 >
                   {{ T.wordsSend }}
