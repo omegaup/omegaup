@@ -908,7 +908,11 @@ EOD;
                     echo "| Name | Type | Description |\n";
                     echo "|------|------|-------------|\n";
                     foreach ($method->requestParams as $requestParam) {
-                        echo "| `{$requestParam->name}` | `{$requestParam->type}` | {$requestParam->description} |\n";
+                        echo "| `{$requestParam->name}` | `" . str_replace(
+                            '|',
+                            '\\|',
+                            $requestParam->type
+                        ) . "` | {$requestParam->description} |\n";
                     }
                 }
 
@@ -924,7 +928,11 @@ EOD;
                     echo "|------|------|\n";
                     ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
-                        echo "| `{$paramName}` | `{$paramType}` |\n";
+                        echo "| `{$paramName}` | `" . str_replace(
+                            '|',
+                            '\\|',
+                            $paramType
+                        ) . "` |\n";
                     }
                 }
             }

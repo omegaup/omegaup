@@ -137,7 +137,7 @@ export class Converter {
       </div>`;
     }
 
-    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)*[\]$]+)|(?:[a-z\/_-]+))")|(?:target="[a-z\/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|iframe(?: (?:src="https:\/\/www\.facebook\.com\/plugins\/video.php\?[\w\d%-_]+"|(?:width|height|style|scrolling|allowTransparency|allowFullScreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
+    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#/%?=~_|!:,.;()*[\]$]+)|(?:[a-z/_-]+))")|(?:target="[a-z/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
     const imageWhitelist = new RegExp(
       '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',
       'i',
@@ -159,7 +159,7 @@ export class Converter {
     ): string => {
       // First we have to escape the escape characters so that
       // we can build a character class out of them
-      let regexString = `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
+      let regexString = `([${charsToEscape.replace(/([[\]\\])/g, '\\$1')}])`;
 
       if (afterBackslash) {
         regexString = `\\\\${regexString}`;
@@ -189,7 +189,7 @@ export class Converter {
       text = text.replace(
         /^\s*\{\{([a-z0-9_-]+:[a-z0-9_-]+)\}\}\s*$/g,
         (wholematch: string, m1: string): string => {
-          if (templates.hasOwnProperty(m1)) {
+          if (Object.prototype.hasOwnProperty.call(templates, m1)) {
             return templates[m1];
           }
           return `<span class="alert alert-danger" role="alert">Unrecognized template name: ${m1}</span>`;
@@ -198,21 +198,21 @@ export class Converter {
       // File transclusion.
       const sourceMapping: ImageMapping = this._sourceMapping || {};
       text = text.replace(
-        /^\s*\{\{([a-z0-9_-]+\.[a-z]{1,4})\}\}\s*$/g,
+        /^\s*\{\{([a-z0-9_-]+\.[a-z]{1,4})\}\}\s*$/gi,
         (wholematch: string, m1: string): string => {
-          if (!sourceMapping.hasOwnProperty(m1)) {
+          if (!Object.prototype.hasOwnProperty.call(sourceMapping, m1)) {
             return `<span class="alert alert-danger" role="alert">Unrecognized source filename: ${m1}</span>`;
           }
 
           const extension = m1.split('.')[1];
           let language = extension;
-          if (languageMapping.hasOwnProperty(language)) {
+          if (Object.prototype.hasOwnProperty.call(languageMapping, language)) {
             language = languageMapping[language];
           }
           const className = ` class="language-${language}"`;
           let contents = sourceMapping[m1];
 
-          if (Prism.languages.hasOwnProperty(language)) {
+          if (Object.prototype.hasOwnProperty.call(Prism.languages, language)) {
             contents = Prism.highlight(
               contents,
               Prism.languages[language],
@@ -233,7 +233,10 @@ export class Converter {
         /<img src="([^"]+)"\s*([^>]+)>/g,
         (wholeMatch: string, url: string, attributes: string): string => {
           url = unescapeCharacters(url);
-          if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
+          if (
+            url.indexOf('/') != -1 ||
+            !Object.prototype.hasOwnProperty.call(imageMapping, url)
+          ) {
             return wholeMatch;
           }
           return `<img src="${escapeCharacters(
@@ -320,6 +323,7 @@ export class Converter {
                   in: `{{examples/${exampleFilename}.in}}`,
                   out: `{{examples/${exampleFilename}.out}}`,
                 };
+                // eslint-disable-next-line no-prototype-builtins
                 if (settings?.cases.hasOwnProperty(exampleFilename)) {
                   exampleFile = settings.cases[exampleFilename];
                 }
@@ -355,8 +359,8 @@ export class Converter {
       'preBlockGamut',
       (
         text: string,
-        blockGamut: (text: string) => string,
-        spanGamut: (text: string) => string,
+        blockGamut: (text: string) => string, // eslint-disable-line @typescript-eslint/no-unused-vars
+        spanGamut: (text: string) => string, // eslint-disable-line @typescript-eslint/no-unused-vars
       ): string => {
         // GitHub-flavored fenced code blocks
         const fencedCodeBlock = (
@@ -372,12 +376,17 @@ export class Converter {
           if (infoString != '') {
             language = infoString.split(/\s+/)[0];
             className = ` class="language-${language}"`;
-            if (languageMapping.hasOwnProperty(language)) {
+            if (
+              Object.prototype.hasOwnProperty.call(languageMapping, language)
+            ) {
               language = languageMapping[language];
             }
           }
 
-          if (language && Prism.languages.hasOwnProperty(language)) {
+          if (
+            language &&
+            Object.prototype.hasOwnProperty.call(Prism.languages, language)
+          ) {
             contents = Prism.highlight(
               contents,
               Prism.languages[language],
@@ -390,9 +399,9 @@ export class Converter {
               .replace(/>/g, '&gt;');
           }
           if (indentation != '') {
-            let lines = [];
-            let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
-            for (let line of contents.split('\n')) {
+            const lines = [];
+            const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+            for (const line of contents.split('\n')) {
               lines.push(line.replace(stripPrefix, ''));
             }
             contents = escapeCharacters(
@@ -430,6 +439,7 @@ export class Converter {
         // GitHub-flavored Markdown table.
         return text.replace(
           /^ {0,3}\|[^\n]*\|[ \t]*(\n {0,3}\|[^\n]*\|[ \t]*)+$/gm,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           (whole: string, inner: string): string => {
             let cells = whole
               .trim()

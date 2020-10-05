@@ -1,6 +1,5 @@
 import { omegaup, OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import T from '../lang';
 import Vue from 'vue';
 import contest_Intro from '../components/contest/Intro.vue';
 import * as ui from '../ui';
@@ -9,8 +8,11 @@ import * as api from '../api';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestIntroPayload();
   const headerPayload = types.payloadParsers.CommonPayload();
-  const contestIntro = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-contest-intro': contest_Intro,
+    },
     render: function (createElement) {
       return createElement('omegaup-contest-intro', {
         props: {
@@ -38,9 +40,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-contest-intro': contest_Intro,
     },
   });
 });

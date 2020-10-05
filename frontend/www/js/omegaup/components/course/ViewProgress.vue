@@ -5,7 +5,7 @@
         <div class="omegaup-course-viewprogress card">
           <div class="card-header">
             <h2>
-              <a v-bind:href="courseUrl">{{ course.name }}</a>
+              <a :href="courseUrl">{{ course.name }}</a>
             </h2>
           </div>
           <div class="card-body table-responsive">
@@ -14,9 +14,9 @@
                 <tr>
                   <th class="text-center">{{ T.wordsName }}</th>
                   <th
-                    v-bind:key="assignment.alias"
-                    class="score text-center"
                     v-for="assignment in assignments"
+                    :key="assignment.alias"
+                    class="score text-center"
                   >
                     {{ assignment.name }}
                   </th>
@@ -25,10 +25,10 @@
               <tbody>
                 <omegaup-student-progress
                   v-for="student in students"
-                  v-bind:key="student.username"
-                  v-bind:student="student"
-                  v-bind:assignments="assignments"
-                  v-bind:course="course"
+                  :key="student.username"
+                  :student="student"
+                  :assignments="assignments"
+                  :course="course"
                 >
                 </omegaup-student-progress>
               </tbody>
@@ -46,14 +46,14 @@
           <div class="card-body">
             <a
               class="btn btn-primary btn-sm mr-1"
-              v-bind:download="csvFilename"
-              v-bind:href="csvDataUrl"
+              :download="csvFilename"
+              :href="csvDataUrl"
               >.csv</a
             >
             <a
               class="btn btn-primary btn-sm"
-              v-bind:download="odsFilename"
-              v-bind:href="odsDataUrl"
+              :download="odsFilename"
+              :href="odsDataUrl"
               >.ods</a
             >
           </div>
@@ -64,18 +64,8 @@
   <!-- panel -->
 </template>
 
-<style>
-.panel-body {
-  overflow: auto;
-  white-space: nowrap;
-}
-.sticky-offset {
-  top: 4rem;
-}
-</style>
-
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
@@ -160,7 +150,9 @@ export default class CourseViewProgress extends Vue {
     student: types.StudentProgress,
     assignment: omegaup.Assignment,
   ): number {
-    if (!student.score.hasOwnProperty(assignment.alias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(student.score, assignment.alias)
+    ) {
       return 0;
     }
 
@@ -285,3 +277,13 @@ export default class CourseViewProgress extends Vue {
   }
 }
 </script>
+
+<style>
+.panel-body {
+  overflow: auto;
+  white-space: nowrap;
+}
+.sticky-offset {
+  top: 4rem;
+}
+</style>

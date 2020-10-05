@@ -1,9 +1,8 @@
 import course_Form from '../components/course/Form.vue';
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { messages, types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
-import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -13,8 +12,14 @@ OmegaUp.on('ready', () => {
   const defaultStartTime = now;
   const defaultFinishTime = finishTime;
   const payload = types.payloadParsers.CourseNewPayload();
-  const details = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-form': course_Form,
+    },
+    data: () => ({
+      invalidParameterName: '',
+    }),
     render: function (createElement) {
       return createElement('omegaup-course-form', {
         props: {
@@ -35,7 +40,7 @@ OmegaUp.on('ready', () => {
         },
         on: {
           submit: (source: course_Form) => {
-            new Promise<number | null>((accept, reject) => {
+            new Promise<number | null>((accept) => {
               if (source.school_id !== undefined) {
                 accept(source.school_id);
               } else if (source.school_name) {
@@ -83,10 +88,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: { invalidParameterName: '' },
-    components: {
-      'omegaup-course-form': course_Form,
     },
   });
 });

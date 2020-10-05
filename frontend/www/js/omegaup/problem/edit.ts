@@ -14,14 +14,38 @@ OmegaUp.on('ready', () => {
   if (payload.statusSuccess) {
     ui.success(T.problemEditUpdatedSuccessfully);
   }
-  const statements: types.Statements = {
-    [payload.statement.language]: payload.statement.markdown,
-  };
   const solutions: types.Statements = {
     [payload.statement?.language || 'es']: payload.solution?.markdown || '',
   };
   const problemEdit = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-edit': problem_Edit,
+    },
+    data: () => ({
+      initialAdmins: payload.admins,
+      initialGroups: payload.groupAdmins,
+      publishedRevision: payload.publishedRevision,
+      statement: payload.statement,
+      solution: payload.solution || {
+        language: 'es',
+        markdown: '',
+        images: {},
+      },
+      problemLevel: payload.problemLevel,
+      selectedPublicTags: payload.selectedPublicTags,
+      selectedPrivateTags: payload.selectedPrivateTags,
+    }),
+    methods: {
+      refreshProblemAdmins: (): void => {
+        api.Problem.admins({ problem_alias: payload.alias })
+          .then((data) => {
+            problemEdit.initialAdmins = data.admins;
+            problemEdit.initialGroups = data.group_admins;
+          })
+          .catch(ui.apiError);
+      },
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-edit', {
         props: {
@@ -44,7 +68,7 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.alias,
               level_tag: levelTag,
             })
-              .then((response) => {
+              .then(() => {
                 ui.success(T.problemLevelUpdated);
                 this.problemLevel = levelTag;
               })
@@ -61,7 +85,7 @@ OmegaUp.on('ready', () => {
             // solutions are the same.
             if (markdownType === 'statements') {
               problemEdit.statement.markdown = currentMarkdown;
-              if (statements.hasOwnProperty(language)) {
+              if (Object.prototype.hasOwnProperty.call(statements, language)) {
                 problemEdit.statement.markdown = statements[language];
                 return;
               }
@@ -89,7 +113,7 @@ OmegaUp.on('ready', () => {
                 });
             } else {
               problemEdit.solution.markdown = currentMarkdown;
-              if (solutions.hasOwnProperty(language)) {
+              if (Object.prototype.hasOwnProperty.call(solutions, language)) {
                 problemEdit.solution.markdown = solutions[language];
                 return;
               }
@@ -167,7 +191,7 @@ OmegaUp.on('ready', () => {
               allow_user_add_tags: allowTags,
               message: `${T.problemEditFormAllowUserAddTags}: ${allowTags}`,
             })
-              .then((response) => {
+              .then(() => {
                 ui.success(T.problemEditUpdatedSuccessfully);
               })
               .catch(ui.apiError);
@@ -225,7 +249,7 @@ OmegaUp.on('ready', () => {
               commit: selectedRevision.commit,
               update_published: updatePublished,
             })
-              .then((response) => {
+              .then(() => {
                 problemEdit.publishedRevision = selectedRevision;
                 ui.success(T.problemVersionUpdated);
               })
@@ -250,40 +274,13 @@ OmegaUp.on('ready', () => {
           },
           remove: (problemAlias: string) => {
             api.Problem.delete({ problem_alias: problemAlias })
-              .then((response) => {
+              .then(() => {
                 window.location.href = '/problem/mine/';
               })
               .catch(ui.apiError);
           },
         },
       });
-    },
-    methods: {
-      refreshProblemAdmins: (): void => {
-        api.Problem.admins({ problem_alias: payload.alias })
-          .then((data) => {
-            problemEdit.initialAdmins = data.admins;
-            problemEdit.initialGroups = data.group_admins;
-          })
-          .catch(ui.apiError);
-      },
-    },
-    data: {
-      initialAdmins: payload.admins,
-      initialGroups: payload.groupAdmins,
-      publishedRevision: payload.publishedRevision,
-      statement: payload.statement,
-      solution: payload.solution || {
-        language: 'es',
-        markdown: '',
-        images: {},
-      },
-      problemLevel: payload.problemLevel,
-      selectedPublicTags: payload.selectedPublicTags,
-      selectedPrivateTags: payload.selectedPrivateTags,
-    },
-    components: {
-      'omegaup-problem-edit': problem_Edit,
     },
   });
 });

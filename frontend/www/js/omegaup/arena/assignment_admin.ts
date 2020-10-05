@@ -7,7 +7,7 @@ import { types } from '../api_types';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseDetailsPayload();
   const options = GetOptionsFromLocation(window.location);
-  const assignmentMatch = /\/course\/([^\/]+)(?:\/assignment\/([^\/]+)\/?)?/.exec(
+  const assignmentMatch = /\/course\/([^/]+)(?:\/assignment\/([^/]+)\/?)?/.exec(
     window.location.pathname,
   );
   if (assignmentMatch) {

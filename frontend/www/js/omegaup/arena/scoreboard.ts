@@ -6,7 +6,7 @@ import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
   const headerPayload = types.payloadParsers.CommonPayload('header-payload');
-  const params = /\/arena\/([^\/]+)\/scoreboard\/([^\/]+)\/?/.exec(
+  const params = /\/arena\/([^/]+)\/scoreboard\/([^/]+)\/?/.exec(
     window.location.pathname,
   );
   const options = {

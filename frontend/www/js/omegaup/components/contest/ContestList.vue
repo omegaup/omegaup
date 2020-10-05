@@ -3,13 +3,13 @@
     <div class="panel-heading">
       <h3 class="panel-title">{{ title }}</h3>
     </div>
-    <div class="panel-body" v-if="isAdmin">
-      <div class="checkbox btn-group" v-if="isAdmin">
+    <div v-if="isAdmin" class="panel-body">
+      <div v-if="isAdmin" class="checkbox btn-group">
         <label
           ><input
             class="show-admin-contests"
             type="checkbox"
-            v-on:click="onShowAdmin"
+            @click="onShowAdmin"
           />
           {{ T.contestListShowAdminContests }}</label
         >
@@ -24,17 +24,17 @@
         </button>
         <ul class="dropdown-menu" role="menu">
           <li>
-            <a v-on:click="onBulkUpdate(selectedContests, 'public')">{{
+            <a @click="onBulkUpdate(selectedContests, 'public')">{{
               T.makePublic
             }}</a>
           </li>
           <li>
-            <a v-on:click="onBulkUpdate(selectedContests, 'private')">{{
+            <a @click="onBulkUpdate(selectedContests, 'private')">{{
               T.makePrivate
             }}</a>
           </li>
           <li>
-            <a v-on:click="onBulkUpdate(selectedContests, 'registration')">{{
+            <a @click="onBulkUpdate(selectedContests, 'registration')">{{
               T.makeRegistration
             }}</a>
           </li>
@@ -50,35 +50,35 @@
           <th>{{ T.arenaPracticeStartTime }}</th>
           <th>{{ T.arenaPracticeEndtime }}</th>
           <th v-if="isAdmin">{{ T.contestNewFormAdmissionMode }}</th>
-          <th colspan="2" v-if="isAdmin">{{ T.wordsScoreboard }}</th>
-          <th colspan="7" v-if="isAdmin"></th>
+          <th v-if="isAdmin" colspan="2">{{ T.wordsScoreboard }}</th>
+          <th v-if="isAdmin" colspan="7"></th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="contest in contests">
           <td v-if="isAdmin">
             <input
-              type="checkbox"
+              :id="contest.alias"
               v-model="selectedContests"
-              v-bind:value="contest.alias"
-              v-bind:id="contest.alias"
+              type="checkbox"
+              :value="contest.alias"
             />
           </td>
 
           <td>
             <strong
-              ><a v-bind:href="'/arena/' + contest.alias + '/'">{{
+              ><a :href="'/arena/' + contest.alias + '/'">{{
                 ui.contestTitle(contest)
               }}</a></strong
             >
           </td>
           <td>
-            <a v-bind:href="makeWorldClockLink(contest.start_time)">{{
+            <a :href="makeWorldClockLink(contest.start_time)">{{
               contest.start_time.format('long')
             }}</a>
           </td>
           <td>
-            <a v-bind:href="makeWorldClockLink(contest.finish_time)">{{
+            <a :href="makeWorldClockLink(contest.finish_time)">{{
               contest.finish_time.format('long')
             }}</a>
           </td>
@@ -92,76 +92,76 @@
           <td v-else-if="contest.admission_mode == 'registration'">
             {{ T.wordsRegistration }}
           </td>
-          <td v-else=""></td>
+          <td v-else></td>
           <td v-if="isAdmin">
             <a
+              v-if="contest.scoreboard_url"
               class="glyphicon glyphicon-link"
-              v-bind:href="
+              :href="
                 '/arena/' +
                 contest.alias +
                 '/scoreboard/' +
                 contest.scoreboard_url
               "
-              v-bind:title="T.contestScoreboardLink"
-              v-if="contest.scoreboard_url"
+              :title="T.contestScoreboardLink"
               >Public</a
             >
           </td>
           <td v-if="isAdmin">
             <a
+              v-if="contest.scoreboard_url_admin"
               class="glyphicon glyphicon-link"
-              v-bind:href="
+              :href="
                 '/arena/' +
                 contest.alias +
                 '/scoreboard/' +
                 contest.scoreboard_url_admin
               "
-              v-bind:title="T.contestScoreboardAdminLink"
-              v-if="contest.scoreboard_url_admin"
+              :title="T.contestScoreboardAdminLink"
               >Admin</a
             >
           </td>
           <td v-if="isAdmin">
             <a
               class="glyphicon glyphicon-edit"
-              v-bind:href="'/contest/' + contest.alias + '/edit/'"
-              v-bind:title="T.wordsEdit"
+              :href="'/contest/' + contest.alias + '/edit/'"
+              :title="T.wordsEdit"
             ></a>
           </td>
           <td v-if="isAdmin">
             <a
               class="glyphicon glyphicon-dashboard"
-              v-bind:href="'/arena/' + contest.alias + '/admin/'"
-              v-bind:title="T.contestListSubmissions"
+              :href="'/arena/' + contest.alias + '/admin/'"
+              :title="T.contestListSubmissions"
             ></a>
           </td>
           <td v-if="isAdmin">
             <a
               class="glyphicon glyphicon-stats"
-              v-bind:href="'/contest/' + contest.alias + '/stats/'"
-              v-bind:title="T.profileStatistics"
+              :href="'/contest/' + contest.alias + '/stats/'"
+              :title="T.profileStatistics"
             ></a>
           </td>
           <td v-if="isAdmin">
             <a
               class="glyphicon glyphicon-time"
-              v-bind:href="'/contest/' + contest.alias + '/activity/'"
-              v-bind:title="T.activityReport"
+              :href="'/contest/' + contest.alias + '/activity/'"
+              :title="T.activityReport"
             ></a>
           </td>
           <td v-if="isAdmin">
             <a
               class="glyphicon glyphicon-print"
-              v-bind:href="'/arena/' + contest.alias + '/print/'"
-              v-bind:title="T.contestPrintableVersion"
+              :href="'/arena/' + contest.alias + '/print/'"
+              :title="T.contestPrintableVersion"
             ></a>
           </td>
           <td v-if="isAdmin">
             <a
               class="glyphicon glyphicon-download"
               href="#download"
-              v-bind:title="T.contestDownloadListOfUsersInContest"
-              v-on:click="onDownloadCsv(contest.alias)"
+              :title="T.contestDownloadListOfUsersInContest"
+              @click="onDownloadCsv(contest.alias)"
             ></a>
           </td>
         </tr>

@@ -1,40 +1,41 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="row" v-if="showEditControls">
+      <div v-if="showEditControls" class="row">
         <div class="form-group col-md-6">
           <label class="font-weight-bold">{{ T.statementLanguage }}</label>
-          <select class="form-control" v-model="currentLanguage">
+          <select v-model="currentLanguage" class="form-control">
             <option
-              v-bind:markdown-contents.sync="currentMarkdown"
-              v-bind:value="language"
               v-for="language in languages"
-              >{{ getLanguageNameText(language) }}</option
+              :markdown-contents="currentMarkdown"
+              :value="language"
             >
+              {{ getLanguageNameText(language) }}
+            </option>
           </select>
         </div>
         <div
           class="form-group col-md-6"
-          v-bind:class="{ 'has-error': errors.includes('message') }"
+          :class="{ 'has-error': errors.includes('message') }"
         >
           <label class="control-label">{{ T.problemEditCommitMessage }}</label>
-          <input class="form-control" v-model="commitMessage" />
+          <input v-model="commitMessage" class="form-control" />
         </div>
       </div>
       <div class="row">
         <div class="col-md-6">
           <div ref="markdownButtonBar" class="wmd-button-bar"></div>
           <textarea
-            class="wmd-input"
             ref="markdownInput"
             v-model="currentMarkdown"
+            class="wmd-input"
           ></textarea>
         </div>
         <div class="col-md-6">
           <h1 class="title text-center">{{ title }}</h1>
           <omegaup-markdown
-            v-bind:markdown="currentMarkdown"
-            v-bind:image-mapping="statement.images"
+            :markdown="currentMarkdown"
+            :image-mapping="statement.images"
             preview="true"
           ></omegaup-markdown>
           <template v-if="markdownType === 'statements'">
@@ -51,9 +52,9 @@
                 <a class="problemsetter">
                   <omegaup-user-username
                     v-if="problemsetter"
-                    v-bind:classname="problemsetter.classname"
-                    v-bind:linkify="true"
-                    v-bind:username="problemsetter.username"
+                    :classname="problemsetter.classname"
+                    :linkify="true"
+                    :username="problemsetter.username"
                   ></omegaup-user-username>
                 </a>
               </em>
@@ -62,18 +63,18 @@
         </div>
       </div>
     </div>
-    <div class="card-footer" v-if="showEditControls">
+    <div v-if="showEditControls" class="card-footer">
       <form
         class="row"
         enctype="multipart/form-data"
         method="post"
-        v-on:submit="onSubmit"
+        @submit="onSubmit"
       >
         <div class="col-md-12">
           <button
             class="btn btn-primary"
             type="submit"
-            v-bind:disabled="commitMessage === ''"
+            :disabled="commitMessage === ''"
           >
             {{
               markdownType === 'solutions'
@@ -82,31 +83,22 @@
             }}
           </button>
         </div>
-        <input type="hidden" name="message" v-bind:value="commitMessage" />
+        <input type="hidden" name="message" :value="commitMessage" />
         <input
           type="hidden"
           name="contents"
-          v-bind:value="JSON.stringify(this.statements)"
+          :value="JSON.stringify(statements)"
         />
-        <input type="hidden" name="directory" v-bind:value="markdownType" />
-        <input type="hidden" name="problem_alias" v-bind:value="alias" />
+        <input type="hidden" name="directory" :value="markdownType" />
+        <input type="hidden" name="problem_alias" :value="alias" />
         <input type="hidden" name="request" value="markdown" />
       </form>
     </div>
   </div>
 </template>
 
-<style lang="scss">
-@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
-.wmd-preview,
-.wmd-button-bar {
-  background-color: #fff;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Emit, Prop, Watch, Ref } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -179,7 +171,7 @@ export default class ProblemStatementEdit extends Vue {
 
   @Watch('currentLanguage')
   onCurrentLanguageChange(newLanguage: string, oldLanguage: string): void {
-    if (!!oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
+    if (oldLanguage) this.statements[oldLanguage] = this.currentMarkdown;
     this.$emit(
       'emit-update-markdown-contents',
       this.statements,
@@ -190,10 +182,7 @@ export default class ProblemStatementEdit extends Vue {
 
   @Emit('update:statement')
   @Watch('currentMarkdown')
-  onCurrentMarkdownChange(
-    newMarkdown: string,
-    oldMarkdown: string,
-  ): types.ProblemStatement {
+  onCurrentMarkdownChange(newMarkdown: string): types.ProblemStatement {
     return {
       images: this.statement.images,
       language: this.statement.language,
@@ -214,3 +203,11 @@ export default class ProblemStatementEdit extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../third_party/js/pagedown/demo/browser/demo.css';
+.wmd-preview,
+.wmd-button-bar {
+  background-color: #fff;
+}
+</style>

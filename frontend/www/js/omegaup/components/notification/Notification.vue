@@ -7,24 +7,22 @@
       </div>
       <button
         class="close"
-        v-on:click.prevent="$emit('remove', notification, null)"
+        @click.prevent="$emit('remove', notification, null)"
       >
         ❌
       </button>
     </div>
     <div
       class="w-100 d-flex align-items-center pt-1"
-      v-bind:class="{ 'notification-link': url }"
-      v-on:click="handleClick"
+      :class="{ 'notification-link': url }"
+      @click="handleClick"
     >
-      <img class="d-block" width="80" v-bind:src="iconUrl" />
+      <img class="d-block" width="80" :src="iconUrl" />
       <template v-if="notificationMarkdown">
-        <omegaup-markdown
-          v-bind:markdown="notificationMarkdown"
-        ></omegaup-markdown>
+        <omegaup-markdown :markdown="notificationMarkdown"></omegaup-markdown>
       </template>
       <div v-else-if="url">
-        <a v-bind:href="url">
+        <a :href="url">
           {{ text }}
         </a>
       </div>
@@ -34,24 +32,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.close {
-  font-size: inherit;
-}
-
-.notification-date {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.notification-link {
-  cursor: pointer;
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -147,3 +127,21 @@ export default class Notification extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.close {
+  font-size: inherit;
+}
+
+.notification-date {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.notification-link {
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+</style>

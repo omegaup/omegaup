@@ -7,36 +7,20 @@
         <h2>{{ title }}</h2>
         <p>{{ description }}</p>
         <a
-          class="btn btn-primary mb-3"
           v-if="button"
-          v-bind:href="button.href"
+          class="btn btn-primary mb-3"
+          :href="button.href"
           role="button"
         >
           {{ button.text[T.locale] }}
         </a>
       </div>
       <div>
-        <img class="d-block" height="320" v-bind:src="imageSrc" />
+        <img class="d-block" height="320" :src="imageSrc" />
       </div>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.slide {
-  @media only screen and (min-width: 767px) {
-    height: 500px;
-  }
-
-  h2 {
-    font-size: 2.4rem;
-  }
-
-  p {
-    font-size: 1.2rem;
-  }
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -59,3 +43,19 @@ export default class Slide extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+.slide {
+  @media only screen and (min-width: 767px) {
+    height: 500px;
+  }
+
+  h2 {
+    font-size: 2.4rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+  }
+}
+</style>

@@ -1,18 +1,18 @@
 <template>
   <div class="container-fluid">
     <h2 class="text-center">
-      <a v-bind:href="`/course/${course.alias}/`">{{ course.name }}</a>
+      <a :href="`/course/${course.alias}/`">{{ course.name }}</a>
     </h2>
     <br />
     <div>
       <div class="d-flex justify-content-center">
         <select v-model="selected" class="text-center">
-          <option v-for="option in options" v-bind:value="option.value">{{
-            option.text
-          }}</option>
+          <option v-for="option in options" :value="option.value">
+            {{ option.text }}
+          </option>
         </select>
       </div>
-      <highcharts v-bind:options="selected"></highcharts>
+      <highcharts :options="selected"></highcharts>
     </div>
   </div>
   <!-- panel -->
@@ -20,10 +20,9 @@
 
 <script lang="ts">
 import { Chart } from 'highcharts-vue';
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as ui from '../../ui';
 
 const ORDERED_VERDICTS = [
   'AC',
@@ -198,7 +197,9 @@ export default class Statistics extends Vue {
       [assignmentAlias: string]: { [problemAlias: string]: number };
     } = {};
     this.problemStats.forEach((problem, index) => {
-      if (!indices.hasOwnProperty(problem.assignment_alias))
+      if (
+        !Object.prototype.hasOwnProperty.call(indices, problem.assignment_alias)
+      )
         indices[problem.assignment_alias] = {};
       indices[problem.assignment_alias][problem.problem_alias] = index;
     });

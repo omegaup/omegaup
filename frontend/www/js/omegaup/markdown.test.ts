@@ -577,9 +577,9 @@ Tags &lt;b&gt;hello&lt;/b&gt;
       // All Markdown special characters should be escaped.
       expect(
         converter.makeHtmlWithImages(
-          '{{sample.in}}',
+          '{{Sample.in}}',
           {},
-          { 'sample.in': '<>&\n*foo* _bar_\n[img](img)\n\\\n' },
+          { 'Sample.in': '<>&\n*foo* _bar_\n[img](img)\n\\\n' },
         ),
       ).toEqual(
         '<p><pre><code class="language-in">&lt;&gt;&amp;\n*foo* _bar_\n[img](img)\n\\\n</code></pre></p>',

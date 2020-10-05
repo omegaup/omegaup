@@ -13,6 +13,12 @@ OmegaUp.on('ready', () => {
   }
   const problemNew = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-new': problem_New,
+    },
+    data: () => ({
+      errors: payload.parameter ? [payload.parameter] : [],
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-new', {
         props: {
@@ -26,7 +32,7 @@ OmegaUp.on('ready', () => {
               return;
             }
             api.Problem.details({ problem_alias: alias }, { quiet: true })
-              .then((data) => {
+              .then(() => {
                 problemNew.errors.push('problem_alias');
                 ui.error(
                   ui.formatString(T.aliasAlreadyInUse, {
@@ -48,10 +54,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: { errors: payload.parameter ? [payload.parameter] : [] },
-    components: {
-      'omegaup-problem-new': problem_New,
     },
   });
 });

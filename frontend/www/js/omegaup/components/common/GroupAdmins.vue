@@ -1,18 +1,18 @@
 <template>
   <div class="card panel panel-primary">
     <div class="card-body panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label class="font-weight-bold"
             >{{ T.wordsGroupAdmin }}
             <font-awesome-icon
-              v-bind:title="T.courseEditAddGroupAdminsTooltip"
+              :title="T.courseEditAddGroupAdminsTooltip"
               icon="info-circle"
             />
             <omegaup-autocomplete
               class="form-control"
-              v-bind:init="(el) => typeahead.groupTypeahead(el)"
-              v-bind:value.sync="groupAlias"
+              :init="(el) => typeahead.groupTypeahead(el)"
+              :value.sync="groupAlias"
             ></omegaup-autocomplete>
           </label>
         </div>
@@ -26,7 +26,7 @@
         {{ T.courseEditGroupAdminsEmpty }}
       </div>
     </div>
-    <table class="table table-striped" v-else="">
+    <table v-else class="table table-striped">
       <thead>
         <tr>
           <th>{{ T.contestEditRegisteredGroupAdminName }}</th>
@@ -37,17 +37,17 @@
       <tbody>
         <tr v-for="groupAdmin in groupAdmins">
           <td>
-            <a v-bind:href="`/group/${groupAdmin.alias}/edit/`">
+            <a :href="`/group/${groupAdmin.alias}/edit/`">
               {{ groupAdmin.name }}
             </a>
           </td>
           <td>{{ groupAdmin.role }}</td>
           <td>
             <button
+              v-if="groupAdmin.name !== 'admin'"
               class="close"
               type="button"
-              v-if="groupAdmin.name !== 'admin'"
-              v-on:click="onRemove(groupAdmin)"
+              @click="onRemove(groupAdmin)"
             >
               &times;
             </button>
@@ -57,10 +57,6 @@
     </table>
   </div>
 </template>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
@@ -119,3 +115,7 @@ export default class GroupAdmin extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+</style>

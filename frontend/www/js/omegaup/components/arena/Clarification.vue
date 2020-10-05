@@ -1,5 +1,5 @@
 <template>
-  <tr v-bind:class="{ resolved: clarification.answer }">
+  <tr :class="{ resolved: clarification.answer }">
     <td class="text-center align-middle">
       {{
         inContest ? clarification.contest_alias : clarification.problem_alias
@@ -18,9 +18,9 @@
         <div v-if="!showUpdateAnswer" class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
+              v-model="showUpdateAnswer"
               class="form-check-input"
               type="checkbox"
-              v-model="showUpdateAnswer"
             />
             {{ T.clarificationUpdateAnswer }}
           </label>
@@ -31,29 +31,28 @@
         class="form-inline justify-content-between"
       >
         <div class="form-group">
-          <select class="form-control" v-model="selectedResponse">
+          <select v-model="selectedResponse" class="form-control">
             <option
               v-for="response in responses"
-              v-bind:value="response.value"
-              v-bind:key="response.value"
+              :key="response.value"
+              :value="response.value"
             >
-              {{ response.text }}</option
-            >
+              {{ response.text }}
+            </option>
           </select>
         </div>
         <div
-          class="form-group mt-2 mt-xl-0"
           v-if="selectedResponse === 'other'"
+          class="form-group mt-2 mt-xl-0"
         >
-          <textarea v-model="message" v-bind:placeholder="T.wordsAnswer">
-          </textarea>
+          <textarea v-model="message" :placeholder="T.wordsAnswer"> </textarea>
         </div>
         <div class="form-check mt-2 mt-xl-0">
           <label class="form-check-label">
             <input
+              v-model="isPublic"
               class="form-check-input"
               type="checkbox"
-              v-model="isPublic"
             />
             {{ T.wordsPublic }}
           </label>
@@ -61,7 +60,7 @@
         <button
           class="btn btn-primary btn-sm mt-2 mt-lg-2"
           type="submit"
-          v-on:click.prevent="sendClarificationResponse"
+          @click.prevent="sendClarificationResponse"
         >
           {{ T.wordsSend }}
         </button>
@@ -69,26 +68,6 @@
     </td>
   </tr>
 </template>
-
-<style lang="scss" scoped>
-.resolved {
-  color: rgb(70, 136, 71);
-  background-image: linear-gradient(
-    rgb(223, 240, 216) 0px,
-    rgb(200, 229, 188) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-
-.direct-message {
-  color: rgb(125, 117, 18);
-  background-image: linear-gradient(
-    rgb(253, 245, 154) 0px,
-    rgba(255, 249, 181, 0.5) 100%
-  );
-  background-color: rgb(223, 240, 216);
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -152,3 +131,23 @@ export default class ArenaClarificationForm extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.resolved {
+  color: rgb(70, 136, 71);
+  background-image: linear-gradient(
+    rgb(223, 240, 216) 0px,
+    rgb(200, 229, 188) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+
+.direct-message {
+  color: rgb(125, 117, 18);
+  background-image: linear-gradient(
+    rgb(253, 245, 154) 0px,
+    rgba(255, 249, 181, 0.5) 100%
+  );
+  background-color: rgb(223, 240, 216);
+}
+</style>

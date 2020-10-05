@@ -14,6 +14,7 @@ import { types } from '../../api_types';
 describe('ViewProgress.vue', () => {
   if (typeof window.URL.createObjectURL === 'undefined') {
     Object.defineProperty(window.URL, 'createObjectURL', {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       value: (obj: any) => '',
       writable: true,
     });
@@ -70,17 +71,11 @@ describe('ViewProgress.vue', () => {
   });
 
   it('Should handle escaped csv cells', () => {
-    const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
-    });
     const escapedCell = escapeCsv('Escaped "text"');
     expect(escapedCell).toBe('"Escaped ""text""');
   });
 
   it('Should handle escaped xml cells', () => {
-    const wrapper = shallowMount(course_ViewProgress, {
-      propsData: baseViewProgressProps,
-    });
     const escapedXml = escapeXml('Escaped <text>');
     expect(escapedXml).toBe('Escaped &lt;text&gt;');
   });

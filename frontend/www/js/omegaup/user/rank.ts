@@ -15,8 +15,11 @@ OmegaUp.on('ready', () => {
     score: user.score,
     problems_solved: user.problems_solved,
   }));
-  const rankTable = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-user-rank': users_Rank,
+    },
     render: function (createElement) {
       return createElement('omegaup-user-rank', {
         props: {
@@ -31,9 +34,6 @@ OmegaUp.on('ready', () => {
           pagerItems: payload.pagerItems,
         },
       });
-    },
-    components: {
-      'omegaup-user-rank': users_Rank,
     },
   });
 });
