@@ -2,7 +2,6 @@ import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
-import { Arena, GetOptionsFromLocation } from '../arena/arena';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -12,8 +11,20 @@ import T from '../lang';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const locationHash = window.location.hash.substr(1).split('/');
-  const problemDetails = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-details': problem_Details,
+    },
+    data: () => ({
+      initialClarifications: payload.clarifications,
+      solutionStatus: payload.solutionStatus,
+      solution: <types.ProblemStatement | null>null,
+      availableTokens: 0,
+      allTokens: 0,
+      showNewRunWindow: locationHash.includes('new-run'),
+      activeTab: window.location.hash ? locationHash[0] : 'problems',
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
@@ -91,7 +102,7 @@ OmegaUp.on('ready', () => {
               nomination: 'dismissal',
               contents: JSON.stringify(contents),
             })
-              .then((data) => {
+              .then(() => {
                 ui.info(T.qualityNominationRateProblemDesc);
               })
               .catch(ui.apiError);
@@ -191,18 +202,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      initialClarifications: payload.clarifications,
-      solutionStatus: payload.solutionStatus,
-      solution: <types.ProblemStatement | null>null,
-      availableTokens: 0,
-      allTokens: 0,
-      showNewRunWindow: locationHash.includes('new-run'),
-      activeTab: window.location.hash ? locationHash[0] : 'problems',
-    },
-    components: {
-      'omegaup-problem-details': problem_Details,
     },
   });
 });

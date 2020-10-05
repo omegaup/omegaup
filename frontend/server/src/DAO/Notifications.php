@@ -17,6 +17,7 @@ class Notifications extends \OmegaUp\DAO\Base\Notifications {
     const COURSE_REGISTRATION_ACCEPTED = 'course-registration-accepted';
     const COURSE_REGISTRATION_REJECTED = 'course-registration-rejected';
     const COURSE_REGISTRATION_REQUEST = 'course-registration-request';
+    const COURSE_REGISTRATION_MANUAL = 'course-registration-manual';
     const DEMOTION = 'demotion';
 
     /**

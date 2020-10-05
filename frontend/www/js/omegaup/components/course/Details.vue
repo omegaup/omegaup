@@ -2,14 +2,14 @@
   <div>
     <h3 class="text-center">
       {{ course.name }}
-      <a v-if="course.is_admin" v-bind:href="`/course/${course.alias}/edit/`">
-        <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+      <a v-if="course.is_admin" :href="`/course/${course.alias}/edit/`">
+        <font-awesome-icon :icon="['fas', 'edit']" />
       </a>
     </h3>
     <div class="my-4 markdown">
-      <omegaup-markdown v-bind:markdown="course.description"></omegaup-markdown>
+      <omegaup-markdown :markdown="course.description"></omegaup-markdown>
     </div>
-    <div class="mb-5" v-if="course.is_admin">
+    <div v-if="course.is_admin" class="mb-5">
       <span>{{
         ui.formatString(T.courseStudentCountLabel, {
           student_count: course.student_count,
@@ -33,19 +33,19 @@
               <a
                 data-button-progress-students
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/students/`"
+                :href="`/course/${course.alias}/students/`"
                 >{{ T.courseStudentsProgress }}</a
               >
               <a
                 data-button-activity-report
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/activity/`"
-                >{{ T.wordsActivityReport }}</a
+                :href="`/course/${course.alias}/activity/`"
+                >{{ T.activityReport }}</a
               >
               <a
                 data-button-activity-report
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/statistics/`"
+                :href="`/course/${course.alias}/statistics/`"
                 >{{ T.omegaupTitleCourseStatistics }}</a
               >
             </div>
@@ -68,13 +68,13 @@
               <a
                 data-button-manage-students
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/edit/#students`"
+                :href="`/course/${course.alias}/edit/#students`"
                 >{{ T.wordsAddStudent }}</a
               >
               <a
                 data-button-manage-content
                 class="dropdown-item"
-                v-bind:href="`/course/${course.alias}/edit/#content`"
+                :href="`/course/${course.alias}/edit/#content`"
                 >{{ T.courseAddContent }}</a
               >
             </div>
@@ -82,13 +82,13 @@
         </div>
       </div>
     </div>
-    <div class="text-center align-middle" v-else>
+    <div v-else class="text-center align-middle">
       <span>
         {{ T.overallCompletedPercentage }}:
         <progress
           max="100"
-          v-bind:value="overallCompletedPercentage"
-          v-bind:title="`${overallCompletedPercentage} %`"
+          :value="overallCompletedPercentage"
+          :title="`${overallCompletedPercentage} %`"
         ></progress>
       </span>
     </div>
@@ -100,11 +100,11 @@
             <tr>
               <th class="text-center" scope="col">{{ T.wordsContentType }}</th>
               <th class="text-center" scope="col">{{ T.wordsName }}</th>
-              <th class="text-center" scope="col" v-if="!course.is_admin">
+              <th v-if="!course.is_admin" class="text-center" scope="col">
                 {{ T.wordsCompletedPercentage }}
               </th>
               <th class="text-center" scope="col">{{ T.wordsDueDate }}</th>
-              <th class="text-center" scope="col" v-if="course.is_admin">
+              <th v-if="course.is_admin" class="text-center" scope="col">
                 {{ T.wordsActions }}
               </th>
             </tr>
@@ -116,10 +116,10 @@
               </td>
             </tr>
             <tr
-              v-else
-              v-bind:key="assignment.alias"
               v-for="assignment in course.assignments"
-              v-bind:data-content-alias="assignment.alias"
+              v-else
+              :key="assignment.alias"
+              :data-content-alias="assignment.alias"
             >
               <td class="text-center">
                 <template v-if="assignment.assignment_type === 'homework'">
@@ -138,40 +138,40 @@
               <td>
                 <a
                   class="text-center"
-                  v-bind:href="`/course/${course.alias}/assignment/${
+                  :href="`/course/${course.alias}/assignment/${
                     assignment.alias
                   }/${course.is_admin ? 'admin/' : ''}`"
                 >
                   {{ assignment.name }}
                 </a>
               </td>
-              <td class="text-center" v-if="!course.is_admin">
+              <td v-if="!course.is_admin" class="text-center">
                 {{ getAssignmentProgress(progress[assignment.alias]) }}
               </td>
               <td class="text-center">
                 {{ getFormattedTime(assignment.finish_time) }}
               </td>
-              <td class="text-center" v-if="course.is_admin">
+              <td v-if="course.is_admin" class="text-center">
                 <a
                   class="mr-2"
-                  v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/scoreboard/${assignment.scoreboard_url}/`"
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'link']" />{{
+                  <font-awesome-icon :icon="['fas', 'link']" />{{
                     T.wordsPublic
                   }}</a
                 >
                 <a
                   class="mr-2"
-                  v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/edit/`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/edit/`"
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+                  <font-awesome-icon :icon="['fas', 'edit']" />
                   {{ T.wordsEdit }}
                 </a>
                 <a
                   class="mr-2"
-                  v-bind:href="`/course/${course.alias}/assignment/${assignment.alias}/admin/#runs`"
+                  :href="`/course/${course.alias}/assignment/${assignment.alias}/admin/#runs`"
                 >
-                  <font-awesome-icon v-bind:icon="['fas', 'tachometer-alt']" />
+                  <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
                   {{ T.wordsRuns }}
                 </a>
               </td>
@@ -182,9 +182,9 @@
     </div>
 
     <div
+      v-if="course.admission_mode === 'public'"
       class="accordion"
       data-accordion-clone
-      v-if="course.admission_mode === 'public'"
     >
       <div class="card">
         <div class="card-header" data-heading-clone>
@@ -210,9 +210,9 @@
         >
           <div class="card-body">
             <omegaup-course-clone
-              v-bind:initial-alias="course.alias"
-              v-bind:initial-name="course.name"
-              v-on:clone="
+              :initial-alias="course.alias"
+              :initial-name="course.name"
+              @clone="
                 (alias, name, startTime) =>
                   $emit('clone', alias, name, startTime)
               "
@@ -226,7 +226,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';
 import * as time from '../../time';
@@ -271,6 +270,7 @@ export default class CourseDetails extends Vue {
   get overallCompletedPercentage(): string {
     let score = 0;
     let maxScore = 0;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const [assignment, progress] of Object.entries(this.progress)) {
       score += progress.score;
       maxScore += progress.max_score;

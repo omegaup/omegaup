@@ -5,8 +5,11 @@ import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.AuthorRankTablePayload();
-  const authorsRank = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-author-rank': authors_Rank,
+    },
     render: function (createElement) {
       return createElement('omegaup-author-rank', {
         props: {
@@ -16,9 +19,6 @@ OmegaUp.on('ready', () => {
           pagerItems: payload.pagerItems,
         },
       });
-    },
-    components: {
-      'omegaup-author-rank': authors_Rank,
     },
   });
 });

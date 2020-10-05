@@ -1,20 +1,22 @@
 <template>
   <div>
-    <div
-      class="card mb-4"
-      v-bind:class="accessMode"
-      v-for="(typeCourses, accessMode) in courses"
-      v-if="typeCourses.activeTab !== ''"
-    >
-      <div class="card-header">
-        <h3 class="card-title">{{ getDescription(accessMode) }}</h3>
-      </div>
+    <template v-for="(typeCourses, accessMode) in courses">
+      <div
+        v-if="typeCourses.activeTab !== ''"
+        :key="accessMode"
+        class="card mb-4"
+        :class="accessMode"
+      >
+        <div class="card-header">
+          <h3 class="card-title">{{ getDescription(accessMode) }}</h3>
+        </div>
 
-      <omegaup-course-filtered-list
-        v-bind:courses="typeCourses"
-        v-bind:activeTab="typeCourses.activeTab"
-      ></omegaup-course-filtered-list>
-    </div>
+        <omegaup-course-filtered-list
+          :courses="typeCourses"
+          :active-tab="typeCourses.activeTab"
+        ></omegaup-course-filtered-list>
+      </div>
+    </template>
   </div>
 </template>
 

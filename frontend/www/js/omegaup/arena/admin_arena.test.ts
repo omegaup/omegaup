@@ -24,7 +24,7 @@ describe('arena', () => {
       const options = arena.GetDefaultOptions();
 
       const arenaInstance = new arena.Arena(options);
-      const adminInstance = new ArenaAdmin(arenaInstance);
+      new ArenaAdmin(arenaInstance);
       expect(arenaInstance.problemsetAdmin).toEqual(true);
     });
   });

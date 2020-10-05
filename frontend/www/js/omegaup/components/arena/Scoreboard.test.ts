@@ -1,11 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
-import T from '../../lang';
 import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
-import * as ui from '../../ui';
 
 import arena_Scoreboard from './Scoreboard.vue';
 

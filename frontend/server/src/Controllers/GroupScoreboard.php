@@ -15,14 +15,13 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
     private static function validateGroupScoreboard(
         string $groupAlias,
         \OmegaUp\DAO\VO\Identities $identity,
-        ?string $scoreboardAlias
+        string $scoreboardAlias
     ): \OmegaUp\DAO\VO\GroupsScoreboards {
-        \OmegaUp\Controllers\Group::validateGroup($groupAlias, $identity);
-
-        \OmegaUp\Validators::validateValidAlias(
-            $scoreboardAlias,
-            'scoreboard_alias'
+        \OmegaUp\Controllers\Group::validateGroupAndOwner(
+            $groupAlias,
+            $identity
         );
+
         $scoreboard = \OmegaUp\DAO\GroupsScoreboards::getByAlias(
             $scoreboardAlias
         );
@@ -43,7 +42,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         string $groupAlias,
         \OmegaUp\DAO\VO\Identities $identity,
         string $scoreboardAlias,
-        ?string $contestAlias
+        string $contestAlias
     ): array {
         $scoreboard = self::validateGroupScoreboard(
             $groupAlias,
@@ -51,7 +50,6 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             $scoreboardAlias
         );
 
-        \OmegaUp\Validators::validateValidAlias($contestAlias, 'contest_alias');
         $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
@@ -79,31 +77,31 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param null|string $contest_alias
-     * @omegaup-request-param null|string $group_alias
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param string $group_alias
      * @omegaup-request-param bool|null $only_ac
-     * @omegaup-request-param null|string $scoreboard_alias
+     * @omegaup-request-param string $scoreboard_alias
      * @omegaup-request-param float $weight
      */
     public static function apiAddContest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['scoreboard_alias'],
-            'scoreboard_alias'
+        $scoreboardAlias = $r->ensureString(
+            'scoreboard_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['contest_alias'],
-            'contest_alias'
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contestScoreboard = self::validateGroupScoreboardAndContest(
-            $r['group_alias'],
+            $groupAlias,
             $r->identity,
-            $r['scoreboard_alias'],
-            $r['contest_alias']
+            $scoreboardAlias,
+            $contestAlias
         );
 
         \OmegaUp\DAO\GroupsScoreboardsProblemsets::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
@@ -114,7 +112,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         ]));
 
         self::$log->info(
-            "Contest {$r['contest_alias']} added to scoreboard {$r['scoreboard_alias']}"
+            "Contest {$contestAlias} added to scoreboard {$scoreboardAlias}"
         );
 
         return [
@@ -129,29 +127,29 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param null|string $contest_alias
-     * @omegaup-request-param null|string $group_alias
-     * @omegaup-request-param null|string $scoreboard_alias
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param string $scoreboard_alias
      */
     public static function apiRemoveContest(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['scoreboard_alias'],
-            'scoreboard_alias'
+        $scoreboardAlias = $r->ensureString(
+            'scoreboard_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['contest_alias'],
-            'contest_alias'
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $contestScoreboard = self::validateGroupScoreboardAndContest(
-            $r['group_alias'],
+            $groupAlias,
             $r->identity,
-            $r['scoreboard_alias'],
-            $r['contest_alias']
+            $scoreboardAlias,
+            $contestAlias
         );
 
         $gscs = \OmegaUp\DAO\GroupsScoreboardsProblemsets::getByPK(
@@ -168,7 +166,7 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\GroupsScoreboardsProblemsets::delete($gscs);
 
         self::$log->info(
-            "Contest {$r['contest_alias']} removed from group {$r['group_alias']}"
+            "Contest {$contestAlias} removed from group {$groupAlias}"
         );
 
         return ['status' => 'ok'];
@@ -187,18 +185,18 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateValidAlias(
-            $r['scoreboard_alias'],
-            'scoreboard_alias'
+        $scoreboardAlias = $r->ensureString(
+            'scoreboard_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         $scoreboard = self::validateGroupScoreboard(
-            $r['group_alias'],
+            $groupAlias,
             $r->identity,
-            $r['scoreboard_alias']
+            $scoreboardAlias
         );
 
         // Fill contests
@@ -274,12 +272,12 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      */
     public static function apiList(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $group = \OmegaUp\Controllers\Group::validateGroup(
-            $r['group_alias'],
+        $group = \OmegaUp\Controllers\Group::validateGroupAndOwner(
+            $groupAlias,
             $r->identity
         );
         if (is_null($group)) {

@@ -4,15 +4,13 @@
       <form>
         <slot name="popup-close-button">
           <div class="close-container">
-            <button type="button" class="close" v-on:click="$emit('dismiss')">
+            <button type="button" class="close" @click="$emit('dismiss')">
               ❌
             </button>
           </div>
         </slot>
         <div class="justify-content-center">
-          <slot name="popup-content">
-            Some content
-          </slot>
+          <slot name="popup-content"> Some content </slot>
         </div>
         <div class="row mt-auto">
           <div class="col-3">
@@ -34,6 +32,16 @@
     </slot>
   </div>
 </template>
+
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
+import T from '../lang';
+
+@Component
+export default class OverlayPopup extends Vue {
+  T = T;
+}
+</script>
 
 <style lang="scss">
 @import '../../../sass/main.scss';
@@ -73,13 +81,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
-import T from '../lang';
-
-@Component
-export default class OverlayPopup extends Vue {
-  T = T;
-}
-</script>
