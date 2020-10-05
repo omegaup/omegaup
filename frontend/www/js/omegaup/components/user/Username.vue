@@ -12,17 +12,17 @@
         :class="classname"
         :title="username"
         @click="$emit('click', username)"
-        >{{ name || username }}</a
+        >{{ nameWithUsername }}</a
       >
       <a
         v-else
         :class="classname"
         :title="username"
         :href="`/profile/${username}/`"
-        >{{ name || username }}</a
+        >{{ nameWithUsername }}</a
       >
     </template>
-    <template v-else> {{ name || username }}</template>
+    <template v-else> {{ nameWithUsername }}</template>
   </span>
 </template>
 
@@ -42,6 +42,17 @@ export default class Username extends Vue {
   @Prop() linkify!: boolean;
   @Prop() country!: string;
   @Prop({ default: false }) emitClickEvent!: boolean;
+  @Prop({ default: false }) showNameWithUsername!: boolean;
+
+  get nameWithUsername(): string {
+    if (!this.showNameWithUsername) {
+      return this.name || this.username;
+    }
+    if (this.name) {
+      return `${this.name} (${this.username})`;
+    }
+    return this.username;
+  }
 }
 </script>
 

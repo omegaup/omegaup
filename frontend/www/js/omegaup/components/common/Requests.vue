@@ -15,8 +15,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="request in requests">
-          <td>{{ request.username }}</td>
+        <tr v-for="request in requests" :key="request.username">
+          <td>
+            <omegaup-username
+              :classname="request.classname"
+              :username="request.username"
+              :name="request.name"
+              :linkify="true"
+              :show-name-with-username="true"
+            ></omegaup-username>
+          </td>
           <td>{{ request.country }}</td>
           <td>{{ time.formatTimestamp(request.request_time) }}</td>
           <td v-if="request.last_update === null">{{ T.wordsPending }}</td>
@@ -58,8 +66,13 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
+import omegaup_Username from '../user/Username.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-username': omegaup_Username,
+  },
+})
 export default class Requests extends Vue {
   @Prop() data!: types.IdentityRequest[];
   @Prop() textAddParticipant!: string;
