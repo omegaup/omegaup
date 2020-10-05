@@ -6,26 +6,26 @@
         <div class="form-group">
           <h5>{{ T.passwordResetPassword }}</h5>
           <input
+            v-model="password"
             type="password"
             name="password"
             class="form-control"
-            v-model="password"
           />
         </div>
         <div class="form-group">
           <h5>{{ T.passwordResetPasswordConfirmation }}</h5>
           <input
+            v-model="passwordConfirmation"
             type="password"
             name="password_confirmation"
             class="form-control"
-            v-model="passwordConfirmation"
           />
         </div>
         <div class="form-group">
           <button
             type="button"
             class="btn btn-primary form-control"
-            v-on:click.prevent="
+            @click.prevent="
               $emit(
                 'reset-password',
                 email,
@@ -44,8 +44,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component

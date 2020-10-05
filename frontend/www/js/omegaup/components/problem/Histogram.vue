@@ -15,7 +15,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-1"
-            v-bind:style="`width:${barsWidth[0]}%`"
+            :style="`width:${barsWidth[0]}%`"
           >
             {{ `${customHistogram[0]}` }}
           </div>
@@ -26,7 +26,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-2"
-            v-bind:style="`width:${barsWidth[1]}%`"
+            :style="`width:${barsWidth[1]}%`"
           >
             {{ `${customHistogram[1]}` }}
           </div>
@@ -37,7 +37,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-3"
-            v-bind:style="`width:${barsWidth[2]}%`"
+            :style="`width:${barsWidth[2]}%`"
           >
             {{ `${customHistogram[2]}` }}
           </div>
@@ -48,7 +48,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-4"
-            v-bind:style="`width:${barsWidth[3]}%`"
+            :style="`width:${barsWidth[3]}%`"
           >
             {{ `${customHistogram[3]}` }}
           </div>
@@ -59,7 +59,7 @@
           </div>
           <div
             class="omegaup-histogram-bar omegaup-histogram-bar-5"
-            v-bind:style="`width:${barsWidth[4]}%`"
+            :style="`width:${barsWidth[4]}%`"
           >
             {{ `${customHistogram[4]}` }}
           </div>
@@ -68,6 +68,56 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+
+@Component
+export default class ProblemHistogram extends Vue {
+  @Prop() type!: string;
+  @Prop() histogram!: number[];
+  @Prop() score!: number;
+
+  T = T;
+
+  get tags(): string[] {
+    return this.type === 'quality'
+      ? [
+          T.qualityFormQualityVeryGood,
+          T.qualityFormQualityGood,
+          T.qualityFormQualityFair,
+          T.qualityFormQualityBad,
+          T.qualityFormQualityVeryBad,
+        ]
+      : [
+          T.qualityFormDifficultyVeryEasy,
+          T.qualityFormDifficultyEasy,
+          T.qualityFormDifficultyMedium,
+          T.qualityFormDifficultyHard,
+          T.qualityFormDifficultyVeryHard,
+        ];
+  }
+
+  get title(): string {
+    return this.type === 'quality' ? T.wordsQuality : T.wordsDifficulty;
+  }
+
+  get customHistogram(): number[] {
+    return this.type === 'quality' ? this.histogram.reverse() : this.histogram;
+  }
+
+  get totalVotes(): number {
+    return this.histogram.reduce((a: number, b: number) => a + b);
+  }
+
+  get barsWidth(): number[] {
+    const maxValue = Math.max(...this.histogram);
+    if (maxValue === 0) return [0, 0, 0, 0, 0];
+    return this.histogram.map((value) => (value / maxValue) * 100);
+  }
+}
+</script>
 
 <style>
 .omegaup-histogram-container {
@@ -161,53 +211,3 @@
   background-image: linear-gradient(to right, #df3e4b 50%, transparent 50%);
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-
-@Component
-export default class ProblemHistogram extends Vue {
-  @Prop() type!: string;
-  @Prop() histogram!: number[];
-  @Prop() score!: number;
-
-  T = T;
-
-  get tags(): string[] {
-    return this.type === 'quality'
-      ? [
-          T.qualityFormQualityVeryGood,
-          T.qualityFormQualityGood,
-          T.qualityFormQualityFair,
-          T.qualityFormQualityBad,
-          T.qualityFormQualityVeryBad,
-        ]
-      : [
-          T.qualityFormDifficultyVeryEasy,
-          T.qualityFormDifficultyEasy,
-          T.qualityFormDifficultyMedium,
-          T.qualityFormDifficultyHard,
-          T.qualityFormDifficultyVeryHard,
-        ];
-  }
-
-  get title(): string {
-    return this.type === 'quality' ? T.wordsQuality : T.wordsDifficulty;
-  }
-
-  get customHistogram(): number[] {
-    return this.type === 'quality' ? this.histogram.reverse() : this.histogram;
-  }
-
-  get totalVotes(): number {
-    return this.histogram.reduce((a: number, b: number) => a + b);
-  }
-
-  get barsWidth(): number[] {
-    const maxValue = Math.max(...this.histogram);
-    if (maxValue === 0) return [0, 0, 0, 0, 0];
-    return this.histogram.map((value) => (value / maxValue) * 100);
-  }
-}
-</script>

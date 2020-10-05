@@ -238,10 +238,12 @@ class Interview extends \OmegaUp\Controllers\Controller {
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-
-        $interview = \OmegaUp\DAO\Interviews::getByAlias(
-            $r->ensureString('interview_alias')
+        $interviewAlias = $r->ensureString(
+            'interview_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+
+        $interview = \OmegaUp\DAO\Interviews::getByAlias($interviewAlias);
         if (is_null($interview)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'interviewNotFound'

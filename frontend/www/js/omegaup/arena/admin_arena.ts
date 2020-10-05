@@ -15,6 +15,7 @@ export default class ArenaAdmin {
   runsList: Vue;
 
   constructor(arena: Arena) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
     this.arena = arena;
@@ -24,6 +25,7 @@ export default class ArenaAdmin {
     this.setUpPagers();
     this.runsList = new Vue({
       el: globalRuns ? '#main-container' : '#runs table.runs',
+      components: { 'omegaup-arena-runs': arena_Runs },
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -48,7 +50,7 @@ export default class ArenaAdmin {
                 return;
               }
               api.Run.disqualify({ run_alias: run.guid })
-                .then((data) => {
+                .then(() => {
                   run.type = 'disqualified';
                   arena.updateRunFallback(run.guid);
                 })
@@ -59,7 +61,7 @@ export default class ArenaAdmin {
             },
             rejudge: (run: types.Run) => {
               api.Run.rejudge({ run_alias: run.guid, debug: false })
-                .then((data) => {
+                .then(() => {
                   run.status = 'rejudging';
                   self.arena.updateRunFallback(run.guid);
                 })
@@ -68,7 +70,6 @@ export default class ArenaAdmin {
           },
         });
       },
-      components: { 'omegaup-arena-runs': arena_Runs },
     });
   }
 
@@ -93,7 +94,7 @@ export default class ArenaAdmin {
       this.refreshClarifications();
     });
 
-    this.arena.elements.clarification.on('submit', (e: Event) => {
+    this.arena.elements.clarification.on('submit', () => {
       $('input', this.arena.elements.clarification).attr(
         'disabled',
         'disabled',
@@ -113,7 +114,7 @@ export default class ArenaAdmin {
           this.arena.elements.clarification,
         ).val(),
       })
-        .then((response) => {
+        .then(() => {
           this.arena.hideOverlay();
           this.refreshClarifications();
         })
@@ -131,7 +132,7 @@ export default class ArenaAdmin {
   refreshRuns(): void {
     const runsListComponent = <arena_Runs>this.runsList.$children[0];
 
-    var options = {
+    const options = {
       assignment_alias: <string | undefined>undefined,
       contest_alias: <string | undefined>undefined,
       course_alias: <string | undefined>undefined,

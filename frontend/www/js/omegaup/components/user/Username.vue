@@ -1,30 +1,49 @@
 <template>
-  <span v-bind:class="classname" v-bind:title="username">
+  <span :class="classname" :title="username">
     <omegaup-countryflag
-      v-bind:country="country"
       v-if="country != null"
+      :country="country"
     ></omegaup-countryflag>
 
     <template v-if="linkify">
       <a
+        v-if="emitClickEvent"
         href="#"
-        v-bind:class="classname"
-        v-bind:title="username"
-        v-if="!!$listeners['emit-click']"
-        v-on:click="$emit('emit-click', username)"
+        :class="classname"
+        :title="username"
+        @click="$emit('click', username)"
         >{{ name || username }}</a
       >
       <a
-        v-bind:class="classname"
-        v-bind:title="username"
-        v-else=""
-        v-bind:href="`/profile/${username}/`"
+        v-else
+        :class="classname"
+        :title="username"
+        :href="`/profile/${username}/`"
         >{{ name || username }}</a
       >
     </template>
-    <template v-else=""> {{ name || username }}</template>
+    <template v-else> {{ name || username }}</template>
   </span>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import CountryFlag from '../CountryFlag.vue';
+
+@Component({
+  components: {
+    'omegaup-countryflag': CountryFlag,
+  },
+})
+export default class Username extends Vue {
+  @Prop() username!: string;
+  @Prop({ default: null }) name!: string;
+  @Prop() classname!: string;
+  @Prop() linkify!: boolean;
+  @Prop() country!: string;
+  @Prop({ default: false }) emitClickEvent!: boolean;
+}
+</script>
 
 <style>
 .user-rank-unranked,
@@ -56,21 +75,3 @@
   color: #cb000a;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import CountryFlag from '../CountryFlag.vue';
-
-@Component({
-  components: {
-    'omegaup-countryflag': CountryFlag,
-  },
-})
-export default class UserName extends Vue {
-  @Prop() username!: string;
-  @Prop({ default: null }) name!: string;
-  @Prop() classname!: string;
-  @Prop() linkify!: boolean;
-  @Prop() country!: string;
-}
-</script>

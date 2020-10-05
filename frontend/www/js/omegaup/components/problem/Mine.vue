@@ -1,8 +1,8 @@
 <template>
   <div>
     <div
-      class="alert alert-info alert-dismissible fade show"
       v-if="privateProblemsAlert"
+      class="alert alert-info alert-dismissible fade show"
       role="alert"
     >
       {{ T.messageMakeYourProblemsPublic }}
@@ -22,10 +22,10 @@
           <div class="form-check col-7">
             <label class="form-check-label">
               <input
+                v-model="shouldShowAllProblems"
                 class="form-check-input"
                 type="checkbox"
-                v-model="shouldShowAllProblems"
-                v-on:change.prevent="
+                @change.prevent="
                   $emit('change-show-all-problems', shouldShowAllProblems)
                 "
               />
@@ -33,9 +33,9 @@
             </label>
           </div>
           <select
-            class="custom-select col-5"
             v-model="allProblemsVisibilityOption"
-            v-on:change="onChangeVisibility"
+            class="custom-select col-5"
+            @change="onChangeVisibility"
           >
             <option selected value="-1">{{ T.forSelectedItems }}</option>
             <option value="1">{{ T.makePublic }}</option>
@@ -58,10 +58,10 @@
             <tr v-for="problem in problems">
               <td class="align-middle">
                 <input
-                  type="checkbox"
                   v-model="selectedProblems"
-                  v-bind:disabled="problem.visibility === -10"
-                  v-bind:value="problem"
+                  type="checkbox"
+                  :disabled="problem.visibility === -10"
+                  :value="problem"
                 />
               </td>
               <td class="text-right align-middle">
@@ -69,36 +69,33 @@
               </td>
               <td class="d-flex align-items-center">
                 <div class="d-inline-block ml-2">
-                  <a
-                    class="mr-1"
-                    v-bind:href="`/arena/problem/${problem.alias}/`"
-                    >{{ problem.title }}</a
-                  >
+                  <a class="mr-1" :href="`/arena/problem/${problem.alias}/`">{{
+                    problem.title
+                  }}</a>
                   <font-awesome-icon
-                    v-bind:title="T.wordsWarningProblem"
                     v-if="
                       problem.visibility ==
                         visibilityStatuses['publicWarning'] ||
                       problem.visibility == visibilityStatuses['privateWarning']
                     "
-                    v-bind:icon="['fas', 'exclamation-triangle']"
+                    :title="T.wordsWarningProblem"
+                    :icon="['fas', 'exclamation-triangle']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsBannedProblem"
                     v-else-if="
                       problem.visibility ==
                         visibilityStatuses['publicBanned'] ||
                       problem.visibility == visibilityStatuses['privateBanned']
                     "
-                    v-bind:icon="['fas', 'ban']"
+                    :title="T.wordsBannedProblem"
+                    :icon="['fas', 'ban']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsDeleted"
                     v-if="problem.visibility === visibilityStatuses['deleted']"
-                    v-bind:icon="['fas', 'trash']"
+                    :title="T.wordsDeleted"
+                    :icon="['fas', 'trash']"
                   />
                   <font-awesome-icon
-                    v-bind:title="T.wordsPrivate"
                     v-else-if="
                       (problem.visibility <=
                         visibilityStatuses['privateBanned'] ||
@@ -107,28 +104,31 @@
                         problem.visibility == visibilityStatuses['private']) &&
                       problem.visibility > visibilityStatuses['deleted']
                     "
-                    v-bind:icon="['fas', 'eye-slash']"
+                    :title="T.wordsPrivate"
+                    :icon="['fas', 'eye-slash']"
                   />
-                  <div class="tags-badges" v-if="problem.tags.length">
+                  <div v-if="problem.tags.length" class="tags-badges">
                     <a
-                      v-bind:class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
-                      v-bind:href="`/problem/?tag[]=${tag.name}`"
                       v-for="tag in problem.tags"
+                      :class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
+                      :href="`/problem/?tag[]=${tag.name}`"
                       >{{
-                        T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name
+                        Object.prototype.hasOwnProperty.call(T, tag.name)
+                          ? T[tag.name]
+                          : tag.name
                       }}</a
                     >
                   </div>
                 </div>
               </td>
               <td class="text-center align-middle">
-                <a v-bind:href="`/problem/${problem.alias}/edit/`">
-                  <font-awesome-icon v-bind:icon="['fas', 'edit']" />
+                <a :href="`/problem/${problem.alias}/edit/`">
+                  <font-awesome-icon :icon="['fas', 'edit']" />
                 </a>
               </td>
               <td class="text-center align-middle">
-                <a v-bind:href="`/problem/${problem.alias}/stats/`">
-                  <font-awesome-icon v-bind:icon="['fas', 'chart-bar']" />
+                <a :href="`/problem/${problem.alias}/stats/`">
+                  <font-awesome-icon :icon="['fas', 'chart-bar']" />
                 </a>
               </td>
             </tr>
@@ -137,8 +137,8 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          v-bind:pagerItems="pagerItems"
-          v-on:page-changed="(page) => $emit('go-to-page', page)"
+          :pager-items="pagerItems"
+          @page-changed="(page) => $emit('go-to-page', page)"
         ></omegaup-common-paginator>
       </div>
     </div>
@@ -146,7 +146,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import common_Paginator from '../common/Paginatorv2.vue';
