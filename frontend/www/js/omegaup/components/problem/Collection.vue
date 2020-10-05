@@ -16,7 +16,12 @@
       </div>
       <div class="card-body panel-body">
         <div class="container-fluid">
-          <div class="row"></div>
+          <div class="row">
+            <omegaup-problem-collection
+              v-for="(collect, idx) in levelTags"
+              v-bind:key="idx"
+            ></omegaup-problem-collection>
+          </div>
         </div>
       </div>
     </div>
@@ -36,11 +41,27 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import problem_Collection from './CollectionProblem.vue';
 
-@Component
+const problemLevelIcons = {
+  problemLevelBasicKarel: 'fas fa-robot',
+  problemLevelBasicIntroductionToProgramming: 'fas fa-laptop-code',
+  problemLevelIntermediateMathsInProgramming: 'fas fa-square-root-alt',
+  problemLevelIntermediateDataStructuresAndAlgorithms: 'fas fa-project-diagram',
+  problemLevelIntermediateAnalysisAndDesignOfAlgorithms: 'fas fa-sitemap',
+  problemLevelAdvancedCompetitiveProgramming: 'fas fa-trophy',
+  problemLevelAdvancedSpecializedTopics: 'fas fa-code',
+};
+
+@Component({
+  components: {
+    'omegaup-problem-collection': problem_Collection,
+  },
+})
 export default class Collection extends Vue {
+  @Prop() levelTags!: string[];
   T = T;
 }
 </script>
