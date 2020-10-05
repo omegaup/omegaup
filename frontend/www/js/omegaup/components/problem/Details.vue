@@ -116,16 +116,18 @@
           :show-overlay="showOverlay"
           @overlay-hidden="onPopupDismissed"
         >
-          <omegaup-arena-runsubmit
-            slot="popup-content"
-            :preferred-language="problem.preferred_language"
-            :languages="problem.languages"
-            :initial-show-form="showFormRunSubmit"
-            @dismiss="onPopupDismissed"
-            @submit-run="
-              (code, selectedLanguage) => onRunSubmitted(code, selectedLanguage)
-            "
-          ></omegaup-arena-runsubmit>
+          <template #popup-content>
+            <omegaup-arena-runsubmit
+              :preferred-language="problem.preferred_language"
+              :languages="problem.languages"
+              :initial-show-form="showFormRunSubmit"
+              @dismiss="onPopupDismissed"
+              @submit-run="
+                (code, selectedLanguage) =>
+                  onRunSubmitted(code, selectedLanguage)
+              "
+            ></omegaup-arena-runsubmit>
+          </template>
         </omegaup-overlay>
         <omegaup-arena-runs
           :problem-alias="problem.alias"
@@ -186,25 +188,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-table td {
-  padding: 0.5rem;
-}
-
-.karel-js-link {
-  border: 1px solid #eee;
-  border-left: 0;
-  border-radius: 3px;
-
-  a {
-    border-left: 5px solid #1b809e;
-    display: block;
-  }
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
@@ -375,3 +358,22 @@ export default class ProblemDetails extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+table td {
+  padding: 0.5rem;
+}
+
+.karel-js-link {
+  border: 1px solid #eee;
+  border-left: 0;
+  border-radius: 3px;
+
+  a {
+    border-left: 5px solid #1b809e;
+    display: block;
+  }
+}
+</style>

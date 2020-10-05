@@ -33,12 +33,12 @@
     <highcharts
       v-if="type !== 'total'"
       :options="periodStatisticOptions"
-      :updateArgs="updateArgs"
+      :update-args="updateArgs"
     ></highcharts>
     <highcharts
       v-else
       :options="aggregateStatisticOptions"
-      :updateArgs="updateArgs"
+      :update-args="updateArgs"
     ></highcharts>
   </div>
 </template>

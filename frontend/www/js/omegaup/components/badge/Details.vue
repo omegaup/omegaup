@@ -42,35 +42,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.badge {
-  &-icon {
-    max-width: 300px;
-
-    &-gray {
-      filter: grayscale(100%);
-    }
-  }
-
-  &-description {
-    font-size: 1.2em;
-  }
-
-  &-data {
-    font-size: 2.5em;
-  }
-
-  &-text {
-    font-size: 1.1em;
-
-    /deep/ &-icon {
-      // See: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors
-      font-size: 30px;
-    }
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -118,3 +89,32 @@ export default class BadgeDetails extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.badge {
+  &-icon {
+    max-width: 300px;
+
+    &-gray {
+      filter: grayscale(100%);
+    }
+  }
+
+  &-description {
+    font-size: 1.2em;
+  }
+
+  &-data {
+    font-size: 2.5em;
+  }
+
+  &-text {
+    font-size: 1.1em;
+
+    /deep/ &-icon {
+      // See: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors
+      font-size: 30px;
+    }
+  }
+}
+</style>

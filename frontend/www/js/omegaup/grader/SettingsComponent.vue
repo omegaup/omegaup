@@ -158,8 +158,14 @@
 <script>
 export default {
   props: {
-    store: Object,
-    storeMapping: Object,
+    store: {
+      type: Object,
+      required: true,
+    },
+    storeMapping: {
+      type: Object,
+      required: true,
+    },
   },
   data: function () {
     return {

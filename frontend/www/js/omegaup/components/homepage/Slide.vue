@@ -22,22 +22,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.slide {
-  @media only screen and (min-width: 767px) {
-    height: 500px;
-  }
-
-  h2 {
-    font-size: 2.4rem;
-  }
-
-  p {
-    font-size: 1.2rem;
-  }
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -59,3 +43,19 @@ export default class Slide extends Vue {
   T = T;
 }
 </script>
+
+<style lang="scss" scoped>
+.slide {
+  @media only screen and (min-width: 767px) {
+    height: 500px;
+  }
+
+  h2 {
+    font-size: 2.4rem;
+  }
+
+  p {
+    font-size: 1.2rem;
+  }
+}
+</style>

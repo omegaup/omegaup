@@ -75,7 +75,7 @@
       <div v-if="showTab === 'problems'" class="tab-pane active problems">
         <omegaup-contest-add-problem
           :contest-alias="contest.alias"
-          :initialPoints="contest.partial_score ? 100 : 1"
+          :initial-points="contest.partial_score ? 100 : 1"
           :data="problems"
           @emit-add-problem="
             (addProblemComponent) => $emit('add-problem', addProblemComponent)
@@ -97,9 +97,9 @@
       </div>
       <div v-if="showTab === 'publish'" class="tab-pane active">
         <omegaup-common-publish
-          :initialAdmissionMode="contest.admission_mode"
-          :shouldShowPublicOption="true"
-          :admissionModeDescription="T.contestNewFormAdmissionModeDescription"
+          :initial-admission-mode="contest.admission_mode"
+          :should-show-public-option="true"
+          :admission-mode-description="T.contestNewFormAdmissionModeDescription"
           @emit-update-admission-mode="
             (publishComponent) =>
               $emit('update-admission-mode', publishComponent)

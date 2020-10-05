@@ -113,7 +113,9 @@
                       :class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
                       :href="`/problem/?tag[]=${tag.name}`"
                       >{{
-                        T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name
+                        Object.prototype.hasOwnProperty.call(T, tag.name)
+                          ? T[tag.name]
+                          : tag.name
                       }}</a
                     >
                   </div>
@@ -135,7 +137,7 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          :pagerItems="pagerItems"
+          :pager-items="pagerItems"
           @page-changed="(page) => $emit('go-to-page', page)"
         ></omegaup-common-paginator>
       </div>

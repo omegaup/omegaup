@@ -62,14 +62,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-table td {
-  padding: 0.5rem;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -147,3 +139,11 @@ export default class ProblemSettingsSummary extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+table td {
+  padding: 0.5rem;
+}
+</style>

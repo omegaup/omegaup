@@ -64,16 +64,6 @@
   <!-- panel -->
 </template>
 
-<style>
-.panel-body {
-  overflow: auto;
-  white-space: nowrap;
-}
-.sticky-offset {
-  top: 4rem;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -160,7 +150,9 @@ export default class CourseViewProgress extends Vue {
     student: types.StudentProgress,
     assignment: omegaup.Assignment,
   ): number {
-    if (!student.score.hasOwnProperty(assignment.alias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(student.score, assignment.alias)
+    ) {
       return 0;
     }
 
@@ -285,3 +277,13 @@ export default class CourseViewProgress extends Vue {
   }
 }
 </script>
+
+<style>
+.panel-body {
+  overflow: auto;
+  white-space: nowrap;
+}
+.sticky-offset {
+  top: 4rem;
+}
+</style>

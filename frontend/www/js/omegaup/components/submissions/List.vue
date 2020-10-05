@@ -121,38 +121,12 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          :pagerItems="pagerItems"
+          :pager-items="pagerItems"
         ></omegaup-common-paginator>
       </div>
     </div>
   </div>
 </template>
-
-<style>
-table.submissions-table > tbody > tr > td {
-  vertical-align: middle;
-}
-.verdict-AC {
-  background: #cf6;
-}
-
-.verdict-CE {
-  background: #f90;
-}
-
-.verdict-JE,
-.verdict-VE {
-  background: #f00;
-}
-
-.school-text {
-  font-size: 0.9em;
-}
-
-.fixed-width-column {
-  width: 180px;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -195,3 +169,29 @@ export default class SubmissionsList extends Vue {
   }
 }
 </script>
+
+<style>
+table.submissions-table > tbody > tr > td {
+  vertical-align: middle;
+}
+.verdict-AC {
+  background: #cf6;
+}
+
+.verdict-CE {
+  background: #f90;
+}
+
+.verdict-JE,
+.verdict-VE {
+  background: #f00;
+}
+
+.school-text {
+  font-size: 0.9em;
+}
+
+.fixed-width-column {
+  width: 180px;
+}
+</style>

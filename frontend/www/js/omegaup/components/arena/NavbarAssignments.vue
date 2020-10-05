@@ -31,15 +31,6 @@
   </div>
 </template>
 
-<style>
-.navbar-assignments > button {
-  margin-bottom: 0.5em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
@@ -74,3 +65,12 @@ export default class ArenaNavbarAssignments extends Vue {
   }
 }
 </script>
+
+<style>
+.navbar-assignments > button {
+  margin-bottom: 0.5em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

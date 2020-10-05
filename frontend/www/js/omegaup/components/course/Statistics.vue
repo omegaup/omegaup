@@ -197,7 +197,9 @@ export default class Statistics extends Vue {
       [assignmentAlias: string]: { [problemAlias: string]: number };
     } = {};
     this.problemStats.forEach((problem, index) => {
-      if (!indices.hasOwnProperty(problem.assignment_alias))
+      if (
+        !Object.prototype.hasOwnProperty.call(indices, problem.assignment_alias)
+      )
         indices[problem.assignment_alias] = {};
       indices[problem.assignment_alias][problem.problem_alias] = index;
     });

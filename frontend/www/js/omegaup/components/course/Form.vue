@@ -167,15 +167,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-.omegaup-course-details .form-group > label {
-  width: 100%;
-}
-.omegaup-course-details .faux-label {
-  font-weight: bold;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { types } from '../../api_types';
@@ -268,3 +259,12 @@ export default class CourseDetails extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.omegaup-course-details .form-group > label {
+  width: 100%;
+}
+.omegaup-course-details .faux-label {
+  font-weight: bold;
+}
+</style>

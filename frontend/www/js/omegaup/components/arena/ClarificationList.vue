@@ -102,24 +102,6 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-// Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
-/deep/ pre {
-  display: block;
-  padding: 0.5rem;
-  font-size: 0.8rem;
-  line-height: 1.42857143;
-  color: #333;
-  word-break: break-all;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-}
-
-.modal-dialog {
-  max-width: 50%;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
@@ -155,3 +137,21 @@ export default class ArenaClarificationList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+// Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
+/deep/ pre {
+  display: block;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.modal-dialog {
+  max-width: 50%;
+}
+</style>

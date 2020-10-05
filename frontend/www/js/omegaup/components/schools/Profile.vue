@@ -22,7 +22,7 @@
           :items-per-page="5"
           :title="T.codersOfTheMonth"
         >
-          <template slot="table-header">
+          <template #table-header>
             <thead>
               <tr>
                 <th>{{ T.codersOfTheMonthUser }}</th>
@@ -51,7 +51,7 @@
           :sort-options="sortOptions"
           @sort-option-change="updateUsers"
         >
-          <template slot="table-header">
+          <template #table-header>
             <thead>
               <tr>
                 <th scope="col" class="text-center">
@@ -62,7 +62,7 @@
               </tr>
             </thead>
           </template>
-          <template slot="item-data" slot-scope="slotProps">
+          <template #item-data="slotProps">
             <omegaup-username
               :username="slotProps.item.toString()"
               :classname="slotProps.item.classname"
@@ -74,17 +74,6 @@
     </div>
   </div>
 </template>
-
-<style>
-.list-group-item strong {
-  display: inline-block;
-  width: 60px;
-}
-
-.rank-number {
-  color: gray;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -162,3 +151,14 @@ export default class SchoolProfile extends Vue {
   }
 }
 </script>
+
+<style>
+.list-group-item strong {
+  display: inline-block;
+  width: 60px;
+}
+
+.rank-number {
+  color: gray;
+}
+</style>

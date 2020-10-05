@@ -8,7 +8,7 @@
         <h1>{{ T.username }}: {{ contestantData.username }}</h1>
         <h3>
           {{ T.wordsTotal }}:<span
-            v-if="contestantData.hasOwnProperty('total') &amp;&amp; contestantData.total.hasOwnProperty('points')"
+            v-if="Object.prototype.hasOwnProperty.call(contestantData, 'total') &amp;&amp; Object.prototype.hasOwnProperty.call(contestantData.total, 'points')"
             >{{ contestantData.total.points }}</span
           ><span v-else>0</span>
         </h3>

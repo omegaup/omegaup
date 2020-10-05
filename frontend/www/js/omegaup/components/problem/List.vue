@@ -1,9 +1,9 @@
 <template>
   <div>
     <omegaup-problem-search-bar
-      :initialLanguage="language"
+      :initial-language="language"
       :languages="languages"
-      :initialKeyword="keyword"
+      :initial-keyword="keyword"
       :tags="tags"
     ></omegaup-problem-search-bar>
     <a
@@ -185,7 +185,11 @@
                       : ''
                   } m-1 p-2`"
                   :href="hrefForProblemTag(currentTags, tag.name)"
-                  >{{ T.hasOwnProperty(tag.name) ? T[tag.name] : tag.name }}</a
+                  >{{
+                    Object.prototype.hasOwnProperty.call(T, tag.name)
+                      ? T[tag.name]
+                      : tag.name
+                  }}</a
                 >
               </td>
               <td
@@ -228,7 +232,7 @@
       </div>
       <div class="card-footer">
         <omegaup-common-paginator
-          :pagerItems="pagerItems"
+          :pager-items="pagerItems"
         ></omegaup-common-paginator>
       </div>
     </div>

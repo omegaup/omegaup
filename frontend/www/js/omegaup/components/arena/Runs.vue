@@ -187,7 +187,8 @@
                 :username="run.username"
                 :country="run.country_id"
                 :linkify="true"
-                @emit-click="(username) => (filterUsername = username)"
+                :emit-click-event="true"
+                @click="(username) => (filterUsername = username)"
               ></omegaup-user-username>
               <a :href="`/profile/${run.username}/`" class="ml-2">
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
@@ -276,43 +277,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-caption {
-  caption-side: top;
-}
-
-.runs {
-  width: 100%;
-  border: 1px solid #ccc;
-  margin-top: 2em;
-}
-
-.runs caption {
-  font-weight: bold;
-  font-size: 1em;
-  margin-bottom: 1em;
-}
-
-.runs td,
-.runs th {
-  border: 1px solid #ccc;
-  border-width: 1px 0;
-  text-align: center;
-}
-
-.runs tfoot td a {
-  display: block;
-  padding: 0.5em;
-  text-decoration: none;
-  color: #000;
-  background: #ccc;
-  text-align: center;
-}
-.runs tfoot td a:hover {
-  background: #fff;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator';
@@ -441,6 +405,7 @@ export default class Runs extends Vue {
     return T.arenaContestNotOpened;
   }
 
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initProblemAutocomplete(el: JQuery<HTMLElement>) {
     if (this.problemsetProblems.length !== 0) {
       typeahead.problemsetProblemTypeahead(
@@ -455,6 +420,7 @@ export default class Runs extends Vue {
     }
   }
 
+  // eslint-disable-next-line no-undef -- This is defined in TypeScript.
   initUserAutocomplete(el: JQuery<HTMLElement>) {
     if (this.problemsetProblems.length !== 0 && this.contestAlias) {
       typeahead.userContestTypeahead(el, this.contestAlias);
@@ -681,3 +647,40 @@ export default class Runs extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+caption {
+  caption-side: top;
+}
+
+.runs {
+  width: 100%;
+  border: 1px solid #ccc;
+  margin-top: 2em;
+}
+
+.runs caption {
+  font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 1em;
+}
+
+.runs td,
+.runs th {
+  border: 1px solid #ccc;
+  border-width: 1px 0;
+  text-align: center;
+}
+
+.runs tfoot td a {
+  display: block;
+  padding: 0.5em;
+  text-decoration: none;
+  color: #000;
+  background: #ccc;
+  text-align: center;
+}
+.runs tfoot td a:hover {
+  background: #fff;
+}
+</style>

@@ -93,8 +93,14 @@ import * as Util from './util';
 
 export default {
   props: {
-    store: Object,
-    storeMapping: Object,
+    store: {
+      type: Object,
+      required: true,
+    },
+    storeMapping: {
+      type: Object,
+      required: true,
+    },
   },
   data: function () {
     return {
@@ -121,9 +127,10 @@ export default {
       const flatCases = Util.vuexGet(this.store, this.storeMapping.cases);
       let resultMap = {};
       for (let caseName in flatCases) {
-        if (!flatCases.hasOwnProperty(caseName)) continue;
+        if (!Object.prototype.hasOwnProperty.call(flatCases, caseName))
+          continue;
         let tokens = caseName.split('.', 2);
-        if (!resultMap.hasOwnProperty(tokens[0])) {
+        if (!Object.prototype.hasOwnProperty.call(resultMap, tokens[0])) {
           resultMap[tokens[0]] = {
             explicit: tokens.length > 1,
             name: tokens[0],
@@ -137,7 +144,8 @@ export default {
       }
       let result = [];
       for (let groupName in resultMap) {
-        if (!resultMap.hasOwnProperty(groupName)) continue;
+        if (!Object.prototype.hasOwnProperty.call(resultMap, groupName))
+          continue;
         resultMap[groupName].cases.sort((a, b) => {
           if (a.name < b.name) return -1;
           if (a.name > b.name) return 1;
@@ -164,7 +172,10 @@ export default {
   methods: {
     caseResult: function (caseName) {
       let flatCaseResults = this.store.getters.flatCaseResults;
-      if (this.store.state.dirty || !flatCaseResults.hasOwnProperty(caseName))
+      if (
+        this.store.state.dirty ||
+        !Object.prototype.hasOwnProperty.call(flatCaseResults, caseName)
+      )
         return null;
       return flatCaseResults[caseName];
     },

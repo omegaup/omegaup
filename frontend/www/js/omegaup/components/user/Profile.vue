@@ -44,7 +44,7 @@
         :items-per-page="15"
         :title="T.profileContests"
       >
-        <template slot="table-header">
+        <template #table-header>
           <thead>
             <tr>
               <th>{{ T.profileContestsTableContest }}</th>
@@ -84,8 +84,8 @@
           v-if="charts"
           :data="charts"
           :username="profile.username"
-          :periodStatisticOptions="periodStatisticOptions"
-          :aggregateStatisticOptions="aggregateStatisticOptions"
+          :period-statistic-options="periodStatisticOptions"
+          :aggregate-statistic-options="aggregateStatisticOptions"
           @emit-update-period-statistics="
             (profileComponent, categories, data) =>
               $emit(
@@ -104,15 +104,6 @@
     </div>
   </div>
 </template>
-
-<style>
-.badges-container {
-  display: grid;
-  justify-content: space-between;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  grid-auto-rows: 180px;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -152,3 +143,12 @@ export default class UserProfile extends Vue {
   columns = 3;
 }
 </script>
+
+<style>
+.badges-container {
+  display: grid;
+  justify-content: space-between;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-auto-rows: 180px;
+}
+</style>

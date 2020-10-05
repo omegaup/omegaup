@@ -48,17 +48,17 @@
 
         <omegaup-problem-settings
           :errors="errors"
-          :timeLimit="timeLimit"
-          :extraWallTime="extraWallTime"
-          :memoryLimit="memoryLimit"
-          :outputLimit="outputLimit"
-          :inputLimit="inputLimit"
-          :initialValidator="validator"
-          :initialLanguage="languages"
-          :overallWallTimeLimit="overallWallTimeLimit"
-          :validatorTimeLimit="validatorTimeLimit"
-          :validLanguages="data.validLanguages"
-          :validatorTypes="data.validatorTypes"
+          :time-limit="timeLimit"
+          :extra-wall-time="extraWallTime"
+          :memory-limit="memoryLimit"
+          :output-limit="outputLimit"
+          :input-limit="inputLimit"
+          :initial-validator="validator"
+          :initial-language="languages"
+          :overall-wall-time-limit="overallWallTimeLimit"
+          :validator-time-limit="validatorTimeLimit"
+          :valid-languages="data.validLanguages"
+          :validator-types="data.validatorTypes"
         ></omegaup-problem-settings>
 
         <div class="row">
@@ -234,13 +234,6 @@
   </div>
 </template>
 
-<style>
-.problem-form .languages {
-  padding: 0;
-  width: 100%;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
@@ -399,3 +392,10 @@ export default class ProblemForm extends Vue {
   }
 }
 </script>
+
+<style>
+.problem-form .languages {
+  padding: 0;
+  width: 100%;
+}
+</style>

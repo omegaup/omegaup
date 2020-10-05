@@ -46,6 +46,33 @@
   </li>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import Notification from './Notification.vue';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
+library.add(faBell);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+    'omegaup-notification': Notification,
+  },
+})
+export default class NotificationList extends Vue {
+  @Prop() notifications!: types.Notification[];
+  T = T;
+
+  readSingleNotification(notification: types.Notification, url?: string): void {
+    this.$emit('read', [notification], url);
+  }
+}
+</script>
+
 <style>
 .notification-toggle {
   font-size: 1.4rem;
@@ -77,30 +104,3 @@
   opacity: 0;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
-import T from '../../lang';
-import Notification from './Notification.vue';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faBell } from '@fortawesome/free-solid-svg-icons';
-library.add(faBell);
-
-@Component({
-  components: {
-    FontAwesomeIcon,
-    'omegaup-notification': Notification,
-  },
-})
-export default class NotificationList extends Vue {
-  @Prop() notifications!: types.Notification[];
-  T = T;
-
-  readSingleNotification(notification: types.Notification, url?: string): void {
-    this.$emit('read', [notification], url);
-  }
-}
-</script>

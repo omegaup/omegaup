@@ -243,7 +243,7 @@
                 >
                 <omegaup-common-grader-badge
                   v-show="isAdmin"
-                  :queueLength="graderQueueLength"
+                  :queue-length="graderQueueLength"
                   :error="errorMessage !== null"
                 ></omegaup-common-grader-badge>
               </a>
@@ -304,7 +304,7 @@
                   v-show="isAdmin"
                   :status="errorMessage !== null ? 'down' : 'ok'"
                   :error="errorMessage"
-                  :graderInfo="graderInfo"
+                  :grader-info="graderInfo"
                 ></omegaup-common-grader-status>
               </div>
             </li>
@@ -314,21 +314,6 @@
     </nav>
   </header>
 </template>
-
-<style lang="scss">
-@import '../../../../sass/main.scss';
-nav.navbar {
-  background-color: $header-primary-color;
-
-  .navbar-brand {
-    background-color: #f2f2f2;
-  }
-
-  a.dropdown-item {
-    color: black;
-  }
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -383,3 +368,18 @@ export default class Navbar extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+nav.navbar {
+  background-color: $header-primary-color;
+
+  .navbar-brand {
+    background-color: #f2f2f2;
+  }
+
+  a.dropdown-item {
+    color: black;
+  }
+}
+</style>

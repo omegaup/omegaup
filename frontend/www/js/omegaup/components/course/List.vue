@@ -13,7 +13,7 @@
 
         <omegaup-course-filtered-list
           :courses="typeCourses"
-          :activeTab="typeCourses.activeTab"
+          :active-tab="typeCourses.activeTab"
         ></omegaup-course-filtered-list>
       </div>
     </template>
