@@ -37,6 +37,7 @@ class Course {
         }
 
         $courseAlias = $courseAlias ?? \OmegaUp\Test\Utils::createRandomString();
+        $courseName = \OmegaUp\Test\Utils::createRandomString();
         if (is_null($adminLogin)) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
@@ -44,7 +45,7 @@ class Course {
         $courseStartTime = \OmegaUp\Time::get();
         $r = new \OmegaUp\Request([
             'auth_token' => $adminLogin->auth_token,
-            'name' => \OmegaUp\Test\Utils::createRandomString(),
+            'name' => $courseName,
             'alias' => $courseAlias,
             'description' => \OmegaUp\Test\Utils::createRandomString(),
             'start_time' => $courseStartTime,
@@ -63,6 +64,7 @@ class Course {
             'request' => $r,
             'admin' => $admin,
             'course_alias' => $courseAlias,
+            'course_name' => $courseName,
         ];
     }
 

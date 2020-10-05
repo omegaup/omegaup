@@ -4,12 +4,12 @@
       <h3>{{ T.wordsCourseContent }}</h3>
     </div>
     <div class="card-body">
-      <div class="card-body" v-if="content.length === 0">
+      <div v-if="content.length === 0" class="card-body">
         <div class="empty-table-message">
           {{ T.courseContentEmpty }}
         </div>
       </div>
-      <table class="table table-striped" v-else="">
+      <table v-else class="table table-striped">
         <thead>
           <tr>
             <td></td>
@@ -19,12 +19,9 @@
           </tr>
         </thead>
         <tbody v-sortable="{ onUpdate: sortContent }">
-          <tr v-bind:key="assignment.alias" v-for="assignment in content">
+          <tr v-for="assignment in content" :key="assignment.alias">
             <td>
-              <button
-                class="btn btn-link"
-                v-bind:title="T.courseAssignmentReorder"
-              >
+              <button class="btn btn-link" :title="T.courseAssignmentReorder">
                 <font-awesome-icon icon="arrows-alt" />
               </button>
             </td>
@@ -37,42 +34,40 @@
                 <font-awesome-icon icon="chalkboard-teacher" />
                 <span class="ml-2">{{ T.wordsLesson }}</span>
               </template>
-              <template v-else="">
+              <template v-else>
                 <font-awesome-icon icon="list-alt" />
                 <span class="ml-2">{{ T.wordsExam }}</span>
               </template>
             </td>
             <td class="align-middle">
-              <a v-bind:href="assignmentUrl(assignment)">{{
-                assignment.name
-              }}</a>
+              <a :href="assignmentUrl(assignment)">{{ assignment.name }}</a>
             </td>
             <td class="text-center">
               <button
                 class="btn btn-link"
-                v-bind:title="T.courseAssignmentEdit"
-                v-on:click="$emit('emit-edit', assignment)"
+                :title="T.courseAssignmentEdit"
+                @click="$emit('emit-edit', assignment)"
               >
                 <font-awesome-icon icon="edit" />
               </button>
               <button
                 class="btn btn-link"
-                v-bind:title="T.courseAddProblemsAdd"
-                v-on:click="$emit('emit-add-problems', assignment)"
+                :title="T.courseAddProblemsAdd"
+                @click="$emit('emit-add-problems', assignment)"
               >
                 <font-awesome-icon icon="list-alt" />
               </button>
               <font-awesome-icon
-                v-bind:title="T.assignmentRemoveAlreadyHasRuns"
-                icon="trash"
                 v-if="assignment.has_runs"
+                :title="T.assignmentRemoveAlreadyHasRuns"
+                icon="trash"
                 class="disabled"
               />
               <button
+                v-else
                 class="btn btn-link"
-                v-else=""
-                v-bind:title="T.courseAssignmentDelete"
-                v-on:click="$emit('emit-delete', assignment)"
+                :title="T.courseAssignmentDelete"
+                @click="$emit('emit-delete', assignment)"
               >
                 <font-awesome-icon icon="trash" />
               </button>
@@ -82,11 +77,11 @@
       </table>
       <div>
         <button
-          class="btn btn-primary"
           v-if="content.length > 1"
-          v-bind:class="{ disabled: !contentOrderChanged }"
+          class="btn btn-primary"
+          :class="{ disabled: !contentOrderChanged }"
           role="button"
-          v-on:click="saveNewOrder"
+          @click="saveNewOrder"
         >
           {{ T.wordsSaveNewOrder }}
         </button>
@@ -101,7 +96,7 @@
                 v-if="assignmentFormMode === AssignmentFormMode.Default"
                 class="btn btn-primary"
                 type="submit"
-                v-on:click.prevent="$emit('emit-new')"
+                @click.prevent="$emit('emit-new')"
               >
                 {{ T.courseAddContent }}
               </button>
@@ -112,16 +107,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.disabled {
-  color: lightgrey;
-}
-
-.table td {
-  vertical-align: middle;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
@@ -185,3 +170,13 @@ export default class CourseAssignmentList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.disabled {
+  color: lightgrey;
+}
+
+.table td {
+  vertical-align: middle;
+}
+</style>

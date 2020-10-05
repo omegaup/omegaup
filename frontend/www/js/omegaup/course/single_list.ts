@@ -6,8 +6,11 @@ import Vue from 'vue';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseListPayload();
   const headerPayload = types.payloadParsers.CommonPayload();
-  const courseList = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-list': course_List,
+    },
     render: function (createElement) {
       return createElement('omegaup-course-list', {
         props: {
@@ -15,9 +18,6 @@ OmegaUp.on('ready', () => {
           isMainUserIdentity: headerPayload?.isMainUserIdentity,
         },
       });
-    },
-    components: {
-      'omegaup-course-list': course_List,
     },
   });
 });

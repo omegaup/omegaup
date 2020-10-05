@@ -7,6 +7,7 @@ services:
       dockerfile: ./Dockerfile.local-backend
       context: ./stuff/docker/
     image: omegaup/local-backend
+    user: "${UID_GID}"
     entrypoint: [
       "wait-for-it",
       "mysql:3306",
@@ -21,6 +22,7 @@ services:
       dockerfile: ./Dockerfile.local-backend
       context: ./stuff/docker/
     image: omegaup/local-backend
+    user: "${UID_GID}"
     entrypoint: ["wait-for-it", "mysql:3306", "--", "/usr/bin/omegaup-grader"]
 
   broadcaster:
@@ -28,6 +30,7 @@ services:
       dockerfile: ./Dockerfile.local-backend
       context: ./stuff/docker/
     image: omegaup/local-backend
+    user: "${UID_GID}"
     entrypoint: ["/usr/bin/omegaup-broadcaster"]
 
   runner:
@@ -35,4 +38,5 @@ services:
       dockerfile: ./Dockerfile.local-backend
       context: ./stuff/docker/
     image: omegaup/local-backend
+    user: "${UID_GID}"
     entrypoint: ["wait-for-it", "grader:11302", "--", "/usr/bin/omegaup-runner", "-noop-sandbox"]

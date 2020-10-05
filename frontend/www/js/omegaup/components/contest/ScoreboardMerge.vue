@@ -4,31 +4,28 @@
       <legend>
         {{ T.wordsContest }}:
         <select
+          v-model="selectedContests"
           class="contests"
           multiple="multiple"
           size="10"
-          v-model="selectedContests"
         >
-          <option
-            v-bind:value="contest.alias"
-            v-for="contest in availableContests"
-          >
+          <option v-for="contest in availableContests" :value="contest.alias">
             {{ ui.contestTitle(contest) }}
           </option>
         </select>
       </legend>
-      <button class="btn" type="button" v-on:click.prevent="onDisplayTable">
+      <button class="btn" type="button" @click.prevent="onDisplayTable">
         {{ T.showTotalScoreboard }}
       </button>
     </div>
     <div class="post">
-      <table class="merged-scoreboard" v-if="scoreboard.length &gt; 0">
+      <table v-if="scoreboard.length &gt; 0" class="merged-scoreboard">
         <tr>
           <td></td>
           <td>
             <strong>{{ T.username }}</strong>
           </td>
-          <td colspan="2" v-for="alias in aliases">
+          <td v-for="alias in aliases" colspan="2">
             <strong>{{ alias }}</strong>
           </td>
           <td colspan="2">
@@ -47,22 +44,22 @@
               {{ rank.username != rank.name ? rank.name : ' ' }}
             </div>
           </td>
-          <td class="numeric" colspan="2" v-for="alias in aliases">
+          <td v-for="alias in aliases" class="numeric" colspan="2">
             {{ rank.contests[alias].points
-            }}<span class="scoreboard-penalty" v-if="showPenalty"
+            }}<span v-if="showPenalty" class="scoreboard-penalty"
               >({{ rank.contests[alias].penalty }})</span
             >
           </td>
           <td class="numeric" colspan="2">
             {{ rank.totalPoints
-            }}<span class="scoreboard-penalty" v-if="showPenalty"
+            }}<span v-if="showPenalty" class="scoreboard-penalty"
               >({{ rank.totalPenalty }})</span
             >
           </td>
         </tr>
       </table>
 
-      <table class="merged-scoreboard" v-else="">
+      <table v-else class="merged-scoreboard">
         <tr>
           <td></td>
           <td>
@@ -76,26 +73,6 @@
     </div>
   </div>
 </template>
-
-<style>
-.merged-scoreboard {
-  background: white;
-}
-
-.merged-scoreboard td {
-  text-align: center;
-}
-
-.scoreboard-penalty {
-  padding-left: 0.5em;
-  opacity: 0.7;
-  color: red;
-}
-
-.post {
-  overflow-x: scroll;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
@@ -120,3 +97,23 @@ export default class ScoreboardMerge extends Vue {
   }
 }
 </script>
+
+<style>
+.merged-scoreboard {
+  background: white;
+}
+
+.merged-scoreboard td {
+  text-align: center;
+}
+
+.scoreboard-penalty {
+  padding-left: 0.5em;
+  opacity: 0.7;
+  color: red;
+}
+
+.post {
+  overflow-x: scroll;
+}
+</style>

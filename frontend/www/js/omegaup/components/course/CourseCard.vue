@@ -9,22 +9,22 @@
         <p v-html="impartedBy"></p>
       </div>
       <div class="float-right">
-        <a v-bind:href="`/course/${courseAlias}/`" class="btn btn-primary">{{
+        <a :href="`/course/${courseAlias}/`" class="btn btn-primary">{{
           buttonTitle
         }}</a>
       </div>
     </div>
     <hr class="ml-3 mr-3" />
     <div class="m-3">
-      <div class="float-right" v-if="progress > 0">
+      <div v-if="progress > 0" class="float-right">
         {{ T.wordsProgress }}:
         <progress
-          v-bind:title="`${progress}%`"
-          v-bind:value="progress"
+          :title="`${progress}%`"
+          :value="progress"
           max="100"
         ></progress>
       </div>
-      <div class="float-left align-middle" v-if="showTopics">
+      <div v-if="showTopics" class="float-left align-middle">
         <details>
           <summary>{{ T.courseCardShowTopics }}</summary>
           <ul>

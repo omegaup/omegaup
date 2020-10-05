@@ -1,6 +1,5 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 import * as ui from '../../ui';
@@ -43,6 +42,7 @@ describe('RunSubmit.vue', () => {
           { java: 'Java' },
         ],
         nextSubmissionTimestamp: new Date(),
+        preferredLanguage: 'es',
       },
     });
 

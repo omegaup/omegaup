@@ -8,9 +8,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="allSchoolsOfTheMonth"
-          v-bind:class="{ active: selectedTab === 'allSchoolsOfTheMonth' }"
-          v-bind:aria-selected="selectedTab === 'allSchoolsOfTheMonth'"
-          v-on:click="selectedTab = 'allSchoolsOfTheMonth'"
+          :class="{ active: selectedTab === 'allSchoolsOfTheMonth' }"
+          :aria-selected="selectedTab === 'allSchoolsOfTheMonth'"
+          @click="selectedTab = 'allSchoolsOfTheMonth'"
         >
           {{ T.schoolsOfTheMonth }}
         </a>
@@ -22,9 +22,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="schoolsOfPreviousMonth"
-          v-bind:class="{ active: selectedTab === 'schoolsOfPreviousMonth' }"
-          v-bind:aria-selected="selectedTab === 'schoolsOfPreviousMonth'"
-          v-on:click="selectedTab = 'schoolsOfPreviousMonth'"
+          :class="{ active: selectedTab === 'schoolsOfPreviousMonth' }"
+          :aria-selected="selectedTab === 'schoolsOfPreviousMonth'"
+          @click="selectedTab = 'schoolsOfPreviousMonth'"
         >
           {{ T.schoolsOfTheMonthRank }}
         </a>
@@ -36,11 +36,11 @@
           data-toggle="tab"
           role="tab"
           aria-controls="candidatesToSchoolOfTheMonth"
-          v-bind:class="{
+          :class="{
             active: selectedTab === 'candidatesToSchoolOfTheMonth',
           }"
-          v-bind:aria-selected="selectedTab === 'candidatesToSchoolOfTheMonth'"
-          v-on:click="selectedTab = 'candidatesToSchoolOfTheMonth'"
+          :aria-selected="selectedTab === 'candidatesToSchoolOfTheMonth'"
+          @click="selectedTab = 'candidatesToSchoolOfTheMonth'"
         >
           {{ T.schoolsOfTheMonthCandidates }}
         </a>
@@ -52,9 +52,9 @@
           <th scope="col" class="text-center">{{ T.wordsCountryRegion }}</th>
           <th scope="col" class="text-center">{{ T.wordsSchool }}</th>
           <th
+            v-if="selectedTab === 'allSchoolsOfTheMonth'"
             scope="col"
             class="text-center"
-            v-if="selectedTab === 'allSchoolsOfTheMonth'"
           >
             {{ T.wordsDate }}
           </th>
@@ -62,36 +62,36 @@
             <th scope="col" class="text-right">
               {{ T.rankScore }}
             </th>
-            <th scope="col" class="text-center" v-if="isMentor">
+            <th v-if="isMentor" scope="col" class="text-center">
               {{ T.wordsActions }}
             </th>
           </template>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(school, index) in visibleSchools">
+        <tr v-for="(school, index) in visibleSchools" :key="index">
           <td class="text-center">
             <omegaup-country-flag
-              v-bind:country="school.country_id"
+              :country="school.country_id"
             ></omegaup-country-flag>
           </td>
           <td class="text-center">
-            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+            <a :href="`/schools/profile/${school.school_id}/`">{{
               school.name
             }}</a>
           </td>
-          <td class="text-center" v-if="selectedTab === 'allSchoolsOfTheMonth'">
+          <td v-if="selectedTab === 'allSchoolsOfTheMonth'" class="text-center">
             {{ school.time }}
           </td>
           <template v-else-if="selectedTab === 'candidatesToSchoolOfTheMonth'">
             <td class="text-right">
               {{ school.score }}
             </td>
-            <td class="text-center" v-if="isMentor">
+            <td v-if="isMentor" class="text-center">
               <button
-                class="btn btn-sm btn-primary"
                 v-if="canChooseSchool && !schoolIsSelected"
-                v-on:click="$emit('select-school', school.school_id)"
+                class="btn btn-sm btn-primary"
+                @click="$emit('select-school', school.school_id)"
               >
                 {{ T.schoolOfTheMonthChooseAsSchool }}
               </button>
