@@ -9,7 +9,7 @@
             />
           </h1>
         </div>
-        <div class="col-sm-8 text-center" style="height: 112px;">
+        <div class="col-sm-8 text-center" style="height: 112px">
           <p>
             <strong>{{ name }}</strong> <br />
             {{ problemCount }} {{ T.wordsProblems }}
