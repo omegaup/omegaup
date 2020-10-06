@@ -5,7 +5,7 @@ import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CollectionDetailsPayload();
-  const CollectionDetails = new Vue({
+  new Vue({
     el: '#main-container',
     render: function (createElement) {
       return createElement('omegaup-collection-details', {
