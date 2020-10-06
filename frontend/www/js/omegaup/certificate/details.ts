@@ -5,17 +5,17 @@ import { types } from '../api_types';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CertificateDetailsPayload();
-  const certificateDetails = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-certificate-details': certificate_Details,
+    },
     render: function (createElement) {
       return createElement('omegaup-certificate-details', {
         props: {
           uuid: payload.uuid,
         },
       });
-    },
-    components: {
-      'omegaup-certificate-details': certificate_Details,
     },
   });
 });

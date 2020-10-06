@@ -7,10 +7,10 @@
       <span>{{ T.courseAddProblemsEditAssignmentDesc }}</span>
     </div>
     <div class="card-body">
-      <div class="empty-table-message" v-if="problems.length == 0">
+      <div v-if="problems.length == 0" class="empty-table-message">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
-      <div v-else="">
+      <div v-else>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -21,12 +21,12 @@
             </tr>
           </thead>
           <tbody v-sortable="{ onUpdate: sort }">
-            <tr v-bind:key="problem.letter" v-for="problem in problems">
+            <tr v-for="problem in problems" :key="problem.letter">
               <td>
                 <button
                   class="btn btn-link"
                   type="button"
-                  v-bind:title="T.courseAssignmentProblemReorder"
+                  :title="T.courseAssignmentProblemReorder"
                 >
                   <font-awesome-icon icon="arrows-alt" />
                 </button>
@@ -36,8 +36,8 @@
               <td class="button-column">
                 <button
                   class="btn btn-link"
-                  v-bind:title="T.courseAssignmentProblemRemove"
-                  v-on:click.prevent="onRemoveProblem(assignment, problem)"
+                  :title="T.courseAssignmentProblemRemove"
+                  @click.prevent="onRemoveProblem(assignment, problem)"
                 >
                   <font-awesome-icon icon="trash" />
                 </button>
@@ -48,9 +48,9 @@
         <div>
           <button
             class="btn btn-primary"
-            v-bind:disabled="!problemsOrderChanged"
+            :disabled="!problemsOrderChanged"
             role="button"
-            v-on:click="saveNewOrder"
+            @click="saveNewOrder"
           >
             {{ T.wordsSaveNewOrder }}
           </button>
@@ -58,7 +58,7 @@
       </div>
     </div>
     <div class="card-footer">
-      <form v-on:submit.prevent="">
+      <form @submit.prevent="">
         <div class="row">
           <div class="col-md-12">
             <div class="row">
@@ -66,9 +66,9 @@
                 <label
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
-                    class="form-control"
-                    v-bind:init="(el) => typeahead.problemTypeahead(el)"
                     v-model="problemAlias"
+                    class="form-control"
+                    :init="(el) => typeahead.problemTypeahead(el)"
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
@@ -78,7 +78,7 @@
               <div class="form-group col-md-2">
                 <label
                   >{{ T.wordsPoints }}
-                  <input type="number" class="form-control" v-model="points" />
+                  <input v-model="points" type="number" class="form-control" />
                 </label>
               </div>
               <div class="form-group col-md-5">
@@ -88,20 +88,20 @@
                     <div class="form-check form-check-inline">
                       <label class="form-check-label">
                         <input
+                          v-model="useLatestVersion"
                           class="form-check-input"
                           type="radio"
-                          v-model="useLatestVersion"
-                          v-bind:value="true"
+                          :value="true"
                         />{{ T.contestAddproblemLatestVersion }}
                       </label>
                     </div>
                     <div class="form-check form-check-inline">
                       <label class="form-check-label">
                         <input
+                          v-model="useLatestVersion"
                           class="form-check-input"
                           type="radio"
-                          v-model="useLatestVersion"
-                          v-bind:value="false"
+                          :value="false"
                         />{{ T.contestAddproblemOtherVersion }}
                       </label>
                     </div>
@@ -110,11 +110,11 @@
               </div>
               <omegaup-problem-versions
                 v-if="!useLatestVersion"
-                v-bind:log="versionLog"
-                v-bind:published-revision="publishedRevision"
-                v-bind:show-footer="false"
                 v-model="selectedRevision"
-                v-on:runs-diff="onRunsDiff"
+                :log="versionLog"
+                :published-revision="publishedRevision"
+                :show-footer="false"
+                @runs-diff="onRunsDiff"
               ></omegaup-problem-versions>
             </div>
             <div class="form-group text-right">
@@ -122,8 +122,8 @@
                 data-add-problem
                 class="btn btn-primary mr-2"
                 type="submit"
-                v-bind:disabled="problemAlias.length == 0"
-                v-on:click.prevent="
+                :disabled="problemAlias.length == 0"
+                @click.prevent="
                   onSaveProblem(assignment, {
                     alias: problemAlias,
                     points: points,
@@ -136,7 +136,7 @@
               <button
                 class="btn btn-secondary"
                 type="reset"
-                v-on:click.prevent="reset"
+                @click.prevent="reset"
               >
                 {{ T.wordsCancel }}
               </button>
@@ -149,12 +149,6 @@
   </div>
   <!-- card -->
 </template>
-
-<style lang="scss" scoped>
-.form-group > label {
-  width: 100%;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
@@ -303,7 +297,7 @@ export default class CourseProblemList extends Vue {
   }
 
   @Watch('problems')
-  onProblemsChange(newVal: types.AddedProblem): void {
+  onProblemsChange(): void {
     this.reset();
   }
 
@@ -334,3 +328,9 @@ export default class CourseProblemList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.form-group > label {
+  width: 100%;
+}
+</style>

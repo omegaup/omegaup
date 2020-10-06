@@ -1,6 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 import { types } from '../../api_types';
@@ -60,7 +59,6 @@ describe('CardsList.vue', () => {
       propsData: coursesListProps,
     });
 
-    expect(wrapper.text()).toContain(T.navAllCourses);
     expect(wrapper.text()).toContain(T.courseCardAboutCourses);
     expect(wrapper.text()).toContain(
       T.courseCardDescriptionCourses.split(

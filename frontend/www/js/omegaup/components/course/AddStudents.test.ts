@@ -1,8 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
-import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 

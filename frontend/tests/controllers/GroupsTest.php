@@ -52,8 +52,25 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'description' => \OmegaUp\Test\Utils::createRandomString(),
             ]));
             $this->fail('Group creation should have failed');
-        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+    }
+
+    public function testCreateGroupWithInvalidAlias() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        try {
+            $login = self::login($identity);
+            \OmegaUp\Controllers\Group::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => 'invalid alias',
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Group creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -252,6 +269,29 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $groupData['group']->group_id,
             $groupScoreboard->group_id
         );
+    }
+
+    public function testCreateScoreboardWithInvalidAlias() {
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $description = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($groupData['owner']);
+        try {
+            \OmegaUp\Controllers\Group::apiCreateScoreboard(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'group_alias' => $groupData['group']->alias,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => 'invalid alias',
+                    'description' => \OmegaUp\Test\Utils::createRandomString()
+                ])
+            );
+            $this->fail('Group creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
     }
 
     /**

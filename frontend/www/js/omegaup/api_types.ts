@@ -127,6 +127,14 @@ export namespace types {
       );
     }
 
+    export function CollectionDetailsPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CommonPayload(
       elementId: string = 'payload',
     ): types.CommonPayload {
@@ -1358,6 +1366,11 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
+  export interface CollectionDetailsPayload {
+    collection: { alias: string; name?: string }[];
+    type: string;
+  }
+
   export interface CommitRunsDiff {
     [key: string]: types.RunsDiff[];
   }
@@ -1873,9 +1886,11 @@ export namespace types {
   export interface IdentityRequest {
     accepted?: boolean;
     admin?: { name?: string; username: string };
+    classname: string;
     country?: string;
     country_id?: string;
     last_update?: Date;
+    name?: string;
     request_time: Date;
     username: string;
   }
@@ -2317,6 +2332,7 @@ export namespace types {
     images: { [key: string]: string };
     language: string;
     markdown: string;
+    sources: { [key: string]: string };
   }
 
   export interface ProblemVersion {
@@ -3707,6 +3723,8 @@ export namespace messages {
   export type SessionGoogleLoginResponse = { [key: string]: string };
 
   // Tag
+  export type TagFrequentTagsRequest = { [key: string]: any };
+  export type TagFrequentTagsResponse = { frequent_tags: { alias: string }[] };
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
 
@@ -4394,6 +4412,9 @@ export namespace controllers {
   }
 
   export interface Tag {
+    frequentTags: (
+      params?: messages.TagFrequentTagsRequest,
+    ) => Promise<messages.TagFrequentTagsResponse>;
     list: (
       params?: messages.TagListRequest,
     ) => Promise<messages.TagListResponse>;

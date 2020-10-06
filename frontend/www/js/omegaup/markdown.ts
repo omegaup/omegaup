@@ -13,6 +13,10 @@ import { getSanitizingConverter } from '@/third_party/js/pagedown/Markdown.Sanit
 import T from './lang';
 import { types } from './api_types';
 
+export type SourceMapping = {
+  [filename: string]: string;
+};
+
 export type ImageMapping = {
   [url: string]: string;
 };
@@ -21,9 +25,29 @@ export interface ConverterOptions {
   preview?: boolean;
 }
 
+const languageMapping: { [key: string]: string } = {
+  c: 'c',
+  'c11-clang': 'c',
+  'c11-gcc': 'c',
+  cpp: 'cpp',
+  'cpp11-clang': 'cpp',
+  'cpp11-gcc': 'cpp',
+  'cpp17-clang': 'cpp',
+  'cpp17-gcc': 'cpp',
+  cs: 'csharp',
+  hs: 'haskell',
+  pas: 'pascal',
+  py: 'python',
+  py2: 'python',
+  py3: 'python',
+  rb: 'ruby',
+  js: 'javascript',
+};
+
 export class Converter {
   private _converter: Markdown.Converter;
   private _settings?: types.ProblemSettingsDistrib;
+  private _sourceMapping?: SourceMapping;
   private _imageMapping?: ImageMapping;
 
   constructor(options: ConverterOptions = {}) {
@@ -113,7 +137,7 @@ export class Converter {
       </div>`;
     }
 
-    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#\/%?=~_|!:,.;\(\)*[\]$]+)|(?:[a-z\/_-]+))")|(?:target="[a-z\/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
+    const whitelist = /^<\/?(a(?:\s+(?:(?:href="(?:(?:mailto:[-A-Za-z0-9+&@#/%?=~_|!:,.;()*[\]$]+)|(?:[a-z/_-]+))")|(?:target="[a-z/_-]+")|(?:class="[a-zA-Z0-9 _-]+")|(?:title="[^"<>]*")))*|details|summary|figure|figcaption|code|i|table|tbody|thead|tr|th(?: align="\w+")?|td(?: align="\w+")?|iframe(?: (?:src="https:\/\/www\.youtube\.com\/embed\/[\w-]+"|(?:width|height|allowfullscreen|frameborder|allow)(?:="[^"]+")?))*|iframe(?: (?:src="https:\/\/www\.facebook\.com\/plugins\/video.php\?[\w\d%-_]+"|(?:width|height|scrolling|allowTransparency|allowFullScreen|frameborder)(?:="[^"]+")?))*|div|h3|span|form(?: role="\w+")*|label|select|option(?: (value|selected)="\w+")*|strong|span|button(?: type="\w+")?)(\s+class="[a-zA-Z0-9 _-]+")?>$/i;
     const imageWhitelist = new RegExp(
       '^<img\\ssrc="data:image/[a-zA-Z0-9/;,=+]+"(\\swidth="\\d{1,3}")?(\\sheight="\\d{1,3}")?(\\salt="[^"<>]*")?(\\stitle="[^"<>]*")?\\s?/?>$',
       'i',
@@ -135,7 +159,7 @@ export class Converter {
     ): string => {
       // First we have to escape the escape characters so that
       // we can build a character class out of them
-      let regexString = `([${charsToEscape.replace(/([\[\]\\])/g, '\\$1')}])`;
+      let regexString = `([${charsToEscape.replace(/([[\]\\])/g, '\\$1')}])`;
 
       if (afterBackslash) {
         regexString = `\\\\${regexString}`;
@@ -163,16 +187,44 @@ export class Converter {
     this._converter.hooks.chain('postSpanGamut', (text: string): string => {
       // Templates.
       text = text.replace(
-        /^\s*\{\{([a-z0-9_:-]+)\}\}\s*$/g,
+        /^\s*\{\{([a-z0-9_-]+:[a-z0-9_-]+)\}\}\s*$/g,
         (wholematch: string, m1: string): string => {
-          if (templates.hasOwnProperty(m1)) {
+          if (Object.prototype.hasOwnProperty.call(templates, m1)) {
             return templates[m1];
           }
-          return (
-            '<strong style="color: red">Unrecognized template name: ' +
-            m1 +
-            '</strong>'
-          );
+          return `<span class="alert alert-danger" role="alert">Unrecognized template name: ${m1}</span>`;
+        },
+      );
+      // File transclusion.
+      const sourceMapping: ImageMapping = this._sourceMapping || {};
+      text = text.replace(
+        /^\s*\{\{([a-z0-9_-]+\.[a-z]{1,4})\}\}\s*$/gi,
+        (wholematch: string, m1: string): string => {
+          if (!Object.prototype.hasOwnProperty.call(sourceMapping, m1)) {
+            return `<span class="alert alert-danger" role="alert">Unrecognized source filename: ${m1}</span>`;
+          }
+
+          const extension = m1.split('.')[1];
+          let language = extension;
+          if (Object.prototype.hasOwnProperty.call(languageMapping, language)) {
+            language = languageMapping[language];
+          }
+          const className = ` class="language-${language}"`;
+          let contents = sourceMapping[m1];
+
+          if (Object.prototype.hasOwnProperty.call(Prism.languages, language)) {
+            contents = Prism.highlight(
+              contents,
+              Prism.languages[language],
+              language,
+            );
+          } else {
+            contents = contents
+              .replace(/&/g, '&amp;')
+              .replace(/</g, '&lt;')
+              .replace(/>/g, '&gt;');
+          }
+          return `<pre><code${className}>${contents}</code></pre>`;
         },
       );
       // Images.
@@ -181,7 +233,10 @@ export class Converter {
         /<img src="([^"]+)"\s*([^>]+)>/g,
         (wholeMatch: string, url: string, attributes: string): string => {
           url = unescapeCharacters(url);
-          if (url.indexOf('/') != -1 || !imageMapping.hasOwnProperty(url)) {
+          if (
+            url.indexOf('/') != -1 ||
+            !Object.prototype.hasOwnProperty.call(imageMapping, url)
+          ) {
             return wholeMatch;
           }
           return `<img src="${escapeCharacters(
@@ -207,12 +262,12 @@ export class Converter {
         return text.replace(
           /^( {0,3}\|\| *(?:input|examplefile) *\n(?:.|\n)+?\n) {0,3}\|\| *end *\n/gm,
           (whole: string, inner: string): string => {
-            var matches = inner.split(
+            const matches = inner.split(
               / {0,3}\|\| *(examplefile|input|output|description) *\n/,
             );
-            var result = '';
-            var description_column = false;
-            for (var i = 1; i < matches.length; i += 2) {
+            let result = '';
+            let description_column = false;
+            for (let i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
                 description_column = true;
                 break;
@@ -224,66 +279,76 @@ export class Converter {
             if (description_column) {
               result += `<th>${T.wordsDescription}</th>`;
             }
-            result += '</tr></thead>';
-            var first_row = true;
-            var columns = 0;
+            result += '</tr></thead>\n';
+            let first_row = true;
+            let columns = 0;
             result += '<tbody>';
-            for (var i = 1; i < matches.length; i += 2) {
+            const escapeSample = (
+              contents: string,
+              doNotEscapeTildeAndDollar: boolean = false,
+            ): string =>
+              escapeCharacters(
+                contents
+                  .replace(/\s+$/, '')
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;'),
+                ' \t*_{}[]()<>#+=.!|`-',
+                /*afterBackslash=*/ false,
+                doNotEscapeTildeAndDollar,
+              );
+            for (let i = 1; i < matches.length; i += 2) {
               if (matches[i] == 'description') {
                 result += '<td>' + blockGamut(matches[i + 1]) + '</td>';
                 columns++;
-              } else {
-                if (matches[i] == 'input' || matches[i] == 'examplefile') {
-                  if (!first_row) {
-                    while (columns < (description_column ? 3 : 2)) {
-                      result += '<td></td>';
-                      columns++;
-                    }
-                    result += '</tr>';
-                  }
-                  first_row = false;
-                  result += '<tr>';
-                  columns = 0;
-                }
+                continue;
+              }
 
-                if (matches[i] == 'examplefile') {
-                  let exampleFilename = matches[i + 1].trim();
-                  let exampleFile = {
-                    in: `{{examples/${exampleFilename}.in}}`,
-                    out: `{{examples/${exampleFilename}.out}}`,
-                  };
-                  if (settings?.cases.hasOwnProperty(exampleFilename)) {
-                    exampleFile = settings.cases[exampleFilename];
+              if (matches[i] == 'input' || matches[i] == 'examplefile') {
+                if (!first_row) {
+                  while (columns < (description_column ? 3 : 2)) {
+                    result += '<td></td>';
+                    columns++;
                   }
-                  result += `<td><pre>${exampleFile['in'].replace(
-                    /\s+$/,
-                    '',
-                  )}</pre></td>`;
-                  result += `<td><pre>${exampleFile.out.replace(
-                    /\s+$/,
-                    '',
-                  )}</pre></td>`;
-                  columns += 2;
-                } else {
-                  result += `<td><pre>${escapeCharacters(
-                    matches[i + 1]
-                      .replace(/\s+$/, '')
-                      .replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;'),
-                    ' \t*_{}[]()<>#+=.!|`-',
-                    /*afterBackslash=*/ false,
-                    /*doNotEscapeTildeAnDollar=*/ true,
-                  )}</pre></td>`;
-                  columns++;
+                  result += '</tr>\n';
                 }
+                first_row = false;
+                result += '<tr>';
+                columns = 0;
+              }
+
+              if (matches[i] == 'examplefile') {
+                const exampleFilename = matches[i + 1].trim();
+                let exampleFile = {
+                  in: `{{examples/${exampleFilename}.in}}`,
+                  out: `{{examples/${exampleFilename}.out}}`,
+                };
+                // eslint-disable-next-line no-prototype-builtins
+                if (settings?.cases.hasOwnProperty(exampleFilename)) {
+                  exampleFile = settings.cases[exampleFilename];
+                }
+                result += `<td><pre>${escapeSample(
+                  exampleFile['in'],
+                )}</pre></td>`;
+                result += `<td><pre>${escapeSample(
+                  exampleFile.out,
+                )}</pre></td>`;
+                columns += 2;
+              } else {
+                // Since the match has already gone through escaping, we need
+                // to unescape its contents.
+                result += `<td><pre>${escapeSample(
+                  matches[i + 1],
+                  /*doNotEscapeTildeAndDollar=*/ true,
+                )}</pre></td>`;
+                columns++;
               }
             }
             while (columns < (description_column ? 3 : 2)) {
               result += '<td></td>';
               columns++;
             }
-            result += '</tr></tbody>';
+            result += '</tr>\n</tbody>';
 
             return '<table class="sample_io">\n' + result + '\n</table>\n';
           },
@@ -294,8 +359,8 @@ export class Converter {
       'preBlockGamut',
       (
         text: string,
-        blockGamut: (text: string) => string,
-        spanGamut: (text: string) => string,
+        blockGamut: (text: string) => string, // eslint-disable-line @typescript-eslint/no-unused-vars
+        spanGamut: (text: string) => string, // eslint-disable-line @typescript-eslint/no-unused-vars
       ): string => {
         // GitHub-flavored fenced code blocks
         const fencedCodeBlock = (
@@ -311,30 +376,17 @@ export class Converter {
           if (infoString != '') {
             language = infoString.split(/\s+/)[0];
             className = ` class="language-${language}"`;
-            const languageMapping: { [key: string]: string } = {
-              c: 'c',
-              'c11-clang': 'c',
-              'c11-gcc': 'c',
-              cpp: 'cpp',
-              'cpp11-clang': 'cpp',
-              'cpp11-gcc': 'cpp',
-              'cpp17-clang': 'cpp',
-              'cpp17-gcc': 'cpp',
-              cs: 'csharp',
-              hs: 'haskell',
-              pas: 'pascal',
-              py: 'python',
-              py2: 'python',
-              py3: 'python',
-              rb: 'ruby',
-              js: 'javascript',
-            };
-            if (languageMapping.hasOwnProperty(language)) {
+            if (
+              Object.prototype.hasOwnProperty.call(languageMapping, language)
+            ) {
               language = languageMapping[language];
             }
           }
 
-          if (language && Prism.languages.hasOwnProperty(language)) {
+          if (
+            language &&
+            Object.prototype.hasOwnProperty.call(Prism.languages, language)
+          ) {
             contents = Prism.highlight(
               contents,
               Prism.languages[language],
@@ -347,9 +399,9 @@ export class Converter {
               .replace(/>/g, '&gt;');
           }
           if (indentation != '') {
-            let lines = [];
-            let stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
-            for (let line of contents.split('\n')) {
+            const lines = [];
+            const stripPrefix = new RegExp('^ {0,' + indentation.length + '}');
+            for (const line of contents.split('\n')) {
               lines.push(line.replace(stripPrefix, ''));
             }
             contents = escapeCharacters(
@@ -387,6 +439,7 @@ export class Converter {
         // GitHub-flavored Markdown table.
         return text.replace(
           /^ {0,3}\|[^\n]*\|[ \t]*(\n {0,3}\|[^\n]*\|[ \t]*)+$/gm,
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           (whole: string, inner: string): string => {
             let cells = whole
               .trim()
@@ -490,10 +543,12 @@ export class Converter {
   public makeHtmlWithImages(
     markdown: string,
     imageMapping: ImageMapping,
+    sourceMapping: SourceMapping,
     settings?: types.ProblemSettingsDistrib,
   ): string {
     try {
       this._imageMapping = imageMapping;
+      this._sourceMapping = sourceMapping;
       this._settings = settings;
       return this._converter.makeHtml(markdown);
     } finally {

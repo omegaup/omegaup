@@ -6,8 +6,8 @@
     >
       <img
         class="col-lg-6 badge-icon"
-        v-bind:class="{ 'badge-icon-gray': !this.badge.assignation_time }"
-        v-bind:src="iconUrl"
+        :class="{ 'badge-icon-gray': !badge.assignation_time }"
+        :src="iconUrl"
       />
       <figcaption class="col-lg-6 p-0 mt-4 mt-lg-0 badge-description">
         {{ description }}
@@ -42,6 +42,54 @@
   </div>
 </template>
 
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import * as time from '../../time';
+
+@Component
+export default class BadgeDetails extends Vue {
+  @Prop() badge!: types.Badge;
+
+  T = T;
+
+  get name(): string {
+    return T[`badge_${this.badge.badge_alias}_name`];
+  }
+
+  get description(): string {
+    return T[`badge_${this.badge.badge_alias}_description`];
+  }
+
+  get iconUrl(): string {
+    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
+  }
+
+  get ownedMessage(): string {
+    return this.badge.assignation_time
+      ? `<span class="badge-text-icon">😁</span> ${T.badgeAssignationTimeMessage}`
+      : `<span class="badge-text-icon">😞</span> ${T.badgeNotAssignedMessage}`;
+  }
+
+  get firstAssignationDate(): string {
+    return this.badge.first_assignation
+      ? time.formatDate(this.badge.first_assignation)
+      : '';
+  }
+
+  get assignationDate(): string {
+    return this.badge.assignation_time
+      ? time.formatDate(this.badge.assignation_time)
+      : '';
+  }
+
+  get ownersNumber(): string {
+    return `${this.badge.owners_count}/${this.badge.total_users}`;
+  }
+}
+</script>
+
 <style lang="scss" scoped>
 .badge {
   &-icon {
@@ -70,51 +118,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
-import T from '../../lang';
-import * as time from '../../time';
-
-@Component
-export default class BadgeDetails extends Vue {
-  @Prop() badge!: types.Badge;
-
-  T = T;
-
-  get name(): string {
-    return T[`badge_${this.badge.badge_alias}_name`];
-  }
-
-  get description(): string {
-    return T[`badge_${this.badge.badge_alias}_description`];
-  }
-
-  get iconUrl(): string {
-    return `/media/dist/badges/${this.badge.badge_alias}.svg`;
-  }
-
-  get ownedMessage(): string {
-    return !!this.badge.assignation_time
-      ? `<span class="badge-text-icon">😁</span> ${T.badgeAssignationTimeMessage}`
-      : `<span class="badge-text-icon">😞</span> ${T.badgeNotAssignedMessage}`;
-  }
-
-  get firstAssignationDate(): string {
-    return this.badge.first_assignation
-      ? time.formatDate(this.badge.first_assignation)
-      : '';
-  }
-
-  get assignationDate(): string {
-    return !!this.badge.assignation_time
-      ? time.formatDate(this.badge.assignation_time)
-      : '';
-  }
-
-  get ownersNumber(): string {
-    return `${this.badge.owners_count}/${this.badge.total_users}`;
-  }
-}
-</script>

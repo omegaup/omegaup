@@ -10,8 +10,21 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
-  const problemDetails = new Vue({
+  const locationHash = window.location.hash.substr(1).split('/');
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-details': problem_Details,
+    },
+    data: () => ({
+      initialClarifications: payload.clarifications,
+      solutionStatus: payload.solutionStatus,
+      solution: <types.ProblemStatement | null>null,
+      availableTokens: 0,
+      allTokens: 0,
+      showNewRunWindow: locationHash.includes('new-run'),
+      activeTab: window.location.hash ? locationHash[0] : 'problems',
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
@@ -28,6 +41,7 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
+          showNewRunWindow: this.showNewRunWindow,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -88,7 +102,7 @@ OmegaUp.on('ready', () => {
               nomination: 'dismissal',
               contents: JSON.stringify(contents),
             })
-              .then((data) => {
+              .then(() => {
                 ui.info(T.qualityNominationRateProblemDesc);
               })
               .catch(ui.apiError);
@@ -181,21 +195,13 @@ OmegaUp.on('ready', () => {
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
+          'redirect-login-page': () => {
+            window.location.href = `/login/?redirect=${escape(
+              window.location.pathname,
+            )}`;
+          },
         },
       });
-    },
-    data: {
-      initialClarifications: payload.clarifications,
-      solutionStatus: payload.solutionStatus,
-      solution: <types.ProblemStatement | null>null,
-      availableTokens: 0,
-      allTokens: 0,
-      activeTab: window.location.hash
-        ? window.location.hash.substr(1).split('/')[0]
-        : 'problems',
-    },
-    components: {
-      'omegaup-problem-details': problem_Details,
     },
   });
 });
