@@ -76,7 +76,7 @@ export default class CollectionProblem extends Vue {
   T = T;
 
   get name(): string {
-    return T[`${this.levelTagAlias}`];
+    return T[this.levelTagAlias];
   }
 
   getProblemLevelIcon(problemLevel: string): string {
