@@ -29,7 +29,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
 import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
@@ -81,7 +80,7 @@ export default class CollectionProblem extends Vue {
   }
 
   getProblemLevelIcon(problemLevel: string): string {
-    if (problemLevelIcons.hasOwnProperty(problemLevel))
+    if ({}.hasOwnProperty.call(problemLevelIcons, problemLevel))
       return problemLevelIcons[problemLevel];
     return 'icon';
   }
