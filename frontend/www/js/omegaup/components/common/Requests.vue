@@ -22,7 +22,6 @@
               :username="request.username"
               :name="request.name"
               :linkify="true"
-              :show-name-with-username="true"
             ></omegaup-username>
           </td>
           <td>{{ request.country }}</td>

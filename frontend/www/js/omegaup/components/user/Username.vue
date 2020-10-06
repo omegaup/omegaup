@@ -42,12 +42,8 @@ export default class Username extends Vue {
   @Prop() linkify!: boolean;
   @Prop() country!: string;
   @Prop({ default: false }) emitClickEvent!: boolean;
-  @Prop({ default: false }) showNameWithUsername!: boolean;
 
   get nameWithUsername(): string {
-    if (!this.showNameWithUsername) {
-      return this.name || this.username;
-    }
     if (this.name) {
       return `${this.name} (${this.username})`;
     }
