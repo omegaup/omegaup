@@ -47,16 +47,6 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import problem_Collection from './CollectionProblem.vue';
 
-const problemLevelIcons = {
-  problemLevelBasicKarel: 'fas fa-robot',
-  problemLevelBasicIntroductionToProgramming: 'fas fa-laptop-code',
-  problemLevelIntermediateMathsInProgramming: 'fas fa-square-root-alt',
-  problemLevelIntermediateDataStructuresAndAlgorithms: 'fas fa-project-diagram',
-  problemLevelIntermediateAnalysisAndDesignOfAlgorithms: 'fas fa-sitemap',
-  problemLevelAdvancedCompetitiveProgramming: 'fas fa-trophy',
-  problemLevelAdvancedSpecializedTopics: 'fas fa-code',
-};
-
 @Component({
   components: {
     'omegaup-problem-collection': problem_Collection,

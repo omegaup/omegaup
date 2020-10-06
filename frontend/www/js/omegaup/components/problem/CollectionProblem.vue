@@ -1,10 +1,27 @@
 <template>
   <div class="col-sm-4 mt-2">
     <div class="border border-dark">
-      <p>
-        <strong>{{ this.name }}</strong> <br />
-        {{ problemCount }} Problemas
-      </p>
+      <div class="row">
+        <div class="col-sm-4 text-center pt-2">
+          <h1>
+            <font-awesome-icon
+                    :icon="['fas', getProblemLevelIcon(levelTagAlias)]"
+                  />
+          </h1>
+        </div>
+        <div class="col-sm-8 text-center">
+          <p>
+            <strong>{{ name }}</strong> <br />
+            {{ problemCount }} {{T.wordsProblems}}
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col mt-1 mb-1 text-center">
+          <a class="btn btn-primary" href="/problem/">{{ T.problemcollectionViewProblems }}</a>
+        </div> 
+      </div>
+      </row>
     </div>
   </div>
 </template>
@@ -16,17 +33,57 @@ import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faRobot,
+  faLaptopCode,
+  faSquareRootAlt,
+  faProjectDiagram,
+  faSitemap,
+  faTrophy,
+  faCode,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faRobot);
+library.add(faLaptopCode);
+library.add(faSquareRootAlt);
+library.add(faProjectDiagram);
+library.add(faSitemap);
+library.add(faTrophy);
+library.add(faCode);
+
+const problemLevelIcons = {
+    'problemLevelBasicKarel': 'robot',
+    'problemLevelBasicIntroductionToProgramming': 'laptop-code',
+    'problemLevelIntermediateMathsInProgramming': 'square-root-alt',
+    'problemLevelIntermediateDataStructuresAndAlgorithms': 'project-diagram',
+    'problemLevelIntermediateAnalysisAndDesignOfAlgorithms': 'sitemap',
+    'problemLevelAdvancedCompetitiveProgramming': 'trophy',
+    'problemLevelAdvancedSpecializedTopics': 'code',
+};
+
 @Component({
   directives: {
     tooltip: VTooltip,
   },
+  components: {
+    FontAwesomeIcon,
+  }
 })
 export default class CollectionProblem extends Vue {
   @Prop() levelTagAlias!: string;
   @Prop() problemCount!: number;
+  T = T;
 
   get name(): string {
     return T[`${this.levelTagAlias}`];
   }
+
+  getProblemLevelIcon(problemLevel: string): string {
+   if (problemLevelIcons.hasOwnProperty(problemLevel))
+    return problemLevelIcons[problemLevel];
+  return 'icon';
+  }
+
 }
 </script>
