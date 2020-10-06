@@ -56,7 +56,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="student in students">
+          <tr v-for="student in students" :key="student.username">
             <td>
               <a :href="studentProgressUrl(student)">{{
                 student.name || student.username
