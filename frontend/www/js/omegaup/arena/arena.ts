@@ -166,6 +166,40 @@ function getMaxScore(
   return maxScore;
 }
 
+function findElement(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+): HTMLElement | null {
+  if (element) {
+    if (itemSelector !== null) {
+      element = element.querySelector(itemSelector);
+    }
+  }
+  return element;
+}
+
+function setItemText(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+  text: string,
+) {
+  element = findElement(element, itemSelector);
+  if (element) {
+    element.textContent = text;
+  }
+}
+
+function setItemHtml(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+  html: string,
+) {
+  element = findElement(element, itemSelector);
+  if (element) {
+    element.innerHTML = html;
+  }
+}
+
 export class Arena {
   options: ArenaOptions;
 
@@ -234,7 +268,7 @@ export class Arena {
   clarificationsOffset: number = 0;
   clarificationsRowcount: number = 20;
   activeTab: string = 'problems';
-  clarifications: { [key: number]: JQuery } = {};
+  clarifications: { [key: number]: HTMLElement } = {};
   submissionGap: number = 0;
 
   // Clarification refresh interval.
@@ -256,11 +290,11 @@ export class Arena {
 
   // UI elements
   elements: {
-    clarification: JQuery;
-    clock: JQuery;
-    loadingOverlay: JQuery;
-    ranking: JQuery;
-    socketStatus: JQuery;
+    clarification: HTMLElement | null;
+    clock: HTMLElement | null;
+    loadingOverlay: HTMLElement | null;
+    ranking: HTMLElement | null;
+    socketStatus: HTMLElement | null;
   };
 
   initialClarifications: types.Clarification[] = [];
@@ -449,11 +483,11 @@ export class Arena {
 
     // UI elements
     this.elements = {
-      clarification: $('#clarification'),
-      clock: $('#title .clock'),
-      loadingOverlay: $('#loading'),
-      ranking: $('#ranking div'),
-      socketStatus: $('#title .socket-status'),
+      clarification: document.querySelector('#clarification'),
+      clock: document.querySelector('#title .clock'),
+      loadingOverlay: document.querySelector('#loading'),
+      ranking: document.querySelector('#ranking div'),
+      socketStatus: document.querySelector('#title .socket-status'),
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
@@ -515,9 +549,9 @@ export class Arena {
       });
     }
 
-    if (this.elements.ranking.length) {
+    if (this.elements.ranking) {
       this.scoreboard = new Vue({
-        el: this.elements.ranking[0],
+        el: this.elements.ranking,
         components: {
           'omegaup-arena-scoreboard': arena_Scoreboard,
         },
@@ -666,11 +700,12 @@ export class Arena {
     $('.libinteractive-download form').on('submit', (e: Event) => {
       e.preventDefault();
 
-      const form = $(<HTMLElement>e.target);
+      const form = <HTMLElement>e.target;
       const alias = this.currentProblem.alias;
       const commit = this.currentProblem.commit;
-      const os = $('.download-os', form).val();
-      const lang = $('.download-lang', form).val();
+      const os = (<HTMLInputElement>form.querySelector('.download-os'))?.value;
+      const lang = (<HTMLInputElement>form.querySelector('.download-lang'))
+        ?.value;
       const extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
       ui.navigateTo(
@@ -703,7 +738,7 @@ export class Arena {
       this.options.disableSockets ||
       this.options.contestAlias == 'admin'
     ) {
-      this.elements.socketStatus.html('✗').css('color', '#800');
+      this.updateSocketStatus('✗', '#800');
       return false;
     }
 
@@ -735,9 +770,16 @@ export class Arena {
       });
     };
 
-    this.elements.socketStatus.html('↻').css('color', '#888');
+    this.updateSocketStatus('↻', '#888');
     connect(uris, 0);
     return false;
+  }
+
+  updateSocketStatus(htmlContent: string, color: string): void {
+    if (this.elements.socketStatus) {
+      this.elements.socketStatus.innerHTML = htmlContent;
+      this.elements.socketStatus.style.color = color;
+    }
   }
 
   setupPolls(): void {
@@ -773,7 +815,7 @@ export class Arena {
     // Once the clock is ready, we can now connect to the socket.
     this.connectSocket();
     if (this.options.isPractice || !this.finishTime) {
-      this.elements.clock.html('&infin;');
+      setItemHtml(this.elements.clock, null, '&infin;');
       return;
     }
     if (deadline) this.submissionDeadline = deadline;
@@ -797,11 +839,11 @@ export class Arena {
 
       const problemsetCallback = () => {
         const now = Date.now();
-        this.elements.loadingOverlay.text(
-          `${problemsetId} ${time.formatDelta(
+        if (this.elements.loadingOverlay) {
+          this.elements.loadingOverlay.textContent = `${problemsetId} ${time.formatDelta(
             problemsetStartTime.getTime() - now,
-          )}`,
-        );
+          )}`;
+        }
         if (now < problemsetStartTime.getTime()) {
           setTimeout(problemsetCallback, 1000);
         } else {
@@ -813,7 +855,9 @@ export class Arena {
       setTimeout(problemsetCallback, 1000);
       return;
     }
-    this.elements.loadingOverlay.html('404');
+    if (this.elements.loadingOverlay) {
+      this.elements.loadingOverlay.textContent = '404';
+    }
   }
 
   problemsetLoaded(problemset: types.Problemset): void {
@@ -863,25 +907,27 @@ export class Arena {
     );
     this.initProblems(problemset);
 
-    const problemSelect = $('select', this.elements.clarification);
-    for (const problem of problemset.problems ?? []) {
-      const problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
+    const problemSelect = this.elements.clarification?.querySelector('select');
+    if (problemSelect) {
+      for (const problem of problemset.problems ?? []) {
+        const problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
-      if (this.navbarProblems) {
-        this.navbarProblems.problems.push({
-          alias: problem.alias,
-          text: problemName,
-          acceptsSubmissions: problem.languages !== '',
-          bestScore: 0,
-          maxScore: problem.points,
-          hasRuns: false,
-        });
+        if (this.navbarProblems) {
+          this.navbarProblems.problems.push({
+            alias: problem.alias,
+            text: problemName,
+            acceptsSubmissions: problem.languages !== '',
+            bestScore: 0,
+            maxScore: problem.points,
+            hasRuns: false,
+          });
+        }
+
+        $('<option>')
+          .val(problem.alias)
+          .text(problemName)
+          .appendTo(<Element>problemSelect);
       }
-
-      $('<option>')
-        .val(problem.alias)
-        .text(problemName)
-        .appendTo(problemSelect);
     }
 
     if (!this.options.isPractice && !this.options.isInterview) {
@@ -891,7 +937,9 @@ export class Arena {
     // Trigger the event (useful on page load).
     this.onHashChanged();
 
-    this.elements.loadingOverlay.fadeOut('slow');
+    if (this.elements.loadingOverlay) {
+      this.elements.loadingOverlay.style.display = 'none';
+    }
     $('#root').fadeIn('slow');
 
     if (
@@ -976,7 +1024,7 @@ export class Arena {
     } else {
       clock = time.formatDelta(countdownTime.getTime() - now);
     }
-    this.elements.clock.text(clock);
+    setItemText(this.elements.clock, null, clock);
   }
 
   updateRunFallback(guid: string): void {
@@ -1340,7 +1388,7 @@ export class Arena {
     series: Highcharts.SeriesLineOptions[],
     navigatorSeries: number[][],
   ): void {
-    if (series.length == 0 || this.elements.ranking.length == 0) return;
+    if (series.length == 0 || !this.elements.ranking) return;
 
     this.rankingChart = Highcharts.stockChart(
       <HTMLElement>document.getElementById('ranking-chart'),
@@ -1406,7 +1454,7 @@ export class Arena {
   }
 
   updateClarification(clarification: types.Clarification): void {
-    let r: JQuery | null = null;
+    let r: HTMLElement | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
     const clarifications =
       this.commonNavbar?.initialClarifications ?? this.initialClarifications;
@@ -1424,10 +1472,15 @@ export class Arena {
         clarifications.push(clarification);
       }
     } else {
-      r = $('.clarifications tbody.clarification-list tr.template')
-        .clone()
-        .removeClass('template')
-        .addClass('inserted');
+      r = <HTMLElement>(
+        document
+          .querySelector('.clarifications tbody.clarification-list tr.template')
+          ?.cloneNode(true)
+      );
+      r.classList.remove('template');
+      r.classList.add('inserted');
+      $('.clarifications tbody.clarification-list').prepend(r);
+      this.clarifications[clarification.clarification_id] = r;
 
       if (this.problemsetAdmin) {
         if (clarifications !== null) {
@@ -1493,23 +1546,19 @@ export class Arena {
       }
     }
 
-    $('.anchor', r).attr('name', anchor);
-    $('.contest', r).text(clarification.contest_alias || '');
-    $('.problem', r).text(clarification.problem_alias);
+    r.querySelector('.anchor')?.setAttribute('name', anchor);
+    setItemText(r, '.contest', clarification.contest_alias ?? '');
+    setItemText(r, '.problem', clarification.problem_alias);
     if (this.problemsetAdmin) {
-      $('.author', r).text(clarification.author || '');
+      setItemText(r, '.author', clarification.author ?? '');
     }
-    $('.time', r).html(time.formatTimestamp(clarification.time));
-    $('.message', r).text(clarification.message);
-    $('.answer pre', r).text(clarification.answer ?? '');
+    setItemHtml(r, '.time', time.formatTimestamp(clarification.time));
+    setItemText(r, '.message', clarification.message);
+    setItemText(r, '.answer pre', clarification.answer ?? '');
     if (clarification.answer) {
       this.answeredClarifications++;
     }
 
-    if (!this.clarifications[clarification.clarification_id]) {
-      $('.clarifications tbody.clarification-list').prepend(r);
-      this.clarifications[clarification.clarification_id] = r;
-    }
     if (clarification.answer == null) {
       $('.answer pre', r).hide();
       if (clarification.receiver != null) {
@@ -1997,7 +2046,7 @@ export class Arena {
   onCloseSubmit(e: Event): void {
     if (
       (<HTMLElement>e.target).id !== 'overlay' &&
-      (<JQuery>(e.target as unknown)).closest('button.close') === null
+      (<HTMLElement>e.target).closest('button.close') === null
     ) {
       return;
     }
@@ -2377,7 +2426,7 @@ export class EventsSocket {
         socket.onmessage = (message) => this.onmessage(message);
         socket.onopen = () => {
           this.shouldRetry = true;
-          this.arena.elements.socketStatus.html('&bull;').css('color', '#080');
+          this.arena.updateSocketStatus('&bull;', '#080');
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
             30000,
@@ -2430,12 +2479,12 @@ export class EventsSocket {
     }
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
-      this.arena.elements.socketStatus.html('↻').css('color', '#888');
+      this.arena.updateSocketStatus('↻', '#888');
       setTimeout(() => this.connect(), Math.random() * 15000);
       return;
     }
 
-    this.arena.elements.socketStatus.html('✗').css('color', '#800');
+    this.arena.updateSocketStatus('✗', '#800');
   }
 }
 

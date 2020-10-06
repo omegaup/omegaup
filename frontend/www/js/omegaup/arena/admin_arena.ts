@@ -74,45 +74,49 @@ export default class ArenaAdmin {
   }
 
   setUpPagers(): void {
-    $('.clarifpager .clarifpagerprev').on('click', () => {
-      if (this.arena.clarificationsOffset > 0) {
-        this.arena.clarificationsOffset -= this.arena.clarificationsRowcount;
+    document
+      .querySelector('.clarifpager .clarifpagerprev')
+      ?.addEventListener('click', () => {
+        if (this.arena.clarificationsOffset > 0) {
+          this.arena.clarificationsOffset -= this.arena.clarificationsRowcount;
+          if (this.arena.clarificationsOffset < 0) {
+            this.arena.clarificationsOffset = 0;
+          }
+
+          this.refreshClarifications();
+        }
+      });
+
+    document
+      .querySelector('.clarifpager .clarifpagernext')
+      ?.addEventListener('click', () => {
+        this.arena.clarificationsOffset += this.arena.clarificationsRowcount;
         if (this.arena.clarificationsOffset < 0) {
           this.arena.clarificationsOffset = 0;
         }
 
         this.refreshClarifications();
+      });
+
+    this.arena.elements.clarification?.addEventListener('submit', () => {
+      const clarification = this.arena.elements.clarification;
+      if (clarification === null) {
+        return;
       }
-    });
-
-    $('.clarifpager .clarifpagernext').on('click', () => {
-      this.arena.clarificationsOffset += this.arena.clarificationsRowcount;
-      if (this.arena.clarificationsOffset < 0) {
-        this.arena.clarificationsOffset = 0;
-      }
-
-      this.refreshClarifications();
-    });
-
-    this.arena.elements.clarification.on('submit', () => {
-      $('input', this.arena.elements.clarification).attr(
-        'disabled',
-        'disabled',
-      );
+      clarification
+        .querySelectorAll('input')
+        .forEach((input) => input.setAttribute('disabled', 'disabled'));
       api.Clarification.create({
         contest_alias: this.arena.options.contestAlias,
-        problem_alias: $(
-          'select[name="problem"]',
-          this.arena.elements.clarification,
-        ).val(),
-        username: $(
-          'select[name="user"]',
-          this.arena.elements.clarification,
-        ).val(),
-        message: $(
-          'textarea[name="message"]',
-          this.arena.elements.clarification,
-        ).val(),
+        problem_alias: (<HTMLInputElement>(
+          clarification.querySelector('select[name="problem"]')
+        )).value,
+        username: (<HTMLInputElement>(
+          clarification.querySelector('select[name="user"]')
+        )).value,
+        message: (<HTMLInputElement>(
+          clarification.querySelector('textarea[name="message"]')
+        )).value,
       })
         .then(() => {
           this.arena.hideOverlay();
@@ -122,7 +126,9 @@ export default class ArenaAdmin {
           alert(e.error);
         })
         .finally(() => {
-          $('input', this.arena.elements.clarification).prop('disabled', false);
+          clarification
+            .querySelectorAll('input')
+            .forEach((input) => input.removeAttribute('disabled'));
         });
 
       return false;
