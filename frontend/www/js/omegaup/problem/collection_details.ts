@@ -7,15 +7,15 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CollectionDetailsPayload();
   new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-collection-details': collection_Details,
+    },
     render: function (createElement) {
       return createElement('omegaup-collection-details', {
         props: {
           data: payload,
         },
       });
-    },
-    components: {
-      'omegaup-collection-details': collection_Details,
     },
   });
 });
