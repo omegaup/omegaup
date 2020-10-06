@@ -40,7 +40,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
- * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>}
+ * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, type: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -5899,6 +5899,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'collection' => $collection,
+                    'type' => $collectionType,
                 ],
                 'title' => $title,
             ],
