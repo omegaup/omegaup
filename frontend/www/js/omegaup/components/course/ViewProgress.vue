@@ -20,6 +20,7 @@
                   >
                     {{ assignment.name }}
                   </th>
+                  <th>{{ T.courseProgressGlobalScore }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -61,7 +62,6 @@
       </div>
     </div>
   </div>
-  <!-- panel -->
 </template>
 
 <script lang="ts">
@@ -162,6 +162,21 @@ export default class CourseViewProgress extends Vue {
     );
   }
 
+  points(
+    student: types.StudentProgress,
+    assignment: omegaup.Assignment,
+  ): number {
+    if (
+      !Object.prototype.hasOwnProperty.call(student.points, assignment.alias)
+    ) {
+      return 0;
+    }
+    return Object.values(student.points[assignment.alias]).reduce(
+      (accumulator: number, currentValue: number) => accumulator + currentValue,
+      0,
+    );
+  }
+
   studentProgressUrl(student: types.StudentProgress): string {
     return `/course/${this.course.alias}/student/${student.username}/`;
   }
@@ -176,6 +191,7 @@ export default class CourseViewProgress extends Vue {
     for (const assignment of this.assignments) {
       header.push(assignment.name);
     }
+    header.push(T.courseProgressGlobalScore);
     table.push(header);
     for (const student of this.students) {
       const row: (number | string)[] = [student.username, student.name || ''];
@@ -183,6 +199,8 @@ export default class CourseViewProgress extends Vue {
       for (const assignment of this.assignments) {
         row.push(this.score(student, assignment));
       }
+      const globalScore = this.getGlobalScoreByStudent(student);
+      row.push(`${globalScore}%`);
 
       table.push(row);
     }
@@ -201,6 +219,29 @@ export default class CourseViewProgress extends Vue {
 
   get odsFilename(): string {
     return `${this.course.alias}.ods`;
+  }
+
+  get weightedMean(): Array<number> {
+    const totalPoints =
+      this.assignments
+        .map((assignment) => assignment.max_points)
+        .reduce((a, b) => (a ?? 0) + (b ?? 0)) ?? 0;
+    return this.assignments.map(
+      (assignment) => ((assignment.max_points ?? 0) / (totalPoints ?? 0)) * 100,
+    );
+  }
+
+  getGlobalScoreByStudent(student: types.StudentProgress): string {
+    const points = [];
+    for (const assignment of this.assignments) {
+      points.push(
+        this.score(student, assignment) / this.points(student, assignment),
+      );
+    }
+    const globalScore = points
+      .map((value, index) => value * this.weightedMean[index])
+      .reduce((a, b) => a + b);
+    return globalScore.toFixed(2);
   }
 
   @AsyncComputed()

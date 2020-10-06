@@ -42,6 +42,7 @@
         </div>
       </div>
     </td>
+    <td data-global-score>{{ globalScoreByStudent }}%</td>
   </tr>
 </template>
 
@@ -118,6 +119,27 @@ export default class StudentProgress extends Vue {
       (accumulator: number, currentValue: number) => accumulator + currentValue,
       0,
     );
+  }
+
+  get weightedMean(): Array<number> {
+    const totalPoints =
+      this.assignments
+        .map((assignment) => assignment.max_points)
+        .reduce((a, b) => (a ?? 0) + (b ?? 0)) ?? 0;
+    return this.assignments.map(
+      (assignment) => ((assignment.max_points ?? 0) / (totalPoints ?? 0)) * 100,
+    );
+  }
+
+  get globalScoreByStudent(): string {
+    const points = [];
+    for (const assignment of this.assignments) {
+      points.push(this.score(assignment.alias) / this.points(assignment.alias));
+    }
+    const globalScore = points
+      .map((value, index) => value * this.weightedMean[index])
+      .reduce((a, b) => a + b);
+    return globalScore.toFixed(2);
   }
 
   getProgressDescription(assignmentAlias: string): string {
