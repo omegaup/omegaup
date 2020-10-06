@@ -9,7 +9,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AssignmentProgress=array<string, Progress>
  * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepts_submissions: bool, accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
- * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}
+ * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
  * @psalm-type CourseGroupAdmin=array{alias: string, name: string, role: string}
  * @psalm-type CourseAssignment=array{alias: string, assignment_type: string, description: string, finish_time: \OmegaUp\Timestamp|null, has_runs: bool, max_points: float, name: string, order: int, problemset_id: int, publish_time_delay: int|null, scoreboard_url: string, scoreboard_url_admin: string, start_time: \OmegaUp\Timestamp}
@@ -2245,6 +2245,32 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
             \OmegaUp\DAO\GroupsIdentities::replace($groupIdentity);
 
+            if (
+                $resolvedIdentity->identity_id !== $r->identity->identity_id
+                && !is_null($resolvedIdentity->user_id)
+            ) {
+                \OmegaUp\DAO\Notifications::create(
+                    new \OmegaUp\DAO\VO\Notifications([
+                        'user_id' => $resolvedIdentity->user_id,
+                        'contents' =>  json_encode(
+                            [
+                                'type' => \OmegaUp\DAO\Notifications::COURSE_REGISTRATION_MANUAL,
+                                'body' => [
+                                    'localizationString' => new \OmegaUp\TranslationString(
+                                        'notificationCourseRegistrationManual'
+                                    ),
+                                    'localizationParams' => [
+                                        'courseName' => $course->name,
+                                    ],
+                                    'url' => "/course/{$course->alias}/",
+                                    'iconUrl' => '/media/info.png',
+                                ],
+                            ]
+                        ),
+                    ])
+                );
+            }
+
             \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
@@ -3239,7 +3265,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'type' => 'course',
                 ],
                 'title' => new \OmegaUp\TranslationString(
-                    'wordsActivityReport'
+                    'activityReport'
                 ),
             ],
             'entrypoint' => 'activity_feed',
@@ -4130,7 +4156,11 @@ class Course extends \OmegaUp\Controllers\Controller {
 
         // Check filter by problem, is optional
         $problem = null;
-        $problemAlias = $r->ensureOptionalString('problem_alias');
+        $problemAlias = $r->ensureOptionalString(
+            'problem_alias',
+            /*$required=*/false,
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
         if (!is_null($problemAlias)) {
             $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
             if (is_null($problem)) {

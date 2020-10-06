@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
-import T from '../../lang';
 import { types } from '../../api_types';
 
 import course_CloneWithToken from './CloneWithToken.vue';

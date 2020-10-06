@@ -136,7 +136,7 @@ jobs:
         run: composer install --prefer-dist --no-progress
 
       - name: Get docker container
-        run: docker pull "$(grep --only-matching 'omegaup/hook_tools:\w\+' stuff/lint.sh)"
+        run: ./stuff/lint.sh ensure-container
 
       - name: Run linters
         run: |

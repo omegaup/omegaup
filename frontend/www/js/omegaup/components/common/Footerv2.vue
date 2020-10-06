@@ -63,16 +63,16 @@
             </li>
             <li class="mt-1">
               <a href="https://github.com/omegaup/omegaup">
-                <font-awesome-icon v-bind:icon="['fab', 'github']" />
+                <font-awesome-icon :icon="['fab', 'github']" />
               </a>
             </li>
             <li class="mt-1">
               <a
+                v-if="!omegaUpLockDown && isLoggedIn"
                 href="https://github.com/omegaup/omegaup/issues/new"
-                v-on:click="$event.target.href = reportAnIssueURL()"
                 target="_blank"
                 rel="nofollow"
-                v-if="!omegaUpLockDown && isLoggedIn"
+                @click="$event.target.href = reportAnIssueURL()"
                 >{{ T.reportAnIssue }}</a
               >
             </li>
@@ -87,12 +87,12 @@
           </ul>
           <div class="social-icons my-0 mx-auto">
             <a href="https://github.com/omegaup/omegaup/">
-              <font-awesome-icon v-bind:icon="['fab', 'github']" />
+              <font-awesome-icon :icon="['fab', 'github']" />
               GitHub
             </a>
             |
             <a href="https://www.facebook.com/omegaup/">
-              <font-awesome-icon v-bind:icon="['fab', 'facebook']" />
+              <font-awesome-icon :icon="['fab', 'facebook']" />
               Facebook
             </a>
           </div>
@@ -125,6 +125,30 @@
     </div>
   </footer>
 </template>
+
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import { reportAnIssueURL } from '../../errors';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faFacebook, faGithub } from '@fortawesome/free-brands-svg-icons';
+library.add(faFacebook, faGithub);
+
+@Component({
+  components: {
+    FontAwesomeIcon,
+  },
+})
+export default class Footer extends Vue {
+  @Prop() isLoggedIn!: boolean;
+  @Prop() omegaUpLockDown!: boolean;
+
+  T = T;
+  reportAnIssueURL = reportAnIssueURL;
+}
+</script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
@@ -172,27 +196,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-import { reportAnIssueURL } from '../../errors';
-
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faFacebook, faGithub } from '@fortawesome/free-brands-svg-icons';
-library.add(faFacebook, faGithub);
-
-@Component({
-  components: {
-    FontAwesomeIcon,
-  },
-})
-export default class Footer extends Vue {
-  @Prop() isLoggedIn!: boolean;
-  @Prop() omegaUpLockDown!: boolean;
-
-  T = T;
-  reportAnIssueURL = reportAnIssueURL;
-}
-</script>

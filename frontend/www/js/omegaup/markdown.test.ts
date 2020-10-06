@@ -99,9 +99,12 @@ Case #2: 15
       ).toEqual(`<h1>Ejemplo</h1>
 
 <table class="sample_io">
-<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead><tbody><tr><td><pre>1
-2</pre></td><td><pre>Case #1: 3</pre></td><td><p>Explicación</p></td></tr><tr><td><pre>5
-10</pre></td><td><pre>Case #2: 15</pre></td><td></td></tr></tbody>
+<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead>
+<tbody><tr><td><pre>1
+2</pre></td><td><pre>Case #1: 3</pre></td><td><p>Explicación</p></td></tr>
+<tr><td><pre>5
+10</pre></td><td><pre>Case #2: 15</pre></td><td></td></tr>
+</tbody>
 </table>`);
     });
 
@@ -148,7 +151,8 @@ Tags <b>hello</b>
       ).toEqual(`<h1>Ejemplo</h1>
 
 <table class="sample_io">
-<thead><tr><th>Entrada</th><th>Salida</th></tr></thead><tbody><tr><td><pre>5 5 2
+<thead><tr><th>Entrada</th><th>Salida</th></tr></thead>
+<tbody><tr><td><pre>5 5 2
 #####
 #A#B#
 #...#
@@ -179,7 +183,117 @@ Other escapes: $~~T~D~E32E
 
 Tags &lt;b&gt;hello&lt;/b&gt;
 
-&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
+&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td></tr>
+</tbody>
+</table>`);
+    });
+
+    it('Should handle sample I/O tables from files', () => {
+      expect(
+        converter.makeHtmlWithImages(
+          `# Ejemplo
+
+||examplefile
+one
+||description
+yes
+||examplefile
+two
+||end`,
+          {},
+          {},
+          {
+            cases: {
+              one: {
+                in: 'hello',
+                out: 'world',
+              },
+              two: {
+                in: `5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+> hi <
+> hello <
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags <b>hello</b>
+
+<pre>hi</pre>`,
+                out: '0',
+              },
+            },
+            limits: {
+              ExtraWallTime: '0s',
+              MemoryLimit: 0,
+              OutputLimit: 0,
+              OverallWallTimeLimit: '0s',
+              TimeLimit: '0s',
+            },
+            validator: {
+              name: 'token',
+            },
+          },
+        ),
+      ).toEqual(`<h1>Ejemplo</h1>
+
+<table class="sample_io">
+<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead>
+<tbody><tr><td><pre>hello</pre></td><td><pre>world</pre></td><td><p>yes</p></td></tr>
+<tr><td><pre>5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+&gt; hi &lt;
+&gt; hello &lt;
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags &lt;b&gt;hello&lt;/b&gt;
+
+&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td><td></td></tr>
+</tbody>
 </table>`);
     });
 
@@ -453,9 +567,9 @@ Tags &lt;b&gt;hello&lt;/b&gt;
       // All Markdown special characters should be escaped.
       expect(
         converter.makeHtmlWithImages(
-          '{{sample.in}}',
+          '{{Sample.in}}',
           {},
-          { 'sample.in': '<>&\n*foo* _bar_\n[img](img)\n\\\n' },
+          { 'Sample.in': '<>&\n*foo* _bar_\n[img](img)\n\\\n' },
         ),
       ).toEqual(
         '<p><pre><code class="language-in">&lt;&gt;&amp;\n*foo* _bar_\n[img](img)\n\\\n</code></pre></p>',

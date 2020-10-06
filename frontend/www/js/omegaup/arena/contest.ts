@@ -48,7 +48,9 @@ OmegaUp.on('ready', () => {
 
   const onlyProblemUpdateRuns = (
     runs: types.Run[],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     scoreColumn: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     multiplier: number,
   ): void => {
     for (const run of runs) {
@@ -135,14 +137,14 @@ OmegaUp.on('ready', () => {
     });
   }
 
-  $('#clarification').on('submit', (e) => {
+  $('#clarification').on('submit', () => {
     $('#clarification input').attr('disabled', 'disabled');
     api.Clarification.create({
       contest_alias: arenaInstance.options.contestAlias,
       problem_alias: $('#clarification select[name="problem"]').val(),
       message: $('#clarification textarea[name="message"]').val(),
     })
-      .then((response) => {
+      .then(() => {
         arenaInstance.hideOverlay();
         arenaInstance.refreshClarifications();
       })

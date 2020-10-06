@@ -1,15 +1,16 @@
 import submissions_List from '../components/submissions/List.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import * as api from '../api';
-import * as ui from '../ui';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SubmissionsListPayload();
 
-  const submissionsList = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-submissions-list': submissions_List,
+    },
     render: function (createElement) {
       return createElement('omegaup-submissions-list', {
         props: {
@@ -21,9 +22,6 @@ OmegaUp.on('ready', () => {
           totalRows: payload.totalRows,
         },
       });
-    },
-    components: {
-      'omegaup-submissions-list': submissions_List,
     },
   });
 });

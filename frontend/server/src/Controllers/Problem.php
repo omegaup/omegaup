@@ -318,7 +318,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'aliasInUse'
                 );
             }
-            if (!\OmegaUp\Validators::isValidAlias($params->problemAlias)) {
+            if (!\OmegaUp\Validators::alias($params->problemAlias)) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalidAlias',
                     'problem_alias'
@@ -643,15 +643,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         // Authenticate logged user
         $r->ensureIdentity();
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString('problem_alias')
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $group = \OmegaUp\DAO\Groups::findByAlias($r->ensureString('group'));
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group) || is_null($group->group_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
@@ -739,11 +744,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
+        $tagName = $r->ensureString(
+            'name',
+            fn (string $name) => \OmegaUp\Validators::alias($name)
+        );
 
         // Authenticate logged user
         $r->ensureIdentity();
-        $r->ensureOptionalBool('public');
+        $isPublic = $r->ensureOptionalBool('public') ?? false;
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
@@ -754,10 +762,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        self::addTag($r['name'], $r['public'] || false, $problem);
+        self::addTag($tagName, $isPublic, $problem);
 
         return [
-            'name' => $r['name'],
+            'name' => $tagName,
         ];
     }
 
@@ -889,25 +897,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRemoveGroupAdmin(\OmegaUp\Request $r): array {
         // Authenticate logged user
         $r->ensureIdentity();
-
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString(
-                'problem_alias',
-                fn (string $problemAlias) => \OmegaUp\Validators::isValidAlias(
-                    $problemAlias
-                )
-            )
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->acl_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $group = \OmegaUp\DAO\Groups::findByAlias(
-            $r->ensureString(
-                'group',
-                fn (string $group) => \OmegaUp\Validators::isValidAlias($group)
-            )
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $group) => \OmegaUp\Validators::alias($group)
         );
+        $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group) || is_null($group->group_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'invalidParameters'
@@ -946,14 +949,17 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'problem_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
+        $tagName = $r->ensureString(
+            'name',
+            fn (string $name) => \OmegaUp\Validators::alias($name)
+        );
 
         $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $tag = \OmegaUp\DAO\Tags::getByName($r['name']);
+        $tag = \OmegaUp\DAO\Tags::getByName($tagName);
         if (is_null($tag)) {
             throw new \OmegaUp\Exceptions\NotFoundException('tagNotFound');
         }
@@ -2124,8 +2130,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     );
                 }
             } elseif (in_array($extension, self::SOURCE_EXTENSIONS)) {
-                if ($file['size'] > 1024) {
-                    // File too big. Skip.
+                if ($file['size'] > 8192) {
+                    // File is too big. Add an error message.
+                    $result['sources'][$file['name']] = "File exceeded the 8192-byte limit: {$file['size']} bytes";
                     continue;
                 }
                 $result['sources'][$file['name']] = mb_convert_encoding(
@@ -3273,11 +3280,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRuns(\OmegaUp\Request $r): array {
         // Get user
         $r->ensureIdentity();
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
 
         // Validate request
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString('problem_alias')
-        );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -5516,14 +5525,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $commit
             ) === 1
         );
-        $problem = \OmegaUp\DAO\Problems::getByAlias(
-            $r->ensureString(
-                'problem_alias',
-                fn (string $problemAlias) => \OmegaUp\Validators::alias(
-                    $problemAlias
-                )
-            )
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
@@ -5721,9 +5727,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'os',
                 ['unix', 'windows']
             );
-            \OmegaUp\Validators::validateValidAlias(
-                $r['name'],
-                'name'
+            $name = $r->ensureString(
+                'name',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
             );
             \OmegaUp\Validators::validateStringNonEmpty(
                 $r['idl'],
@@ -5745,13 +5751,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'libinteractive'
         );
         try {
-            file_put_contents("{$dirname}/{$r['name']}.idl", $r['idl']);
+            file_put_contents("{$dirname}/{$name}.idl", $r['idl']);
             $args = [
                 '/usr/bin/java',
                 '-jar',
                 '/usr/share/java/libinteractive.jar',
                 'generate',
-                "{$r['name']}.idl",
+                "{$name}.idl",
                 $language,
                 $language,
                 '--makefile',
@@ -5825,7 +5831,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
             header('Content-Type: application/zip');
             header(
-                "Content-Disposition: attachment; filename={$r['name']}.zip"
+                "Content-Disposition: attachment; filename={$name}.zip"
             );
             readfile("{$dirname}/interactive.zip");
             \OmegaUp\FileHandler::deleteDirRecursively($dirname);

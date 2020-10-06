@@ -8,8 +8,15 @@ import coderofthemonth_List from '../components/coderofthemonth/List.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CoderOfTheMonthPayload();
-  let coderOfTheMonthList = new Vue({
+  const coderOfTheMonthList = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-coder-of-the-month-list': coderofthemonth_List,
+    },
+    data: () => ({
+      coderIsSelected:
+        payload.isMentor && payload.options && payload.options.coderIsSelected,
+    }),
     render: function (createElement) {
       return createElement('omegaup-coder-of-the-month-list', {
         props: {
@@ -42,13 +49,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      coderIsSelected:
-        payload.isMentor && payload.options && payload.options.coderIsSelected,
-    },
-    components: {
-      'omegaup-coder-of-the-month-list': coderofthemonth_List,
     },
   });
 });

@@ -7,8 +7,14 @@ import course_Intro from '../components/course/Intro.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.IntroDetailsPayload();
-  let courseIntro = new Vue({
+  const courseIntro = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-intro': course_Intro,
+    },
+    data: () => ({
+      userRegistrationRequested: payload.userRegistrationRequested,
+    }),
     render: function (createElement) {
       return createElement('omegaup-course-intro', {
         props: {
@@ -34,7 +40,7 @@ OmegaUp.on('ready', () => {
                 payload.statements.acceptTeacher?.gitObjectId,
               statement_type: payload.statements.privacy?.statementType,
             })
-              .then((data) => {
+              .then(() => {
                 window.location.replace(`/course/${payload.alias}/`);
               })
               .catch(ui.apiError);
@@ -48,12 +54,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      userRegistrationRequested: payload.userRegistrationRequested,
-    },
-    components: {
-      'omegaup-course-intro': course_Intro,
     },
   });
 });

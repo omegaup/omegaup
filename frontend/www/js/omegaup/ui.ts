@@ -1,4 +1,3 @@
-import { types } from './api_types';
 import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
@@ -55,7 +54,7 @@ export function formatString(
 ): string {
   const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
   return template.replace(re, (match, key, modifier) => {
-    if (!values.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(values, key)) {
       // If the array does not provide a replacement for the key, just return
       // the original substring.
       return match;
@@ -130,10 +129,10 @@ export function apiError(response: { error?: string; payload?: any }): void {
   );
 }
 
-export function ignoreError(response: {
-  error?: string;
-  payload?: any;
-}): void {}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ignoreError(response: { error?: string; payload?: any }): void {
+  return;
+}
 
 export function dismissNotifications(originalStatusCounter?: number): void {
   const statusElement = $('#status');
@@ -167,7 +166,7 @@ export function prettyPrintJSON(json: JSONType): string {
 }
 
 export function syntaxHighlight(json: JSONType): string {
-  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
+  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
   return json
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

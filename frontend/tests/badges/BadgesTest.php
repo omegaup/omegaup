@@ -123,7 +123,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
      */
     public function testBadge(string $badgeAlias) {
         $this->assertTrue(
-            \OmegaUp\Validators::isValidAlias($badgeAlias),
+            \OmegaUp\Validators::alias($badgeAlias),
             'The alias for this badge is invalid.'
         );
 

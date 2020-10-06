@@ -15,12 +15,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="solver in solvers" v-bind:key="solver.username">
+      <tr v-for="solver in solvers" :key="solver.username">
         <td>
           <omegaup-username
-            v-bind:classname="solver.classname"
-            v-bind:username="solver.username"
-            v-bind:linkify="true"
+            :classname="solver.classname"
+            :username="solver.username"
+            :linkify="true"
           ></omegaup-username>
         </td>
         <td>{{ solver.language }}</td>
@@ -31,6 +31,26 @@
     </tbody>
   </table>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import { types } from '../../api_types';
+import * as time from '../../time';
+import omegaup_Username from '../user/Username.vue';
+
+@Component({
+  components: {
+    'omegaup-username': omegaup_Username,
+  },
+})
+export default class Solvers extends Vue {
+  @Prop() solvers!: types.BestSolvers[];
+
+  T = T;
+  time = time;
+}
+</script>
 
 <style lang="scss" scoped>
 table {
@@ -53,23 +73,3 @@ th {
   text-align: center;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-import { types } from '../../api_types';
-import * as time from '../../time';
-import omegaup_Username from '../user/Username.vue';
-
-@Component({
-  components: {
-    'omegaup-username': omegaup_Username,
-  },
-})
-export default class Solvers extends Vue {
-  @Prop() solvers!: types.BestSolvers[];
-
-  T = T;
-  time = time;
-}
-</script>
