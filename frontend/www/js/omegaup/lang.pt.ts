@@ -909,6 +909,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUpdated: "Vers\u00e3o do problema atualizada.",
   problemVersionUsername: "Nome de usu\u00e1rio",
   problemVersionVersion: "Vers\u00e3o do problema",
+  problemcollectionViewProblems: "Ver problemas",
   problemsOrderUpdated: "A ordem dos problemas foi atualizada.",
   problemsetIdentityNotFound: "O usu\u00e1rio ou identidade n\u00e3o est\u00e1 associado ao curso, question\u00e1rio ou tarefa.",
   problemsetNotFound: "Conjunto de problemas n\u00e3o encontrado.",

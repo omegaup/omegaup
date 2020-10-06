@@ -909,6 +909,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUpdated: "(Pr0b13m v3r5i0n upda73d.)",
   problemVersionUsername: "(U53rnam3)",
   problemVersionVersion: "(Pr0b13m v3r5i0n)",
+  problemcollectionViewProblems: "(Vi3w pr0b13m5)",
   problemsOrderUpdated: "(Pr0b13m5' 0rd3r ha5 b33n upda73d)",
   problemsetIdentityNotFound: "(U53r 0r id3n7i7y ar3 n07 a550cia73d wi7h 7hi5 c0ur53, c0n7357 0r 7a5k.)",
   problemsetNotFound: "(Pr0b13m537 d035 n07 3xi57.)",

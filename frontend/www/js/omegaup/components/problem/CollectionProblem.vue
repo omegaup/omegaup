@@ -5,23 +5,24 @@
         <div class="col-sm-4 text-center pt-2">
           <h1>
             <font-awesome-icon
-                    :icon="['fas', getProblemLevelIcon(levelTagAlias)]"
-                  />
+              :icon="['fas', getProblemLevelIcon(levelTagAlias)]"
+            />
           </h1>
         </div>
-        <div class="col-sm-8 text-center">
+        <div class="col-sm-8 text-center" style="height: 112px;">
           <p>
             <strong>{{ name }}</strong> <br />
-            {{ problemCount }} {{T.wordsProblems}}
+            {{ problemCount }} {{ T.wordsProblems }}
           </p>
         </div>
       </div>
       <div class="row">
         <div class="col mt-1 mb-1 text-center">
-          <a class="btn btn-primary" href="/problem/">{{ T.problemcollectionViewProblems }}</a>
-        </div> 
+          <a class="btn btn-primary" href="/problem/">{{
+            T.problemcollectionViewProblems
+          }}</a>
+        </div>
       </div>
-      </row>
     </div>
   </div>
 </template>
@@ -52,14 +53,14 @@ library.add(faSitemap);
 library.add(faTrophy);
 library.add(faCode);
 
-const problemLevelIcons = {
-    'problemLevelBasicKarel': 'robot',
-    'problemLevelBasicIntroductionToProgramming': 'laptop-code',
-    'problemLevelIntermediateMathsInProgramming': 'square-root-alt',
-    'problemLevelIntermediateDataStructuresAndAlgorithms': 'project-diagram',
-    'problemLevelIntermediateAnalysisAndDesignOfAlgorithms': 'sitemap',
-    'problemLevelAdvancedCompetitiveProgramming': 'trophy',
-    'problemLevelAdvancedSpecializedTopics': 'code',
+const problemLevelIcons: { [key: string]: string } = {
+  problemLevelBasicKarel: 'robot',
+  problemLevelBasicIntroductionToProgramming: 'laptop-code',
+  problemLevelIntermediateMathsInProgramming: 'square-root-alt',
+  problemLevelIntermediateDataStructuresAndAlgorithms: 'project-diagram',
+  problemLevelIntermediateAnalysisAndDesignOfAlgorithms: 'sitemap',
+  problemLevelAdvancedCompetitiveProgramming: 'trophy',
+  problemLevelAdvancedSpecializedTopics: 'code',
 };
 
 @Component({
@@ -68,7 +69,7 @@ const problemLevelIcons = {
   },
   components: {
     FontAwesomeIcon,
-  }
+  },
 })
 export default class CollectionProblem extends Vue {
   @Prop() levelTagAlias!: string;
@@ -80,10 +81,9 @@ export default class CollectionProblem extends Vue {
   }
 
   getProblemLevelIcon(problemLevel: string): string {
-   if (problemLevelIcons.hasOwnProperty(problemLevel))
-    return problemLevelIcons[problemLevel];
-  return 'icon';
+    if (problemLevelIcons.hasOwnProperty(problemLevel))
+      return problemLevelIcons[problemLevel];
+    return 'icon';
   }
-
 }
 </script>

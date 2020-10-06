@@ -909,6 +909,7 @@ const translations: { [key: string]: string; } = {
   problemVersionUpdated: "Problem version updated.",
   problemVersionUsername: "Username",
   problemVersionVersion: "Problem version",
+  problemcollectionViewProblems: "View problems",
   problemsOrderUpdated: "Problems' order has been updated",
   problemsetIdentityNotFound: "User or identity are not associated with this course, contest or task.",
   problemsetNotFound: "Problemset does not exist.",
