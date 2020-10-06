@@ -19,9 +19,9 @@
           <div class="row">
             <omegaup-problem-collection
               v-for="(collect, idx) in problemCount"
-              v-bind:key="idx"
-              :levelTagAlias="collect.name"
-              :problemCount="collect.problems_per_tag"
+              :key="idx"
+              :level-tag-alias="collect.name"
+              :problem-count="collect.problems_per_tag"
             ></omegaup-problem-collection>
           </div>
         </div>
