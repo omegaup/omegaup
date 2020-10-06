@@ -80,7 +80,7 @@ export default class CollectionProblem extends Vue {
   }
 
   getProblemLevelIcon(problemLevel: string): string {
-    if ({}.hasOwnProperty.call(problemLevelIcons, problemLevel))
+    if (Object.prototype.hasOwnProperty.call(problemLevelIcons, problemLevel))
       return problemLevelIcons[problemLevel];
     return 'icon';
   }
