@@ -328,8 +328,46 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 'group_alias' => $group['group']->alias,
             ]));
             $this->fail('Should not have allowed bulk user creation');
-        } catch (\OmegaUp\Exceptions\DatabaseOperationException $e) {
-            // OK.
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'parameterInvalidStateDoesNotBelongToCountry',
+                $e->getMessage()
+            );
+        }
+    }
+
+    public function testUploadCsvFileWithEmptyCountryAndSelectedState() {
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creatorIdentity,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creatorIdentity);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creatorIdentity,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        try {
+            // Call api using identity creator group team member
+            $response = \OmegaUp\Controllers\Identity::apiBulkCreate(
+                new \OmegaUp\Request([
+                    'auth_token' => $creatorLogin->auth_token,
+                    'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                        'identities_wrong_state_id.csv',
+                        $group['group']->alias
+                    ),
+                    'group_alias' => $group['group']->alias,
+                ])
+            );
+            $this->fail('Should not have allowed bulk user creation');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals(
+                'parameterInvalidStateNeedsBelongToCountry',
+                $e->getMessage()
+            );
         }
     }
 
