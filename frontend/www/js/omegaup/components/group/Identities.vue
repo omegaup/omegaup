@@ -10,7 +10,7 @@
       </div>
       <br />
       <div
-        v-show="identities.length &gt; 0"
+        v-show="identities.length > 0"
         class="panel panel-default no-bottom-margin"
       >
         <div class="panel-heading">
@@ -29,7 +29,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="identity in identities">
+            <tr
+              v-for="identity in identities"
+              :key="identity.username"
+              :class="{ 'alert-danger': userErrorRow === identity.username }"
+            >
               <td class="username">
                 <strong>{{ identity.username }}</strong>
               </td>
@@ -77,6 +81,7 @@ import * as ui from '../../ui';
 @Component
 export default class Identities extends Vue {
   @Prop() groupAlias!: string;
+  @Prop() userErrorRow!: string | null;
 
   T = T;
   identities: omegaup.Identity[] = [];

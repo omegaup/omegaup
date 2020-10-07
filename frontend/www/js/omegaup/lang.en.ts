@@ -610,6 +610,8 @@ const translations: { [key: string]: string; } = {
   parameterEmpty: "Empty parameter.",
   parameterInvalid: "Invalid parameter.",
   parameterInvalidAlias: "Parameter can only contain letters, digits, and _. Spaces are not allowed",
+  parameterInvalidStateDoesNotBelongToCountry: "The selected state does not belong to the country.",
+  parameterInvalidStateNeedsBelongToCountry: "You need to select country in order to choose a state.",
   parameterNotADate: "Parameter must be a date.",
   parameterNotANumber: "Parameter must be a number.",
   parameterNotFound: "Parameter value not found.",

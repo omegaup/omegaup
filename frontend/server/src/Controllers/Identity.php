@@ -365,6 +365,32 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotExist'
             );
         }
+        if (is_null($identity->country_id) && !is_null($identity->state_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidStateNeedsBelongToCountry',
+                $identity->username
+            );
+        } elseif (
+            !is_null($identity->country_id)
+            && !is_null($identity->state_id)
+        ) {
+            $countryStates = \OmegaUp\DAO\States::getByCountry(
+                $identity->country_id
+            );
+            $states = array_map(
+                /**
+                 * @param \OmegaUp\DAO\VO\States $state
+                 */
+                fn ($state) => $state->state_id,
+                $countryStates
+            );
+            if (!in_array($identity->state_id, $states)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalidStateDoesNotBelongToCountry',
+                    $identity->username
+                );
+            }
+        }
         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
             $identity->username
         );
