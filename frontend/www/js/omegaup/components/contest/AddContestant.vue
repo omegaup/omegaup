@@ -2,12 +2,12 @@
   <div>
     <div class="card">
       <div class="card-body">
-        <form class="form" v-on:submit.prevent="onSubmit">
+        <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
             <label>{{ T.wordsUser }}</label>
             <omegaup-autocomplete
-              v-bind:init="(el) => typeahead.userTypeahead(el)"
               v-model="contestant"
+              :init="(el) => typeahead.userTypeahead(el)"
             ></omegaup-autocomplete>
           </div>
           <button class="btn btn-primary" type="submit">
@@ -17,9 +17,9 @@
           <div class="form-group">
             <label>{{ T.wordsMultipleUser }}</label>
             <textarea
+              v-model="contestants"
               class="form-control contestants"
               rows="4"
-              v-model="contestants"
             ></textarea>
           </div>
           <button class="btn btn-primary" type="submit">
@@ -34,7 +34,7 @@
             <th class="text-center">
               {{ T.contestAdduserRegisteredUserTime }}
             </th>
-            <th class="text-center" v-if="contest.window_length !== null">
+            <th v-if="contest.window_length !== null" class="text-center">
               {{ T.wordsEndTimeContest }}
             </th>
             <th class="text-center">
@@ -43,11 +43,11 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-bind:key="user.username" v-for="user in users">
+          <tr v-for="user in users" :key="user.username">
             <td class="text-center">
               <omegaup-user-username
-                v-bind:linkify="true"
-                v-bind:username="user.username"
+                :linkify="true"
+                :username="user.username"
               ></omegaup-user-username>
             </td>
             <td class="text-center">
@@ -55,19 +55,19 @@
                 {{ time.formatDateTime(user.access_time) }}
               </template>
             </td>
-            <td class="text-center" v-if="contest.window_length !== null">
-              <div class="row" v-if="user.end_time">
+            <td v-if="contest.window_length !== null" class="text-center">
+              <div v-if="user.end_time" class="row">
                 <div class="col-xs-10">
                   <omegaup-datetimepicker
-                    v-bind:finish="contest.finish_time"
-                    v-bind:start="contest.start_time"
                     v-model="user.end_time"
+                    :finish="contest.finish_time"
+                    :start="contest.start_time"
                   ></omegaup-datetimepicker>
                 </div>
                 <div class="col-xs-2">
                   <button
                     class="btn-link glyphicon glyphicon-floppy-disk"
-                    v-on:click="$emit('emit-save-end-time', user)"
+                    @click="$emit('emit-save-end-time', user)"
                   ></button>
                 </div>
               </div>
@@ -76,8 +76,8 @@
               <button
                 class="close float-none"
                 type="button"
-                v-bind:title="T.contestAdduserRegisteredUserDelete"
-                v-on:click="$emit('emit-remove-user', user)"
+                :title="T.contestAdduserRegisteredUserDelete"
+                @click="$emit('emit-remove-user', user)"
               >
                 ×
               </button>
@@ -90,7 +90,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 
 import { types } from '../../api_types';
 import T from '../../lang';

@@ -148,18 +148,16 @@
           "
         ></omegaup-common-publish>
       </div>
-      <div class="tab-pane active" v-if="showTab === 'contestants'">
+      <div v-if="showTab === 'contestants'" class="tab-pane active">
         <omegaup-contest-add-contestant
-          v-bind:contest="details"
-          v-bind:initial-users="users"
-          v-on:emit-add-user="
+          :contest="details"
+          :initial-users="users"
+          @emit-add-user="
             (contestants, contestant) =>
               $emit('add-user', contestants, contestant)
           "
-          v-on:emit-remove-user="
-            (contestant) => $emit('remove-user', contestant)
-          "
-          v-on:emit-save-end-time="(user) => $emit('save-end-time', user)"
+          @emit-remove-user="(contestant) => $emit('remove-user', contestant)"
+          @emit-save-end-time="(user) => $emit('save-end-time', user)"
         ></omegaup-contest-add-contestant>
       </div>
     </div>

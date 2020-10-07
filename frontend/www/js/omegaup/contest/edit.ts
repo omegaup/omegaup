@@ -19,6 +19,7 @@ OmegaUp.on('ready', () => {
       details: payload.details,
       problems: payload.problems,
       requests: payload.requests,
+      users: payload.users,
     }),
     methods: {
       refreshDetails: (): void => {
@@ -45,6 +46,15 @@ OmegaUp.on('ready', () => {
         })
           .then((response) => {
             contestEdit.requests = response.users;
+          })
+          .catch(ui.apiError);
+      },
+      refreshUsers: (): void => {
+        api.Contest.users({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.users = response.users;
           })
           .catch(ui.apiError);
       },
@@ -156,16 +166,13 @@ OmegaUp.on('ready', () => {
                 api.Contest.addUser({
                   contest_alias: payload.details.alias,
                   usernameOrEmail: user,
-                }),
+                }).catch(() => user),
               ),
             )
               .then((results) => {
-                let contestantsWithError: string[] = [];
-                results.forEach((result) => {
-                  if (result.status === 'rejected') {
-                    contestantsWithError.push(result.reason.userEmail);
-                  }
-                });
+                const contestantsWithError: string[] = results
+                  .filter((result) => result.status === 'rejected')
+                  .map((result) => result.reason);
                 this.refreshUsers();
                 this.refreshRequests();
                 if (!contestantsWithError.length) {
@@ -207,53 +214,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      details: payload.details,
-      problems: payload.problems,
-      requests: payload.requests,
-      users: payload.users,
-    },
-    components: {
-      'omegaup-contest-edit': contest_Edit,
-    },
-    methods: {
-      refreshDetails: (): void => {
-        api.Contest.adminDetails({
-          contest: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.details = response;
-          })
-          .catch(ui.apiError);
-      },
-      refreshProblems: (): void => {
-        api.Contest.problems({
-          contest_alias: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.problems = response.problems;
-          })
-          .catch(ui.apiError);
-      },
-      refreshRequests: (): void => {
-        api.Contest.requests({
-          contest_alias: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.requests = response.users;
-          })
-          .catch(ui.apiError);
-      },
-      refreshUsers: (): void => {
-        api.Contest.users({
-          contest_alias: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.users = response.users;
-          })
-          .catch(ui.apiError);
-      },
     },
   });
 });
