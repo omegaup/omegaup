@@ -1166,7 +1166,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 WHERE
                     quality_seal = 1
                 GROUP BY
-                    rand() LIMIT 1;'
+                    rand() LIMIT 1;';
 
         /** @var string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
