@@ -5906,4 +5906,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'entrypoint' => 'problem_collections_details',
         ];
     }
+
+    /**
+     * @return string
+     */
+    public static function getRandomProblem(): string {
+        return \OmegaUp\DAO\Problems::getProblemAliasRandom();
+    }
 }
