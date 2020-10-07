@@ -1367,6 +1367,7 @@ export namespace types {
   }
 
   export interface CollectionDetailsPayload {
+    anotherTags: string[];
     collection: { alias: string; name?: string }[];
     type: string;
   }
