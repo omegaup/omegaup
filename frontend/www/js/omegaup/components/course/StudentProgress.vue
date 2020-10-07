@@ -122,24 +122,24 @@ export default class StudentProgress extends Vue {
   }
 
   get weightedMean(): Array<number> {
-    const totalPoints =
-      this.assignments
-        .map((assignment) => assignment.max_points)
-        .reduce((a, b) => (a ?? 0) + (b ?? 0)) ?? 0;
-    return this.assignments.map(
-      (assignment) => ((assignment.max_points ?? 0) / (totalPoints ?? 0)) * 100,
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + (curr ?? 0), 0);
+    return this.assignments.map((assignment) =>
+      totalPoints ? ((assignment.max_points ?? 0) / totalPoints) * 100 : 0,
     );
   }
 
   get globalScoreByStudent(): string {
-    const points = [];
-    for (const assignment of this.assignments) {
-      points.push(this.score(assignment.alias) / this.points(assignment.alias));
-    }
-    const globalScore = points
+    const points = this.assignments.map((assignment) => {
+      const pointsPerAssignment = this.points(assignment.alias);
+      if (pointsPerAssignment === 0) return 0;
+      return this.score(assignment.alias) / pointsPerAssignment;
+    });
+    return points
       .map((value, index) => value * this.weightedMean[index])
-      .reduce((a, b) => a + b);
-    return globalScore.toFixed(2);
+      .reduce((acc, curr) => acc + curr)
+      .toFixed(2);
   }
 
   getProgressDescription(assignmentAlias: string): string {
