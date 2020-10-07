@@ -1,9 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
-
-import T from '../../lang';
-import * as ui from '../../ui';
 
 import common_SortControls from './SortControls.vue';
 

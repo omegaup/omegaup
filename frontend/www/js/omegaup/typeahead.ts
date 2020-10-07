@@ -65,7 +65,7 @@ function typeaheadWrapper<T>(
 
         // If there is a pending request, send it out now.
         if (!lastRequest) return;
-        let currentRequest = lastRequest;
+        const currentRequest = lastRequest;
         lastRequest = null;
         wrappedCall(...currentRequest);
       });

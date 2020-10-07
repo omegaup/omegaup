@@ -1,12 +1,12 @@
 <template>
   <div class="panel panel-primary problems-container">
     <div class="panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group col-md-6">
           <label>{{ T.wordsProblem }}</label>
           <omegaup-autocomplete
-            v-bind:init="(el) => typeahead.problemTypeahead(el)"
             v-model="alias"
+            :init="(el) => typeahead.problemTypeahead(el)"
           ></omegaup-autocomplete>
         </div>
         <div class="form-group col-md-6">
@@ -16,19 +16,19 @@
           <div class="form-control">
             <label class="radio-inline">
               <input
+                v-model="useLatestVersion"
                 type="radio"
                 name="use-latest-version"
-                v-model="useLatestVersion"
-                v-bind:value="true"
+                :value="true"
               />
               {{ T.contestAddproblemLatestVersion }}
             </label>
             <label class="radio-inline">
               <input
+                v-model="useLatestVersion"
                 type="radio"
                 name="use-latest-version"
-                v-model="useLatestVersion"
-                v-bind:value="false"
+                :value="false"
               />
               {{ T.contestAddproblemOtherVersion }}
             </label>
@@ -37,27 +37,27 @@
         <div class="form-group col-md-6">
           <label>{{ T.contestAddproblemProblemPoints }}</label>
           <input
+            v-model="points"
             class="form-control problem-points"
             size="3"
-            v-model="points"
           />
         </div>
         <div class="form-group col-md-6">
           <label>{{ T.contestAddproblemContestOrder }}</label>
           <input
+            v-model="order"
             class="form-control"
             max="100"
             size="2"
             type="number"
-            v-model="order"
           />
         </div>
-        <div class="form-group col-md-12" v-show="!useLatestVersion">
+        <div v-show="!useLatestVersion" class="form-group col-md-12">
           <button
             class="btn btn-primary get-versions"
             type="submit"
-            v-bind:disabled="alias == ''"
-            v-on:click.prevent="onSubmit"
+            :disabled="alias == ''"
+            @click.prevent="onSubmit"
           >
             {{ T.wordsGetVersions }}
           </button>
@@ -66,20 +66,20 @@
           }}</span>
         </div>
         <omegaup-problem-versions
-          v-bind:log="versionLog"
-          v-bind:published-revision="publishedRevision"
-          v-bind:show-footer="false"
-          v-model="selectedRevision"
-          v-on:runs-diff="onRunsDiff"
           v-show="!useLatestVersion"
+          v-model="selectedRevision"
+          :log="versionLog"
+          :published-revision="publishedRevision"
+          :show-footer="false"
+          @runs-diff="onRunsDiff"
         ></omegaup-problem-versions>
       </form>
       <div class="form-group col-md-12">
         <button
           class="btn btn-primary add-problem"
           type="submit"
-          v-on:click.prevent="onAddProblem"
-          v-bind:disabled="addProblemButtonDisabled"
+          :disabled="addProblemButtonDisabled"
+          @click.prevent="onAddProblem"
         >
           {{ addProblemButtonLabel }}
         </button>
@@ -96,13 +96,13 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="problem.alias" v-for="problem in problems">
+        <tr v-for="problem in problems" :key="problem.alias">
           <td>
             <button
               class="btn btn-default"
               type="button"
-              v-bind:aria-label="T.wordsEdit"
-              v-on:click.prevent="onEdit(problem)"
+              :aria-label="T.wordsEdit"
+              @click.prevent="onEdit(problem)"
             >
               <span
                 aria-hidden="true"
@@ -112,13 +112,13 @@
           </td>
           <td>{{ problem.order }}</td>
           <td>
-            <a v-bind:href="`/arena/problem/${problem.alias}/`">{{
+            <a :href="`/arena/problem/${problem.alias}/`">{{
               problem.alias
             }}</a>
           </td>
           <td>{{ problem.points }}</td>
           <td>
-            <button class="close" v-on:click="onRemove(problem)">×</button>
+            <button class="close" @click="onRemove(problem)">×</button>
           </td>
         </tr>
       </tbody>
@@ -233,7 +233,6 @@ export default class AddProblem extends Vue {
   @Watch('problems')
   onProblemsChange(newValue: omegaup.Problem[]): void {
     this.alias = '';
-    this.points = this.points;
     this.order = newValue.length + 1;
   }
 

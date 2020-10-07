@@ -13,7 +13,7 @@
       <form
         class="form-horizontal"
         role="form"
-        v-on:submit.prevent="
+        @submit.prevent="
           $emit('emit-change-password', newPassword, newPasswordRepeat)
         "
       >
@@ -28,7 +28,7 @@
                 disabled="disabled"
                 size="30"
                 type="text"
-                v-bind:value="username"
+                :value="username"
               />
             </div>
           </div>
@@ -38,10 +38,10 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="newPassword"
                 class="form-control"
                 size="30"
                 type="password"
-                v-model="newPassword"
               />
             </div>
           </div>
@@ -51,10 +51,10 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="newPasswordRepeat"
                 class="form-control"
                 size="30"
                 type="password"
-                v-model="newPasswordRepeat"
               />
             </div>
           </div>
@@ -66,7 +66,7 @@
           <button
             class="btn btn-secundary"
             type="reset"
-            v-on:click="$emit('emit-cancel')"
+            @click="$emit('emit-cancel')"
           >
             {{ T.wordsCancel }}
           </button>

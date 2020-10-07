@@ -240,9 +240,15 @@ let store = new Vuex.Store({
     settingsCases(state) {
       let resultMap = {};
       for (let caseName in state.request.input.cases) {
-        if (!state.request.input.cases.hasOwnProperty(caseName)) continue;
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            state.request.input.cases,
+            caseName,
+          )
+        )
+          continue;
         let tokens = caseName.split('.', 2);
-        if (!resultMap.hasOwnProperty(tokens[0])) {
+        if (!Object.prototype.hasOwnProperty.call(resultMap, tokens[0])) {
           resultMap[tokens[0]] = {
             Name: tokens[0],
             Cases: [],
@@ -258,7 +264,8 @@ let store = new Vuex.Store({
       }
       let result = [];
       for (let groupName in resultMap) {
-        if (!resultMap.hasOwnProperty(groupName)) continue;
+        if (!Object.prototype.hasOwnProperty.call(resultMap, groupName))
+          continue;
         resultMap[groupName].Cases.sort((a, b) => {
           if (a.Name < b.Name) return -1;
           if (a.Name > b.Name) return 1;
@@ -382,13 +389,23 @@ let store = new Vuex.Store({
     },
     Validator(state, value) {
       if (value == 'token-numeric') {
-        if (!state.request.input.validator.hasOwnProperty('tolerance'))
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            state.request.input.validator,
+            'tolerance',
+          )
+        )
           Vue.set(state.request.input.validator, 'tolerance', 1e-9);
       } else {
         Vue.delete(state.request.input.validator, 'tolerance');
       }
       if (value == 'custom') {
-        if (!state.request.input.validator.hasOwnProperty('custom_validator')) {
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            state.request.input.validator,
+            'custom_validator',
+          )
+        ) {
           Vue.set(state.request.input.validator, 'custom_validator', {
             source: defaultValidatorSource,
             language: 'py3',
@@ -437,7 +454,12 @@ let store = new Vuex.Store({
     },
 
     createCase(state, caseData) {
-      if (!state.request.input.cases.hasOwnProperty(caseData.name)) {
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          state.request.input.cases,
+          caseData.name,
+        )
+      ) {
         Vue.set(state.request.input.cases, caseData.name, {
           in: '',
           out: '',
@@ -449,7 +471,10 @@ let store = new Vuex.Store({
       state.dirty = true;
     },
     removeCase(state, name) {
-      if (!state.request.input.cases.hasOwnProperty(name)) return;
+      if (
+        !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
+      )
+        return;
       if (name == 'sample') return;
       if (name == state.currentCase) state.currentCase = 'sample';
       Vue.delete(state.request.input.cases, name);
@@ -748,7 +773,7 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       };
       for (let k in componentState) {
         if (k == 'id') continue;
-        if (!componentState.hasOwnProperty(k)) continue;
+        if (!Object.prototype.hasOwnProperty.call(componentState, k)) continue;
         props[k] = componentState[k];
       }
       let vue = new Vue({
@@ -913,13 +938,21 @@ onResized();
 document.getElementById('language').addEventListener('change', function () {
   store.commit('request.language', this.value);
   document.getElementById('language').value = this.value;
-  if (!Util.languageExtensionMapping.hasOwnProperty(this.value)) return;
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      Util.languageExtensionMapping,
+      this.value,
+    )
+  )
+    return;
   let language = Util.languageExtensionMapping[this.value];
   if (store.getters.isInteractive) {
-    if (!interactiveTemplates.hasOwnProperty(language)) return;
+    if (!Object.prototype.hasOwnProperty.call(interactiveTemplates, language))
+      return;
     store.commit('request.source', interactiveTemplates[language]);
   } else {
-    if (!sourceTemplates.hasOwnProperty(language)) return;
+    if (!Object.prototype.hasOwnProperty.call(sourceTemplates, language))
+      return;
     store.commit('request.source', sourceTemplates[language]);
   }
 });
@@ -1008,7 +1041,8 @@ document.getElementById('upload').addEventListener('change', (e) => {
         store.commit('removeCase', 'long');
         let cases = {};
         for (let fileName in zip.files) {
-          if (!zip.files.hasOwnProperty(fileName)) continue;
+          if (!Object.prototype.hasOwnProperty.call(zip.files, fileName))
+            continue;
 
           if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
             let caseName = fileName.substring(
@@ -1017,7 +1051,10 @@ document.getElementById('upload').addEventListener('change', (e) => {
             );
             cases[caseName] = true;
             let caseOutFileName = `cases/${caseName}.out`;
-            if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
+            if (
+              !Object.prototype.hasOwnProperty.call(zip.files, caseOutFileName)
+            )
+              continue;
             store.commit('createCase', {
               name: caseName,
               weight: 1,
@@ -1041,7 +1078,12 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .catch(Util.asyncError);
           } else if (fileName.startsWith('validator.')) {
             let extension = fileName.substring('validator.'.length);
-            if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+            if (
+              !Object.prototype.hasOwnProperty.call(
+                Util.languageExtensionMapping,
+                extension,
+              )
+            )
               continue;
             zip
               .file(fileName)
@@ -1074,7 +1116,12 @@ document.getElementById('upload').addEventListener('change', (e) => {
               .catch(Util.asyncError);
           } else if (fileName.startsWith('interactive/Main.')) {
             let extension = fileName.substring('interactive/Main.'.length);
-            if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+            if (
+              !Object.prototype.hasOwnProperty.call(
+                Util.languageExtensionMapping,
+                extension,
+              )
+            )
               continue;
             zip
               .file(fileName)
@@ -1088,7 +1135,7 @@ document.getElementById('upload').addEventListener('change', (e) => {
           }
         }
 
-        if (zip.files.hasOwnProperty('testplan')) {
+        if (Object.prototype.hasOwnProperty.call(zip.files, 'testplan')) {
           zip
             .file('testplan')
             .async('string')
@@ -1098,7 +1145,8 @@ document.getElementById('upload').addEventListener('change', (e) => {
                 let tokens = line.split(/\s+/);
                 if (tokens.length != 2) continue;
                 let [caseName, weight] = tokens;
-                if (!cases.hasOwnProperty(caseName)) continue;
+                if (!Object.prototype.hasOwnProperty.call(cases, caseName))
+                  continue;
                 store.commit('createCase', {
                   name: caseName,
                   weight: parseFloat(weight),
@@ -1107,13 +1155,13 @@ document.getElementById('upload').addEventListener('change', (e) => {
             })
             .catch(Util.asyncError);
         }
-        if (zip.files.hasOwnProperty('settings.json')) {
+        if (Object.prototype.hasOwnProperty.call(zip.files, 'settings.json')) {
           zip
             .file('settings.json')
             .async('string')
             .then((value) => {
               value = JSON.parse(value);
-              if (value.hasOwnProperty('Limits')) {
+              if (Object.prototype.hasOwnProperty.call(value, 'Limits')) {
                 for (let name of [
                   'TimeLimit',
                   'OverallWallTimeLimit',
@@ -1121,15 +1169,23 @@ document.getElementById('upload').addEventListener('change', (e) => {
                   'MemoryLimit',
                   'OutputLimit',
                 ]) {
-                  if (!value.Limits.hasOwnProperty(name)) continue;
+                  if (!Object.prototype.hasOwnProperty.call(value.Limits, name))
+                    continue;
                   store.commit(name, value.Limits[name]);
                 }
               }
-              if (value.hasOwnProperty('Validator')) {
-                if (value.Validator.hasOwnProperty('Name')) {
+              if (Object.prototype.hasOwnProperty.call(value, 'Validator')) {
+                if (
+                  Object.prototype.hasOwnProperty.call(value.Validator, 'Name')
+                ) {
                   store.commit('Validator', value.Validator.Name);
                 }
-                if (value.Validator.hasOwnProperty('Tolerance')) {
+                if (
+                  Object.prototype.hasOwnProperty.call(
+                    value.Validator,
+                    'Tolerance',
+                  )
+                ) {
                   store.commit('Tolerance', value.Validator.Tolerance);
                 }
               }
@@ -1152,7 +1208,13 @@ document.getElementById('download').addEventListener('click', (e) => {
 
   let testplan = '';
   for (let caseName in store.state.request.input.cases) {
-    if (!store.state.request.input.cases.hasOwnProperty(caseName)) continue;
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        store.state.request.input.cases,
+        caseName,
+      )
+    )
+      continue;
 
     cases.file(`${caseName}.in`, store.state.request.input.cases[caseName].in);
     cases.file(
@@ -1166,10 +1228,20 @@ document.getElementById('download').addEventListener('click', (e) => {
   let settingsValidator = {
     Name: store.state.request.input.validator.name,
   };
-  if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
+  if (
+    Object.prototype.hasOwnProperty.call(
+      store.state.request.input.validator,
+      'tolerance',
+    )
+  ) {
     settingsValidator.Tolerance = store.state.request.input.validator.Tolerance;
   }
-  if (store.state.request.input.validator.hasOwnProperty('custom_validator')) {
+  if (
+    Object.prototype.hasOwnProperty.call(
+      store.state.request.input.validator,
+      'custom_validator',
+    )
+  ) {
     settingsValidator.Lang =
       store.state.request.input.validator.custom_validator.lang;
   }
@@ -1289,7 +1361,7 @@ function setSettings(settings) {
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
   for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
-    if (!settings.limits.hasOwnProperty(name)) continue;
+    if (!Object.prototype.hasOwnProperty.call(settings.limits, name)) continue;
     store.commit(name, Util.parseDuration(settings.limits[name]));
   }
   store.commit('Validator', settings.validator.name);
@@ -1298,7 +1370,13 @@ function setSettings(settings) {
   store.commit('Interactive', !!settings.interactive);
   if (settings.interactive) {
     for (let language in settings.interactive.templates) {
-      if (!settings.interactive.templates.hasOwnProperty(language)) continue;
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          settings.interactive.templates,
+          language,
+        )
+      )
+        continue;
       interactiveTemplates[language] = settings.interactive.templates[language];
     }
     store.commit('request.source', interactiveTemplates.cpp);
@@ -1311,7 +1389,8 @@ function setSettings(settings) {
     );
   }
   for (let caseName in settings.cases) {
-    if (!settings.cases.hasOwnProperty(caseName)) continue;
+    if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
+      continue;
     let caseData = settings.cases[caseName];
     store.commit('createCase', {
       name: caseName,

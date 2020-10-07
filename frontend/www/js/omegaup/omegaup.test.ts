@@ -6,12 +6,12 @@ import T from './lang';
 describe('omegaup', () => {
   describe('experiments', () => {
     it('Should handle unknown experiments', () => {
-      var experiments = new Experiments([]);
+      const experiments = new Experiments([]);
       expect(experiments.isEnabled('foo')).toEqual(false);
     });
 
     it('Should handle known experiments', () => {
-      var experiments = new Experiments(['foo']);
+      const experiments = new Experiments(['foo']);
       expect(experiments.isEnabled('foo')).toEqual(true);
     });
   });

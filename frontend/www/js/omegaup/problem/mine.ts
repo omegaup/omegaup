@@ -11,6 +11,13 @@ OmegaUp.on('ready', () => {
   let showAllProblems = false;
   const problemsMine = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-mine': problem_Mine,
+    },
+    data: () => ({
+      problems: <types.ProblemListItem[]>[],
+      pagerItems: <types.PageItem[]>[],
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-mine', {
         props: {
@@ -61,13 +68,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      problems: <types.ProblemListItem[]>[],
-      pagerItems: <types.PageItem[]>[],
-    },
-    components: {
-      'omegaup-problem-mine': problem_Mine,
     },
   });
 

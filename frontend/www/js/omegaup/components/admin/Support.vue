@@ -8,23 +8,23 @@
     </div>
     <div class="panel-body">
       <div class="row">
-        <form class="form" v-on:submit.prevent="onSearchEmail">
+        <form class="form" @submit.prevent="onSearchEmail">
           <div class="col-md-4">
             <div class="input-group">
               <input
+                v-model="email"
                 class="form-control"
                 name="email"
                 type="text"
-                v-bind:disabled="username != null"
-                v-bind:placeholder="T.email"
-                v-model="email"
+                :disabled="username != null"
+                :placeholder="T.email"
               />
               <span class="input-group-btn"
                 ><button
                   class="btn btn-default"
                   type="button"
-                  v-bind:disabled="username != null"
-                  v-on:click.prevent="onSearchEmail"
+                  :disabled="username != null"
+                  @click.prevent="onSearchEmail"
                 >
                   {{ T.wordsSearch }}
                 </button></span
@@ -33,27 +33,27 @@
           </div>
         </form>
         <form
-          class="form"
-          v-on:submit.prevent="onVerifyUser"
           v-show="username != null"
+          class="form"
+          @submit.prevent="onVerifyUser"
         >
           <div class="col-md-4 bottom-margin">
             <button
               class="btn btn-default btn-block"
               type="button"
-              v-bind:disabled="verified"
-              v-on:click.prevent="onVerifyUser"
+              :disabled="verified"
+              @click.prevent="onVerifyUser"
             >
               <template v-if="verified">
                 <span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
                 {{ T.userVerified }}
               </template>
-              <template v-else="">
+              <template v-else>
                 {{ T.userVerify }}
               </template>
             </button>
           </div>
-          <div class="col-md-4 bottom-margin" v-show="username != null">
+          <div v-show="username != null" class="col-md-4 bottom-margin">
             <label>
               <template v-if="lastLogin != null">
                 {{
@@ -62,7 +62,7 @@
                   })
                 }}
               </template>
-              <template v-else="">
+              <template v-else>
                 {{ T.userNeverLoggedIn }}
               </template></label
             >
@@ -71,28 +71,28 @@
       </div>
       <div class="row bottom-margin">
         <form
-          class="form bottom-margin"
-          v-on:submit.prevent="onGenerateToken"
           v-show="username != null"
+          class="form bottom-margin"
+          @submit.prevent="onGenerateToken"
         >
           <div class="col-md-12">
             <div class="input-group bottom-margin">
               <input
+                v-model="link"
                 class="form-control"
                 name="link"
                 type="text"
-                v-bind:placeholder="T.passwordGenerateTokenDesc"
-                v-model="link"
+                :placeholder="T.passwordGenerateTokenDesc"
               />
               <span class="input-group-btn"
                 ><button
                   class="btn btn-default"
                   name="copy"
                   type="button"
-                  v-bind:aria-label="T.passwordCopyToken"
-                  v-bind:disabled="link == ''"
-                  v-bind:title="T.passwordCopyToken"
-                  v-on:click.prevent="onCopyToken"
+                  :aria-label="T.passwordCopyToken"
+                  :disabled="link == ''"
+                  :title="T.passwordCopyToken"
+                  @click.prevent="onCopyToken"
                 >
                   <span
                     aria-hidden="true"
@@ -102,8 +102,8 @@
                 <button
                   class="btn btn-default"
                   type="button"
-                  v-bind:title="T.passwordGenerateTokenDesc"
-                  v-on:click.prevent="onGenerateToken"
+                  :title="T.passwordGenerateTokenDesc"
+                  @click.prevent="onGenerateToken"
                 >
                   {{ T.passwordGenerateToken }}
                 </button></span
@@ -113,7 +113,7 @@
               <button
                 class="btn btn-primary submit"
                 type="reset"
-                v-on:click.prevent="onReset"
+                @click.prevent="onReset"
               >
                 {{ T.wordsCancel }}
               </button>

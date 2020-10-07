@@ -1,8 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
-
-import { omegaup } from '../../omegaup';
 
 import arena_DiffView from './DiffView.vue';
 
