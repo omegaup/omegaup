@@ -4834,7 +4834,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleCollections'
                 ),
             ],
-            'entrypoint' => 'problem_collections',
+            'entrypoint' => 'problem_collection',
         ];
     }
 
