@@ -1368,6 +1368,7 @@ export namespace types {
 
   export interface CollectionDetailsPayload {
     collection: { alias: string; name?: string }[];
+    type: string;
   }
 
   export interface CommitRunsDiff {
@@ -1885,9 +1886,11 @@ export namespace types {
   export interface IdentityRequest {
     accepted?: boolean;
     admin?: { name?: string; username: string };
+    classname: string;
     country?: string;
     country_id?: string;
     last_update?: Date;
+    name?: string;
     request_time: Date;
     username: string;
   }
