@@ -42,7 +42,7 @@
         </div>
       </div>
     </td>
-    <td data-global-score>{{ globalScoreByStudent }}%</td>
+    <td data-global-score>{{ globalScore }}%</td>
   </tr>
 </template>
 
@@ -121,24 +121,17 @@ export default class StudentProgress extends Vue {
     );
   }
 
-  get weightedMean(): Array<number> {
+  get globalScore(): string {
     const totalPoints = this.assignments
       .map((assignment) => assignment.max_points ?? 0)
-      .reduce((acc, curr) => acc + (curr ?? 0), 0);
-    return this.assignments.map((assignment) =>
-      totalPoints ? ((assignment.max_points ?? 0) / totalPoints) * 100 : 0,
-    );
-  }
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return '0.00';
+    }
 
-  get globalScoreByStudent(): string {
-    const points = this.assignments.map((assignment) => {
-      const pointsPerAssignment = this.points(assignment.alias);
-      if (pointsPerAssignment === 0) return 0;
-      return this.score(assignment.alias) / pointsPerAssignment;
-    });
-    return points
-      .map((value, index) => value * this.weightedMean[index])
-      .reduce((acc, curr) => acc + curr)
+    return this.assignments
+      .map((assignment) => (this.score(assignment.alias) * 100) / totalPoints)
+      .reduce((acc, curr) => acc + curr, 0)
       .toFixed(2);
   }
 

@@ -162,21 +162,6 @@ export default class CourseViewProgress extends Vue {
     );
   }
 
-  points(
-    student: types.StudentProgress,
-    assignment: omegaup.Assignment,
-  ): number {
-    if (
-      !Object.prototype.hasOwnProperty.call(student.points, assignment.alias)
-    ) {
-      return 0;
-    }
-    return Object.values(student.points[assignment.alias]).reduce(
-      (accumulator: number, currentValue: number) => accumulator + currentValue,
-      0,
-    );
-  }
-
   studentProgressUrl(student: types.StudentProgress): string {
     return `/course/${this.course.alias}/student/${student.username}/`;
   }
@@ -221,24 +206,19 @@ export default class CourseViewProgress extends Vue {
     return `${this.course.alias}.ods`;
   }
 
-  get weightedMean(): Array<number> {
+  getGlobalScoreByStudent(student: types.StudentProgress): string {
     const totalPoints = this.assignments
       .map((assignment) => assignment.max_points ?? 0)
-      .reduce((acc, curr) => acc + (curr ?? 0), 0);
-    return this.assignments.map((assignment) =>
-      totalPoints ? ((assignment.max_points ?? 0) / totalPoints) * 100 : 0,
-    );
-  }
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return '0.00';
+    }
 
-  getGlobalScoreByStudent(student: types.StudentProgress): string {
-    const points = this.assignments.map((assignment) => {
-      const pointsPerAssignment = this.points(student, assignment);
-      if (pointsPerAssignment === 0) return 0;
-      return this.score(student, assignment) / pointsPerAssignment;
-    });
-    return points
-      .map((value, index) => value * this.weightedMean[index])
-      .reduce((acc, curr) => acc + curr)
+    return this.assignments
+      .map(
+        (assignment) => (this.score(student, assignment) * 100) / totalPoints,
+      )
+      .reduce((acc, curr) => acc + curr, 0)
       .toFixed(2);
   }
 
