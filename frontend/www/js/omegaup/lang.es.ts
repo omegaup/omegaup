@@ -1289,7 +1289,7 @@ const translations: { [key: string]: string; } = {
   wordsExam: "Examen",
   wordsExperiments: "Experimentos",
   wordsExtraWallTimeMs: "Tiempo extra para libinteractive (ms)",
-  wordsFeedback: "Feedback",
+  wordsFeedback: "Comentarios",
   wordsFilterByCountry: "Filtrar por mi pa\u00eds / regi\u00f3n",
   wordsFilterByLanguage: "Filtrar por idioma",
   wordsFilterBySchool: "Filtrar por mi escuela",
