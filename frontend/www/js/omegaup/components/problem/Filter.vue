@@ -4,7 +4,7 @@
       <tbody>
         <tr v-for="(element, index) in collection" :key="index">
           <td>
-            <input type="checkbox" v-model="element.checked" />
+            <input v-model="element.checked" type="checkbox" />
           </td>
           <td>{{ T[element.tagname] }}</td>
         </tr>
