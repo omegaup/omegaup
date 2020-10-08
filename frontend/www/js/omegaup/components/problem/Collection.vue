@@ -22,7 +22,11 @@
               :key="idx"
               :level-tag-alias="collect.name"
               :problem-count="collect.problems_per_tag"
-            ></omegaup-problem-collection>
+            >
+              <template #problems>
+                {{ T.wordsProblems }}
+              </template>
+            </omegaup-problem-collection>
           </div>
         </div>
       </div>
@@ -35,12 +39,13 @@
       </div>
       <div class="card-body panel-body">
         <div class="container-fluid">
-          <div class="row"></div>
-          <omegaup-problem-collection
-            v-for="(collect, idx) in otherCollections"
-            :key="idx"
-            :level-tag-alias="collect"
-          ></omegaup-problem-collection>
+          <div class="row">
+            <omegaup-problem-collection
+              v-for="(collect, idx) in otherCollections"
+              :key="idx"
+              :level-tag-alias="collect"
+            ></omegaup-problem-collection>
+          </div>
         </div>
       </div>
     </div>
