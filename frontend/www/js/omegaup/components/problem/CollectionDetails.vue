@@ -9,6 +9,7 @@
             :another-tags="data.anotherTags"
             :another-tags-displayed="anotherTagsDisplayed"
             @emit-add-tag="addTag"
+            @emit-check-tag="checkTag"
           ></omegaup-collection-filter>
           <input name="checked_tags" :value="checkedTagsList" type="hidden" />
         </template>
@@ -36,13 +37,15 @@ export default class CollectionDetails extends Vue {
   anotherTags: types.SelectedTag[] = [];
   checkedTags: types.CheckedTag[] = [];
 
-  get checkedTagsList(): string {
-    if(this.checkedTags.length == 0){
-      this.data.collection.forEach(element => {
-        this.checkTag(element.alias, false);
-      });
-    }
-    return JSON.stringify(this.checkedTags);
+  checkTag(tagname: string, checked: boolean): void {
+    this.checkedTags.push({
+      tagname: tagname,
+      checked: checked,
+    });
+  }
+
+  get selectedTagsList(): string {
+    return JSON.stringify(this.anotherTags);
   }
 
   addTag(alias: string, tagname: string, isPublic: boolean): void {
@@ -51,7 +54,6 @@ export default class CollectionDetails extends Vue {
       public: isPublic,
     });
   }
-
   get anotherTagsDisplayed(): string[] {
     return this.anotherTags
       .filter((tag) => tag.public === true)
