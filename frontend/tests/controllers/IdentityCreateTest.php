@@ -365,7 +365,7 @@ class IdentityCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should not have allowed bulk user creation');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals(
-                'parameterInvalidStateNeedsBelongToCountry',
+                'parameterInvalidStateNeedsToBelongToCountry',
                 $e->getMessage()
             );
         }

@@ -367,7 +367,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
         }
         if (is_null($identity->country_id) && !is_null($identity->state_id)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidStateNeedsBelongToCountry',
+                'parameterInvalidStateNeedsToBelongToCountry',
                 $identity->username
             );
         } elseif (
