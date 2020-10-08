@@ -38,7 +38,7 @@ OmegaUp.on('ready', function () {
               records: identities,
             });
             const hiddenElement = document.createElement('a');
-            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURI(
+            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
               csv,
             )}`;
             hiddenElement.target = '_blank';
