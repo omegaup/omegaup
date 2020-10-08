@@ -10,5 +10,7 @@ describe('Collection.vue', () => {
     const wrapper = shallowMount(problem_collection, {});
 
     expect(wrapper.text()).toContain(T.collectionTitle);
+    expect(wrapper.text()).toContain(T.problemCollectionEducationLevel);
+    expect(wrapper.text()).toContain(T.problemCollectionOthers);
   });
 });
