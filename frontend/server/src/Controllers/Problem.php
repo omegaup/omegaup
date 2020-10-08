@@ -4829,7 +4829,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     'problemCount' => \OmegaUp\DAO\Problems::getProblemsPerTagCount(),
-                    'otherCollections' => [problemCollectionAuthors, problemCollectionRandomProblem, problemCollectionSearchProblem]
+                    'otherCollections' => ['problemCollectionAuthors', 'problemCollectionRandomProblem', 'problemCollectionSearchProblem']
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollections'

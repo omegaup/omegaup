@@ -15,6 +15,7 @@ OmegaUp.on('ready', () => {
         props: {
           levelTags: payload.levelTags,
           problemCount: payload.problemCount,
+          otherCollections: payload.otherCollections,
         },
       });
     },

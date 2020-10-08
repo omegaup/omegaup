@@ -18,9 +18,11 @@
       </div>
       <div class="row">
         <div class="col mt-1 mb-1 text-center">
-          <a class="btn btn-primary" href="/problem/">{{
-            T.problemcollectionViewProblems
-          }}</a>
+          <a
+            class="btn btn-primary"
+            :href="'/problem/collection/' + levelTagAlias + '/'"
+            >{{ T.problemcollectionViewProblems }}</a
+          >
         </div>
       </div>
     </div>
@@ -43,6 +45,9 @@ import {
   faSitemap,
   faTrophy,
   faCode,
+  faUsers,
+  faRandom,
+  faSearch,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(faRobot);
 library.add(faLaptopCode);
@@ -51,6 +56,9 @@ library.add(faProjectDiagram);
 library.add(faSitemap);
 library.add(faTrophy);
 library.add(faCode);
+library.add(faUsers);
+library.add(faRandom);
+library.add(faSearch);
 
 const problemLevelIcons: { [key: string]: string } = {
   problemLevelBasicKarel: 'robot',
@@ -60,6 +68,9 @@ const problemLevelIcons: { [key: string]: string } = {
   problemLevelIntermediateAnalysisAndDesignOfAlgorithms: 'sitemap',
   problemLevelAdvancedCompetitiveProgramming: 'trophy',
   problemLevelAdvancedSpecializedTopics: 'code',
+  problemCollectionAuthors: 'users',
+  problemCollectionRandomProblem: 'random',
+  problemCollectionSearchProblem: 'search',
 };
 
 @Component({

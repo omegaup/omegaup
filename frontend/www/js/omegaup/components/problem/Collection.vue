@@ -36,6 +36,11 @@
       <div class="card-body panel-body">
         <div class="container-fluid">
           <div class="row"></div>
+          <omegaup-problem-collection
+            v-for="(collect, idx) in otherCollections"
+            :key="idx"
+            :level-tag-alias="collect"
+          ></omegaup-problem-collection>
         </div>
       </div>
     </div>
@@ -55,6 +60,7 @@ import problem_Collection from './CollectionProblem.vue';
 export default class Collection extends Vue {
   @Prop() levelTags!: string[];
   @Prop() problemCount!: string[];
+  @Prop() otherCollections!: string[];
   T = T;
 }
 </script>
