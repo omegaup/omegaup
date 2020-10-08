@@ -41,6 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
  * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, anotherTags: list<string>, type: string}
+ * @psalm-type CheckedTag=array{checked: bool, tagname: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS

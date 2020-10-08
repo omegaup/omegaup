@@ -1,24 +1,27 @@
 <template>
   <div class="card mb-3 panel panel-primary">
-    <table class="table">
+    <table class="table table-striped">
       <tbody>
-        <tr v-for="element in collection">
+        <tr v-for="(element, index) in collection" :key="index">
           <td>
-            <input type="checkbox" />
+            <input type="checkbox" v-model="element.checked">
           </td>
-          <td>{{ T[element.alias] }}</td>
+          <td>{{ T[element.tagname] }}</td>
         </tr>
       </tbody>
     </table>
     <vue-typeahead-bootstrap
-      :data="publicTags"
+      :data="anotherTags"
       :serializer="publicTagsSerializer"
-      @hit="addPublicTag"
+      @hit="addAnotherTag"
     >
     </vue-typeahead-bootstrap>
     <table class="table table-striped">
       <tbody>
-        <tr v-for="tag in selectedPublicTags" :key="tag">
+        <tr v-for="tag in anotherTagsDisplayed" :key="tag">
+          <td>
+            <input type="checkbox" />
+          </td>
           <td>
             {{ Object.prototype.hasOwnProperty.call(T, tag) ? T[tag] : tag }}
           </td>
@@ -32,7 +35,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
-
 @Component({
   components: {
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
@@ -40,14 +42,13 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 })
 export default class CollectionFilter extends Vue {
   @Prop() collection!: string[];
-  @Prop() publicTags!: string[];
-  @Prop() selectedPublicTags!: string[];
+  @Prop() anotherTags!: string[];
+  @Prop() anotherTagsDisplayed!: string[];
   @Prop() alias!: string;
-
   T = T;
 
-  addPublicTag(tag: string): void {
-    if (!this.selectedPublicTags.includes(tag)) {
+  addAnotherTag(tag: string): void {
+    if (!this.anotherTagsDisplayed.includes(tag)) {
       this.$emit('emit-add-tag', this.alias, tag, true);
     }
   }

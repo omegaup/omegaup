@@ -1,13 +1,19 @@
 <template>
   <div>
     <h1 class="card-title">{{ title }}</h1>
-    <omegaup-collection-filter
-      :collection="data.collection"
-      :public-tags="data.anotherTags"
-      :selected-public-tags="selectedPublicTags"
-      @emit-add-tag="addTag"
-    ></omegaup-collection-filter>
-    <input name="selected_tags" :value="selectedTagsList" type="hidden" />
+    <div class="row">
+      <div class="col col-md-4">
+        <template>
+          <omegaup-collection-filter
+            :collection="checkedTags"
+            :another-tags="data.anotherTags"
+            :another-tags-displayed="anotherTagsDisplayed"
+            @emit-add-tag="addTag"
+          ></omegaup-collection-filter>
+          <input name="checked_tags" :value="checkedTagsList" type="hidden" />
+        </template>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -27,21 +33,27 @@ export default class CollectionDetails extends Vue {
 
   T = T;
   type = this.data.type;
-  selectedTags = [];
+  anotherTags: types.SelectedTag[] = [];
+  checkedTags: types.CheckedTag[] = [];
 
-  get selectedTagsList(): string {
-    return JSON.stringify(this.selectedTags);
+  get checkedTagsList(): string {
+    if(this.checkedTags.length == 0){
+      this.data.collection.forEach(element => {
+        this.checkTag(element.alias, false);
+      });
+    }
+    return JSON.stringify(this.checkedTags);
   }
 
   addTag(alias: string, tagname: string, isPublic: boolean): void {
-    this.selectedTags.push({
+    this.anotherTags.push({
       tagname: tagname,
       public: isPublic,
     });
   }
 
-  get selectedPublicTags(): string[] {
-    return this.selectedTags
+  get anotherTagsDisplayed(): string[] {
+    return this.anotherTags
       .filter((tag) => tag.public === true)
       .map((tag) => tag.tagname);
   }
