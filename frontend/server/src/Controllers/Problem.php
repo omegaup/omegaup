@@ -5910,7 +5910,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{alias: string}
      */
-    public static function apiRandomProblem(Request $r) {
+    public static function apiRandomProblem(\OmegaUp\Request $r) {
         return [
             'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
         ];
