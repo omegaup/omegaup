@@ -611,6 +611,8 @@ const translations: { [key: string]: string; } = {
   parameterEmpty: "Par\u00e2metro vazio",
   parameterInvalid: "Par\u00e2metro inv\u00e1lido",
   parameterInvalidAlias: "Par\u00e2metros s\u00f3 podem conter letras, d\u00edgitos, e _. Espa\u00e7os n\u00e3o s\u00e3o permitidos",
+  parameterInvalidStateDoesNotBelongToCountry: "O estado selecionado n\u00e3o pertence ao pa\u00eds baseado em ISO 3166-2.",
+  parameterInvalidStateNeedsToBelongToCountry: "Voc\u00ea precisa selecionar o pa\u00eds para selecionar um estado.",
   parameterNotADate: "Par\u00e2metro deve ser uma data",
   parameterNotANumber: "Par\u00e2metro deve ser um n\u00famero",
   parameterNotFound: "Valor do par\u00e2metro n\u00e3o encontrado",
