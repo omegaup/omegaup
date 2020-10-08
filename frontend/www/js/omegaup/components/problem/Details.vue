@@ -116,8 +116,8 @@
           :show-overlay="showOverlay"
           @overlay-hidden="onPopupDismissed"
         >
-          <template #popup-content>
-            <omegaup-arena-runsubmit
+          <template #popup>
+            <omegaup-arena-runsubmit-popup
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
               :initial-show-form="showFormRunSubmit"
@@ -126,7 +126,7 @@
                 (code, selectedLanguage) =>
                   onRunSubmitted(code, selectedLanguage)
               "
-            ></omegaup-arena-runsubmit>
+            ></omegaup-arena-runsubmit-popup>
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -197,7 +197,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
-import arena_RunSubmit from '../arena/RunSubmit.vue';
+import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
@@ -208,7 +208,6 @@ import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
-import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -237,11 +236,10 @@ interface Tab {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
-    'omegaup-arena-runsubmit': arena_RunSubmit,
+    'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
-    'omegaup-overlay-popup': omegaup_OverlayPopup,
     'omegaup-username': user_Username,
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
