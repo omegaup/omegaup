@@ -5908,9 +5908,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return string
+     * @return array{alias: string}
      */
-    public static function getRandomProblem(): string {
-        return \OmegaUp\DAO\Problems::getProblemAliasRandom();
+    public static function apiRandomProblem(Request $r): string {
+        return [
+            'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
+        ];
     }
 }

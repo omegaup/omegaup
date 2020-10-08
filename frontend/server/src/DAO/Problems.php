@@ -1158,7 +1158,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
-    final public static function getProblemAliasRandom(): string {
+    final public static function getRandomProblemAlias(): string {
         $sql = 'SELECT
                     alias
                 FROM
@@ -1166,7 +1166,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 WHERE
                     quality_seal = 1
                 GROUP BY
-                    rand() LIMIT 1;';
+                    RAND() LIMIT 1;';
 
         /** @var string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
