@@ -20,6 +20,7 @@
                   >
                     {{ assignment.name }}
                   </th>
+                  <th>{{ T.courseProgressGlobalScore }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -61,7 +62,6 @@
       </div>
     </div>
   </div>
-  <!-- panel -->
 </template>
 
 <script lang="ts">
@@ -176,6 +176,7 @@ export default class CourseViewProgress extends Vue {
     for (const assignment of this.assignments) {
       header.push(assignment.name);
     }
+    header.push(T.courseProgressGlobalScore);
     table.push(header);
     for (const student of this.students) {
       const row: (number | string)[] = [student.username, student.name || ''];
@@ -183,6 +184,8 @@ export default class CourseViewProgress extends Vue {
       for (const assignment of this.assignments) {
         row.push(this.score(student, assignment));
       }
+      const globalScore = this.getGlobalScoreByStudent(student);
+      row.push(`${globalScore}%`);
 
       table.push(row);
     }
@@ -201,6 +204,22 @@ export default class CourseViewProgress extends Vue {
 
   get odsFilename(): string {
     return `${this.course.alias}.ods`;
+  }
+
+  getGlobalScoreByStudent(student: types.StudentProgress): string {
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return '0.00';
+    }
+
+    return this.assignments
+      .map(
+        (assignment) => (this.score(student, assignment) * 100) / totalPoints,
+      )
+      .reduce((acc, curr) => acc + curr, 0)
+      .toFixed(2);
   }
 
   @AsyncComputed()
