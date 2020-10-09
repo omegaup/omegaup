@@ -1,33 +1,39 @@
 <template>
-  <div class="card mb-3 panel panel-primary">
-    <table class="table table-striped">
-      <tbody>
-        <tr v-for="(element, index) in collection" :key="index">
-          <td>
-            <input v-model="element.checked" type="checkbox" />
-          </td>
-          <td>{{ T[element.tagname] }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <vue-typeahead-bootstrap
-      :data="anotherTags"
-      :serializer="publicTagsSerializer"
-      @hit="addAnotherTag"
-    >
-    </vue-typeahead-bootstrap>
-    <table class="table table-striped">
-      <tbody>
-        <tr v-for="(tag, index) in anotherTagsDisplayed" :key="index">
-          <td>
-            <input v-model="tag.checked" type="checkbox" />
-          </td>
-          <td>
-            {{ T[tag.tagname] }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="card">
+    <div class="card-body">
+      <h3>{{ T.problemEditAddTags }}</h3>
+      <table class="table table-borderless">
+        <tbody>
+          <tr v-for="(tag, index) in collection" :key="index">
+            <td>
+              <input v-model="tag.checked" type="checkbox" />
+            </td>
+            <td>{{ T[tag.tagname] }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="form-group">
+        <vue-typeahead-bootstrap
+          :data="anotherTags"
+          :serializer="publicTagsSerializer"
+          :placeholder="T.collecionAnotherTags"
+          @hit="addAnotherTag"
+        >
+        </vue-typeahead-bootstrap>
+      </div>
+      <table class="table table-borderless">
+        <tbody>
+          <tr v-for="(tag, index) in anotherTagsDisplayed" :key="index">
+            <td class="fix">
+              <input v-model="tag.checked" type="checkbox" />
+            </td>
+            <td>
+              {{ T[tag.tagname] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -44,7 +50,7 @@ export default class CollectionFilter extends Vue {
   @Prop() collection!: string[];
   @Prop() anotherTags!: string[];
   @Prop() anotherTagsDisplayed!: string[];
-  @Prop() alias!: string;
+
   T = T;
 
   addAnotherTag(tag: string): void {
@@ -61,3 +67,9 @@ export default class CollectionFilter extends Vue {
   }
 }
 </script>
+
+<style>
+.fix {
+  width: 40px;
+}
+</style>
