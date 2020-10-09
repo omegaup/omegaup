@@ -1368,6 +1368,7 @@ export namespace types {
 
   export interface CollectionDetailsPayload {
     collection: { alias: string; name?: string }[];
+    type: string;
   }
 
   export interface CommitRunsDiff {
@@ -1885,9 +1886,11 @@ export namespace types {
   export interface IdentityRequest {
     accepted?: boolean;
     admin?: { name?: string; username: string };
+    classname: string;
     country?: string;
     country_id?: string;
     last_update?: Date;
+    name?: string;
     request_time: Date;
     username: string;
   }
@@ -3481,6 +3484,8 @@ export namespace messages {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
   };
+  export type ProblemRandomProblemRequest = { [key: string]: any };
+  export type ProblemRandomProblemResponse = { alias: string };
   export type ProblemRejudgeRequest = { [key: string]: any };
   export type ProblemRejudgeResponse = {};
   export type ProblemRemoveAdminRequest = { [key: string]: any };
@@ -4256,6 +4261,9 @@ export namespace controllers {
     myList: (
       params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
+    randomProblem: (
+      params?: messages.ProblemRandomProblemRequest,
+    ) => Promise<messages.ProblemRandomProblemResponse>;
     rejudge: (
       params?: messages.ProblemRejudgeRequest,
     ) => Promise<messages.ProblemRejudgeResponse>;

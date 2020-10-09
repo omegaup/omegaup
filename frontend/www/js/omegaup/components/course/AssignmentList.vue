@@ -21,7 +21,10 @@
         <tbody v-sortable="{ onUpdate: sortContent }">
           <tr v-for="assignment in content" :key="assignment.alias">
             <td>
-              <button class="btn btn-link" :title="T.courseAssignmentReorder">
+              <button
+                v-tooltip="T.courseAssignmentReorder"
+                class="btn btn-link"
+              >
                 <font-awesome-icon icon="arrows-alt" />
               </button>
             </td>
@@ -44,29 +47,32 @@
             </td>
             <td class="text-center">
               <button
+                v-tooltip="T.courseAssignmentEdit"
                 class="btn btn-link"
-                :title="T.courseAssignmentEdit"
                 @click="$emit('emit-edit', assignment)"
               >
                 <font-awesome-icon icon="edit" />
               </button>
               <button
+                v-tooltip="T.courseAddProblemsAdd"
                 class="btn btn-link"
-                :title="T.courseAddProblemsAdd"
                 @click="$emit('emit-add-problems', assignment)"
               >
                 <font-awesome-icon icon="list-alt" />
               </button>
-              <font-awesome-icon
+              <button
                 v-if="assignment.has_runs"
-                :title="T.assignmentRemoveAlreadyHasRuns"
-                icon="trash"
-                class="disabled"
-              />
+                v-tooltip="T.assignmentRemoveAlreadyHasRuns"
+                class="btn btn-link"
+                data-toggle="tooltip"
+                data-placement="bottom"
+              >
+                <font-awesome-icon icon="trash" class="disabled" />
+              </button>
               <button
                 v-else
+                v-tooltip="T.courseAssignmentDelete"
                 class="btn btn-link"
-                :title="T.courseAssignmentDelete"
                 @click="$emit('emit-delete', assignment)"
               >
                 <font-awesome-icon icon="trash" />
@@ -113,6 +119,8 @@ import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
 
 import {
   FontAwesomeIcon,
@@ -128,6 +136,9 @@ library.add(fas);
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+  directives: {
+    tooltip: VTooltip,
   },
 })
 export default class CourseAssignmentList extends Vue {

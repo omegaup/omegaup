@@ -1138,6 +1138,10 @@ export const Problem = {
     messages.ProblemMyListRequest,
     messages.ProblemMyListResponse
   >('/api/problem/myList/'),
+  randomProblem: apiCall<
+    messages.ProblemRandomProblemRequest,
+    messages.ProblemRandomProblemResponse
+  >('/api/problem/randomProblem/'),
   rejudge: apiCall<
     messages.ProblemRejudgeRequest,
     messages.ProblemRejudgeResponse
