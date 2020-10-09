@@ -40,6 +40,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
+ * @psalm-type RandomProblemPayload=array{alias: string}
  * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, type: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
@@ -5913,6 +5914,25 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRandomProblem(\OmegaUp\Request $r) {
         return [
             'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
+        ];
+    }
+
+    /**
+     * @return array{smartyProperties: array{payload: RandomProblemPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getRandomProblemForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCollections'
+                ),
+            ],
+            'entrypoint' => 'problem_random_problem',
         ];
     }
 }

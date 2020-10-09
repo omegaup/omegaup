@@ -1021,6 +1021,14 @@ export namespace types {
       );
     }
 
+    export function RandomProblemPayload(
+      elementId: string = 'payload',
+    ): types.RandomProblemPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function SchoolOfTheMonthPayload(
       elementId: string = 'payload',
     ): types.SchoolOfTheMonthPayload {
@@ -2438,6 +2446,10 @@ export namespace types {
   export interface Progress {
     max_score: number;
     score: number;
+  }
+
+  export interface RandomProblemPayload {
+    alias: string;
   }
 
   export interface Run {
