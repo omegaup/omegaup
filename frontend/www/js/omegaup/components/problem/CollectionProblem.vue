@@ -18,11 +18,9 @@
       </div>
       <div class="row">
         <div class="col mt-1 mb-1 text-center">
-          <a
-            class="btn btn-primary"
-            :href="getProblemLink(levelTagAlias)"
-            >{{ T.problemcollectionViewProblems }}</a
-          >
+          <a class="btn btn-primary" :href="getProblemLink(levelTagAlias)">{{
+            T.problemcollectionViewProblems
+          }}</a>
         </div>
       </div>
     </div>
@@ -97,16 +95,16 @@ export default class CollectionProblem extends Vue {
   }
 
   getProblemLink(alias: string): string {
-    if(alias !== 'problemCollectionAuthors' && alias !== 'problemCollectionRandomProblem' && alias !== 'problemCollectionSearchProblem')
+    if (
+      alias !== 'problemCollectionAuthors' &&
+      alias !== 'problemCollectionRandomProblem' &&
+      alias !== 'problemCollectionSearchProblem'
+    )
       return '/problem/collection/' + alias + '/';
-    if(alias === 'problemCollectionAuthors')
-      return '/problem/';
-    if(alias === 'problemCollectionRandomProblem')
-      return '/problem/';
-    if(alias === 'problemCollectionSearchProblem')
-      return '/problem/';
+    if (alias === 'problemCollectionAuthors') return '/problem/';
+    if (alias === 'problemCollectionRandomProblem') return '/problem/';
+    if (alias === 'problemCollectionSearchProblem') return '/problem/';
     return '/problem/';
   }
-
 }
 </script>
