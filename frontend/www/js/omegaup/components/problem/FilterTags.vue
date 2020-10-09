@@ -6,7 +6,12 @@
         <tbody>
           <tr v-for="(tag, index) in collection" :key="index">
             <td>
-              <input v-model="tag.checked" type="checkbox" />
+              <input
+                :id="tag.tagname"
+                v-model="tag.checked"
+                class="collection-tags"
+                type="checkbox"
+              />
             </td>
             <td>{{ T[tag.tagname] }}</td>
           </tr>
@@ -25,7 +30,12 @@
         <tbody>
           <tr v-for="(tag, index) in anotherTagsDisplayed" :key="index">
             <td class="fix">
-              <input v-model="tag.checked" type="checkbox" />
+              <input
+                :id="tag.tagname"
+                v-model="tag.checked"
+                class="another-tags"
+                type="checkbox"
+              />
             </td>
             <td>
               {{ T[tag.tagname] }}
@@ -41,12 +51,13 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+
 @Component({
   components: {
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
   },
 })
-export default class CollectionFilter extends Vue {
+export default class CollectionFilterTags extends Vue {
   @Prop() collection!: string[];
   @Prop() anotherTags!: string[];
   @Prop() anotherTagsDisplayed!: string[];
@@ -55,7 +66,7 @@ export default class CollectionFilter extends Vue {
 
   addAnotherTag(tag: string): void {
     if (!this.anotherTagsDisplayed.includes(tag)) {
-      this.$emit('emit-add-tag', tag, false);
+      this.$emit('emit-add-tag', tag, true);
     }
   }
 

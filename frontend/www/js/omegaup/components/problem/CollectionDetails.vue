@@ -4,12 +4,12 @@
     <div class="row">
       <div class="col col-md-4">
         <div>
-          <omegaup-collection-filter
+          <omegaup-collection-filter-tags
             :collection="checkedTags"
             :another-tags="data.anotherTags"
             :another-tags-displayed="anotherTags"
             @emit-add-tag="addTag"
-          ></omegaup-collection-filter>
+          ></omegaup-collection-filter-tags>
           <input name="checked_tags" :value="checkedTagsList" type="hidden" />
           <input
             name="another_checked_tags"
@@ -24,13 +24,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import collection_Filter from './Filter.vue';
+import collection_Filter_Tags from './FilterTags.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
 @Component({
   components: {
-    'omegaup-collection-filter': collection_Filter,
+    'omegaup-collection-filter-tags': collection_Filter_Tags,
   },
 })
 export default class CollectionDetails extends Vue {

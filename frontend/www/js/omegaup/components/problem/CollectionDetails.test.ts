@@ -10,11 +10,27 @@ describe('CollectionDetails.vue', () => {
     const wrapper = shallowMount(collection_Details, {
       propsData: {
         data: {
-          type: 'author',
+          type: 'problemLevelBasicIntroductionToProgramming',
+          collection: <string[]>[
+            'problemTagMatrices',
+            'problemTagDiophantineEquations',
+            'problemTagInputAndOutput',
+            'problemTagArrays',
+          ],
+          anotherTags: <string[]>[
+            'problemTagConditionals',
+            'problemTagLoops',
+            'problemTagFunctions',
+            'problemTagCharsAndStrings',
+            'problemTagSimulation',
+            'problemTagAnalyticGeometry',
+          ],
         },
       },
     });
 
-    expect(wrapper.text()).toContain(T.omegaupTitleCollectionsByAuthor);
+    expect(wrapper.text()).toContain(
+      T.problemLevelBasicIntroductionToProgramming,
+    );
   });
 });
