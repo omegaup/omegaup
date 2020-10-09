@@ -2,14 +2,14 @@
   <div class="col-sm-4 mt-2">
     <div class="border border-dark">
       <div class="row">
-        <div class="col-sm-4 text-center pt-2">
+        <div class="col-sm-4 d-flex align-items-center justify-content-end">
           <h1>
             <font-awesome-icon
               :icon="['fas', getProblemLevelIcon(levelTagAlias)]"
             />
           </h1>
         </div>
-        <div class="col-sm-8 text-center" style="height: 112px">
+        <div class="col-sm-8 d-flex align-items-center" style="height: 112px">
           <p>
             <strong>{{ name }}</strong> <br />
             {{ problemCount }} <slot name="problems"></slot>
@@ -20,7 +20,7 @@
         <div class="col mt-1 mb-1 text-center">
           <a
             class="btn btn-primary"
-            :href="'/problem/collection/' + levelTagAlias + '/'"
+            :href="getProblemLink(levelTagAlias)"
             >{{ T.problemcollectionViewProblems }}</a
           >
         </div>
@@ -95,5 +95,18 @@ export default class CollectionProblem extends Vue {
       return problemLevelIcons[problemLevel];
     return 'icon';
   }
+
+  getProblemLink(alias: string): string {
+    if(alias !== 'problemCollectionAuthors' && alias !== 'problemCollectionRandomProblem' && alias !== 'problemCollectionSearchProblem')
+      return '/problem/collection/' + alias + '/';
+    if(alias === 'problemCollectionAuthors')
+      return '/problem/';
+    if(alias === 'problemCollectionRandomProblem')
+      return '/problem/';
+    if(alias === 'problemCollectionSearchProblem')
+      return '/problem/';
+    return '/problem/';
+  }
+
 }
 </script>
