@@ -18,12 +18,12 @@
     </vue-typeahead-bootstrap>
     <table class="table table-striped">
       <tbody>
-        <tr v-for="tag in anotherTagsDisplayed" :key="tag">
+        <tr v-for="(tag, index) in anotherTagsDisplayed" :key="index">
           <td>
-            <input type="checkbox" />
+            <input v-model="tag.checked" type="checkbox" />
           </td>
           <td>
-            {{ Object.prototype.hasOwnProperty.call(T, tag) ? T[tag] : tag }}
+            {{ T[tag.tagname] }}
           </td>
         </tr>
       </tbody>
@@ -49,7 +49,7 @@ export default class CollectionFilter extends Vue {
 
   addAnotherTag(tag: string): void {
     if (!this.anotherTagsDisplayed.includes(tag)) {
-      this.$emit('emit-add-tag', this.alias, tag, true);
+      this.$emit('emit-add-tag', tag, false);
     }
   }
 
