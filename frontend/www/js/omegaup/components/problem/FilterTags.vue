@@ -2,7 +2,7 @@
   <div class="card">
     <div class="card-body">
       <h3>{{ T.problemEditAddTags }}</h3>
-      <table class="table table-borderless">
+      <table class="table table-borderless marginFix">
         <tbody>
           <tr v-for="(tag, index) in collection" :key="index">
             <td>
@@ -17,15 +17,6 @@
           </tr>
         </tbody>
       </table>
-      <div class="form-group">
-        <vue-typeahead-bootstrap
-          :data="anotherTags"
-          :serializer="publicTagsSerializer"
-          :placeholder="T.collecionAnotherTags"
-          @hit="addAnotherTag"
-        >
-        </vue-typeahead-bootstrap>
-      </div>
       <table class="table table-borderless">
         <tbody>
           <tr v-for="(tag, index) in anotherTagsDisplayed" :key="index">
@@ -43,6 +34,15 @@
           </tr>
         </tbody>
       </table>
+      <div class="form-group">
+        <vue-typeahead-bootstrap
+          :data="anotherTags"
+          :serializer="publicTagsSerializer"
+          :placeholder="T.collecionAnotherTags"
+          @hit="addAnotherTag"
+        >
+        </vue-typeahead-bootstrap>
+      </div>
     </div>
   </div>
 </template>
@@ -82,5 +82,9 @@ export default class CollectionFilterTags extends Vue {
 <style>
 .fix {
   width: 40px;
+}
+
+.marginFix {
+  margin-bottom: 0px;
 }
 </style>
