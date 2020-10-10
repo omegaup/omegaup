@@ -7,7 +7,7 @@
             <label>{{ T.wordsUser }}</label>
             <omegaup-autocomplete
               v-model="contestant"
-              :init="el => typeahead.userTypeahead(el)"
+              :init="(el) => typeahead.userTypeahead(el)"
             ></omegaup-autocomplete>
           </div>
           <button class="btn btn-primary" type="submit">
@@ -129,7 +129,7 @@ export default class AddContestant extends Vue {
     if (this.users.length) {
       this.$emit(
         'emit-add-user',
-        users.map(user => user.trim()),
+        users.map((user) => user.trim()),
       );
     }
   }
