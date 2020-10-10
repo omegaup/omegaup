@@ -171,7 +171,10 @@ OmegaUp.on('ready', () => {
             )
               .then((results) => {
                 const contestantsWithError: string[] = results
-                  .filter((result): item is PromiseRejectedResult => result.status === 'rejected')
+                  .filter(
+                    (result): result is PromiseRejectedResult =>
+                      result.status === 'rejected',
+                  )
                   .map((result) => result.reason);
                 this.refreshUsers();
                 this.refreshRequests();
