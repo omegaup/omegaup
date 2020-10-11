@@ -4,10 +4,18 @@ import Vue from 'vue';
 import contest_Intro from '../components/contest/Intro.vue';
 import * as ui from '../ui';
 import * as api from '../api';
+import * as time from '../time';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ContestIntroPayload();
   const headerPayload = types.payloadParsers.CommonPayload();
+
+  // Adjust the clock in case the local time significantly differs from what is
+  // expected.
+  payload.contest.start_time = time.remoteDate(payload.contest.start_time);
+  if (payload.contest.finish_time) {
+    payload.contest.finish_time = time.remoteDate(payload.contest.finish_time);
+  }
   new Vue({
     el: '#main-container',
     components: {
