@@ -640,6 +640,7 @@ problemAliasExists = "Já existe este alias de problema. Por favor, tente um dif
 problemCollectionAuthors = "Autores"
 problemCollectionEducationLevel = "Por nível educacional"
 problemCollectionOthers = "Outras coleções"
+problemCollectionProblemCount = "%(count) problemas"
 problemCollectionRandomProblem = "problema aleatório"
 problemCollectionSearchProblem = "Localizador de Problemas"
 problemDeployerChangeMissingSettingsJson = "O problema precisa ter um arquivo 'settings.json'."

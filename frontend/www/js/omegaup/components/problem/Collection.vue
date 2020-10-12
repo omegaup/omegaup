@@ -31,7 +31,7 @@
                 ></font-awesome-icon>
               </template>
               <template #problem-count>
-                {{ collection.problems_per_tag }} {{ T.wordsProblems }}
+                {{ui.formatString(T.problemCollectionProblemCount, {count: collection.problems_per_tag})}}
               </template>
             </omegaup-problem-collection>
           </div>
