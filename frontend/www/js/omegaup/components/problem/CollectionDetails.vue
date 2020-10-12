@@ -11,12 +11,6 @@
             @emit-add-tag="addTag"
             @emit-check="check"
           ></omegaup-problem-filter-tags>
-          <!-- <input name="checked_tags" :value="checkedTagsList" type="hidden" />
-          <input
-            name="another_checked_tags"
-            :value="checkedAnotherTagsList"
-            type="hidden"
-          /> -->
         </div>
       </div>
     </div>

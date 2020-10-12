@@ -11,18 +11,6 @@
         />
         <label class="form-check-label" :for="tag">{{ T[tag] }}</label>
       </div>
-      <!-- <div class="form-check" v-for="(tag, index) in otherTagsDisplayed" :key="index">
-              <input
-                :id="tag.tagname"
-                v-model="tag.checked"
-                class="form-check-input"
-                type="checkbox"
-              />
-
-            <label class="form-check-label" :for="tag.tagname">
-              {{ T[tag.tagname] }}
-            </label>
-      </div> -->
       <div class="form-group">
         <vue-typeahead-bootstrap
           :data="publicTags"
