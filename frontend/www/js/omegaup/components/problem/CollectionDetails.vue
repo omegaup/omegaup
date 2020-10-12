@@ -4,18 +4,19 @@
     <div class="row">
       <div class="col col-md-4">
         <div>
-          <omegaup-collection-filter-tags
-            :collection="checkedTags"
-            :another-tags="data.anotherTags"
-            :another-tags-displayed="anotherTags"
+          <omegaup-problem-filter-tags
+            :tags="collectionTags"
+            :public-tags="publicTags"
+            :selected-tags="selectedTags"
             @emit-add-tag="addTag"
-          ></omegaup-collection-filter-tags>
-          <input name="checked_tags" :value="checkedTagsList" type="hidden" />
+            @emit-check="check"
+          ></omegaup-problem-filter-tags>
+          <!-- <input name="checked_tags" :value="checkedTagsList" type="hidden" />
           <input
             name="another_checked_tags"
             :value="checkedAnotherTagsList"
             type="hidden"
-          />
+          /> -->
         </div>
       </div>
     </div>
@@ -24,13 +25,13 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import collection_Filter_Tags from './FilterTags.vue';
+import problem_FilterTags from './FilterTags.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
 @Component({
   components: {
-    'omegaup-collection-filter-tags': collection_Filter_Tags,
+    'omegaup-problem-filter-tags': problem_FilterTags,
   },
 })
 export default class CollectionDetails extends Vue {
@@ -38,38 +39,33 @@ export default class CollectionDetails extends Vue {
 
   T = T;
   type = this.data.type;
-  anotherTags: types.CheckedTag[] = [];
-  checkedTags: types.CheckedTag[] = [];
+  tags: string[] = [];
+  selectedTags: string[] = [];
 
-  checkTag(tagname: string, checked: boolean): void {
-    this.checkedTags.push({
-      tagname: tagname,
-      checked: checked,
-    });
-  }
-
-  get checkedTagsList(): string {
-    if (this.checkedTags.length == 0) {
+  get collectionTags(): string[] {
+    if (this.tags.length == 0) {
       this.data.collection.forEach((element) => {
-        this.checkTag(element.alias, false);
+        this.tags.push(element.alias);
       });
     }
-    return JSON.stringify(this.checkedTags);
+    return this.tags;
   }
 
-  get checkedAnotherTagsList(): string {
-    return JSON.stringify(this.anotherTags);
+  get publicTags(): string[] {
+    let collectionTags: string[] = this.data.collection.map((x) => x.alias);
+    return this.data.publicTags.filter((x) => !collectionTags.includes(x));
   }
 
-  addTag(tagname: string, checked: boolean): void {
-    this.anotherTags.push({
-      tagname: tagname,
-      checked: checked,
-    });
+  get selected(): string[] {
+    return this.selectedTags;
   }
 
-  get anotherTagsDisplayed(): string[] {
-    return this.anotherTags.map((tag) => tag.tagname);
+  addTag(tagname: string): void {
+    this.tags.push(tagname);
+  }
+
+  check(tagname: string): void {
+    this.selectedTags.push(tagname);
   }
 
   get title(): string {

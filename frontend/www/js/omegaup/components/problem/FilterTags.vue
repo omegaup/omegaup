@@ -2,44 +2,33 @@
   <div class="card">
     <div class="card-body">
       <h3>{{ T.problemEditAddTags }}</h3>
-      <table class="table table-borderless marginFix">
-        <tbody>
-          <tr v-for="(tag, index) in collection" :key="index">
-            <td>
+      <div v-for="(tag, index) in tags" :key="index" class="form-check">
+        <input
+          :id="tag.tagname"
+          v-model="localValue"
+          class="form-check-input"
+          type="checkbox"
+        />
+        <label class="form-check-label" :for="tag">{{ T[tag] }}</label>
+      </div>
+      <!-- <div class="form-check" v-for="(tag, index) in otherTagsDisplayed" :key="index">
               <input
                 :id="tag.tagname"
                 v-model="tag.checked"
-                class="collection-tags"
+                class="form-check-input"
                 type="checkbox"
               />
-            </td>
-            <td>{{ T[tag.tagname] }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <table class="table table-borderless">
-        <tbody>
-          <tr v-for="(tag, index) in anotherTagsDisplayed" :key="index">
-            <td class="fix">
-              <input
-                :id="tag.tagname"
-                v-model="tag.checked"
-                class="another-tags"
-                type="checkbox"
-              />
-            </td>
-            <td>
+
+            <label class="form-check-label" :for="tag.tagname">
               {{ T[tag.tagname] }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </label>
+      </div> -->
       <div class="form-group">
         <vue-typeahead-bootstrap
-          :data="anotherTags"
+          :data="publicTags"
           :serializer="publicTagsSerializer"
-          :placeholder="T.collecionAnotherTags"
-          @hit="addAnotherTag"
+          :placeholder="T.collecionOtherTags"
+          @hit="addOtherTag"
         >
         </vue-typeahead-bootstrap>
       </div>
@@ -48,7 +37,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
@@ -58,16 +47,22 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
   },
 })
 export default class CollectionFilterTags extends Vue {
-  @Prop() collection!: string[];
-  @Prop() anotherTags!: string[];
-  @Prop() anotherTagsDisplayed!: string[];
+  @Prop() tags!: string[];
+  @Prop() publicTags!: string[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
+  localValue = this.selectedTags;
 
-  addAnotherTag(tag: string): void {
-    if (!this.anotherTagsDisplayed.includes(tag)) {
-      this.$emit('emit-add-tag', tag, true);
+  addOtherTag(tag: string): void {
+    if (!this.tags.includes(tag)) {
+      this.$emit('emit-add-tag', tag);
     }
+  }
+
+  @Watch('localValue')
+  onChecked(newValue: string): void {
+    this.$emit('emit-check', newValue);
   }
 
   publicTagsSerializer(tagname: string): string {
@@ -78,13 +73,3 @@ export default class CollectionFilterTags extends Vue {
   }
 }
 </script>
-
-<style>
-.fix {
-  width: 40px;
-}
-
-.marginFix {
-  margin-bottom: 0px;
-}
-</style>

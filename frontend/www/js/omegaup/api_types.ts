@@ -1305,11 +1305,6 @@ export namespace types {
     uuid: string;
   }
 
-  export interface CheckedTag {
-    checked: boolean;
-    tagname: string;
-  }
-
   export interface Clarification {
     answer?: string;
     author?: string;
@@ -1372,8 +1367,8 @@ export namespace types {
   }
 
   export interface CollectionDetailsPayload {
-    anotherTags: string[];
     collection: { alias: string; name?: string }[];
+    publicTags: string[];
     type: string;
   }
 
