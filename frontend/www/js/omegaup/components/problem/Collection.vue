@@ -48,15 +48,15 @@
       <div class="card-body panel-body">
         <div class="container-fluid">
           <div class="row">
-            <omegaup-problem-static-collection
+            <omegaup-problem-collection
               :href="'/problem/author/'"
               :title="T.problemCollectionAuthors"
             >
               <template #icon>
                 <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
               </template>
-            </omegaup-problem-static-collection>
-            <omegaup-problem-static-collection
+            </omegaup-problem-collection>
+            <omegaup-problem-collection
               :href="'/problem/random/'"
               :title="T.problemCollectionRandomProblem"
             >
@@ -65,8 +65,8 @@
                   :icon="['fas', 'random']"
                 ></font-awesome-icon>
               </template>
-            </omegaup-problem-static-collection>
-            <omegaup-problem-static-collection
+            </omegaup-problem-collection>
+            <omegaup-problem-collection
               :href="'/problem/'"
               :title="T.problemCollectionSearchProblem"
             >
@@ -75,7 +75,7 @@
                   :icon="['fas', 'search']"
                 ></font-awesome-icon>
               </template>
-            </omegaup-problem-static-collection>
+            </omegaup-problem-collection>
           </div>
         </div>
       </div>
@@ -129,7 +129,6 @@ const problemLevelIcons: { [key: string]: string } = {
 @Component({
   components: {
     'omegaup-problem-collection': problem_Collection,
-    'omegaup-problem-static-collection': problem_Collection,
     FontAwesomeIcon,
   },
 })
