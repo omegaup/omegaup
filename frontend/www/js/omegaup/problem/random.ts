@@ -5,17 +5,17 @@ import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.RandomProblemPayload();
-  const randomProblem = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-random-problem': problem_random_problem,
+    },
     render: function (createElement) {
       return createElement('omegaup-problem-random-problem', {
         props: {
           alias: payload.alias,
         },
       });
-    },
-    components: {
-      'omegaup-problem-collection': problem_random_problem,
     },
   });
 });
