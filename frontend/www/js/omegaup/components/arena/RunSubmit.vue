@@ -240,10 +240,6 @@ export default class ArenaRunSubmit extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-.CodeMirror pre.CodeMirror-line {
-  padding: 0px 35px;
-}
-
 form[data-run-submit] {
   background: #eee;
   width: 80%;
@@ -260,6 +256,7 @@ form[data-run-submit] {
   right: 0;
   display: flex;
   flex-direction: column;
+  z-index: -1;
   .close-container {
     width: 100%;
     .close {

@@ -1,80 +1,69 @@
 <template>
-  <div data-overlay-popup>
-    <slot name="popup">
-      <form data-run-submit @submit.prevent="onSubmit">
-        <div class="close-container">
-          <button type="button" class="close" @click="$emit('dismiss')">
-            ❌
+  <omegaup-overlay-popup @dismiss="$emit('dismiss')">
+    <form data-run-submit @submit.prevent="onSubmit">
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">
+          {{ T.wordsLanguage }}
+        </label>
+        <div class="col-sm-4">
+          <select
+            v-model="selectedLanguage"
+            class="form-control"
+            name="language"
+          >
+            <option
+              v-for="(language, key) in allowedLanguages"
+              :key="key"
+              :value="key"
+            >
+              {{ language }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-7 col-form-label">
+          {{ T.arenaRunSubmitFilename }}
+          <tt>{{ filename }}</tt>
+        </label>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-7 col-form-label">{{
+          T.arenaRunSubmitPaste
+        }}</label>
+      </div>
+      <div class="code-view">
+        <omegaup-arena-code-view
+          v-model="code"
+          :language="selectedLanguage"
+          :readonly="false"
+        ></omegaup-arena-code-view>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-3 col-form-label">
+          {{ T.arenaRunSubmitUpload }}
+        </label>
+        <div class="col-sm-7">
+          <input ref="inputFile" type="file" name="file" />
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="col-sm-10">
+          <button type="submit" class="btn btn-primary" :disabled="!canSubmit">
+            <omegaup-countdown
+              v-if="!canSubmit"
+              :target-time="nextSubmissionTimestamp"
+              :countdown-format="
+                omegaup.CountdownFormat.WaitBetweenUploadsSeconds
+              "
+              @emit-finish="now = Date.now()"
+            ></omegaup-countdown>
+            <span v-else>{{ T.wordsSend }}</span>
           </button>
         </div>
-        <div class="form-group row">
-          <label class="col-sm-2 col-form-label">
-            {{ T.wordsLanguage }}
-          </label>
-          <div class="col-sm-4">
-            <select
-              v-model="selectedLanguage"
-              class="form-control"
-              name="language"
-            >
-              <option
-                v-for="(language, key) in allowedLanguages"
-                :key="key"
-                :value="key"
-              >
-                {{ language }}
-              </option>
-            </select>
-          </div>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-7 col-form-label">
-            {{ T.arenaRunSubmitFilename }}
-            <tt>{{ filename }}</tt>
-          </label>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-7 col-form-label">{{
-            T.arenaRunSubmitPaste
-          }}</label>
-        </div>
-        <div class="code-view">
-          <omegaup-arena-code-view
-            v-model="code"
-            :language="selectedLanguage"
-            :readonly="false"
-          ></omegaup-arena-code-view>
-        </div>
-        <div class="form-group row">
-          <label class="col-sm-3 col-form-label">
-            {{ T.arenaRunSubmitUpload }}
-          </label>
-          <div class="col-sm-7">
-            <input ref="inputFile" type="file" name="file" />
-          </div>
-        </div>
-        <div class="form-group row">
-          <div class="col-sm-10">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              :disabled="!canSubmit"
-            >
-              <omegaup-countdown
-                v-if="!canSubmit"
-                :target-time="nextSubmissionTimestamp"
-                :countdown-format="
-                  omegaup.CountdownFormat.WaitBetweenUploadsSeconds
-                "
-                @emit-finish="now = Date.now()"
-              ></omegaup-countdown>
-              <span v-else>{{ T.wordsSend }}</span>
-            </button>
-          </div>
-        </div>
-      </form>
-    </slot>
-  </div>
+      </div>
+    </form>
+  </omegaup-overlay-popup>
 </template>
 
 <script lang="ts">
@@ -84,11 +73,13 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import arena_CodeView from './CodeView.vue';
 import omegaup_Countdown from '../Countdown.vue';
+import omegaup_OverlayPopup from '../OverlayPopup.vue';
 
 @Component({
   components: {
     'omegaup-arena-code-view': arena_CodeView,
     'omegaup-countdown': omegaup_Countdown,
+    'omegaup-overlay-popup': omegaup_OverlayPopup,
   },
 })
 export default class ArenaRunSubmitPopup extends Vue {
@@ -97,7 +88,6 @@ export default class ArenaRunSubmitPopup extends Vue {
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop() preferredLanguage!: string;
-  @Prop() isOverlayShown!: boolean;
 
   T = T;
   omegaup = omegaup;
@@ -228,14 +218,14 @@ export default class ArenaRunSubmitPopup extends Vue {
           return;
         }
         reader.readAsText(file, 'UTF-8');
-      } else {
-        // 512kiB _must_ be enough for anybody.
-        if (file.size >= 512 * 1024) {
-          alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }));
-          return;
-        }
-        reader.readAsDataURL(file);
+        return;
       }
+      // 512kiB _must_ be enough for anybody.
+      if (file.size >= 512 * 1024) {
+        alert(ui.formatString(T.arenaRunSubmitFilesize, { limit: '512kiB' }));
+        return;
+      }
+      reader.readAsDataURL(file);
 
       return;
     }
@@ -254,70 +244,3 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-.CodeMirror pre.CodeMirror-line {
-  padding: 0px 35px;
-}
-
-form[data-run-submit] {
-  background: #eee;
-  width: 80%;
-  height: 90%;
-  margin: auto;
-  border: 2px solid #ccc;
-  padding: 1em;
-  position: absolute;
-  overflow-y: auto;
-  overflow-x: hidden;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  .close-container {
-    width: 100%;
-    .close {
-      position: absolute;
-      top: 0;
-      right: 0;
-      background-color: $omegaup-white;
-      border: 1px solid #ccc;
-      border-width: 0 0 1px 1px;
-      font-size: 110%;
-      width: 25px;
-      height: 25px;
-      &:hover {
-        background-color: #eee;
-      }
-    }
-  }
-  .languages {
-    width: 100%;
-  }
-  .filename-extension {
-    width: 100%;
-  }
-  .run-submit-paste-text {
-    width: 100%;
-  }
-  .code-view {
-    width: 100%;
-    flex-grow: 1;
-    overflow: auto;
-  }
-  .upload-file {
-    width: 100%;
-  }
-  .submit-run {
-    width: 100%;
-  }
-}
-
-input[type='submit'] {
-  font-size: 110%;
-  padding: 0.3em 0.5em;
-}
-</style>

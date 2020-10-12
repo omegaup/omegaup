@@ -107,12 +107,15 @@ export default class CodeView extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 @import '../../../../sass/main.scss';
 .vue-codemirror-wrap {
   height: 95%;
   .CodeMirror {
     height: 100%;
+    pre.CodeMirror-line {
+      padding: 0px 35px;
+    }
   }
 }
 </style>
