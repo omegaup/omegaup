@@ -610,6 +610,8 @@
 	"parameterEmpty": "Empty parameter.",
 	"parameterInvalid": "Invalid parameter.",
 	"parameterInvalidAlias": "Parameter can only contain letters, digits, and _. Spaces are not allowed",
+	"parameterInvalidStateDoesNotBelongToCountry": "The selected state does not belong to the country based on ISO 3166-2.",
+	"parameterInvalidStateNeedsToBelongToCountry": "You need to select a country in order to select a state.",
 	"parameterNotADate": "Parameter must be a date.",
 	"parameterNotANumber": "Parameter must be a number.",
 	"parameterNotFound": "Parameter value not found.",

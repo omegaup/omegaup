@@ -135,6 +135,7 @@
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
   - [`/api/problem/myList/`](#apiproblemmylist)
+  - [`/api/problem/randomProblem/`](#apiproblemrandomproblem)
   - [`/api/problem/rejudge/`](#apiproblemrejudge)
   - [`/api/problem/removeAdmin/`](#apiproblemremoveadmin)
   - [`/api/problem/removeGroupAdmin/`](#apiproblemremovegroupadmin)
@@ -2720,6 +2721,16 @@ Gets a list of problems where current user is the owner
 | ------------ | ------------------------- |
 | `pagerItems` | `types.PageItem[]`        |
 | `problems`   | `types.ProblemListItem[]` |
+
+## `/api/problem/randomProblem/`
+
+### Description
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `alias` | `string` |
 
 ## `/api/problem/rejudge/`
 

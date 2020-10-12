@@ -610,6 +610,8 @@
 	"parameterEmpty": "(Emp7y param373r.)",
 	"parameterInvalid": "(Inva1id param373r.)",
 	"parameterInvalidAlias": "(Param373r can 0n1y c0n7ain 13773r5, digi75, and _. Spac35 ar3 n07 a110w3d)",
+	"parameterInvalidStateDoesNotBelongToCountry": "(Th3 5313c73d 57a73 d035 n07 b310ng 70 7h3 c0un7ry ba53d 0n ISO 3166-2.)",
+	"parameterInvalidStateNeedsToBelongToCountry": "(Y0u n33d 70 5313c7 a c0un7ry in 0rd3r 70 5313c7 a 57a73.)",
 	"parameterNotADate": "(Param373r mu57 b3 a da73.)",
 	"parameterNotANumber": "(Param373r mu57 b3 a numb3r.)",
 	"parameterNotFound": "(Param373r va1u3 n07 f0und.)",

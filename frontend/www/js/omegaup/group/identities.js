@@ -12,7 +12,11 @@ OmegaUp.on('ready', function () {
     el: '#create-identities',
     render: function (createElement) {
       return createElement('omegaup-group-identites', {
-        props: { identities: this.identities, groupAlias: this.groupAlias },
+        props: {
+          identities: this.identities,
+          groupAlias: this.groupAlias,
+          userErrorRow: this.userErrorRow,
+        },
         on: {
           'bulk-identities': function (identities) {
             api.Identity.bulkCreate({
@@ -22,7 +26,10 @@ OmegaUp.on('ready', function () {
               .then(function (data) {
                 ui.success(T.groupsIdentitiesSuccessfullyCreated);
               })
-              .catch(ui.apiError);
+              .catch(function (data) {
+                ui.error(data.error);
+                groupIdentities.userErrorRow = data.parameter;
+              });
           },
           'download-identities': function (identities) {
             const csv = CSV.serialize({
@@ -38,7 +45,7 @@ OmegaUp.on('ready', function () {
               records: identities,
             });
             const hiddenElement = document.createElement('a');
-            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURI(
+            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
               csv,
             )}`;
             hiddenElement.target = '_blank';
@@ -65,12 +72,13 @@ OmegaUp.on('ready', function () {
                   school_name: cells[5],
                 });
               }
+              groupIdentities.userErrorRow = null;
             });
           },
         },
       });
     },
-    data: { identities: [], groupAlias: groupAlias },
+    data: { identities: [], groupAlias: groupAlias, userErrorRow: null },
     components: {
       'omegaup-group-identites': group_Identities,
     },
