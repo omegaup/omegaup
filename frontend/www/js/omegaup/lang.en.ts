@@ -642,6 +642,7 @@ const translations: { [key: string]: string; } = {
   problemCollectionAuthors: "Authors",
   problemCollectionEducationLevel: "By educational level",
   problemCollectionOthers: "Other collections",
+  problemCollectionProblemCount: "%(count) problems",
   problemCollectionRandomProblem: "Random Problem",
   problemCollectionSearchProblem: "Problem Finder",
   problemDeployerChangeMissingSettingsJson: "The problem is missing a 'settings.json' file.",

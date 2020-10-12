@@ -31,7 +31,11 @@
                 ></font-awesome-icon>
               </template>
               <template #problem-count>
-                {{ui.formatString(T.problemCollectionProblemCount, {count: collection.problems_per_tag})}}
+                {{
+                  ui.formatString(T.problemCollectionProblemCount, {
+                    count: collection.problems_per_tag,
+                  })
+                }}
               </template>
             </omegaup-problem-collection>
           </div>
@@ -85,6 +89,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 import problem_Collection from './CollectionProblem.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -135,6 +140,7 @@ export default class Collection extends Vue {
   @Prop() levelTags!: string[];
   @Prop() problemCount!: string[];
   T = T;
+  ui = ui;
 
   getProblemLevelIcon(problemLevel: string): string {
     if (Object.prototype.hasOwnProperty.call(problemLevelIcons, problemLevel))
