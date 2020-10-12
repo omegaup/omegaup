@@ -8,10 +8,10 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-problem-random-problem': problem_random_problem,
+      'omegaup-random-problem': problem_random_problem,
     },
     render: function (createElement) {
-      return createElement('omegaup-problem-random-problem', {
+      return createElement('omegaup-random-problem', {
         props: {
           alias: payload.alias,
         },
