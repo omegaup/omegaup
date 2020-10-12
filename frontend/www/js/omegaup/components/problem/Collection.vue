@@ -20,9 +20,11 @@
             <omegaup-problem-collection
               v-for="(collection, idx) in problemCount"
               :key="idx"
-              :title="getname(collection.name)"
+              :title="getName(collection.name)"
               :problem-count="collection.problems_per_tag"
-              :href="'/problem/collection/' + collection.name + '/'"
+              :href="`/problem/collection/${encodeURIComponent(
+                collection.name,
+              )}/`"
             >
               <template #icon>
                 <font-awesome-icon
@@ -85,7 +87,6 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import problem_Collection from './CollectionProblem.vue';
-import problem_Static_Collection from './CollectionProblem.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -128,7 +129,7 @@ const problemLevelIcons: { [key: string]: string } = {
 @Component({
   components: {
     'omegaup-problem-collection': problem_Collection,
-    'omegaup-problem-static-collection': problem_Static_Collection,
+    'omegaup-problem-static-collection': problem_Collection,
     FontAwesomeIcon,
   },
 })
@@ -143,7 +144,7 @@ export default class Collection extends Vue {
     return 'icon';
   }
 
-  getname(alias: string): string {
+  getName(alias: string): string {
     return T[alias];
   }
 }
