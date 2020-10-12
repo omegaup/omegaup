@@ -10,7 +10,7 @@
         <div class="col-sm-8 d-flex align-items-center" style="height: 112px">
           <p>
             <strong>{{ title }}</strong> <br />
-            {{ problemCount }} <slot name="problems"></slot>
+            <slot name="problem-count"></slot>
           </p>
         </div>
       </div>
@@ -39,7 +39,6 @@ import { VTooltip } from 'v-tooltip';
 export default class CollectionProblem extends Vue {
   @Prop() title!: string;
   @Prop() href!: string;
-  @Prop() problemCount!: number;
   T = T;
 }
 </script>

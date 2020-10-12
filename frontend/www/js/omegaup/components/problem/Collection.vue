@@ -21,7 +21,6 @@
               v-for="(collection, idx) in problemCount"
               :key="idx"
               :title="getName(collection.name)"
-              :problem-count="collection.problems_per_tag"
               :href="`/problem/collection/${encodeURIComponent(
                 collection.name,
               )}/`"
@@ -31,8 +30,8 @@
                   :icon="['fas', getProblemLevelIcon(collection.name)]"
                 ></font-awesome-icon>
               </template>
-              <template #problems>
-                {{ T.wordsProblems }}
+              <template #problem-count>
+                {{ collection.problems_per_tag }} {{ T.wordsProblems }}
               </template>
             </omegaup-problem-collection>
           </div>
