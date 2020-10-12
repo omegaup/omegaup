@@ -379,47 +379,6 @@ export namespace types {
       );
     }
 
-    export function CourseAssignmentEditPayload(
-      elementId: string = 'payload',
-    ): types.CourseAssignmentEditPayload {
-      return ((x) => {
-        if (x.assignment)
-          x.assignment = ((x) => {
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            return x;
-          })(x.assignment);
-        x.course = ((x) => {
-          if (x.assignments)
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
-                return x;
-              });
-            })(x.assignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.course);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function CourseCloneDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseCloneDetailsPayload {
@@ -1681,11 +1640,6 @@ export namespace types {
     scoreboard_url: string;
     scoreboard_url_admin: string;
     start_time: Date;
-  }
-
-  export interface CourseAssignmentEditPayload {
-    assignment?: types.CourseAssignment;
-    course: types.CourseDetails;
   }
 
   export interface CourseCloneDetailsPayload {
