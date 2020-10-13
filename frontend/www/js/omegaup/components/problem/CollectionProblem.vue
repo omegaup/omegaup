@@ -1,5 +1,5 @@
 <template>
-  <div class="card mb-3" style="width: 290px">
+  <div class="card mb-3" omegaup-collection-problem>
     <div class="row no-gutters">
       <div class="col-md-4">
         <div class="card-body">
@@ -40,3 +40,10 @@ export default class CollectionProblem extends Vue {
   T = T;
 }
 </script>
+
+<style>
+[omegaup-collection-problem] {
+  width: 290px;
+  margin-right: 0.5em;
+}
+</style>
