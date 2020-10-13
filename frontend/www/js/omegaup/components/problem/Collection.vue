@@ -18,11 +18,26 @@
         <div class="container-fluid">
           <div class="row">
             <omegaup-problem-collection
-              v-for="(collect, idx) in problemCount"
+              v-for="(collection, idx) in problemCount"
               :key="idx"
-              :level-tag-alias="collect.name"
-              :problem-count="collect.problems_per_tag"
-            ></omegaup-problem-collection>
+              :title="getName(collection.name)"
+              :href="`/problem/collection/${encodeURIComponent(
+                collection.name,
+              )}/`"
+            >
+              <template #icon>
+                <font-awesome-icon
+                  :icon="['fas', getProblemLevelIcon(collection.name)]"
+                ></font-awesome-icon>
+              </template>
+              <template #problem-count>
+                {{
+                  ui.formatString(T.problemCollectionProblemCount, {
+                    count: collection.problems_per_tag,
+                  })
+                }}
+              </template>
+            </omegaup-problem-collection>
           </div>
         </div>
       </div>
@@ -35,7 +50,36 @@
       </div>
       <div class="card-body panel-body">
         <div class="container-fluid">
-          <div class="row"></div>
+          <div class="row">
+            <omegaup-problem-collection
+              :href="'/problem/author/'"
+              :title="T.problemCollectionAuthors"
+            >
+              <template #icon>
+                <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
+              </template>
+            </omegaup-problem-collection>
+            <omegaup-problem-collection
+              :href="'/problem/random/'"
+              :title="T.problemCollectionRandomProblem"
+            >
+              <template #icon>
+                <font-awesome-icon
+                  :icon="['fas', 'random']"
+                ></font-awesome-icon>
+              </template>
+            </omegaup-problem-collection>
+            <omegaup-problem-collection
+              :href="'/problem/'"
+              :title="T.problemCollectionSearchProblem"
+            >
+              <template #icon>
+                <font-awesome-icon
+                  :icon="['fas', 'search']"
+                ></font-awesome-icon>
+              </template>
+            </omegaup-problem-collection>
+          </div>
         </div>
       </div>
     </div>
@@ -45,16 +89,67 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import * as ui from '../../ui';
 import problem_Collection from './CollectionProblem.vue';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {
+  faRobot,
+  faLaptopCode,
+  faSquareRootAlt,
+  faProjectDiagram,
+  faSitemap,
+  faTrophy,
+  faCode,
+  faUsers,
+  faRandom,
+  faSearch,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faRobot);
+library.add(faLaptopCode);
+library.add(faSquareRootAlt);
+library.add(faProjectDiagram);
+library.add(faSitemap);
+library.add(faTrophy);
+library.add(faCode);
+library.add(faUsers);
+library.add(faRandom);
+library.add(faSearch);
+
+const problemLevelIcons: { [key: string]: string } = {
+  problemLevelBasicKarel: 'robot',
+  problemLevelBasicIntroductionToProgramming: 'laptop-code',
+  problemLevelIntermediateMathsInProgramming: 'square-root-alt',
+  problemLevelIntermediateDataStructuresAndAlgorithms: 'project-diagram',
+  problemLevelIntermediateAnalysisAndDesignOfAlgorithms: 'sitemap',
+  problemLevelAdvancedCompetitiveProgramming: 'trophy',
+  problemLevelAdvancedSpecializedTopics: 'code',
+  problemCollectionAuthors: 'users',
+  problemCollectionRandomProblem: 'random',
+  problemCollectionSearchProblem: 'search',
+};
 
 @Component({
   components: {
     'omegaup-problem-collection': problem_Collection,
+    FontAwesomeIcon,
   },
 })
 export default class Collection extends Vue {
   @Prop() levelTags!: string[];
   @Prop() problemCount!: string[];
   T = T;
+  ui = ui;
+
+  getProblemLevelIcon(problemLevel: string): string {
+    if (Object.prototype.hasOwnProperty.call(problemLevelIcons, problemLevel))
+      return problemLevelIcons[problemLevel];
+    return 'icon';
+  }
+
+  getName(alias: string): string {
+    return T[alias];
+  }
 }
 </script>
