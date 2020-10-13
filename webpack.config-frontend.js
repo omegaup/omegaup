@@ -83,7 +83,6 @@ module.exports = {
     problem_mine: './frontend/www/js/omegaup/problem/mine.ts',
     problem_new: './frontend/www/js/omegaup/problem/new.ts',
     problem_print: './frontend/www/js/omegaup/problem/print.ts',
-    problem_random_problem: './frontend/www/js/omegaup/problem/random.ts',
     problem_statement: './frontend/www/js/omegaup/problem/statement.ts',
     problem_solution: './frontend/www/js/omegaup/problem/solution.ts',
     problem_settings_summary:
