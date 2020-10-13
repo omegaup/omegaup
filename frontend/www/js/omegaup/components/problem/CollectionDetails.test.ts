@@ -1,6 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
+import { types } from '../../api_types';
 import T from '../../lang';
 
 import collection_Details from './CollectionDetails.vue';
@@ -11,13 +12,13 @@ describe('CollectionDetails.vue', () => {
       propsData: {
         data: {
           type: 'problemLevelBasicIntroductionToProgramming',
-          collection: <string[]>[
-            'problemTagMatrices',
-            'problemTagDiophantineEquations',
-            'problemTagInputAndOutput',
-            'problemTagArrays',
+          collection: [
+            { alias: 'problemTagMatrices' },
+            { alias: 'problemTagDiophantineEquations' },
+            { alias: 'problemTagInputAndOutput' },
+            { alias: 'problemTagArrays' },
           ],
-          anotherTags: <string[]>[
+          publicTags: <string[]>[
             'problemTagConditionals',
             'problemTagLoops',
             'problemTagFunctions',
@@ -25,7 +26,7 @@ describe('CollectionDetails.vue', () => {
             'problemTagSimulation',
             'problemTagAnalyticGeometry',
           ],
-        },
+        } as types.CollectionDetailsPayload,
       },
     });
 

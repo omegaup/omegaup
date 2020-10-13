@@ -8,8 +8,8 @@
             :tags="collectionTags"
             :public-tags="publicTags"
             :selected-tags="selectedTags"
-            @emit-add-tag="addTag"
-            @emit-check="check"
+            @add-tag="addTag"
+            @check="(selectedTags) => check(selectedTags)"
           ></omegaup-problem-filter-tags>
         </div>
       </div>
@@ -50,16 +50,13 @@ export default class CollectionDetails extends Vue {
     return this.data.publicTags.filter((x) => !collectionTags.includes(x));
   }
 
-  get selected(): string[] {
-    return this.selectedTags;
-  }
-
   addTag(tagname: string): void {
     this.tags.push(tagname);
+    this.selectedTags.push(tagname);
   }
 
-  check(tagname: string): void {
-    this.selectedTags.push(tagname);
+  check(selectedTags: string[]): void {
+    this.selectedTags = selectedTags;
   }
 
   get title(): string {

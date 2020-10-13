@@ -4,25 +4,25 @@ import expect from 'expect';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import collection_Filter_Tags from './FilterTags.vue';
+import problem_FilterTags from './FilterTags.vue';
 
 describe('Filter.vue', () => {
   it('Should handle empty list of tags', async () => {
-    const wrapper = mount(collection_Filter_Tags, {
+    const wrapper = mount(problem_FilterTags, {
       propsData: {
-        collection: <types.CheckedTag[]>[
-          { tagname: 'problemTagMatrices', checked: false },
-          { tagname: 'problemTagDiophantineEquations', checked: false },
-          { tagname: 'problemTagInputAndOutput', checked: false },
-          { tagname: 'problemTagArrays', checked: false },
+        tags: <string[]>[
+          'problemTagMatrices',
+          'problemTagDiophantineEquations',
+          'problemTagInputAndOutput',
+          'problemTagArrays',
         ],
-        anotherTags: <types.CheckedTag[]>[
-          { tagname: 'problemTagConditionals', checked: false },
-          { tagname: 'problemTagLoops', checked: false },
-          { tagname: 'problemTagFunctions', checked: false },
-          { tagname: 'problemTagCharsAndStrings', checked: false },
-          { tagname: 'problemTagSimulation', checked: false },
-          { tagname: 'problemTagAnalyticGeometry', checked: false },
+        publicTags: <string[]>[
+          'problemTagConditionals',
+          'problemTagLoops',
+          'problemTagFunctions',
+          'problemTagCharsAndStrings',
+          'problemTagSimulation',
+          'problemTagAnalyticGeometry',
         ],
       },
     });
@@ -30,6 +30,6 @@ describe('Filter.vue', () => {
     expect(wrapper.text()).toContain(T.problemTagMatrices);
     expect(wrapper.text()).not.toContain(T.problemTagConditionals);
 
-    expect(wrapper.find('#problemTagArrays').exists());
+    expect(wrapper.find('input[value="problemTagArrays').exists()).toBe(true);
   });
 });

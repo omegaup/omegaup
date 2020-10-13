@@ -3,13 +3,14 @@
     <div class="card-body">
       <h3>{{ T.problemEditAddTags }}</h3>
       <div v-for="(tag, index) in tags" :key="index" class="form-check">
-        <input
-          :id="tag.tagname"
-          v-model="localValue"
-          class="form-check-input"
-          type="checkbox"
-        />
-        <label class="form-check-label" :for="tag">{{ T[tag] }}</label>
+        <label class="form-check-label">
+          <input
+            v-model="localSelectedTags"
+            :value="tag"
+            class="form-check-input"
+            type="checkbox"
+          />{{ T[tag] }}
+        </label>
       </div>
       <div class="form-group">
         <vue-typeahead-bootstrap
@@ -40,17 +41,17 @@ export default class CollectionFilterTags extends Vue {
   @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
-  localValue = this.selectedTags;
+  localSelectedTags = this.selectedTags;
 
   addOtherTag(tag: string): void {
     if (!this.tags.includes(tag)) {
-      this.$emit('emit-add-tag', tag);
+      this.$emit('add-tag', tag);
     }
   }
 
-  @Watch('localValue')
-  onChecked(newValue: string): void {
-    this.$emit('emit-check', newValue);
+  @Watch('localSelectedTags')
+  onChecked(check: string[]): void {
+    this.$emit('check', check);
   }
 
   publicTagsSerializer(tagname: string): string {
