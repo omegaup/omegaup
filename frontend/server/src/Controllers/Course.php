@@ -38,7 +38,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type StudentProgress=array{name: string|null, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}
  * @psalm-type CourseNewPayload=array{is_curator: bool, is_admin: bool}
  * @psalm-type CourseEditPayload=array{admins: list<CourseAdmin>, assignmentProblems: list<ProblemsetProblem>, course: CourseDetails, groupsAdmins: list<CourseGroupAdmin>, identityRequests: list<IdentityRequest>, selectedAssignment: CourseAssignment|null, students: list<CourseStudent>, tags: list<string>}
- * @psalm-type CourseAssignmentEditPayload=array{course: CourseDetails, assignment: CourseAssignment|null}
  * @psalm-type StudentProgressPayload=array{course: CourseDetails, students: list<StudentProgress>, student: string}
  * @psalm-type StudentsProgressPayload=array{course: CourseDetails, students: list<StudentProgress>}
  * @psalm-type CourseProblem=array{accepted: int, alias: string, commit: string, difficulty: float, languages: string, letter: string, order: int, points: float, submissions: int, title: string, version: string, visibility: int, visits: int, runs: list<array{guid: string, language: string, source?: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int}>}
@@ -2770,52 +2769,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'title' => new \OmegaUp\TranslationString('courseEdit'),
             ],
             'entrypoint' => 'course_edit',
-        ];
-    }
-
-    /**
-     * @return array{entrypoint: string, smartyProperties: array{payload: CourseAssignmentEditPayload, title: \OmegaUp\TranslationString}}
-     *
-     * @omegaup-request-param null|string $assignment_alias
-     * @omegaup-request-param string $course
-     */
-    public static function getCourseEditDetailsWithSelectedAssignmentForSmarty(
-        \OmegaUp\Request $r
-    ): array {
-        $r->ensureMainUserIdentity();
-        $courseAlias = $r->ensureString(
-            'course',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-        $assignmentAlias = $r->ensureString(
-            'assignment_alias',
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-
-        [
-            'course' => $courseEditDetails,
-        ] = self::getCourseEditDetails($courseAlias, $r->identity);
-
-        $assignment = null;
-        if (!empty($courseEditDetails['assignments'])) {
-            $assignment = array_filter(
-                $courseEditDetails['assignments'],
-                fn (array $assignment) => $assignment['alias'] === $assignmentAlias
-            );
-            $assignment = array_shift($assignment);
-        }
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'course' => $courseEditDetails,
-                    'assignment' => $assignment,
-                ],
-                'title' => new \OmegaUp\TranslationString(
-                    'courseAssignmentEdit'
-                ),
-            ],
-            'entrypoint' => 'course_assignment_edit',
         ];
     }
 
