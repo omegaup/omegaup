@@ -16,7 +16,7 @@
       </div>
       <div class="card-body panel-body">
         <div class="container-fluid">
-          <div class="row">
+          <div class="row d-flex justify-content-center">
             <omegaup-problem-collection
               v-for="(collection, idx) in problemCount"
               :key="idx"
@@ -31,11 +31,13 @@
                 ></font-awesome-icon>
               </template>
               <template #problem-count>
-                {{
-                  ui.formatString(T.problemCollectionProblemCount, {
-                    count: collection.problems_per_tag,
-                  })
-                }}
+                <p class="card-text">
+                  {{
+                    ui.formatString(T.problemCollectionProblemCount, {
+                      count: collection.problems_per_tag,
+                    })
+                  }}
+                </p>
               </template>
             </omegaup-problem-collection>
           </div>
@@ -50,7 +52,7 @@
       </div>
       <div class="card-body panel-body">
         <div class="container-fluid">
-          <div class="row">
+          <div class="row d-flex justify-content-center">
             <omegaup-problem-collection
               :href="'/problem/author/'"
               :title="T.problemCollectionAuthors"
