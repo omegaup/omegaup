@@ -2194,6 +2194,7 @@ export namespace types {
   export interface ProblemListCollectionPayload {
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
+    tagData: { name?: string }[];
   }
 
   export interface ProblemListItem {

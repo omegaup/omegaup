@@ -21,9 +21,6 @@
               v-for="(collection, idx) in problemCount"
               :key="idx"
               :title="getName(collection.name)"
-              :href="`/problem/collection/${encodeURIComponent(
-                collection.name,
-              )}/`"
             >
               <template #icon>
                 <font-awesome-icon
@@ -39,6 +36,15 @@
                   }}
                 </p>
               </template>
+              <template #collection-button>
+                <a
+                  class="btn btn-primary"
+                  :href="`/problem/collection/${encodeURIComponent(
+                    collection.name,
+                  )}/`"
+                  >{{ T.problemcollectionViewProblems }}</a
+                >
+              </template>
             </omegaup-problem-collection>
           </div>
         </div>
@@ -53,16 +59,17 @@
       <div class="card-body panel-body">
         <div class="container-fluid">
           <div class="row d-flex justify-content-center">
-            <omegaup-problem-collection
-              :href="'/problem/author/'"
-              :title="T.problemCollectionAuthors"
-            >
+            <omegaup-problem-collection :title="T.problemCollectionAuthors">
               <template #icon>
                 <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
               </template>
+              <template #collection-button>
+                <a class="btn btn-primary" href="/problem/author/">{{
+                  T.problemcollectionViewProblems
+                }}</a>
+              </template>
             </omegaup-problem-collection>
             <omegaup-problem-collection
-              :href="'/problem/random/'"
               :title="T.problemCollectionRandomProblem"
             >
               <template #icon>
@@ -70,9 +77,13 @@
                   :icon="['fas', 'random']"
                 ></font-awesome-icon>
               </template>
+              <template #collection-button>
+                <a class="btn btn-primary" href="/problem/random/">{{
+                  T.problemcollectionViewProblems
+                }}</a>
+              </template>
             </omegaup-problem-collection>
             <omegaup-problem-collection
-              :href="'/problem/'"
               :title="T.problemCollectionSearchProblem"
             >
               <template #icon>
@@ -80,7 +91,22 @@
                   :icon="['fas', 'search']"
                 ></font-awesome-icon>
               </template>
+              <template #collection-button>
+                <a
+                  class="btn btn-primary"
+                  href="#"
+                  @click="showFinderWizard = true"
+                  >{{ T.problemcollectionViewProblems }}</a
+                >
+              </template>
             </omegaup-problem-collection>
+            <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
+            <omegaup-problem-finder
+              v-show="showFinderWizard"
+              :possible-tags="wizardTags"
+              @close="showFinderWizard = false"
+              @search-problems="wizardSearch"
+            ></omegaup-problem-finder>
           </div>
         </div>
       </div>
@@ -91,8 +117,10 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
+import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import problem_Collection from './CollectionProblem.vue';
+import problem_FinderWizard from './FinderWizard.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -136,13 +164,17 @@ const problemLevelIcons: { [key: string]: string } = {
   components: {
     'omegaup-problem-collection': problem_Collection,
     FontAwesomeIcon,
+    'omegaup-problem-finder': problem_FinderWizard,
   },
 })
 export default class Collection extends Vue {
   @Prop() levelTags!: string[];
   @Prop() problemCount!: string[];
+  @Prop() wizardTags!: omegaup.Tag[];
   T = T;
   ui = ui;
+  omegaup = omegaup;
+  showFinderWizard = false;
 
   getProblemLevelIcon(problemLevel: string): string {
     if (Object.prototype.hasOwnProperty.call(problemLevelIcons, problemLevel))
@@ -152,6 +184,10 @@ export default class Collection extends Vue {
 
   getName(alias: string): string {
     return T[alias];
+  }
+
+  wizardSearch(queryParameters: omegaup.QueryParameters): void {
+    this.$emit('wizard-search', queryParameters);
   }
 }
 </script>
