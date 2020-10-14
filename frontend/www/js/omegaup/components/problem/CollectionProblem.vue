@@ -1,21 +1,19 @@
 <template>
-  <div class="col-sm-4 mt-2">
-    <div class="border border-dark">
-      <div class="row">
-        <div class="col-sm-4 d-flex align-items-center justify-content-end">
+  <div class="card mb-3" omegaup-collection-problem>
+    <div class="row no-gutters">
+      <div class="col-md-4">
+        <div class="card-body">
           <h1>
             <slot name="icon"></slot>
           </h1>
         </div>
-        <div class="col-sm-8 d-flex align-items-center" style="height: 112px">
-          <p>
-            <strong>{{ title }}</strong> <br />
-            <slot name="problem-count"></slot>
-          </p>
-        </div>
       </div>
-      <div class="row">
-        <div class="col mt-1 mb-1 text-center">
+      <div class="col-md-8">
+        <div class="card-body">
+          <h6 class="card-title">
+            {{ title }}
+          </h6>
+          <slot name="problem-count"></slot>
           <a class="btn btn-primary" :href="href">{{
             T.problemcollectionViewProblems
           }}</a>
@@ -42,3 +40,10 @@ export default class CollectionProblem extends Vue {
   T = T;
 }
 </script>
+
+<style>
+[omegaup-collection-problem] {
+  width: 290px;
+  margin-right: 0.5em;
+}
+</style>
