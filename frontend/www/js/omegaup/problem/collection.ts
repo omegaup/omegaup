@@ -22,7 +22,9 @@ OmegaUp.on('ready', () => {
           'wizard-search': (queryParameters: {
             [key: string]: string;
           }): void => {
-            window.location.search = ui.buildURLQuery(queryParameters);
+            window.location.replace(
+              `/problem/?${ui.buildURLQuery(queryParameters)}`,
+            );
           },
         },
       });
