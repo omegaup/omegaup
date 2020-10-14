@@ -15,7 +15,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     /**
      * @return list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>
      */
-    public static function GetMemberIdentities(\OmegaUp\DAO\VO\Groups $group) {
+    public static function getMemberIdentities(\OmegaUp\DAO\VO\Groups $group) {
         $sql = '
             SELECT
                 i.username,

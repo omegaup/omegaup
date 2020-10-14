@@ -2,6 +2,11 @@
 
 // DAO types
 export namespace dao {
+  export interface Countries {
+    country_id?: string;
+    name?: string;
+  }
+
   export interface Identities {
     country_id?: string;
     current_identity_school_id?: number;
@@ -754,6 +759,14 @@ export namespace types {
     export function CourseSubmissionsListPayload(
       elementId: string = 'payload',
     ): types.CourseSubmissionsListPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function GroupEditPayload(
+      elementId: string = 'payload',
+    ): types.GroupEditPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -1876,11 +1889,39 @@ export namespace types {
     status: string;
   }
 
+  export interface GroupEditPayload {
+    countries: dao.Countries[];
+    groupAlias: string;
+    groupName?: string;
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    scoreboards: types.GroupScoreboard[];
+  }
+
+  export interface GroupScoreboard {
+    alias: string;
+    create_time: string;
+    description?: string;
+    name: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
     quality: number;
     qualityHistogram?: string;
+  }
+
+  export interface Identity {
+    classname: string;
+    country?: string;
+    country_id?: string;
+    name?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username: string;
   }
 
   export interface IdentityRequest {
