@@ -22,6 +22,20 @@ OmegaUp.on('ready', () => {
       users: payload.users,
     }),
     methods: {
+      arbitrateRequest: (username: string, resolution: boolean): void => {
+        const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+        api.Contest.arbitrateRequest({
+          contest_alias: payload.details.alias,
+          username,
+          resolution,
+          note: resolutionText,
+        })
+          .then(() => {
+            ui.success(T.successfulOperation);
+            contestEdit.refreshRequests();
+          })
+          .catch(ui.apiError);
+      },
       refreshDetails: (): void => {
         api.Contest.adminDetails({
           contest: payload.details.alias,
@@ -214,6 +228,12 @@ OmegaUp.on('ready', () => {
                 ui.success(T.userEndTimeUpdatedSuccessfully);
               })
               .catch(ui.apiError);
+          },
+          'accept-request': (username: string) => {
+            this.arbitrateRequest(username, true);
+          },
+          'deny-request': (username: string) => {
+            this.arbitrateRequest(username, false);
           },
         },
       });
