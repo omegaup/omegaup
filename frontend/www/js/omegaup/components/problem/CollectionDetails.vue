@@ -3,15 +3,10 @@
     <h1 class="card-title">{{ title }}</h1>
     <div class="row">
       <div class="col col-md-4">
-        <div>
-          <omegaup-problem-filter-tags
-            :tags="collectionTags"
-            :public-tags="publicTags"
-            :selected-tags="selectedTags"
-            @add-tag="addTag"
-            @check="(selectedTags) => check(selectedTags)"
-          ></omegaup-problem-filter-tags>
-        </div>
+        <omegaup-problem-filter-tags
+          :tags.sync="tags"
+          :public-tags="publicTags"
+        ></omegaup-problem-filter-tags>
       </div>
     </div>
   </div>
@@ -33,30 +28,11 @@ export default class CollectionDetails extends Vue {
 
   T = T;
   type = this.data.type;
-  tags: string[] = [];
-  selectedTags: string[] = [];
-
-  get collectionTags(): string[] {
-    if (this.tags.length == 0) {
-      this.data.collection.forEach((element) => {
-        this.tags.push(element.alias);
-      });
-    }
-    return this.tags;
-  }
+  tags: string[] = this.data.collection.map((element) => element.alias);
 
   get publicTags(): string[] {
-    let collectionTags: string[] = this.data.collection.map((x) => x.alias);
-    return this.data.publicTags.filter((x) => !collectionTags.includes(x));
-  }
-
-  addTag(tagname: string): void {
-    this.tags.push(tagname);
-    this.selectedTags.push(tagname);
-  }
-
-  check(selectedTags: string[]): void {
-    this.selectedTags = selectedTags;
+    let tags: string[] = this.data.collection.map((x) => x.alias);
+    return this.data.publicTags.filter((x) => !tags.includes(x));
   }
 
   get title(): string {

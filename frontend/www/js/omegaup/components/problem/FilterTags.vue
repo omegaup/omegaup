@@ -5,7 +5,7 @@
       <div v-for="(tag, index) in tags" :key="index" class="form-check">
         <label class="form-check-label">
           <input
-            v-model="localSelectedTags"
+            v-model="selectedTags"
             :value="tag"
             class="form-check-input"
             type="checkbox"
@@ -26,10 +26,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
-
 @Component({
   components: {
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
@@ -38,20 +37,15 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 export default class CollectionFilterTags extends Vue {
   @Prop() tags!: string[];
   @Prop() publicTags!: string[];
-  @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
-  localSelectedTags = this.selectedTags;
+  selectedTags: string[] = [];
 
   addOtherTag(tag: string): void {
     if (!this.tags.includes(tag)) {
-      this.$emit('add-tag', tag);
+      this.selectedTags.push(tag);
+      this.tags.push(tag);
     }
-  }
-
-  @Watch('localSelectedTags')
-  onChecked(check: string[]): void {
-    this.$emit('check', check);
   }
 
   publicTagsSerializer(tagname: string): string {
