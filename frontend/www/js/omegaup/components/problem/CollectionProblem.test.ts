@@ -9,6 +9,5 @@ describe('CollectionProblem.vue', () => {
     const wrapper = shallowMount(collection_problem, {});
 
     expect(wrapper.text()).toContain(T.wordsProblems);
-    expect(wrapper.text()).toContain(T.problemcollectionViewProblems);
   });
 });
