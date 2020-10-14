@@ -162,13 +162,6 @@
                 >
                 <a
                   class="mr-2"
-                  :href="`/course/${course.alias}/assignment/${assignment.alias}/edit/`"
-                >
-                  <font-awesome-icon :icon="['fas', 'edit']" />
-                  {{ T.wordsEdit }}
-                </a>
-                <a
-                  class="mr-2"
                   :href="`/course/${course.alias}/assignment/${assignment.alias}/admin/#runs`"
                 >
                   <font-awesome-icon :icon="['fas', 'tachometer-alt']" />
