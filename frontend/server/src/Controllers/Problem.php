@@ -3716,7 +3716,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
-     * @omegaup-request-param mixed $only_quality_seal
+     * @omegaup-request-param bool|null $only_quality_seal
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -5929,7 +5929,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            1
+            true
         );
 
         $params = [
