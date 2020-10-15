@@ -5,6 +5,13 @@
  * @author joemmanuel
  */
 class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
+
+        \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
+        \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
+    }
+
     /**
      * Gets the list of problems
      */
@@ -1221,5 +1228,44 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 $apiListResponse['results']
             )
         );
+    }
+
+        /**
+     * Gets the list of problems
+     */
+    public function testProblemList2() {
+        // Get 3 problems
+        $n = 3;
+        foreach (range(0, $n - 1) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        //print_r($problemData);
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[0]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        print_r($response);
     }
 }

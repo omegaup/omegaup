@@ -3763,7 +3763,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $minVisibility,
             $difficultyRange,
             $r->identity,
-            $r->user
+            $r->user,
+            null
         );
     }
 
@@ -3787,7 +3788,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         int $minVisibility,
         ?array $difficultyRange,
         ?\OmegaUp\DAO\VO\Identities $identity,
-        ?\OmegaUp\DAO\VO\Users $user
+        ?\OmegaUp\DAO\VO\Users $user,
+        ?bool $onlyQualitySeal
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -3837,7 +3839,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $minVisibility,
             $requireAllTags,
             $programmingLanguages,
-            $difficultyRange
+            $difficultyRange,
+            $onlyQualitySeal
         );
         return [
             'total' => $count,
@@ -4713,6 +4716,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param mixed $only_quality_seal
      */
     public static function getProblemListForSmarty(
         \OmegaUp\Request $r
@@ -4763,7 +4767,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $minVisibility,
             $difficultyRange,
             $r->identity,
-            $r->user
+            $r->user,
+            $onlyQualitySeal
         );
 
         $params = [
