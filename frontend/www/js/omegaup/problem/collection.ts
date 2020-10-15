@@ -19,7 +19,9 @@ OmegaUp.on('ready', () => {
           allTags: payload.allTags,
         },
         on: {
-          'wizard-search': (queryParameters: omegaup.QueryParameters): void => {
+          'search-problems': (
+            queryParameters: omegaup.QueryParameters,
+          ): void => {
             window.location.replace(
               `/problem/?${ui.buildURLQuery(
                 <{ [key: string]: any }>queryParameters,
