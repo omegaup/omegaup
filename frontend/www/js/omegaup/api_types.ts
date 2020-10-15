@@ -2192,9 +2192,9 @@ export namespace types {
   }
 
   export interface ProblemListCollectionPayload {
+    allTags: types.Tag[];
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
-    tagData: { name?: string }[];
   }
 
   export interface ProblemListItem {
@@ -2670,6 +2670,10 @@ export namespace types {
     pagerItems: types.PageItem[];
     submissions: types.Submission[];
     totalRows: number;
+  }
+
+  export interface Tag {
+    name: string;
   }
 
   export interface UserInfoForProblem {

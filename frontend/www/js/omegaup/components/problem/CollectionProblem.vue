@@ -14,7 +14,7 @@
             {{ title }}
           </h6>
           <slot name="problem-count"></slot>
-          <slot name="collection-button"></slot>
+          <slot name="button"></slot>
         </div>
       </div>
     </div>

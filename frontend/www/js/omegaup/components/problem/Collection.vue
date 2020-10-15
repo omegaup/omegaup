@@ -36,7 +36,7 @@
                   }}
                 </p>
               </template>
-              <template #collection-button>
+              <template #button>
                 <a
                   class="btn btn-primary"
                   :href="`/problem/collection/${encodeURIComponent(
@@ -63,7 +63,7 @@
               <template #icon>
                 <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
               </template>
-              <template #collection-button>
+              <template #button>
                 <a class="btn btn-primary" href="/problem/author/">{{
                   T.problemcollectionViewProblems
                 }}</a>
@@ -77,7 +77,7 @@
                   :icon="['fas', 'random']"
                 ></font-awesome-icon>
               </template>
-              <template #collection-button>
+              <template #button>
                 <a class="btn btn-primary" href="/problem/random/">{{
                   T.problemcollectionViewProblems
                 }}</a>
@@ -91,22 +91,22 @@
                   :icon="['fas', 'search']"
                 ></font-awesome-icon>
               </template>
-              <template #collection-button>
-                <a
+              <template #button>
+                <button
                   class="btn btn-primary"
-                  href="#"
                   @click="showFinderWizard = true"
-                  >{{ T.problemcollectionViewProblems }}</a
                 >
+                  {{ T.wordsSearch }}
+                </button>
               </template>
             </omegaup-problem-collection>
             <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
-            <omegaup-problem-finder
+            <omegaup-problem-finder-wizard
               v-show="showFinderWizard"
-              :possible-tags="wizardTags"
+              :possible-tags="allTags"
               @close="showFinderWizard = false"
-              @search-problems="wizardSearch"
-            ></omegaup-problem-finder>
+              @search-problems="$emit('search-problems', $event)"
+            ></omegaup-problem-finder-wizard>
           </div>
         </div>
       </div>
@@ -117,7 +117,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import * as ui from '../../ui';
 import problem_Collection from './CollectionProblem.vue';
 import problem_FinderWizard from './FinderWizard.vue';
@@ -164,16 +164,15 @@ const problemLevelIcons: { [key: string]: string } = {
   components: {
     'omegaup-problem-collection': problem_Collection,
     FontAwesomeIcon,
-    'omegaup-problem-finder': problem_FinderWizard,
+    'omegaup-problem-finder-wizard': problem_FinderWizard,
   },
 })
 export default class Collection extends Vue {
   @Prop() levelTags!: string[];
   @Prop() problemCount!: string[];
-  @Prop() wizardTags!: omegaup.Tag[];
+  @Prop() allTags!: types.Tag[];
   T = T;
   ui = ui;
-  omegaup = omegaup;
   showFinderWizard = false;
 
   getProblemLevelIcon(problemLevel: string): string {
@@ -184,10 +183,6 @@ export default class Collection extends Vue {
 
   getName(alias: string): string {
     return T[alias];
-  }
-
-  wizardSearch(queryParameters: omegaup.QueryParameters): void {
-    this.$emit('wizard-search', queryParameters);
   }
 }
 </script>
