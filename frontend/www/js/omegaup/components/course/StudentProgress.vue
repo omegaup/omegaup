@@ -42,6 +42,7 @@
         </div>
       </div>
     </td>
+    <td data-global-score>{{ globalScore }}%</td>
   </tr>
 </template>
 
@@ -118,6 +119,20 @@ export default class StudentProgress extends Vue {
       (accumulator: number, currentValue: number) => accumulator + currentValue,
       0,
     );
+  }
+
+  get globalScore(): string {
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return '0.00';
+    }
+
+    return this.assignments
+      .map((assignment) => (this.score(assignment.alias) * 100) / totalPoints)
+      .reduce((acc, curr) => acc + curr, 0)
+      .toFixed(2);
   }
 
   getProgressDescription(assignmentAlias: string): string {

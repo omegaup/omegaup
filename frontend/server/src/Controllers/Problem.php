@@ -4834,7 +4834,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleCollections'
                 ),
             ],
-            'entrypoint' => 'problem_collections',
+            'entrypoint' => 'problem_collection',
         ];
     }
 
@@ -5905,6 +5905,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 'title' => $title,
             ],
             'entrypoint' => 'problem_collections_details',
+        ];
+    }
+
+    /**
+     * @return array{alias: string}
+     */
+    public static function apiRandomProblem(\OmegaUp\Request $r) {
+        return [
+            'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
         ];
     }
 }
