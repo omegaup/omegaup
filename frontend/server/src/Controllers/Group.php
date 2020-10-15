@@ -5,7 +5,7 @@
 /**
  *  GroupController
  *
- * @psalm-type Identity=array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}
+ * @psalm-type Identity=array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
  * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
  *
@@ -266,7 +266,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<array{alias: string, create_time: string, description: null|string, name: string}>}
+     * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<GroupScoreboard>}
      *
      * @omegaup-request-param string $group_alias
      */
@@ -297,7 +297,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             'scoreboards' => [],
         ];
         foreach ($scoreboards as $scoreboard) {
-            /** @var array{alias: string, create_time: string, description: null|string, name: string} */
+            /** @var GroupScoreboard */
             $response['scoreboards'][] = $scoreboard->asFilteredArray([
                 'alias',
                 'create_time',
@@ -420,7 +420,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         $scoreboards = [];
 
         foreach ($scoreboardsByGroup as $scoreboard) {
-            /** @var array{alias: string, create_time: string, description: null|string, name: string} */
+            /** @var GroupScoreboard */
             $scoreboards[] = $scoreboard->asFilteredArray([
                 'alias',
                 'create_time',
@@ -454,7 +454,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleGroupsEdit'
                 ),
             ],
-            // Replace the following line with 'entrypoint' => 'group_edit'
+            // TODO: Replace the following line with 'entrypoint' => 'group_edit'
             'template' => 'group.edit.tpl',
         ];
     }

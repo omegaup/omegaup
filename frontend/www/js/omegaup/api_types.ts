@@ -1916,6 +1916,7 @@ export namespace types {
     classname: string;
     country?: string;
     country_id?: string;
+    gender?: string;
     name?: string;
     school?: string;
     school_id?: number;
@@ -3334,12 +3335,7 @@ export namespace messages {
       description?: string;
       name?: string;
     };
-    scoreboards: {
-      alias: string;
-      create_time: string;
-      description?: string;
-      name: string;
-    }[];
+    scoreboards: types.GroupScoreboard[];
   };
   export type GroupListRequest = { [key: string]: any };
   export type GroupListResponse = { label: string; value: string }[];
