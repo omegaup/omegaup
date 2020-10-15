@@ -4829,9 +4829,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $allTags = self::getAllTagsFromCache();
 
         foreach ($allTags as $tag) {
-            if ($tag->name !== null) {
-                $tags[] = ['name' => $tag->name];
+            if (is_null($tag->name)) {
+                continue;
             }
+            $tags[] = ['name' => $tag->name];
         }
         return [
             'smartyProperties' => [
