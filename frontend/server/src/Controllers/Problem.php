@@ -4825,18 +4825,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function getProblemCollectionDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        $tagData = [];
+        $tags = [];
         $allTags = self::getAllTagsFromCache();
 
         foreach ($allTags as $tag) {
-            $tagData[] = ['name' => $tag->name];
+            $tags[] = ['name' => $tag->name];
         }
         return [
             'smartyProperties' => [
                 'payload' => [
                     'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
                     'problemCount' => \OmegaUp\DAO\Problems::getProblemsPerTagCount(),
-                    'allTags' => $tagData,
+                    'allTags' => $tags,
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollections'
