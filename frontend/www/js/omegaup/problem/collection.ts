@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import problem_Collection from '../components/problem/Collection.vue';
 import { types } from '../api_types';
-import { omegaup,OmegaUp } from '../omegaup';
+import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
