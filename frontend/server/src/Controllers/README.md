@@ -2684,7 +2684,7 @@ List of public and user's private problems
 | `min_visibility`        | `int\|null`    |             |
 | `offset`                | `mixed`        |             |
 | `only_karel`            | `mixed`        |             |
-| `only_quality_seal`     | `mixed`        |             |
+| `only_quality_seal`     | `bool\|null`   |             |
 | `order_by`              | `mixed`        |             |
 | `page`                  | `mixed`        |             |
 | `programming_languages` | `null\|string` |             |
