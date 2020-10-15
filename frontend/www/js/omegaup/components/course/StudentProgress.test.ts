@@ -48,10 +48,14 @@ describe('StudentProgress.vue', () => {
           },
           username: 'student',
         },
+        problems: {
+          problem1: 'Problem 1',
+          problem2: 'Problem 2',
+        },
       },
     });
     expect(wrapper.find('div.bg-yellow').exists()).toBe(true);
     expect(wrapper.find('div.bg-red').exists()).toBe(true);
-    expect(wrapper.find('td[data-global-score]').text()).toBe('50.00%');
+    expect(wrapper.find('td[data-global-score]').text()).toBe('50%');
   });
 });

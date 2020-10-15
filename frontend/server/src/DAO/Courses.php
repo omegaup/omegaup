@@ -260,7 +260,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns a list of students within a course with their score and progress
      * by problem
-     * @return list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>
+     * @return array{allProgress: list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problems: array<string, string>}
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
         int $courseId,
@@ -271,6 +271,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     i.name,
                     pr.assignment_alias,
                     pr.problem_alias,
+                    pr.problem_title,
                     problem_points,
                     MAX(r.contest_score) AS problem_score
                 FROM
@@ -282,6 +283,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.alias AS assignment_alias,
                             a.problemset_id,
                             p.problem_id,
+                            p.title AS problem_title,
                             p.alias AS problem_alias,
                             `psp`.`order`,
                             psp.points AS problem_points
@@ -310,13 +312,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ORDER BY
                     `pr`.`order`;';
 
-        /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, username: string}> */
+        /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $groupId]
         );
 
         $allProgress = [];
+        $problems = [];
         foreach ($rs as $row) {
             $username = $row['username'];
             if (!isset($allProgress[$username])) {
@@ -331,6 +334,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
             $assignmentAlias = $row['assignment_alias'];
             $problemAlias = $row['problem_alias'];
+
+            if (!isset($problems[$problemAlias])) {
+                $problems[$problemAlias] =  $row['problem_title'];
+            }
 
             if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
                 $allProgress[$username]['progress'][$assignmentAlias] = [];
@@ -365,7 +372,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 !empty($b['name']) ? $b['name'] : $b['username']
             )
         );
-        return $allProgress;
+        return [
+            'allProgress' => $allProgress,
+            'problems' => $problems,
+        ];
     }
 
     /**

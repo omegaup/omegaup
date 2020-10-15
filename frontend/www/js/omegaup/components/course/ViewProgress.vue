@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-lg-10 mb-3">
         <div class="omegaup-course-viewprogress card">
           <div class="card-header">
             <h2>
@@ -18,9 +18,11 @@
                     :key="assignment.alias"
                     class="score text-center"
                   >
-                    {{ assignment.name }}
+                    <omegaup-markdown
+                      :markdown="getTotalPointsWithName(assignment)"
+                    ></omegaup-markdown>
                   </th>
-                  <th>{{ T.courseProgressGlobalScore }}</th>
+                  <th class="text-center">{{ T.courseProgressGlobalScore }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -30,6 +32,7 @@
                   :student="student"
                   :assignments="assignments"
                   :course="course"
+                  :problems="problems"
                 >
                 </omegaup-student-progress>
               </tbody>
@@ -37,7 +40,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-2">
+      <div class="col-md-2">
         <div class="card sticky-top sticky-offset">
           <div class="card-header p-1">
             <p class="card-title text-sm-center mb-1">
@@ -46,13 +49,13 @@
           </div>
           <div class="card-body">
             <a
-              class="btn btn-primary btn-sm mr-1"
+              class="btn btn-primary btn-sm w-100 my-1"
               :download="csvFilename"
               :href="csvDataUrl"
               >.csv</a
             >
             <a
-              class="btn btn-primary btn-sm"
+              class="btn btn-primary btn-sm w-100 my-1"
               :download="odsFilename"
               :href="odsDataUrl"
               >.ods</a
@@ -69,10 +72,12 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
 import StudentProgress from './StudentProgress.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -137,12 +142,16 @@ export function toOds(
 }
 
 @Component({
-  components: { 'omegaup-student-progress': StudentProgress },
+  components: {
+    'omegaup-student-progress': StudentProgress,
+    'omegaup-markdown': omegaup_Markdown,
+  },
 })
 export default class CourseViewProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
   @Prop() students!: types.StudentProgress[];
+  @Prop() problems!: { [key: string]: string };
 
   T = T;
 
@@ -204,6 +213,23 @@ export default class CourseViewProgress extends Vue {
 
   get odsFilename(): string {
     return `${this.course.alias}.ods`;
+  }
+
+  get totalPoints(): number {
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return 0;
+    }
+    return totalPoints;
+  }
+
+  getTotalPointsWithName(assignment: omegaup.Assignment): string {
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      name: assignment.name,
+      points: assignment.max_points,
+    });
   }
 
   getGlobalScoreByStudent(student: types.StudentProgress): string {
@@ -304,5 +330,11 @@ export default class CourseViewProgress extends Vue {
 }
 .sticky-offset {
   top: 4rem;
+}
+[data-markdown-statement] p {
+  margin-bottom: 0.3em !important;
+  text-align: center !important;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 </style>
