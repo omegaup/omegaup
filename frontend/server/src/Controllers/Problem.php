@@ -41,7 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
- * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, type: string}
+ * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, publicTags: list<string>, type: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -5907,6 +5907,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'collection' => $collection,
+                    'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                     'type' => $collectionType,
                 ],
                 'title' => $title,
