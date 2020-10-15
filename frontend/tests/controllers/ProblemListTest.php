@@ -1230,17 +1230,15 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-        /**
-     * Gets the list of problems
+    /**
+     * Gets the list of quality problems
      */
-    public function testProblemList2() {
-        // Get 3 problems
+    public function testQualityProblemList() {
+
         $n = 3;
         foreach (range(0, $n - 1) as $i) {
             $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
-
-        //print_r($problemData);
 
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
@@ -1255,6 +1253,16 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
             ]),
         ]));
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[1]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagMatrices', 'problemTagNumberTheory'],
+            ]),
+        ]));
 
         \OmegaUp\Test\Utils::runAggregateFeedback();
 
@@ -1263,9 +1271,11 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $response = \OmegaUp\Controllers\Problem::apiList(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
+                'only_quality_seal' => true,
             ])
         );
 
-        print_r($response);
+        $this->assertTrue($response['results'][0]['quality_seal']);
+        $this->assertTrue($response['results'][1]['quality_seal']);
     }
 }
