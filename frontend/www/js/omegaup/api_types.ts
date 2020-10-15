@@ -1327,7 +1327,20 @@ export namespace types {
 
   export interface CollectionDetailsPayload {
     collection: { alias: string; name?: string }[];
+    column: string;
+    columns: string[];
+    currentTags: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
     publicTags: string[];
+    tagData: { name?: string }[];
+    tags: string[];
     type: string;
   }
 

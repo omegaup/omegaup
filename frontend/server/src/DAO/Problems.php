@@ -294,7 +294,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             );
         }
 
-        if(!is_null($onlyQualitySeal)) {
+        if (!is_null($onlyQualitySeal)) {
             $clauses[] = [
                 'p.quality_seal = ?', [1]
             ];

@@ -40,7 +40,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
- * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, publicTags: list<string>, type: string}
+ * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, publicTags: list<string>, type: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -3730,7 +3730,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $offset = null;
         $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
-        $onlyQualitySeal = isset($r['only_quality_seal']) ? $r['only_quality_seal'] : null;
+        $onlyQualitySeal = isset(
+            $r['only_quality_seal']
+        ) ? $r['only_quality_seal'] : null;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
@@ -5865,12 +5867,96 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: CollectionDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $collection_type
+     *
+     * @omegaup-request-param null|string $difficulty_range
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param int|null $max_difficulty
+     * @omegaup-request-param int|null $min_difficulty
+     * @omegaup-request-param int|null $min_visibility
+     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param mixed $page
+     * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param mixed $some_tags
+     * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsForSmarty(\OmegaUp\Request $r): array {
         $collectionType = $r->ensureString('collection_type');
 
         $collection = [];
+        $problems = [];
 
+        // Problem list
+        $offset = null;
+        $pageSize = \OmegaUp\Controllers\Problem::PAGE_SIZE;
+
+        if (is_null($r['page'])) {
+            $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
+        }
+        if (!is_null($r['rowcount'])) {
+            $pageSize = intval($r['rowcount']);
+        }
+
+        [
+            'sortOrder' => $sortOrder,
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'language' => $language,
+            'tags' => $tags,
+            'keyword' => $keyword,
+            'requireAllTags' => $requireAllTags,
+            'programmingLanguages' => $programmingLanguages,
+            'difficultyRange' => $difficultyRange,
+            'minVisibility' => $minVisibility,
+        ] = self::validateListParams($r);
+
+        $response = self::getList(
+            $page ?: 1,
+            $language ?: 'all',
+            $orderBy ?: 'problem_id',
+            $sortOrder ?: 'desc',
+            $offset,
+            $pageSize,
+            $tags,
+            $keyword,
+            $requireAllTags,
+            $programmingLanguages,
+            $minVisibility,
+            $difficultyRange,
+            $r->identity,
+            $r->user,
+            1
+        );
+
+        $params = [
+            'query' => $keyword,
+            'language' => $language,
+            'order_by' => $orderBy,
+            'sort_order' => $sortOrder,
+            'tag' => $tags
+        ];
+
+        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
+            $response['total'],
+            $pageSize,
+            $page ?: 1,
+            '/problem/collection/([a-zA-Z0-9_+-]+)',
+            5,
+            $params
+        );
+
+        $tagData = [];
+        $allTags = self::getAllTagsFromCache();
+
+        foreach ($allTags as $tag) {
+            $tagData[] = ['name' => $tag->name];
+        }
+
+        // Collection
         $title = new \OmegaUp\TranslationString(
             'omegaupTitleCollectionsByLevel'
         );
@@ -5900,6 +5986,16 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
                 $r->ensureString('collection_type')
             );
+
+            foreach ($response['results'] as $problem) {
+                if (
+                    $problem['tags'][0]['name'] === $r->ensureString(
+                        'collection_type'
+                    )
+                ) {
+                    $problems[] = $problem;
+                }
+            }
         }
 
         return [
@@ -5908,6 +6004,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'collection' => $collection,
                     'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                     'type' => $collectionType,
+                    'problems' => $problems,
+                    'loggedIn' => !is_null($r->identity),
+                    'currentTags' => $tags,
+                    'pagerItems' => $pagerItems,
+                    'keyword' => $keyword,
+                    'mode' => $sortOrder,
+                    'column' => $orderBy,
+                    'language' => $language,
+                    'languages' => array_merge(
+                        ['all'],
+                        \OmegaUp\Controllers\Problem::VALID_LANGUAGES
+                    ),
+                    'modes' => \OmegaUp\Controllers\Problem::VALID_SORTING_MODES,
+                    'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
+                    'tags' => $tags,
+                    'tagData' => $tagData,
                 ],
                 'title' => $title,
             ],
