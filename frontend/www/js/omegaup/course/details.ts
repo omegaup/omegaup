@@ -18,6 +18,7 @@ OmegaUp.on('ready', () => {
         props: {
           course: payload.details,
           progress: payload.progress,
+          loggedIn: payload.loggedIn,
         },
         on: {
           clone: (alias: string, name: string, startTime: Date) => {

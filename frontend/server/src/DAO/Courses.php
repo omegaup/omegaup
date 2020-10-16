@@ -369,7 +369,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * Returns the score per assignment of a user, as well as the maximum score attainable
+     * Returns the score per assignment of a user, as well as the maximum score
+     * attainable
      *
      * @return array<string, array{score: float, max_score: float}>
      */
@@ -403,13 +404,47 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 GROUP BY bpr.assignment_id
             ) pr
             ON a.assignment_id = pr.assignment_id
-            where a.course_id = ?;
+            WHERE a.course_id = ?;
         ';
 
         /** @var list<array{assignment: string, max_score: float, score: float}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $identityId, $courseId]
+        );
+
+        $progress = [];
+        foreach ($rs as $row) {
+            $progress[$row['assignment']] = [
+                'score' => $row['score'],
+                'max_score' => $row['max_score'],
+            ];
+        }
+        return $progress;
+    }
+
+    /**
+     * Returns the score as 0.0 per assignment of a unlogged user, as well as
+     * the maximum score attainable
+     *
+     * @return array<string, array{score: float, max_score: float}>
+     */
+    public static function getAssignmentsEmptyProgress(int $courseId) {
+        $sql = '
+            SELECT
+                a.alias as assignment,
+                0.0 as score,
+                a.max_points as max_score
+            FROM
+                Assignments a
+            WHERE
+                a.course_id = ?;
+        ';
+
+        /** @var list<array{assignment: string, max_score: float, score: float}> */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$courseId]
         );
 
         $progress = [];

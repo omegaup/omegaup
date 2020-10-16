@@ -137,6 +137,7 @@
               </td>
               <td>
                 <a
+                  v-if="loggedIn"
                   class="text-center"
                   :href="`/course/${course.alias}/assignment/${
                     assignment.alias
@@ -144,6 +145,7 @@
                 >
                   {{ assignment.name }}
                 </a>
+                <span v-else>{{ assignment.name }}</span>
               </td>
               <td v-if="!course.is_admin" class="text-center">
                 {{ getAssignmentProgress(progress[assignment.alias]) }}
@@ -174,8 +176,22 @@
       </div>
     </div>
 
+    <div v-if="!loggedIn">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="text-center">
+            <a
+              :href="`/login/?redirect=${encodeURI(window.location.pathname)}`"
+            >
+              {{ T.loginLogIn }}
+            </a>
+          </h5>
+        </div>
+      </div>
+    </div>
+
     <div
-      v-if="course.admission_mode === 'public'"
+      v-else-if="course.admission_mode === 'public'"
       class="accordion"
       data-accordion-clone
     >
@@ -256,9 +272,11 @@ library.add(
 export default class CourseDetails extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() progress!: types.AssignmentProgress;
+  @Prop() loggedIn!: boolean;
 
   T = T;
   ui = ui;
+  window = window;
 
   get overallCompletedPercentage(): string {
     let score = 0;

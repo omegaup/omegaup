@@ -282,6 +282,7 @@
 	"courseCardDescriptionCourses": "<p>Os cursos do omegaUp s\u00e3o para</p><ul><li>Professores que desejam criar cursos online</li><li>Alunos participando dos cursos de suas aulas</li><li>Qualquer usu\u00e1rio que deseja aprender mais sobre programa\u00e7\u00e3o participando de cursos p\u00fablicos</li></ul>",
 	"courseCardDueDate": "Termina %(due_date)",
 	"courseCardImpartedBy": "Transmitido por <span class=\"font-weight-bold\">%(school_name)</span>",
+	"courseCardSeeContent": "Ver conte\u00fado",
 	"courseCardShowTopics": "Mostrar t\u00f3picos",
 	"courseCloneCreatedBy": "Criado por",
 	"courseCloneGenerateLinkButton": "Gerar link",
