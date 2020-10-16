@@ -100,7 +100,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $requireAllTags,
         array $programmingLanguages,
         ?array $difficultyRange,
-        ?bool $onlyQualitySeal
+        bool $onlyQualitySeal
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -294,7 +294,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             );
         }
 
-        if (!is_null($onlyQualitySeal)) {
+        if ($onlyQualitySeal) {
             $clauses[] = [
                 'p.quality_seal = ?', [1]
             ];

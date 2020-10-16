@@ -3716,7 +3716,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
-     * @omegaup-request-param bool|null $only_quality_seal
+     * @omegaup-request-param bool $only_quality_seal
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3730,10 +3730,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $offset = null;
         $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
-        $onlyQualitySeal = null;
-        $onlyQualitySeal = isset(
-            $r['only_quality_seal']
-        ) ? $r['only_quality_seal'] : null;
+        $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
@@ -3770,7 +3767,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            $onlyQualitySeal,
+            $onlyQualitySeal
         );
     }
 
@@ -3795,7 +3792,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?array $difficultyRange,
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
-        ?bool $onlyQualitySeal
+        bool $onlyQualitySeal
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -4773,7 +4770,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            null
+            false
         );
 
         $params = [
