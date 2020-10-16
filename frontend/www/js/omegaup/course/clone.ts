@@ -8,6 +8,7 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseCloneDetailsPayload();
+  const headerPayload = types.payloadParsers.CommonPayload();
   new Vue({
     el: '#main-container',
     components: {
@@ -20,6 +21,7 @@ OmegaUp.on('ready', () => {
           classname: payload.creator.classname,
           course: payload.details,
           token: payload.token,
+          currentUsername: headerPayload.currentUsername,
         },
         on: {
           clone: (

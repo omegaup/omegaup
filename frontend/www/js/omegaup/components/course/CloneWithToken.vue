@@ -29,7 +29,7 @@
         </li>
       </div>
       <omegaup-course-clone
-        :initial-alias="getAlias()"
+        :initial-alias="aliasWithUsername"
         :initial-name="course.name"
         @clone="
           (alias, name, startTime) =>
@@ -58,8 +58,6 @@ import { fas } from '@fortawesome/free-solid-svg-icons';
 import { library } from '@fortawesome/fontawesome-svg-core';
 library.add(fas);
 
-const headerPayload = types.payloadParsers.CommonPayload();
-
 @Component({
   components: {
     'omegaup-course-clone': course_Clone,
@@ -76,11 +74,12 @@ export default class CourseCloneWithToken extends Vue {
   @Prop() username!: string;
   @Prop() classname!: string;
   @Prop() token!: string;
+  @Prop() currentUsername!: string;
 
   T = T;
 
-  getAlias(): string {
-    return this.course.alias + '_' + headerPayload.currentUsername;
+  get aliasWithUsername(): string {
+    return `${this.course.alias}_${this.currentUsername}`;
   }
 }
 </script>
