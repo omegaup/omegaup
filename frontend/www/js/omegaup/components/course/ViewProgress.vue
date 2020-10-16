@@ -18,9 +18,8 @@
                     :key="assignment.alias"
                     class="score text-center"
                   >
-                    <omegaup-markdown
-                      :markdown="getTotalPointsWithName(assignment)"
-                    ></omegaup-markdown>
+                    {{ assignment.name }}<br />
+                    <span>{{ getTotalPoints(assignment) }}</span>
                   </th>
                   <th class="text-center">{{ T.courseProgressGlobalScore }}</th>
                 </tr>
@@ -32,7 +31,7 @@
                   :student="student"
                   :assignments="assignments"
                   :course="course"
-                  :problems="problems"
+                  :problem-titles="problemTitles"
                 >
                 </omegaup-student-progress>
               </tbody>
@@ -77,7 +76,6 @@ import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
 import StudentProgress from './StudentProgress.vue';
-import omegaup_Markdown from '../Markdown.vue';
 
 Vue.use(AsyncComputedPlugin);
 
@@ -144,14 +142,13 @@ export function toOds(
 @Component({
   components: {
     'omegaup-student-progress': StudentProgress,
-    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class CourseViewProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
   @Prop() students!: types.StudentProgress[];
-  @Prop() problems!: { [key: string]: string };
+  @Prop() problemTitles!: { [key: string]: string };
 
   T = T;
 
@@ -216,18 +213,13 @@ export default class CourseViewProgress extends Vue {
   }
 
   get totalPoints(): number {
-    const totalPoints = this.assignments
+    return this.assignments
       .map((assignment) => assignment.max_points ?? 0)
       .reduce((acc, curr) => acc + curr, 0);
-    if (!totalPoints) {
-      return 0;
-    }
-    return totalPoints;
   }
 
-  getTotalPointsWithName(assignment: omegaup.Assignment): string {
+  getTotalPoints(assignment: omegaup.Assignment): string {
     return ui.formatString(T.studentProgressDescriptionTotalPoints, {
-      name: assignment.name,
       points: assignment.max_points,
     });
   }
@@ -323,18 +315,12 @@ export default class CourseViewProgress extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .panel-body {
   overflow: auto;
   white-space: nowrap;
 }
 .sticky-offset {
   top: 4rem;
-}
-[data-markdown-statement] p {
-  margin-bottom: 0.3em !important;
-  text-align: center !important;
-  overflow-x: auto;
-  white-space: nowrap;
 }
 </style>

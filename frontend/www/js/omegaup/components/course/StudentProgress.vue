@@ -54,6 +54,9 @@ import * as ui from '../../ui';
 import T from '../../lang';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import * as markdown from '../../markdown';
+
+const markdownConverter = new markdown.Converter();
 
 @Component({
   directives: {
@@ -64,7 +67,7 @@ export default class StudentProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() student!: types.StudentProgress;
   @Prop() assignments!: omegaup.Assignment[];
-  @Prop() problems!: { [key: string]: string };
+  @Prop() problemTitles!: { [key: string]: string };
 
   T = T;
 
@@ -172,14 +175,14 @@ export default class StudentProgress extends Vue {
     assignmentAlias: string,
     problemAlias: string,
   ): string {
-    return ui
-      .formatString(T.studentProgressTooltipDescription, {
-        problem: this.problems[problemAlias],
+    return markdownConverter.makeHtml(
+      ui.formatString(T.studentProgressTooltipDescription, {
+        problem: this.problemTitles[problemAlias],
         score: this.getScore(assignmentAlias, problemAlias),
         points: this.getPoints(assignmentAlias, problemAlias),
         progress: this.getProgress(assignmentAlias, problemAlias),
-      })
-      .replace(/\s\s/g, '<br />');
+      }),
+    );
   }
 
   get studentProgressUrl(): string {

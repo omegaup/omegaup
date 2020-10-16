@@ -260,7 +260,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns a list of students within a course with their score and progress
      * by problem
-     * @return array{allProgress: list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problems: array<string, string>}
+     * @return array{allProgress: list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problemTitles: array<string, string>}
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
         int $courseId,
@@ -319,7 +319,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         );
 
         $allProgress = [];
-        $problems = [];
+        $problemTitles = [];
         foreach ($rs as $row) {
             $username = $row['username'];
             if (!isset($allProgress[$username])) {
@@ -335,8 +335,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
             $assignmentAlias = $row['assignment_alias'];
             $problemAlias = $row['problem_alias'];
 
-            if (!isset($problems[$problemAlias])) {
-                $problems[$problemAlias] =  $row['problem_title'];
+            if (!isset($problemTitles[$problemAlias])) {
+                $problemTitles[$problemAlias] =  $row['problem_title'];
             }
 
             if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
@@ -374,7 +374,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         );
         return [
             'allProgress' => $allProgress,
-            'problems' => $problems,
+            'problemTitles' => $problemTitles,
         ];
     }
 
