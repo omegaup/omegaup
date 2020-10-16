@@ -14,9 +14,7 @@
             {{ title }}
           </h6>
           <slot name="problem-count"></slot>
-          <a class="btn btn-primary" :href="href">{{
-            T.problemcollectionViewProblems
-          }}</a>
+          <slot name="button"></slot>
         </div>
       </div>
     </div>
@@ -36,7 +34,6 @@ import { VTooltip } from 'v-tooltip';
 })
 export default class CollectionProblem extends Vue {
   @Prop() title!: string;
-  @Prop() href!: string;
   T = T;
 }
 </script>
