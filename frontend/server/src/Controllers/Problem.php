@@ -3730,6 +3730,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $offset = null;
         $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
+        $onlyQualitySeal = null;
         $onlyQualitySeal = isset(
             $r['only_quality_seal']
         ) ? $r['only_quality_seal'] : null;
@@ -3769,7 +3770,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            $onlyQualitySeal
+            $onlyQualitySeal,
         );
     }
 
