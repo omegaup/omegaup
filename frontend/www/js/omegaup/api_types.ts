@@ -132,9 +132,17 @@ export namespace types {
       );
     }
 
-    export function CollectionDetailsPayload(
+    export function CollectionDetailsByAuthorPayload(
       elementId: string = 'payload',
-    ): types.CollectionDetailsPayload {
+    ): types.CollectionDetailsByAuthorPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function CollectionDetailsByLevelPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsByLevelPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -1338,7 +1346,25 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
-  export interface CollectionDetailsPayload {
+  export interface CollectionDetailsByAuthorPayload {
+    collection: { alias: string; name?: string }[];
+    column: string;
+    columns: string[];
+    currentTags: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    tagData: { name?: string }[];
+    tags: string[];
+    type: string;
+  }
+
+  export interface CollectionDetailsByLevelPayload {
     collection: { alias: string; name?: string }[];
     column: string;
     columns: string[];

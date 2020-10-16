@@ -4,7 +4,7 @@ import { types } from '../api_types';
 import { OmegaUp } from '../omegaup';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.CollectionDetailsPayload();
+  const payload = types.payloadParsers.CollectionDetailsByLevelPayload();
   new Vue({
     el: '#main-container',
     components: {
