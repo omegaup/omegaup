@@ -203,7 +203,7 @@
         >
           <div class="card-body">
             <omegaup-course-clone
-              :initial-alias="course.alias"
+              :initial-alias="getAlias()"
               :initial-name="course.name"
               @clone="
                 (alias, name, startTime) =>
@@ -245,6 +245,7 @@ library.add(
   faFileAlt,
   faListAlt,
 );
+const headerPayload = types.payloadParsers.CommonPayload();
 
 @Component({
   components: {
@@ -287,6 +288,9 @@ export default class CourseDetails extends Vue {
       return '—';
     }
     return time.formatDateTime(date);
+  }
+  getAlias(): string {
+    return this.course.alias + '_' + headerPayload.currentUsername;
   }
 }
 </script>
