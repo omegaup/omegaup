@@ -4767,8 +4767,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            false,
-            '/problem/list/'
+            /*$onlyQualitySeal=*/false,
+            /*$url=*/'/problem/list/'
         );
 
         return [
@@ -5901,8 +5901,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            true,
-            "/problem/collection/{$collectionType}/"
+            /*$onlyQualitySeal=*/true,
+            /*$url=*/"/problem/collection/{$collectionType}/"
         );
 
         $title = new \OmegaUp\TranslationString(
@@ -6002,8 +6002,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            true,
-            '/problem/collection/author/'
+            /*$onlyQualitySeal=*/true,
+            /*$url=*/'/problem/collection/author/'
         );
 
         $title = new \OmegaUp\TranslationString(
