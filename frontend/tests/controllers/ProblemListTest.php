@@ -1294,7 +1294,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertTrue($response['results'][1]['quality_seal']);
         $this->assertTrue($response['results'][2]['quality_seal']);
 
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'collection_type' => 'problemLevelBasicIntroductionToProgramming',
@@ -1308,7 +1308,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsForSmarty(
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'collection_type' => 'problemLevelBasicKarel',

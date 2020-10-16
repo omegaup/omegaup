@@ -74,8 +74,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsForSmarty with a level tag collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsForSmarty(
+        // Call getCollectionsDetailsByLevelForSmarty with a level tag collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'collection_type' => 'problemLevelBasicIntroductionToProgramming',
@@ -151,11 +151,10 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsForSmarty with an author collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsForSmarty(
+        // Call getCollectionsDetailsByAuthorForSmarty with an author collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'collection_type' => 'author',
             ])
         )['smartyProperties']['payload']['collection'];
 
