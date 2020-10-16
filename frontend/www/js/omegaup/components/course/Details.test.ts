@@ -118,6 +118,7 @@ describe('Details.vue', () => {
             max_score: 1,
           },
         },
+        loggedIn: true,
       },
     });
 
