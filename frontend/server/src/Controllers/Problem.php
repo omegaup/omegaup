@@ -39,14 +39,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
-<<<<<<< HEAD
- * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>}
  * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, publicTags: list<string>, type: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
-=======
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
- * @psalm-type CollectionDetailsPayload=array{collection: list<array{alias: string, name?: string}>, publicTags: list<string>, type: string}
->>>>>>> upstream/master
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -4761,11 +4756,11 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        $response = self::getList(
-            $page ?: 1,
-            $language ?: 'all',
-            $orderBy ?: 'problem_id',
-            $sortOrder ?: 'desc',
+        $result = self::getListReturn(
+            $page,
+            $language,
+            $orderBy,
+            $sortOrder,
             $offset,
             $pageSize,
             $tags,
@@ -4776,52 +4771,26 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            false
+            false,
+            '/problem/list/'     
         );
-
-        $params = [
-            'query' => $keyword,
-            'language' => $language,
-            'order_by' => $orderBy,
-            'sort_order' => $sortOrder,
-            'tag' => $tags
-        ];
-
-        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
-            $response['total'],
-            $pageSize,
-            $page ?: 1,
-            '/problem/list/',
-            5,
-            $params
-        );
-
-        $tagData = [];
-        $allTags = self::getAllTagsFromCache();
-
-        foreach ($allTags as $tag) {
-            $tagData[] = ['name' => $tag->name];
-        }
 
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'problems' => $response['results'],
+                    'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
-                    'currentTags' => $tags,
-                    'pagerItems' => $pagerItems,
-                    'keyword' => $keyword,
-                    'mode' => $sortOrder,
-                    'column' => $orderBy,
-                    'language' => $language,
-                    'languages' => array_merge(
-                        ['all'],
-                        \OmegaUp\Controllers\Problem::VALID_LANGUAGES
-                    ),
-                    'modes' => \OmegaUp\Controllers\Problem::VALID_SORTING_MODES,
-                    'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
-                    'tags' => $tags,
-                    'tagData' => $tagData,
+                    'currentTags' => $result['currentTags'],
+                    'pagerItems' => $result['pagerItems'],
+                    'keyword' => $result['keyword'],
+                    'mode' => $result['mode'],
+                    'column' => $result['column'],
+                    'language' => $result['language'],
+                    'languages' => $result['languages'],
+                    'modes' => $result['modes'],
+                    'columns' => $result['columns'],
+                    'tags' => $result['tags'],
+                    'tagData' => $result['tags'],
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblems'
@@ -6047,6 +6016,85 @@ class Problem extends \OmegaUp\Controllers\Controller {
     public static function apiRandomProblem(\OmegaUp\Request $r) {
         return [
             'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
+        ];
+    }
+
+    private static function getListReturn(
+        int $page,
+        string $language,
+        string $orderBy,
+        string $sortOrder,
+        ?int $offset,
+        int $rowcount,
+        array $tags,
+        string $keyword,
+        bool $requireAllTags,
+        array $programmingLanguages,
+        int $minVisibility,
+        ?array $difficultyRange,
+        ?\OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user,
+        bool $onlyQualitySeal,
+        string $url
+    ) {
+        $response = self::getList(
+            $page ?: 1,
+            $language ?: 'all',
+            $orderBy ?: 'problem_id',
+            $sortOrder ?: 'desc',
+            $offset,
+            $rowcount,
+            $tags,
+            $keyword,
+            $requireAllTags,
+            $programmingLanguages,
+            $minVisibility,
+            $difficultyRange,
+            $identity,
+            $user,
+            $onlyQualitySeal
+        );
+
+        $params = [
+            'query' => $keyword,
+            'language' => $language,
+            'order_by' => $orderBy,
+            'sort_order' => $sortOrder,
+            'tag' => $tags
+        ];        
+
+        $pagerItems = \OmegaUp\Pager::paginateWithUrl(
+            $response['total'],
+            $rowcount,
+            $page ?: 1,
+            $url,
+            5,
+            $params
+        );
+    
+        $tagData = [];
+        $allTags = self::getAllTagsFromCache();
+    
+        foreach ($allTags as $tag) {
+            $tagData[] = ['name' => $tag->name];
+        }
+        
+        return [
+            'problems' => $response['results'],
+            'currentTags' => $tags,
+            'pagerItems' => $pagerItems,
+            'keyword' => $keyword,
+            'mode' => $sortOrder,
+            'column' => $orderBy,
+            'language' => $language,
+            'languages' => array_merge(
+                ['all'],
+                \OmegaUp\Controllers\Problem::VALID_LANGUAGES
+            ),
+            'modes' => \OmegaUp\Controllers\Problem::VALID_SORTING_MODES,
+            'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
+            'tags' => $tags,
+            'tagData' => $tagData,		
         ];
     }
 }
