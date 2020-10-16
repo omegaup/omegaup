@@ -136,6 +136,7 @@ const translations: { [key: string]: string; } = {
   codersOfTheMonthListCandidate: "(Li57 0f candida735 70 c0d3r 0f 7h3 m0n7h)",
   codersOfTheMonthRank: "(T0p 100 c0d3r5 0f 7h3 pr3vi0u5 m0n7h)",
   codersOfTheMonthUser: "(U53rnam3)",
+  collecionOtherTags: "(O7h3r 7ag5)",
   collectionTitle: "(Pr0b13m C0113c7i0n5)",
   contentOrderUpdated: "(C0n73n7'5 0rd3r ha5 b33n upda73d)",
   contestAddgroupAddGroup: "(Add gr0up)",
