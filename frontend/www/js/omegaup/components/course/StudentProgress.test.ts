@@ -48,7 +48,7 @@ describe('StudentProgress.vue', () => {
           },
           username: 'student',
         },
-        problems: {
+        problemTitles: {
           problem1: 'Problem 1',
           problem2: 'Problem 2',
         },
