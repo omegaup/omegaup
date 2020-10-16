@@ -30,7 +30,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type AdminCourses=array{admin: CoursesByAccessMode}
  * @psalm-type StudentCourses=array<string, CoursesByAccessMode>
  * @psalm-type CourseListMinePayload=array{courses: AdminCourses}
- * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses, logged_in: bool}
+ * @psalm-type CourseListPayload=array{course_type: null|string, courses: StudentCourses, loggedIn: bool}
  * @psalm-type CourseProblemVerdict=array{assignment_alias: string, problem_alias: string, problem_id: int, runs: int, verdict: null|string}
  * @psalm-type CourseProblemStatistics=array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}
  * @psalm-type CourseStatisticsPayload=array{course: CourseDetails, problemStats: list<CourseProblemStatistics>, verdicts: list<CourseProblemVerdict>}
@@ -3047,7 +3047,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'courses' => $filteredCourses,
                     'course_type' => $courseType,
-                    'logged_in' => true,
+                    'loggedIn' => true,
                 ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
             ],
@@ -3087,7 +3087,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'payload' => [
                         'courses' => $filteredCourses,
                         'course_type' => null,
-                        'logged_in' => false,
+                        'loggedIn' => false,
                     ],
                     'title' => new \OmegaUp\TranslationString('courseList'),
                 ],
@@ -3133,7 +3133,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'payload' => [
                     'courses' => $filteredCourses,
                     'course_type' => null,
-                    'logged_in' => true,
+                    'loggedIn' => true,
                 ],
                 'title' => new \OmegaUp\TranslationString('courseList'),
             ],
@@ -3298,7 +3298,10 @@ class Course extends \OmegaUp\Controllers\Controller {
             $r->ensureIdentity();
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
             // Check who is visiting, but a not logged user can still view
-            // the content's course
+            // the course's contents, unless it is a public course
+            if ($course->admission_mode === self::ADMISSION_MODE_PRIVATE) {
+                \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
+            }
             return [
                 'smartyProperties' => [
                     'payload' => [

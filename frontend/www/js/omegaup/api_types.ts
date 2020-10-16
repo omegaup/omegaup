@@ -1699,7 +1699,7 @@ export namespace types {
   export interface CourseListPayload {
     course_type?: string;
     courses: types.StudentCourses;
-    logged_in: boolean;
+    loggedIn: boolean;
   }
 
   export interface CourseNewPayload {

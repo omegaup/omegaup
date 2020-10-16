@@ -181,7 +181,9 @@
         <div class="card-header">
           <h5 class="text-center">
             <a
-              :href="`/login/?redirect=${encodeURI(window.location.pathname)}`"
+              :href="`/login/?redirect=${encodeURIComponent(
+                window.location.pathname,
+              )}`"
             >
               {{ T.loginLogIn }}
             </a>

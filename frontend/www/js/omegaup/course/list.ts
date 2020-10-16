@@ -14,7 +14,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-course-cards-list', {
         props: {
           courses: payload.courses,
-          loggedIn: payload.logged_in,
+          loggedIn: payload.loggedIn,
         },
       });
     },
