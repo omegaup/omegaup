@@ -2108,10 +2108,10 @@ Details of a group (scoreboards)
 
 ### Returns
 
-| Name          | Type                                                                           |
-| ------------- | ------------------------------------------------------------------------------ |
-| `group`       | `{ alias: string; create_time: number; description: string; name: string; }`   |
-| `scoreboards` | `{ alias: string; create_time: string; description: string; name: string; }[]` |
+| Name          | Type                                                                         |
+| ------------- | ---------------------------------------------------------------------------- |
+| `group`       | `{ alias: string; create_time: number; description: string; name: string; }` |
+| `scoreboards` | `types.GroupScoreboard[]`                                                    |
 
 ## `/api/group/list/`
 
