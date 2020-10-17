@@ -2690,6 +2690,7 @@ export namespace types {
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
+    problemTitles: { [key: string]: string };
     students: types.StudentProgress[];
   }
 
