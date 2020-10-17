@@ -289,6 +289,7 @@ export default class CourseDetails extends Vue {
     }
     return time.formatDateTime(date);
   }
+
   get aliasWithUsername(): string {
     return `${this.course.alias}_${this.currentUsername}`;
   }
