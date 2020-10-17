@@ -43,6 +43,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CollectionDetailsByAuthorPayload=array{collection: list<array{alias: string, name?: string}>, type: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
+ * @psalm-type PagerItem=array{class: string, label: string, page: int, url?: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -4711,14 +4712,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param mixed $only_karel
      * @omegaup-request-param mixed $order_by
-     * @omegaup-request-param mixed $page
+     * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      */
@@ -4786,7 +4787,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'modes' => $result['modes'],
                     'columns' => $result['columns'],
                     'tags' => $result['tags'],
-                    'tagData' => $result['tags'],
+                    'tagData' => $result['tagData'],
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleProblems'
@@ -5851,14 +5852,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param mixed $only_karel
      * @omegaup-request-param mixed $order_by
-     * @omegaup-request-param mixed $page
+     * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      */
@@ -5937,7 +5938,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'modes' => $result['modes'],
                     'columns' => $result['columns'],
                     'tags' => $result['tags'],
-                    'tagData' => $result['tags'],
+                    'tagData' => $result['tagData'],
                 ],
                 'title' => $title,
             ],
@@ -5954,14 +5955,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $max_difficulty
      * @omegaup-request-param int|null $min_difficulty
      * @omegaup-request-param int|null $min_visibility
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param mixed $only_karel
      * @omegaup-request-param mixed $order_by
-     * @omegaup-request-param mixed $page
+     * @omegaup-request-param int|null $page
      * @omegaup-request-param null|string $programming_languages
      * @omegaup-request-param null|string $query
      * @omegaup-request-param mixed $require_all_tags
-     * @omegaup-request-param mixed $rowcount
+     * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      */
@@ -6045,7 +6046,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'modes' => $result['modes'],
                     'columns' => $result['columns'],
                     'tags' => $result['tags'],
-                    'tagData' => $result['tags'],
+                    'tagData' => $result['tagData'],
                 ],
                 'title' => $title,
             ],
@@ -6062,6 +6063,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ];
     }
 
+    /**
+     * @param list<string> $tags
+     * @param list<string> $programmingLanguages
+     * @param array{0: int, 1: int}|null $difficultyRange
+     *
+     * @return array{column: string, columns: list<string>, currentTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PagerItem>, tagData: list<Tag>, tags: list<string>}
+     */
     private static function getListReturn(
         int $page,
         string $language,
