@@ -37,7 +37,7 @@
             />
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
+            <label>{{ T.contestNewFormShortTitleAlias }}</label>
             <input
               v-model="alias"
               class="form-control"
@@ -50,7 +50,7 @@
               required="required"
             />
             <p class="help-block">
-              {{ T.contestNewFormShortTitle_alias_Desc }}
+              {{ T.contestNewFormShortTitleAliasDesc }}
             </p>
           </div>
         </div>

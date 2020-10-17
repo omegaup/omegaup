@@ -8,13 +8,13 @@
             <input v-model="title" class="form-control" size="30" type="text" />
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
+            <label>{{ T.contestNewFormShortTitleAlias }}</label>
             <span
               aria-hidden="true"
               class="glyphicon glyphicon-info-sign"
               data-placement="top"
               data-toggle="tooltip"
-              title="T.contestNewFormShortTitle_alias_Desc"
+              :title="T.contestNewFormShortTitleAliasDesc"
             ></span>
             <input v-model="alias" class="form-control" type="text" />
           </div>
