@@ -5,6 +5,10 @@
 /**
  *  GroupController
  *
+ * @psalm-type Identity=array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}
+ * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
+ * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
+ *
  * @author joemmanuel
  */
 
@@ -262,7 +266,7 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<array{alias: string, create_time: string, description: null|string, name: string}>}
+     * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<GroupScoreboard>}
      *
      * @omegaup-request-param string $group_alias
      */
@@ -293,7 +297,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             'scoreboards' => [],
         ];
         foreach ($scoreboards as $scoreboard) {
-            /** @var array{alias: string, create_time: string, description: null|string, name: string} */
+            /** @var GroupScoreboard */
             $response['scoreboards'][] = $scoreboard->asFilteredArray([
                 'alias',
                 'create_time',
@@ -382,7 +386,9 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{IS_ORGANIZER: bool, payload: array{countries: list<\OmegaUp\DAO\VO\Countries>}}, template: string}
+     * @return array{smartyProperties: array{IS_ORGANIZER: bool, payload: GroupEditPayload, title: \OmegaUp\TranslationString}, template: string}
+     *
+     * @omegaup-request-param string $group
      */
     public static function getGroupEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -395,17 +401,60 @@ class Group extends \OmegaUp\Controllers\Controller {
         ) && \OmegaUp\Authorization::canCreateGroupIdentities(
             $r->identity
         );
+
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
+        if (is_null($group) || is_null($group->group_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'group_alias'
+            );
+        }
+
+        $scoreboardsByGroup = \OmegaUp\DAO\GroupsScoreboards::getByGroup(
+            $group->group_id
+        );
+        $scoreboards = [];
+
+        foreach ($scoreboardsByGroup as $scoreboard) {
+            /** @var GroupScoreboard */
+            $scoreboards[] = $scoreboard->asFilteredArray([
+                'alias',
+                'create_time',
+                'description',
+                'name',
+            ]);
+        }
+
         return [
             'smartyProperties' => [
                 'IS_ORGANIZER' => $isOrganizer,
                 'payload' => [
+                    'groupAlias' => $groupAlias,
+                    'groupName' => $group->name,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,
                         'name'
                     ),
+                    'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
+                        $group
+                    ),
+                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
+                        \OmegaUp\Experiments::IDENTITIES
+                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                        $r->identity
+                    ),
+                    'scoreboards' => $scoreboards,
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleGroupsEdit'
+                ),
             ],
+            // TODO: Replace the following line with 'entrypoint' => 'group_edit'
             'template' => 'group.edit.tpl',
         ];
     }
