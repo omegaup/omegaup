@@ -2065,13 +2065,6 @@ export namespace types {
     url?: string;
   }
 
-  export interface PagerItem {
-    class: string;
-    label: string;
-    page: number;
-    url?: string;
-  }
-
   export interface PrivacyStatement {
     gitObjectId?: string;
     markdown: string;

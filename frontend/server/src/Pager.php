@@ -3,7 +3,7 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type PagerItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  */
 class Pager {
     /**
@@ -122,7 +122,7 @@ class Pager {
      * @param array<string, string[]|string> $params Additional key => value
      * parameters to append to the item's URL.
      *
-     * @return list<PagerItem> The information for each item of the pager.
+     * @return list<PageItem> The information for each item of the pager.
      */
     public static function paginateWithUrl(
         int $rows,

@@ -43,7 +43,6 @@ namespace OmegaUp\Controllers;
  * @psalm-type CollectionDetailsByAuthorPayload=array{collection: list<array{alias: string, name?: string}>, type: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
- * @psalm-type PagerItem=array{class: string, label: string, page: int, url?: string}
  */
 class Problem extends \OmegaUp\Controllers\Controller {
     // SOLUTION STATUS
@@ -6068,7 +6067,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $programmingLanguages
      * @param array{0: int, 1: int}|null $difficultyRange
      *
-     * @return array{column: string, columns: list<string>, currentTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PagerItem>, tagData: list<Tag>, tags: list<string>}
+     * @return array{column: string, columns: list<string>, currentTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PageItem>, tagData: list<Tag>, tags: list<string>}
      */
     private static function getListReturn(
         int $page,
@@ -6127,6 +6126,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $allTags = self::getAllTagsFromCache();
 
         foreach ($allTags as $tag) {
+            if (is_null($tag->name)) {
+                continue;
+            }
             $tagData[] = ['name' => $tag->name];
         }
 
