@@ -12,11 +12,11 @@
             }}</label>
             <div class="col-md-7">
               <input
+                v-model="email"
                 class="form-control"
                 name="email"
                 size="30"
                 type="text"
-                v-model="email"
               />
             </div>
           </div>
@@ -25,7 +25,7 @@
               <button
                 class="btn btn-primary"
                 type="button"
-                v-on:click.prevent="$emit('submit', email)"
+                @click.prevent="$emit('submit', email)"
               >
                 {{ T.wordsSaveChanges }}
               </button>

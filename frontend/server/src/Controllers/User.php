@@ -744,9 +744,9 @@ class User extends \OmegaUp\Controllers\Controller {
             $r['auth_token'],
             'auth_token'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['contest_alias'],
-            'contest_alias'
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         $response = [];
@@ -1277,11 +1277,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
 
                 // Add user to contest if needed
-                if (!is_null($r['contest_alias'])) {
+                if (!is_null($contestAlias)) {
                     $addUserRequest = new \OmegaUp\Request();
                     $addUserRequest['auth_token'] = $r['auth_token'];
                     $addUserRequest['usernameOrEmail'] = $username;
-                    $addUserRequest['contest_alias'] = $r['contest_alias'];
+                    $addUserRequest['contest_alias'] = $contestAlias;
                     \OmegaUp\Controllers\Contest::apiAddUser($addUserRequest);
                 }
             }
@@ -1784,13 +1784,13 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiInterviewStats(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['interview'],
-            'interview'
+        $interviewAlias = $r->ensureString(
+            'interview',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
-        $contest = \OmegaUp\DAO\Contests::getByAlias($r['interview']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($interviewAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'interviewNotFound'
@@ -2803,6 +2803,9 @@ class User extends \OmegaUp\Controllers\Controller {
                     );
                     if ($contestResponse['contest_admin']) {
                         $response['contest_admin'][] = $contestResponse['contest_alias'];
+                        $response['problemset_admin'][] = intval(
+                            $contestResponse['contest']->problemset_id
+                        );
                     }
                     break;
                 case 'problemset':
@@ -2820,13 +2823,16 @@ class User extends \OmegaUp\Controllers\Controller {
                         'tokens' => $tokens,
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
-                        'contest_alias'
+                        'contest_alias',
+                        /*$required=*/false,
+                        fn (string $alias) => \OmegaUp\Validators::alias($alias)
                     );
                     if (
                         !empty($contestAlias) &&
                         ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
+                        $response['problemset_admin'][] = intval($tokens[2]);
                     }
                     break;
                 case 'problem':
@@ -2969,8 +2975,11 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiAddGroup(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
-        $group = self::validateAddRemoveGroup($r['group']);
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $group = self::validateAddRemoveGroup($groupAlias);
         \OmegaUp\DAO\GroupsIdentities::create(
             new \OmegaUp\DAO\VO\GroupsIdentities([
                 'identity_id' => $r->identity->identity_id,
@@ -2993,8 +3002,11 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiRemoveGroup(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
-        $group = self::validateAddRemoveGroup($r['group']);
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $group = self::validateAddRemoveGroup($groupAlias);
 
         \OmegaUp\DAO\GroupsIdentities::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => intval($r->identity->identity_id),

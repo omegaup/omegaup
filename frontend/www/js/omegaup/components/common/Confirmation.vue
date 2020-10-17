@@ -7,7 +7,7 @@
             class="close"
             type="button"
             data-dismiss="modal"
-            v-on:click.prevent="$emit('close')"
+            @click.prevent="$emit('close')"
           >
             ×
           </button>
@@ -20,7 +20,7 @@
             type="button"
             class="btn btn-primary"
             data-dismiss="modal"
-            v-on:click.prevent="$emit('yes')"
+            @click.prevent="$emit('yes')"
           >
             {{ answerYes }}
           </button>
@@ -28,7 +28,7 @@
             type="button"
             class="btn btn-danger"
             data-dismiss="modal"
-            v-on:click.prevent="$emit('no')"
+            @click.prevent="$emit('no')"
           >
             {{ answerNo }}
           </button>
@@ -37,6 +37,17 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+@Component
+export default class Paginator extends Vue {
+  @Prop() question!: string;
+  @Prop() answerYes!: string;
+  @Prop() answerNo!: string;
+}
+</script>
 
 <style>
 .mask {
@@ -56,16 +67,3 @@
   position: absolute;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
-import T from '../../lang';
-
-@Component
-export default class Paginator extends Vue {
-  @Prop() question!: string;
-  @Prop() answerYes!: string;
-  @Prop() answerNo!: string;
-}
-</script>

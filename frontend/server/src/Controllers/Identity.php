@@ -299,12 +299,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        \OmegaUp\Validators::validateValidAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $group = \OmegaUp\Controllers\Group::validateGroup(
-            $r['group_alias'],
+        $group = \OmegaUp\Controllers\Group::validateGroupAndOwner(
+            $groupAlias,
             $r->identity
         );
         if (is_null($group)) {
@@ -365,6 +365,32 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotExist'
             );
         }
+        if (is_null($identity->country_id) && !is_null($identity->state_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterInvalidStateNeedsToBelongToCountry',
+                $identity->username
+            );
+        } elseif (
+            !is_null($identity->country_id)
+            && !is_null($identity->state_id)
+        ) {
+            $countryStates = \OmegaUp\DAO\States::getByCountry(
+                $identity->country_id
+            );
+            $states = array_map(
+                /**
+                 * @param \OmegaUp\DAO\VO\States $state
+                 */
+                fn ($state) => $state->state_id,
+                $countryStates
+            );
+            if (!in_array($identity->state_id, $states)) {
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'parameterInvalidStateDoesNotBelongToCountry',
+                    $identity->username
+                );
+            }
+        }
         $preexistingIdentity = \OmegaUp\DAO\Identities::findByUsername(
             $identity->username
         );
@@ -420,9 +446,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['gender'],
             'gender'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['school_name'],
@@ -453,7 +479,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
             $r['name'],
             $state,
             $r['gender'],
-            $r['group_alias'],
+            $groupAlias,
             $originalIdentity
         );
 
@@ -551,12 +577,12 @@ class Identity extends \OmegaUp\Controllers\Controller {
                 'userNotAllowed'
             );
         }
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Controllers\Group::validateGroup(
-            $r['group_alias'],
+        \OmegaUp\Controllers\Group::validateGroupAndOwner(
+            $groupAlias,
             $r->identity
         );
         if (

@@ -1,13 +1,13 @@
 <template>
   <input
+    v-model="stringValue"
     class="form-control"
-    v-bind:class="{ 'is-invalid': isInvalid }"
+    :class="{ 'is-invalid': isInvalid }"
     required="required"
     size="16"
     type="date"
-    v-bind:disabled="!enabled"
-    v-bind:readonly="usedFallback"
-    v-model="stringValue"
+    :disabled="!enabled"
+    :readonly="usedFallback"
   />
 </template>
 
@@ -39,17 +39,16 @@ export default class DatePicker extends Vue {
   }
 
   private mountedFallback() {
-    let self = this;
-    self.usedFallback = true;
-    $(self.$el)
+    this.usedFallback = true;
+    $(this.$el)
       .datepicker({
         weekStart: 1,
-        format: self.format,
+        format: this.format,
       })
       .on('changeDate', (ev) => {
-        self.$emit('input', ev.date);
+        this.$emit('input', ev.date);
       })
-      .datepicker('setValue', self.value);
+      .datepicker('setValue', this.value);
   }
 
   @Watch('stringValue')

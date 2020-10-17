@@ -1157,4 +1157,18 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         /** @var list<array{name: string, problems_per_tag: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
+
+    final public static function getRandomProblemAlias(): string {
+        $sql = 'SELECT
+                    alias
+                FROM
+                    Problems
+                WHERE
+                    quality_seal = 1
+                GROUP BY
+                    RAND() LIMIT 1;';
+
+        /** @var string */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
 }

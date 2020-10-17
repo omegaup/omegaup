@@ -1,9 +1,8 @@
 import course_ViewStudent from '../components/course/ViewStudent.vue';
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
-import T from '../lang';
 import Vue from 'vue';
 
 OmegaUp.on('ready', () => {
@@ -22,6 +21,12 @@ OmegaUp.on('ready', () => {
 
   const viewStudent = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-course-viewstudent': course_ViewStudent,
+    },
+    data: () => ({
+      problems: <types.CourseProblem[]>[],
+    }),
     render: function (createElement) {
       return createElement('omegaup-course-viewstudent', {
         props: {
@@ -46,12 +51,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      problems: <types.CourseProblem[]>[],
-    },
-    components: {
-      'omegaup-course-viewstudent': course_ViewStudent,
     },
   });
 });

@@ -1,56 +1,56 @@
 <template>
   <div class="card panel panel-primary">
-    <div class="card-header bg-primary text-white panel-heading" v-if="!update">
+    <div v-if="!update" class="card-header bg-primary text-white panel-heading">
       <h3 class="panel-title">{{ T.contestNew }}</h3>
     </div>
     <div class="card-body panel-body">
       <div class="btn-group bottom-margin mb-3">
-        <button class="btn btn-default btn-secondary" v-on:click="fillOmi">
+        <button class="btn btn-default btn-secondary" @click="fillOmi">
           {{ T.contestNewFormOmiStyle }}
         </button>
-        <button class="btn btn-default btn-secondary" v-on:click="fillPreIoi">
+        <button class="btn btn-default btn-secondary" @click="fillPreIoi">
           {{ T.contestNewForm }}
         </button>
-        <button class="btn btn-default btn-secondary" v-on:click="fillConacup">
+        <button class="btn btn-default btn-secondary" @click="fillConacup">
           {{ T.contestNewFormConacupStyle }}
         </button>
-        <button class="btn btn-default btn-secondary" v-on:click="fillIcpc">
+        <button class="btn btn-default btn-secondary" @click="fillIcpc">
           {{ T.contestNewFormICPCStyle }}
         </button>
       </div>
-      <form class="contest-form" v-on:submit.prevent="onSubmit">
+      <form class="contest-form" @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsTitle }}</label>
             <input
+              v-model="title"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'title',
               }"
               name="title"
               data-title
-              v-bind:placeholder="titlePlaceHolder"
+              :placeholder="titlePlaceHolder"
               size="30"
               type="text"
-              v-model="title"
               required="required"
             />
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
+            <label>{{ T.contestNewFormShortTitleAlias }}</label>
             <input
+              v-model="alias"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'alias',
               }"
               name="alias"
-              v-bind:disabled="update"
+              :disabled="update"
               type="text"
-              v-model="alias"
               required="required"
             />
             <p class="help-block">
-              {{ T.contestNewFormShortTitle_alias_Desc }}
+              {{ T.contestNewFormShortTitleAliasDesc }}
             </p>
           </div>
         </div>
@@ -66,7 +66,7 @@
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
               v-model="finishTime"
-              v-bind:is-invalid="invalidParameterName === 'finish_time'"
+              :is-invalid="invalidParameterName === 'finish_time'"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
           </div>
@@ -75,14 +75,14 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormDescription }}</label>
             <textarea
+              v-model="description"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'description',
               }"
               name="description"
               cols="30"
               rows="10"
-              v-model="description"
               required="required"
             ></textarea>
           </div>
@@ -90,19 +90,19 @@
             <label>{{ T.contestNewFormDifferentStarts }}</label>
             <div class="checkbox">
               <label
-                ><input type="checkbox" v-model="windowLengthEnabled" />
+                ><input v-model="windowLengthEnabled" type="checkbox" />
                 {{ T.wordsEnable }}</label
               >
             </div>
             <input
+              v-model="windowLength"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'window_length',
               }"
               size="3"
               type="text"
-              v-bind:disabled="!windowLengthEnabled"
-              v-model="windowLength"
+              :disabled="!windowLengthEnabled"
             />
             <p class="help-block">{{ T.contestNewFormDifferentStartsDesc }}</p>
           </div>
@@ -111,14 +111,14 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
+              v-model="scoreboard"
               class="form-control scoreboard-time-percent"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'scoreboard',
               }"
               name="scoreboard"
               size="3"
               type="text"
-              v-model="scoreboard"
               required="required"
             />
             <p class="help-block">
@@ -128,13 +128,13 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormSubmissionsSeparation }}</label>
             <input
+              v-model="submissionsGap"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'submissions_gap',
               }"
               size="2"
               type="text"
-              v-model="submissionsGap"
               required="required"
             />
             <p class="help-block">
@@ -145,7 +145,7 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPenaltyType }}</label>
-            <select class="form-control" v-model="penaltyType">
+            <select v-model="penaltyType" class="form-control">
               <option value="none">
                 {{ T.contestNewFormNoPenalty }}
               </option>
@@ -164,13 +164,13 @@
           <div class="form-group col-md-6">
             <label>{{ T.wordsPenalty }}</label>
             <input
+              v-model="penalty"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'penalty',
               }"
               size="2"
               type="text"
-              v-model="penalty"
               required="required"
             />
             <p class="help-block">{{ T.contestNewFormPenaltyDesc }}</p>
@@ -179,7 +179,7 @@
         <div class="row">
           <div class="form-group col-md-4">
             <label>{{ T.wordsFeedback }}</label>
-            <select class="form-control" v-model="feedback">
+            <select v-model="feedback" class="form-control">
               <option value="none">
                 {{ T.wordsNone }}
               </option>
@@ -196,11 +196,11 @@
           </div>
           <div class="form-group col-md-4">
             <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
-            <select class="form-control" v-model="showScoreboardAfter">
-              <option v-bind:value="true">
+            <select v-model="showScoreboardAfter" class="form-control">
+              <option :value="true">
                 {{ T.wordsYes }}
               </option>
-              <option v-bind:value="false">
+              <option :value="false">
                 {{ T.wordsNo }}
               </option>
             </select>
@@ -208,11 +208,11 @@
           </div>
           <div class="form-group col-md-4">
             <label>{{ T.contestNewFormPartialScore }}</label>
-            <select class="form-control" v-model="partialScore">
-              <option v-bind:value="true">
+            <select v-model="partialScore" class="form-control">
+              <option :value="true">
                 {{ T.wordsYes }}
               </option>
-              <option v-bind:value="false">
+              <option :value="false">
                 {{ T.wordsNo }}
               </option>
             </select>
@@ -223,13 +223,13 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPointDecrementFactor }}</label>
             <input
+              v-model="pointsDecayFactor"
               class="form-control"
-              v-bind:class="{
+              :class="{
                 'is-invalid': invalidParameterName === 'points_decay_factor',
               }"
               size="4"
               type="text"
-              v-model="pointsDecayFactor"
               required="required"
             />
             <p class="help-block">
@@ -241,11 +241,11 @@
             ><br />
             <multiselect
               v-model="languages"
-              v-bind:options="Object.keys(allLanguages)"
-              v-bind:multiple="true"
-              v-bind:placeholder="T.contestNewFormLanguages"
-              v-bind:close-on-select="false"
-              v-bind:allow-empty="false"
+              :options="Object.keys(allLanguages)"
+              :multiple="true"
+              :placeholder="T.contestNewFormLanguages"
+              :close-on-select="false"
+              :allow-empty="false"
             >
             </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
@@ -256,7 +256,7 @@
             <label>{{ T.contestNewFormBasicInformationRequired }}</label>
             <div class="checkbox">
               <label
-                ><input type="checkbox" v-model="needsBasicInformation" />{{
+                ><input v-model="needsBasicInformation" type="checkbox" />{{
                   T.wordsEnable
                 }}</label
               >
@@ -267,7 +267,7 @@
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormUserInformationRequired }}</label>
-            <select class="form-control" v-model="requestsUserInformation">
+            <select v-model="requestsUserInformation" class="form-control">
               <option value="no">
                 {{ T.wordsNo }}
               </option>
@@ -296,14 +296,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss">
-@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
-
-.multiselect__tag {
-  background: #678dd7;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
@@ -461,3 +453,11 @@ export default class NewForm extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+
+.multiselect__tag {
+  background: #678dd7;
+}
+</style>

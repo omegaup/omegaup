@@ -13,13 +13,34 @@ namespace OmegaUp\DAO;
  */
 class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
     /**
-     * @return list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}>
+     * @return list<array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}>
      */
     public static function getRequestsForCourseWithFirstAdmin(int $courseId) {
         $sql = '
             SELECT DISTINCT
                 i.identity_id,
                 i.username,
+                i.name,
+                IFNULL(
+                    (
+                        SELECT urc.classname FROM
+                            User_Rank_Cutoffs urc
+                        WHERE
+                            urc.score <= (
+                                    SELECT
+                                        ur.score
+                                    FROM
+                                        User_Rank ur
+                                    WHERE
+                                        ur.user_id = i.user_id
+                                )
+                        ORDER BY
+                            urc.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    \'user-rank-unranked\'
+                ) AS classname,
                 i.country_id,
                 c.name AS country,
                 r.request_time,
@@ -78,7 +99,7 @@ class CourseIdentityRequest extends \OmegaUp\DAO\Base\CourseIdentityRequest {
             ORDER BY
                 i.identity_id;';
 
-        /** @var list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, country: null|string, country_id: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, request_time: \OmegaUp\Timestamp, username: string}> */
+        /** @var list<array{accepted: bool|null, admin_name: null|string, admin_username: null|string, classname: string, country: null|string, country_id: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $courseId]
