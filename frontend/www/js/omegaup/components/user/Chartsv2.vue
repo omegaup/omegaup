@@ -127,20 +127,6 @@ export default class UserCharts extends Vue {
   period: 'day' | 'week' | 'month' | 'year' = 'day';
   updateArgs = [true, true, { duration: 500 }];
 
-  @Watch('type')
-  onTypeChanged(newValue: string): void {
-    if (newValue === 'total') {
-      this.normalizedRunCounts;
-    } else {
-      this.runsForPeriod;
-    }
-  }
-
-  @Watch('period')
-  onPeriodChanged(): void {
-    this.runsForPeriod;
-  }
-
   get totalRuns(): number {
     let total = 0;
     for (const runs of this.data.runs) {
