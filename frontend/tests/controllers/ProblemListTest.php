@@ -1297,7 +1297,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'collection_type' => 'problemLevelBasicIntroductionToProgramming',
+                'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         )['smartyProperties']['payload']['problems'];
 
@@ -1311,7 +1311,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
         $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'collection_type' => 'problemLevelBasicKarel',
+                'level' => 'problemLevelBasicKarel',
             ])
         )['smartyProperties']['payload']['problems'];
 

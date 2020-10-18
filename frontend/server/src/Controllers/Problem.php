@@ -5844,7 +5844,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @omegaup-request-param string $collection_type
+     * @omegaup-request-param string $level
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
      * @omegaup-request-param int|null $max_difficulty
@@ -5862,7 +5862,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsByLevelForSmarty(\OmegaUp\Request $r): array {
-        $collectionType = $r->ensureString('collection_type');
+        $collectionType = $r->ensureString('level');
 
         $collection = [];
         $problems = [];

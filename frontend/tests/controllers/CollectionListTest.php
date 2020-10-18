@@ -78,7 +78,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'collection_type' => 'problemLevelBasicIntroductionToProgramming',
+                'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         )['smartyProperties']['payload']['collection'];
 
