@@ -155,7 +155,7 @@
                   v-bind:items="contests"
                   v-bind:items-per-page="15"
                 >
-                  <template slot="table-header">
+                  <template v-slot:table-header>
                     <thead>
                       <tr>
                         <th>{{ T.profileContestsTableContest }}</th>
@@ -197,18 +197,6 @@
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-a:hover {
-  cursor: pointer;
-}
-th.numericColumn {
-  text-align: right;
-}
-[data-user-profile-root] {
-  font-size: 1rem;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -287,3 +275,15 @@ export default class UserProfile extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+a:hover {
+  cursor: pointer;
+}
+th.numericColumn {
+  text-align: right;
+}
+[data-user-profile-root] {
+  font-size: 1rem;
+}
+</style>

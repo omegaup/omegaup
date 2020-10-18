@@ -7,8 +7,11 @@ import user_Profile from '../components/user/Profilev2.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();
-  const viewProfile = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-user-profile': user_Profile,
+    },
     render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
@@ -19,9 +22,6 @@ OmegaUp.on('ready', () => {
           visitorBadges: new Set(payload.badges),
         },
       });
-    },
-    components: {
-      'omegaup-user-profile': user_Profile,
     },
   });
 });
