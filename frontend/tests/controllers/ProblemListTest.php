@@ -5,6 +5,13 @@
  * @author joemmanuel
  */
 class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
+    public function setUp(): void {
+        parent::setUp();
+
+        \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
+        \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
+    }
+
     /**
      * Gets the list of problems
      */
@@ -1220,6 +1227,97 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             count(
                 $apiListResponse['results']
             )
+        );
+    }
+
+    /**
+     * Gets the list of quality problems
+     */
+    public function testQualityProblemList() {
+        $n = 3;
+        foreach (range(0, $n - 1) as $i) {
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'problem_level' => 'problemLevelBasicKarel',
+            ])
+        );
+
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[0]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+            ]),
+        ]));
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[1]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicIntroductionToProgramming',
+                'tags' => ['problemTagMatrices', 'problemTagNumberTheory'],
+            ]),
+        ]));
+        \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $reviewerLogin->auth_token,
+            'problem_alias' => $problemData[3]['request']['problem_alias'],
+            'nomination' => 'quality_tag',
+            'contents' => json_encode([
+                'quality_seal' => true,
+                'tag' => 'problemLevelBasicKarel',
+                'tags' => ['problemTagMatrices', 'problemTagNumberTheory'],
+            ]),
+        ]));
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'only_quality_seal' => true,
+            ])
+        );
+
+        $this->assertTrue($response['results'][0]['quality_seal']);
+        $this->assertTrue($response['results'][1]['quality_seal']);
+        $this->assertTrue($response['results'][2]['quality_seal']);
+
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        foreach ($result as $problem) {
+            $this->assertEquals(
+                $problem['tags'][0]['name'],
+                'problemLevelBasicIntroductionToProgramming'
+            );
+        }
+
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicKarel',
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertEquals(
+            $result[0]['tags'][0]['name'],
+            'problemLevelBasicKarel'
         );
     }
 }
