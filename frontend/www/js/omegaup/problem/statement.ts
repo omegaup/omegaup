@@ -71,8 +71,8 @@ OmegaUp.on('ready', () => {
           showEditControls: false,
         },
         on: {
-          'update:markdownContents': (contents: string) => {
-            localStorage.setItem('wmdinput', contents);
+          'update:statement': (statement: types.ProblemStatement) => {
+            localStorage.setItem('wmdinput', statement.markdown);
           },
         },
       });
