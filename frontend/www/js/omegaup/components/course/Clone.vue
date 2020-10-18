@@ -10,9 +10,9 @@
         </div>
         <div class="form-group col-md-3">
           <label
-            >{{ T.courseNewFormShortTitle_alias_ }}
+            >{{ T.courseNewFormShortTitleAlias }}
             <font-awesome-icon
-              :title="T.courseNewFormShortTitle_alias_Desc"
+              :title="T.courseNewFormShortTitleAliasDesc"
               icon="info-circle" />
             <input v-model="alias" class="form-control" type="text"
           /></label>
