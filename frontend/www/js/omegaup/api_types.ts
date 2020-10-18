@@ -2,6 +2,11 @@
 
 // DAO types
 export namespace dao {
+  export interface Countries {
+    country_id?: string;
+    name?: string;
+  }
+
   export interface Identities {
     country_id?: string;
     current_identity_school_id?: number;
@@ -379,47 +384,6 @@ export namespace types {
       );
     }
 
-    export function CourseAssignmentEditPayload(
-      elementId: string = 'payload',
-    ): types.CourseAssignmentEditPayload {
-      return ((x) => {
-        if (x.assignment)
-          x.assignment = ((x) => {
-            if (x.finish_time)
-              x.finish_time = ((x: number) => new Date(x * 1000))(
-                x.finish_time,
-              );
-            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-            return x;
-          })(x.assignment);
-        x.course = ((x) => {
-          if (x.assignments)
-            x.assignments = ((x) => {
-              if (!Array.isArray(x)) {
-                return x;
-              }
-              return x.map((x) => {
-                if (x.finish_time)
-                  x.finish_time = ((x: number) => new Date(x * 1000))(
-                    x.finish_time,
-                  );
-                x.start_time = ((x: number) => new Date(x * 1000))(
-                  x.start_time,
-                );
-                return x;
-              });
-            })(x.assignments);
-          if (x.finish_time)
-            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
-          x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
-          return x;
-        })(x.course);
-        return x;
-      })(
-        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
-      );
-    }
-
     export function CourseCloneDetailsPayload(
       elementId: string = 'payload',
     ): types.CourseCloneDetailsPayload {
@@ -754,6 +718,14 @@ export namespace types {
     export function CourseSubmissionsListPayload(
       elementId: string = 'payload',
     ): types.CourseSubmissionsListPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function GroupEditPayload(
+      elementId: string = 'payload',
+    ): types.GroupEditPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -1368,6 +1340,7 @@ export namespace types {
 
   export interface CollectionDetailsPayload {
     collection: { alias: string; name?: string }[];
+    publicTags: string[];
     type: string;
   }
 
@@ -1683,11 +1656,6 @@ export namespace types {
     start_time: Date;
   }
 
-  export interface CourseAssignmentEditPayload {
-    assignment?: types.CourseAssignment;
-    course: types.CourseDetails;
-  }
-
   export interface CourseCloneDetailsPayload {
     creator: { classname: string; username: string };
     details: types.CourseDetails;
@@ -1876,11 +1844,40 @@ export namespace types {
     status: string;
   }
 
+  export interface GroupEditPayload {
+    countries: dao.Countries[];
+    groupAlias: string;
+    groupName?: string;
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    scoreboards: types.GroupScoreboard[];
+  }
+
+  export interface GroupScoreboard {
+    alias: string;
+    create_time: string;
+    description?: string;
+    name: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
     quality: number;
     qualityHistogram?: string;
+  }
+
+  export interface Identity {
+    classname: string;
+    country?: string;
+    country_id?: string;
+    gender?: string;
+    name?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username: string;
   }
 
   export interface IdentityRequest {
@@ -2238,6 +2235,7 @@ export namespace types {
   }
 
   export interface ProblemListCollectionPayload {
+    allTags: types.Tag[];
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
   }
@@ -2692,6 +2690,7 @@ export namespace types {
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
+    problemTitles: { [key: string]: string };
     students: types.StudentProgress[];
   }
 
@@ -2715,6 +2714,10 @@ export namespace types {
     pagerItems: types.PageItem[];
     submissions: types.Submission[];
     totalRows: number;
+  }
+
+  export interface Tag {
+    name: string;
   }
 
   export interface UserInfoForProblem {
@@ -3293,12 +3296,7 @@ export namespace messages {
       description?: string;
       name?: string;
     };
-    scoreboards: {
-      alias: string;
-      create_time: string;
-      description?: string;
-      name: string;
-    }[];
+    scoreboards: types.GroupScoreboard[];
   };
   export type GroupListRequest = { [key: string]: any };
   export type GroupListResponse = { label: string; value: string }[];

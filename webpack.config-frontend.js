@@ -52,8 +52,6 @@ module.exports = {
     contest_report: './frontend/www/js/omegaup/contest/report.js',
     contest_scoreboardmerge:
       './frontend/www/js/omegaup/contest/scoreboardmerge.js',
-    course_assignment_edit:
-      './frontend/www/js/omegaup/course/assignment_edit.ts',
     course_clone: './frontend/www/js/omegaup/course/clone.ts',
     course_details: './frontend/www/js/omegaup/course/details.ts',
     course_edit: './frontend/www/js/omegaup/course/edit.ts',

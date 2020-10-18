@@ -159,6 +159,12 @@
           @emit-remove-user="(contestant) => $emit('remove-user', contestant)"
           @emit-save-end-time="(user) => $emit('save-end-time', user)"
         ></omegaup-contest-add-contestant>
+        <omegaup-common-requests
+          :data="requests"
+          :text-add-participant="T.contestAdduserAddContestant"
+          @emit-accept-request="(username) => $emit('accept-request', username)"
+          @emit-deny-request="(username) => $emit('deny-request', username)"
+        ></omegaup-common-requests>
       </div>
     </div>
   </div>
@@ -174,7 +180,7 @@ import contest_AddProblem from './AddProblemv2.vue';
 import contest_AddContestant from './AddContestant.vue';
 import contest_Admins from '../common/Admins.vue';
 import contest_Clone from './Clone.vue';
-import common_Requests from '../common/Requests.vue';
+import common_Requests from '../common/Requestsv2.vue';
 import contest_Groups from './Groups.vue';
 import contest_GroupAdmins from '../common/GroupAdmins.vue';
 import contest_Links from './Links.vue';

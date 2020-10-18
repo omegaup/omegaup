@@ -29,7 +29,7 @@
         </li>
       </div>
       <omegaup-course-clone
-        :initial-alias="course.alias"
+        :initial-alias="aliasWithUsername"
         :initial-name="course.name"
         @clone="
           (alias, name, startTime) =>
@@ -74,7 +74,12 @@ export default class CourseCloneWithToken extends Vue {
   @Prop() username!: string;
   @Prop() classname!: string;
   @Prop() token!: string;
+  @Prop() currentUsername!: string;
 
   T = T;
+
+  get aliasWithUsername(): string {
+    return `${this.course.alias}_${this.currentUsername}`;
+  }
 }
 </script>
