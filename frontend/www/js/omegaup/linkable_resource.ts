@@ -28,6 +28,9 @@ export class ContestResult implements LinkableResource {
   }
 
   getBadge(): Optional<string> {
+    if (!this.place) {
+      return Optional.ofNonNull('—');
+    }
     return Optional.ofNonNull(`${this.place}`);
   }
 }

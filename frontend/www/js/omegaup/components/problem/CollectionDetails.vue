@@ -24,7 +24,7 @@ import { types } from '../../api_types';
   },
 })
 export default class CollectionDetails extends Vue {
-  @Prop() data!: types.CollectionDetailsPayload;
+  @Prop() data!: types.CollectionDetailsByLevelPayload;
 
   T = T;
   type = this.data.type;

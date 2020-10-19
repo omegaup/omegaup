@@ -21,6 +21,7 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-contest-new', {
         props: {
           allLanguages: payload.languages,
+          initialLanguages: Object.keys(payload.languages),
           update: false,
           initialStartTime: startTime,
           initialFinishTime: finishTime,
