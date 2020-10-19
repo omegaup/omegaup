@@ -2108,10 +2108,10 @@ Details of a group (scoreboards)
 
 ### Returns
 
-| Name          | Type                                                                           |
-| ------------- | ------------------------------------------------------------------------------ |
-| `group`       | `{ alias: string; create_time: number; description: string; name: string; }`   |
-| `scoreboards` | `{ alias: string; create_time: string; description: string; name: string; }[]` |
+| Name          | Type                                                                         |
+| ------------- | ---------------------------------------------------------------------------- |
+| `group`       | `{ alias: string; create_time: number; description: string; name: string; }` |
+| `scoreboards` | `types.GroupScoreboard[]`                                                    |
 
 ## `/api/group/list/`
 
@@ -2677,6 +2677,7 @@ List of public and user's private problems
 
 | Name                    | Type           | Description |
 | ----------------------- | -------------- | ----------- |
+| `only_quality_seal`     | `bool`         |             |
 | `difficulty_range`      | `null\|string` |             |
 | `language`              | `mixed`        |             |
 | `max_difficulty`        | `int\|null`    |             |
