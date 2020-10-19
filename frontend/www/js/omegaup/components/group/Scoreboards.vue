@@ -11,7 +11,6 @@
                   v-model="title"
                   class="form-control"
                   autocomplete="off"
-                  @blur="onGenerateAlias"
                 />
               </label>
             </div>
