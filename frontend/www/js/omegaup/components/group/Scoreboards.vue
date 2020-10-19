@@ -18,11 +18,11 @@
 
             <div class="form-group col-md-6">
               <label class="d-block">
-                {{ T.contestNewFormShortTitle_alias_ }}
+                {{ T.contestNewFormShortTitleAlias }}
                 <input :value="alias" class="form-control" disabled="true" />
               </label>
               <p class="help-block">
-                {{ T.contestNewFormShortTitle_alias_Desc }}
+                {{ T.contestNewFormShortTitleAliasDesc }}
               </p>
             </div>
           </div>
@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import latinize from 'latinize';
 import { types } from '../../api_types';
@@ -99,23 +99,16 @@ export default class GroupScoreboards extends Vue {
   alias: null | string = null;
   description: null | string = null;
 
-  onGenerateAlias(): void {
-    if (this.title === null) {
+  @Watch('title')
+  onTitleBlur(newValue: string, oldValue: string): void {
+    if (newValue === null || newValue === oldValue) {
       return;
     }
 
-    // Remove accents
-    let generatedAlias = latinize(this.title);
-
-    // Replace whitespace
-    generatedAlias = generatedAlias.replace(/\s+/g, '-');
-
-    // Remove invalid characters
-    generatedAlias = generatedAlias.replace(/[^a-zA-Z0-9_-]/g, '');
-
-    generatedAlias = generatedAlias.substring(0, 32);
-
-    this.alias = generatedAlias;
+    this.alias = latinize(newValue) // Remove accents
+      .replace(/\s+/g, '-') // Replace whitespace
+      .replace(/[^a-zA-Z0-9_-]/g, '') // Remove invalid characters
+      .substring(0, 32);
   }
 
   onSubmitScoreboard(): void {
