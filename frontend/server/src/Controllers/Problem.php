@@ -3754,7 +3754,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        return self::getList(
+        return self::getListImpl(
             $page ?: 1,
             $language ?: 'all',
             $orderBy ?: 'problem_id',
@@ -3779,7 +3779,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $programmingLanguages
      * @return array{results: list<ProblemListItem>, total: int}
      */
-    private static function getList(
+    private static function getListImpl(
         int $page,
         string $language,
         string $orderBy,
@@ -4752,7 +4752,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        $result = self::getListReturn(
+        $result = self::getList(
             $page,
             $language,
             $orderBy,
@@ -5886,7 +5886,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        $result = self::getListReturn(
+        $result = self::getList(
             $page,
             $language,
             $orderBy,
@@ -5903,10 +5903,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->user,
             /*$onlyQualitySeal=*/true,
             /*$url=*/"/problem/collection/{$collectionType}/"
-        );
-
-        $title = new \OmegaUp\TranslationString(
-            'omegaupTitleCollectionsByLevel'
         );
 
         $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
@@ -5939,7 +5935,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'tags' => $result['tags'],
                     'tagData' => $result['tagData'],
                 ],
-                'title' => $title,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCollectionsByLevel'
+                ),
             ],
             'entrypoint' => 'problem_collections_details',
         ];
@@ -5961,7 +5959,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{column: string, columns: list<string>, currentTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PageItem>, tagData: list<Tag>, tags: list<string>}
      */
-    private static function getListReturn(
+    private static function getList(
         int $page,
         string $language,
         string $orderBy,
@@ -5979,7 +5977,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $onlyQualitySeal,
         string $url
     ) {
-        $response = self::getList(
+        $response = self::getListImpl(
             $page ?: 1,
             $language ?: 'all',
             $orderBy ?: 'problem_id',
@@ -6086,7 +6084,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        $result = self::getListReturn(
+        $result = self::getList(
             $page,
             $language,
             $orderBy,
@@ -6105,34 +6103,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
             /*$url=*/'/problem/collection/author/'
         );
 
-        $title = new \OmegaUp\TranslationString(
-            'omegaupTitleCollectionsByAuthor'
-        );
-
-        $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRank(
-            1,
-            15
-        )['ranking'];
+        $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems()['ranking'];
 
         foreach ($authorsRanking as $author) {
-            if (!is_null($author['name'])) {
-                $collection[] = [
-                    'name' => $author['name'],
-                    'alias' => $author['username'],
-                ];
-                continue;
-            }
-            $collection[] = [
-                'alias' => $author['username'],
-            ];
-        }
-
-        $authorsRankingExtra = \OmegaUp\Controllers\User::getAuthorsRank(
-            1,
-            115
-        )['ranking'];
-
-        foreach ($authorsRankingExtra as $author) {
             if (!is_null($author['name'])) {
                 $authors[] = [
                     'name' => $author['name'],
@@ -6143,6 +6116,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $authors[] = [
                 'alias' => $author['username'],
             ];
+        }
+
+        for ($i = 0; $i < 15; $i++) {
+            if (!isset($authors[$i])) {
+                break;
+            }
+            $collection[] = $authors[$i];
         }
 
         return [
@@ -6165,7 +6145,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'tags' => $result['tags'],
                     'tagData' => $result['tagData'],
                 ],
-                'title' => $title,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCollectionsByAuthor'
+                ),
             ],
             'entrypoint' => 'problem_collections_by_author_details',
         ];

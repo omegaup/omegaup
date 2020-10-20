@@ -1255,6 +1255,15 @@ export namespace types {
     total: number;
   }
 
+  export interface AuthorsRankWithQualityProblems {
+    ranking: {
+      author_ranking?: number;
+      name?: string;
+      user_id?: number;
+      username: string;
+    }[];
+  }
+
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;

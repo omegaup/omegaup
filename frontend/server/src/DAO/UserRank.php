@@ -164,4 +164,48 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             'total' => $totalRows,
         ];
     }
+
+        /**
+     * @return array{ranking: list<array{user_id: int|null, author_ranking: int|null, name: null|string, username: string}>}
+     */
+    public static function getAuthorsRankWithQualityProblems(): array {
+        $sqlSelect = '
+            SELECT
+                `ur`.`user_id`,
+                `ur`.`author_ranking`,
+                `ur`.`username`,
+                `ur`.`name`
+        ';
+        $sqlFrom = '
+            FROM
+                `User_Rank` `ur`
+            WHERE
+                `ur`.`author_score` IS NOT NULL AND
+                `ur`.`author_ranking` IS NOT NULL AND
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        `Problems` `p`
+                    INNER JOIN
+                        `ACLs` `acl` ON `p`.`acl_id` = `acl`.`acl_id`
+                    INNER JOIN
+                        `Users` `u` ON `u`.`user_id` = `acl`.`owner_id`
+                    WHERE
+                    `u`.`user_id` = `ur`.`user_id` AND `p`.`quality_seal` = 1
+                ) > 0
+        ';
+        $sqlOrderBy = '
+            ORDER BY
+                    `ur`.`author_ranking` ASC
+        ';
+
+        /** @var list<array{user_id: int|null, author_ranking: int|null, name: null|string, username: string}> */
+        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}"
+        );
+        return [
+            'ranking' => $allData
+        ];
+    }
 }
