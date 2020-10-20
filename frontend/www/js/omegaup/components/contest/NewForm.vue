@@ -316,6 +316,7 @@ export default class NewForm extends Vue {
   @Prop({ default: '' }) initialAlias!: string;
   @Prop({ default: '' }) initialDescription!: string;
   @Prop({ default: 'none' }) initialFeedback!: string;
+  @Prop() initialLanguages!: string[];
   @Prop() initialFinishTime!: Date;
   @Prop({ default: false }) initialNeedsBasicInformation!: boolean;
   @Prop({ default: 0 }) initialPenalty!: number;
@@ -336,7 +337,7 @@ export default class NewForm extends Vue {
   description = this.initialDescription;
   feedback = this.initialFeedback;
   finishTime = this.initialFinishTime;
-  languages = Object.keys(this.allLanguages);
+  languages = this.initialLanguages;
   needsBasicInformation = this.initialNeedsBasicInformation;
   penalty = this.initialPenalty;
   penaltyType = this.initialPenaltyType;

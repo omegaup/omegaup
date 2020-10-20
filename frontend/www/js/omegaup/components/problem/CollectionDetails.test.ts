@@ -26,7 +26,7 @@ describe('CollectionDetails.vue', () => {
             'problemTagSimulation',
             'problemTagAnalyticGeometry',
           ],
-        } as types.CollectionDetailsPayload,
+        } as types.CollectionDetailsByLevelPayload,
       },
     });
 
