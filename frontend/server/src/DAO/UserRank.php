@@ -166,12 +166,14 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
     }
 
     /**
-     * @return array{ranking: list<array{user_id: int|null, author_ranking: int|null, name: null|string, username: string}>}
+     * @return array{ranking: list<array{author_ranking: int, name: null|string, username: string}>, total: int}
      */
-    public static function getAuthorsRankWithQualityProblems(): array {
+    public static function getAuthorsRankWithQualityProblems(
+        int $page,
+        int $rowsPerPage
+    ): array {
         $sqlSelect = '
             SELECT
-                `ur`.`user_id`,
                 `ur`.`author_ranking`,
                 `ur`.`username`,
                 `ur`.`name`
@@ -195,17 +197,33 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
                     `u`.`user_id` = `ur`.`user_id` AND `p`.`quality_seal` = 1
                 ) > 0
         ';
+        $sqlCount = '
+            SELECT
+                COUNT(1)
+        ';
         $sqlOrderBy = '
             ORDER BY
                     `ur`.`author_ranking` ASC
         ';
+        $sqlLimit = ' LIMIT ?, ?';
 
-        /** @var list<array{user_id: int|null, author_ranking: int|null, name: null|string, username: string}> */
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            "{$sqlCount}{$sqlFrom}",
+            []
+        ) ?? 0;
+
+        /** @var list<array{author_ranking: int|null, name: null|string, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}"
+            "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
+            [
+                ($page - 1) * $rowsPerPage,
+                $rowsPerPage
+            ]
         );
         return [
-            'ranking' => $allData
+            'ranking' => $allData,
+            'total' => $totalRows,
         ];
     }
 }

@@ -2545,13 +2545,17 @@ class User extends \OmegaUp\Controllers\Controller {
      *
      * @return AuthorsRankWithQualityProblems
      */
-    public static function getAuthorsRankWithQualityProblems(): array {
-        $currentDate = new \DateTime(date('Y-m-d', \OmegaUp\Time::get()));
-        $date = $currentDate->format('Y-m-d');
+    public static function getAuthorsRankWithQualityProblems(
+        int $offset,
+        int $rowCount
+    ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::AUTHORS_RANK_WITH_QUALITY_PROBLEMS,
-            "{$date}",
-            fn () => \OmegaUp\DAO\UserRank::getAuthorsRankWithQualityProblems(),
+            "{$offset}-{$rowCount}",
+            fn () => \OmegaUp\DAO\UserRank::getAuthorsRankWithQualityProblems(
+                $offset,
+                $rowCount
+            ),
             APC_USER_CACHE_USER_RANK_TIMEOUT
         );
     }

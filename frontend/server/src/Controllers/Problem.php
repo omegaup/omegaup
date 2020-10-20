@@ -6103,9 +6103,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
             /*$url=*/'/problem/collection/author/'
         );
 
-        $authorsRanking = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems()['ranking'];
+        $response = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(
+            /*$offset*/            1,
+            /*$rowCount*/100
+        );
 
-        foreach ($authorsRanking as $author) {
+        foreach ($response['ranking'] as $author) {
             if (!is_null($author['name'])) {
                 $authors[] = [
                     'name' => $author['name'],
