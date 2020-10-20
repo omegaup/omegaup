@@ -213,7 +213,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             []
         ) ?? 0;
 
-        /** @var list<array{author_ranking: int|null, name: null|string, username: string}> */
+        /** @var list<array{author_ranking: int, name: null|string, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
             [

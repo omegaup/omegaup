@@ -1256,12 +1256,7 @@ export namespace types {
   }
 
   export interface AuthorsRankWithQualityProblems {
-    ranking: {
-      author_ranking?: number;
-      name?: string;
-      user_id?: number;
-      username: string;
-    }[];
+    ranking: { author_ranking: number; name?: string; username: string }[];
   }
 
   export interface Badge {
