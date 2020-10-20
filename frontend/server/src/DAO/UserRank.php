@@ -165,7 +165,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         ];
     }
 
-        /**
+    /**
      * @return array{ranking: list<array{user_id: int|null, author_ranking: int|null, name: null|string, username: string}>}
      */
     public static function getAuthorsRankWithQualityProblems(): array {
