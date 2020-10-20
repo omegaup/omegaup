@@ -4,20 +4,20 @@
       <div class="col-md-2">
         <div class="card">
           <omegaup-countryflag
-            class="m-1"
-            v-bind:country="profile.country_id"
             v-if="profile.country_id"
+            class="m-1"
+            :country="profile.country_id"
           />
           <div class="card-body">
             <div class="img-thumbnail rounded-circle bottom-margin">
-              <img class="rounded-circle" v-bind:src="profile.gravatar_92" />
+              <img class="rounded-circle" :src="profile.gravatar_92" />
             </div>
           </div>
           <div class="card-title text-center">
             <div class="mb-3">
               <omegaup-user-username
-                v-bind:classname="profile.classname"
-                v-bind:username="profile.username"
+                :classname="profile.classname"
+                :username="profile.username"
               ></omegaup-user-username>
             </div>
             <div class="mb-3">
@@ -53,7 +53,7 @@
               </p>
             </div>
           </div>
-          <div class="mb-3 text-center" v-if="profile.email">
+          <div v-if="profile.email" class="mb-3 text-center">
             <a class="btn btn-primary btn-sm" href="/profile/edit/">{{
               T.profileEdit
             }}</a>
@@ -67,7 +67,7 @@
               <a
                 class="nav-item nav-link active"
                 data-toggle="tab"
-                v-on:click="selectedTab = 'badges'"
+                @click="selectedTab = 'badges'"
               >
                 {{ T.wordsBadgesObtained }}
                 <span class="badge badge-secondary">
@@ -77,13 +77,13 @@
               <a
                 class="nav-item nav-link"
                 data-toggle="tab"
-                v-on:click="selectedTab = 'problems'"
+                @click="selectedTab = 'problems'"
                 >{{ T.wordsProblems }}</a
               >
               <a
                 class="nav-item nav-link"
                 data-toggle="tab"
-                v-on:click="selectedTab = 'contests'"
+                @click="selectedTab = 'contests'"
               >
                 {{ T.profileContests }}
                 <span class="badge badge-secondary">
@@ -93,13 +93,13 @@
               <a
                 class="nav-item nav-link"
                 data-toggle="tab"
-                v-on:click="selectedTab = 'data'"
+                @click="selectedTab = 'data'"
                 >{{ T.profilePersonalData }}</a
               >
               <a
                 class="nav-item nav-link"
                 data-toggle="tab"
-                v-on:click="selectedTab = 'charts'"
+                @click="selectedTab = 'charts'"
                 >{{ T.wordsStatistics }}</a
               >
             </nav>
@@ -110,52 +110,52 @@
                 aria-labelledby="nav-badges-tab"
               >
                 <omegaup-badge-list
-                  v-bind:all-badges="profileBadges"
-                  v-bind:show-all-badges-link="true"
-                  v-bind:visitor-badges="visitorBadges"
                   v-if="selectedTab == 'badges'"
+                  :all-badges="profileBadges"
+                  :show-all-badges-link="true"
+                  :visitor-badges="visitorBadges"
                 ></omegaup-badge-list>
               </div>
               <div
+                v-if="selectedTab == 'problems'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-problems-tab"
-                v-if="selectedTab == 'problems'"
               >
                 <omegaup-grid-paginator
-                  v-bind:columns="3"
-                  v-bind:items="solvedProblems"
-                  v-bind:items-per-page="30"
-                  v-bind:title="T.profileSolvedProblems"
+                  :columns="3"
+                  :items="solvedProblems"
+                  :items-per-page="30"
+                  :title="T.profileSolvedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
                 <omegaup-grid-paginator
-                  v-bind:columns="3"
-                  v-bind:items="unsolvedProblems"
-                  v-bind:items-per-page="30"
-                  v-bind:title="T.profileUnsolvedProblems"
+                  :columns="3"
+                  :items="unsolvedProblems"
+                  :items-per-page="30"
+                  :title="T.profileUnsolvedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
                 <omegaup-grid-paginator
-                  v-bind:columns="3"
-                  v-bind:items="createdProblems"
-                  v-bind:items-per-page="30"
-                  v-bind:title="T.profileCreatedProblems"
+                  :columns="3"
+                  :items="createdProblems"
+                  :items-per-page="30"
+                  :title="T.profileCreatedProblems"
                   class="mb-3"
                 ></omegaup-grid-paginator>
               </div>
               <div
+                v-if="selectedTab == 'contests'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-contests-tab"
-                v-if="selectedTab == 'contests'"
               >
                 <omegaup-grid-paginator
-                  v-bind:columns="1"
-                  v-bind:items="contests"
-                  v-bind:items-per-page="15"
+                  :columns="1"
+                  :items="contests"
+                  :items-per-page="15"
                 >
-                  <template v-slot:table-header>
+                  <template #table-header>
                     <thead>
                       <tr>
                         <th>{{ T.profileContestsTableContest }}</th>
@@ -168,26 +168,26 @@
                 </omegaup-grid-paginator>
               </div>
               <div
+                v-if="selectedTab == 'data'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-user-info-tab"
-                v-if="selectedTab == 'data'"
               >
                 <omegaup-user-basicinfo
-                  v-bind:profile="profile"
-                  v-bind:rank="rank"
+                  :profile="profile"
+                  :rank="rank"
                 ></omegaup-user-basicinfo>
               </div>
               <div
+                v-if="selectedTab == 'charts'"
                 class="tab-pane fade show active"
                 role="tab"
                 aria-labelledby="nav-charts-tab"
-                v-if="selectedTab == 'charts'"
               >
                 <omegaup-user-charts
-                  v-bind:data="charts"
-                  v-bind:username="profile.username"
                   v-if="charts"
+                  :data="charts"
+                  :username="profile.username"
                 ></omegaup-user-charts>
               </div>
             </div>
@@ -200,9 +200,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import { Chart } from 'highcharts-vue';
 import country_Flag from '../CountryFlag.vue';
 import user_BasicInfo from './BasicInfov2.vue';
 import user_Username from './Username.vue';
@@ -210,7 +208,7 @@ import user_Charts from './Chartsv2.vue';
 import badge_List from '../badge/List.vue';
 import common_GridPaginator from '../common/GridPaginator.vue';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
+import * as Highcharts from 'highcharts/highstock';
 import { Problem, ContestResult } from '../../linkable_resource';
 
 @Component({

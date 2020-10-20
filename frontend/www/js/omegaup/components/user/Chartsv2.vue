@@ -48,6 +48,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Chart } from 'highcharts-vue';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import * as Highcharts from 'highcharts/highstock';
 import * as ui from '../../ui';
 
 interface Data {
