@@ -19,7 +19,7 @@ OmegaUp.on('ready', () => {
         props: {
           course: payload.details,
           progress: payload.progress,
-          loggedIn: payload.loggedIn,
+          loggedIn: headerPayload.isLoggedIn,
           currentUsername: headerPayload.currentUsername,
         },
         on: {

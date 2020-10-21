@@ -1696,7 +1696,6 @@ export namespace types {
 
   export interface CourseDetailsPayload {
     details: types.CourseDetails;
-    loggedIn: boolean;
     progress?: types.AssignmentProgress;
     shouldShowFirstAssociatedIdentityRunWarning: boolean;
   }
@@ -1725,7 +1724,6 @@ export namespace types {
   export interface CourseListPayload {
     course_type?: string;
     courses: types.StudentCourses;
-    loggedIn: boolean;
   }
 
   export interface CourseNewPayload {
@@ -1952,10 +1950,8 @@ export namespace types {
 
   export interface IntroDetailsPayload {
     alias: string;
-    currentUsername: string;
     description: string;
     isFirstTimeAccess: boolean;
-    loggedIn: boolean;
     name: string;
     needsBasicInformation: boolean;
     requestsUserInformation: string;
