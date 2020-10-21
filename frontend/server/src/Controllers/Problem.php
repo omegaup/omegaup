@@ -6105,27 +6105,20 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $response = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(
             /*$offset*/            1,
-            /*$rowCount*/100
+            /*$rowCount*/15
         );
 
         foreach ($response['ranking'] as $author) {
             if (!is_null($author['name'])) {
-                $authors[] = [
+                $collection[] = [
                     'name' => $author['name'],
                     'alias' => $author['username'],
                 ];
                 continue;
             }
-            $authors[] = [
+            $collection[] = [
                 'alias' => $author['username'],
             ];
-        }
-
-        for ($i = 0; $i < 15; $i++) {
-            if (!isset($authors[$i])) {
-                break;
-            }
-            $collection[] = $authors[$i];
         }
 
         return [
