@@ -421,7 +421,7 @@ class Course {
         \OmegaUp\Controllers\Course::apiIntroDetails(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
             'course_alias' => $courseAssignmentData['request']['course_alias'],
-            'assignment_alias' => $courseAssignmentData['request']['assignment_alias'],
+            'assignment_alias' => $courseAssignmentData['request']['alias'],
         ]));
     }
 
