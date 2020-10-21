@@ -3403,7 +3403,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                 && $course->requests_user_information !== 'no'
             )
         ) {
-            // TODO: Uncoment the lines beloow when PR #4845 is merged
+            // TODO: Uncomment the lines below when PR #4845 is merged
             /*return self::getIntroDetailsForCourse(
                 $course,
                 $r->identity,
