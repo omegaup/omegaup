@@ -25,6 +25,10 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
+          @apply-filter="
+            (columnName, sortOrder) =>
+              $emit('apply-filter', columnName, sortOrder)
+          "
         >
         </omegaup-problem-list>
       </div>
