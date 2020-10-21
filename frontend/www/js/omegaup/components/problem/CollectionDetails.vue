@@ -8,23 +8,61 @@
           :public-tags="publicTags"
         ></omegaup-problem-filter-tags>
       </div>
+      <div class="col">
+        <omegaup-problem-list
+          :problems="problems"
+          :logged-in="loggedIn"
+          :current-tags="currentTags"
+          :pager-items="pagerItems"
+          :wizard-tags="wizardTags"
+          :language="language"
+          :languges="languages"
+          :keyword="keyword"
+          :modes="modes"
+          :columns="columns"
+          :mode="modes"
+          :column="column"
+          :tags="tagsList"
+          :sort-order="sortOrder"
+          :column-name="columnName"
+        >
+        </omegaup-problem-list>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
 import problem_FilterTags from './FilterTags.vue';
+import problem_List from './ListV2.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
 @Component({
   components: {
     'omegaup-problem-filter-tags': problem_FilterTags,
+    'omegaup-problem-list': problem_List,
   },
 })
 export default class CollectionDetails extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
+  @Prop() problems!: omegaup.Problem;
+  @Prop() loggedIn!: boolean;
+  @Prop() currentTags!: string[];
+  @Prop() pagerItems!: types.PageItem[];
+  @Prop() wizardTags!: omegaup.Tag[];
+  @Prop() language!: string;
+  @Prop() languages!: string[];
+  @Prop() keyword!: string;
+  @Prop() modes!: string[];
+  @Prop() columns!: string[];
+  @Prop() mode!: string;
+  @Prop() column!: string;
+  @Prop({ default: () => [] }) tagsList!: string[];
+  @Prop() sortOrder!: string;
+  @Prop() columnName!: string;
 
   T = T;
   type = this.data.type;

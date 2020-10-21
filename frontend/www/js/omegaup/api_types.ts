@@ -1353,7 +1353,7 @@ export namespace types {
     problems: types.ProblemListItem[];
     publicTags: string[];
     tagData: { name?: string }[];
-    tags: string[];
+    tagsList: string[];
     type: string;
   }
 
