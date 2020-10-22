@@ -33,7 +33,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemEditPayload=array{admins: list<ProblemAdmin>, alias: string, allowUserAddTags: bool, emailClarifications: bool, extraWallTime: float, groupAdmins: list<ProblemGroupAdmin>, inputLimit: int, languages: string, levelTags: list<string>, log: list<ProblemVersion>, memoryLimit: float, outputLimit: int, overallWallTimeLimit: float, problemLevel: null|string, problemsetter?: ProblemsetterInfo, publicTags: list<string>, publishedRevision: ProblemVersion|null, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, showDiff: string, solution: ProblemStatement|null, source: string, statement: ProblemStatement, statusError?: string, statusSuccess: bool, timeLimit: float, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: float|int, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type Histogram=array{difficulty: float, difficultyHistogram: null|string, quality: float, qualityHistogram: null|string}
  * @psalm-type ProblemDetailsPayload=array{accepts_submissions: bool, accepted: int, admin?: bool, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, difficulty: float|null, email_clarifications: bool, histogram: array{difficulty: float, difficulty_histogram: null|string, quality: float, quality_histogram: null|string}, input_limit: int, languages: list<string>, letter?: string, order: string, points: float, preferred_language?: string, problem_id: int, problemsetter?: ProblemsetterInfo, quality_seal: bool, runs?: list<Run>, score: float, settings: ProblemSettingsDistrib, shouldShowFirstAssociatedIdentityRunWarning: bool, solution_status?: string, solvers?: list<BestSolvers>, source?: string, statement: ProblemStatement, submissions: int, title: string, user: array{admin: bool, logged_in: bool, reviewer: bool}, version: string, visibility: int, visits: int}
- * @psalm-type ProblemDetailsv2Payload=array{allRuns?: list<Run>, clarifications?: list<Clarification>, histogram: Histogram, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers?: list<BestSolvers>, user: UserInfoForProblem}
+ * @psalm-type ProblemDetailsv2Payload=array{allRuns?: list<Run>, problemLevel?: null|string, publicTags?: list<string>, levelTags?: list<string>, allowUserAddTags?: bool, selectedPublicTags?: list<string>, selectedPrivateTags?: list<string>,clarifications?: list<Clarification>, histogram: Histogram, nominationStatus?: NominationStatus, problem: ProblemInfo, runs?: list<Run>, solutionStatus?: string, solvers?: list<BestSolvers>, user: UserInfoForProblem}
  * @psalm-type ProblemFormPayload=array{alias: string, allowUserAddTags: true, emailClarifications: bool, extraWallTime: int|string, inputLimit: int|string, languages: string, levelTags: list<string>, memoryLimit: int|string, message?: string, outputLimit: int|string, overallWallTimeLimit: int|string, parameter: null|string, problem_level: string, publicTags: list<string>, selectedTags: list<SelectedTag>|null, showDiff: string, source: string, statusError: string, tags: list<array{name: null|string}>, timeLimit: int|string, title: string, validLanguages: array<string, string>, validator: string, validatorTimeLimit: int|string, validatorTypes: array<string, null|string>, visibility: int, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemsMineInfoPayload=array{isSysadmin: bool, privateProblemsAlert: bool, visibilityStatuses: array<string, int>}
  * @psalm-type ProblemListPayload=array{currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
@@ -4515,6 +4515,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
+        $problemAdmin = \OmegaUp\DAO\Problems::getByAlias(
+            $alias
+        );
+        if (is_null($problem) || is_null($problem->alias)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'problemNotFound'
+            );
+        }
+
         // Get problem details from API
         $details = self::getProblemDetails(
             $r->identity,
@@ -4697,6 +4706,24 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $allRuns[] = $run;
             }
             $response['smartyProperties']['payload']['allRuns'] = $allRuns;
+            $response['smartyProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
+                $problemAdmin
+            ); //----------
+            $response['smartyProperties']['payload']['publicTags'] = \OmegaUp\Controllers\Tag::getPublicTags();
+            $response['smartyProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
+            $response['smartyProperties']['payload']['allowUserAddTags'] = $problemAdmin->allow_user_add_tags;
+            $response['smartyProperties']['payload']['selectedPublicTags'] = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+                $problem,
+                true
+            );
+            $response['smartyProperties']['payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
+                $r->identity,
+                $problemAdmin
+            ) ?
+            \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+                $problem,
+                false
+            ) : []);
         }
 
         return $response;
