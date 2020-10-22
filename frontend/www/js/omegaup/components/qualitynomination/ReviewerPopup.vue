@@ -16,10 +16,10 @@
           {{ T.reviewerNominationQuality }}
         </label>
         <br />
-          <omegaup-radio-switch
-            :value.sync="qualitySeal"
-            :selected-value="qualitySeal"
-          ></omegaup-radio-switch>
+        <omegaup-radio-switch
+          :value.sync="qualitySeal"
+          :selected-value="qualitySeal"
+        ></omegaup-radio-switch>
       </div>
       <div class="form-group">
         <label class="control-label">
@@ -43,31 +43,31 @@
         >
       </div>
       <omegaup-problem-tags
-          :alias="problemAlias"
-          :title="problemTitle"
-          :initial-allow-tags="allowUserAddTags"
-          :can-add-new-tags="true"
-          :public-tags="publicTags"
-          :level-tags="levelTags"
-          :problem-level="problemLevel"
-          :selected-public-tags="selectedPublicTags"
-          :selected-private-tags="selectedPrivateTags"
-          @emit-update-problem-level="
-            (levelTag) => $emit('update-problem-level', levelTag)
-          "
-          @emit-add-tag="
-            (alias, tagname, isPublic) =>
-              $emit('add-tag', alias, tagname, isPublic)
-          "
-          @emit-remove-tag="
-            (alias, tagname, isPublic) =>
-              $emit('remove-tag', alias, tagname, isPublic)
-          "
-          @emit-change-allow-user-add-tag="
-            (alias, title, allowTags) =>
-              $emit('change-allow-user-add-tag', alias, title, allowTags)
-          "
-        ></omegaup-problem-tags>
+        :alias="problemAlias"
+        :title="problemTitle"
+        :initial-allow-tags="allowUserAddTags"
+        :can-add-new-tags="true"
+        :public-tags="publicTags"
+        :level-tags="levelTags"
+        :problem-level="problemLevel"
+        :selected-public-tags="selectedPublicTags"
+        :selected-private-tags="selectedPrivateTags"
+        @emit-update-problem-level="
+          (levelTag) => $emit('update-problem-level', levelTag)
+        "
+        @emit-add-tag="
+          (alias, tagname, isPublic) =>
+            $emit('add-tag', alias, tagname, isPublic)
+        "
+        @emit-remove-tag="
+          (alias, tagname, isPublic) =>
+            $emit('remove-tag', alias, tagname, isPublic)
+        "
+        @emit-change-allow-user-add-tag="
+          (alias, title, allowTags) =>
+            $emit('change-allow-user-add-tag', alias, title, allowTags)
+        "
+      ></omegaup-problem-tags>
       <div class="button-row text-right">
         <button
           class="col-md-4 mr-2 btn btn-primary"
@@ -112,12 +112,10 @@ export default class ReviewerPopup extends Vue {
   @Prop() selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
   @Prop() problemTitle!: string;
- 
+
   T = T;
   qualitySeal = true;
   tag = '';
-
-
 
   PROBLEM_CATEGORIES = [
     'problemLevelAdvancedCompetitiveProgramming',
@@ -128,9 +126,5 @@ export default class ReviewerPopup extends Vue {
     'problemLevelIntermediateDataStructuresAndAlgorithms',
     'problemLevelIntermediateMathsInProgramming',
   ];
-
-
-
-
 }
 </script>
