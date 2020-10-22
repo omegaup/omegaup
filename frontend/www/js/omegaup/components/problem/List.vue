@@ -1,26 +1,28 @@
 <template>
   <div>
-    <omegaup-problem-search-bar
-      :initial-language="language"
-      :languages="languages"
-      :initial-keyword="keyword"
-      :tags="tags"
-    ></omegaup-problem-search-bar>
-    <a
-      href="#"
-      class="d-inline-block mb-3"
-      role="button"
-      @click="showFinderWizard = true"
-    >
-      {{ T.wizardLinkText }}
-    </a>
-    <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
-    <omegaup-problem-finder
-      v-show="showFinderWizard"
-      :possible-tags="wizardTags"
-      @close="showFinderWizard = false"
-      @search-problems="wizardSearch"
-    ></omegaup-problem-finder>
+    <div v-if="isProblemPage">
+      <omegaup-problem-search-bar
+        :initial-language="language"
+        :languages="languages"
+        :initial-keyword="keyword"
+        :tags="tags"
+      ></omegaup-problem-search-bar>
+      <a
+        href="#"
+        class="d-inline-block mb-3"
+        role="button"
+        @click="showFinderWizard = true"
+      >
+        {{ T.wizardLinkText }}
+      </a>
+      <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
+      <omegaup-problem-finder
+        v-show="showFinderWizard"
+        :possible-tags="wizardTags"
+        @close="showFinderWizard = false"
+        @search-problems="wizardSearch"
+      ></omegaup-problem-finder>
+    </div>
     <div class="card">
       <h5 class="card-header">
         {{ T.wordsProblems }}
@@ -292,6 +294,7 @@ export default class ProblemList extends Vue {
   @Prop() tags!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop({ default: true }) isProblemPage!: boolean;
 
   T = T;
   ui = ui;

@@ -25,6 +25,7 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
+          :is-problem-page="false"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder)
@@ -40,7 +41,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import problem_FilterTags from './FilterTags.vue';
-import problem_List from './ListV2.vue';
+import problem_List from './List.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
