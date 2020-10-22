@@ -1,6 +1,5 @@
 <p align="center"><a href="https://omegaup.com" target="_blank">
-<img src="logo/favicon.png" width="50"><br>
-<img width="150" src="logo/omegaUp.png" alt="OmegaUp logo">
+<img src="logo/omegaup.png" width="150" alt="OmegaUp logo">
 </a></p>
 
 <p align="center">
