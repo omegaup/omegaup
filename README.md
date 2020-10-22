@@ -1,4 +1,4 @@
-[![Logo](logo/omegaup.png)](https://omegaup.com)
+[![omegaUp](frontend/www/media/omegaup.png)](https://omegaup.com)
 
 [![Build Status](https://travis-ci.com/omegaup/omegaup.svg)](https://travis-ci.com/omegaup/omegaup)
 
@@ -14,7 +14,7 @@
 
 [![Twitter](https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow)](https://twitter.com/omegaup)
 
-[OmegaUp](https://omegaup.com) es una plataforma educativa gratuita que ayuda a mejorar las habilidades en programación, usada por miles de estudiantes y profesores en Latinoamérica. 
+[omegaUp](https://omegaup.com) es una plataforma educativa gratuita que ayuda a mejorar las habilidades en programación, usada por miles de estudiantes y profesores en Latinoamérica.
 
 ## Directorios
 
@@ -33,7 +33,7 @@ El resto del código está en otros repositorios
 | Repositorio| Descripción |
 |------------|-------------|
 | [quark](https://github.com/lhchavez/quark) | Incluye el código del grader para la calificación de problemas y ejecutar los códigos bajo minijail, así como el servicio utilizado en los servidores de la nube para servir la cola de envíos. |
-| [karel.js](https://github.com/omegaup/karel.js) | La versión oficial de Karel utilizada por la Olimpiada Mexicana de Informática. | 
+| [karel.js](https://github.com/omegaup/karel.js) | La versión oficial de Karel utilizada por la Olimpiada Mexicana de Informática. |
 | [omegajail](https://github.com/omegaup/omegajail) | Un mecanismo de ejecución segura que basado en contenedores de Linux y seccomp-bpf. Utiliza [minijail](https://android.googlesource.com/platform/external/minijail/+/master), escrito por el proyecto [Chromium](https://www.chromium.org). |
 | [libinteractive](https://github.com/omegaup/libinteractive) | Una librería para hacer problemas interactivos fácilmente.
 
@@ -50,6 +50,6 @@ Los navegadores oficialmente soportados son aquellos que soportan [ECMAScript 20
 
 Esto también incluye todos los navegadores basados en Blink / WebKit cuyas versiones sean compatibles con las de Chrome / Safari.
 
-## Licencia 
+## Licencia
 
 BSD
