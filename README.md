@@ -1,26 +1,22 @@
-<br/><p align="center"><a href="https://omegaup.com" target="_blank"><img src="logo/omegaup.png" width="200" alt="OmegaUp logo">
-</a></p><br/>
+<p align="center"><a href="https://omegaup.com" target="_blank">
+<img src="logo/omegaup.png" width="200" alt="OmegaUp logo">
+</a></p>
 
 <p align="center">
   <a href="https://travis-ci.com/omegaup/omegaup" target="_blank"><img src="https://travis-ci.com/omegaup/omegaup.svg" alt="Build Status"></a>
   <a href="https://github.com/omegaup/omegaup/graphs/contributors"><img src="https://img.shields.io/github/contributors/omegaup/omegaup" alt="Contributors"></a>
   <a href="https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen"><img src="https://img.shields.io/github/issues/omegaup/omegaup" alt="Issues open"></a>
   <a href="https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed"><img src="https://img.shields.io/github/issues-closed/omegaup/omegaup" alt="Issues closed"></a>
-  <br/>
   <a href="https://github.com/omegaup/omegaup/network/members"><img src="https://img.shields.io/github/forks/omegaup/omegaup?style=social" alt="Forks"></a>
   <a href="https://github.com/omegaup/omegaup/stargazers"><img src="https://img.shields.io/github/stars/omegaup/omegaup?style=social" alt="Stars"></a>
   <a href="https://twitter.com/omegaup" target="_blank"><img src="https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow" alt="Twitter"></a>
-</p><br/>
+</p>
 
 [OmegaUp](https://omegaup.com) es una plataforma educativa gratuita que ayuda a mejorar las habilidades en programación, usada por miles de estudiantes y profesores en Latinoamérica. 
-
-<br/>
 
 ## Directorios
 
 Directorios que se utilizan activamente en el desarrollo.
-
-<br/>
 
 | Directorio | Descripción |
 |------------|-------------|
@@ -30,11 +26,7 @@ Directorios que se utilizan activamente en el desarrollo.
 | [frontend/templates](https://github.com/omegaup/omegaup/tree/master/frontend/templates) | Plantillas de Smarty utilizadas para generar el HTML que se despliega a los usuarios. También aquí están los archivos de internacionalización para inglés, español y portugués. |
 | [frontend/www](https://github.com/omegaup/omegaup/tree/master/frontend/www) |  Los contenidos completos de la página de internet. |
 
-<br/>
-
 El resto del código está en otros repositorios
-
-<br/>
 
 | Repositorio| Descripción |
 |------------|-------------|
@@ -47,8 +39,6 @@ El resto del código está en otros repositorios
 
 Los navegadores oficialmente soportados son aquellos que soportan [ECMAScript 2015 (ES6)](https://caniuse.com/#feat=es6), e incluyen los siguientes:
 
-<br/>
-
 | Navegador | Versión |
 |-----------|---------|
 | [Chrome](https://www.google.com/chrome/) | 51 |
@@ -56,10 +46,7 @@ Los navegadores oficialmente soportados son aquellos que soportan [ECMAScript 20
 | [Edge](https://www.microsoft.com/edge) | 12 |
 | [Safari](https://www.apple.com/safari/) | 12 |
 
-<br/>
-
 Esto también incluye todos los navegadores basados en Blink / WebKit cuyas versiones sean compatibles con las de Chrome / Safari.
-
 
 ## Licencia 
 
