@@ -132,9 +132,17 @@ export namespace types {
       );
     }
 
-    export function CollectionDetailsPayload(
+    export function CollectionDetailsByAuthorPayload(
       elementId: string = 'payload',
-    ): types.CollectionDetailsPayload {
+    ): types.CollectionDetailsByAuthorPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function CollectionDetailsByLevelPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsByLevelPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -1247,6 +1255,10 @@ export namespace types {
     total: number;
   }
 
+  export interface AuthorsRankWithQualityProblems {
+    ranking: { author_ranking: number; name?: string; username: string }[];
+  }
+
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;
@@ -1338,9 +1350,39 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
-  export interface CollectionDetailsPayload {
+  export interface CollectionDetailsByAuthorPayload {
+    authors: { name?: string; username: string }[];
+    column: string;
+    columns: string[];
+    currentTags: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    tagData: { name?: string }[];
+    tags: string[];
+  }
+
+  export interface CollectionDetailsByLevelPayload {
     collection: { alias: string; name?: string }[];
+    column: string;
+    columns: string[];
+    currentTags: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
     publicTags: string[];
+    tagData: { name?: string }[];
+    tags: string[];
     type: string;
   }
 
@@ -2690,6 +2732,7 @@ export namespace types {
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
+    problemTitles: { [key: string]: string };
     students: types.StudentProgress[];
   }
 

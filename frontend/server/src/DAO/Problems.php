@@ -99,7 +99,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         array $programmingLanguages,
-        ?array $difficultyRange
+        ?array $difficultyRange,
+        bool $onlyQualitySeal
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -291,6 +292,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $args,
                 $clauses
             );
+        }
+
+        if ($onlyQualitySeal) {
+            $clauses[] = [
+                'p.quality_seal = ?', [1]
+            ];
         }
 
         // Finally flatten all WHERE clauses, and add a 'WHERE' if applicable.
@@ -1165,7 +1172,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     Problems
                 WHERE
                     quality_seal = 1
-                GROUP BY
+                ORDER BY
                     RAND() LIMIT 1;';
 
         /** @var string */

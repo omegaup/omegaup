@@ -203,7 +203,7 @@
         >
           <div class="card-body">
             <omegaup-course-clone
-              :initial-alias="course.alias"
+              :initial-alias="aliasWithUsername"
               :initial-name="course.name"
               @clone="
                 (alias, name, startTime) =>
@@ -256,6 +256,7 @@ library.add(
 export default class CourseDetails extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() progress!: types.AssignmentProgress;
+  @Prop() currentUsername!: string;
 
   T = T;
   ui = ui;
@@ -287,6 +288,10 @@ export default class CourseDetails extends Vue {
       return '—';
     }
     return time.formatDateTime(date);
+  }
+
+  get aliasWithUsername(): string {
+    return `${this.course.alias}_${this.currentUsername}`;
   }
 }
 </script>
