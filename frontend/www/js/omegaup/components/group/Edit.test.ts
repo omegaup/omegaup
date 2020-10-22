@@ -2,8 +2,6 @@ import { mount, shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
 
 import group_Edit from './Edit.vue';
 
@@ -13,9 +11,7 @@ describe('Edit.vue', () => {
       propsData: {
         groupAlias: 'Hello',
         groupName: 'Hello omegaUp',
-        countries: [
-          { country_id: 'MX', name: 'Mexico' },
-        ],
+        countries: [{ country_id: 'MX', name: 'Mexico' }],
         isOrganizer: true,
         initialTab: 'members',
         initialIdentities: [],
@@ -24,17 +20,15 @@ describe('Edit.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('some');
+    expect(wrapper.text()).toContain('Hello omegaUp');
   });
 
-  it('Should handle edit view with empty scoreboards and identities', () => {
+  it('Should handle edit view getting the subcomponents info', () => {
     const wrapper = mount(group_Edit, {
       propsData: {
         groupAlias: 'Hello',
         groupName: 'Hello omegaUp',
-        countries: [
-          { country_id: 'MX', name: 'Mexico' },
-        ],
+        countries: [{ country_id: 'MX', name: 'Mexico' }],
         isOrganizer: true,
         initialTab: 'members',
         initialIdentities: [],
@@ -43,6 +37,6 @@ describe('Edit.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('some');
+    expect(wrapper.text()).toContain(T.groupEditMembers);
   });
 });
