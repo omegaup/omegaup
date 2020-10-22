@@ -1,6 +1,6 @@
 # Bienvenido a omegaUp!
 
-[![Build Status](https://travis-ci.org/omegaup/omegaup.svg?branch=master)](https://travis-ci.org/omegaup/omegaup)
+[![Build Status](https://travis-ci.com/omegaup/omegaup.svg?branch=master)](https://travis-ci.com/omegaup/omegaup)
 
 ## Código
 
