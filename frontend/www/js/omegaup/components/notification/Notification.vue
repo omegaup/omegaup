@@ -65,6 +65,8 @@ export default class Notification extends Vue {
         return '/media/warning.svg';
       case 'general_notification':
         return '/media/email.svg';
+      case 'coder_of_the_month':
+        return '/media/info.png';
       default:
         return '/media/info.png';
     }
@@ -75,6 +77,8 @@ export default class Notification extends Vue {
       case 'demotion':
         return this.notification.contents.message || '';
       case 'general_notification':
+        return this.notification.contents.message || '';
+      case 'coder_of_the_month':
         return this.notification.contents.message || '';
       default:
         return '';

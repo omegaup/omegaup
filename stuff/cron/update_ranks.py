@@ -4,6 +4,7 @@
 
 import argparse
 import datetime
+import json
 import logging
 import os
 import sys
@@ -661,6 +662,21 @@ def update_coder_of_the_month_candidates(
                         category,
                         row['score'],
                         row['ProblemsSolved']
+                    ))
+        cur.execute('''
+                    INSERT INTO
+                        `Notifications` (
+                            `user_id`,
+                            `contents`
+                        )
+                    VALUES (
+                        %s,
+                        %s
+                    );
+                    ''',
+                    (
+                        row['user_id'],
+                        json.dumps({'type': 'coder_of_the_month', 'body': 'coderOfTheMonthNotice'})
                     ))
 
 
