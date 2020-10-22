@@ -1,16 +1,18 @@
-<p align="center"><a href="https://omegaup.com" target="_blank">
-<img src="logo/omegaup.png" width="200" alt="OmegaUp logo">
-</a></p>
+[![Logo](logo/omegaup.png)](https://omegaup.com)
 
-<p align="center">
-  <a href="https://travis-ci.com/omegaup/omegaup" target="_blank"><img src="https://travis-ci.com/omegaup/omegaup.svg" alt="Build Status"></a>
-  <a href="https://github.com/omegaup/omegaup/graphs/contributors"><img src="https://img.shields.io/github/contributors/omegaup/omegaup" alt="Contributors"></a>
-  <a href="https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen"><img src="https://img.shields.io/github/issues/omegaup/omegaup" alt="Issues open"></a>
-  <a href="https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed"><img src="https://img.shields.io/github/issues-closed/omegaup/omegaup" alt="Issues closed"></a>
-  <a href="https://github.com/omegaup/omegaup/network/members"><img src="https://img.shields.io/github/forks/omegaup/omegaup?style=social" alt="Forks"></a>
-  <a href="https://github.com/omegaup/omegaup/stargazers"><img src="https://img.shields.io/github/stars/omegaup/omegaup?style=social" alt="Stars"></a>
-  <a href="https://twitter.com/omegaup" target="_blank"><img src="https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow" alt="Twitter"></a>
-</p>
+[![Build Status](https://travis-ci.com/omegaup/omegaup.svg)](https://travis-ci.com/omegaup/omegaup)
+
+[![Contributors](https://img.shields.io/github/contributors/omegaup/omegaup)](https://github.com/omegaup/omegaup/graphs/contributors)
+
+[![Issues open](https://img.shields.io/github/issues/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aopen)
+
+[![Issues closed](https://img.shields.io/github/issues-closed/omegaup/omegaup)](https://github.com/omegaup/omegaup/issues?q=is%3Aissue+is%3Aclosed)
+
+[![Forks](https://img.shields.io/github/forks/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/network/members)
+
+[![Stars](https://img.shields.io/github/stars/omegaup/omegaup?style=social)](https://github.com/omegaup/omegaup/stargazers)
+
+[![Twitter](https://img.shields.io/twitter/follow/omegaup.svg?style=social&label=Follow)](https://twitter.com/omegaup)
 
 [OmegaUp](https://omegaup.com) es una plataforma educativa gratuita que ayuda a mejorar las habilidades en programación, usada por miles de estudiantes y profesores en Latinoamérica. 
 
