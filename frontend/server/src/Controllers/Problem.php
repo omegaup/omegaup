@@ -4516,7 +4516,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         $problemAdmin = \OmegaUp\DAO\Problems::getByAlias(
-            $alias
+            $problemAlias
         );
         if (is_null($problem) || is_null($problem->alias)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -4708,7 +4708,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $response['smartyProperties']['payload']['allRuns'] = $allRuns;
             $response['smartyProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
                 $problemAdmin
-            ); //----------
+            );
             $response['smartyProperties']['payload']['publicTags'] = \OmegaUp\Controllers\Tag::getPublicTags();
             $response['smartyProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
             $response['smartyProperties']['payload']['allowUserAddTags'] = $problemAdmin->allow_user_add_tags;
