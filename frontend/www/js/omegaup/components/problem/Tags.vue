@@ -54,57 +54,59 @@
           </tr>
         </tbody>
       </table>
-      <div class="form-group">
-        <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
-        <div class="input-group">
-          <input
-            v-model="newPrivateTag"
-            type="text"
-            class="form-control"
-            :placeholder="T.privateTagsPlaceholder"
-          />
-          <div class="input-group-append">
-            <button
-              class="btn btn-outline-primary"
-              type="button"
-              :disabled="newPrivateTag === ''"
-              @click.prevent="addPrivateTag"
-            >
-              {{ T.wordsAddTag }}
-            </button>
+      <template v-if="isCreate">
+        <div class="form-group">
+          <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
+          <div class="input-group">
+            <input
+              v-model="newPrivateTag"
+              type="text"
+              class="form-control"
+              :placeholder="T.privateTagsPlaceholder"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-outline-primary"
+                type="button"
+                :disabled="newPrivateTag === ''"
+                @click.prevent="addPrivateTag"
+              >
+                {{ T.wordsAddTag }}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th class="text-center" scope="col">
-              {{ T.contestEditTagName }}
-            </th>
-            <th class="text-center" scope="col">
-              {{ T.contestEditTagDelete }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="tag in selectedPrivateTags" :key="tag">
-            <td class="align-middle">
-              <a :href="`/problem/?tag[]=${tag}`">
-                {{ tag }}
-              </a>
-            </td>
-            <td class="text-center">
-              <button
-                type="button"
-                class="btn btn-danger"
-                @click="removeTag(tag, false /* public */)"
-              >
-                <font-awesome-icon :icon="['fas', 'trash']" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagName }}
+              </th>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagDelete }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="tag in selectedPrivateTags" :key="tag">
+              <td class="align-middle">
+                <a :href="`/problem/?tag[]=${tag}`">
+                  {{ tag }}
+                </a>
+              </td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  @click="removeTag(tag, false /* public */)"
+                >
+                  <font-awesome-icon :icon="['fas', 'trash']" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
       <div class="row">
         <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsLevel }}</label>
@@ -189,6 +191,7 @@ export default class ProblemTags extends Vue {
   @Prop({ default: false }) canAddNewTags!: boolean;
   @Prop({ default: false }) isCreate!: boolean;
   @Prop({ default: () => [] }) errors!: string[];
+  @Prop({ default: false }) isReview!: boolean;
 
   T = T;
   allowTags = this.initialAllowTags;

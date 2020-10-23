@@ -22,52 +22,34 @@
         ></omegaup-radio-switch>
       </div>
       <div class="form-group">
-        <label class="control-label">
-          {{ T.reviewerNominationCategory }}
-          <ul class="tag-select">
-            <li
-              v-for="problemTopic in slotProps.sortedProblemTags"
-              :key="problemTopic.value"
-              class="tag-select"
-            >
-              <label class="tag-select"
-                ><input
-                  v-model="tag"
-                  type="radio"
-                  :value="problemTopic.value"
-                />
-                {{ problemTopic.text }}</label
-              >
-            </li>
-          </ul></label
-        >
+        <omegaup-problem-tags
+          :alias="problemAlias"
+          :title="problemTitle"
+          :initial-allow-tags="allowUserAddTags"
+          :can-add-new-tags="true"
+          :public-tags="publicTags"
+          :level-tags="levelTags"
+          :problem-level="problemLevel"
+          :selected-public-tags="selectedPublicTags"
+          :selected-private-tags="selectedPrivateTags"
+          :is-review="true"
+          @emit-update-problem-level="
+            (levelTag) => $emit('update-problem-level', levelTag)
+          "
+          @emit-add-tag="
+            (alias, tagname, isPublic) =>
+              $emit('add-tag', alias, tagname, isPublic)
+          "
+          @emit-remove-tag="
+            (alias, tagname, isPublic) =>
+              $emit('remove-tag', alias, tagname, isPublic)
+          "
+          @emit-change-allow-user-add-tag="
+            (alias, title, allowTags) =>
+              $emit('change-allow-user-add-tag', alias, title, allowTags)
+          "
+        ></omegaup-problem-tags>
       </div>
-      <omegaup-problem-tags
-        :alias="problemAlias"
-        :title="problemTitle"
-        :initial-allow-tags="allowUserAddTags"
-        :can-add-new-tags="true"
-        :public-tags="publicTags"
-        :level-tags="levelTags"
-        :problem-level="problemLevel"
-        :selected-public-tags="selectedPublicTags"
-        :selected-private-tags="selectedPrivateTags"
-        @emit-update-problem-level="
-          (levelTag) => $emit('update-problem-level', levelTag)
-        "
-        @emit-add-tag="
-          (alias, tagname, isPublic) =>
-            $emit('add-tag', alias, tagname, isPublic)
-        "
-        @emit-remove-tag="
-          (alias, tagname, isPublic) =>
-            $emit('remove-tag', alias, tagname, isPublic)
-        "
-        @emit-change-allow-user-add-tag="
-          (alias, title, allowTags) =>
-            $emit('change-allow-user-add-tag', alias, title, allowTags)
-        "
-      ></omegaup-problem-tags>
       <div class="button-row text-right">
         <button
           class="col-md-4 mr-2 btn btn-primary"
