@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import collection_List from '../components/problem/CollectionList.vue';
+import problem_CollectionList from '../components/problem/CollectionList.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
@@ -41,10 +41,10 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-collection-list': collection_List,
+      'omegaup-problem-collection-list': problem_CollectionList,
     },
     render: function (createElement) {
-      return createElement('omegaup-collection-list', {
+      return createElement('omegaup-problem-collection-list', {
         props: {
           data: payload,
           problems: payload.problems,
@@ -71,7 +71,7 @@ OmegaUp.on('ready', () => {
               sort_order: sortOrder,
             };
             window.location.replace(
-              `/problem/collection/${payload.type}?${ui.buildURLQuery(
+              `/problem/collection/${payload.level}/?${ui.buildURLQuery(
                 queryParameters,
               )}`,
             );

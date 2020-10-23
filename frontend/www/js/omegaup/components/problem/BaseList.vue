@@ -1,4 +1,25 @@
 <template>
+  <omegaup-problem-search-bar
+    :initial-language="language"
+    :languages="languages"
+    :initial-keyword="keyword"
+    :tags="tags"
+  ></omegaup-problem-search-bar>
+  <a
+    href="#"
+    class="d-inline-block mb-3"
+    role="button"
+    @click="showFinderWizard = true"
+  >
+    {{ T.wizardLinkText }}
+  </a>
+  <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
+  <omegaup-problem-finder
+    v-show="showFinderWizard"
+    :possible-tags="wizardTags"
+    @close="showFinderWizard = false"
+    @search-problems="wizardSearch"
+  ></omegaup-problem-finder>
   <omegaup-problem-list
     :problems="problems"
     :logged-in="loggedIn"
@@ -15,35 +36,10 @@
     :tags="tags"
     :sort-order="sortOrder"
     :column-name="columnName"
-    :is-problem-page="false"
     @apply-filter="
       (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
     "
-  >
-    <template #search-and-finder>
-      <omegaup-problem-search-bar
-        :initial-language="language"
-        :languages="languages"
-        :initial-keyword="keyword"
-        :tags="tags"
-      ></omegaup-problem-search-bar>
-      <a
-        href="#"
-        class="d-inline-block mb-3"
-        role="button"
-        @click="showFinderWizard = true"
-      >
-        {{ T.wizardLinkText }}
-      </a>
-      <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
-      <omegaup-problem-finder
-        v-show="showFinderWizard"
-        :possible-tags="wizardTags"
-        @close="showFinderWizard = false"
-        @search-problems="wizardSearch"
-      ></omegaup-problem-finder>
-    </template>
-  </omegaup-problem-list>
+  ></omegaup-problem-list>
 </template>
 
 <script lang="ts">

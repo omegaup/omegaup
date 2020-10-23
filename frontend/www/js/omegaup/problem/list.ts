@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import problem_List from '../components/problem/ListSearch.vue';
+import problem_List from '../components/problem/List.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';

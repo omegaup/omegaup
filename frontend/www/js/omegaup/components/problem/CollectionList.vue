@@ -25,7 +25,6 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
-          :is-problem-page="false"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder)
@@ -70,7 +69,7 @@ export default class CollectionList extends Vue {
   @Prop() columnName!: string;
 
   T = T;
-  type = this.data.type;
+  level = this.data.level;
   tags: string[] = this.data.collection.map((element) => element.alias);
 
   get publicTags(): string[] {
@@ -79,7 +78,7 @@ export default class CollectionList extends Vue {
   }
 
   get title(): string {
-    switch (this.type) {
+    switch (this.level) {
       case 'author':
         return T.omegaupTitleCollectionsByAuthor;
       case 'problemLevelBasicKarel':

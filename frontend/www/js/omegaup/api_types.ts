@@ -1346,6 +1346,7 @@ export namespace types {
     keyword: string;
     language: string;
     languages: string[];
+    level: string;
     loggedIn: boolean;
     mode: string;
     modes: string[];
@@ -1354,7 +1355,6 @@ export namespace types {
     publicTags: string[];
     tagData: { name?: string }[];
     tagsList: string[];
-    type: string;
   }
 
   export interface CommitRunsDiff {
