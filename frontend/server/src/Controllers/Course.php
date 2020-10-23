@@ -2596,7 +2596,6 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return IntroDetailsPayload
      *
-     * @omegaup-request-param null|string $assignment_alias
      * @omegaup-request-param string $course_alias
      */
     public static function apiIntroDetails(\OmegaUp\Request $r) {
@@ -2611,12 +2610,6 @@ class Course extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         $group = self::resolveGroup($course);
-        $assignmentAlias = $r->ensureOptionalString(
-            'assignment_alias',
-            /*$required=*/false,
-            fn (string $alias) => \OmegaUp\Validators::alias($alias)
-        );
-        $showAssignment = !is_null($assignmentAlias);
         $shouldShowIntro = !\OmegaUp\Authorization::canViewCourse(
             $r->identity,
             $course,
@@ -2663,7 +2656,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $course,
             $r->identity,
             $shouldShowIntro,
-            $hasAcceptedTeacher,
+            $hasAcceptedTeacher ?? false,
             $hasSharedUserInformation,
             $registrationResponse
         );
@@ -3353,31 +3346,47 @@ class Course extends \OmegaUp\Controllers\Controller {
         \OmegaUp\DAO\VO\Courses $course,
         ?\OmegaUp\DAO\VO\Identities $identity = null,
         bool $shouldShowIntro = true,
-        ?bool $hasAcceptedTeacher = true,
+        bool $hasAcceptedTeacher = true,
         bool $hasSharedUserInformation = false,
         array $registrationResponse = []
     ) {
         $courseDetails = self::getBasicCourseDetails($course);
         $commonDetails = [];
         $currentUser = [];
+        $teacherStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+            'accept_teacher'
+        );
         if (
             $shouldShowIntro &&
             $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
-        if (
-            $course->admission_mode !== self::ADMISSION_MODE_PRIVATE
-            && !is_null($identity)
-        ) {
-            $commonDetails = [
-                'details' => self::getCommonCourseDetails($course, $identity)
-            ];
+        if (is_null($teacherStatement)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         $requestUserInformation = $courseDetails['requests_user_information'];
         $needsBasicInformation = false;
         $privacyStatementMarkdown = null;
+        $statements = [];
         if (!is_null($identity)) {
+            if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
+                $commonDetails = [
+                    'details' => self::getCommonCourseDetails(
+                        $course,
+                        $identity
+                    ),
+                ];
+            }
+            $markdown = \OmegaUp\PrivacyStatement::getForConsent(
+                $identity->language_id,
+                'accept_teacher'
+            );
+            $statements['acceptTeacher'] = [
+                'markdown' => $markdown,
+                'statementType' => 'accept_teacher',
+                'gitObjectId' => $teacherStatement['git_object_id'],
+            ];
             $needsBasicInformation = (
                 $courseDetails['needs_basic_information']
                 && (
@@ -3393,39 +3402,22 @@ class Course extends \OmegaUp\Controllers\Controller {
                 'course',
                 $requestUserInformation
             );
-        }
-
-        $statements = [];
-        if (!is_null($privacyStatementMarkdown)) {
-            $statementType = "course_{$requestUserInformation}_consent";
-            $statement =
-                \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
-                    $statementType
-                );
-            if (!is_null($statement)) {
-                $statements['privacy'] = [
-                    'markdown' => $privacyStatementMarkdown,
-                    'statementType' => $statementType,
-                    'gitObjectId' => $statement['git_object_id'],
-                ];
+            if (!is_null($privacyStatementMarkdown)) {
+                $statementType = "course_{$requestUserInformation}_consent";
+                $statement =
+                    \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                        $statementType
+                    );
+                if (!is_null($statement)) {
+                    $statements['privacy'] = [
+                        'markdown' => $privacyStatementMarkdown,
+                        'statementType' => $statementType,
+                        'gitObjectId' => $statement['git_object_id'],
+                    ];
+                }
             }
         }
 
-        $teacherStatement =
-            \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
-                'accept_teacher'
-            );
-        if (!is_null($teacherStatement) && !is_null($identity)) {
-            $markdown = \OmegaUp\PrivacyStatement::getForConsent(
-                $identity->language_id,
-                'accept_teacher'
-            );
-            $statements['acceptTeacher'] = [
-                'markdown' => $markdown,
-                'statementType' => 'accept_teacher',
-                'gitObjectId' => $teacherStatement['git_object_id'],
-            ];
-        }
         $coursePayload = array_merge(
             $registrationResponse,
             $commonDetails,
