@@ -14,6 +14,14 @@ OmegaUp.on('ready', function () {
       el: '#qualitynomination-qualityreview',
       render: function (createElement) {
         return createElement('qualitynomination-reviewerpopup', {
+          props: {
+            allowUserAddTags: this.allowUserAddTags,
+            levelTags: this.levelTags,
+            problemLevel: this.problemLevel,
+            publicTags: this.publicTags,
+            selectedPublicTags: this.selectedPublicTags,
+            selectedPrivateTags: this.selectedPrivateTags,
+          },
           on: {
             submit: function (tag, qualitySeal) {
               const contents = {};

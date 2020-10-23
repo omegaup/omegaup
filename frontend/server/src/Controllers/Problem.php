@@ -4515,15 +4515,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
 
-        $problemAdmin = \OmegaUp\DAO\Problems::getByAlias(
-            $problemAlias
-        );
-        if (is_null($problem) || is_null($problem->alias)) {
-            throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemNotFound'
-            );
-        }
-
         // Get problem details from API
         $details = self::getProblemDetails(
             $r->identity,
@@ -4707,18 +4698,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
             }
             $response['smartyProperties']['payload']['allRuns'] = $allRuns;
             $response['smartyProperties']['payload']['problemLevel'] = \OmegaUp\DAO\ProblemsTags::getProblemLevel(
-                $problemAdmin
+                $problem
             );
             $response['smartyProperties']['payload']['publicTags'] = \OmegaUp\Controllers\Tag::getPublicTags();
             $response['smartyProperties']['payload']['levelTags'] = \OmegaUp\Controllers\Tag::getLevelTags();
-            $response['smartyProperties']['payload']['allowUserAddTags'] = $problemAdmin->allow_user_add_tags;
+            $response['smartyProperties']['payload']['allowUserAddTags'] = $problem->allow_user_add_tags;
             $response['smartyProperties']['payload']['selectedPublicTags'] = \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
                 $problem,
                 true
             );
             $response['smartyProperties']['payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
                 $r->identity,
-                $problemAdmin
+                $problem
             ) ?
             \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
                 $problem,
