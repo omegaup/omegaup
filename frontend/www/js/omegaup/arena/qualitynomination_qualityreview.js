@@ -15,12 +15,14 @@ OmegaUp.on('ready', function () {
       render: function (createElement) {
         return createElement('qualitynomination-reviewerpopup', {
           props: {
-            allowUserAddTags: this.allowUserAddTags,
-            levelTags: this.levelTags,
-            problemLevel: this.problemLevel,
-            publicTags: this.publicTags,
-            selectedPublicTags: this.selectedPublicTags,
-            selectedPrivateTags: this.selectedPrivateTags,
+            allowUserAddTags: nominationPayload.allowUserAddTags,
+            levelTags: nominationPayload.levelTags,
+            problemLevel: nominationPayload.problemLevel,
+            publicTags: nominationPayload.publicTags,
+            selectedPublicTags: nominationPayload.selectedPublicTags,
+            selectedPrivateTags: nominationPayload.selectedPrivateTags,
+            problemAlias: nominationPayload.problem_alias,
+            problemTitle: nominationPayload.problemTitle,
           },
           on: {
             submit: function (tag, qualitySeal) {
