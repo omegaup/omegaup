@@ -40,7 +40,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type CollectionDetailsByLevelPayload=array{collection: list<array{alias: string, name?: string}>, publicTags: list<string>, type: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
- * @psalm-type CollectionDetailsByAuthorPayload=array{collection: list<array{alias: string, name?: string}>, type: string, authors: list<array{alias: string, name?: string}>, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
+ * @psalm-type CollectionDetailsByAuthorPayload=array{authors: list<array{username: string, name?: string}>, type: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  */
@@ -6062,7 +6062,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $sort_order
      */
     public static function getCollectionsDetailsByAuthorForSmarty(\OmegaUp\Request $r): array {
-        $collection = [];
         $problems = [];
         $authors = [];
 
@@ -6110,23 +6109,22 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         foreach ($response['ranking'] as $author) {
             if (!is_null($author['name'])) {
-                $collection[] = [
+                $authors[] = [
                     'name' => $author['name'],
-                    'alias' => $author['username'],
+                    'username' => $author['username'],
                 ];
                 continue;
             }
-            $collection[] = [
-                'alias' => $author['username'],
+            $authors[] = [
+                'username' => $author['username'],
             ];
         }
 
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'collection' => $collection,
-                    'type' => 'author',
                     'authors' => $authors,
+                    'type' => 'author',
                     'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
                     'currentTags' => $result['currentTags'],

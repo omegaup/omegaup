@@ -1351,8 +1351,7 @@ export namespace types {
   }
 
   export interface CollectionDetailsByAuthorPayload {
-    authors: { alias: string; name?: string }[];
-    collection: { alias: string; name?: string }[];
+    authors: { name?: string; username: string }[];
     column: string;
     columns: string[];
     currentTags: string[];
