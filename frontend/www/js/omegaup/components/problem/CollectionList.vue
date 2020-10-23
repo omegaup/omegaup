@@ -51,7 +51,7 @@ import { types } from '../../api_types';
     'omegaup-problem-list': problem_List,
   },
 })
-export default class CollectionDetails extends Vue {
+export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;

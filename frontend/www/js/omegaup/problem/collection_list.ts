@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import collection_Details from '../components/problem/CollectionDetails.vue';
+import collection_List from '../components/problem/CollectionList.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
@@ -41,10 +41,10 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-collection-details': collection_Details,
+      'omegaup-collection-list': collection_List,
     },
     render: function (createElement) {
-      return createElement('omegaup-collection-details', {
+      return createElement('omegaup-collection-list', {
         props: {
           data: payload,
           problems: payload.problems,

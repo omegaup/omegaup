@@ -1,28 +1,6 @@
 <template>
   <div>
-    <div v-if="isProblemPage">
-      <omegaup-problem-search-bar
-        :initial-language="language"
-        :languages="languages"
-        :initial-keyword="keyword"
-        :tags="tags"
-      ></omegaup-problem-search-bar>
-      <a
-        href="#"
-        class="d-inline-block mb-3"
-        role="button"
-        @click="showFinderWizard = true"
-      >
-        {{ T.wizardLinkText }}
-      </a>
-      <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
-      <omegaup-problem-finder
-        v-show="showFinderWizard"
-        :possible-tags="wizardTags"
-        @close="showFinderWizard = false"
-        @search-problems="wizardSearch"
-      ></omegaup-problem-finder>
-    </div>
+    <slot name="search-and-finder"></slot>
     <div class="card">
       <h5 class="card-header">
         {{ T.wordsProblems }}
@@ -250,8 +228,6 @@ import * as ui from '../../ui';
 
 import common_Paginator from '../common/Paginatorv2.vue';
 import common_SortControls from '../common/SortControls.vue';
-import problem_FinderWizard from './FinderWizard.vue';
-import problem_SearchBar from './SearchBar.vue';
 
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
@@ -269,10 +245,8 @@ library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
 @Component({
   components: {
     FontAwesomeIcon,
-    'omegaup-problem-finder': problem_FinderWizard,
     'omegaup-common-paginator': common_Paginator,
     'omegaup-common-sort-controls': common_SortControls,
-    'omegaup-problem-search-bar': problem_SearchBar,
   },
   directives: {
     tooltip: VTooltip,
@@ -320,10 +294,6 @@ export default class ProblemList extends Vue {
     let tags = currentTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
     return `/problem/?tag[]=${tags.join('&tag[]=')}`;
-  }
-
-  wizardSearch(queryParameters: omegaup.QueryParameters): void {
-    this.$emit('wizard-search', queryParameters);
   }
 }
 </script>

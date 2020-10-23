@@ -4,10 +4,10 @@ import expect from 'expect';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import collection_Details from './CollectionDetails.vue';
+import collection_Details from './CollectionList.vue';
 
-describe('CollectionDetails.vue', () => {
-  it('Should handle empty details of problem collection', async () => {
+describe('CollectionList.vue', () => {
+  it('Should handle empty details of problem list collection', async () => {
     const wrapper = shallowMount(collection_Details, {
       propsData: {
         data: {
