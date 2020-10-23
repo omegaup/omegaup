@@ -676,7 +676,7 @@ def update_coder_of_the_month_candidates(
                     ''',
                     (
                         row['user_id'],
-                        json.dumps({'type': 'coder_of_the_month', 'body': 'coderOfTheMonthNotice'})
+                        json.dumps({'type': 'coder-of-the-month', 'body': {'localizationString': 'coderOfTheMonthNotice', 'localizationParams': {'username': row['username']}, 'iconUrl': '/media/info.png'}})
                     ))
 
 
