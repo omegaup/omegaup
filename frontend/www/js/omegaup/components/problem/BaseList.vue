@@ -1,45 +1,47 @@
 <template>
-  <omegaup-problem-search-bar
-    :initial-language="language"
-    :languages="languages"
-    :initial-keyword="keyword"
-    :tags="tags"
-  ></omegaup-problem-search-bar>
-  <a
-    href="#"
-    class="d-inline-block mb-3"
-    role="button"
-    @click="showFinderWizard = true"
-  >
-    {{ T.wizardLinkText }}
-  </a>
-  <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
-  <omegaup-problem-finder
-    v-show="showFinderWizard"
-    :possible-tags="wizardTags"
-    @close="showFinderWizard = false"
-    @search-problems="wizardSearch"
-  ></omegaup-problem-finder>
-  <omegaup-problem-list
-    :problems="problems"
-    :logged-in="loggedIn"
-    :current-tags="currentTags"
-    :pager-items="pagerItems"
-    :wizard-tags="wizardTags"
-    :language="language"
-    :languges="languages"
-    :keyword="keyword"
-    :modes="modes"
-    :columns="columns"
-    :mode="modes"
-    :column="column"
-    :tags="tags"
-    :sort-order="sortOrder"
-    :column-name="columnName"
-    @apply-filter="
-      (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
-    "
-  ></omegaup-problem-list>
+  <div>
+    <omegaup-problem-search-bar
+      :initial-language="language"
+      :languages="languages"
+      :initial-keyword="keyword"
+      :tags="tags"
+    ></omegaup-problem-search-bar>
+    <a
+      href="#"
+      class="d-inline-block mb-3"
+      role="button"
+      @click="showFinderWizard = true"
+    >
+      {{ T.wizardLinkText }}
+    </a>
+    <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
+    <omegaup-problem-finder
+      v-show="showFinderWizard"
+      :possible-tags="wizardTags"
+      @close="showFinderWizard = false"
+      @search-problems="wizardSearch"
+    ></omegaup-problem-finder>
+    <omegaup-problem-list
+      :problems="problems"
+      :logged-in="loggedIn"
+      :current-tags="currentTags"
+      :pager-items="pagerItems"
+      :wizard-tags="wizardTags"
+      :language="language"
+      :languges="languages"
+      :keyword="keyword"
+      :modes="modes"
+      :columns="columns"
+      :mode="modes"
+      :column="column"
+      :tags="tags"
+      :sort-order="sortOrder"
+      :column-name="columnName"
+      @apply-filter="
+        (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
+      "
+    ></omegaup-problem-list>
+  </div>
 </template>
 
 <script lang="ts">
