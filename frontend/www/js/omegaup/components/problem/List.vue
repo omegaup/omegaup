@@ -61,7 +61,7 @@ import problem_BaseList from './BaseList.vue';
     'omegaup-problem-search-bar': problem_SearchBar,
   },
 })
-export default class ProblemListSearch extends Vue {
+export default class List extends Vue {
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
   @Prop() currentTags!: string[];

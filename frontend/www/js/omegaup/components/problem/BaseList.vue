@@ -249,7 +249,7 @@ library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
     tooltip: VTooltip,
   },
 })
-export default class ProblemBaseList extends Vue {
+export default class BaseList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
   @Prop() currentTags!: string[];
