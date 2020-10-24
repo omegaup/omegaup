@@ -134,14 +134,6 @@ def prepare_run(driver, problem_alias):
                 (By.CSS_SELECTOR,
                  'a[data-nav-problems-all]'))).click()
 
-    search_box_element = driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR,
-             'input.tt-input[name="query"]')))
-    search_box_element.send_keys(problem_alias)
-    with driver.page_transition():
-        search_box_element.submit()
-
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.XPATH,

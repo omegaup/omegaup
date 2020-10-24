@@ -1375,6 +1375,7 @@ export namespace types {
     keyword: string;
     language: string;
     languages: string[];
+    level: string;
     loggedIn: boolean;
     mode: string;
     modes: string[];
@@ -1382,8 +1383,7 @@ export namespace types {
     problems: types.ProblemListItem[];
     publicTags: string[];
     tagData: { name?: string }[];
-    tags: string[];
-    type: string;
+    tagsList: string[];
   }
 
   export interface CommitRunsDiff {
