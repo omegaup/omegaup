@@ -1365,7 +1365,6 @@ export namespace types {
     problems: types.ProblemListItem[];
     tagData: { name?: string }[];
     tags: string[];
-    type: string;
   }
 
   export interface CollectionDetailsByLevelPayload {
