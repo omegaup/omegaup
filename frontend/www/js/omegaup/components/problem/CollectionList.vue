@@ -9,7 +9,7 @@
         ></omegaup-problem-filter-tags>
       </div>
       <div class="col">
-        <omegaup-problem-list
+        <omegaup-problem-base-list
           :problems="problems"
           :logged-in="loggedIn"
           :current-tags="currentTags"
@@ -30,7 +30,7 @@
               $emit('apply-filter', columnName, sortOrder)
           "
         >
-        </omegaup-problem-list>
+        </omegaup-problem-base-list>
       </div>
     </div>
   </div>
@@ -40,14 +40,14 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import problem_FilterTags from './FilterTags.vue';
-import problem_List from './List.vue';
+import problem_BaseList from './BaseList.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
 @Component({
   components: {
     'omegaup-problem-filter-tags': problem_FilterTags,
-    'omegaup-problem-list': problem_List,
+    'omegaup-problem-base-list': problem_BaseList,
   },
 })
 export default class CollectionList extends Vue {
