@@ -7,7 +7,7 @@
       :tags="tags"
     ></omegaup-problem-search-bar>
     <button
-      class="btn btn-primary problem-finder-button"
+      class="btn btn-primary mb-3"
       type="button"
       @click="showFinderWizard = true"
     >
