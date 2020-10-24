@@ -323,9 +323,3 @@ export default class ProblemList extends Vue {
   }
 }
 </script>
-
-<style>
-.problem-finder-button {
-  margin-bottom: 1rem;
-}
-</style>
