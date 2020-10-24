@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <form class="form" @submit.prevent="onSubmitScoreboard">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <div class="row">
             <div class="form-group col-md-6">
@@ -110,7 +110,7 @@ export default class GroupScoreboards extends Vue {
       .substring(0, 32);
   }
 
-  onSubmitScoreboard(): void {
+  onSubmit(): void {
     this.$emit(
       'create-scoreboard',
       this,
