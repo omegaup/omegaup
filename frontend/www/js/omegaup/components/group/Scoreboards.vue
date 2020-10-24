@@ -99,7 +99,7 @@ export default class GroupScoreboards extends Vue {
   description: null | string = null;
 
   @Watch('title')
-  onTitleBlur(newValue: string, oldValue: string): void {
+  onTitleChanged(newValue: string, oldValue: string): void {
     if (newValue === null || newValue === oldValue) {
       return;
     }
