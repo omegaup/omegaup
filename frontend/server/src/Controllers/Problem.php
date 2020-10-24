@@ -4436,6 +4436,14 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity
         );
 
+        $result['nomination_payload']['selectedPrivateTags'] = (\OmegaUp\Authorization::canEditProblem(
+            $r->identity,
+            $problem
+        ) ?
+        \OmegaUp\DAO\ProblemsTags::getTagsForProblem(
+            $problem,
+            false
+        ) : []);
         $result['nomination_payload']['reviewer'] = $isQualityReviewer;
         $result['nomination_payload']['already_reviewed'] = \OmegaUp\DAO\QualityNominations::reviewerHasQualityTagNominatedProblem(
             $r->identity,
