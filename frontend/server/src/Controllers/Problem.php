@@ -6127,7 +6127,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'authors' => $authors,
-                    'type' => 'author',
                     'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
                     'currentTags' => $result['currentTags'],
