@@ -1,15 +1,5 @@
 <template>
   <div>
-    <omegaup-coder-of-the-month-notice
-      v-if="
-        currentUserInfo &&
-        ((coderOfTheMonth &&
-          coderOfTheMonth.username == currentUserInfo.username) ||
-          (coderOfTheMonthFemale &&
-            coderOfTheMonthFemale.username == currentUserInfo.username))
-      "
-      :coder-username="currentUserInfo.username"
-    ></omegaup-coder-of-the-month-notice>
     <omegaup-carousel></omegaup-carousel>
     <div
       v-if="
