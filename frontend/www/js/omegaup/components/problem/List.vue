@@ -6,14 +6,13 @@
       :initial-keyword="keyword"
       :tags="tags"
     ></omegaup-problem-search-bar>
-    <a
-      href="#"
-      class="d-inline-block mb-3"
-      role="button"
+    <button
+      class="btn btn-primary problem-finder-button"
+      type="button"
       @click="showFinderWizard = true"
     >
       {{ T.wizardLinkText }}
-    </a>
+    </button>
     <!-- TODO: Migrar el problem finder a BS4 (solo para eliminar algunos estilos) -->
     <omegaup-problem-finder
       v-show="showFinderWizard"
@@ -324,3 +323,9 @@ export default class ProblemList extends Vue {
   }
 }
 </script>
+
+<style>
+.problem-finder-button{
+  margin-bottom: 1rem;
+}
+</style>
