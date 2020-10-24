@@ -535,7 +535,6 @@ const translations: { [key: string]: string; } = {
   navRanking: "Ranking",
   navSchoolOfTheMonth: "Escuela del mes",
   navSchoolRanking: "Ranking de escuelas",
-  navSchools: "Escuelas",
   navTutorials: "Tutoriales",
   navUserRanking: "Ranking de usuarios",
   navViewBadges: "Ver insignias",
