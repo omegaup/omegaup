@@ -40,6 +40,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type CollectionDetailsByLevelPayload=array{collection: list<array{alias: string, name?: string}>, publicTags: list<string>, type: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
+ * @psalm-type CollectionDetailsByAuthorPayload=array{authors: list<array{username: string, name?: string}>, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  */
@@ -3753,7 +3754,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        return self::getList(
+        return self::getListImpl(
             $page ?: 1,
             $language ?: 'all',
             $orderBy ?: 'problem_id',
@@ -3778,7 +3779,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $programmingLanguages
      * @return array{results: list<ProblemListItem>, total: int}
      */
-    private static function getList(
+    private static function getListImpl(
         int $page,
         string $language,
         string $orderBy,
@@ -4751,7 +4752,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        $result = self::getListReturn(
+        $result = self::getList(
             $page,
             $language,
             $orderBy,
@@ -5885,7 +5886,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
         ] = self::validateListParams($r);
 
-        $result = self::getListReturn(
+        $result = self::getList(
             $page,
             $language,
             $orderBy,
@@ -5902,10 +5903,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->user,
             /*$onlyQualitySeal=*/true,
             /*$url=*/"/problem/collection/{$collectionType}/"
-        );
-
-        $title = new \OmegaUp\TranslationString(
-            'omegaupTitleCollectionsByLevel'
         );
 
         $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
@@ -5938,7 +5935,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'tags' => $result['tags'],
                     'tagData' => $result['tagData'],
                 ],
-                'title' => $title,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCollectionsByLevel'
+                ),
             ],
             'entrypoint' => 'problem_collections_details',
         ];
@@ -5960,7 +5959,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{column: string, columns: list<string>, currentTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PageItem>, tagData: list<Tag>, tags: list<string>}
      */
-    private static function getListReturn(
+    private static function getList(
         int $page,
         string $language,
         string $orderBy,
@@ -5978,7 +5977,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         bool $onlyQualitySeal,
         string $url
     ) {
-        $response = self::getList(
+        $response = self::getListImpl(
             $page ?: 1,
             $language ?: 'all',
             $orderBy ?: 'problem_id',
@@ -6042,6 +6041,111 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
             'tags' => $tags,
             'tagData' => $tagData,
+        ];
+    }
+
+    /**
+     *
+     * @return array{smartyProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     *
+     * @omegaup-request-param null|string $difficulty_range
+     * @omegaup-request-param mixed $language
+     * @omegaup-request-param int|null $max_difficulty
+     * @omegaup-request-param int|null $min_difficulty
+     * @omegaup-request-param int|null $min_visibility
+     * @omegaup-request-param int|null $offset
+     * @omegaup-request-param mixed $only_karel
+     * @omegaup-request-param mixed $order_by
+     * @omegaup-request-param int|null $page
+     * @omegaup-request-param null|string $programming_languages
+     * @omegaup-request-param null|string $query
+     * @omegaup-request-param mixed $require_all_tags
+     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param mixed $some_tags
+     * @omegaup-request-param mixed $sort_order
+     */
+    public static function getCollectionsDetailsByAuthorForSmarty(\OmegaUp\Request $r): array {
+        $problems = [];
+        $authors = [];
+
+        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $pageSize = $r->ensureOptionalInt(
+            'rowcount'
+        ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+
+        [
+            'sortOrder' => $sortOrder,
+            'page' => $page,
+            'orderBy' => $orderBy,
+            'language' => $language,
+            'tags' => $tags,
+            'keyword' => $keyword,
+            'requireAllTags' => $requireAllTags,
+            'programmingLanguages' => $programmingLanguages,
+            'difficultyRange' => $difficultyRange,
+            'minVisibility' => $minVisibility,
+        ] = self::validateListParams($r);
+
+        $result = self::getList(
+            $page,
+            $language,
+            $orderBy,
+            $sortOrder,
+            $offset,
+            $pageSize,
+            $tags,
+            $keyword,
+            $requireAllTags,
+            $programmingLanguages,
+            $minVisibility,
+            $difficultyRange,
+            $r->identity,
+            $r->user,
+            /*$onlyQualitySeal=*/true,
+            /*$url=*/'/problem/collection/author/'
+        );
+
+        $response = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(
+            /*$offset*/            1,
+            /*$rowCount*/15
+        );
+
+        foreach ($response['ranking'] as $author) {
+            if (!is_null($author['name'])) {
+                $authors[] = [
+                    'name' => $author['name'],
+                    'username' => $author['username'],
+                ];
+                continue;
+            }
+            $authors[] = [
+                'username' => $author['username'],
+            ];
+        }
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'authors' => $authors,
+                    'problems' => $result['problems'],
+                    'loggedIn' => !is_null($r->identity),
+                    'currentTags' => $result['currentTags'],
+                    'pagerItems' => $result['pagerItems'],
+                    'keyword' => $result['keyword'],
+                    'mode' => $result['mode'],
+                    'column' => $result['column'],
+                    'language' => $result['language'],
+                    'languages' => $result['languages'],
+                    'modes' => $result['modes'],
+                    'columns' => $result['columns'],
+                    'tags' => $result['tags'],
+                    'tagData' => $result['tagData'],
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCollectionsByAuthor'
+                ),
+            ],
+            'entrypoint' => 'problem_collections_by_author_details',
         ];
     }
 }
