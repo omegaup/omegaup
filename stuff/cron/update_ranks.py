@@ -4,10 +4,10 @@
 
 import argparse
 import datetime
+import json
 import logging
 import os
 import sys
-import json
 from typing import Sequence, NamedTuple
 
 import MySQLdb
@@ -663,25 +663,32 @@ def update_coder_of_the_month_candidates(
                         row['score'],
                         row['ProblemsSolved']
                     ))
-        cur.execute('''
-                    INSERT INTO
-                        `Notifications` (
-                            `user_id`,
-                            `contents`
-                        )
-                    VALUES (
-                        %s,
-                        %s
-                    );
-                    ''',
-                    (
-                        row['user_id'],
-                        json.dumps({'type': 'coder-of-the-month',
-                                    'body': {'localizationString':
-                                             'coderOfTheMonthNotice',
-                                             'localizationParams':
-                                             {'username': row['username']},
-                                             'iconUrl': '/media/info.png'}})))
+        cur.execute(
+            '''
+            INSERT INTO
+                `Notifications` (
+                    `user_id`,
+                    `contents`
+                )
+            VALUES (
+                %s,
+                %s
+            );
+            ''',
+            (
+                row['user_id'],
+                json.dumps({
+                    'type': 'coder-of-the-month',
+                    'body': {
+                        'localizationString': 'coderOfTheMonthNotice',
+                        'localizationParams': {
+                            'username': row['username'],
+                        },
+                        'iconUrl': '/media/info.png',
+                    },
+                }),
+            ),
+        )
 
 
 def update_users_stats(
