@@ -3339,7 +3339,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-<<<<<<< HEAD
      * @return array{entrypoint: string, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: IntroCourseDetails|IntroDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     private static function getCourseDetails(
