@@ -132,6 +132,14 @@ export namespace types {
       );
     }
 
+    export function CollectionDetailsByAuthorPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsByAuthorPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CollectionDetailsByLevelPayload(
       elementId: string = 'payload',
     ): types.CollectionDetailsByLevelPayload {
@@ -1274,6 +1282,10 @@ export namespace types {
     total: number;
   }
 
+  export interface AuthorsRankWithQualityProblems {
+    ranking: { author_ranking: number; name?: string; username: string }[];
+  }
+
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;
@@ -1365,8 +1377,8 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
-  export interface CollectionDetailsByLevelPayload {
-    collection: { alias: string; name?: string }[];
+  export interface CollectionDetailsByAuthorPayload {
+    authors: { name?: string; username: string }[];
     column: string;
     columns: string[];
     currentTags: string[];
@@ -1378,10 +1390,27 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
-    publicTags: string[];
     tagData: { name?: string }[];
     tags: string[];
-    type: string;
+  }
+
+  export interface CollectionDetailsByLevelPayload {
+    collection: { alias: string; name?: string }[];
+    column: string;
+    columns: string[];
+    currentTags: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    level: string;
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    publicTags: string[];
+    tagData: { name?: string }[];
+    tagsList: string[];
   }
 
   export interface CommitRunsDiff {
