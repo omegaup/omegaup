@@ -23,9 +23,6 @@
             <a href="/rank/">{{ T.navRanking }}</a>
           </li>
           <li>
-            <a href="/schools/">{{ T.navSchools }}</a>
-          </li>
-          <li>
             <a href="https://blog.omegaup.com">{{ T.navBlog }}</a>
           </li>
         </ul>
