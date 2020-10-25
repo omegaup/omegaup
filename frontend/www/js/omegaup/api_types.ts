@@ -779,8 +779,35 @@ export namespace types {
     export function IntroDetailsPayload(
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+      return ((x) => {
+        if (x.details)
+          x.details = ((x) => {
+            if (x.assignments)
+              x.assignments = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  if (x.finish_time)
+                    x.finish_time = ((x: number) => new Date(x * 1000))(
+                      x.finish_time,
+                    );
+                  x.start_time = ((x: number) => new Date(x * 1000))(
+                    x.start_time,
+                  );
+                  return x;
+                });
+              })(x.assignments);
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
       );
     }
 
@@ -1979,8 +2006,8 @@ export namespace types {
 
   export interface IntroDetailsPayload {
     alias: string;
-    currentUsername: string;
     description: string;
+    details?: types.CourseDetails;
     isFirstTimeAccess: boolean;
     name: string;
     needsBasicInformation: boolean;
@@ -3260,6 +3287,7 @@ export namespace messages {
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
+  export type _CourseIntroDetailsServerResponse = any;
   export type CourseIntroDetailsResponse = types.IntroDetailsPayload;
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;
