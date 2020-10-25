@@ -3477,46 +3477,6 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{inContest: bool, smartyProperties: array{payload: CourseDetailsPayload, showRanking: bool}, template: string}
-     */
-    private static function getAssignmentDetails(
-        \OmegaUp\Request $r,
-        \OmegaUp\DAO\VO\Courses $course,
-        \OmegaUp\DAO\VO\Groups $group,
-        string $assignmentAlias
-    ) {
-        $r->ensureIdentity();
-        $assignment = self::validateCourseAssignmentAlias(
-            $course,
-            $assignmentAlias
-        );
-        $commonDetails = self::getCommonCourseDetails($course, $r->identity);
-        return [
-            'smartyProperties' => [
-                'showRanking' => \OmegaUp\Controllers\Course::shouldShowScoreboard(
-                    $r->identity,
-                    $course,
-                    $group
-                ),
-                'payload' => ['shouldShowFirstAssociatedIdentityRunWarning' =>
-                    !is_null($r->user) &&
-                    !\OmegaUp\Controllers\User::isMainIdentity(
-                        $r->user,
-                        $r->identity
-                    ) &&
-                    \OmegaUp\DAO\Problemsets::shouldShowFirstAssociatedIdentityRunWarning(
-                        $r->user
-                    ),
-                    'details' => $commonDetails,
-                ],
-            ],
-            'template' => 'arena.contest.course.tpl',
-            // Navbar is only hidden during exams.
-            'inContest' => $assignment->assignment_type === 'test',
-        ];
-    }
-
-    /**
      * @param array{userRegistrationAccepted?: bool|null, userRegistrationAnswered: bool, userRegistrationRequested: bool}|array<empty, empty> $registrationResponse
      *
      * @return array{entrypoint: string, smartyProperties: array{coursePayload: IntroDetailsPayload, payload: IntroDetailsPayload, title: \OmegaUp\TranslationString}}
