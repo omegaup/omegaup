@@ -2004,6 +2004,12 @@ export namespace types {
     templates: { [key: string]: string };
   }
 
+  export interface IntroCourseDetails {
+    details: types.CourseDetails;
+    progress: { [key: string]: { [key: string]: number } };
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+  }
+
   export interface IntroDetailsPayload {
     alias: string;
     description: string;
