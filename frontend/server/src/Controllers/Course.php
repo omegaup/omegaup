@@ -3353,17 +3353,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         $courseDetails = self::getBasicCourseDetails($course);
         $commonDetails = [];
         $currentUser = [];
-        $teacherStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
-            'accept_teacher'
-        );
         if (
             $shouldShowIntro &&
             $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
-        }
-        if (is_null($teacherStatement)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
         }
         $requestUserInformation = $courseDetails['requests_user_information'];
         $needsBasicInformation = false;
@@ -3382,6 +3376,14 @@ class Course extends \OmegaUp\Controllers\Controller {
                 $identity->language_id,
                 'accept_teacher'
             );
+            $teacherStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                'accept_teacher'
+            );
+            if (is_null($teacherStatement)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
+            }
             $statements['acceptTeacher'] = [
                 'markdown' => $markdown,
                 'statementType' => 'accept_teacher',
