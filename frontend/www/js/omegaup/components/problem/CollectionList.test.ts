@@ -4,14 +4,14 @@ import expect from 'expect';
 import { types } from '../../api_types';
 import T from '../../lang';
 
-import collection_Details from './CollectionDetails.vue';
+import problem_CollectionList from './CollectionList.vue';
 
-describe('CollectionDetails.vue', () => {
-  it('Should handle empty details of problem collection', async () => {
-    const wrapper = shallowMount(collection_Details, {
+describe('CollectionList.vue', () => {
+  it('Should handle empty details of problem list collection', async () => {
+    const wrapper = shallowMount(problem_CollectionList, {
       propsData: {
         data: {
-          type: 'problemLevelBasicIntroductionToProgramming',
+          level: 'problemLevelBasicIntroductionToProgramming',
           collection: [
             { alias: 'problemTagMatrices' },
             { alias: 'problemTagDiophantineEquations' },

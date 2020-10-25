@@ -1172,7 +1172,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     Problems
                 WHERE
                     quality_seal = 1
-                GROUP BY
+                ORDER BY
                     RAND() LIMIT 1;';
 
         /** @var string */

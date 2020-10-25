@@ -23,6 +23,13 @@ class TranslationStringChecker implements
         'usernameOrPassIsWrong',
     ];
 
+    /**
+     * A list of messages that are present in other scripts.
+     */
+    const SCRIPTS_MESSAGES = [
+        'coderOfTheMonthNotice',
+    ];
+
     /** @var list<string>|null */
     private static $allTranslationStrings = null;
 
@@ -50,6 +57,10 @@ class TranslationStringChecker implements
         file_put_contents(
             self::getTranslationStringsDirname() . '/exceptions',
             implode("\n", self::EXCEPTION_MESSAGES) . "\n"
+        );
+        file_put_contents(
+            self::getTranslationStringsDirname() . '/scripts',
+            implode("\n", self::SCRIPTS_MESSAGES) . "\n"
         );
         file_put_contents(
             self::getTranslationStringsDirname() . '/problem_deployer_errors',
