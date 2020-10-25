@@ -44,7 +44,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseDetailsPayload=array{details: CourseDetails, progress?: AssignmentProgress, shouldShowFirstAssociatedIdentityRunWarning: bool}
  * @psalm-type PrivacyStatement=array{markdown: string, statementType: string, gitObjectId?: string}
  * @psalm-type IntroCourseDetails=array{details: CourseDetails, progress: array<string, array<string, float>>, shouldShowFirstAssociatedIdentityRunWarning: bool}
- * @psalm-type IntroDetailsPayload=array{alias: string, currentUsername: string, description: string, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
+ * @psalm-type IntroDetailsPayload=array{alias: string, description: string, details?: CourseDetails, isFirstTimeAccess: bool, name: string, needsBasicInformation: bool, requestsUserInformation: string, shouldShowAcceptTeacher: bool, shouldShowFirstAssociatedIdentityRunWarning: bool, shouldShowResults: bool, statements: array{acceptTeacher?: PrivacyStatement, privacy?: PrivacyStatement}, userRegistrationAccepted?: bool|null, userRegistrationAnswered?: bool, userRegistrationRequested?: bool}
  * @psalm-type AddedProblem=array{alias: string, commit?: string, points: float}
  * @psalm-type Event=array{courseAlias?: string, courseName?: string, name: string, problem?: string}
  * @psalm-type ActivityEvent=array{classname: string, event: Event, ip: int|null, time: \OmegaUp\Timestamp, username: string}
@@ -2597,11 +2597,71 @@ class Course extends \OmegaUp\Controllers\Controller {
      *
      * @return IntroDetailsPayload
      *
-     * @omegaup-request-param string $assignment_alias
      * @omegaup-request-param string $course_alias
      */
     public static function apiIntroDetails(\OmegaUp\Request $r) {
-        $introDetails = self::getIntroDetails($r);
+        $r->ensureIdentity();
+
+        $courseAlias = $r->ensureString(
+            'course_alias',
+            fn (string $courseAlias) => \OmegaUp\Validators::alias($courseAlias)
+        );
+        $course = self::validateCourseExists($courseAlias);
+        if (is_null($course->course_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('courseNotFound');
+        }
+        $group = self::resolveGroup($course);
+        $shouldShowIntro = !\OmegaUp\Authorization::canViewCourse(
+            $r->identity,
+            $course,
+            $group
+        );
+
+        $hasSharedUserInformation = true;
+        $hasAcceptedTeacher = null;
+        $registrationResponse = [];
+        if (!\OmegaUp\Authorization::isGroupAdmin($r->identity, $group)) {
+            [
+                'share_user_information' => $hasSharedUserInformation,
+                'accept_teacher' => $hasAcceptedTeacher,
+            ] = \OmegaUp\DAO\Courses::getSharingInformation(
+                $r->identity->identity_id,
+                $course,
+                $group
+            );
+        }
+
+        if ($course->admission_mode === self::ADMISSION_MODE_REGISTRATION) {
+            $registration = \OmegaUp\DAO\CourseIdentityRequest::getByPK(
+                $r->identity->identity_id,
+                $course->course_id
+            );
+
+            if (is_null($registration)) {
+                $registrationResponse = [
+                    'userRegistrationAnswered' => false,
+                    'userRegistrationRequested' => false,
+                ];
+            } else {
+                $registrationResponse = [
+                    'userRegistrationAccepted' => $registration->accepted,
+                    'userRegistrationAnswered' => !is_null(
+                        $registration->accepted
+                    ),
+                    'userRegistrationRequested' => true,
+                ];
+            }
+        }
+
+        $introDetails = self::getIntroDetailsForCourse(
+            $course,
+            $r->identity,
+            $shouldShowIntro,
+            $hasAcceptedTeacher ?? false,
+            $hasSharedUserInformation,
+            $registrationResponse
+        );
+
         if (!isset($introDetails['smartyProperties']['coursePayload'])) {
             throw new \OmegaUp\Exceptions\NotFoundException();
         }
@@ -3279,6 +3339,7 @@ class Course extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+<<<<<<< HEAD
      * @return array{entrypoint: string, smartyProperties: array{coursePayload?: IntroDetailsPayload, payload: IntroCourseDetails|IntroDetailsPayload, title: \OmegaUp\TranslationString}}
      */
     private static function getCourseDetails(
@@ -3403,15 +3464,14 @@ class Course extends \OmegaUp\Controllers\Controller {
                 && $course->requests_user_information !== 'no'
             )
         ) {
-            // TODO: Uncomment the lines below when PR #4845 is merged
-            /*return self::getIntroDetailsForCourse(
+            return self::getIntroDetailsForCourse(
                 $course,
                 $r->identity,
                 $shouldShowIntro,
-                $hasAcceptedTeacher,
+                $hasAcceptedTeacher ?? false,
                 $hasSharedUserInformation,
                 $registrationResponse
-            );*/
+            );
         }
 
         return $detailsResponse;
@@ -3454,6 +3514,119 @@ class Course extends \OmegaUp\Controllers\Controller {
             'template' => 'arena.contest.course.tpl',
             // Navbar is only hidden during exams.
             'inContest' => $assignment->assignment_type === 'test',
+        ];
+    }
+
+    /**
+     * @param array{userRegistrationAccepted?: bool|null, userRegistrationAnswered: bool, userRegistrationRequested: bool}|array<empty, empty> $registrationResponse
+     *
+     * @return array{entrypoint: string, smartyProperties: array{coursePayload: IntroDetailsPayload, payload: IntroDetailsPayload, title: \OmegaUp\TranslationString}}
+     */
+    private static function getIntroDetailsForCourse(
+        \OmegaUp\DAO\VO\Courses $course,
+        ?\OmegaUp\DAO\VO\Identities $identity = null,
+        bool $shouldShowIntro = true,
+        bool $hasAcceptedTeacher = true,
+        bool $hasSharedUserInformation = false,
+        array $registrationResponse = []
+    ) {
+        $courseDetails = self::getBasicCourseDetails($course);
+        $commonDetails = [];
+        $currentUser = [];
+        if (
+            $shouldShowIntro &&
+            $course->admission_mode === self::ADMISSION_MODE_PRIVATE
+        ) {
+            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+        }
+        $requestUserInformation = $courseDetails['requests_user_information'];
+        $needsBasicInformation = false;
+        $privacyStatementMarkdown = null;
+        $statements = [];
+        if (!is_null($identity)) {
+            if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
+                $commonDetails = [
+                    'details' => self::getCommonCourseDetails(
+                        $course,
+                        $identity
+                    ),
+                ];
+            }
+            $markdown = \OmegaUp\PrivacyStatement::getForConsent(
+                $identity->language_id,
+                'accept_teacher'
+            );
+            $teacherStatement = \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                'accept_teacher'
+            );
+            if (is_null($teacherStatement)) {
+                throw new \OmegaUp\Exceptions\NotFoundException(
+                    'courseNotFound'
+                );
+            }
+            $statements['acceptTeacher'] = [
+                'markdown' => $markdown,
+                'statementType' => 'accept_teacher',
+                'gitObjectId' => $teacherStatement['git_object_id'],
+            ];
+            $needsBasicInformation = (
+                $courseDetails['needs_basic_information']
+                && (
+                    is_null($identity->country_id)
+                    || is_null($identity->state_id)
+                    || is_null($identity->current_identity_school_id)
+                )
+            );
+
+            // Privacy Statement Information
+            $privacyStatementMarkdown = \OmegaUp\PrivacyStatement::getForProblemset(
+                $identity->language_id,
+                'course',
+                $requestUserInformation
+            );
+            if (!is_null($privacyStatementMarkdown)) {
+                $statementType = "course_{$requestUserInformation}_consent";
+                $statement =
+                    \OmegaUp\DAO\PrivacyStatements::getLatestPublishedStatement(
+                        $statementType
+                    );
+                if (!is_null($statement)) {
+                    $statements['privacy'] = [
+                        'markdown' => $privacyStatementMarkdown,
+                        'statementType' => $statementType,
+                        'gitObjectId' => $statement['git_object_id'],
+                    ];
+                }
+            }
+        }
+
+        $coursePayload = array_merge(
+            $registrationResponse,
+            $commonDetails,
+            $currentUser,
+            [
+                'name' => $courseDetails['name'],
+                'description' => $courseDetails['description'],
+                'alias' => $courseDetails['alias'],
+                'needsBasicInformation' => $needsBasicInformation,
+                'requestsUserInformation' =>
+                    $courseDetails['requests_user_information'],
+                'shouldShowAcceptTeacher' => !$hasAcceptedTeacher,
+                'statements' => $statements,
+                'isFirstTimeAccess' => !$hasSharedUserInformation,
+                'shouldShowResults' => $shouldShowIntro,
+                'shouldShowFirstAssociatedIdentityRunWarning' => false,
+            ]
+        );
+        return [
+            'smartyProperties' => [
+                'payload' => $coursePayload,
+                'coursePayload' => $coursePayload,
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleCourseIntro'
+                ),
+            ],
+            'entrypoint' => 'course_intro',
         ];
     }
 
@@ -3521,7 +3694,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             }
         }
 
-        $courseDetails = self::getBasicCourseDetails($course, $r->identity);
+        $courseDetails = self::getBasicCourseDetails($course);
         $commonDetails = self::getCommonCourseDetails($course, $r->identity);
 
         $requestUserInformation = $courseDetails['requests_user_information'];
@@ -3640,7 +3813,6 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'name' => $courseDetails['name'],
                     'description' => $courseDetails['description'],
                     'alias' => $courseDetails['alias'],
-                    'currentUsername' => $r->identity->username,
                     'needsBasicInformation' => $needsBasicInformation,
                     'requestsUserInformation' =>
                         $courseDetails['requests_user_information'],
@@ -3737,8 +3909,7 @@ class Course extends \OmegaUp\Controllers\Controller {
      * @return array{alias: string, needs_basic_information: bool, description: string, name: string, requests_user_information: string}
      */
     private static function getBasicCourseDetails(
-        \OmegaUp\DAO\VO\Courses $course,
-        \OmegaUp\DAO\VO\Identities $identity
+        \OmegaUp\DAO\VO\Courses $course
     ) {
         return [
             'name' => strval($course->name),
