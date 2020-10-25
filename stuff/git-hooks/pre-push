@@ -1,9 +1,12 @@
 #!/bin/bash
 
+set -e
+
 GIT_PUSH=0
 EMPTY_HASH=0000000000000000000000000000000000000000
 REMOTE_HASH=
 PRE_UPLOAD_ARGS=""
+OMEGAUP_ROOT="$(/usr/bin/git rev-parse --show-toplevel)"
 
 if [ $# = 0 ]; then
 	ARGS="HEAD"
@@ -16,7 +19,8 @@ else
 	GIT_PUSH=1
 fi
 
-set -e
+# This needs to happen after reading the `git push` parameters, but before any
+# calls to `confirm()`.
 exec < /dev/tty
 
 confirm () {
@@ -31,8 +35,6 @@ confirm () {
 			;;
 	esac
 }
-
-OMEGAUP_ROOT="$(/usr/bin/git rev-parse --show-toplevel)"
 
 if [ $GIT_PUSH -eq 1 ]; then
 	# Fetch the remote in case we don't know the remote ref (e.g. when rebasing
