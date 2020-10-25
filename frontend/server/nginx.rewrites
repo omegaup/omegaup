@@ -75,6 +75,7 @@ rewrite ^/nomination/mine/?$ /qualitynomination/my_list.php last;
 rewrite ^/permissions/?$ /permissions.php last;
 rewrite ^/problem/?$ /problems/list.php last;
 rewrite ^/problem/collection/?$ /problems/collection.php last;
+rewrite ^/problem/collection/author/?$ /problems/collection_details_by_author.php last;
 rewrite ^/problem/collection/([a-zA-Z0-9_+-]+)/?$ /problems/collection_details_by_level.php?level=$1 last;
 rewrite ^/problem/list/?$ /problems/list.php last;
 rewrite ^/problem/mine/?$ /problems/mine.php last;
