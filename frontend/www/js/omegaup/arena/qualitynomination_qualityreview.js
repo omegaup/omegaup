@@ -1,6 +1,7 @@
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
+import T from '../lang';
 import qualitynomination_ReviewerPopup from '../components/qualitynomination/ReviewerPopup.vue';
 import Vue from 'vue';
 
@@ -39,7 +40,7 @@ OmegaUp.on('ready', function () {
             },
             'update-problem-level': (levelTag) => {
               api.Problem.updateProblemLevel({
-                problem_alias: payload.alias,
+                problem_alias: nominationPayload.problem_alias,
                 level_tag: levelTag,
               })
                 .then(() => {
@@ -57,9 +58,9 @@ OmegaUp.on('ready', function () {
                 .then(() => {
                   ui.success(T.tagAdded);
                   if (isPublic) {
-                    this.selectedPublicTags.push(tagname);
+                    nominationPayload.selectedPublicTags.push(tagname);
                   } else {
-                    this.selectedPrivateTags.push(tagname);
+                    nominationPayload.selectedPrivateTags.push(tagname);
                   }
                 })
                 .catch(ui.apiError);
@@ -71,24 +72,19 @@ OmegaUp.on('ready', function () {
               })
                 .then(() => {
                   ui.success(T.tagRemoved);
-                  // FIXME: For some reason this is not being reactive
                   if (isPublic) {
-                    this.selectedPublicTags = this.selectedPublicTags.filter(
+                    nominationPayload.selectedPublicTags = nominationPayload.selectedPublicTags.filter(
                       (tag) => tag !== tagname,
                     );
                   } else {
-                    this.selectedPrivateTags = this.selectedPrivateTags.filter(
+                    nominationPayload.selectedPrivateTags = nominationPayload.selectedPrivateTags.filter(
                       (tag) => tag !== tagname,
                     );
                   }
                 })
                 .catch(ui.apiError);
             },
-            'change-allow-user-add-tag': (
-              alias,
-              title,
-              allowTags,
-            ) => {
+            'change-allow-user-add-tag': (alias, title, allowTags) => {
               api.Problem.update({
                 problem_alias: alias,
                 title: title,

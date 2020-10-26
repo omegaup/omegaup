@@ -11,7 +11,7 @@
       <div class="title-text">
         {{ T.reviewerNominationFormTitle }}
       </div>
-      <div class="form-group d-inline-block">
+      <div class="form-group">
         <label class="control-label">
           {{ T.reviewerNominationQuality }}
         </label>

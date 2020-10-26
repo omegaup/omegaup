@@ -1036,7 +1036,6 @@ const translations: { [key: string]: string; } = {
   resendInterviewEmail: "Re-send email",
   resourceNotFound: "Resource not found.",
   reviewerNomination: "Qualify problem as reviewer",
-  reviewerNominationCategory: "Which one is the category of this problem?",
   reviewerNominationFormTitle: "\u00a1Qualify this problem!",
   reviewerNominationQuality: "Is this a quality problem?",
   runDisqualifyConfirm: "Do you really want to disqualify this run?",
