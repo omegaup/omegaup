@@ -657,6 +657,8 @@ caption {
   width: 100%;
   border: 1px solid #ccc;
   margin-top: 2em;
+  table-layout: fixed;
+  word-break: break-all;
 }
 
 .runs caption {
