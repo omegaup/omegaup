@@ -7,6 +7,8 @@
           :tags.sync="tags"
           :public-tags="publicTags"
         ></omegaup-problem-filter-tags>
+        <omegaup-problem-filter-difficulty>   
+        </omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
         <omegaup-problem-base-list
