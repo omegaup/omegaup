@@ -37,6 +37,69 @@ OmegaUp.on('ready', function () {
                 contents: JSON.stringify(contents),
               }).catch(ui.apiError);
             },
+            'update-problem-level': (levelTag) => {
+              api.Problem.updateProblemLevel({
+                problem_alias: payload.alias,
+                level_tag: levelTag,
+              })
+                .then(() => {
+                  ui.success(T.problemLevelUpdated);
+                  this.problemLevel = levelTag;
+                })
+                .catch(ui.apiError);
+            },
+            'add-tag': (alias, tagname, isPublic) => {
+              api.Problem.addTag({
+                problem_alias: alias,
+                name: tagname,
+                public: isPublic,
+              })
+                .then(() => {
+                  ui.success(T.tagAdded);
+                  if (isPublic) {
+                    this.selectedPublicTags.push(tagname);
+                  } else {
+                    this.selectedPrivateTags.push(tagname);
+                  }
+                })
+                .catch(ui.apiError);
+            },
+            'remove-tag': (alias, tagname, isPublic) => {
+              api.Problem.removeTag({
+                problem_alias: alias,
+                name: tagname,
+              })
+                .then(() => {
+                  ui.success(T.tagRemoved);
+                  // FIXME: For some reason this is not being reactive
+                  if (isPublic) {
+                    this.selectedPublicTags = this.selectedPublicTags.filter(
+                      (tag) => tag !== tagname,
+                    );
+                  } else {
+                    this.selectedPrivateTags = this.selectedPrivateTags.filter(
+                      (tag) => tag !== tagname,
+                    );
+                  }
+                })
+                .catch(ui.apiError);
+            },
+            'change-allow-user-add-tag': (
+              alias,
+              title,
+              allowTags,
+            ) => {
+              api.Problem.update({
+                problem_alias: alias,
+                title: title,
+                allow_user_add_tags: allowTags,
+                message: `${T.problemEditFormAllowUserAddTags}: ${allowTags}`,
+              })
+                .then(() => {
+                  ui.success(T.problemEditUpdatedSuccessfully);
+                })
+                .catch(ui.apiError);
+            },
           },
         });
       },
