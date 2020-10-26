@@ -15,46 +15,48 @@
         >
         </vue-typeahead-bootstrap>
       </div>
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th class="text-center" scope="col">
-              {{ T.contestEditTagName }}
-            </th>
-            <th class="text-center" scope="col">
-              {{ T.contestEditTagDelete }}
-              <a
-                data-toggle="tooltip"
-                rel="tooltip"
-                :title="T.problemEditTagPublicRequired"
-                ><img src="/media/question.png"
-              /></a>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="tag in selectedPublicTags" :key="tag">
-            <td class="align-middle">
-              <a :href="`/problem/?tag[]=${tag}`">
-                {{
-                  Object.prototype.hasOwnProperty.call(T, tag) ? T[tag] : tag
-                }}
-              </a>
-            </td>
-            <td class="text-center">
-              <button
-                type="button"
-                class="btn btn-danger"
-                :disabled="selectedPublicTags.length < 2"
-                @click="removeTag(tag, /*public=*/ true)"
-              >
-                <font-awesome-icon :icon="['fas', 'trash']" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <template v-if="isCreate">
+      <template v-if="!isReview">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagName }}
+              </th>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagDelete }}
+                <a
+                  data-toggle="tooltip"
+                  rel="tooltip"
+                  :title="T.problemEditTagPublicRequired"
+                  ><img src="/media/question.png"
+                /></a>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="tag in selectedPublicTags" :key="tag">
+              <td class="align-middle">
+                <a :href="`/problem/?tag[]=${tag}`">
+                  {{
+                    Object.prototype.hasOwnProperty.call(T, tag) ? T[tag] : tag
+                  }}
+                </a>
+              </td>
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  :disabled="selectedPublicTags.length < 2"
+                  @click="removeTag(tag, /*public=*/ true)"
+                >
+                  <font-awesome-icon :icon="['fas', 'trash']" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+      <template v-if="!isReview">
         <div class="form-group">
           <label class="font-weight-bold">{{ T.wordsPrivateTags }}</label>
           <div class="input-group">

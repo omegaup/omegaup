@@ -21,7 +21,7 @@
           :selected-value="qualitySeal"
         ></omegaup-radio-switch>
       </div>
-      <div class="form-group">
+      <div class="tab-pane active">
         <omegaup-problem-tags
           :alias="problemAlias"
           :title="problemTitle"
