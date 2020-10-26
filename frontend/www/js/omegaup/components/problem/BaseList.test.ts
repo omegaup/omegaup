@@ -1,11 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
-import problem_List from './List.vue';
+import problem_BaseList from './BaseList.vue';
 
-describe('List.vue', () => {
+describe('BaseList.vue', () => {
   it('Should handle empty list of problems', async () => {
-    const wrapper = shallowMount(problem_List, {
+    const wrapper = shallowMount(problem_BaseList, {
       propsData: {
         isSysadmin: false,
         problems: [],
