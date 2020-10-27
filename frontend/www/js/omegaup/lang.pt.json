@@ -262,7 +262,7 @@
 	"courseAssignmentEndDateBeforeCourseStartDate": "A data de t\u00e9rmino \u00e9 anterior \u00e0 data de in\u00edcio do curso",
 	"courseAssignmentNewFormEndDateDesc": "Data (hora local) quando termina.",
 	"courseAssignmentNewFormSchedule": "Criar conte\u00fado",
-	"courseAssignmentNewFormShortTitle_alias_Desc": "O t\u00edtulo curto \u00e9 usado para construir o URL (exemplo: TAREFA, EXAMEFINAL)",
+	"courseAssignmentNewFormShortTitleAliasDesc": "O t\u00edtulo curto \u00e9 usado para construir o URL (exemplo: TAREFA, EXAMEFINAL)",
 	"courseAssignmentNewFormStartDateDesc": "Hora e data (na hora local) em que vai come\u00e7ar.",
 	"courseAssignmentNewFormUpdate": "Atualizar conte\u00fado",
 	"courseAssignmentProblemAdded": "Problema adicionado com sucesso.",
