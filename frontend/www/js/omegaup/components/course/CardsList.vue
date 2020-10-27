@@ -44,6 +44,7 @@
                   :content="
                     course.admission_mode !== 'public' ? [] : course.assignments
                   "
+                  :logged-in="loggedIn"
                   :is-open="course.is_open"
                   :show-topics="
                     course.admission_mode === 'public' &&
@@ -84,6 +85,7 @@ library.add(fas);
 })
 export default class CourseList extends Vue {
   @Prop() courses!: types.StudentCourses;
+  @Prop() loggedIn!: boolean;
 
   T = T;
 
