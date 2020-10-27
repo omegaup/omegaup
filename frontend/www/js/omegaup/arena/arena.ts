@@ -1475,6 +1475,9 @@ export class Arena {
         if (clarifications !== null) {
           clarifications.push(clarification);
         }
+        if (!r) {
+          return;
+        }
         ((id, answerNode) => {
           const responseFormNode = $('.create-response-form', answerNode)
             .first()
