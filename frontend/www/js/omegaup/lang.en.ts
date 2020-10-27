@@ -637,7 +637,7 @@ const translations: { [key: string]: string; } = {
   passwordResetResetTitle: "Reset password",
   passwordResetTokenWasGeneratedSuccessfully: "Token was generated succesfully",
   pendingRegistrations: "Pending requests",
-  privacyPolicyNotice: "By clicking on Register you are accepting the site's <a href=\"http://blog.omegaup.com/privacy-policy/\">Use and Privacy Policy</a>, as well as our <a href=\"https://blog.omegaup.com/codigo-de-conducta-en-omegaup/\">Code of Conduct</a>.",
+  privacyPolicyNotice: "By clicking on Register you are accepting the site's [Use and Privacy Policy](http://blog.omegaup.com/privacy-policy/), as well as our [Code of Conduct](https://blog.omegaup.com/codigo-de-conducta-en-omegaup/).",
   privacyStatementNotFound: "Privacy Statement not found.",
   privateTagsPlaceholder: "Ex. university, 2019, class-2020",
   problemAliasExists: "Problem alias already exists. Please try a different one.",
