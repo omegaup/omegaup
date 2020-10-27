@@ -153,7 +153,7 @@
             <th>{{ T.wordsLanguage }}</th>
             <th class="numeric">{{ T.wordsMemory }}</th>
             <th class="numeric">{{ T.wordsRuntime }}</th>
-            <th colspan="3">{{ T.wordsActions }}</th>
+            <th></th>
           </tr>
         </thead>
         <tfoot v-if="problemAlias != null">
@@ -181,7 +181,7 @@
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
-            <td v-if="showUser">
+            <td v-if="showUser" class="text-break">
               <omegaup-user-username
                 :classname="run.classname"
                 :username="run.username"
@@ -194,7 +194,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showContest">
+            <td v-if="showContest" class="text-break">
               <a
                 href="#"
                 @click="onEmitFilterChanged(run.contest_alias, 'contest')"
@@ -208,7 +208,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showProblem">
+            <td v-if="showProblem" class="text-break">
               <a href="#" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
@@ -241,35 +241,47 @@
             <td>{{ run.language }}</td>
             <td class="numeric">{{ memory(run) }}</td>
             <td class="numeric">{{ runtime(run) }}</td>
-            <td v-if="showRejudge">
-              <button
-                type="button"
-                :title="T.wordsRejudge"
-                class="btn btn-outline-dark btn-sm"
-                @click="$emit('rejudge', run)"
-              >
-                <font-awesome-icon :icon="['fas', 'redo-alt']" />
-              </button>
-            </td>
-            <td v-if="showDisqualify">
-              <button
-                type="button"
-                :title="T.wordsDisqualify"
-                class="btn btn-outline-dark btn-sm"
-                @click="$emit('disqualify', run)"
-              >
-                <font-awesome-icon :icon="['fas', 'ban']" />
-              </button>
-            </td>
-            <td v-if="showDetails">
-              <button
-                type="button"
-                data-run-details
-                class="details btn btn-outline-dark btn-sm"
-                @click="$emit('details', run)"
-              >
-                <font-awesome-icon :icon="['fas', 'search-plus']" />
-              </button>
+            <td>
+              <div class="btn-group" role="group">
+                <button
+                  type="button"
+                  class="btn btn-secondary dropdown-toggle"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  {{ T.wordsActions }}
+                </button>
+                <div class="dropdown-menu">
+                  <button
+                    v-if="showRejudge"
+                    type="button"
+                    :title="T.wordsRejudge"
+                    class="btn btn-outline-dark btn-sm"
+                    @click="$emit('rejudge', run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'redo-alt']" />
+                  </button>
+                  <button
+                    v-if="showDisqualify"
+                    type="button"
+                    :title="T.wordsDisqualify"
+                    class="btn btn-outline-dark btn-sm"
+                    @click="$emit('disqualify', run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'ban']" />
+                  </button>
+                  <button
+                    v-if="showDetails"
+                    type="button"
+                    data-run-details
+                    class="details btn btn-outline-dark btn-sm"
+                    @click="$emit('details', run)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'search-plus']" />
+                  </button>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -653,12 +665,14 @@ caption {
   caption-side: top;
 }
 
+.text-break {
+  word-break: break-all;
+}
+
 .runs {
   width: 100%;
   border: 1px solid #ccc;
   margin-top: 2em;
-  table-layout: fixed;
-  word-break: break-all;
 }
 
 .runs caption {
