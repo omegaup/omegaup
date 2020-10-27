@@ -19,11 +19,7 @@
               </a>
             </div>
             <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a
-                :href="linkedinURL"
-                :title="T.loginWithLinkedIn"
-                class="openid_large_btn"
-              >
+              <a :href="linkedinURL" :title="T.loginWithLinkedIn">
                 <img src="/css/ln-oauth.png" height="45px" width="45px" />
               </a>
             </div>

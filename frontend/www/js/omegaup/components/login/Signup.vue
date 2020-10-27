@@ -61,7 +61,7 @@
           <div v-if="validateRecaptcha" class="col-md-4">
             <vue-recaptcha
               name="recaptcha"
-              sitekey="6LdxQfoUAAAAAFQlVIK7_mCYTn0Ah6Y9ckdCTlx4"
+              sitekey="6LfMqdoSAAAAALS8h-PB_sqY7V4nJjFpGK2jAokS"
               @verify="verify"
               @expired="expired"
             ></vue-recaptcha>
