@@ -157,7 +157,7 @@ interface Statement {
   },
 })
 export default class CourseIntro extends Vue {
-  @Prop({ default: null }) course!: types.CourseDetails;
+  @Prop({ default: null }) course!: types.CourseDetails | null;
   @Prop() name!: string;
   @Prop() description!: string;
   @Prop() needsBasicInformation!: boolean;
