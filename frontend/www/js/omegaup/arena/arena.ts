@@ -170,12 +170,10 @@ function findElement(
   element: HTMLElement | null,
   itemSelector: string | null,
 ): HTMLElement | null {
-  if (element) {
-    if (itemSelector !== null) {
-      element = element.querySelector(itemSelector);
-    }
+  if (!element || itemSelector === null) {
+    return element;
   }
-  return element;
+  return element.querySelector(itemSelector);
 }
 
 function setItemText(
@@ -186,17 +184,6 @@ function setItemText(
   element = findElement(element, itemSelector);
   if (element) {
     element.textContent = text;
-  }
-}
-
-function setItemHtml(
-  element: HTMLElement | null,
-  itemSelector: string | null,
-  html: string,
-) {
-  element = findElement(element, itemSelector);
-  if (element) {
-    element.innerHTML = html;
   }
 }
 
@@ -775,11 +762,12 @@ export class Arena {
     return false;
   }
 
-  updateSocketStatus(htmlContent: string, color: string): void {
-    if (this.elements.socketStatus) {
-      this.elements.socketStatus.innerHTML = htmlContent;
-      this.elements.socketStatus.style.color = color;
+  updateSocketStatus(status: string, color: string): void {
+    if (!this.elements.socketStatus) {
+      return;
     }
+    this.elements.socketStatus.textContent = status;
+    this.elements.socketStatus.style.color = color;
   }
 
   setupPolls(): void {
@@ -815,7 +803,7 @@ export class Arena {
     // Once the clock is ready, we can now connect to the socket.
     this.connectSocket();
     if (this.options.isPractice || !this.finishTime) {
-      setItemHtml(this.elements.clock, null, '&infin;');
+      setItemText(this.elements.clock, null, '∞');
       return;
     }
     if (deadline) this.submissionDeadline = deadline;
@@ -1472,16 +1460,17 @@ export class Arena {
         clarifications.push(clarification);
       }
     } else {
-      r = <HTMLElement>(
+      r = <HTMLElement|null>(
         document
           .querySelector('.clarifications tbody.clarification-list tr.template')
           ?.cloneNode(true)
       );
-      r.classList.remove('template');
-      r.classList.add('inserted');
-      $('.clarifications tbody.clarification-list').prepend(r);
-      this.clarifications[clarification.clarification_id] = r;
-
+      if (r) {
+        r.classList.remove('template');
+        r.classList.add('inserted');
+        $('.clarifications tbody.clarification-list').prepend(r);
+        this.clarifications[clarification.clarification_id] = r;
+      }
       if (this.problemsetAdmin) {
         if (clarifications !== null) {
           clarifications.push(clarification);
@@ -1546,33 +1535,34 @@ export class Arena {
       }
     }
 
-    r.querySelector('.anchor')?.setAttribute('name', anchor);
-    setItemText(r, '.contest', clarification.contest_alias ?? '');
-    setItemText(r, '.problem', clarification.problem_alias);
-    if (this.problemsetAdmin) {
-      setItemText(r, '.author', clarification.author ?? '');
-    }
-    setItemHtml(r, '.time', time.formatTimestamp(clarification.time));
-    setItemText(r, '.message', clarification.message);
-    setItemText(r, '.answer pre', clarification.answer ?? '');
-    if (clarification.answer) {
-      this.answeredClarifications++;
-    }
-
-    if (clarification.answer == null) {
-      $('.answer pre', r).hide();
-      if (clarification.receiver != null) {
-        $(r).addClass('direct-message');
+    if (r) {
+      r.querySelector('.anchor')?.setAttribute('name', anchor);
+      setItemText(r, '.contest', clarification.contest_alias ?? '');
+      setItemText(r, '.problem', clarification.problem_alias);
+      if (this.problemsetAdmin) {
+        setItemText(r, '.author', clarification.author ?? '');
       }
-    } else {
-      $('.answer pre', r).show();
-      $(r).addClass('resolved');
-    }
-    if (clarification.public) {
-      $('.create-response-is-public', r).first().prop('checked', true);
+      setItemText(r, '.time', time.formatTimestamp(clarification.time));
+      setItemText(r, '.message', clarification.message);
+      setItemText(r, '.answer pre', clarification.answer ?? '');
+      if (clarification.answer) {
+        this.answeredClarifications++;
+      }
+
+      if (clarification.answer == null) {
+        $('.answer pre', r).hide();
+        if (clarification.receiver != null) {
+          $(r).addClass('direct-message');
+        }
+      } else {
+        $('.answer pre', r).show();
+        $(r).addClass('resolved');
+      }
+      if (clarification.public) {
+        $('.create-response-is-public', r).first().prop('checked', true);
+      }
     }
   }
-
   clarificationsChange(clarifications: types.Clarification[]): void {
     $('.clarifications tr.inserted').remove();
     if (
@@ -2426,7 +2416,7 @@ export class EventsSocket {
         socket.onmessage = (message) => this.onmessage(message);
         socket.onopen = () => {
           this.shouldRetry = true;
-          this.arena.updateSocketStatus('&bull;', '#080');
+          this.arena.updateSocketStatus('•', '#080');
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
             30000,

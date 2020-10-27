@@ -99,23 +99,23 @@ export default class ArenaAdmin {
       });
 
     this.arena.elements.clarification?.addEventListener('submit', () => {
-      const clarification = this.arena.elements.clarification;
-      if (clarification === null) {
+      const clarificationElement = this.arena.elements.clarification;
+      if (clarificationElement === null) {
         return;
       }
-      clarification
+      clarificationElement
         .querySelectorAll('input')
         .forEach((input) => input.setAttribute('disabled', 'disabled'));
       api.Clarification.create({
         contest_alias: this.arena.options.contestAlias,
         problem_alias: (<HTMLInputElement>(
-          clarification.querySelector('select[name="problem"]')
+          clarificationElement.querySelector('select[name="problem"]')
         )).value,
         username: (<HTMLInputElement>(
-          clarification.querySelector('select[name="user"]')
+          clarificationElement.querySelector('select[name="user"]')
         )).value,
         message: (<HTMLInputElement>(
-          clarification.querySelector('textarea[name="message"]')
+          clarificationElement.querySelector('textarea[name="message"]')
         )).value,
       })
         .then(() => {
@@ -126,7 +126,7 @@ export default class ArenaAdmin {
           alert(e.error);
         })
         .finally(() => {
-          clarification
+          clarificationElement
             .querySelectorAll('input')
             .forEach((input) => input.removeAttribute('disabled'));
         });
