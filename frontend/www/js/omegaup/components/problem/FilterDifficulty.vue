@@ -42,7 +42,6 @@ import T from '../../lang';
 
 @Component
 export default class CollectionFilterDifficulty extends Vue {
-
   T = T;
   selectedDifficulty = '';
 }
