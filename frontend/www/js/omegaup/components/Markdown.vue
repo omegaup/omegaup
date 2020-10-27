@@ -84,7 +84,10 @@ export default class Markdown extends Vue {
           ui.copyToClipboard(inputValue);
         });
 
-        preElement.insertBefore(clipboardButton, preElement.firstChild);
+        (<HTMLElement>preElement.parentElement).insertBefore(
+          clipboardButton,
+          preElement,
+        );
       });
     if (!window.MathJax?.startup) {
       window.MathJax = {
@@ -209,15 +212,20 @@ export default class Markdown extends Vue {
     border-radius: 6px;
     display: block;
     line-height: 125%;
-    & > button.clipboard {
-      float: right;
-      border-color: rgb(218, 224, 229);
-    }
   }
   & > pre > button {
     margin-right: -16px;
     margin-top: -16px;
     padding: 6px;
+    font-size: 90%;
+  }
+  td > button.clipboard {
+    float: right;
+    border-color: rgb(218, 224, 229);
+    margin-left: 0.5em;
+    margin-right: -6px;
+    margin-top: -6px;
+    padding: 3px;
     font-size: 90%;
   }
 
