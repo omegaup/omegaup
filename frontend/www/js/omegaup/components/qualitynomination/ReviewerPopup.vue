@@ -42,6 +42,15 @@
           </ul></label
         >
       </div>
+      <div class="form-group">
+        <vue-typeahead-bootstrap
+          :data="publicTags"
+          :serializer="publicTagsSerializer"
+          :placeholder="T.collecionOtherTags"
+          @hit="addOtherTag"
+        >
+        </vue-typeahead-bootstrap>
+      </div>
       <div class="button-row text-right">
         <button
           class="col-md-4 mr-2 btn btn-primary"
@@ -68,11 +77,13 @@ import { Vue, Prop, Component } from 'vue-property-decorator';
 import Popup from './Popup.vue';
 import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import T from '../../lang';
+import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
 @Component({
   components: {
     'omegaup-popup': Popup,
     'omegaup-radio-switch': omegaup_RadioSwitch,
+    'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
   },
 })
 export default class ReviewerPopup extends Vue {
@@ -88,6 +99,7 @@ export default class ReviewerPopup extends Vue {
   T = T;
   qualitySeal = true;
   tag = '';
+  lista=[];
 
   PROBLEM_CATEGORIES = [
     'problemLevelAdvancedCompetitiveProgramming',
@@ -98,5 +110,20 @@ export default class ReviewerPopup extends Vue {
     'problemLevelIntermediateDataStructuresAndAlgorithms',
     'problemLevelIntermediateMathsInProgramming',
   ];
+
+  addOtherTag(tag: string): void {
+    if (!this.lista.includes(tag)) {
+      this.selectedTags.push(tag);
+      this.lista.push(tag);
+    }
+  }
+  publicTagsSerializer(tagname: string): string {
+    if (Object.prototype.hasOwnProperty.call(T, tagname)) {
+      return T[tagname];
+    }
+    return tagname;
+  }
+
+
 }
 </script>
