@@ -10,7 +10,6 @@ const baseProblemTagsPropsData = {
   canAddNewTags: true,
   initialAllowTags: true,
   isCreate: true,
-  isReview: false,
   levelTags: <string[]>[
     'problemLevelAdvancedCompetitiveProgramming',
     'problemLevelAdvancedSpecializedTopics',
