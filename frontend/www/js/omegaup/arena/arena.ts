@@ -1460,7 +1460,7 @@ export class Arena {
         clarifications.push(clarification);
       }
     } else {
-      r = <HTMLElement|null>(
+      r = <HTMLElement | null>(
         document
           .querySelector('.clarifications tbody.clarification-list tr.template')
           ?.cloneNode(true)
