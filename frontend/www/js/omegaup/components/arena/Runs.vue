@@ -181,7 +181,7 @@
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
-            <td v-if="showUser" class="text-break">
+            <td v-if="showUser" class="text-break-all">
               <omegaup-user-username
                 :classname="run.classname"
                 :username="run.username"
@@ -194,7 +194,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showContest" class="text-break">
+            <td v-if="showContest" class="text-break-all">
               <a
                 href="#"
                 @click="onEmitFilterChanged(run.contest_alias, 'contest')"
@@ -208,7 +208,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showProblem" class="text-break">
+            <td v-if="showProblem" class="text-break-all">
               <a href="#" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
@@ -241,48 +241,84 @@
             <td>{{ run.language }}</td>
             <td class="numeric">{{ memory(run) }}</td>
             <td class="numeric">{{ runtime(run) }}</td>
-            <td>
-              <div class="btn-group" role="group">
+            <td v-if="showDetails && !showDisqualify && !showRejudge">
+              <button
+                class="details btn btn-outline-dark btn-sm"
+                data-run-details
+                @click="$emit('details', run)"
+              >
+                <font-awesome-icon :icon="['fas', 'search-plus']" />
+              </button>
+            </td>
+            <td v-else-if="showDetails || showDisqualify || showRejudge">
+              <div class="dropdown">
                 <button
-                  type="button"
                   class="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  :data-actions="run.alias"
                   data-toggle="dropdown"
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
                   {{ T.wordsActions }}
+                  <span v-if="!globalRuns" class="caret"></span>
                 </button>
-                <div class="dropdown-menu">
-                  <button
-                    v-if="showRejudge"
-                    type="button"
-                    :title="T.wordsRejudge"
-                    class="btn btn-outline-dark btn-sm"
-                    @click="$emit('rejudge', run)"
-                  >
-                    <font-awesome-icon :icon="['fas', 'redo-alt']" />
-                  </button>
-                  <button
-                    v-if="showDisqualify"
-                    type="button"
-                    :title="T.wordsDisqualify"
-                    class="btn btn-outline-dark btn-sm"
-                    @click="$emit('disqualify', run)"
-                  >
-                    <font-awesome-icon :icon="['fas', 'ban']" />
-                  </button>
+                <div v-if="globalRuns" class="dropdown-menu">
                   <button
                     v-if="showDetails"
-                    type="button"
-                    data-run-details
-                    class="details btn btn-outline-dark btn-sm"
+                    class="btn btn-link dropdown-item"
+                    :data-details="run.guid"
                     @click="$emit('details', run)"
                   >
-                    <font-awesome-icon :icon="['fas', 'search-plus']" />
+                    {{ T.wordsDetails }}
                   </button>
+                  <a
+                    v-if="showRejudge"
+                    class="dropdown-item"
+                    href="#"
+                    @click="$emit('rejudge', run)"
+                    >{{ T.wordsRejudge }}</a
+                  >
+                  <div class="dropdown-divider"></div>
+                  <a
+                    v-if="showDisqualify"
+                    class="dropdown-item"
+                    href="#"
+                    @click="$emit('disqualify', run)"
+                    >{{ T.wordsDisqualify }}</a
+                  >
                 </div>
+                <ul v-else class="dropdown-menu">
+                  <li v-if="showDetails">
+                    <button
+                      class="btn btn-link dropdown-item"
+                      :data-details="run.guid"
+                      @click="$emit('details', run)"
+                    >
+                      {{ T.wordsDetails }}
+                    </button>
+                  </li>
+                  <li v-if="showRejudge">
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      @click="$emit('rejudge', run)"
+                      >{{ T.wordsRejudge }}</a
+                    >
+                  </li>
+                  <li role="separator" class="divider"></li>
+                  <li v-if="showDisqualify">
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      @click="$emit('disqualify', run)"
+                      >{{ T.wordsDisqualify }}</a
+                    >
+                  </li>
+                </ul>
               </div>
             </td>
+            <td v-else></td>
           </tr>
         </tbody>
       </table>
@@ -665,7 +701,7 @@ caption {
   caption-side: top;
 }
 
-.text-break {
+.text-break-all {
   word-break: break-all;
 }
 
@@ -696,7 +732,13 @@ caption {
   background: #ccc;
   text-align: center;
 }
+
 .runs tfoot td a:hover {
   background: #fff;
+}
+
+.dropdown-menu {
+  top: initial;
+  left: auto;
 }
 </style>
