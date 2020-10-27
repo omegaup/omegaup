@@ -158,7 +158,7 @@
               <a
                 v-for="tag in problem.tags"
                 :class="`badge custom-badge custom-badge-${tag.source} ${
-                  hrefForProblemTag(currentTags, tag.name).includes('Level')
+                  tag.name.includes('problemLevel')
                     ? 'custom-badge-quality'
                     : ''
                 } m-1 p-2`"
