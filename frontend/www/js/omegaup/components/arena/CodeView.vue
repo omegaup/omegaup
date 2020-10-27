@@ -3,6 +3,7 @@
     ref="cm-wrapper"
     :options="editorOptions"
     :value="value"
+    data-code-mirror
     @change="onChange"
     @input="onInput"
   ></codemirror-editor>
@@ -109,12 +110,12 @@ export default class CodeView extends Vue {
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
-.vue-codemirror-wrap {
-  height: 95%;
-  .CodeMirror {
-    height: 100%;
-    pre.CodeMirror-line {
-      padding: 0px 35px;
+
+[data-code-mirror] {
+  .vue-codemirror-wrap {
+    height: 95%;
+    .CodeMirror {
+      height: 100%;
     }
   }
 }
