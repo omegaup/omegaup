@@ -1,14 +1,17 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import T from '../../lang';
 
 import collection_problem from './CollectionProblem.vue';
 
 describe('CollectionProblem.vue', () => {
   it('Should display collection', async () => {
-    const wrapper = shallowMount(collection_problem, {});
+    const title = 'Nivel Básico: Introducción a la programación';
+    const wrapper = shallowMount(collection_problem, {
+      propsData: {
+        title: title,
+      },
+    });
 
-    expect(wrapper.text()).toContain(T.wordsProblems);
-    expect(wrapper.text()).toContain(T.problemcollectionViewProblems);
+    expect(wrapper.find('h6').text()).toBe(title);
   });
 });

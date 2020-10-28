@@ -13,9 +13,7 @@ function escapeString(s: string): string {
 
 export { escapeString as escape };
 
-export function buildURLQuery(queryParameters: {
-  [key: string]: string;
-}): string {
+export function buildURLQuery(queryParameters: { [key: string]: any }): string {
   return Object.entries(queryParameters)
     .map(([key, value]) => {
       const encodedKey = encodeURIComponent(key);

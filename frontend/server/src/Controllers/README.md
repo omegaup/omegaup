@@ -135,6 +135,7 @@
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
   - [`/api/problem/myList/`](#apiproblemmylist)
+  - [`/api/problem/randomProblem/`](#apiproblemrandomproblem)
   - [`/api/problem/rejudge/`](#apiproblemrejudge)
   - [`/api/problem/removeAdmin/`](#apiproblemremoveadmin)
   - [`/api/problem/removeGroupAdmin/`](#apiproblemremovegroupadmin)
@@ -1656,10 +1657,9 @@ Show course intro only on public courses when user is not yet registered
 
 ### Parameters
 
-| Name               | Type     | Description |
-| ------------------ | -------- | ----------- |
-| `assignment_alias` | `string` |             |
-| `course_alias`     | `string` |             |
+| Name           | Type     | Description |
+| -------------- | -------- | ----------- |
+| `course_alias` | `string` |             |
 
 ### Returns
 
@@ -2107,10 +2107,10 @@ Details of a group (scoreboards)
 
 ### Returns
 
-| Name          | Type                                                                           |
-| ------------- | ------------------------------------------------------------------------------ |
-| `group`       | `{ alias: string; create_time: number; description: string; name: string; }`   |
-| `scoreboards` | `{ alias: string; create_time: string; description: string; name: string; }[]` |
+| Name          | Type                                                                         |
+| ------------- | ---------------------------------------------------------------------------- |
+| `group`       | `{ alias: string; create_time: number; description: string; name: string; }` |
+| `scoreboards` | `types.GroupScoreboard[]`                                                    |
 
 ## `/api/group/list/`
 
@@ -2676,6 +2676,7 @@ List of public and user's private problems
 
 | Name                    | Type           | Description |
 | ----------------------- | -------------- | ----------- |
+| `only_quality_seal`     | `bool`         |             |
 | `difficulty_range`      | `null\|string` |             |
 | `language`              | `mixed`        |             |
 | `max_difficulty`        | `int\|null`    |             |
@@ -2720,6 +2721,16 @@ Gets a list of problems where current user is the owner
 | ------------ | ------------------------- |
 | `pagerItems` | `types.PageItem[]`        |
 | `problems`   | `types.ProblemListItem[]` |
+
+## `/api/problem/randomProblem/`
+
+### Description
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `alias` | `string` |
 
 ## `/api/problem/rejudge/`
 
