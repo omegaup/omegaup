@@ -338,6 +338,76 @@ class CourseRegistrationTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testAccessRequestNoNeededToInvitedIdentities() {
+        // create a course with access mode = registration
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse(
+            /*$admin=*/            null,
+            /*$adminLogin=*/ null,
+            \OmegaUp\Controllers\Course::ADMISSION_MODE_REGISTRATION,
+        );
+
+        // make it "registrable"
+        $adminLogin = self::login($courseData['admin']);
+
+        // Create two users
+        ['identity' => $invited] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $uninvited] = \OmegaUp\Test\Factories\User::createUser();
+
+        // The first one is explictly invited
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $invited
+        );
+
+        // Invited users can join the course , they don't need to requset access
+        $invitedLogin = self::login($invited);
+
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $invitedLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertArrayHasKey(
+            'gitObjectId',
+            $response['statements']['acceptTeacher']
+        );
+        $gitObjectId = $response['statements']['acceptTeacher']['gitObjectId'];
+
+        \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+            'course_alias' => $courseData['request']['alias'],
+            'auth_token' => $invitedLogin->auth_token,
+            'usernameOrEmail' => $invited->username,
+            'accept_teacher_git_object_id' => $gitObjectId,
+            'accept_teacher' => true,
+        ]));
+
+        // The second one needs request access to join the course
+        $uninvitedLogin = self::login($uninvited);
+
+        $response = \OmegaUp\Controllers\Course::getCourseDetailsForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $invitedLogin->auth_token,
+                'course_alias' => $courseData['course_alias'],
+            ])
+        )['smartyProperties']['payload'];
+
+        $this->assertArrayNotHasKey('statements', $response);
+
+        try {
+            \OmegaUp\Controllers\Course::apiAddStudent(new \OmegaUp\Request([
+                'course_alias' => $courseData['request']['alias'],
+                'auth_token' => $uninvitedLogin->auth_token,
+                'usernameOrEmail' => $uninvited->username,
+                'accept_teacher_git_object_id' => $gitObjectId,
+            ]));
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
     private function assertRequestResultsAreEqualToExpected(
         array $result,
         array $expectedRequestResult
