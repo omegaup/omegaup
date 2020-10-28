@@ -54,8 +54,12 @@
         <div class="card-body table-responsive">
           <table class="table table-striped">
             <thead>
-              <th class="text-center">Nombre de la etiqueta</th>
-              <th class="text-center">Eliminar</th>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagName }}
+              </th>
+              <th class="text-center" scope="col">
+                {{ T.contestEditTagDelete }}
+              </th>
             </thead>
             <tbody>
               <tr v-for="tag in publicTagsList">
@@ -130,7 +134,6 @@ export default class ReviewerPopup extends Vue {
   qualitySeal = true;
   tag = '';
   publicTagsList = this.selectedPublicTags;
-  sendPublicTags: Array<string> = [];
 
   PROBLEM_CATEGORIES = [
     'problemLevelAdvancedCompetitiveProgramming',
@@ -145,7 +148,6 @@ export default class ReviewerPopup extends Vue {
   addOtherTag(tag: string): void {
     if (!this.publicTagsList.includes(tag)) {
       this.publicTagsList.push(tag);
-      this.sendPublicTags.push(tag);
     }
   }
   publicTagsSerializer(tagname: string): string {
@@ -160,8 +162,6 @@ export default class ReviewerPopup extends Vue {
   removeTag(name: string) {
     let pos = this.publicTagsList.indexOf(name);
     this.publicTagsList.splice(pos, 1);
-    pos = this.sendPublicTags.indexOf(name);
-    this.sendPublicTags.splice(pos, 1);
   }
 }
 </script>
