@@ -164,4 +164,66 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             'total' => $totalRows,
         ];
     }
+
+    /**
+     * @return array{ranking: list<array{author_ranking: int, name: null|string, username: string}>, total: int}
+     */
+    public static function getAuthorsRankWithQualityProblems(
+        int $page,
+        int $rowsPerPage
+    ): array {
+        $sqlSelect = '
+            SELECT
+                IFNULL(`ur`.`author_ranking`, 0) AS `author_ranking`,
+                `ur`.`username`,
+                `ur`.`name`
+        ';
+        $sqlFrom = '
+            FROM
+                `User_Rank` `ur`
+            WHERE
+                `ur`.`author_score` IS NOT NULL AND
+                `ur`.`author_ranking` IS NOT NULL AND
+                (
+                    SELECT
+                        COUNT(*)
+                    FROM
+                        `Problems` `p`
+                    INNER JOIN
+                        `ACLs` `acl` ON `p`.`acl_id` = `acl`.`acl_id`
+                    INNER JOIN
+                        `Users` `u` ON `u`.`user_id` = `acl`.`owner_id`
+                    WHERE
+                    `u`.`user_id` = `ur`.`user_id` AND `p`.`quality_seal` = 1
+                ) > 0
+        ';
+        $sqlCount = '
+            SELECT
+                COUNT(1)
+        ';
+        $sqlOrderBy = '
+            ORDER BY
+                    `ur`.`author_ranking` ASC
+        ';
+        $sqlLimit = ' LIMIT ?, ?';
+
+        /** @var int */
+        $totalRows = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            "{$sqlCount}{$sqlFrom}",
+            []
+        ) ?? 0;
+
+        /** @var list<array{author_ranking: int, name: null|string, username: string}> */
+        $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
+            [
+                ($page - 1) * $rowsPerPage,
+                $rowsPerPage
+            ]
+        );
+        return [
+            'ranking' => $allData,
+            'total' => $totalRows,
+        ];
+    }
 }

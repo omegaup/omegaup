@@ -132,6 +132,14 @@ export namespace types {
       );
     }
 
+    export function CollectionDetailsByAuthorPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsByAuthorPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function CollectionDetailsByLevelPayload(
       elementId: string = 'payload',
     ): types.CollectionDetailsByLevelPayload {
@@ -771,8 +779,35 @@ export namespace types {
     export function IntroDetailsPayload(
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
-      return JSON.parse(
-        (<HTMLElement>document.getElementById(elementId)).innerText,
+      return ((x) => {
+        if (x.details)
+          x.details = ((x) => {
+            if (x.assignments)
+              x.assignments = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  if (x.finish_time)
+                    x.finish_time = ((x: number) => new Date(x * 1000))(
+                      x.finish_time,
+                    );
+                  x.start_time = ((x: number) => new Date(x * 1000))(
+                    x.start_time,
+                  );
+                  return x;
+                });
+              })(x.assignments);
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
       );
     }
 
@@ -1247,6 +1282,10 @@ export namespace types {
     total: number;
   }
 
+  export interface AuthorsRankWithQualityProblems {
+    ranking: { author_ranking: number; name?: string; username: string }[];
+  }
+
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;
@@ -1338,8 +1377,8 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
-  export interface CollectionDetailsByLevelPayload {
-    collection: { alias: string; name?: string }[];
+  export interface CollectionDetailsByAuthorPayload {
+    authors: { name?: string; username: string }[];
     column: string;
     columns: string[];
     currentTags: string[];
@@ -1351,10 +1390,27 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
-    publicTags: string[];
     tagData: { name?: string }[];
     tags: string[];
-    type: string;
+  }
+
+  export interface CollectionDetailsByLevelPayload {
+    collection: { alias: string; name?: string }[];
+    column: string;
+    columns: string[];
+    currentTags: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    level: string;
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    publicTags: string[];
+    tagData: { name?: string }[];
+    tagsList: string[];
   }
 
   export interface CommitRunsDiff {
@@ -1948,10 +2004,16 @@ export namespace types {
     templates: { [key: string]: string };
   }
 
+  export interface IntroCourseDetails {
+    details: types.CourseDetails;
+    progress: { [key: string]: { [key: string]: number } };
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+  }
+
   export interface IntroDetailsPayload {
     alias: string;
-    currentUsername: string;
     description: string;
+    details?: types.CourseDetails;
     isFirstTimeAccess: boolean;
     name: string;
     needsBasicInformation: boolean;
@@ -3231,6 +3293,7 @@ export namespace messages {
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
+  export type _CourseIntroDetailsServerResponse = any;
   export type CourseIntroDetailsResponse = types.IntroDetailsPayload;
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;

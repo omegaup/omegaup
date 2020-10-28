@@ -28,7 +28,9 @@
         <details>
           <summary>{{ T.courseCardShowTopics }}</summary>
           <ul>
-            <li v-for="assignment in content">{{ assignment.name }}</li>
+            <li v-for="assignment in content" :key="assignment.alias">
+              {{ assignment.name }}
+            </li>
           </ul>
         </details>
       </div>
@@ -52,11 +54,15 @@ export default class CourseCard extends Vue {
   @Prop() progress!: number;
   @Prop() content!: types.CourseAssignment[];
   @Prop() isOpen!: boolean;
+  @Prop() loggedIn!: boolean;
   @Prop({ default: false }) showTopics!: boolean;
 
   T = T;
 
   get buttonTitle(): string {
+    if (!this.loggedIn) {
+      return T.courseCardSeeContent;
+    }
     if (this.isOpen) {
       return T.courseCardCourseResume;
     }
