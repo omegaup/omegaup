@@ -2,7 +2,7 @@
   <omegaup-popup
     :reviewer-nomination="true"
     :possible-tags="PROBLEM_CATEGORIES"
-    @submit="$emit('submit', tag, qualitySeal)"
+    @submit="$emit('submit', tag, qualitySeal, selectedPublicTags)"
   >
     <template #link-title>
       {{ T.reviewerNomination }}
@@ -50,6 +50,30 @@
           @hit="addOtherTag"
         >
         </vue-typeahead-bootstrap>
+        <br />
+        <div class="card-body table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <th class="text-center">Nombre de la etiqueta</th>
+              <th class="text-center">Eliminar</th>
+            </thead>
+            <tbody>
+              <tr v-for="tag in publicTagsList">
+                <td>{{ getName(tag) }}</td>
+                <td class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-danger"
+                    :disabled="publicTagsList.length < 2"
+                    @click="removeTag(tag)"
+                  >
+                    <font-awesome-icon :icon="['fas', 'trash']" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       <div class="button-row text-right">
         <button
@@ -79,11 +103,17 @@ import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+library.add(faTrash);
+
 @Component({
   components: {
     'omegaup-popup': Popup,
     'omegaup-radio-switch': omegaup_RadioSwitch,
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
+    FontAwesomeIcon,
   },
 })
 export default class ReviewerPopup extends Vue {
@@ -99,7 +129,8 @@ export default class ReviewerPopup extends Vue {
   T = T;
   qualitySeal = true;
   tag = '';
-  lista=[];
+  publicTagsList = this.selectedPublicTags;
+  sendPublicTags: Array<string> = [];
 
   PROBLEM_CATEGORIES = [
     'problemLevelAdvancedCompetitiveProgramming',
@@ -112,9 +143,9 @@ export default class ReviewerPopup extends Vue {
   ];
 
   addOtherTag(tag: string): void {
-    if (!this.lista.includes(tag)) {
-      this.selectedTags.push(tag);
-      this.lista.push(tag);
+    if (!this.publicTagsList.includes(tag)) {
+      this.publicTagsList.push(tag);
+      this.sendPublicTags.push(tag);
     }
   }
   publicTagsSerializer(tagname: string): string {
@@ -123,7 +154,14 @@ export default class ReviewerPopup extends Vue {
     }
     return tagname;
   }
-
-
+  getName(alias: string): string {
+    return T[alias];
+  }
+  removeTag(name: string) {
+    let pos = this.publicTagsList.indexOf(name);
+    this.publicTagsList.splice(pos, 1);
+    pos = this.sendPublicTags.indexOf(name);
+    this.sendPublicTags.splice(pos, 1);
+  }
 }
 </script>
