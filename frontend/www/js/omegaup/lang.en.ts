@@ -954,6 +954,7 @@ const translations: { [key: string]: string; } = {
   profileIdentityAdded: "Identity added succesfully",
   profileManageIdentities: "Manage identities",
   profileOrganizedContests: "Organized contests",
+  profilePersonalData: "Personal data",
   profileRank: "Rank",
   profileRankBeginner: "\u03bf",
   profileRankExpert: "\u0398",
