@@ -34,7 +34,7 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
   },
 })
-export default class CollectionFilterTags extends Vue {
+export default class FilterTags extends Vue {
   @Prop() tags!: string[];
   @Prop() publicTags!: string[];
 

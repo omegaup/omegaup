@@ -2,34 +2,18 @@
   <div class="card mt-4">
     <div class="card-body">
       <h3>{{ T.wordsDifficulty }}</h3>
-      <div class="form-check">
+      <div
+        v-for="(difficulty, index) in difficulties"
+        :key="index"
+        class="form-check"
+      >
         <label class="form-check-label">
           <input
-            v-model="selectedDifficulty"
-            value="0"
+            :selectedDifficulty="difficulty"
             class="form-check-input"
             type="radio"
-          />{{ T.qualityFormDifficultyEasy }}
-        </label>
-      </div>
-      <div class="form-check">
-        <label class="form-check-label">
-          <input
-            v-model="selectedDifficulty"
-            value="1"
-            class="form-check-input"
-            type="radio"
-          />{{ T.qualityFormDifficultyMedium }}
-        </label>
-      </div>
-      <div class="form-check">
-        <label class="form-check-label">
-          <input
-            v-model="selectedDifficulty"
-            value="2"
-            class="form-check-input"
-            type="radio"
-          />{{ T.qualityFormDifficultyHard }}
+            @change="$emit('change', $event.target.difficulty)"
+          />{{ T[difficulty] }}
         </label>
       </div>
     </div>
@@ -37,12 +21,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
+import { Vue, Component, Model } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
-export default class CollectionFilterDifficulty extends Vue {
+export default class FilterDifficulty extends Vue {
+  @Model('change') selectedDifficulty: string[] = [];
+
+  difficulties: string[] = [
+    'qualityFormDifficultyEasy',
+    'qualityFormDifficultyMedium',
+    'qualityFormDifficultyHard',
+  ];
+
   T = T;
-  selectedDifficulty = '';
 }
 </script>

@@ -7,7 +7,9 @@
           :tags.sync="tags"
           :public-tags="publicTags"
         ></omegaup-problem-filter-tags>
-        <omegaup-problem-filter-difficulty> </omegaup-problem-filter-difficulty>
+        <omegaup-problem-filter-difficulty
+          :selected-difficulty.sync="selectedDifficulty"
+        ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
         <omegaup-problem-base-list
@@ -70,6 +72,8 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) tagsList!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+
+  @Prop({ default: () => '' }) selectedDifficulty!: string;
 
   T = T;
   level = this.data.level;
