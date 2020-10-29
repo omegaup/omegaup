@@ -2,13 +2,15 @@
   <div class="group-edit">
     <div class="page-header">
       <h1>
-        <span>{{ T.omegaupTitleGroupsEdit }} {{ groupName }}</span>
+        <span>
+          {{ ui.formatString(T.omegaupTitleGroupsEdit, { name: groupName }) }}
+        </span>
       </h1>
     </div>
     <ul class="nav nav-pills">
       <li class="nav-item" role="presentation">
         <a
-          href="#members"
+          href="#"
           class="nav-link"
           data-tab-members
           :class="{ active: showTab === 'members' }"
@@ -18,7 +20,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#scoreboards"
+          href="#"
           class="nav-link"
           data-tab-scoreboards
           :class="{ active: showTab === 'scoreboards' }"
@@ -28,7 +30,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#identities"
+          href="#"
           class="nav-link"
           data-tab-identities
           :class="{ active: showTab === 'identities' }"
@@ -142,6 +144,7 @@ import group_Members from './Members.vue';
 import group_Scoreboards from './Scoreboards.vue';
 import T from '../../lang';
 import { dao, types } from '../../api_types';
+import * as ui from '../../ui';
 
 const availableTabs = ['memebers', 'scoreboards', 'identities'];
 
@@ -163,6 +166,7 @@ export default class GroupEdit extends Vue {
   @Prop() initialScoreboards!: types.GroupScoreboard[];
 
   T = T;
+  ui = ui;
   showTab = this.initialTab;
   userErrorRow = null;
   identities = this.initialIdentities;
