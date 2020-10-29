@@ -1,5 +1,5 @@
 {include file='redirect.tpl' inline}
-{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleGroupsEditDeprecated#}" inline}
+{include file='head.tpl' navbarSection='contests' headerPayload=$headerPayload htmlTitle="{#omegaupTitleGroupsEdit#}" inline}
 
 <span id="form-data" data-name="groups" data-page="edit" data-alias="{$smarty.get.group}"></span>
 <script src="{version_hash src="/js/groups.js"}" defer></script>

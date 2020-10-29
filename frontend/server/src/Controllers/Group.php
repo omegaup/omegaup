@@ -451,7 +451,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'scoreboards' => $scoreboards,
                 ],
                 'title' => new \OmegaUp\TranslationString(
-                    'omegaupTitleGroupsEditDeprecated'
+                    'omegaupTitleGroupsEdit'
                 ),
             ],
             // TODO: Replace the following line with 'entrypoint' => 'group_edit'
