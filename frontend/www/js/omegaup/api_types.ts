@@ -811,6 +811,14 @@ export namespace types {
       );
     }
 
+    export function LoginDetailsPayload(
+      elementId: string = 'payload',
+    ): types.LoginDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
@@ -2036,6 +2044,12 @@ export namespace types {
     OutputLimit: number | string;
     OverallWallTimeLimit: string;
     TimeLimit: string;
+  }
+
+  export interface LoginDetailsPayload {
+    facebookURL: string;
+    linkedinURL: string;
+    validateRecaptcha: string;
   }
 
   export interface NominationListItem {
