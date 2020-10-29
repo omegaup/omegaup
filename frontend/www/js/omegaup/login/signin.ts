@@ -7,6 +7,31 @@ import Vue from 'vue';
 import login_Signin from '../components/login/Signin.vue';
 import VueRecaptcha from 'vue-recaptcha';
 
+function loginAndredirect(
+  usernameOrEmail: string,
+  password: string,
+  isAccountCreation: boolean,
+): void {
+  api.User.login({
+    usernameOrEmail: usernameOrEmail,
+    password: password,
+  })
+    .then(() => {
+      const params = new URL(document.location.toString()).searchParams;
+      const pathname = params.get('redirect');
+      if (pathname && pathname.indexOf('/') !== 0) {
+        window.location.href = pathname;
+        return;
+      }
+      if (isAccountCreation) {
+        window.location.href = '/profile/';
+        return;
+      }
+      window.location.href = '/';
+    })
+    .catch(ui.apiError);
+}
+
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.LoginDetailsPayload();
   new Vue({
@@ -14,35 +39,6 @@ OmegaUp.on('ready', () => {
     components: {
       'omegaup-login-signin': login_Signin,
       'vue-recaptcha': VueRecaptcha,
-    },
-    methods: {
-      loginAndredirect: (
-        usernameOrEmail: string,
-        password: string,
-        type: string,
-      ): void => {
-        api.User.login({
-          usernameOrEmail: usernameOrEmail,
-          password: password,
-        })
-          .then(() => {
-            const params = new URL(document.location.toString()).searchParams;
-            let pathname = params.get('redirect');
-            if (
-              !pathname ||
-              (pathname.indexOf('/') === 0 && type === 'register')
-            ) {
-              pathname = '/profile/';
-            } else if (
-              !pathname ||
-              (pathname.indexOf('/') === 0 && type === 'login')
-            ) {
-              pathname = '/';
-            }
-            window.location.href = pathname;
-          })
-          .catch(ui.apiError);
-      },
     },
     render: function (createElement) {
       return createElement('omegaup-login-signin', {
@@ -75,12 +71,20 @@ OmegaUp.on('ready', () => {
               recaptcha: recaptchaResponse,
             })
               .then(() => {
-                this.loginAndredirect(username, password, 'register');
+                loginAndredirect(
+                  username,
+                  password,
+                  /*isAccountCreation*/ true,
+                );
               })
               .catch(ui.apiError);
           },
           login: (usernameOrEmail: string, password: string) => {
-            this.loginAndredirect(usernameOrEmail, password, 'login');
+            loginAndredirect(
+              usernameOrEmail,
+              password,
+              /*isAccountCreation*/ false,
+            );
           },
         },
       });

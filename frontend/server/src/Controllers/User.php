@@ -26,7 +26,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
- * @psalm-type LoginDetailsPayload=array{facebookURL: string, linkedinURL: string, validateRecaptcha: string}
+ * @psalm-type LoginDetailsPayload=array{facebookURL: string, linkedinURL: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */

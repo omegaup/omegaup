@@ -1,14 +1,24 @@
 <template>
   <div>
     <omegaup-login
-      :facebook-u-r-l="facebookURL"
-      :linkedin-u-r-l="linkedinURL"
-      @login="loginAndRedirect"
+      :facebook-url="facebookUrl"
+      :linkedin-url="linkedinUrl"
+      @login="(username, password) => $emit('login', username, password)"
     >
     </omegaup-login>
     <omegaup-signup
       :validate-recaptcha="validateRecaptcha"
-      @register-and-login="registerAndLogin"
+      @register-and-login="
+        (username, email, password, passwordConfirmation, recaptchaResponse) =>
+          $emit(
+            'register-and-login',
+            username,
+            email,
+            password,
+            passwordConfirmation,
+            recaptchaResponse,
+          )
+      "
     >
     </omegaup-signup>
   </div>
@@ -30,31 +40,9 @@ import omegaup_Signup from './Signup.vue';
 })
 export default class Signin extends Vue {
   @Prop() validateRecaptcha!: boolean;
-  @Prop() facebookURL!: string;
-  @Prop() linkedinURL!: string;
+  @Prop() facebookUrl!: string;
+  @Prop() linkedinUrl!: string;
 
-  tem = this.facebookURL;
   T = T;
-
-  loginAndRedirect(usernameOrEmail: string, password: string) {
-    this.$emit('login', usernameOrEmail, password);
-  }
-
-  registerAndLogin(
-    username: string,
-    email: string,
-    password: string,
-    passwordConfirmation: string,
-    recaptchaResponse: string,
-  ) {
-    this.$emit(
-      'register-and-login',
-      username,
-      email,
-      password,
-      passwordConfirmation,
-      recaptchaResponse,
-    );
-  }
 }
 </script>

@@ -2049,7 +2049,7 @@ export namespace types {
   export interface LoginDetailsPayload {
     facebookURL: string;
     linkedinURL: string;
-    validateRecaptcha: string;
+    validateRecaptcha: boolean;
   }
 
   export interface NominationListItem {

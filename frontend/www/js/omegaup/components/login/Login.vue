@@ -14,12 +14,12 @@
               <!-- id-lint on -->
             </div>
             <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a :href="facebookURL" :title="T.loginWithFacebook">
+              <a :href="facebookUrl" :title="T.loginWithFacebook">
                 <img src="/css/fb-oauth.png" height="45px" width="45px" />
               </a>
             </div>
             <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a :href="linkedinURL" :title="T.loginWithLinkedIn">
+              <a :href="linkedinUrl" :title="T.loginWithLinkedIn">
                 <img src="/css/ln-oauth.png" height="45px" width="45px" />
               </a>
             </div>
@@ -80,8 +80,8 @@ import T from '../../lang';
 
 @Component
 export default class Login extends Vue {
-  @Prop() facebookURL!: string;
-  @Prop() linkedinURL!: string;
+  @Prop() facebookUrl!: string;
+  @Prop() linkedinUrl!: string;
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
