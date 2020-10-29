@@ -181,7 +181,7 @@
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
-            <td v-if="showUser">
+            <td v-if="showUser" class="text-break-all">
               <omegaup-user-username
                 :classname="run.classname"
                 :username="run.username"
@@ -194,7 +194,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showContest">
+            <td v-if="showContest" class="text-break-all">
               <a
                 href="#"
                 @click="onEmitFilterChanged(run.contest_alias, 'contest')"
@@ -208,7 +208,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showProblem">
+            <td v-if="showProblem" class="text-break-all">
               <a href="#" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
@@ -653,6 +653,10 @@ caption {
   caption-side: top;
 }
 
+.text-break-all {
+  word-break: break-all;
+}
+
 .runs {
   width: 100%;
   border: 1px solid #ccc;
@@ -680,6 +684,7 @@ caption {
   background: #ccc;
   text-align: center;
 }
+
 .runs tfoot td a:hover {
   background: #fff;
 }
