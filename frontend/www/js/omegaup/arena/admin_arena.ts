@@ -4,6 +4,7 @@ import * as api from '../api';
 import { types } from '../api_types';
 import T from '../lang';
 import arena_Runs from '../components/arena/Runs.vue';
+import arena_Runsv2 from '../components/arena/Runsv2.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
@@ -25,7 +26,9 @@ export default class ArenaAdmin {
     this.setUpPagers();
     this.runsList = new Vue({
       el: globalRuns ? '#main-container' : '#runs table.runs',
-      components: { 'omegaup-arena-runs': arena_Runs },
+      components: {
+        'omegaup-arena-runs': globalRuns ? arena_Runsv2 : arena_Runs,
+      },
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
