@@ -8,7 +8,7 @@
           :public-tags="publicTags"
         ></omegaup-problem-filter-tags>
         <omegaup-problem-filter-difficulty
-          :selected-difficulty.sync="selectedDifficulty"
+          v-model="selectedDifficulty"
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
@@ -73,11 +73,10 @@ export default class CollectionList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
 
-  @Prop({ default: () => '' }) selectedDifficulty!: string;
-
   T = T;
   level = this.data.level;
   tags: string[] = this.data.collection.map((element) => element.alias);
+  selectedDifficulty: null | string = null;
 
   get publicTags(): string[] {
     let tags: string[] = this.data.collection.map((x) => x.alias);

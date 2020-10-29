@@ -9,10 +9,11 @@
       >
         <label class="form-check-label">
           <input
-            :selectedDifficulty="difficulty"
             class="form-check-input"
             type="radio"
-            @change="$emit('change', $event.target.difficulty)"
+            name="difficulty"
+            :value="difficulty"
+            @change="$emit('change', $event.target.value)"
           />{{ T[difficulty] }}
         </label>
       </div>
@@ -26,14 +27,15 @@ import T from '../../lang';
 
 @Component
 export default class FilterDifficulty extends Vue {
-  @Model('change') selectedDifficulty: string[] = [];
+  @Model('change', { type: String }) readonly selectedDifficulty:
+    | null
+    | string = null;
 
+  T = T;
   difficulties: string[] = [
     'qualityFormDifficultyEasy',
     'qualityFormDifficultyMedium',
     'qualityFormDifficultyHard',
   ];
-
-  T = T;
 }
 </script>
