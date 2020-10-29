@@ -7,7 +7,7 @@
       <div id="run-details"></div>
     </div>
     <!-- id-lint on -->
-    <div class="card-header">
+    <div v-if="globalRuns" class="card-header">
       <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
     </div>
     <div class="table-responsive">
@@ -354,6 +354,7 @@ export default class Runsv2 extends Vue {
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
+  @Prop({ default: false }) globalRuns!: boolean;
 
   T = T;
   time = time;
