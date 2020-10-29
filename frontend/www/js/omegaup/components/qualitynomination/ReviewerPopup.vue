@@ -133,7 +133,7 @@ export default class ReviewerPopup extends Vue {
   T = T;
   qualitySeal = true;
   tag = '';
-  publicTagsList = this.selectedPublicTags;
+  publicTagsList = this.selectedPublicTags ?? [];
 
   PROBLEM_CATEGORIES = [
     'problemLevelAdvancedCompetitiveProgramming',
