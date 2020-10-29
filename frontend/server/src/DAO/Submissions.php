@@ -102,13 +102,19 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
     }
 
     /**
-     * Get last submission time of a user.
+     * Get whether the to-be-created submission is within the allowed
+     * submission gap.
      */
-    final public static function getLastSubmissionTime(
-        int $identityId,
+    final public static function isInsideSubmissionGap(
+        ?int $problemsetId,
+        ?\OmegaUp\DAO\VO\Contests $contest,
         int $problemId,
-        ?int $problemsetId
-    ): ?\OmegaUp\Timestamp {
+        int $identityId
+    ): bool {
+        // Acquire row-level locks using `FOR UPDATE` so that multiple
+        // concurrent queries cannot all obtain the same submission time and
+        // incorrectly insert several submissions, thinking that they were all
+        // within the submission gap.
         if (is_null($problemsetId)) {
             $sql = '
                 SELECT
@@ -119,7 +125,8 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     s.identity_id = ? AND s.problem_id = ?
                 ORDER BY
                     s.time DESC
-                LIMIT 1;
+                LIMIT 1
+                FOR UPDATE;
             ';
             $val = [$identityId, $problemId];
         } else {
@@ -132,13 +139,31 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
                     s.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
                 ORDER BY
                     s.time DESC
-                LIMIT 1;
+                LIMIT 1
+                FOR UPDATE;
             ';
             $val = [$identityId, $problemId, $problemsetId];
         }
 
         /** @var \OmegaUp\Timestamp|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql, $val);
+        $lastRunTime = \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            $val
+        );
+        if (is_null($lastRunTime)) {
+            return true;
+        }
+
+        $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
+        if (!is_null($contest)) {
+            // Get submissions gap
+            $submissionGap = max(
+                $submissionGap,
+                intval($contest->submissions_gap)
+            );
+        }
+
+        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
     }
 
     public static function countAcceptedSubmissions(

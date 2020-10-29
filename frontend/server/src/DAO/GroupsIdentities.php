@@ -91,6 +91,26 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
         return $identities;
     }
 
+    /**
+     * @return list<array{identity_id: int}>
+     */
+    public static function getGroupIdentities(\OmegaUp\DAO\VO\Groups $group) {
+        $sql = 'SELECT
+                i.identity_id
+            FROM
+                Groups_Identities gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?;';
+
+        /** @var list<array{identity_id: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$group->group_id]
+        );
+    }
+
     public static function GetMemberCountById(int $groupId): int {
         $sql = '
             SELECT

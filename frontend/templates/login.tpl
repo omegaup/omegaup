@@ -94,7 +94,7 @@
 				</div>
 				<div class="row">
 					<div class="col-md-4 col-md-offset-2">
-						{#privacyPolicyNotice#}
+						{#privacyPolicyNoticeDeprecated#}
 					</div>
 					<div class="col-md-4">
 						{if $VALIDATE_RECAPTCHA}
