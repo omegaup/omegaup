@@ -3,8 +3,8 @@
     <div class="card-body">
       <h3>{{ T.wordsDifficulty }}</h3>
       <div
-        v-for="(difficulty, index) in difficulties"
-        :key="index"
+        v-for="(difficultyName, difficulty) in difficulties"
+        :key="difficulty"
         class="form-check"
       >
         <label class="form-check-label">
@@ -13,8 +13,8 @@
             class="form-check-input"
             type="radio"
             name="difficulty"
-            :value="index"
-          />{{ difficulty }}
+            :value="difficulty"
+          />{{ difficultyName }}
         </label>
       </div>
     </div>
