@@ -37,8 +37,6 @@ export default class Signin extends Vue {
   T = T;
 
   loginAndRedirect(usernameOrEmail: string, password: string) {
-    console.log(usernameOrEmail);
-    console.log(password);
     this.$emit('login', usernameOrEmail, password);
   }
 
@@ -49,10 +47,6 @@ export default class Signin extends Vue {
     passwordConfirmation: string,
     recaptchaResponse: string,
   ) {
-    console.log(username);
-    console.log(email);
-    console.log(password);
-    console.log(passwordConfirmation);
     this.$emit(
       'register-and-login',
       username,
