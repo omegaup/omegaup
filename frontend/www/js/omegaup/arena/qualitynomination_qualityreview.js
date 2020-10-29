@@ -1,6 +1,7 @@
 import { OmegaUp } from '../omegaup';
 import * as api from '../api';
 import * as ui from '../ui';
+import T from '../lang';
 import qualitynomination_ReviewerPopup from '../components/qualitynomination/ReviewerPopup.vue';
 import Vue from 'vue';
 
@@ -14,13 +15,24 @@ OmegaUp.on('ready', function () {
       el: '#qualitynomination-qualityreview',
       render: function (createElement) {
         return createElement('qualitynomination-reviewerpopup', {
+          props: {
+            allowUserAddTags: nominationPayload.allowUserAddTags,
+            levelTags: nominationPayload.levelTags,
+            problemLevel: nominationPayload.problemLevel,
+            publicTags: nominationPayload.publicTags,
+            selectedPublicTags: nominationPayload.selectedPublicTags,
+            selectedPrivateTags: nominationPayload.selectedPrivateTags,
+            problemAlias: nominationPayload.problem_alias,
+            problemTitle: nominationPayload.problemTitle,
+          },
           on: {
-            submit: function (tag, qualitySeal) {
+            submit: function (tag, qualitySeal, sendPublicTags) {
               const contents = {};
               if (tag) {
                 contents.tag = tag;
               }
               contents.quality_seal = qualitySeal;
+              contents.tags = sendPublicTags;
               api.QualityNomination.create({
                 problem_alias: nominationPayload.problem_alias,
                 nomination: 'quality_tag',

@@ -42,6 +42,12 @@ OmegaUp.on('ready', () => {
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
           showNewRunWindow: this.showNewRunWindow,
+          allowUserAddTags: payload.allowUserAddTags,
+          levelTags: payload.levelTags,
+          problemLevel: payload.problemLevel,
+          publicTags: payload.publicTags,
+          selectedPublicTags: payload.selectedPublicTags,
+          selectedPrivateTags: payload.selectedPrivateTags,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
