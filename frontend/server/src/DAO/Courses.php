@@ -379,7 +379,8 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     }
 
     /**
-     * Returns the score per assignment of a user, as well as the maximum score attainable
+     * Returns the score per assignment of a user, as well as the maximum score
+     * attainable
      *
      * @return array<string, array{score: float, max_score: float}>
      */
@@ -413,7 +414,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 GROUP BY bpr.assignment_id
             ) pr
             ON a.assignment_id = pr.assignment_id
-            where a.course_id = ?;
+            WHERE a.course_id = ?;
         ';
 
         /** @var list<array{assignment: string, max_score: float, score: float}> */
