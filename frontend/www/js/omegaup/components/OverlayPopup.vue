@@ -17,11 +17,21 @@ export default class OverlayPopup extends Vue {}
 <style lang="scss" scoped>
 @import '../../../sass/main.scss';
 div[data-overlay-popup] {
-  height: 100%;
+  background: #eee;
+  width: 80%;
+  height: 90%;
+  margin: auto;
+  border: 2px solid #ccc;
+  padding: 1em;
+  position: absolute;
+  overflow-y: auto;
+  overflow-x: hidden;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1;
   .close-container {
-    left: 100%;
-    transform: translate(-10%, 6%);
-    height: 88%;
     .close {
       background-color: transparent;
       border: none;

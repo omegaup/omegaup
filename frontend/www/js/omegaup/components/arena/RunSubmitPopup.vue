@@ -247,22 +247,9 @@ export default class ArenaRunSubmitPopup extends Vue {
 
 <style lang="scss" scoped>
 form[data-run-submit] {
-  background: #eee;
-  width: 80%;
-  height: 90%;
-  margin: auto;
-  border: 2px solid #ccc;
-  padding: 1em;
-  position: absolute;
-  overflow-y: auto;
-  overflow-x: hidden;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  height: 96%;
   display: flex;
   flex-direction: column;
-  z-index: -1;
   .languages {
     width: 100%;
   }
