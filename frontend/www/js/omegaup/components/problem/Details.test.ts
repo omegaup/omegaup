@@ -98,6 +98,7 @@ describe('Details.vue', () => {
         solutionStatus: 'not_found',
         histogram: histogram,
         showNewRunWindow: false,
+        publicTags: [],
       },
     });
 
