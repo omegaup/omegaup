@@ -237,7 +237,14 @@ export default class ProblemTags extends Vue {
 
   publicTagsSerializer(tagname: string): string {
     if (Object.prototype.hasOwnProperty.call(T, tagname)) {
-      return `${T[tagname]} (${this.removeSpecialCharacters(T[tagname])})`;
+      let complete = `${T[tagname]} ( ${this.removeSpecialCharacters(
+        T[tagname],
+      )})`;
+      return `${
+        this.removeSpecialCharacters(T[tagname]).includes(T[tagname])
+          ? T[tagname]
+          : complete
+      }`;
     }
     return tagname;
   }
