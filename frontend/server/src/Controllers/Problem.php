@@ -3742,7 +3742,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['rowcount'])) {
             $rowcount = intval($r['rowcount']);
         }
-        if (!is_null($r['level'])){
+        if (!is_null($r['level'])) {
             $level = intval($r['level']);
         }
 
@@ -3802,7 +3802,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Users $user,
         bool $onlyQualitySeal,
         ?int $level
-    ) {//print_r($page . '   <---page|');print_r($language . '   <----language|');print_r($orderBy . '   <----orderBy|');print_r($sortOrder . '   <----sortOrder|');print_r($offset . '   <----offset|');print_r($rowcount . '   <----rowcount|');print_r($tags);print_r($keyword . '   <----keyword|');print_r($requireAllTags . '   <----requireAllTags|');print_r($programmingLanguages);print_r($minVisibility . '   <----minVisibility|');print_r($difficultyRange . '   <----difficultyRange|');print_r($identity . '   <----identity|');print_r($user . '   <----user|');print_r($onlyQualitySeal . '   <----onlyQualitySeal|');print_r($level . '   <----level|');
+    ) {
+//print_r($page . '   <---page|');print_r($language . '   <----language|');print_r($orderBy . '   <----orderBy|');print_r($sortOrder . '   <----sortOrder|');print_r($offset . '   <----offset|');print_r($rowcount . '   <----rowcount|');print_r($tags);print_r($keyword . '   <----keyword|');print_r($requireAllTags . '   <----requireAllTags|');print_r($programmingLanguages);print_r($minVisibility . '   <----minVisibility|');print_r($difficultyRange . '   <----difficultyRange|');print_r($identity . '   <----identity|');print_r($user . '   <----user|');print_r($onlyQualitySeal . '   <----onlyQualitySeal|');print_r($level . '   <----level|');
         $authorIdentityId = null;
         $authorUserId = null;
         // There are basically three types of users:

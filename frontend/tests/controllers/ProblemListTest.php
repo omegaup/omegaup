@@ -1300,7 +1300,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         )['smartyProperties']['payload']['problems'];
-        
+
         foreach ($result as $problem) {
             $this->assertEquals(
                 $problem['tags'][0]['name'],
@@ -1319,5 +1319,26 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $result[0]['tags'][0]['name'],
             'problemLevelBasicKarel'
         );
+
+        // Test count of problems
+        $apiListResponse = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'only_quality_seal' => true,
+                'level' => 3
+            ])
+        );
+
+        $this->assertEquals(2, $apiListResponse['total']);
+
+        $apiListResponse = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'only_quality_seal' => true,
+                'level' => 2
+            ])
+        );
+
+        $this->assertEquals(1, $apiListResponse['total']);
     }
 }

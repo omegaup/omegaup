@@ -107,7 +107,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if ($order !== 'asc' && $order !== 'desc') {
             $order = 'desc';
         }
-        
+
         $languageJoin = '';
         if (!is_null($language) && $language !== 'all') {
             $languageJoin = '
@@ -118,13 +118,13 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     AND Languages.name = \'' . $language . '\'
             ';
         }
-        
+
         $levelJoin = '';
         if (!is_null($level)) {
             $levelJoin = '
-            INNER JOIN 
-                Problems_Tags pt ON p.problem_id = pt.problem_id 
-            INNER JOIN 
+            INNER JOIN
+                Problems_Tags pt ON p.problem_id = pt.problem_id
+            INNER JOIN
                 Tags t ON t.tag_id = pt.tag_id
             ';
         }
@@ -338,7 +338,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             "SELECT COUNT(*) $sql",
             $args
         );
-        
+
         // Reset the offset to 0 if out of bounds.
         if ($offset < 0 || $offset > $count) {
             $offset = 0;
