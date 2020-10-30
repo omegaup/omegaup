@@ -11,6 +11,9 @@ describe('FilterDifficulty.vue', () => {
       },
     });
 
+    expect(wrapper.text()).toContain(T.qualityFormDifficultyEasy);
+    expect(wrapper.text()).toContain(T.qualityFormDifficultyMedium);
+    expect(wrapper.text()).toContain(T.qualityFormDifficultyHard);
     expect(
       wrapper.find('input[value="qualityFormDifficultyEasy').exists(),
     ).toBe(true);
