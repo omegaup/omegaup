@@ -1,6 +1,10 @@
 <template>
   <omegaup-overlay-popup @dismiss="$emit('dismiss')">
-    <form data-run-submit @submit.prevent="onSubmit">
+    <form
+      data-run-submit
+      class="d-flex flex-column h-100"
+      @submit.prevent="onSubmit"
+    >
       <div class="form-group row">
         <label class="col-sm-2 col-form-label">
           {{ T.wordsLanguage }}
@@ -32,7 +36,7 @@
           T.arenaRunSubmitPaste
         }}</label>
       </div>
-      <div class="code-view">
+      <div class="h-100">
         <omegaup-arena-code-view
           v-model="code"
           :language="selectedLanguage"
@@ -244,36 +248,3 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-form[data-run-submit] {
-  height: 96%;
-  display: flex;
-  flex-direction: column;
-  .languages {
-    width: 100%;
-  }
-  .filename-extension {
-    width: 100%;
-  }
-  .run-submit-paste-text {
-    width: 100%;
-  }
-  .code-view {
-    width: 100%;
-    flex-grow: 1;
-    overflow: auto;
-  }
-  .upload-file {
-    width: 100%;
-  }
-  .submit-run {
-    width: 100%;
-  }
-}
-
-input[type='submit'] {
-  font-size: 110%;
-  padding: 0.3em 0.5em;
-}
-</style>
