@@ -7,6 +7,9 @@
           :tags.sync="tags"
           :public-tags="publicTags"
         ></omegaup-problem-filter-tags>
+        <omegaup-problem-filter-difficulty
+          v-model="selectedDifficulty"
+        ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
         <omegaup-problem-base-list
@@ -41,6 +44,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import problem_FilterTags from './FilterTags.vue';
 import problem_BaseList from './BaseList.vue';
+import problem_FilterDifficulty from './FilterDifficulty.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
 
@@ -48,6 +52,7 @@ import { types } from '../../api_types';
   components: {
     'omegaup-problem-filter-tags': problem_FilterTags,
     'omegaup-problem-base-list': problem_BaseList,
+    'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
   },
 })
 export default class CollectionList extends Vue {
@@ -71,6 +76,7 @@ export default class CollectionList extends Vue {
   T = T;
   level = this.data.level;
   tags: string[] = this.data.collection.map((element) => element.alias);
+  selectedDifficulty: null | string = null;
 
   get publicTags(): string[] {
     let tags: string[] = this.data.collection.map((x) => x.alias);
