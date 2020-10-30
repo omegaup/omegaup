@@ -73,7 +73,7 @@
   "scripts": {
     "test": "mochapack --webpack-config webpack.config-test.js --require frontend/www/js/omegaup/test.setup.js 'frontend/www/js/**/*.test.ts'",
     "test:watch": "mochapack --watch --webpack-config webpack.config-test.js --require frontend/www/js/omegaup/test.setup.js 'frontend/www/js/**/*.test.ts'",
-    "test:coverage": "cross-env NODE_ENV=coverage NODE_OPTIONS=--max-old-space-size=6144 nyc --reporter=json --reporter=text yarn run test",
+    "test:coverage": "cross-env NODE_ENV=coverage NODE_OPTIONS=--max-old-space-size=7168 nyc --reporter=json --reporter=text yarn run test",
     "dev": "cross-env webpack --config-name=frontend --mode=development --display=minimal --display-chunk=false --color=true",
     "dev:watch": "cross-env webpack --config-name=frontend --watch --mode=development --display=minimal --display-chunk=false --color=true",
     "dev-all": "cross-env webpack --mode=development --display=minimal --display-chunk=false --color=true",
