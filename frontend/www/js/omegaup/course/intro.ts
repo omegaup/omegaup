@@ -19,6 +19,7 @@ OmegaUp.on('ready', () => {
     render: function (createElement) {
       return createElement('omegaup-course-intro', {
         props: {
+          course: payload.details,
           name: payload.name,
           description: payload.description,
           needsBasicInformation: payload.needsBasicInformation,
@@ -28,6 +29,7 @@ OmegaUp.on('ready', () => {
           userRegistrationRequested: this.userRegistrationRequested,
           userRegistrationAnswered: payload.userRegistrationAnswered,
           userRegistrationAccepted: payload.userRegistrationAccepted,
+          loggedIn: headerPayload.isLoggedIn,
         },
         on: {
           submit: (source: course_Intro) => {

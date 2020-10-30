@@ -2200,11 +2200,17 @@ export namespace types {
 
   export interface ProblemDetailsv2Payload {
     allRuns?: types.Run[];
+    allowUserAddTags?: boolean;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
+    levelTags?: string[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
+    problemLevel?: string;
+    publicTags?: string[];
     runs?: types.Run[];
+    selectedPrivateTags?: string[];
+    selectedPublicTags?: string[];
     solutionStatus?: string;
     solvers?: types.BestSolvers[];
     user: types.UserInfoForProblem;
