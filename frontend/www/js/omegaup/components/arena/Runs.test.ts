@@ -10,12 +10,10 @@ describe('Runs.vue', () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
-        globalRuns: true,
         runs: [],
       },
     });
 
-    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
     expect(wrapper.find('table tbody').text()).toBe('');
   });
 
@@ -24,7 +22,6 @@ describe('Runs.vue', () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
-        globalRuns: true,
         runs: [
           {
             alias: 'alias',

@@ -12,7 +12,7 @@ describe('StudentProgress.vue', () => {
         course: {
           alias: 'hello',
         },
-        assignment: <omegaup.Assignment[]>[
+        assignments: <omegaup.Assignment[]>[
           {
             alias: 'assignment',
             assignment_type: 'homework',
@@ -23,6 +23,7 @@ describe('StudentProgress.vue', () => {
             order: 1,
             scoreboard_url: '',
             scoreboard_url_admin: '',
+            max_points: 200,
           } as omegaup.Assignment,
         ],
         student: <types.StudentProgress>{
@@ -36,22 +37,25 @@ describe('StudentProgress.vue', () => {
           progress: {
             ['assignment']: {
               ['problem1']: 55,
-              ['problem2']: 44,
+              ['problem2']: 45,
             },
           },
           score: {
             ['assignment']: {
               ['problem1']: 55,
-              ['problem2']: 44,
+              ['problem2']: 45,
             },
           },
           username: 'student',
         },
+        problemTitles: {
+          problem1: 'Problem 1',
+          problem2: 'Problem 2',
+        },
       },
     });
-    expect(wrapper.find('div.bg-yellow'));
-    expect(wrapper.find('div.bg-red'));
-    expect(wrapper.find('div[title="55%"]'));
-    expect(wrapper.find('div[title="44%"]'));
+    expect(wrapper.find('div.bg-yellow').exists()).toBe(true);
+    expect(wrapper.find('div.bg-red').exists()).toBe(true);
+    expect(wrapper.find('td[data-global-score]').text()).toBe('50%');
   });
 });

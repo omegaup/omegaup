@@ -1,17 +1,5 @@
 <template>
   <div class="mt-2">
-    <template v-if="globalRuns">
-      <!-- TODO: This code should be removed when we stop using jquery and the
-        migration to vue was over -->
-      <!-- id-lint off -->
-      <div id="overlay">
-        <div id="run-details"></div>
-      </div>
-      <!-- id-lint on -->
-      <div class="card-header">
-        <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
-      </div>
-    </template>
     <div class="table-responsive">
       <table class="runs table table-striped">
         <caption>
@@ -153,7 +141,10 @@
             <th>{{ T.wordsLanguage }}</th>
             <th class="numeric">{{ T.wordsMemory }}</th>
             <th class="numeric">{{ T.wordsRuntime }}</th>
-            <th colspan="3">{{ T.wordsActions }}</th>
+            <th v-if="showDetails && !showDisqualify && !showRejudge">
+              {{ T.wordsActions }}
+            </th>
+            <th v-else></th>
           </tr>
         </thead>
         <tfoot v-if="problemAlias != null">
@@ -181,7 +172,7 @@
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
-            <td v-if="showUser">
+            <td v-if="showUser" class="text-break-all">
               <omegaup-user-username
                 :classname="run.classname"
                 :username="run.username"
@@ -194,7 +185,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showContest">
+            <td v-if="showContest" class="text-break-all">
               <a
                 href="#"
                 @click="onEmitFilterChanged(run.contest_alias, 'contest')"
@@ -208,7 +199,7 @@
                 <font-awesome-icon :icon="['fas', 'external-link-alt']" />
               </a>
             </td>
-            <td v-if="showProblem">
+            <td v-if="showProblem" class="text-break-all">
               <a href="#" @click.prevent="filterProblem = run.alias">{{
                 run.alias
               }}</a>
@@ -241,36 +232,57 @@
             <td>{{ run.language }}</td>
             <td class="numeric">{{ memory(run) }}</td>
             <td class="numeric">{{ runtime(run) }}</td>
-            <td v-if="showRejudge">
+            <td v-if="showDetails && !showDisqualify && !showRejudge">
               <button
-                type="button"
-                :title="T.wordsRejudge"
-                class="btn btn-outline-dark btn-sm"
-                @click="$emit('rejudge', run)"
-              >
-                <font-awesome-icon :icon="['fas', 'redo-alt']" />
-              </button>
-            </td>
-            <td v-if="showDisqualify">
-              <button
-                type="button"
-                :title="T.wordsDisqualify"
-                class="btn btn-outline-dark btn-sm"
-                @click="$emit('disqualify', run)"
-              >
-                <font-awesome-icon :icon="['fas', 'ban']" />
-              </button>
-            </td>
-            <td v-if="showDetails">
-              <button
-                type="button"
-                data-run-details
                 class="details btn btn-outline-dark btn-sm"
+                data-run-details
                 @click="$emit('details', run)"
               >
                 <font-awesome-icon :icon="['fas', 'search-plus']" />
               </button>
             </td>
+            <td v-else-if="showDetails || showDisqualify || showRejudge">
+              <div class="dropdown">
+                <button
+                  class="btn btn-secondary dropdown-toggle"
+                  type="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  {{ T.wordsActions }}
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li v-if="showDetails">
+                    <button
+                      class="btn btn-link dropdown-item"
+                      @click="$emit('details', run)"
+                    >
+                      {{ T.wordsDetails }}
+                    </button>
+                  </li>
+                  <li v-if="showRejudge">
+                    <button
+                      class="btn btn-link dropdown-item"
+                      @click="$emit('rejudge', run)"
+                    >
+                      {{ T.wordsRejudge }}
+                    </button>
+                  </li>
+                  <li role="separator" class="divider"></li>
+                  <li v-if="showDisqualify">
+                    <button
+                      class="btn btn-link dropdown-item"
+                      @click="$emit('disqualify', run)"
+                    >
+                      {{ T.wordsDisqualify }}
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </td>
+            <td v-else></td>
           </tr>
         </tbody>
       </table>
@@ -336,7 +348,6 @@ export default class Runs extends Vue {
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
-  @Prop({ default: false }) globalRuns!: boolean;
 
   T = T;
   time = time;
@@ -653,6 +664,10 @@ caption {
   caption-side: top;
 }
 
+.text-break-all {
+  word-break: break-all;
+}
+
 .runs {
   width: 100%;
   border: 1px solid #ccc;
@@ -680,6 +695,7 @@ caption {
   background: #ccc;
   text-align: center;
 }
+
 .runs tfoot td a:hover {
   background: #fff;
 }

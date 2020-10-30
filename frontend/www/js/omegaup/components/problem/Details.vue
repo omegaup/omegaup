@@ -82,6 +82,14 @@
         </template>
         <omegaup-quality-nomination-review
           v-if="user.reviewer && !nominationStatus.already_reviewed"
+          :allow-user-add-tags="allowUserAddTags"
+          :level-tags="levelTags"
+          :problem-level="problemLevel"
+          :public-tags="publicTags"
+          :selected-public-tags="selectedPublicTags"
+          :selected-private-tags="selectedPrivateTags"
+          :problem-alias="problem.alias"
+          :problem-title="problem.title"
           @submit="
             (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
           "
@@ -269,6 +277,12 @@ export default class ProblemDetails extends Vue {
   @Prop() histogram!: types.Histogram;
   @Prop() showNewRunWindow!: boolean;
   @Prop() activeTab!: string;
+  @Prop() allowUserAddTags!: boolean;
+  @Prop() levelTags!: string[];
+  @Prop() problemLevel!: string;
+  @Prop() publicTags!: string[];
+  @Prop() selectedPublicTags!: string[];
+  @Prop() selectedPrivateTags!: string[];
 
   T = T;
   ui = ui;

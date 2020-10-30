@@ -8,6 +8,7 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CourseDetailsPayload();
+  const headerPayload = types.payloadParsers.CommonPayload();
   new Vue({
     el: '#main-container',
     components: {
@@ -18,6 +19,7 @@ OmegaUp.on('ready', () => {
         props: {
           course: payload.details,
           progress: payload.progress,
+          currentUsername: headerPayload.currentUsername,
         },
         on: {
           clone: (alias: string, name: string, startTime: Date) => {

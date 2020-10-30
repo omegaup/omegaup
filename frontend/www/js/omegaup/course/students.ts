@@ -18,6 +18,7 @@ OmegaUp.on('ready', function () {
           T: T,
           course: payload.course,
           students: payload.students,
+          problemTitles: payload.problemTitles,
           assignments: payload.course.assignments,
         },
       });

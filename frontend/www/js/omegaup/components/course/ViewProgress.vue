@@ -1,7 +1,7 @@
 <template>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-lg-10 mb-3">
         <div class="omegaup-course-viewprogress card">
           <div class="card-header">
             <h2>
@@ -18,8 +18,10 @@
                     :key="assignment.alias"
                     class="score text-center"
                   >
-                    {{ assignment.name }}
+                    {{ assignment.name }}<br />
+                    <span>{{ getTotalPoints(assignment) }}</span>
                   </th>
+                  <th class="text-center">{{ T.courseProgressGlobalScore }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -29,6 +31,7 @@
                   :student="student"
                   :assignments="assignments"
                   :course="course"
+                  :problem-titles="problemTitles"
                 >
                 </omegaup-student-progress>
               </tbody>
@@ -36,7 +39,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-2">
+      <div class="col-md-2">
         <div class="card sticky-top sticky-offset">
           <div class="card-header p-1">
             <p class="card-title text-sm-center mb-1">
@@ -45,13 +48,13 @@
           </div>
           <div class="card-body">
             <a
-              class="btn btn-primary btn-sm mr-1"
+              class="btn btn-primary btn-sm w-100 my-1"
               :download="csvFilename"
               :href="csvDataUrl"
               >.csv</a
             >
             <a
-              class="btn btn-primary btn-sm"
+              class="btn btn-primary btn-sm w-100 my-1"
               :download="odsFilename"
               :href="odsDataUrl"
               >.ods</a
@@ -61,7 +64,6 @@
       </div>
     </div>
   </div>
-  <!-- panel -->
 </template>
 
 <script lang="ts">
@@ -69,6 +71,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
+import * as ui from '../../ui';
 import AsyncComputedPlugin from 'vue-async-computed';
 import AsyncComputed from 'vue-async-computed-decorator';
 import JSZip from 'jszip';
@@ -137,12 +140,15 @@ export function toOds(
 }
 
 @Component({
-  components: { 'omegaup-student-progress': StudentProgress },
+  components: {
+    'omegaup-student-progress': StudentProgress,
+  },
 })
 export default class CourseViewProgress extends Vue {
   @Prop() assignments!: omegaup.Assignment[];
   @Prop() course!: types.CourseDetails;
   @Prop() students!: types.StudentProgress[];
+  @Prop() problemTitles!: { [key: string]: string };
 
   T = T;
 
@@ -176,6 +182,7 @@ export default class CourseViewProgress extends Vue {
     for (const assignment of this.assignments) {
       header.push(assignment.name);
     }
+    header.push(T.courseProgressGlobalScore);
     table.push(header);
     for (const student of this.students) {
       const row: (number | string)[] = [student.username, student.name || ''];
@@ -183,6 +190,8 @@ export default class CourseViewProgress extends Vue {
       for (const assignment of this.assignments) {
         row.push(this.score(student, assignment));
       }
+      const globalScore = this.getGlobalScoreByStudent(student);
+      row.push(`${globalScore}%`);
 
       table.push(row);
     }
@@ -201,6 +210,34 @@ export default class CourseViewProgress extends Vue {
 
   get odsFilename(): string {
     return `${this.course.alias}.ods`;
+  }
+
+  get totalPoints(): number {
+    return this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+  }
+
+  getTotalPoints(assignment: omegaup.Assignment): string {
+    return ui.formatString(T.studentProgressDescriptionTotalPoints, {
+      points: assignment.max_points,
+    });
+  }
+
+  getGlobalScoreByStudent(student: types.StudentProgress): string {
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return '0.00';
+    }
+
+    return this.assignments
+      .map(
+        (assignment) => (this.score(student, assignment) * 100) / totalPoints,
+      )
+      .reduce((acc, curr) => acc + curr, 0)
+      .toFixed(2);
   }
 
   @AsyncComputed()
@@ -278,7 +315,7 @@ export default class CourseViewProgress extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 .panel-body {
   overflow: auto;
   white-space: nowrap;

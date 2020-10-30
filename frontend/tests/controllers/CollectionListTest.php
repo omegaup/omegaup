@@ -8,6 +8,10 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
+
+        // Reviewers
+        \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
+        \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
     }
 
     /**
@@ -74,11 +78,11 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsForSmarty with a level tag collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsForSmarty(
+        // Call getCollectionsDetailsByLevelForSmarty with a level tag collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'collection_type' => 'problemLevelBasicIntroductionToProgramming',
+                'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         )['smartyProperties']['payload']['collection'];
 
@@ -147,20 +151,38 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Test\Utils::runAggregateFeedback();
         \OmegaUp\Test\Utils::runUpdateRanks();
 
+        // Review problems as quality problems
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        foreach ($problems as $problem) {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problem['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => true,
+                    'tag' => 'problemLevelBasicIntroductionToProgramming',
+                    'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+                ]),
+            ]));
+        }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
         // Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
 
-        // Call getCollectionsDetailsForSmarty with an author collection type
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsForSmarty(
+        // Call getCollectionsDetailsByAuthorForSmarty with an author collection type
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'collection_type' => 'author',
             ])
-        )['smartyProperties']['payload']['collection'];
+        )['smartyProperties']['payload']['authors'];
 
         foreach ($result as $key) {
-            $this->assertArrayHasKey('alias', $key);
+            $this->assertArrayHasKey('username', $key);
             $this->assertArrayHasKey('name', $key);
         }
 

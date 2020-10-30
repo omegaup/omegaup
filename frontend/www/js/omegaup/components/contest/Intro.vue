@@ -111,7 +111,7 @@
       <hr />
       <div>
         <h1>{{ T.registerForContestChallenges }}</h1>
-        <p>{{ contest.description }}</p>
+        <omegaup-markdown :markdown="contest.description"></omegaup-markdown>
       </div>
       <div>
         <h1>{{ T.registerForContestRules }}</h1>

@@ -340,6 +340,9 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 ui.success(T.courseEditCourseEdited);
+                if (admissionMode === 'registration') {
+                  this.refreshStudentList();
+                }
               })
               .catch(ui.apiError);
           },
@@ -349,7 +352,7 @@ OmegaUp.on('ready', () => {
           }) => {
             let participants: string[] = [];
             if (ev.participants !== '')
-              participants = ev.participants.split(',');
+              participants = ev.participants.split(/[\n,]/);
             if (ev.participant !== '') participants.push(ev.participant);
             if (participants.length === 0) {
               ui.error(T.wordsEmptyAddStudentInput);

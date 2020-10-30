@@ -8,11 +8,9 @@
     <td
       v-for="assignment in assignments"
       :key="assignment.alias"
-      class="score flex-column justify-content-center align-items-center"
+      class="flex-column text-center text-nowrap justify-content-center align-items-center"
     >
-      <omegaup-markdown
-        :markdown="getProgressDescription(assignment.alias)"
-      ></omegaup-markdown>
+      {{ getProgressDescription(assignment.alias) }}
       <div class="d-flex justify-content-center">
         <div
           v-if="
@@ -42,6 +40,9 @@
         </div>
       </div>
     </td>
+    <td data-global-score class="text-center font-weight-bold align-middle">
+      {{ globalScore }}%
+    </td>
   </tr>
 </template>
 
@@ -51,14 +52,13 @@ import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
-import omegaup_Markdown from '../Markdown.vue';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import * as markdown from '../../markdown';
+
+const markdownConverter = new markdown.Converter();
 
 @Component({
-  components: {
-    'omegaup-markdown': omegaup_Markdown,
-  },
   directives: {
     tooltip: VTooltip,
   },
@@ -67,6 +67,7 @@ export default class StudentProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() student!: types.StudentProgress;
   @Prop() assignments!: omegaup.Assignment[];
+  @Prop() problemTitles!: { [key: string]: string };
 
   T = T;
 
@@ -120,6 +121,20 @@ export default class StudentProgress extends Vue {
     );
   }
 
+  get globalScore(): string {
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return '0.00';
+    }
+
+    return this.assignments
+      .map((assignment) => (this.score(assignment.alias) * 100) / totalPoints)
+      .reduce((acc, curr) => acc + curr, 0)
+      .toFixed(0);
+  }
+
   getProgressDescription(assignmentAlias: string): string {
     const score = this.score(assignmentAlias);
     const points = this.points(assignmentAlias);
@@ -128,8 +143,7 @@ export default class StudentProgress extends Vue {
     }
     return ui.formatString(T.studentProgressDescription, {
       score: score,
-      points: points,
-      progress: (points != 0 ? (score / points) * 100 : 0).toFixed(2),
+      progress: (points != 0 ? (score / points) * 100 : 0).toFixed(0),
     });
   }
 
@@ -161,12 +175,14 @@ export default class StudentProgress extends Vue {
     assignmentAlias: string,
     problemAlias: string,
   ): string {
-    return ui.formatString(T.studentProgressTooltipDescription, {
-      problem: problemAlias,
-      score: this.getScore(assignmentAlias, problemAlias),
-      points: this.getPoints(assignmentAlias, problemAlias),
-      progress: this.getProgress(assignmentAlias, problemAlias),
-    });
+    return markdownConverter.makeHtml(
+      ui.formatString(T.studentProgressTooltipDescription, {
+        problem: this.problemTitles[problemAlias],
+        score: this.getScore(assignmentAlias, problemAlias),
+        points: this.getPoints(assignmentAlias, problemAlias),
+        progress: this.getProgress(assignmentAlias, problemAlias),
+      }),
+    );
   }
 
   get studentProgressUrl(): string {

@@ -35,6 +35,7 @@ describe('ViewProgress.vue', () => {
         order: 1,
         scoreboard_url: '',
         scoreboard_url_admin: '',
+        max_points: 200,
       } as omegaup.Assignment,
     ],
     students: <types.StudentProgress[]>[
@@ -84,33 +85,37 @@ describe('ViewProgress.vue', () => {
     const wrapper = shallowMount(course_ViewProgress, {
       propsData: baseViewProgressProps,
     });
+    const globalScore = wrapper.vm.getGlobalScoreByStudent(student);
 
     const odsContent = toOds(courseName, wrapper.vm.progressTable);
     expect(odsContent).toBe(`<table:table table:name="${courseName}">
-<table:table-column table:number-columns-repeated="3"/>
+<table:table-column table:number-columns-repeated="4"/>
 <table:table-row>
 <table:table-cell office:value-type="string"><text:p>${T.profileUsername}\
 </text:p></table:table-cell><table:table-cell office:value-type="string">\
 <text:p>${T.wordsName}</text:p></table:table-cell><table:table-cell \
 office:value-type="string"><text:p>${assignment.name}</text:p>\
-</table:table-cell></table:table-row>
+</table:table-cell><table:table-cell office:value-type="string"><text:p>\
+${T.courseProgressGlobalScore}</text:p></table:table-cell></table:table-row>
 <table:table-row>
 <table:table-cell office:value-type="string"><text:p>${student.username}\
 </text:p></table:table-cell><table:table-cell office:value-type="string">\
 <text:p>${student.name}</text:p></table:table-cell><table:table-cell \
 office:value-type="float" office:value="${score}"><text:p>${score}</text:p>\
-</table:table-cell></table:table-row>
+</table:table-cell><table:table-cell office:value-type="string"><text:p>\
+${globalScore}%</text:p></table:table-cell></table:table-row>
 </table:table>`);
   });
 
-  it('Should handle csv contents', () => {
+  it('Should handle csv content', () => {
     const wrapper = shallowMount(course_ViewProgress, {
       propsData: baseViewProgressProps,
     });
+    const globalScore = wrapper.vm.getGlobalScoreByStudent(student);
 
     const csvContent = toCsv(wrapper.vm.progressTable);
     expect(csvContent)
-      .toBe(`${T.profileUsername},${T.wordsName},${assignment.name}\r
-${student.username},${student.name},${score}`);
+      .toBe(`${T.profileUsername},${T.wordsName},${assignment.name},${T.courseProgressGlobalScore}\r
+${student.username},${student.name},${score},${globalScore}%`);
   });
 });

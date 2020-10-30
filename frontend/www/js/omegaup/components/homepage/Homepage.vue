@@ -1,15 +1,5 @@
 <template>
   <div>
-    <omegaup-coder-of-the-month-notice
-      v-if="
-        currentUserInfo &&
-        ((coderOfTheMonth &&
-          coderOfTheMonth.username == currentUserInfo.username) ||
-          (coderOfTheMonthFemale &&
-            coderOfTheMonthFemale.username == currentUserInfo.username))
-      "
-      :coder-username="currentUserInfo.username"
-    ></omegaup-coder-of-the-month-notice>
     <omegaup-carousel></omegaup-carousel>
     <div
       v-if="
@@ -146,7 +136,6 @@ import homepage_Testimonials from './Testimonials.vue';
 import homepage_Section from './Section.vue';
 import school_Rank from '../schools/Rank.vue';
 import user_Rank from '../user/Rank.vue';
-import coderofthemonth_Notice from '../coderofthemonth/Noticev2.vue';
 
 @Component({
   components: {
@@ -157,7 +146,6 @@ import coderofthemonth_Notice from '../coderofthemonth/Noticev2.vue';
     'omegaup-user-rank': user_Rank,
     'omegaup-testimonials': homepage_Testimonials,
     'omegaup-section': homepage_Section,
-    'omegaup-coder-of-the-month-notice': coderofthemonth_Notice,
   },
 })
 export default class Homepage extends Vue {
