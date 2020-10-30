@@ -100,13 +100,14 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $requireAllTags,
         array $programmingLanguages,
         ?array $difficultyRange,
-        bool $onlyQualitySeal
+        bool $onlyQualitySeal,
+        ?int $level
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
             $order = 'desc';
         }
-
+        
         $languageJoin = '';
         if (!is_null($language) && $language !== 'all') {
             $languageJoin = '
@@ -115,6 +116,16 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 INNER JOIN
                     Languages ON Problems_Languages.language_id = Languages.language_id
                     AND Languages.name = \'' . $language . '\'
+            ';
+        }
+        
+        $levelJoin = '';
+        if (!is_null($level)) {
+            $levelJoin = '
+            INNER JOIN 
+                Problems_Tags pt ON p.problem_id = pt.problem_id 
+            INNER JOIN 
+                Tags t ON t.tag_id = pt.tag_id
             ';
         }
 
@@ -191,7 +202,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         Submissions.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
-                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin;
+                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility > ?',
@@ -240,7 +251,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gi.group_id
                     WHERE gi.identity_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin;
+                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin . $levelJoin;
             $args[] = $identityId;
             $args[] = $userId;
             $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
@@ -271,7 +282,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         p.* ';
             $sql = '
                     FROM
-                        Problems p ' . $languageJoin;
+                        Problems p ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility >= ?',
@@ -300,6 +311,12 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ];
         }
 
+        if (!is_null($level)) {
+            $clauses[] = [
+                't.tag_id = ?', [$level]
+            ];
+        }
+
         // Finally flatten all WHERE clauses, and add a 'WHERE' if applicable.
         if (!empty($clauses)) {
             $sql .= "\nWHERE\n" . implode(
@@ -321,7 +338,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             "SELECT COUNT(*) $sql",
             $args
         );
-
+        
         // Reset the offset to 0 if out of bounds.
         if ($offset < 0 || $offset > $count) {
             $offset = 0;

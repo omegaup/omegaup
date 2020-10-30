@@ -1300,7 +1300,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
         )['smartyProperties']['payload']['problems'];
-
+        
         foreach ($result as $problem) {
             $this->assertEquals(
                 $problem['tags'][0]['name'],
