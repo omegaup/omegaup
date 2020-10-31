@@ -102,8 +102,10 @@ ${T.courseProgressGlobalScore}</text:p></table:table-cell></table:table-row>
 </text:p></table:table-cell><table:table-cell office:value-type="string">\
 <text:p>${student.name}</text:p></table:table-cell><table:table-cell \
 office:value-type="float" office:value="${score}"><text:p>${score}</text:p>\
-</table:table-cell><table:table-cell office:value-type="string"><text:p>\
-${globalScore}%</text:p></table:table-cell></table:table-row>
+</table:table-cell>\
+<table:table-cell office:value-type="percentage" office:value="${globalScore.value}">\
+<text:p>${globalScore}</text:p>\
+</table:table-cell></table:table-row>
 </table:table>`);
   });
 
@@ -114,8 +116,9 @@ ${globalScore}%</text:p></table:table-cell></table:table-row>
     const globalScore = wrapper.vm.getGlobalScoreByStudent(student);
 
     const csvContent = toCsv(wrapper.vm.progressTable);
-    expect(csvContent)
-      .toBe(`${T.profileUsername},${T.wordsName},${assignment.name},${T.courseProgressGlobalScore}\r
-${student.username},${student.name},${score},${globalScore}%`);
+    expect(csvContent).toBe(`${T.profileUsername},${T.wordsName},${
+      assignment.name
+    },${T.courseProgressGlobalScore}\r
+${student.username},${student.name},${score.toFixed(2)},${globalScore}`);
   });
 });
