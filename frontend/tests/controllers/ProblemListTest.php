@@ -1319,5 +1319,26 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             $result[0]['tags'][0]['name'],
             'problemLevelBasicKarel'
         );
+
+        // Test count of problems
+        $apiListResponse = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'only_quality_seal' => true,
+                'level' => 'problemLevelBasicIntroductionToProgramming'
+            ])
+        );
+
+        $this->assertEquals(2, $apiListResponse['total']);
+
+        $apiListResponse = \OmegaUp\Controllers\Problem::apiList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'only_quality_seal' => true,
+                'level' => 'problemLevelBasicKarel'
+            ])
+        );
+
+        $this->assertEquals(1, $apiListResponse['total']);
     }
 }

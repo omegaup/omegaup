@@ -2679,6 +2679,7 @@ List of public and user's private problems
 | `only_quality_seal`     | `bool`         |             |
 | `difficulty_range`      | `null\|string` |             |
 | `language`              | `mixed`        |             |
+| `level`                 | `null\|string` |             |
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |

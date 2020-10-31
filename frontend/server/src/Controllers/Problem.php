@@ -3719,6 +3719,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
      * @omegaup-request-param bool $only_quality_seal
+     * @omegaup-request-param null|string $level
      */
     public static function apiList(\OmegaUp\Request $r) {
         // Authenticate request
@@ -3733,6 +3734,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $rowcount = \OmegaUp\Controllers\Problem::PAGE_SIZE;
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
+        $level = $r->ensureOptionalString('level');
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
@@ -3769,7 +3771,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $r->identity,
             $r->user,
-            $onlyQualitySeal
+            $onlyQualitySeal,
+            $level
         );
     }
 
@@ -3794,7 +3797,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?array $difficultyRange,
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
-        bool $onlyQualitySeal
+        bool $onlyQualitySeal,
+        ?string $level
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -3845,7 +3849,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $requireAllTags,
             $programmingLanguages,
             $difficultyRange,
-            $onlyQualitySeal
+            $onlyQualitySeal,
+            $level
         );
         return [
             'total' => $count,
@@ -4806,7 +4811,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r->user,
             /*$onlyQualitySeal=*/false,
-            /*$url=*/'/problem/list/'
+            /*$url=*/'/problem/list/',
+            /*$level=*/null
         );
 
         return [
@@ -5904,7 +5910,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $collectionLevel = $r->ensureString('level');
 
         $collection = [];
-        $problems = [];
 
         $offset = $r->ensureOptionalInt('offset') ?? 0;
         $pageSize = $r->ensureOptionalInt(
@@ -5940,18 +5945,13 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r->user,
             /*$onlyQualitySeal=*/true,
-            /*$url=*/"/problem/collection/{$collectionLevel}/"
+            /*$url=*/"/problem/collection/{$collectionLevel}/",
+            /*$level=*/$collectionLevel
         );
 
         $collection = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
             $collectionLevel
         );
-
-        foreach ($result['problems'] as $problem) {
-            if ($problem['tags'][0]['name'] === $collectionLevel) {
-                $problems[] = $problem;
-            }
-        }
 
         return [
             'smartyProperties' => [
@@ -5959,7 +5959,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'collection' => $collection,
                     'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                     'level' => $collectionLevel,
-                    'problems' => $problems,
+                    'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
                     'currentTags' => $result['currentTags'],
                     'pagerItems' => $result['pagerItems'],
@@ -6013,7 +6013,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
         bool $onlyQualitySeal,
-        string $url
+        string $url,
+        ?string $level
     ) {
         $response = self::getListImpl(
             $page ?: 1,
@@ -6030,7 +6031,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $difficultyRange,
             $identity,
             $user,
-            $onlyQualitySeal
+            $onlyQualitySeal,
+            $level
         );
 
         $params = [
@@ -6140,7 +6142,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r->user,
             /*$onlyQualitySeal=*/true,
-            /*$url=*/'/problem/collection/author/'
+            /*$url=*/'/problem/collection/author/',
+            /*$level=*/null
         );
 
         $response = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(
