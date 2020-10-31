@@ -113,10 +113,10 @@ OmegaUp.on('ready', () => {
         tab.classList.remove('active');
       });
       document
-        .querySelectorAll('.tabs a[href="#' + arenaInstance.activeTab + '"]')
+        .querySelectorAll(`.tabs a[href="#${arenaInstance.activeTab}"]`)
         .forEach((element) => element.classList.add('active'));
       document
-        .querySelectorAll('#' + arenaInstance.activeTab)
+        .querySelectorAll(`#${arenaInstance.activeTab}`)
         .forEach((element) => ((<HTMLElement>element).style.display = 'block'));
 
       if (arenaInstance.activeTab == 'clarifications') {
