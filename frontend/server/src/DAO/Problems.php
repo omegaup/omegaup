@@ -101,7 +101,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         array $programmingLanguages,
         ?array $difficultyRange,
         bool $onlyQualitySeal,
-        ?int $level
+        ?string $level
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -119,6 +119,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ';
         }
 
+        $clauses = [];
+
         $levelJoin = '';
         if (!is_null($level)) {
             $levelJoin = '
@@ -127,6 +129,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN
                 Tags t ON t.tag_id = pt.tag_id
             ';
+            $clauses[] = [
+                't.name = ?', [$level]
+            ];
         }
 
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
@@ -138,7 +143,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
         /** @var list<array{0: string, 1: list<string>}> */
-        $clauses = [];
+
         foreach ($programmingLanguages as $programmingLanguage) {
             $clauses[] = [
                 'FIND_IN_SET(?, p.languages) > 0',
@@ -308,12 +313,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         if ($onlyQualitySeal) {
             $clauses[] = [
                 'p.quality_seal = ?', [1]
-            ];
-        }
-
-        if (!is_null($level)) {
-            $clauses[] = [
-                't.tag_id = ?', [$level]
             ];
         }
 
