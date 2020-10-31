@@ -217,7 +217,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
             [
-                ($page - 1) * $rowsPerPage,
+                $page,
                 $rowsPerPage
             ]
         );

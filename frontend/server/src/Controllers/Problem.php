@@ -6144,7 +6144,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $response = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(
-            /*$offset*/            1,
+            /*$offset*/            0,
             /*$rowCount*/15
         );
 
@@ -6183,7 +6183,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleCollectionsByAuthor'
                 ),
             ],
-            'entrypoint' => 'problem_collections_by_author_details',
+            'entrypoint' => 'problem_collection_list_by_author',
         ];
     }
 }
