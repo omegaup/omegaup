@@ -252,3 +252,40 @@ export function rankingUsername(
     username = formatString(T.virtualSuffix, { username: username });
   return username;
 }
+
+export function findElement(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+): HTMLElement | null {
+  if (!element || itemSelector === null) {
+    return element;
+  }
+  return element.querySelector(itemSelector);
+}
+
+export function setItemText(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+  text: string,
+) {
+  element = findElement(element, itemSelector);
+  if (element) {
+    element.textContent = text;
+  }
+}
+
+export function getInputValue(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+): string | undefined {
+  if (itemSelector !== null) {
+    if (element !== null) {
+      element = element.querySelector(itemSelector);
+    } else {
+      element = document.querySelector(itemSelector);
+    }
+  }
+  if (element) {
+    return (<HTMLInputElement>element).value;
+  }
+}

@@ -11,19 +11,22 @@ OmegaUp.on('ready', () => {
 
   const onlyProblemLoaded = (problem: types.ProblemDetailsPayload) => {
     arenaInstance.renderProblem(problem);
-
-    for (const solver of problem.solvers ?? []) {
-      const prob = $('.solver-list .template').clone().removeClass('template');
-      $('.user', prob)
-        .attr('href', '/profile/' + solver.username)
-        .text(solver.username);
-      $('.language', prob).text(solver.language);
-      $('.runtime', prob).text((solver.runtime / 1000.0).toFixed(2));
-      $('.memory', prob).text((solver.memory / (1024 * 1024)).toFixed(2));
-      $('.time', prob).text(time.formatTimestamp(solver.time));
-      $('.solver-list').append(prob);
+    const solverTemplate = document.querySelector('.solver-list .template');
+    const solverList = document.querySelector('.solver-list');
+    if (solverTemplate && solverList) {
+      for (const solver of problem.solvers ?? []) {
+        const prob = <HTMLElement>solverTemplate.cloneNode(true);
+        prob.classList.remove('template');
+        prob.querySelector('.user')
+          ?.setAttribute('href', '/profile/${solver.username}');
+        ui.setItemText(prob, '.user', solver.username);
+        ui.setItemText(prob, '.language', solver.language);
+        ui.setItemText(prob, '.runtime', (solver.runtime / 1000.0).toFixed(2));
+        ui.setItemText(prob, '.memory', (solver.memory / (1024 * 1024)).toFixed(2));
+        ui.setItemText(prob, '.time', time.formatTimestamp(solver.time));
+        solverList.appendChild(prob);
+      }
     }
-
     if (problem.user.logged_in) {
       api.Problem.runs({ problem_alias: problem.alias })
         .then((result) => {
@@ -85,20 +88,25 @@ OmegaUp.on('ready', () => {
           )}`;
           return;
         }
-        $('#overlay form:not([data-run-submit])').hide();
-        $('#overlay').show();
+        document.querySelectorAll('#overlay form:not([data-run-submit])').forEach(element => (<HTMLElement>element).style.display = 'none');
+        document.querySelectorAll('#overlay').forEach(element => (<HTMLElement>element).style.display = 'block');
       }
     }
     arenaInstance.detectShowRun();
 
     if (tabChanged) {
-      $('.tabs a.active').removeClass('active');
-      $('.tabs a[href="#' + arenaInstance.activeTab + '"]').addClass('active');
-      $('.tab').hide();
-      $('#' + arenaInstance.activeTab).show();
+      document.querySelectorAll('.tab').forEach(tab => {
+        (<HTMLElement>tab).style.display = 'none';
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tabs a[href="#' + arenaInstance.activeTab + '"]').forEach(element => element.classList.add('active'));
+      document.querySelectorAll('#' + arenaInstance.activeTab).forEach(element => (<HTMLElement>element).style.display = 'block');
 
       if (arenaInstance.activeTab == 'clarifications') {
-        $('#clarifications-count').css('font-weight', 'normal');
+        const clarificationsCountElement = <HTMLElement>document.querySelector('#clarifications-count');
+        if (clarificationsCountElement) {
+          clarificationsCountElement.style.fontWeight = 'normal';
+        }
       }
     }
   };
@@ -112,7 +120,8 @@ OmegaUp.on('ready', () => {
       .then((result) => arenaInstance.problemsetLoaded(result))
       .catch((e) => arenaInstance.problemsetLoadedError(e));
 
-    $('.clarifpager .clarifpagerprev').on('click', () => {
+    document.querySelector('.clarifpager .clarifpagerprev')
+      ?.addEventListener('click', () => {
       if (arenaInstance.clarificationsOffset > 0) {
         arenaInstance.clarificationsOffset -=
           arenaInstance.clarificationsRowcount;
@@ -125,7 +134,8 @@ OmegaUp.on('ready', () => {
       }
     });
 
-    $('.clarifpager .clarifpagernext').on('click', () => {
+    document.querySelector('.clarifpager .clarifpagernext')
+      ?.addEventListener('click', () => {
       arenaInstance.clarificationsOffset +=
         arenaInstance.clarificationsRowcount;
       if (arenaInstance.clarificationsOffset < 0) {
@@ -137,12 +147,12 @@ OmegaUp.on('ready', () => {
     });
   }
 
-  $('#clarification').on('submit', () => {
-    $('#clarification input').attr('disabled', 'disabled');
+  document.querySelector('#clarification')?.addEventListener('submit', () => {
+    document.querySelectorAll('#clarification input').forEach(input => input.setAttribute('disabled', 'disabled'));
     api.Clarification.create({
       contest_alias: arenaInstance.options.contestAlias,
-      problem_alias: $('#clarification select[name="problem"]').val(),
-      message: $('#clarification textarea[name="message"]').val(),
+      problem_alias: ui.getInputValue(null, '#clarification select[name="problem"]'),
+      message: ui.getInputValue(null, '#clarification textarea[name="message"]'),
     })
       .then(() => {
         arenaInstance.hideOverlay();
@@ -152,7 +162,7 @@ OmegaUp.on('ready', () => {
         alert(e.error);
       })
       .finally(() => {
-        $('#clarification input').prop('disabled', false);
+        document.querySelectorAll('#clarification input').forEach(input => input.removeAttribute('disabled'));
       });
 
     return false;

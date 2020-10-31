@@ -166,27 +166,6 @@ function getMaxScore(
   return maxScore;
 }
 
-function findElement(
-  element: HTMLElement | null,
-  itemSelector: string | null,
-): HTMLElement | null {
-  if (!element || itemSelector === null) {
-    return element;
-  }
-  return element.querySelector(itemSelector);
-}
-
-function setItemText(
-  element: HTMLElement | null,
-  itemSelector: string | null,
-  text: string,
-) {
-  element = findElement(element, itemSelector);
-  if (element) {
-    element.textContent = text;
-  }
-}
-
 export class Arena {
   options: ArenaOptions;
 
@@ -803,7 +782,7 @@ export class Arena {
     // Once the clock is ready, we can now connect to the socket.
     this.connectSocket();
     if (this.options.isPractice || !this.finishTime) {
-      setItemText(this.elements.clock, null, '∞');
+      ui.setItemText(this.elements.clock, null, '∞');
       return;
     }
     if (deadline) this.submissionDeadline = deadline;
@@ -1012,7 +991,7 @@ export class Arena {
     } else {
       clock = time.formatDelta(countdownTime.getTime() - now);
     }
-    setItemText(this.elements.clock, null, clock);
+    ui.setItemText(this.elements.clock, null, clock);
   }
 
   updateRunFallback(guid: string): void {
@@ -1540,14 +1519,14 @@ export class Arena {
 
     if (r) {
       r.querySelector('.anchor')?.setAttribute('name', anchor);
-      setItemText(r, '.contest', clarification.contest_alias ?? '');
-      setItemText(r, '.problem', clarification.problem_alias);
+      ui.setItemText(r, '.contest', clarification.contest_alias ?? '');
+      ui.setItemText(r, '.problem', clarification.problem_alias);
       if (this.problemsetAdmin) {
-        setItemText(r, '.author', clarification.author ?? '');
+        ui.setItemText(r, '.author', clarification.author ?? '');
       }
-      setItemText(r, '.time', time.formatTimestamp(clarification.time));
-      setItemText(r, '.message', clarification.message);
-      setItemText(r, '.answer pre', clarification.answer ?? '');
+      ui.setItemText(r, '.time', time.formatTimestamp(clarification.time));
+      ui.setItemText(r, '.message', clarification.message);
+      ui.setItemText(r, '.answer pre', clarification.answer ?? '');
       if (clarification.answer) {
         this.answeredClarifications++;
       }
