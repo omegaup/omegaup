@@ -1325,7 +1325,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'only_quality_seal' => true,
-                'level' => 3
+                'level' => 'problemLevelBasicIntroductionToProgramming'
             ])
         );
 
@@ -1335,7 +1335,7 @@ class ProblemListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'only_quality_seal' => true,
-                'level' => 2
+                'level' => 'problemLevelBasicKarel'
             ])
         );
 
