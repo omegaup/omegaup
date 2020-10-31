@@ -811,6 +811,14 @@ export namespace types {
       );
     }
 
+    export function LoginDetailsPayload(
+      elementId: string = 'payload',
+    ): types.LoginDetailsPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function ProblemDetailsPayload(
       elementId: string = 'payload',
     ): types.ProblemDetailsPayload {
@@ -2038,6 +2046,12 @@ export namespace types {
     TimeLimit: string;
   }
 
+  export interface LoginDetailsPayload {
+    facebookURL: string;
+    linkedinURL: string;
+    validateRecaptcha: boolean;
+  }
+
   export interface NominationListItem {
     author: { name?: string; username: string };
     contents?: {
@@ -2200,11 +2214,17 @@ export namespace types {
 
   export interface ProblemDetailsv2Payload {
     allRuns?: types.Run[];
+    allowUserAddTags?: boolean;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
+    levelTags?: string[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
+    problemLevel?: string;
+    publicTags?: string[];
     runs?: types.Run[];
+    selectedPrivateTags?: string[];
+    selectedPublicTags?: string[];
     solutionStatus?: string;
     solvers?: types.BestSolvers[];
     user: types.UserInfoForProblem;

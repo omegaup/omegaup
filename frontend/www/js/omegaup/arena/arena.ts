@@ -166,6 +166,27 @@ function getMaxScore(
   return maxScore;
 }
 
+function findElement(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+): HTMLElement | null {
+  if (!element || itemSelector === null) {
+    return element;
+  }
+  return element.querySelector(itemSelector);
+}
+
+function setItemText(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+  text: string,
+) {
+  element = findElement(element, itemSelector);
+  if (element) {
+    element.textContent = text;
+  }
+}
+
 export class Arena {
   options: ArenaOptions;
 
@@ -1439,7 +1460,7 @@ export class Arena {
         clarifications.push(clarification);
       }
     } else {
-      r = <HTMLElement|null>(
+      r = <HTMLElement | null>(
         document
           .querySelector('.clarifications tbody.clarification-list tr.template')
           ?.cloneNode(true)
