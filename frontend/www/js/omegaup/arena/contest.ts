@@ -17,12 +17,17 @@ OmegaUp.on('ready', () => {
       for (const solver of problem.solvers ?? []) {
         const prob = <HTMLElement>solverTemplate.cloneNode(true);
         prob.classList.remove('template');
-        prob.querySelector('.user')
+        prob
+          .querySelector('.user')
           ?.setAttribute('href', '/profile/${solver.username}');
         ui.setItemText(prob, '.user', solver.username);
         ui.setItemText(prob, '.language', solver.language);
         ui.setItemText(prob, '.runtime', (solver.runtime / 1000.0).toFixed(2));
-        ui.setItemText(prob, '.memory', (solver.memory / (1024 * 1024)).toFixed(2));
+        ui.setItemText(
+          prob,
+          '.memory',
+          (solver.memory / (1024 * 1024)).toFixed(2),
+        );
         ui.setItemText(prob, '.time', time.formatTimestamp(solver.time));
         solverList.appendChild(prob);
       }
@@ -88,22 +93,36 @@ OmegaUp.on('ready', () => {
           )}`;
           return;
         }
-        document.querySelectorAll('#overlay form:not([data-run-submit])').forEach(element => (<HTMLElement>element).style.display = 'none');
-        document.querySelectorAll('#overlay').forEach(element => (<HTMLElement>element).style.display = 'block');
+        document
+          .querySelectorAll('#overlay form:not([data-run-submit])')
+          .forEach(
+            (element) => ((<HTMLElement>element).style.display = 'none'),
+          );
+        document
+          .querySelectorAll('#overlay')
+          .forEach(
+            (element) => ((<HTMLElement>element).style.display = 'block'),
+          );
       }
     }
     arenaInstance.detectShowRun();
 
     if (tabChanged) {
-      document.querySelectorAll('.tab').forEach(tab => {
+      document.querySelectorAll('.tab').forEach((tab) => {
         (<HTMLElement>tab).style.display = 'none';
         tab.classList.remove('active');
       });
-      document.querySelectorAll('.tabs a[href="#' + arenaInstance.activeTab + '"]').forEach(element => element.classList.add('active'));
-      document.querySelectorAll('#' + arenaInstance.activeTab).forEach(element => (<HTMLElement>element).style.display = 'block');
+      document
+        .querySelectorAll('.tabs a[href="#' + arenaInstance.activeTab + '"]')
+        .forEach((element) => element.classList.add('active'));
+      document
+        .querySelectorAll('#' + arenaInstance.activeTab)
+        .forEach((element) => ((<HTMLElement>element).style.display = 'block'));
 
       if (arenaInstance.activeTab == 'clarifications') {
-        const clarificationsCountElement = <HTMLElement>document.querySelector('#clarifications-count');
+        const clarificationsCountElement = <HTMLElement>(
+          document.querySelector('#clarifications-count')
+        );
         if (clarificationsCountElement) {
           clarificationsCountElement.style.fontWeight = 'normal';
         }
@@ -120,10 +139,25 @@ OmegaUp.on('ready', () => {
       .then((result) => arenaInstance.problemsetLoaded(result))
       .catch((e) => arenaInstance.problemsetLoadedError(e));
 
-    document.querySelector('.clarifpager .clarifpagerprev')
+    document
+      .querySelector('.clarifpager .clarifpagerprev')
       ?.addEventListener('click', () => {
-      if (arenaInstance.clarificationsOffset > 0) {
-        arenaInstance.clarificationsOffset -=
+        if (arenaInstance.clarificationsOffset > 0) {
+          arenaInstance.clarificationsOffset -=
+            arenaInstance.clarificationsRowcount;
+          if (arenaInstance.clarificationsOffset < 0) {
+            arenaInstance.clarificationsOffset = 0;
+          }
+
+          // Refresh with previous page
+          arenaInstance.refreshClarifications();
+        }
+      });
+
+    document
+      .querySelector('.clarifpager .clarifpagernext')
+      ?.addEventListener('click', () => {
+        arenaInstance.clarificationsOffset +=
           arenaInstance.clarificationsRowcount;
         if (arenaInstance.clarificationsOffset < 0) {
           arenaInstance.clarificationsOffset = 0;
@@ -131,28 +165,23 @@ OmegaUp.on('ready', () => {
 
         // Refresh with previous page
         arenaInstance.refreshClarifications();
-      }
-    });
-
-    document.querySelector('.clarifpager .clarifpagernext')
-      ?.addEventListener('click', () => {
-      arenaInstance.clarificationsOffset +=
-        arenaInstance.clarificationsRowcount;
-      if (arenaInstance.clarificationsOffset < 0) {
-        arenaInstance.clarificationsOffset = 0;
-      }
-
-      // Refresh with previous page
-      arenaInstance.refreshClarifications();
-    });
+      });
   }
 
   document.querySelector('#clarification')?.addEventListener('submit', () => {
-    document.querySelectorAll('#clarification input').forEach(input => input.setAttribute('disabled', 'disabled'));
+    document
+      .querySelectorAll('#clarification input')
+      .forEach((input) => input.setAttribute('disabled', 'disabled'));
     api.Clarification.create({
       contest_alias: arenaInstance.options.contestAlias,
-      problem_alias: ui.getInputValue(null, '#clarification select[name="problem"]'),
-      message: ui.getInputValue(null, '#clarification textarea[name="message"]'),
+      problem_alias: ui.getInputValue(
+        null,
+        '#clarification select[name="problem"]',
+      ),
+      message: ui.getInputValue(
+        null,
+        '#clarification textarea[name="message"]',
+      ),
     })
       .then(() => {
         arenaInstance.hideOverlay();
@@ -162,7 +191,9 @@ OmegaUp.on('ready', () => {
         alert(e.error);
       })
       .finally(() => {
-        document.querySelectorAll('#clarification input').forEach(input => input.removeAttribute('disabled'));
+        document
+          .querySelectorAll('#clarification input')
+          .forEach((input) => input.removeAttribute('disabled'));
       });
 
     return false;
