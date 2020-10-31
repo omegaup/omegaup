@@ -3742,9 +3742,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
         if (!is_null($r['rowcount'])) {
             $rowcount = intval($r['rowcount']);
         }
-        if (!is_null($r['level'])) {
-            $level = strval($r['level']);
-        }
 
         [
             'sortOrder' => $sortOrder,
