@@ -1291,7 +1291,7 @@ export namespace types {
   }
 
   export interface AuthorsRankWithQualityProblems {
-    ranking: { author_ranking: number; name?: string; username: string }[];
+    ranking: { author_ranking: number; classname: string; username: string }[];
   }
 
   export interface Badge {
@@ -1386,7 +1386,7 @@ export namespace types {
   }
 
   export interface CollectionDetailsByAuthorPayload {
-    authors: { name?: string; username: string }[];
+    authors: types.AuthorsRankWithQualityProblems;
     column: string;
     columns: string[];
     currentTags: string[];
