@@ -6149,21 +6149,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             /*$rowCount*/15
         );
 
-        // foreach ($response['ranking'] as $author) {
-        //     if (!is_null($author['name'])) {
-        //         $authors[] = [
-        //             'name' => $author['name'],
-        //             'username' => $author['username'],
-        //             'classname' => $author['classname'],
-        //         ];
-        //         continue;
-        //     }
-        //     $authors[] = [
-        //         'username' => $author['username'],
-        //         'classname' => $author['classname'],
-        //     ];
-        // }
-
         return [
             'smartyProperties' => [
                 'payload' => [
