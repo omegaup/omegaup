@@ -82,6 +82,14 @@
         </template>
         <omegaup-quality-nomination-review
           v-if="user.reviewer && !nominationStatus.already_reviewed"
+          :allow-user-add-tags="allowUserAddTags"
+          :level-tags="levelTags"
+          :problem-level="problemLevel"
+          :public-tags="publicTags"
+          :selected-public-tags="selectedPublicTags"
+          :selected-private-tags="selectedPrivateTags"
+          :problem-alias="problem.alias"
+          :problem-title="problem.title"
           @submit="
             (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
           "
@@ -116,8 +124,8 @@
           :show-overlay="showOverlay"
           @overlay-hidden="onPopupDismissed"
         >
-          <template #popup-content>
-            <omegaup-arena-runsubmit
+          <template #popup>
+            <omegaup-arena-runsubmit-popup
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
               :initial-show-form="showFormRunSubmit"
@@ -126,7 +134,7 @@
                 (code, selectedLanguage) =>
                   onRunSubmitted(code, selectedLanguage)
               "
-            ></omegaup-arena-runsubmit>
+            ></omegaup-arena-runsubmit-popup>
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -197,7 +205,7 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
-import arena_RunSubmit from '../arena/RunSubmit.vue';
+import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
@@ -236,7 +244,7 @@ interface Tab {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
-    'omegaup-arena-runsubmit': arena_RunSubmit,
+    'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
@@ -269,6 +277,12 @@ export default class ProblemDetails extends Vue {
   @Prop() histogram!: types.Histogram;
   @Prop() showNewRunWindow!: boolean;
   @Prop() activeTab!: string;
+  @Prop() allowUserAddTags!: boolean;
+  @Prop() levelTags!: string[];
+  @Prop() problemLevel!: string;
+  @Prop() publicTags!: string[];
+  @Prop() selectedPublicTags!: string[];
+  @Prop() selectedPrivateTags!: string[];
 
   T = T;
   ui = ui;

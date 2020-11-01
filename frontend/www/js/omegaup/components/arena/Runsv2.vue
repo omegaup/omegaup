@@ -1,5 +1,15 @@
 <template>
   <div class="mt-2">
+    <!-- TODO: This code should be removed when we stop using jquery and the
+      migration to vue was over -->
+    <!-- id-lint off -->
+    <div id="overlay">
+      <div id="run-details"></div>
+    </div>
+    <!-- id-lint on -->
+    <div v-if="globalRuns" class="card-header">
+      <h1 class="text-center">{{ T.wordsGlobalSubmissions }}</h1>
+    </div>
     <div class="table-responsive">
       <table class="runs table table-striped">
         <caption>
@@ -251,35 +261,31 @@
                   aria-expanded="false"
                 >
                   {{ T.wordsActions }}
-                  <span class="caret"></span>
                 </button>
-                <ul class="dropdown-menu">
-                  <li v-if="showDetails">
-                    <button
-                      class="btn btn-link dropdown-item"
-                      @click="$emit('details', run)"
-                    >
-                      {{ T.wordsDetails }}
-                    </button>
-                  </li>
-                  <li v-if="showRejudge">
-                    <button
-                      class="btn btn-link dropdown-item"
-                      @click="$emit('rejudge', run)"
-                    >
-                      {{ T.wordsRejudge }}
-                    </button>
-                  </li>
-                  <li role="separator" class="divider"></li>
-                  <li v-if="showDisqualify">
-                    <button
-                      class="btn btn-link dropdown-item"
-                      @click="$emit('disqualify', run)"
-                    >
-                      {{ T.wordsDisqualify }}
-                    </button>
-                  </li>
-                </ul>
+                <div class="dropdown-menu">
+                  <button
+                    v-if="showDetails"
+                    class="btn btn-link dropdown-item"
+                    @click="$emit('details', run)"
+                  >
+                    {{ T.wordsDetails }}
+                  </button>
+                  <button
+                    v-if="showRejudge"
+                    class="btn btn-link dropdown-item"
+                    @click="$emit('rejudge', run)"
+                  >
+                    {{ T.wordsRejudge }}
+                  </button>
+                  <div class="dropdown-divider"></div>
+                  <button
+                    v-if="showDisqualify"
+                    class="btn btn-link dropdown-item"
+                    @click="$emit('disqualify', run)"
+                  >
+                    {{ T.wordsDisqualify }}
+                  </button>
+                </div>
               </div>
             </td>
             <td v-else></td>
@@ -331,7 +337,7 @@ declare global {
     'omegaup-user-username': user_Username,
   },
 })
-export default class Runs extends Vue {
+export default class Runsv2 extends Vue {
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -348,6 +354,7 @@ export default class Runs extends Vue {
   @Prop({ default: null }) username!: string | null;
   @Prop({ default: 100 }) rowCount!: number;
   @Prop() runs!: types.Run[];
+  @Prop({ default: false }) globalRuns!: boolean;
 
   T = T;
   time = time;

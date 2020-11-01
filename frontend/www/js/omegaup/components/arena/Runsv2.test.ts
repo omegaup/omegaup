@@ -3,25 +3,28 @@ import expect from 'expect';
 
 import T from '../../lang';
 
-import arena_Runs from './Runs.vue';
+import arena_Runsv2 from './Runsv2.vue';
 
-describe('Runs.vue', () => {
+describe('Runsv2.vue', () => {
   it('Should handle empty runs', () => {
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runsv2, {
       propsData: {
         contestAlias: 'admin',
+        globalRuns: true,
         runs: [],
       },
     });
 
+    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
     expect(wrapper.find('table tbody').text()).toBe('');
   });
 
   it('Should handle runs', async () => {
     const expectedDate = '1/1/2020, 12:00:00 AM';
-    const wrapper = shallowMount(arena_Runs, {
+    const wrapper = shallowMount(arena_Runsv2, {
       propsData: {
         contestAlias: 'admin',
+        globalRuns: true,
         runs: [
           {
             alias: 'alias',
