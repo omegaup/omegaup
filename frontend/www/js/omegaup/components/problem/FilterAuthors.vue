@@ -9,7 +9,11 @@
             :value="author"
             class="form-check-input"
             type="checkbox"
-          />{{ author }}
+          />
+          <omegaup-user-username
+            :linkify="true"
+            :username="author"
+          ></omegaup-user-username>
         </label>
       </div>
     </div>
@@ -20,9 +24,12 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
+import user_Username from '../user/Username.vue';
+
 @Component({
   components: {
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
+    'omegaup-user-username': user_Username,
   },
 })
 export default class FilterAuthors extends Vue {

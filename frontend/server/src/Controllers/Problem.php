@@ -6144,7 +6144,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $response = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(
-            /*$offset*/            0,
+            /*$offset*/            1,
             /*$rowCount*/15
         );
 

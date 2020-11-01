@@ -72,7 +72,7 @@ OmegaUp.on('ready', () => {
             window.location.replace(
               `/problem/collection/author/?${ui.buildURLQuery(
                 queryParameters,
-              )}`,
+              )}/`,
             );
           },
         },
