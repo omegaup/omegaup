@@ -139,7 +139,7 @@ export default class StudentProgress extends Vue {
     const score = this.score(assignmentAlias);
     const points = this.points(assignmentAlias);
     if (points === 0) {
-      return T.studentProgressOnlyLecturesDescription;
+      return T.courseWithoutProblems;
     }
     return ui.formatString(T.studentProgressDescription, {
       score: score,
