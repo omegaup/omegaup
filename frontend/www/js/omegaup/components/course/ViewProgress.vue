@@ -24,7 +24,7 @@
                       v-if="assignment.max_points === 0"
                       data-toggle="tooltip"
                       rel="tooltip"
-                      :title="T.problemEditTagPublicRequired"
+                      :title="T.studentProgressOnlyLecturesDescription"
                       ><img src="/media/question.png"
                     /></a>
                   </th>

@@ -363,6 +363,7 @@ const translations: { [key: string]: string; } = {
   courseStudentsProgressExportToSpreadsheet: "Export table as:",
   courseSubmissionsList: "Course submissions list",
   courseUpdateAlreadyHasRuns: "The duration can't be changed once a solution has been judged.",
+  courseWithoutProblems: "Without problems",
   csrfException: "Cross-site Request Forgery attempt",
   currentStatus: "Current state",
   datePickerFormat: "mm/dd/yyyy",
