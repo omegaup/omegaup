@@ -559,6 +559,31 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Entry point for change account of a session
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @return array{auth_token: string}
+     *
+     * @omegaup-request-param string $usernameOrEmail
+     */
+    public static function apiChangeAccount(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+
+        $usernameOrEmail = $r->ensureString(
+            'usernameOrEmail',
+            fn (string $username) => \OmegaUp\Validators::username($username)
+        );
+
+        return [
+            'auth_token' => \OmegaUp\Controllers\Session::loginWithAssociatedIdentity(
+                $usernameOrEmail,
+                $r->identity
+            ),
+        ];
+    }
+
+    /**
      * @param \OmegaUp\Request $r
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException

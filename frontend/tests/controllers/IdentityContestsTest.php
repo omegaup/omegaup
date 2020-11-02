@@ -135,4 +135,98 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
         }
     }
+
+    /**
+     * Basic test for creating a single identity with contests, associating it
+     * with a registred user
+     */
+    public function testChangeAccountForAssociatedIdentities() {
+        [
+            'identity' => $creator,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        // Creator adds 3 contests, in the first one identity will be invited.
+        // In the other contests user will be invited.
+        // At the end, user associates the account with the identity and it can
+        // be able to see all the 3 contests switching between both accounts
+        $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
+        $identityUsername = "{$group['group']->alias}:{$identityName}";
+        $password = \OmegaUp\Test\Utils::createRandomString();
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $identityUsername,
+            'name' => $identityName,
+            'password' => $password,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        // Create the user to associate
+        ['identity' => $user] = \OmegaUp\Test\Factories\User::createUser();
+
+        $userContests = [$identityUsername, $user->username, $user->username];
+
+        $contests = [];
+        foreach ($userContests as $userId => $username) {
+            $contests[$userId] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'admissionMode' => 'private',
+                    'title' => "Contest_{$userId}",
+                ])
+            );
+
+            $directorLogin = self::login($contests[$userId]['director']);
+            \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contests[$userId]['request']['alias'],
+                'usernameOrEmail' => $username,
+            ]));
+        }
+
+        $login = self::login($user);
+        \OmegaUp\Controllers\User::apiAssociateIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $identityUsername,
+                'password' => $password,
+            ])
+        );
+
+        $contestsList = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        // User has been invited to 2 contests
+        $this->assertEquals(2, $contestsList['number_of_results']);
+        $this->assertEquals('Contest_1', $contestsList['results'][0]['title']);
+        $this->assertEquals('Contest_2', $contestsList['results'][1]['title']);
+
+        // User switch the account
+        $result = \OmegaUp\Controllers\Identity::apiChangeAccount(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $identityUsername,
+            ])
+        );
+
+        $contestsList = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $result['auth_token']])
+        );
+
+        // Identity has been invited to 1 contest
+        $this->assertEquals(1, $contestsList['number_of_results']);
+        $this->assertEquals('Contest_0', $contestsList['results'][0]['title']);
+    }
 }
