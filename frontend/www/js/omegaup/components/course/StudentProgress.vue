@@ -14,16 +14,11 @@
       <div class="d-flex justify-content-center">
         <div
           v-if="
-            !Object.prototype.hasOwnProperty.call(
+            Object.prototype.hasOwnProperty.call(
               student.progress,
               assignment.alias,
             )
           "
-        >
-          {{ T.wordsProblemsUnsolved }}
-        </div>
-        <div
-          v-else
           class="d-flex border border-dark"
           :class="{ invisible: points(assignment.alias) === 0 }"
         >
