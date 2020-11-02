@@ -1385,7 +1385,6 @@ const translations: { [key: string]: string; } = {
   wordsProblem: "(Pr0b13m)",
   wordsProblemOrSolutionNotExist: "(Th3 pr0b13m 0r 501u7i0n d0n'7 3xi57.)",
   wordsProblems: "(Pr0b13m5)",
-  wordsProblemsUnsolved: "(N0 pr0b13m5 501v3d)",
   wordsProblemsetter: "(Up10ad3d by)",
   wordsProgress: "(Pr0gr355)",
   wordsProportion: "(Pr0p0r7i0n)",
