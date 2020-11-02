@@ -175,6 +175,8 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $sqlSelect = '
             SELECT
                 IFNULL(`ur`.`author_ranking`, 0) AS `author_ranking`,
+                IFNULL(`ur`.`author_score`, 0) AS `author_score`,
+                `ur`.`country_id`,
                 `ur`.`username`,
                 `ur`.`name`,
                 IFNULL(
