@@ -17,6 +17,7 @@
           <omegaup-user-username
             :linkify="true"
             :username="author.username"
+            :name="author.name"
             :classname="author.classname"
           ></omegaup-user-username>
         </label>
@@ -39,7 +40,7 @@ import user_Username from '../user/Username.vue';
   },
 })
 export default class FilterAuthors extends Vue {
-  @Prop() authors!: types.AuthorsRankWithQualityProblems;
+  @Prop() authors!: types.AuthorsRank;
 
   T = T;
   selectedAuthors: string[] = [];

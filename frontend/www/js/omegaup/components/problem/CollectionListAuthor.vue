@@ -73,7 +73,7 @@ export default class CollectionList extends Vue {
   @Prop() columnName!: string;
 
   T = T;
-  authors = this.data.authors; //.map((element) => element.username);
+  authors = this.data.authors;
   selectedDifficulty: null | string = null;
 }
 </script>

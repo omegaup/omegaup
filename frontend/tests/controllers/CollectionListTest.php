@@ -184,6 +184,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         foreach ($result as $key) {
             $this->assertArrayHasKey('author_ranking', $key);
             $this->assertArrayHasKey('username', $key);
+            $this->assertArrayHasKey('name', $key);
             $this->assertArrayHasKey('classname', $key);
         }
 
