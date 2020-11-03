@@ -3717,6 +3717,7 @@ Return most frequent public tags of a certain level
 | Name           | Type     | Description |
 | -------------- | -------- | ----------- |
 | `problemLevel` | `string` |             |
+| `rows`         | `int`    |             |
 
 ### Returns
 

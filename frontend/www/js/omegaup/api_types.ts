@@ -1403,10 +1403,10 @@ export namespace types {
   }
 
   export interface CollectionDetailsByLevelPayload {
-    collection: { alias: string; name?: string }[];
     column: string;
     columns: string[];
     currentTags: string[];
+    frequentTags: { alias: string; name?: string }[];
     keyword: string;
     language: string;
     languages: string[];

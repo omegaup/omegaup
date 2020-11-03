@@ -84,7 +84,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
                 'level' => 'problemLevelBasicIntroductionToProgramming',
             ])
-        )['smartyProperties']['payload']['collection'];
+        )['smartyProperties']['payload']['frequentTags'];
 
         $this->assertEquals('problemTagMatrices', $result['0']['alias']);
         $this->assertCount(6, $result);

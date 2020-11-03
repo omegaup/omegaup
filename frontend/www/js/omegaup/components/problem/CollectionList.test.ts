@@ -12,7 +12,7 @@ describe('CollectionList.vue', () => {
       propsData: {
         data: {
           level: 'problemLevelBasicIntroductionToProgramming',
-          collection: [
+          frequentTags: [
             { alias: 'problemTagMatrices' },
             { alias: 'problemTagDiophantineEquations' },
             { alias: 'problemTagInputAndOutput' },

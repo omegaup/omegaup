@@ -75,11 +75,11 @@ export default class CollectionList extends Vue {
 
   T = T;
   level = this.data.level;
-  tags: string[] = this.data.collection.map((element) => element.alias);
+  tags: string[] = this.data.frequentTags.map((element) => element.alias);
   selectedDifficulty: null | string = null;
 
   get publicTags(): string[] {
-    let tags: string[] = this.data.collection.map((x) => x.alias);
+    let tags: string[] = this.data.frequentTags.map((x) => x.alias);
     return this.data.publicTags.filter((x) => !tags.includes(x));
   }
 
