@@ -101,7 +101,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         array $programmingLanguages,
         ?array $difficultyRange,
         bool $onlyQualitySeal,
-        ?string $level
+        ?string $level,
+        string $difficulty
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -143,7 +144,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
         /** @var list<array{0: string, 1: list<string>}> */
-
         foreach ($programmingLanguages as $programmingLanguage) {
             $clauses[] = [
                 'FIND_IN_SET(?, p.languages) > 0',
@@ -160,6 +160,28 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $conditions,
                 $difficultyRange,
             ];
+        }
+
+        $difficulties = array('easy', 'medium', 'hard');
+        $difficultyConditions = 'p.difficulty >= ? AND p.difficulty <= ?';
+
+        if($difficulty !== 'all' || !in_array($difficulty, $difficulties, true)){
+            if($difficulty === $difficulties[0]){
+                $clauses[] = [
+                    $difficultyConditions,
+                    [0, 1.33],
+                ];
+            } else if($difficulty === $difficulties[1]){
+                $clauses[] = [
+                    $difficultyConditions,
+                    [1.34, 2.66],
+                ];
+            } else {
+                $clauses[] = [
+                    $difficultyConditions,
+                    [2.67, 4],
+                ];
+            }
         }
 
         if (!is_null($query)) {

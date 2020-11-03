@@ -3603,6 +3603,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param mixed $difficulty
      */
     private static function validateListParams(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3680,6 +3681,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $programmingLanguages = [];
         }
 
+        $difficulty = $r->ensureOptionalString(
+            'difficulty'
+        );        
+
         return [
             'sortOrder' => strval($r['sort_order']),
             'page' => intval($r['page']),
@@ -3695,6 +3700,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
+            'difficulty' => $difficulty,
         ];
     }
 
@@ -3798,7 +3804,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Identities $identity,
         ?\OmegaUp\DAO\VO\Users $user,
         bool $onlyQualitySeal,
-        ?string $level
+        ?string $level,
+        string $difficulty
     ) {
         $authorIdentityId = null;
         $authorUserId = null;
@@ -3850,7 +3857,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $programmingLanguages,
             $difficultyRange,
             $onlyQualitySeal,
-            $level
+            $level,
+            $difficulty
         );
         return [
             'total' => $count,
@@ -5905,6 +5913,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
+     * @omegaup-request-param mixed $difficulty
      */
     public static function getCollectionsDetailsByLevelForSmarty(\OmegaUp\Request $r): array {
         $collectionLevel = $r->ensureString('level');
@@ -5927,6 +5936,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
+            'difficulty' => $difficulty, 
         ] = self::validateListParams($r);
 
         $result = self::getList(
@@ -5946,7 +5956,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->user,
             /*$onlyQualitySeal=*/true,
             /*$url=*/"/problem/collection/{$collectionLevel}/",
-            /*$level=*/$collectionLevel
+            /*$level=*/$collectionLevel,
+            $difficulty
         );
 
         $frequentTags = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
@@ -5973,6 +5984,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'columns' => $result['columns'],
                     'tagsList' => $result['tags'],
                     'tagData' => $result['tagData'],
+                    'difficulty' => $result['difficulty'],
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollectionsByLevel'
@@ -5996,7 +6008,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @param list<string> $programmingLanguages
      * @param array{0: int, 1: int}|null $difficultyRange
      *
-     * @return array{column: string, columns: list<string>, currentTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PageItem>, tagData: list<Tag>, tags: list<string>}
+     * @return array{column: string, columns: list<string>, currentTags: list<string>, keyword: string, language: string, languages: list<string>, mode: string, modes: list<string>, problems: list<ProblemListItem>, pagerItems: list<PageItem>, tagData: list<Tag>, tags: list<string>, difficulty: string}
      */
     private static function getList(
         int $page,
@@ -6015,7 +6027,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
         ?\OmegaUp\DAO\VO\Users $user,
         bool $onlyQualitySeal,
         string $url,
-        ?string $level
+        ?string $level,
+        string $difficulty
     ) {
         $response = self::getListImpl(
             $page ?: 1,
@@ -6033,7 +6046,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $identity,
             $user,
             $onlyQualitySeal,
-            $level
+            $level,
+            $difficulty ?: 'all'
         );
 
         $params = [
@@ -6041,7 +6055,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'language' => $language,
             'order_by' => $orderBy,
             'sort_order' => $sortOrder,
-            'tag' => $tags
+            'tag' => $tags,
+            'difficulty' => $difficulty
         ];
 
         $pagerItems = \OmegaUp\Pager::paginateWithUrl(
@@ -6082,6 +6097,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'columns' => \OmegaUp\Controllers\Problem::VALID_SORTING_COLUMNS,
             'tags' => $tags,
             'tagData' => $tagData,
+            'difficulty', => $difficulty
         ];
     }
 
