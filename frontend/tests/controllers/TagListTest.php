@@ -125,7 +125,8 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
         $request = \OmegaUp\Controllers\Tag::apiFrequentTags(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'problemLevel' => 'problemLevelBasicIntroductionToProgramming'
+                'problemLevel' => 'problemLevelBasicIntroductionToProgramming',
+                'rows' => 15
             ])
         );
 
