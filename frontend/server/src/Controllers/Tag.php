@@ -77,7 +77,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
-            "level-{$problemLevel}",
+            "level-{$problemLevel}-{$rows}",
             fn () => \OmegaUp\DAO\Tags::getFrequentTagsByLevel(
                 $problemLevel,
                 $rows
