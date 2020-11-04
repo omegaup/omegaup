@@ -85,5 +85,26 @@ export default class Login extends Vue {
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
+  window = window;
+
+  mounted() {
+    window.gapi.signin2.render('google-signin', {
+      scope: 'profile',
+      width: 45,
+      height: 45,
+      longtitle: false,
+      theme: 'light',
+      onsuccess: this.onHandleSuccess,
+      onfailure: this.onHandleFailure,
+    });
+  }
+
+  onHandleSuccess(googleUser: any) {
+    this.$emit('google-login', googleUser.getAuthResponse().id_token);
+  }
+
+  onHandleFailure() {
+    console.error('fail');
+  }
 }
 </script>

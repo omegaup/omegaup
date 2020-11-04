@@ -550,7 +550,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             return self::ThirdPartyLogin(
                 'LinkedIn',
                 $profile['emailAddress'],
-                $profile['firstName'] . ' ' . $profile['lastName']
+                "{$profile['firstName']} {$profile['lastName']}"
             );
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error("Unable to login via LinkedIn: $e");

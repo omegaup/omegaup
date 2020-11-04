@@ -19,6 +19,9 @@
     <script type="text/javascript" src="{version_hash src="/js/jquery_error_handler.js"}"></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/highstock.js" defer}" defer></script>
     <script type="text/javascript" src="{version_hash src="/third_party/js/sugar.js" defer}"></script>
+    {if isset($GOOGLECLIENTID) && !empty($GOOGLECLIENTID)}
+      <script src="https://apis.google.com/js/platform.js?onload=init" async defer></script>
+    {/if}
     {js_include entrypoint="omegaup" runtime}
 
     {if isset($inArena) && $inArena}

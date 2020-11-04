@@ -11,6 +11,7 @@
               <label class="control-label">{{ T.wordsUser }}</label>
               <input
                 v-model="username"
+                name="reg_username"
                 class="form-control"
                 autocomplete="username"
               />
@@ -21,6 +22,7 @@
               <label class="control-label">{{ T.loginEmail }}</label>
               <input
                 v-model="email"
+                name="reg_email"
                 type="email"
                 class="form-control"
                 autocomplete="email"
@@ -34,6 +36,7 @@
               <label class="control-label">{{ T.loginPasswordCreate }}</label>
               <input
                 v-model="password"
+                name="reg_password"
                 type="password"
                 class="form-control"
                 autocomplete="new-password"
@@ -45,6 +48,7 @@
               <label class="control-label">{{ T.loginRepeatPassword }}</label>
               <input
                 v-model="passwordConfirmation"
+                name="reg_password_confirmation"
                 type="password"
                 class="form-control"
                 autocomplete="new-password"
@@ -70,7 +74,7 @@
             <div class="form-group">
               <button
                 class="btn btn-primary form-control"
-                name="sign"
+                name="sign_up"
                 @click.prevent="
                   $emit(
                     'register-and-login',

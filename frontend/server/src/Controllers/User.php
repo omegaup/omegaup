@@ -26,7 +26,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
- * @psalm-type LoginDetailsPayload=array{facebookURL: string, linkedinURL: string, validateRecaptcha: bool}
+ * @psalm-type LoginDetailsPayload=array{errorMessage?: string, errorToUser?: string, facebookUrl: string, linkedinUrl: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3904,22 +3904,98 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param mixed $code
+     * @omegaup-request-param mixed $error
+     * @omegaup-request-param mixed $error_description
+     * @omegaup-request-param mixed $fb
+     * @omegaup-request-param mixed $linkedin
+     * @omegaup-request-param mixed $redirect
+     * @omegaup-request-param mixed $state
      */
     public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
         $triedToLogin = false;
         $emailVerified = true;
+
+        if (isset($r['linkedin'])) {
+            if (isset($r['code']) && isset($r['state'])) {
+                /** @var array<string, mixed> */
+                $response = \OmegaUp\Controllers\Session::LoginViaLinkedIn();
+            }
+            $triedToLogin = true;
+        } elseif (isset($r['fb'])) {
+            /** @var array<string, mixed> */
+            $response = \OmegaUp\Controllers\Session::LoginViaFacebook();
+            $triedToLogin = true;
+        }
+
+        $errors = [];
+        if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
+            if (
+                !empty($r['redirect']) &&
+                is_string($r['redirect']) &&
+                self::shouldRedirect($r['redirect'])
+            ) {
+                header("Location: {$r['redirect']}");
+                die();
+            }
+            header('Location: /profile/');
+            die();
+        } elseif ($triedToLogin) {
+            if (isset($response['error'])) {
+                $errors = [
+                    'errorToUser' => 'NATIVE_LOGIN_FAILED',
+                    'errorMessage' => $response['error'],
+                ];
+            } elseif (isset($r['error'])) {
+                $errors = [
+                    'errorToUser' => 'THIRD_PARTY_LOGIN_FAILED',
+                    'errorMessage' => $r['error_description'],
+                ];
+            } else {
+                $errors = [
+                    'errorToUser' => 'THIRD_PARTY_LOGIN_FAILED',
+                    'errorMessage' => \OmegaUp\Translations::getInstance()->get(
+                        'loginFederatedFailed'
+                    ),
+                ];
+            }
+        }
+
+        $payload = array_merge($errors, [
+            'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+            'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+            'linkedinUrl' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
+        ]);
+
         return [
             'smartyProperties' => [
-                'payload' => [
-                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
-                    'facebookURL' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
-                    'linkedinURL' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
-                ],
+                'payload' => $payload,
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
             ],
             'entrypoint' => 'login_signin',
         ];
+    }
+
+    private static function shouldRedirect(string $url): bool {
+        $redirectParsedUrl = parse_url($url);
+        // If a malformed URL is given, don't redirect.
+        if ($redirectParsedUrl === false) {
+            return false;
+        }
+        // Just the path portion of the URL was given.
+        if (
+            empty($redirectParsedUrl['scheme']) ||
+            empty($redirectParsedUrl['host'])
+        ) {
+            return ($redirectParsedUrl['path'] ?? '') != '/logout/';
+        }
+        $redirectUrl = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
+        if (isset($redirectParsedUrl['port'])) {
+            $redirectUrl .= ":{$redirectParsedUrl['port']}";
+        }
+        return $redirectUrl === OMEGAUP_URL;
     }
 }
 

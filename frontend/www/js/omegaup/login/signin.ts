@@ -7,33 +7,36 @@ import Vue from 'vue';
 import login_Signin from '../components/login/Signin.vue';
 import VueRecaptcha from 'vue-recaptcha';
 
-function loginAndredirect(
-  usernameOrEmail: string,
-  password: string,
-  isAccountCreation: boolean,
-): void {
-  api.User.login({
-    usernameOrEmail: usernameOrEmail,
-    password: password,
-  })
-    .then(() => {
-      const params = new URL(document.location.toString()).searchParams;
-      const pathname = params.get('redirect');
-      if (pathname && pathname.indexOf('/') !== 0) {
-        window.location.href = pathname;
-        return;
-      }
-      if (isAccountCreation) {
-        window.location.href = '/profile/';
-        return;
-      }
-      window.location.href = '/';
-    })
-    .catch(ui.apiError);
-}
-
 OmegaUp.on('ready', () => {
+  function loginAndredirect(
+    usernameOrEmail: string,
+    password: string,
+    isAccountCreation: boolean,
+  ): void {
+    api.User.login({
+      usernameOrEmail: usernameOrEmail,
+      password: password,
+    })
+      .then(() => {
+        const params = new URL(document.location.toString()).searchParams;
+        const pathname = params.get('redirect');
+        if (pathname && pathname.indexOf('/') !== 0) {
+          window.location.href = pathname;
+          return;
+        }
+        if (isAccountCreation) {
+          window.location.href = '/profile/';
+          return;
+        }
+        window.location.href = '/';
+      })
+      .catch(ui.apiError);
+  }
+
   const payload = types.payloadParsers.LoginDetailsPayload();
+  if (payload.errorMessage) {
+    ui.error(payload.errorMessage);
+  }
   new Vue({
     el: '#main-container',
     components: {
@@ -44,8 +47,8 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-login-signin', {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
-          facebookURL: payload.facebookURL,
-          linkedinURL: payload.linkedinURL,
+          facebookUrl: payload.facebookUrl,
+          linkedinUrl: payload.linkedinUrl,
         },
         on: {
           'register-and-login': (
@@ -85,6 +88,14 @@ OmegaUp.on('ready', () => {
               password,
               /*isAccountCreation*/ false,
             );
+          },
+          'google-login': (idToken: string) => {
+            // Only log in if the user actually clicked the sign-in button.
+            api.Session.googleLogin({ storeToken: idToken })
+              .then(() => {
+                window.location.reload();
+              })
+              .catch(ui.apiError);
           },
         },
       });
