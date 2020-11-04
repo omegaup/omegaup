@@ -3603,7 +3603,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $require_all_tags
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
-     * @omegaup-request-param mixed $difficulty
      */
     private static function validateListParams(\OmegaUp\Request $r) {
         \OmegaUp\Validators::validateOptionalInEnum(
@@ -3681,10 +3680,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $programmingLanguages = [];
         }
 
-        $difficulty = $r->ensureOptionalString(
-            'difficulty'
-        );
-
         return [
             'sortOrder' => strval($r['sort_order']),
             'page' => intval($r['page']),
@@ -3700,7 +3695,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
-            'difficulty' => $difficulty,
         ];
     }
 
@@ -3709,6 +3703,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{results: list<ProblemListItem>, total: int}
      *
+     * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
      * @omegaup-request-param int|null $max_difficulty
@@ -3741,6 +3736,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
         $level = $r->ensureOptionalString('level');
+        $difficulty = $r->ensureOptionalString('difficulty');
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
@@ -3778,7 +3774,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->identity,
             $r->user,
             $onlyQualitySeal,
-            $level
+            $level,
+            $difficulty ?: 'all'
         );
     }
 
@@ -4820,7 +4817,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->user,
             /*$onlyQualitySeal=*/false,
             /*$url=*/'/problem/list/',
-            /*$level=*/null
+            /*$level=*/null,
+            /*$difficulty=*/'all'
         );
 
         return [
@@ -5898,6 +5896,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @return array{smartyProperties: array{payload: CollectionDetailsByLevelPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $level
+     * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
      * @omegaup-request-param int|null $max_difficulty
@@ -5913,7 +5912,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param int|null $rowcount
      * @omegaup-request-param mixed $some_tags
      * @omegaup-request-param mixed $sort_order
-     * @omegaup-request-param mixed $difficulty
      */
     public static function getCollectionsDetailsByLevelForSmarty(\OmegaUp\Request $r): array {
         $collectionLevel = $r->ensureString('level');
@@ -5924,6 +5922,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
 
         [
             'sortOrder' => $sortOrder,
@@ -5936,7 +5935,6 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'programmingLanguages' => $programmingLanguages,
             'difficultyRange' => $difficultyRange,
             'minVisibility' => $minVisibility,
-            'difficulty' => $difficulty,
         ] = self::validateListParams($r);
 
         $result = self::getList(
@@ -6105,6 +6103,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      *
      * @return array{smartyProperties: array{payload: CollectionDetailsByAuthorPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
+     * @omegaup-request-param null|string $difficulty
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
      * @omegaup-request-param int|null $max_difficulty
@@ -6129,6 +6128,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
+        $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
 
         [
             'sortOrder' => $sortOrder,
@@ -6160,7 +6160,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->user,
             /*$onlyQualitySeal=*/true,
             /*$url=*/'/problem/collection/author/',
-            /*$level=*/null
+            /*$level=*/null,
+            $difficulty
         );
 
         $response = \OmegaUp\Controllers\User::getAuthorsRankWithQualityProblems(

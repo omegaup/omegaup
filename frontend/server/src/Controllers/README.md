@@ -2677,6 +2677,7 @@ List of public and user's private problems
 | Name                    | Type           | Description |
 | ----------------------- | -------------- | ----------- |
 | `only_quality_seal`     | `bool`         |             |
+| `difficulty`            | `null\|string` |             |
 | `difficulty_range`      | `null\|string` |             |
 | `language`              | `mixed`        |             |
 | `level`                 | `null\|string` |             |
