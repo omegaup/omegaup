@@ -173,7 +173,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             } elseif ($difficulty === $difficulties[1]) {
                 $clauses[] = [
                     'p.difficulty >= ? AND p.difficulty < ?',
-                    ['1.34', '2.67'],
+                    ['1.34', '2.66'],
                 ];
             } else {
                 $clauses[] = [
