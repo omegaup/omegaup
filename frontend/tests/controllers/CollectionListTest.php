@@ -188,4 +188,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(4, $result);
     }
+
+    public function testDifficultyOfQualityProblems(){
+        
+    }
 }

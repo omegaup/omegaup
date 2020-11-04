@@ -3775,7 +3775,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->user,
             $onlyQualitySeal,
             $level,
-            $difficulty ?: 'all'
+            $difficulty ?? 'all'
         );
     }
 
@@ -6045,7 +6045,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $user,
             $onlyQualitySeal,
             $level,
-            $difficulty ?: 'all'
+            $difficulty ?? 'all'
         );
 
         $params = [

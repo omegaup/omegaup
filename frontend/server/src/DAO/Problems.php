@@ -163,23 +163,22 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         $difficulties = ['easy', 'medium', 'hard'];
-        $difficultyConditions = 'p.difficulty >= ? AND p.difficulty <= ?';
 
         if (in_array($difficulty, $difficulties, true)) {
             if ($difficulty === $difficulties[0]) {
                 $clauses[] = [
-                    $difficultyConditions,
-                    ['0', '1.33'],
+                    'p.difficulty < ?',
+                    ['1.34'],
                 ];
             } elseif ($difficulty === $difficulties[1]) {
                 $clauses[] = [
-                    $difficultyConditions,
-                    ['1.34', '2.66'],
+                    'p.difficulty >= ? AND p.difficulty < ?',
+                    ['1.34', '2.67'],
                 ];
             } else {
                 $clauses[] = [
-                    $difficultyConditions,
-                    ['2.67', '4'],
+                    'p.difficulty >= ?',
+                    ['2.67'],
                 ];
             }
         }
