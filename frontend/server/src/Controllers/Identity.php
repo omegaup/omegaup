@@ -563,8 +563,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
-     * @return array{auth_token: string}
+     * @return array{status: string}
      *
+     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiSelectIdentity(\OmegaUp\Request $r) {

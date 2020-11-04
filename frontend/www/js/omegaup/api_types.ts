@@ -3513,7 +3513,7 @@ export namespace messages {
   export type IdentityCreateRequest = { [key: string]: any };
   export type IdentityCreateResponse = { username: string };
   export type IdentitySelectIdentityRequest = { [key: string]: any };
-  export type IdentitySelectIdentityResponse = { auth_token: string };
+  export type IdentitySelectIdentityResponse = {};
   export type IdentityUpdateRequest = { [key: string]: any };
   export type IdentityUpdateResponse = {};
 

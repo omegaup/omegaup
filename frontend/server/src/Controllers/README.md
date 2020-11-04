@@ -2342,15 +2342,14 @@ Entry point for switching between associated identities for a user
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type           | Description |
+| ----------------- | -------------- | ----------- |
+| `usernameOrEmail` | `string`       |             |
+| `auth_token`      | `null\|string` |             |
 
 ### Returns
 
-| Name         | Type     |
-| ------------ | -------- |
-| `auth_token` | `string` |
+_Nothing_
 
 ## `/api/identity/update/`
 

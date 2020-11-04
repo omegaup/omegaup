@@ -520,17 +520,19 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * Does login for an identity given username or email. Password no needed
      * because user should have a successful native login
+     *
+     * @omegaup-request-param null|string $auth_token
      */
     public static function loginWithAssociatedIdentity(
         \OmegaUp\Request $r,
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $loggedIdentity
-    ) {
+    ): void {
         $response = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
             $usernameOrEmail,
             $loggedIdentity
         );
-        if (is_null($response) || is_null($response['identity'])) {
+        if (is_null($response)) {
             self::$log->warn("Identity {$usernameOrEmail} not found.");
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
