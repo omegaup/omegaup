@@ -559,7 +559,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Entry point for change account of a session
+     * Entry point for switching between associated identities for a user
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
@@ -567,7 +567,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param string $usernameOrEmail
      */
-    public static function apiChangeAccount(\OmegaUp\Request $r) {
+    public static function apiSelectIdentity(\OmegaUp\Request $r) {
         $r->ensureIdentity();
 
         $usernameOrEmail = $r->ensureString(
@@ -575,11 +575,14 @@ class Identity extends \OmegaUp\Controllers\Controller {
             fn (string $username) => \OmegaUp\Validators::username($username)
         );
 
+        \OmegaUp\Controllers\Session::loginWithAssociatedIdentity(
+            $r,
+            $usernameOrEmail,
+            $r->identity
+        );
+
         return [
-            'auth_token' => \OmegaUp\Controllers\Session::loginWithAssociatedIdentity(
-                $usernameOrEmail,
-                $r->identity
-            ),
+            'status' => 'ok',
         ];
     }
 

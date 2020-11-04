@@ -1002,10 +1002,6 @@ export const Identity = {
     messages.IdentityBulkCreateRequest,
     messages.IdentityBulkCreateResponse
   >('/api/identity/bulkCreate/'),
-  changeAccount: apiCall<
-    messages.IdentityChangeAccountRequest,
-    messages.IdentityChangeAccountResponse
-  >('/api/identity/changeAccount/'),
   changePassword: apiCall<
     messages.IdentityChangePasswordRequest,
     messages.IdentityChangePasswordResponse
@@ -1014,6 +1010,10 @@ export const Identity = {
     messages.IdentityCreateRequest,
     messages.IdentityCreateResponse
   >('/api/identity/create/'),
+  selectIdentity: apiCall<
+    messages.IdentitySelectIdentityRequest,
+    messages.IdentitySelectIdentityResponse
+  >('/api/identity/selectIdentity/'),
   update: apiCall<
     messages.IdentityUpdateRequest,
     messages.IdentityUpdateResponse

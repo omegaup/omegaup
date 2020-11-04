@@ -3508,12 +3508,12 @@ export namespace messages {
   // Identity
   export type IdentityBulkCreateRequest = { [key: string]: any };
   export type IdentityBulkCreateResponse = {};
-  export type IdentityChangeAccountRequest = { [key: string]: any };
-  export type IdentityChangeAccountResponse = { auth_token: string };
   export type IdentityChangePasswordRequest = { [key: string]: any };
   export type IdentityChangePasswordResponse = {};
   export type IdentityCreateRequest = { [key: string]: any };
   export type IdentityCreateResponse = { username: string };
+  export type IdentitySelectIdentityRequest = { [key: string]: any };
+  export type IdentitySelectIdentityResponse = { auth_token: string };
   export type IdentityUpdateRequest = { [key: string]: any };
   export type IdentityUpdateResponse = {};
 
@@ -4297,15 +4297,15 @@ export namespace controllers {
     bulkCreate: (
       params?: messages.IdentityBulkCreateRequest,
     ) => Promise<messages.IdentityBulkCreateResponse>;
-    changeAccount: (
-      params?: messages.IdentityChangeAccountRequest,
-    ) => Promise<messages.IdentityChangeAccountResponse>;
     changePassword: (
       params?: messages.IdentityChangePasswordRequest,
     ) => Promise<messages.IdentityChangePasswordResponse>;
     create: (
       params?: messages.IdentityCreateRequest,
     ) => Promise<messages.IdentityCreateResponse>;
+    selectIdentity: (
+      params?: messages.IdentitySelectIdentityRequest,
+    ) => Promise<messages.IdentitySelectIdentityResponse>;
     update: (
       params?: messages.IdentityUpdateRequest,
     ) => Promise<messages.IdentityUpdateResponse>;

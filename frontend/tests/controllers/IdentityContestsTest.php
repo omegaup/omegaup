@@ -140,7 +140,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
      * Basic test for creating a single identity with contests, associating it
      * with a registred user
      */
-    public function testChangeAccountForAssociatedIdentities() {
+    public function testSwitchBetweenAssociatedIdentities() {
         [
             'identity' => $creator,
         ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
@@ -214,7 +214,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('Contest_2', $contestsList['results'][1]['title']);
 
         // User switch the account
-        $result = \OmegaUp\Controllers\Identity::apiChangeAccount(
+        \OmegaUp\Controllers\Identity::apiSelectIdentity(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
                 'usernameOrEmail' => $identityUsername,
@@ -222,7 +222,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $contestsList = \OmegaUp\Controllers\Contest::apiList(
-            new \OmegaUp\Request(['auth_token' => $result['auth_token']])
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
         );
 
         // Identity has been invited to 1 contest

@@ -107,6 +107,54 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
+    /**
+     * @return array{identity: \OmegaUp\DAO\VO\Identities, isMainIdentity: bool}|null
+     */
+    public static function resolveAssociatedIdentity(
+        string $usernameOrEmail,
+        \OmegaUp\DAO\VO\Identities $currentIdentity
+    ): ?array {
+        $sql = '
+            SELECT
+                i.*,
+                u.main_identity_id,
+                e.email
+            FROM
+                Identities i
+            INNER JOIN
+                Users u
+            ON
+                i.user_id = u.user_id
+            INNER JOIN
+                Emails e
+            ON
+                e.email_id = u.main_email_id
+            WHERE
+                i.username = ? OR e.email = ?
+            LIMIT 100;';
+        $args = [$usernameOrEmail, $usernameOrEmail];
+
+        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
+        foreach ($rs as $identityData) {
+            if (
+                $usernameOrEmail === $identityData['username']
+                || $usernameOrEmail === $identityData['email']
+            ) {
+                $isMainIdentity = $identityData['identity_id'] === $identityData['main_identity_id'];
+                unset($identityData['email']);
+                unset($identityData['main_identity_id']);
+
+                $result = [
+                    'isMainIdentity' => $isMainIdentity,
+                    'identity' => new \OmegaUp\DAO\VO\Identities($identityData),
+                ];
+                return $result;
+            }
+        }
+        return null;
+    }
+
     public static function savePassword(\OmegaUp\DAO\VO\Identities $identities): int {
         $sql = '
             UPDATE

@@ -111,9 +111,9 @@
   - [`/api/groupScoreboard/removeContest/`](#apigroupscoreboardremovecontest)
 - [Identity](#identity)
   - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
-  - [`/api/identity/changeAccount/`](#apiidentitychangeaccount)
   - [`/api/identity/changePassword/`](#apiidentitychangepassword)
   - [`/api/identity/create/`](#apiidentitycreate)
+  - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
   - [`/api/identity/update/`](#apiidentityupdate)
 - [Interview](#interview)
   - [`/api/interview/addUsers/`](#apiinterviewaddusers)
@@ -2288,24 +2288,6 @@ Entry point for Create bulk Identities API
 
 _Nothing_
 
-## `/api/identity/changeAccount/`
-
-### Description
-
-Entry point for change account of a session
-
-### Parameters
-
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `usernameOrEmail` | `string` |             |
-
-### Returns
-
-| Name         | Type     |
-| ------------ | -------- |
-| `auth_token` | `string` |
-
 ## `/api/identity/changePassword/`
 
 ### Description
@@ -2351,6 +2333,24 @@ Entry point for Create an Identity API
 | Name       | Type     |
 | ---------- | -------- |
 | `username` | `string` |
+
+## `/api/identity/selectIdentity/`
+
+### Description
+
+Entry point for switching between associated identities for a user
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+| Name         | Type     |
+| ------------ | -------- |
+| `auth_token` | `string` |
 
 ## `/api/identity/update/`
 

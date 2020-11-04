@@ -522,47 +522,43 @@ class Session extends \OmegaUp\Controllers\Controller {
      * because user should have a successful native login
      */
     public static function loginWithAssociatedIdentity(
+        \OmegaUp\Request $r,
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $loggedIdentity
-    ): string {
-        try {
-            $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
-                $usernameOrEmail
-            );
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
+    ) {
+        $response = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
+            $usernameOrEmail,
+            $loggedIdentity
+        );
+        if (is_null($response) || is_null($response['identity'])) {
             self::$log->warn("Identity {$usernameOrEmail} not found.");
-            throw new \OmegaUp\Exceptions\InvalidCredentialsException();
-        }
-        if (
-            !in_array(
-                $usernameOrEmail,
-                array_map(
-                    fn ($identity) => $identity['username'],
-                    \OmegaUp\DAO\Identities::getAssociatedIdentities($identity)
-                )
-            )
-        ) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
+        $identity = $response['identity'];
+        $isMainIdentity = $response['isMainIdentity'];
 
         self::$log->info(
-            "User {$identity->username} has logged with associated identity."
+            "User {$loggedIdentity->username} has logged with associated identity {$identity->username}."
         );
 
-        if (!is_null($identity->user_id)) {
-            $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-            if (is_null($user)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
-            \OmegaUp\Controllers\User::checkEmailVerification($user, $identity);
+        $currentSession = self::getCurrentSession($r);
+        if (is_null($currentSession['auth_token'])) {
+            self::$log->warn('Auth token not found.');
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'loginRequired'
+            );
         }
-        self::unregisterSession();
-
         try {
-            return self::registerSession($identity);
-        } catch (\Exception $e) {
+            \OmegaUp\DAO\AuthTokens::replace(new \OmegaUp\DAO\VO\AuthTokens([
+                'user_id' => $isMainIdentity ? $identity->user_id : null,
+                'identity_id' => $identity->identity_id,
+                'token' => $currentSession['auth_token'],
+            ]));
+
+            self::getCurrentSession($r);
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error($e);
-            throw new \OmegaUp\Exceptions\InvalidCredentialsException();
+            throw $e;
         }
     }
 
