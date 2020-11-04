@@ -119,8 +119,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$i],
                     $problems[$j]['request']['problem_alias'],
-                    1,
-                    4,
+                    1, /* difficulty */
+                    4, /* quality */
                     [],
                     false
                 );
@@ -140,8 +140,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$i],
                     $problems[$j]['request']['problem_alias'],
-                    1,
-                    3,
+                    1, /* difficulty */
+                    3, /* quality */
                     [],
                     false
                 );
@@ -189,7 +189,171 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(4, $result);
     }
 
-    public function testDifficultyOfQualityProblems(){
-        
+    public function testDifficultyOfQualityProblems() {
+        $identities = [];
+        $problems = [];
+
+        // Create 4 user with a problem each
+        for ($i = 0; $i < 4; $i++) {
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                $identities[$i]
+            );
+        }
+
+        // Create 6 non-author users
+        for ($i = 4; $i < 10; $i++) {
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+        }
+
+        // The 6 users solve and rate the 4 problems
+        for ($i = 0; $i < 4; $i++) {
+            for ($j = 4; $j < 10; $j++) {
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problems[$i],
+                    $identities[$j]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.5, 'AC');
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                    $identities[$j],
+                    $problems[$i]['request']['problem_alias'],
+                    $i, /* difficulty */
+                    3, /* quality */
+                    [],
+                    false
+                );
+            }
+        }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        // Review problems as quality problems
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+
+        foreach ($problems as $problem) {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problem['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => true,
+                    'tag' => 'problemLevelBasicIntroductionToProgramming',
+                    'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+                ]),
+            ]));
+        }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Call getCollectionsDetailsByLevelForSmarty with easy difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+                'difficulty' => 'easy'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(2, $result);
+
+        // Call getCollectionsDetailsByLevelForSmarty with medium difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+                'difficulty' => 'medium'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(1, $result);
+
+        // Call getCollectionsDetailsByLevelForSmarty with hard difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+                'difficulty' => 'hard'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(1, $result);
+
+        // Call getCollectionsDetailsByLevelForSmarty with all difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+                'difficulty' => 'all'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(4, $result);
+
+        // Call getCollectionsDetailsByLevelForSmarty without difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(4, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with easy difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'difficulty' => 'easy'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(2, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with medium difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'difficulty' => 'medium'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(1, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with hard difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'difficulty' => 'hard'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(1, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with all difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'difficulty' => 'all'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(4, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty without difficulty parameter
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(4, $result);
     }
 }
