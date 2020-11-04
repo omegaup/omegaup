@@ -28,6 +28,8 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
+          :collections="true"
+          :collectionTitle="this.level"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder)
