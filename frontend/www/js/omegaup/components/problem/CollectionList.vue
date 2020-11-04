@@ -29,7 +29,7 @@
           :sort-order="sortOrder"
           :column-name="columnName"
           :collections="true"
-          :collectionTitle="this.level"
+          :collection-title="level"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder)
