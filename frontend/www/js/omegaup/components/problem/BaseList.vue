@@ -164,15 +164,7 @@
                     ? 'custom-badge-quality'
                     : ''
                 } m-1 p-2`"
-                :href="`${
-                  collections
-                    ? hrefForProblemTagCollection(
-                        currentTags,
-                        tag.name,
-                        collectionTitle,
-                      )
-                    : hrefForProblemTag(currentTags, tag.name)
-                }`"
+                :href="hrefForProblemTag(currentTags, tag.name, rute)"
                 >{{
                   Object.prototype.hasOwnProperty.call(T, tag.name)
                     ? T[tag.name]
@@ -275,8 +267,7 @@ export default class BaseList extends Vue {
   @Prop() tags!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
-  @Prop({ default: false }) collections!: boolean;
-  @Prop() collectionTitle!: string;
+  @Prop() rute!: string;
 
   T = T;
   ui = ui;
@@ -297,23 +288,15 @@ export default class BaseList extends Vue {
     T.qualityFormDifficultyVeryHard,
   ];
 
-  hrefForProblemTag(currentTags: string[], problemTag: string): string {
-    if (!currentTags) return `/problem/?tag[]=${problemTag}`;
-    let tags = currentTags.slice();
-    if (!tags.includes(problemTag)) tags.push(problemTag);
-    return `/problem/?tag[]=${tags.join('&tag[]=')}`;
-  }
-
-  hrefForProblemTagCollection(
+  hrefForProblemTag(
     currentTags: string[],
     problemTag: string,
-    title: string,
+    rute: string,
   ): string {
-    if (!currentTags)
-      return `/problem/collection/${title}/?tag[]=${problemTag}`;
+    if (!currentTags) return `${rute}?tag[]=${problemTag}`;
     let tags = currentTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
-    return `/problem/collection/${title}/?tag[]=${tags.join('&tag[]=')}`;
+    return `${rute}?tag[]=${tags.join('&tag[]=')}`;
   }
 }
 </script>
