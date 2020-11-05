@@ -119,8 +119,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$i],
                     $problems[$j]['request']['problem_alias'],
-                    1, /* difficulty */
-                    4, /* quality */
+                    /*$difficulty=*/1,
+                    /*$quality=*/4,
                     [],
                     false
                 );
@@ -140,8 +140,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$i],
                     $problems[$j]['request']['problem_alias'],
-                    1, /* difficulty */
-                    3, /* quality */
+                    /*$difficulty=*/1,
+                    /*$quality=*/3,
                     [],
                     false
                 );
@@ -218,8 +218,8 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
                     $identities[$j],
                     $problems[$i]['request']['problem_alias'],
-                    $i, /* difficulty */
-                    3, /* quality */
+                    /*$difficulty=*/$i,
+                    /*$quality=*/3,
                     [],
                     false
                 );

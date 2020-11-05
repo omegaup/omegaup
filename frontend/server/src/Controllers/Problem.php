@@ -3736,7 +3736,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $onlyQualitySeal = $r->ensureOptionalBool('only_quality_seal') ?? false;
         $level = $r->ensureOptionalString('level');
-        $difficulty = $r->ensureOptionalString('difficulty');
+        $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
 
         if (is_null($r['page'])) {
             $offset = is_null($r['offset']) ? 0 : intval($r['offset']);
@@ -3775,7 +3775,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $r->user,
             $onlyQualitySeal,
             $level,
-            $difficulty ?: 'all'
+            $difficulty
         );
     }
 
@@ -5922,7 +5922,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
-        $difficulty = $r->ensureOptionalString('difficulty') ?: 'all';
+        $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
 
         [
             'sortOrder' => $sortOrder,
@@ -6045,7 +6045,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $user,
             $onlyQualitySeal,
             $level,
-            $difficulty ?: 'all'
+            $difficulty
         );
 
         $params = [
@@ -6128,7 +6128,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
-        $difficulty = $r->ensureOptionalString('difficulty') ?: 'all';
+        $difficulty = $r->ensureOptionalString('difficulty') ?? 'all';
 
         [
             'sortOrder' => $sortOrder,
