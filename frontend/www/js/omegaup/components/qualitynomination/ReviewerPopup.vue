@@ -66,7 +66,7 @@
               </th>
             </thead>
             <tbody>
-              <tr v-for="(tag, index) in publicTagsList" :key="index">
+              <tr v-for="tag in publicTagsList" :key="tag">
                 <td>{{ getName(tag) }}</td>
                 <td class="text-center">
                   <button
