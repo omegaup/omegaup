@@ -1402,6 +1402,7 @@ export namespace types {
     column: string;
     columns: string[];
     currentTags: string[];
+    difficulty: string;
     frequentTags: { alias: string; name?: string }[];
     keyword: string;
     language: string;

@@ -28,6 +28,7 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
+          :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder)
