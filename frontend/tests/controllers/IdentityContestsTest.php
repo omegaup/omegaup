@@ -213,6 +213,16 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals('Contest_1', $contestsList['results'][0]['title']);
         $this->assertEquals('Contest_2', $contestsList['results'][1]['title']);
 
+        $result = \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token
+        ]));
+
+        $this->assertArrayHasKey(
+            'contests',
+            $result,
+            'Users with main identity should be able to see their contests list'
+        );
+
         // User switch the account
         \OmegaUp\Controllers\Identity::apiSelectIdentity(
             new \OmegaUp\Request([
@@ -228,5 +238,16 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         // Identity has been invited to 1 contest
         $this->assertEquals(1, $contestsList['number_of_results']);
         $this->assertEquals('Contest_0', $contestsList['results'][0]['title']);
+
+        // No main identities should be restricted to do some stuff, like see
+        // their contests list.
+        try {
+            \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token
+            ]));
+            $this->fail('identity does not have access to see apiMyList');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 }
