@@ -28,7 +28,7 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
-          :rute="`/problem/collection/${level}/`"
+          :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder)

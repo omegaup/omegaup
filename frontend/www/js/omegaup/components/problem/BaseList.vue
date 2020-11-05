@@ -164,7 +164,7 @@
                     ? 'custom-badge-quality'
                     : ''
                 } m-1 p-2`"
-                :href="hrefForProblemTag(currentTags, tag.name, rute)"
+                :href="hrefForProblemTag(currentTags, tag.name)"
                 >{{
                   Object.prototype.hasOwnProperty.call(T, tag.name)
                     ? T[tag.name]
@@ -267,7 +267,7 @@ export default class BaseList extends Vue {
   @Prop() tags!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
-  @Prop() rute!: string;
+  @Prop() path!: string;
 
   T = T;
   ui = ui;
@@ -288,15 +288,11 @@ export default class BaseList extends Vue {
     T.qualityFormDifficultyVeryHard,
   ];
 
-  hrefForProblemTag(
-    currentTags: string[],
-    problemTag: string,
-    rute: string,
-  ): string {
-    if (!currentTags) return `${rute}?tag[]=${problemTag}`;
+  hrefForProblemTag(currentTags: string[], problemTag: string): string {
+    if (!currentTags) return `${this.path}?tag[]=${problemTag}`;
     let tags = currentTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
-    return `${rute}?tag[]=${tags.join('&tag[]=')}`;
+    return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
   }
 }
 </script>

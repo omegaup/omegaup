@@ -36,7 +36,7 @@
       :tags="tags"
       :sort-order="sortOrder"
       :column-name="columnName"
-      :rute="'/problem/'"
+      :path="'/problem/'"
       @apply-filter="
         (columnName, sortOrder) => $emit('apply-filter', columnName, sortOrder)
       "
