@@ -105,6 +105,8 @@ class UserUpdateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Double check language update with the appropiate API
         $identity = \OmegaUp\DAO\AuthTokens::getIdentityByToken($token);
+        unset($identity['acting_identity_id']);
+        unset($identity['acting_user_id']);
         unset($identity['classname']);
         $this->assertEquals(
             $locale->name,

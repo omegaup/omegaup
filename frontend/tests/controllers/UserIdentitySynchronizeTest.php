@@ -95,6 +95,8 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
             $r['auth_token']
         );
         unset($identityDb['classname']);
+        unset($identityDb['acting_identity_id']);
+        unset($identityDb['acting_user_id']);
         $identityDb = new \OmegaUp\DAO\VO\Identities($identityDb);
         $graduationDate = null;
         if (!is_null($identityDb->current_identity_school_id)) {
@@ -144,6 +146,8 @@ class UserIdentitySynchronizeTest extends \OmegaUp\Test\ControllerTestCase {
             $r['auth_token']
         );
         unset($identityDb['classname']);
+        unset($identityDb['acting_identity_id']);
+        unset($identityDb['acting_user_id']);
         $identityDb = new \OmegaUp\DAO\VO\Identities($identityDb);
         $graduationDate = null;
         if (!is_null($identityDb->current_identity_school_id)) {

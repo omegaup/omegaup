@@ -165,10 +165,17 @@ class Session extends \OmegaUp\Controllers\Controller {
             return $emptySession;
         }
         $identityClassname = $currentIdentityExt['classname'];
+        $actingIdentityId = $currentIdentityExt['acting_identity_id'];
+        $actingUserId = $currentIdentityExt['acting_user_id'];
         unset($currentIdentityExt['classname']);
+        unset($currentIdentityExt['acting_identity_id']);
+        unset($currentIdentityExt['acting_user_id']);
         $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
 
-        if (is_null($currentIdentity->user_id)) {
+        if (
+            is_null($currentIdentity->user_id)
+            || (!is_null($actingIdentityId) && !is_null($actingUserId))
+        ) {
             $currentUser = null;
             $email = null;
             $allIdentities = [];
@@ -249,7 +256,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private static function registerSession(\OmegaUp\DAO\VO\Identities $identity): string {
+    private static function registerSession(
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user
+    ): string {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => intval($identity->identity_id),
@@ -280,11 +290,16 @@ class Session extends \OmegaUp\Controllers\Controller {
             OMEGAUP_MD5_SALT . $identity->identity_id . $entropy
         );
         $token = "{$entropy}-{$identity->identity_id}-{$hash}";
+        $isMainIdentity = (
+            !is_null($user)
+            && $user->main_identity_id === $identity->identity_id
+        );
 
         \OmegaUp\DAO\AuthTokens::replace(new \OmegaUp\DAO\VO\AuthTokens([
             'user_id' => $identity->user_id,
             'identity_id' => $identity->identity_id,
             'token' => $token,
+            'acting_identity_id' => !$isMainIdentity ? $identity->identity_id : null,
         ]));
 
         if (self::$_setCookieOnRegisterSession) {
@@ -501,6 +516,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             "Identity {$identity->username} has logged in natively."
         );
 
+        $user = null;
         if (!is_null($identity->user_id)) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
             if (is_null($user)) {
@@ -510,7 +526,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            return self::registerSession($identity);
+            return self::registerSession($identity, $user);
         } catch (\Exception $e) {
             self::$log->error($e);
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
@@ -536,6 +552,13 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$log->warn("Identity {$usernameOrEmail} not found.");
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
+
+        // Only users acting as main identities can select another identity
+        if (!$response['loggedAsMainIdentity']) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'userNotAllowed'
+            );
+        }
         $identity = $response['identity'];
         $isMainIdentity = $response['isMainIdentity'];
 
@@ -554,8 +577,10 @@ class Session extends \OmegaUp\Controllers\Controller {
             \OmegaUp\DAO\AuthTokens::replace(new \OmegaUp\DAO\VO\AuthTokens([
                 'user_id' => $isMainIdentity ? $identity->user_id : null,
                 'identity_id' => $identity->identity_id,
+                'acting_identity_id' => !$isMainIdentity ? $identity->identity_id : null,
                 'token' => $currentSession['auth_token'],
             ]));
+            self::invalidateCache();
 
             self::getCurrentSession($r);
         } catch (\OmegaUp\Exceptions\ApiException $e) {
@@ -647,8 +672,15 @@ class Session extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
+        if (is_null($identity->username)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = \OmegaUp\DAO\Users::FindByUsername($identity->username);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
-        self::registerSession($identity);
+        self::registerSession($identity, $user);
         return ['status' => 'ok'];
     }
 

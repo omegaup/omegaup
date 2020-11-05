@@ -108,7 +108,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{identity: \OmegaUp\DAO\VO\Identities, isMainIdentity: bool}|null
+     * @return array{identity: \OmegaUp\DAO\VO\Identities, isMainIdentity: bool, loggedAsMainIdentity: bool}|null
      */
     public static function resolveAssociatedIdentity(
         string $usernameOrEmail,
@@ -116,6 +116,8 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     ): ?array {
         $sql = 'SELECT
                     i.*,
+                    aut.acting_identity_id,
+                    aut.user_id AS acting_user_id,
                     u.main_identity_id,
                     e.email
                 FROM
@@ -128,6 +130,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     Emails e
                 ON
                     e.email_id = u.main_email_id
+                LEFT JOIN
+                    Auth_Tokens aut
+                ON
+                    aut.user_id = i.user_id
                 WHERE
                     i.user_id = (
                         SELECT
@@ -148,7 +154,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 LIMIT 100;';
         $args = [$usernameOrEmail, $usernameOrEmail];
 
-        /** @var list<array{country_id: null|string, current_identity_school_id: int|null, email: null|string, gender: null|string, identity_id: int, language_id: int|null, main_identity_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
+        /** @var list<array{acting_identity_id: int|null, acting_user_id: int|null, country_id: null|string, current_identity_school_id: int|null, email: null|string, gender: null|string, identity_id: int, language_id: int|null, main_identity_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
         foreach ($rs as $identityData) {
             if (
@@ -156,10 +162,17 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 || $usernameOrEmail === $identityData['email']
             ) {
                 $isMainIdentity = $identityData['identity_id'] === $identityData['main_identity_id'];
+                $loggedAsMainIdentity = (
+                    is_null($identityData['acting_identity_id'])
+                    || is_null($identityData['acting_user_id'])
+                );
                 unset($identityData['email']);
                 unset($identityData['main_identity_id']);
+                unset($identityData['acting_identity_id']);
+                unset($identityData['acting_user_id']);
 
                 $result = [
+                    'loggedAsMainIdentity' => $loggedAsMainIdentity,
                     'isMainIdentity' => $isMainIdentity,
                     'identity' => new \OmegaUp\DAO\VO\Identities($identityData),
                 ];

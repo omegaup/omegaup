@@ -37,11 +37,13 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     }
 
     /**
-     * @return array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null
+     * @return array{acting_identity_id: int|null, acting_user_id: int|null, classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null
      */
     public static function getIdentityByToken(string $authToken) {
         $sql = 'SELECT
                     i.*,
+                    at.acting_identity_id,
+                    at.user_id AS acting_user_id,
                     IFNULL(
                         (
                             SELECT `urc`.`classname` FROM
@@ -70,7 +72,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     at.identity_id = i.identity_id
                 WHERE
                     at.token = ?;';
-        /** @var array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
+        /** @var array{acting_identity_id: int|null, acting_user_id: int|null, classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null */
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$authToken]
@@ -97,7 +99,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     `Auth_Tokens` at
                 WHERE
                     at.identity_id = ?;';
-        /** @var list<array{create_time: \OmegaUp\Timestamp, identity_id: int, token: string, user_id: int|null}> */
+        /** @var list<array{acting_identity_id: int|null, create_time: \OmegaUp\Timestamp, identity_id: int, token: string, user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]
