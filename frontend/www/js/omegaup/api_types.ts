@@ -1290,10 +1290,6 @@ export namespace types {
     total: number;
   }
 
-  export interface AuthorsRankWithQualityProblems {
-    ranking: { author_ranking: number; name?: string; username: string }[];
-  }
-
   export interface Badge {
     assignation_time?: Date;
     badge_alias: string;
@@ -1386,7 +1382,7 @@ export namespace types {
   }
 
   export interface CollectionDetailsByAuthorPayload {
-    authors: { name?: string; username: string }[];
+    authors: types.AuthorsRank;
     column: string;
     columns: string[];
     currentTags: string[];
@@ -1403,10 +1399,11 @@ export namespace types {
   }
 
   export interface CollectionDetailsByLevelPayload {
-    collection: { alias: string; name?: string }[];
     column: string;
     columns: string[];
     currentTags: string[];
+    difficulty: string;
+    frequentTags: { alias: string; name?: string }[];
     keyword: string;
     language: string;
     languages: string[];

@@ -100,7 +100,9 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         bool $requireAllTags,
         array $programmingLanguages,
         ?array $difficultyRange,
-        bool $onlyQualitySeal
+        bool $onlyQualitySeal,
+        ?string $level,
+        string $difficulty
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -118,6 +120,21 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ';
         }
 
+        $clauses = [];
+
+        $levelJoin = '';
+        if (!is_null($level)) {
+            $levelJoin = '
+            INNER JOIN
+                Problems_Tags pt ON p.problem_id = pt.problem_id
+            INNER JOIN
+                Tags t ON t.tag_id = pt.tag_id
+            ';
+            $clauses[] = [
+                't.name = ?', [$level]
+            ];
+        }
+
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
         $collation = ($orderBy === 'title') ? 'COLLATE utf8mb4_bin' : '';
         $select = '';
@@ -127,7 +144,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
         /** @var list<array{0: string, 1: list<string>}> */
-        $clauses = [];
         foreach ($programmingLanguages as $programmingLanguage) {
             $clauses[] = [
                 'FIND_IN_SET(?, p.languages) > 0',
@@ -144,6 +160,27 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $conditions,
                 $difficultyRange,
             ];
+        }
+
+        $difficulties = ['easy', 'medium', 'hard'];
+
+        if (in_array($difficulty, $difficulties, true)) {
+            if ($difficulty === $difficulties[0]) {
+                $clauses[] = [
+                    'p.difficulty < 1.34',
+                    [],
+                ];
+            } elseif ($difficulty === $difficulties[1]) {
+                $clauses[] = [
+                    'p.difficulty >= 1.34 AND p.difficulty < 2.66',
+                    [],
+                ];
+            } else {
+                $clauses[] = [
+                    'p.difficulty >= 2.67',
+                    [],
+                ];
+            }
         }
 
         if (!is_null($query)) {
@@ -191,7 +228,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         Submissions.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
-                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin;
+                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility > ?',
@@ -240,7 +277,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gi.group_id
                     WHERE gi.identity_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin;
+                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin . $levelJoin;
             $args[] = $identityId;
             $args[] = $userId;
             $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
@@ -271,7 +308,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         p.* ';
             $sql = '
                     FROM
-                        Problems p ' . $languageJoin;
+                        Problems p ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility >= ?',
