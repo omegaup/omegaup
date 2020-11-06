@@ -3589,7 +3589,7 @@ class Course extends \OmegaUp\Controllers\Controller {
             $shouldShowIntro &&
             $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
         }
         if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
             $commonDetails = [
