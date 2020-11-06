@@ -12,7 +12,7 @@
           @change-difficulty="
             (difficulty) =>
               $emit('apply-filter', columnName, sortOrder, difficulty)
-          "  
+          "
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
@@ -36,7 +36,7 @@
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder, difficulty)
-          "        
+          "
         >
         </omegaup-problem-base-list>
       </div>
@@ -89,14 +89,14 @@ export default class CollectionList extends Vue {
     return this.data.publicTags.filter((x) => !tags.includes(x));
   }
 
-  get changeDifficultyParameter(){
+  get changeDifficultyParameter() {
     switch (this.difficulty) {
       case 'easy':
         return 'qualityFormDifficultyEasy';
       case 'medium':
         return 'qualityFormDifficultyMedium';
       case 'hard':
-        return 'qualityFormDifficultyHard';              
+        return 'qualityFormDifficultyHard';
       default:
         return 'all';
     }
