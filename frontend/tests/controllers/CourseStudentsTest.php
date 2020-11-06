@@ -140,8 +140,8 @@ class CourseStudentsTest extends \OmegaUp\Test\ControllerTestCase {
             );
             $this->fail('Unassociated identity group should not join the course' .
                         'without an explicit invitation');
-        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
-            $this->assertEquals('userNotAllowed', $e->getMessage());
+        } catch (\OmegaUp\Exceptions\NotAllowedToSubmitException $e) {
+            $this->assertEquals('runNotEvenOpened', $e->getMessage());
         }
     }
 
