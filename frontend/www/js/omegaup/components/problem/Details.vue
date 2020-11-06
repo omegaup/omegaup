@@ -212,7 +212,7 @@ import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
 import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
-import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopup.vue';
+import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopupv2.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
