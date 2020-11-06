@@ -10,6 +10,7 @@ OmegaUp.on('ready', () => {
   let sortOrder = 'desc';
   let columnName = 'problem_id';
   let language = 'all';
+  let difficulty = 'all';
   let query = '';
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -31,12 +32,18 @@ OmegaUp.on('ready', () => {
         language = languageParam;
       }
     }
+    if (urlParams.get('difficulty')) {
+      const queryParam = urlParams.get('difficulty');
+      if (queryParam) {
+        difficulty = queryParam;
+      }
+    }       
     if (urlParams.get('query')) {
       const queryParam = urlParams.get('query');
       if (queryParam) {
         query = queryParam;
       }
-    }
+    } 
   }
   new Vue({
     el: '#main-container',
@@ -58,17 +65,21 @@ OmegaUp.on('ready', () => {
           tagsList: payload.tagsList,
           sortOrder: sortOrder,
           columnName: columnName,
+          difficulty: payload.difficulty,
         },
         on: {
           'apply-filter': (
             columnName: string,
             sortOrder: omegaup.SortOrder,
+            difficultyParameter: string,
           ): void => {
+            let difficulty: string = changeDifficultyParameter(difficultyParameter);
             const queryParameters = {
               language,
               query,
               order_by: columnName,
               sort_order: sortOrder,
+              difficulty
             };
             window.location.replace(
               `/problem/collection/${payload.level}/?${ui.buildURLQuery(
@@ -80,4 +91,17 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  function changeDifficultyParameter(difficultyParameter: string){
+    switch (difficultyParameter) {
+      case 'qualityFormDifficultyEasy':
+        return 'easy';
+      case 'qualityFormDifficultyMedium':
+        return 'medium';
+      case 'qualityFormDifficultyHard':
+        return 'hard';              
+      default:
+        return 'all';
+    }
+  }
 });

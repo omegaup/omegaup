@@ -9,6 +9,10 @@
         ></omegaup-problem-filter-tags>
         <omegaup-problem-filter-difficulty
           v-model="selectedDifficulty"
+          @change-difficulty="
+            (difficulty) =>
+              $emit('apply-filter', columnName, sortOrder, difficulty)
+          "  
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
@@ -31,8 +35,8 @@
           :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder)
-          "
+              $emit('apply-filter', columnName, sortOrder, difficulty)
+          "        
         >
         </omegaup-problem-base-list>
       </div>
@@ -73,6 +77,7 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) tagsList!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() difficulty!: string;
 
   T = T;
   level = this.data.level;

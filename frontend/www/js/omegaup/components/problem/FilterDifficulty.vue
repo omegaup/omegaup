@@ -14,6 +14,7 @@
             type="radio"
             name="difficulty"
             :value="difficulty"
+            @click="$emit('change-difficulty', difficulty)"
           />{{ difficultyName }}
         </label>
       </div>
