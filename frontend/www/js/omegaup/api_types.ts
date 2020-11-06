@@ -1427,10 +1427,10 @@ export namespace types {
   }
 
   export interface CommonPayload {
-    allIdentities: types.UsernameIdentity[];
+    associatedIdentities: types.UsernameIdentity[];
     bootstrap4: boolean;
     currentEmail: string;
-    currentName: string;
+    currentName?: string;
     currentUsername: string;
     gravatarURL128: string;
     gravatarURL51: string;
@@ -1894,7 +1894,7 @@ export namespace types {
   }
 
   export interface CurrentSession {
-    all_identities: types.UsernameIdentity[];
+    associated_identities: types.UsernameIdentity[];
     auth_token?: string;
     classname: string;
     email?: string;

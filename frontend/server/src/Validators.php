@@ -165,14 +165,32 @@ class Validators {
      * @return boolean
      */
     public static function username(string $usernameOrEmail): bool {
-        if (
-            self::email($usernameOrEmail) ||
-            preg_match('/^[a-zA-Z0-9_.-]+$/', $usernameOrEmail) ||
-            preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $usernameOrEmail)
-        ) {
-            return true;
-        }
-        return false;
+        return (
+            self::email($usernameOrEmail)
+            && self::normalUsername($usernameOrEmail)
+            && self::identityUsername($usernameOrEmail)
+        );
+    }
+
+    /**
+     * Returns whether the username is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function normalUsername(string $username): bool {
+        return preg_match('/^[a-zA-Z0-9_.-]+$/', $username);
+    }
+
+    /**
+     * Returns whether the username of an identity is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function identityUsername(string $username): bool {
+        return preg_match('/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/', $username);
+        ;
     }
 
     /**
