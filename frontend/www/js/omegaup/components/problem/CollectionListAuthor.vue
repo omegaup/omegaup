@@ -1,18 +1,13 @@
 <template>
   <div>
-    <h1 class="card-title">{{ title }}</h1>
+    <h1 class="card-title">{{ T.omegaupTitleCollectionsByAuthor }}</h1>
     <div class="row">
       <div class="col col-md-4">
-        <omegaup-problem-filter-tags
-          :tags.sync="tags"
-          :public-tags="publicTags"
-        ></omegaup-problem-filter-tags>
+        <omegaup-problem-filter-authors
+          :authors.sync="authors"
+        ></omegaup-problem-filter-authors>
         <omegaup-problem-filter-difficulty
           v-model="selectedDifficulty"
-          @change-difficulty="
-            (difficulty) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
-          "  
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
@@ -32,11 +27,10 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
-          :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
-          "        
+              $emit('apply-filter', columnName, sortOrder)
+          "
         >
         </omegaup-problem-base-list>
       </div>
@@ -47,7 +41,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
-import problem_FilterTags from './FilterTags.vue';
+import problem_FilterAuthors from './FilterAuthors.vue';
 import problem_BaseList from './BaseList.vue';
 import problem_FilterDifficulty from './FilterDifficulty.vue';
 import T from '../../lang';
@@ -55,13 +49,13 @@ import { types } from '../../api_types';
 
 @Component({
   components: {
-    'omegaup-problem-filter-tags': problem_FilterTags,
+    'omegaup-problem-filter-authors': problem_FilterAuthors,
     'omegaup-problem-base-list': problem_BaseList,
     'omegaup-problem-filter-difficulty': problem_FilterDifficulty,
   },
 })
 export default class CollectionList extends Vue {
-  @Prop() data!: types.CollectionDetailsByLevelPayload;
+  @Prop() data!: types.CollectionDetailsByAuthorPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
   @Prop() currentTags!: string[];
@@ -77,37 +71,9 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) tagsList!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
-  @Prop() difficulty!: string;
 
   T = T;
-  level = this.data.level;
-  tags: string[] = this.data.frequentTags.map((element) => element.alias);
+  authors = this.data.authors;
   selectedDifficulty: null | string = null;
-
-  get publicTags(): string[] {
-    let tags: string[] = this.data.frequentTags.map((x) => x.alias);
-    return this.data.publicTags.filter((x) => !tags.includes(x));
-  }
-
-  get title(): string {
-    switch (this.level) {
-      case 'problemLevelBasicKarel':
-        return T.problemLevelBasicKarel;
-      case 'problemLevelBasicIntroductionToProgramming':
-        return T.problemLevelBasicIntroductionToProgramming;
-      case 'problemLevelIntermediateMathsInProgramming':
-        return T.problemLevelIntermediateMathsInProgramming;
-      case 'problemLevelIntermediateDataStructuresAndAlgorithms':
-        return T.problemLevelIntermediateDataStructuresAndAlgorithms;
-      case 'problemLevelIntermediateAnalysisAndDesignOfAlgorithms':
-        return T.problemLevelIntermediateAnalysisAndDesignOfAlgorithms;
-      case 'problemLevelAdvancedCompetitiveProgramming':
-        return T.problemLevelAdvancedCompetitiveProgramming;
-      case 'problemLevelAdvancedSpecializedTopics':
-        return T.problemLevelAdvancedSpecializedTopics;
-      default:
-        return '';
-    }
-  }
 }
 </script>

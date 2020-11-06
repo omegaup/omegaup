@@ -18,6 +18,7 @@ class AuthTokens extends \OmegaUp\DAO\VO\VO {
     const FIELD_NAMES = [
         'user_id' => true,
         'identity_id' => true,
+        'acting_identity_id' => true,
         'token' => true,
         'create_time' => true,
     ];
@@ -40,6 +41,11 @@ class AuthTokens extends \OmegaUp\DAO\VO\VO {
         if (isset($data['identity_id'])) {
             $this->identity_id = intval(
                 $data['identity_id']
+            );
+        }
+        if (isset($data['acting_identity_id'])) {
+            $this->acting_identity_id = intval(
+                $data['acting_identity_id']
             );
         }
         if (isset($data['token'])) {
@@ -77,6 +83,13 @@ class AuthTokens extends \OmegaUp\DAO\VO\VO {
      * @var int|null
      */
     public $identity_id = null;
+
+    /**
+     * Identidad del usuario que indica que no está actuando como identidad principal
+     *
+     * @var int|null
+     */
+    public $acting_identity_id = null;
 
     /**
      * [Campo no documentado]

@@ -179,11 +179,13 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['authors'];
+        )['smartyProperties']['payload']['authors']['ranking'];
 
         foreach ($result as $key) {
+            $this->assertArrayHasKey('author_ranking', $key);
             $this->assertArrayHasKey('username', $key);
             $this->assertArrayHasKey('name', $key);
+            $this->assertArrayHasKey('classname', $key);
         }
 
         $this->assertCount(4, $result);
