@@ -1427,8 +1427,12 @@ export namespace types {
   }
 
   export interface CommonPayload {
+    allIdentities: types.UsernameIdentity[];
     bootstrap4: boolean;
+    currentEmail: string;
+    currentName: string;
     currentUsername: string;
+    gravatarURL128: string;
     gravatarURL51: string;
     inContest: boolean;
     isAdmin: boolean;
@@ -1887,6 +1891,17 @@ export namespace types {
     admin: types.FilteredCourse[];
     public: types.FilteredCourse[];
     student: types.FilteredCourse[];
+  }
+
+  export interface CurrentSession {
+    all_identities: types.UsernameIdentity[];
+    auth_token?: string;
+    classname: string;
+    email?: string;
+    identity?: dao.Identities;
+    is_admin: boolean;
+    user?: dao.Users;
+    valid: boolean;
   }
 
   export interface Event {
@@ -2943,6 +2958,11 @@ export namespace types {
     pagerItems: types.PageItem[];
     ranking: types.UserRank;
   }
+
+  export interface UsernameIdentity {
+    default: boolean;
+    username: string;
+  }
 }
 
 // API messages
@@ -3493,6 +3513,8 @@ export namespace messages {
   export type IdentityChangePasswordResponse = {};
   export type IdentityCreateRequest = { [key: string]: any };
   export type IdentityCreateResponse = { username: string };
+  export type IdentitySelectIdentityRequest = { [key: string]: any };
+  export type IdentitySelectIdentityResponse = {};
   export type IdentityUpdateRequest = { [key: string]: any };
   export type IdentityUpdateResponse = {};
 
@@ -3805,15 +3827,7 @@ export namespace messages {
   // Session
   export type SessionCurrentSessionRequest = { [key: string]: any };
   export type SessionCurrentSessionResponse = {
-    session?: {
-      auth_token?: string;
-      classname: string;
-      email?: string;
-      identity?: dao.Identities;
-      is_admin: boolean;
-      user?: dao.Users;
-      valid: boolean;
-    };
+    session?: types.CurrentSession;
     time: number;
   };
   export type SessionGoogleLoginRequest = { [key: string]: any };
@@ -3893,7 +3907,7 @@ export namespace messages {
   export type UserListResponse = types.UserListItem[];
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
-    identities: { default: boolean; username: string }[];
+    identities: types.UsernameIdentity[];
   };
   export type UserListUnsolvedProblemsRequest = { [key: string]: any };
   export type UserListUnsolvedProblemsResponse = { problems: types.Problem[] };
@@ -4290,6 +4304,9 @@ export namespace controllers {
     create: (
       params?: messages.IdentityCreateRequest,
     ) => Promise<messages.IdentityCreateResponse>;
+    selectIdentity: (
+      params?: messages.IdentitySelectIdentityRequest,
+    ) => Promise<messages.IdentitySelectIdentityResponse>;
     update: (
       params?: messages.IdentityUpdateRequest,
     ) => Promise<messages.IdentityUpdateResponse>;

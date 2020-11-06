@@ -330,7 +330,12 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     /**
      * @return list<array{username: string, default: bool}>
      */
-    public static function getAssociatedIdentities(int $userId): array {
+    public static function getAssociatedIdentities(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        if (is_null($identity->user_id)) {
+            return [];
+        }
         $sql = '
             SELECT
                 i.username,
@@ -347,7 +352,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ';
 
         /** @var list<array{identity_id: int, main_identity_id: int|null, username: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identity->user_id]
+        );
         $result = [];
         foreach ($rs as $identity) {
             $result[] = [

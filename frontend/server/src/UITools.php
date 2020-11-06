@@ -3,7 +3,9 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{allIdentities: list<array{username: string, default: bool}>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type UsernameIdentity=array{username: string, default: bool}
+ * @psalm-type CurrentSession=array{all_identities: list<UsernameIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
 class UITools {
     /** @var ?\Smarty */
@@ -77,12 +79,13 @@ class UITools {
 
         // Not sure why this makes Psalm complain, but no other invocation of
         // getCurrentSession() does so.
-        /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
+        /** @var CurrentSession */
         [
             'email' => $email,
             'identity' => $identity,
             'user' => $user,
             'is_admin' => $isAdmin,
+            'all_identities' => $allIdentities,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         if (!is_null($identity) && !is_null($identity->username)) {
             $smarty->assign('LOGGED_IN', '1');
@@ -222,6 +225,7 @@ class UITools {
             'classname' => $userClassname,
             'user' => $user,
             'is_admin' => $isAdmin,
+            'all_identities' => $allIdentities,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
@@ -238,11 +242,23 @@ class UITools {
                 '' :
                 self::getFormattedGravatarURL(md5($email), '51')
             ),
+            'gravatarURL128' => (
+                is_null($email) ?
+                '' :
+                self::getFormattedGravatarURL(md5($email), '128')
+            ),
             'currentUsername' => (
                 !is_null($identity) && !is_null($identity->username) ?
                 $identity->username :
                 ''
             ),
+            'currentName' => (
+                !is_null($identity) && !is_null($identity->name) ?
+                $identity->name :
+                ''
+            ),
+            'currentEmail' => $email ?? '',
+            'allIdentities' => $allIdentities,
             'userClassname' => $userClassname,
             'userCountry' => (!is_null(
                 $identity
