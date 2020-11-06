@@ -10,7 +10,7 @@ OmegaUp.on('ready', () => {
   let sortOrder = 'desc';
   let columnName = 'problem_id';
   let language = 'all';
-  let difficulty = 'all';
+  let difficulty = payload.difficulty;
   let query = '';
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
