@@ -7,7 +7,6 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
- * @psalm-type AuthorsRankWithQualityProblems=array{ranking: list<array{author_ranking: int, name: null|string, username: string}>}
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type UsernameIdentity=array{username: string, default: bool}
@@ -2545,7 +2544,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get authors of quality problems
      *
-     * @return AuthorsRankWithQualityProblems
+     * @return AuthorsRank
      */
     public static function getAuthorsRankWithQualityProblems(
         int $offset,

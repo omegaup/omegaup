@@ -48,9 +48,11 @@ abstract class AuthTokens {
                 Auth_Tokens (
                     `user_id`,
                     `identity_id`,
+                    `acting_identity_id`,
                     `token`,
                     `create_time`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -65,6 +67,11 @@ abstract class AuthTokens {
             (
                 !is_null($Auth_Tokens->identity_id) ?
                 intval($Auth_Tokens->identity_id) :
+                null
+            ),
+            (
+                !is_null($Auth_Tokens->acting_identity_id) ?
+                intval($Auth_Tokens->acting_identity_id) :
                 null
             ),
             $Auth_Tokens->token,
@@ -92,6 +99,7 @@ abstract class AuthTokens {
             SET
                 `user_id` = ?,
                 `identity_id` = ?,
+                `acting_identity_id` = ?,
                 `create_time` = ?
             WHERE
                 (
@@ -107,6 +115,11 @@ abstract class AuthTokens {
                 is_null($Auth_Tokens->identity_id) ?
                 null :
                 intval($Auth_Tokens->identity_id)
+            ),
+            (
+                is_null($Auth_Tokens->acting_identity_id) ?
+                null :
+                intval($Auth_Tokens->acting_identity_id)
             ),
             \OmegaUp\DAO\DAO::toMySQLTimestamp(
                 $Auth_Tokens->create_time
@@ -134,6 +147,7 @@ abstract class AuthTokens {
             SELECT
                 `Auth_Tokens`.`user_id`,
                 `Auth_Tokens`.`identity_id`,
+                `Auth_Tokens`.`acting_identity_id`,
                 `Auth_Tokens`.`token`,
                 `Auth_Tokens`.`create_time`
             FROM
@@ -219,6 +233,7 @@ abstract class AuthTokens {
             SELECT
                 `Auth_Tokens`.`user_id`,
                 `Auth_Tokens`.`identity_id`,
+                `Auth_Tokens`.`acting_identity_id`,
                 `Auth_Tokens`.`token`,
                 `Auth_Tokens`.`create_time`
             FROM
@@ -273,9 +288,11 @@ abstract class AuthTokens {
                 `Auth_Tokens` (
                     `user_id`,
                     `identity_id`,
+                    `acting_identity_id`,
                     `token`,
                     `create_time`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -291,6 +308,11 @@ abstract class AuthTokens {
                 is_null($Auth_Tokens->identity_id) ?
                 null :
                 intval($Auth_Tokens->identity_id)
+            ),
+            (
+                is_null($Auth_Tokens->acting_identity_id) ?
+                null :
+                intval($Auth_Tokens->acting_identity_id)
             ),
             $Auth_Tokens->token,
             \OmegaUp\DAO\DAO::toMySQLTimestamp(

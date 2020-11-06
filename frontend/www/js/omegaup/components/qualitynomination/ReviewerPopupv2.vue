@@ -16,14 +16,10 @@
           {{ T.reviewerNominationQuality }}
         </label>
         <br />
-        <label class="radio-inline"
-          ><input v-model="qualitySeal" type="radio" :value="true" />
-          {{ T.wordsYes }}</label
-        >
-        <label class="radio-inline"
-          ><input v-model="qualitySeal" type="radio" :value="false" />
-          {{ T.wordsNo }}</label
-        >
+        <omegaup-radio-switch
+          :value.sync="qualitySeal"
+          :selected-value="qualitySeal"
+        ></omegaup-radio-switch>
       </div>
       <div class="form-group">
         <label class="control-label">
@@ -107,6 +103,7 @@
 <script lang="ts">
 import { Vue, Prop, Component } from 'vue-property-decorator';
 import Popup from './Popup.vue';
+import omegaup_RadioSwitch from '../RadioSwitch.vue';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 
@@ -118,6 +115,7 @@ library.add(faTrash);
 @Component({
   components: {
     'omegaup-popup': Popup,
+    'omegaup-radio-switch': omegaup_RadioSwitch,
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
     FontAwesomeIcon,
   },
