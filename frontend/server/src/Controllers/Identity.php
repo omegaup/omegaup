@@ -559,6 +559,32 @@ class Identity extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Entry point for switching between associated identities for a user
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $usernameOrEmail
+     */
+    public static function apiSelectIdentity(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+
+        $usernameOrEmail = $r->ensureString(
+            'usernameOrEmail',
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
+        );
+
+        // TODO: Call function loginWithAssociatedIdentity
+
+        return [
+            'status' => 'ok',
+        ];
+    }
+
+    /**
      * @param \OmegaUp\Request $r
      *
      * @throws \OmegaUp\Exceptions\InvalidParameterException

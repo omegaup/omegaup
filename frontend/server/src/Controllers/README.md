@@ -113,6 +113,7 @@
   - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
   - [`/api/identity/changePassword/`](#apiidentitychangepassword)
   - [`/api/identity/create/`](#apiidentitycreate)
+  - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
   - [`/api/identity/update/`](#apiidentityupdate)
 - [Interview](#interview)
   - [`/api/interview/addUsers/`](#apiinterviewaddusers)
@@ -2333,6 +2334,22 @@ Entry point for Create an Identity API
 | ---------- | -------- |
 | `username` | `string` |
 
+## `/api/identity/selectIdentity/`
+
+### Description
+
+Entry point for switching between associated identities for a user
+
+### Parameters
+
+| Name              | Type     | Description |
+| ----------------- | -------- | ----------- |
+| `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/identity/update/`
 
 ### Description
@@ -3682,10 +3699,10 @@ contestant's machine and the server.
 
 ### Returns
 
-| Name      | Type                                                                                                                                      |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `session` | `{ auth_token: string; classname: string; email: string; identity: dao.Identities; is_admin: boolean; user: dao.Users; valid: boolean; }` |
-| `time`    | `number`                                                                                                                                  |
+| Name      | Type                   |
+| --------- | ---------------------- |
+| `session` | `types.CurrentSession` |
+| `time`    | `number`               |
 
 ## `/api/session/googleLogin/`
 
@@ -4076,9 +4093,9 @@ Get the identities that have been associated to the logged user
 
 ### Returns
 
-| Name         | Type                                        |
-| ------------ | ------------------------------------------- |
-| `identities` | `{ default: boolean; username: string; }[]` |
+| Name         | Type                         |
+| ------------ | ---------------------------- |
+| `identities` | `types.AssociatedIdentity[]` |
 
 ## `/api/user/listUnsolvedProblems/`
 
