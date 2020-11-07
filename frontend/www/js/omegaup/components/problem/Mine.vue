@@ -110,7 +110,13 @@
                   <div v-if="problem.tags.length" class="tags-badges">
                     <a
                       v-for="tag in problem.tags"
-                      :class="`badge custom-badge custom-badge-${tag.source} m-1 p-2`"
+                      :class="`badge custom-badge custom-badge-${
+                        tag.source.includes('quality') ? 'owner' : tag.source
+                      } ${
+                        tag.name.includes('problemLevel')
+                          ? 'custom-badge-quality'
+                          : ''
+                      } m-1 p-2`"
                       :href="`/problem/?tag[]=${tag.name}`"
                       >{{
                         Object.prototype.hasOwnProperty.call(T, tag.name)
