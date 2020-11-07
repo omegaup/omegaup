@@ -4,8 +4,8 @@ namespace OmegaUp;
 
 /**
  * @psalm-type CommonPayload=array{associatedIdentities: list<array{username: string, default: bool}>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
- * @psalm-type UsernameIdentity=array{username: string, default: bool}
- * @psalm-type CurrentSession=array{associated_identities: list<UsernameIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
+ * @psalm-type AssociatedIdentity=array{username: string, default: bool}
+ * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
 class UITools {
     /** @var ?\Smarty */

@@ -164,7 +164,7 @@ class Validators {
      * @param string $usernameOrEmail
      * @return boolean
      */
-    public static function username(string $usernameOrEmail): bool {
+    public static function usernameOrEmail(string $usernameOrEmail): bool {
         return (
             self::email($usernameOrEmail)
             && self::normalUsername($usernameOrEmail)

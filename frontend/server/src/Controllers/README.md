@@ -4093,9 +4093,9 @@ Get the identities that have been associated to the logged user
 
 ### Returns
 
-| Name         | Type                       |
-| ------------ | -------------------------- |
-| `identities` | `types.UsernameIdentity[]` |
+| Name         | Type                         |
+| ------------ | ---------------------------- |
+| `identities` | `types.AssociatedIdentity[]` |
 
 ## `/api/user/listUnsolvedProblems/`
 

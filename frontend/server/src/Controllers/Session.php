@@ -22,8 +22,8 @@ class ScopedFacebook {
 
 /**
  * Session controller handles sessions.
- * @psalm-type UsernameIdentity=array{username: string, default: bool}
- * @psalm-type CurrentSession=array{associated_identities: list<UsernameIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
+ * @psalm-type AssociatedIdentity=array{username: string, default: bool}
+ * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;

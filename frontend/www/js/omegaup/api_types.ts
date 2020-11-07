@@ -1271,6 +1271,11 @@ export namespace types {
     [key: string]: types.Progress;
   }
 
+  export interface AssociatedIdentity {
+    default: boolean;
+    username: string;
+  }
+
   export interface AuthorRankTablePayload {
     length: number;
     page: number;
@@ -1423,7 +1428,7 @@ export namespace types {
   }
 
   export interface CommonPayload {
-    associatedIdentities: types.UsernameIdentity[];
+    associatedIdentities: types.AssociatedIdentity[];
     bootstrap4: boolean;
     currentEmail: string;
     currentName?: string;
@@ -1890,7 +1895,7 @@ export namespace types {
   }
 
   export interface CurrentSession {
-    associated_identities: types.UsernameIdentity[];
+    associated_identities: types.AssociatedIdentity[];
     auth_token?: string;
     classname: string;
     email?: string;
@@ -2954,11 +2959,6 @@ export namespace types {
     pagerItems: types.PageItem[];
     ranking: types.UserRank;
   }
-
-  export interface UsernameIdentity {
-    default: boolean;
-    username: string;
-  }
 }
 
 // API messages
@@ -3903,7 +3903,7 @@ export namespace messages {
   export type UserListResponse = types.UserListItem[];
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
-    identities: types.UsernameIdentity[];
+    identities: types.AssociatedIdentity[];
   };
   export type UserListUnsolvedProblemsRequest = { [key: string]: any };
   export type UserListUnsolvedProblemsResponse = { problems: types.Problem[] };
