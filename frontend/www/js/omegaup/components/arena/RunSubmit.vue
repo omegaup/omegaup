@@ -48,7 +48,7 @@
         <button
           type="submit"
           class="btn btn-primary"
-          :disabled="!canSubmit || awaitForServerResponse"
+          :disabled="!canSubmit || waitingForServerResponse"
         >
           <omegaup-countdown
             v-if="!canSubmit"
@@ -91,7 +91,7 @@ export default class ArenaRunSubmit extends Vue {
   selectedLanguage = '';
   code = '';
   now: number = Date.now();
-  awaitForServerResponse = false;
+  waitingForServerResponse = false;
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() < this.now;
@@ -179,11 +179,11 @@ export default class ArenaRunSubmit extends Vue {
     const file = this.inputFile.files?.[0];
     if (file) {
       const reader = new FileReader();
-      this.awaitForServerResponse = true;
 
       reader.onload = (e) => {
         const result = e.target?.result ?? null;
         if (result === null) return;
+        this.waitingForServerResponse = true;
         this.$emit('submit-run', result as string, this.selectedLanguage);
       };
 
@@ -233,7 +233,7 @@ export default class ArenaRunSubmit extends Vue {
       alert(T.arenaRunSubmitEmptyCode);
       return;
     }
-    this.awaitForServerResponse = true;
+    this.waitingForServerResponse = true;
     this.$emit('submit-run', this.code, this.selectedLanguage);
   }
 
@@ -241,7 +241,7 @@ export default class ArenaRunSubmit extends Vue {
     this.code = '';
     this.inputFile.type = 'text';
     this.inputFile.type = 'file';
-    this.awaitForServerResponse = false;
+    this.waitingForServerResponse = false;
   }
 }
 </script>
