@@ -825,7 +825,7 @@ CREATE TABLE `Runs` (
   `submission_id` int NOT NULL COMMENT 'El envío',
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
   `commit` char(40) NOT NULL COMMENT 'El hash SHA1 del commit en la rama master del problema con el que se realizó el envío.',
-  `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
+  `status` enum('new','waiting','compiling','running','ready','uploading') NOT NULL DEFAULT 'new',
   `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
   `runtime` int NOT NULL DEFAULT '0',
   `penalty` int NOT NULL DEFAULT '0',
