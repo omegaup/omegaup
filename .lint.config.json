@@ -111,7 +111,8 @@
 		"dao": {
 			"allowlist": [
 				"frontend/database/schema.sql",
-				"frontend/server/libs/dao/base/.*\\.base\\.php$"
+				"frontend/server/src/DAO/Base/.*\\.php$",
+				"frontend/server/src/DAO/VO/.*\\.php$"
 			]
 		},
 		"translation_strings": {
