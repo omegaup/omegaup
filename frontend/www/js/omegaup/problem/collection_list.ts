@@ -85,10 +85,7 @@ OmegaUp.on('ready', () => {
               )}`,
             );
           },
-          'apply-difficulty-filter': (difficultyParameter: string): void => {
-            const difficulty: string = changeDifficultyParameter(
-              difficultyParameter,
-            );
+          'apply-difficulty-filter': (difficulty: string): void => {
             const queryParameters = {
               language,
               query,
@@ -106,17 +103,4 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-
-  function changeDifficultyParameter(difficultyParameter: string) {
-    switch (difficultyParameter) {
-      case 'qualityFormDifficultyEasy':
-        return 'easy';
-      case 'qualityFormDifficultyMedium':
-        return 'medium';
-      case 'qualityFormDifficultyHard':
-        return 'hard';
-      default:
-        return 'all';
-    }
-  }
 });

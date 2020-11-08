@@ -3,7 +3,7 @@
     <div class="card-body">
       <h3>{{ T.wordsDifficulty }}</h3>
       <div
-        v-for="(difficulty, identifier) in difficulties"
+        v-for="difficulty in difficulties"
         :key="difficulty.id"
         class="form-check"
       >
@@ -14,7 +14,7 @@
             type="radio"
             name="difficulty"
             :value="difficulty.id"
-            @click="$emit('change-difficulty', identifier)"
+            @click="$emit('change-difficulty', difficulty.id)"
           />{{ difficulty.name }}
         </label>
       </div>
