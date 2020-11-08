@@ -65,15 +65,28 @@ OmegaUp.on('ready', () => {
           tagsList: payload.tagsList,
           sortOrder: sortOrder,
           columnName: columnName,
-          difficulty: payload.difficulty,
+          difficulty: difficulty,
         },
         on: {
-          'apply-filter': (
+          'apply-order-filter': (
             columnName: string,
             sortOrder: omegaup.SortOrder,
-            difficultyParameter: string,
           ): void => {
-            let difficulty: string = changeDifficultyParameter(
+            const queryParameters = {
+              language,
+              query,
+              order_by: columnName,
+              sort_order: sortOrder,
+              difficulty,
+            };
+            window.location.replace(
+              `/problem/collection/${payload.level}/?${ui.buildURLQuery(
+                queryParameters,
+              )}`,
+            );
+          },
+          'apply-difficulty-filter': (difficultyParameter: string): void => {
+            const difficulty: string = changeDifficultyParameter(
               difficultyParameter,
             );
             const queryParameters = {
