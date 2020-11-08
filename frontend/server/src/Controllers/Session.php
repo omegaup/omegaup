@@ -22,8 +22,8 @@ class ScopedFacebook {
 
 /**
  * Session controller handles sessions.
- * @psalm-type UsernameIdentity=array{username: string, default: bool}
- * @psalm-type CurrentSession=array{all_identities: list<UsernameIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
+ * @psalm-type AssociatedIdentity=array{username: string, default: bool}
+ * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -151,7 +151,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             'classname' => 'user-rank-unranked',
             'auth_token' => null,
             'is_admin' => false,
-            'all_identities' => [],
+            'associated_identities' => [],
         ];
         if (empty($authToken)) {
             return $emptySession;
@@ -178,7 +178,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         ) {
             $currentUser = null;
             $email = null;
-            $allIdentities = [];
+            $associatedIdentities = [];
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
@@ -189,7 +189,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;
-            $allIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
+            $associatedIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
                 $currentIdentity,
             );
         }
@@ -204,7 +204,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
                 $currentIdentity
             ),
-            'all_identities' => $allIdentities,
+            'associated_identities' => $associatedIdentities,
         ];
     }
 
@@ -672,10 +672,10 @@ class Session extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
-        if (is_null($identity->username)) {
+        if (is_null($identity->username) || is_null($identity->user_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
-        $user = \OmegaUp\DAO\Users::FindByUsername($identity->username);
+        $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }

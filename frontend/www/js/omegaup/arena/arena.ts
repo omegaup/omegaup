@@ -2324,7 +2324,7 @@ export function GetDefaultOptions(): ArenaOptions {
     problemsetId: null,
     problemsetAdmin: false,
     payload: {
-      allIdentities: [],
+      associatedIdentities: [],
       omegaUpLockDown: false,
       bootstrap4: false,
       inContest: false,
@@ -2333,7 +2333,7 @@ export function GetDefaultOptions(): ArenaOptions {
       gravatarURL51: '',
       gravatarURL128: '',
       currentEmail: '',
-      currentName: '',
+      currentName: undefined,
       currentUsername: '',
       userClassname: 'user-rank-unranked',
       userCountry: 'xx',

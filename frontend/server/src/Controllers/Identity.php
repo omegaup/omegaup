@@ -573,7 +573,9 @@ class Identity extends \OmegaUp\Controllers\Controller {
 
         $usernameOrEmail = $r->ensureString(
             'usernameOrEmail',
-            fn (string $username) => \OmegaUp\Validators::username($username)
+            fn (string $username) => \OmegaUp\Validators::usernameOrEmail(
+                $username
+            )
         );
 
         \OmegaUp\Controllers\Session::loginWithAssociatedIdentity(
