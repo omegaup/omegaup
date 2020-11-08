@@ -118,28 +118,26 @@ class Submissions extends \OmegaUp\DAO\Base\Submissions {
         if (is_null($problemsetId)) {
             $sql = '
                 SELECT
-                    MAX(s.time) AS time
+                    MAX(s.time)
                 FROM
-                    Submissions s
+                    Identities AS i
+                LEFT JOIN
+                    Submissions s ON s.identity_id = i.identity_id
                 WHERE
-                    s.identity_id = ? AND s.problem_id = ?
-                ORDER BY
-                    s.time DESC
-                LIMIT 1
+                    i.identity_id = ? AND s.problem_id = ?
                 FOR UPDATE;
             ';
             $val = [$identityId, $problemId];
         } else {
             $sql = '
                 SELECT
-                    MAX(s.time) AS time
+                    MAX(s.time)
                 FROM
-                    Submissions s
+                    Identities AS i
+                LEFT JOIN
+                    Submissions s ON s.identity_id = i.identity_id
                 WHERE
-                    s.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
-                ORDER BY
-                    s.time DESC
-                LIMIT 1
+                    i.identity_id = ? AND s.problem_id = ? AND s.problemset_id = ?
                 FOR UPDATE;
             ';
             $val = [$identityId, $problemId, $problemsetId];
