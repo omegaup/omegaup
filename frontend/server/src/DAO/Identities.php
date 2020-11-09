@@ -135,51 +135,31 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ON
                     aut.user_id = i.user_id
                 WHERE
-                    i.user_id = (
-                        SELECT
-                            si.user_id
-                        FROM
-                            Identities si
-                        INNER JOIN
-                            Users su
-                        ON
-                            si.user_id = su.user_id
-                        INNER JOIN
-                            Emails se
-                        ON
-                            se.email_id = su.main_email_id
-                        WHERE
-                            si.username = ? OR se.email = ?
-                    )
-                LIMIT 100;';
-        $args = [$usernameOrEmail, $usernameOrEmail];
+                    i.user_id = ?
+                    AND i.username = ?
+                LIMIT 1;';
+        $args = [$currentIdentity->user_id, $usernameOrEmail];
 
-        /** @var list<array{acting_identity_id: int|null, acting_user_id: int|null, country_id: null|string, current_identity_school_id: int|null, email: null|string, gender: null|string, identity_id: int, language_id: int|null, main_identity_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> $rs */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
-        foreach ($rs as $identityData) {
-            if (
-                $usernameOrEmail === $identityData['username']
-                || $usernameOrEmail === $identityData['email']
-            ) {
-                $isMainIdentity = $identityData['identity_id'] === $identityData['main_identity_id'];
-                $loggedAsMainIdentity = (
-                    is_null($identityData['acting_identity_id'])
-                    || is_null($identityData['acting_user_id'])
-                );
-                unset($identityData['email']);
-                unset($identityData['main_identity_id']);
-                unset($identityData['acting_identity_id']);
-                unset($identityData['acting_user_id']);
-
-                $result = [
-                    'loggedAsMainIdentity' => $loggedAsMainIdentity,
-                    'isMainIdentity' => $isMainIdentity,
-                    'identity' => new \OmegaUp\DAO\VO\Identities($identityData),
-                ];
-                return $result;
-            }
+        /** @var array{acting_identity_id: int|null, acting_user_id: int|null, country_id: null|string, current_identity_school_id: int|null, email: null|string, gender: null|string, identity_id: int, language_id: int|null, main_identity_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
+        if (is_null($rs)) {
+            return null;
         }
-        return null;
+        $isMainIdentity = $rs['identity_id'] === $rs['main_identity_id'];
+        $loggedAsMainIdentity = (
+            is_null($rs['acting_identity_id'])
+            || is_null($rs['acting_user_id'])
+        );
+        unset($rs['email']);
+        unset($rs['main_identity_id']);
+        unset($rs['acting_identity_id']);
+        unset($rs['acting_user_id']);
+
+        return [
+            'loggedAsMainIdentity' => $loggedAsMainIdentity,
+            'isMainIdentity' => $isMainIdentity,
+            'identity' => new \OmegaUp\DAO\VO\Identities($rs),
+        ];
     }
 
     public static function savePassword(\OmegaUp\DAO\VO\Identities $identities): int {

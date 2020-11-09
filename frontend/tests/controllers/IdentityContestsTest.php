@@ -249,5 +249,51 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals('userNotAllowed', $e->getMessage());
         }
+
+        // This account can select the main identity
+        \OmegaUp\Controllers\Identity::apiSelectIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'usernameOrEmail' => $user->username,
+            ])
+        );
+
+        $contestsList = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        // User has been invited to 2 contests
+        $this->assertEquals(2, $contestsList['number_of_results']);
+        $this->assertEquals('Contest_1', $contestsList['results'][0]['title']);
+        $this->assertEquals('Contest_2', $contestsList['results'][1]['title']);
+
+        // But, when user login with a no-main identity, it's no able to switch
+        // between accounts
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $identityUsername
+        );
+        $identity->password = $password;
+
+        $login = self::login($identity);
+
+        $contestsList = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $login->auth_token])
+        );
+
+        // Identity has been invited to 1 contest
+        $this->assertEquals(1, $contestsList['number_of_results']);
+        $this->assertEquals('Contest_0', $contestsList['results'][0]['title']);
+
+        // User switch the account
+        try {
+            \OmegaUp\Controllers\Identity::apiSelectIdentity(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'usernameOrEmail' => $user->username,
+                ])
+            );
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
     }
 }
