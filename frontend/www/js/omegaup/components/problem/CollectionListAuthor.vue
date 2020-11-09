@@ -7,7 +7,11 @@
           :authors.sync="authors"
         ></omegaup-problem-filter-authors>
         <omegaup-problem-filter-difficulty
-          v-model="selectedDifficulty"
+          :selected-difficulty="difficulty"
+          @change-difficulty="
+            (difficulty) =>
+              $emit('apply-filter', columnName, sortOrder, difficulty)
+          "
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
@@ -29,7 +33,7 @@
           :column-name="columnName"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder)
+              $emit('apply-filter', columnName, sortOrder, difficulty)
           "
         >
         </omegaup-problem-base-list>
@@ -71,9 +75,9 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) tagsList!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() difficulty!: string;
 
   T = T;
   authors = this.data.authors;
-  selectedDifficulty: null | string = null;
 }
 </script>

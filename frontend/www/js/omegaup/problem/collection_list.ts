@@ -10,6 +10,7 @@ OmegaUp.on('ready', () => {
   let sortOrder = 'desc';
   let columnName = 'problem_id';
   let language = 'all';
+  let difficulty = 'all';
   let query = '';
   if (queryString) {
     const urlParams = new URLSearchParams(queryString);
@@ -29,6 +30,12 @@ OmegaUp.on('ready', () => {
       const languageParam = urlParams.get('language');
       if (languageParam) {
         language = languageParam;
+      }
+    }
+    if (urlParams.get('difficulty')) {
+      const queryParam = urlParams.get('difficulty');
+      if (queryParam) {
+        difficulty = queryParam;
       }
     }
     if (urlParams.get('query')) {
@@ -58,17 +65,20 @@ OmegaUp.on('ready', () => {
           tagsList: payload.tagsList,
           sortOrder: sortOrder,
           columnName: columnName,
+          difficulty: difficulty,
         },
         on: {
           'apply-filter': (
             columnName: string,
             sortOrder: omegaup.SortOrder,
+            difficulty: string,
           ): void => {
             const queryParameters = {
               language,
               query,
               order_by: columnName,
               sort_order: sortOrder,
+              difficulty,
             };
             window.location.replace(
               `/problem/collection/${payload.level}/?${ui.buildURLQuery(
