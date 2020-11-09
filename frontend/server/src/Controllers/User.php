@@ -3946,12 +3946,20 @@ class User extends \OmegaUp\Controllers\Controller {
             if (isset($response['error'])) {
                 $errors = [
                     'errorToUser' => 'NATIVE_LOGIN_FAILED',
-                    'errorMessage' => $response['error'],
+                    'errorMessage' => is_string(
+                        $response['error']
+                    ) ? $response['error'] : \OmegaUp\Translations::getInstance()->get(
+                        'loginFederatedFailed'
+                    ),
                 ];
             } elseif (isset($r['error'])) {
                 $errors = [
                     'errorToUser' => 'THIRD_PARTY_LOGIN_FAILED',
-                    'errorMessage' => $r['error_description'],
+                    'errorMessage' => is_string(
+                        $r['error_description']
+                    ) ? $r['error_description'] : \OmegaUp\Translations::getInstance()->get(
+                        'loginFederatedFailed'
+                    ),
                 ];
             } else {
                 $errors = [
