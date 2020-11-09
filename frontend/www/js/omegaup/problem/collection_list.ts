@@ -73,16 +73,13 @@ OmegaUp.on('ready', () => {
             sortOrder: omegaup.SortOrder,
             difficulty: string,
           ): void => {
-            let queryParameters = {
+            const queryParameters = {
               language,
               query,
               order_by: columnName,
               sort_order: sortOrder,
               difficulty,
             };
-            if (difficulty !== 'all') {
-              queryParameters = Object.assign(queryParameters, { difficulty });
-            }
             window.location.replace(
               `/problem/collection/${payload.level}/?${ui.buildURLQuery(
                 queryParameters,
