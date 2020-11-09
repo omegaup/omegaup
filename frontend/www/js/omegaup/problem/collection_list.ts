@@ -68,31 +68,21 @@ OmegaUp.on('ready', () => {
           difficulty: difficulty,
         },
         on: {
-          'apply-order-filter': (
+          'apply-filter': (
             columnName: string,
             sortOrder: omegaup.SortOrder,
+            difficulty: string,
           ): void => {
-            const queryParameters = {
+            let queryParameters = {
               language,
               query,
               order_by: columnName,
               sort_order: sortOrder,
               difficulty,
             };
-            window.location.replace(
-              `/problem/collection/${payload.level}/?${ui.buildURLQuery(
-                queryParameters,
-              )}`,
-            );
-          },
-          'apply-difficulty-filter': (difficulty: string): void => {
-            const queryParameters = {
-              language,
-              query,
-              order_by: columnName,
-              sort_order: sortOrder,
-              difficulty,
-            };
+            if (difficulty !== 'all') {
+              queryParameters = Object.assign(queryParameters, { difficulty });
+            }
             window.location.replace(
               `/problem/collection/${payload.level}/?${ui.buildURLQuery(
                 queryParameters,

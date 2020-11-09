@@ -10,7 +10,8 @@
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
           @change-difficulty="
-            (difficulty) => $emit('apply-difficulty-filter', difficulty)
+            (difficulty) =>
+              $emit('apply-filter', columnName, sortOrder, difficulty)
           "
         ></omegaup-problem-filter-difficulty>
       </div>
@@ -33,8 +34,8 @@
           :column-name="columnName"
           :path="`/problem/collection/${level}/`"
           @apply-filter="
-            (columnName, sortOrder, difficulty) =>
-              $emit('apply-order-filter', columnName, sortOrder, difficulty)
+            (columnName, sortOrder) =>
+              $emit('apply-filter', columnName, sortOrder, difficulty)
           "
         >
         </omegaup-problem-base-list>
