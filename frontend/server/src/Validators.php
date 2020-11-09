@@ -159,6 +159,45 @@ class Validators {
     }
 
     /**
+     * Returns whether the username or email is valid.
+     *
+     * @param string $usernameOrEmail
+     * @return boolean
+     */
+    public static function usernameOrEmail(string $usernameOrEmail): bool {
+        return (
+            self::email($usernameOrEmail)
+            && self::normalUsername($usernameOrEmail)
+            && self::identityUsername($usernameOrEmail)
+        );
+    }
+
+    /**
+     * Returns whether the username is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function normalUsername(string $username): bool {
+        return preg_match('/^[a-zA-Z0-9_.-]+$/', $username) !== 0;
+    }
+
+    /**
+     * Returns whether the username of an identity is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function identityUsername(string $username): bool {
+        return (
+            preg_match(
+                '/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $username
+            ) !== 0
+        );
+    }
+
+    /**
      * Returns whether the alias is restricted.
      *
      * @param string $alias the alias.

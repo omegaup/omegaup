@@ -1010,6 +1010,10 @@ export const Identity = {
     messages.IdentityCreateRequest,
     messages.IdentityCreateResponse
   >('/api/identity/create/'),
+  selectIdentity: apiCall<
+    messages.IdentitySelectIdentityRequest,
+    messages.IdentitySelectIdentityResponse
+  >('/api/identity/selectIdentity/'),
   update: apiCall<
     messages.IdentityUpdateRequest,
     messages.IdentityUpdateResponse

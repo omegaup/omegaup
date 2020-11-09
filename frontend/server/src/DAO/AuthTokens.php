@@ -97,7 +97,7 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
                     `Auth_Tokens` at
                 WHERE
                     at.identity_id = ?;';
-        /** @var list<array{create_time: \OmegaUp\Timestamp, identity_id: int, token: string, user_id: int|null}> */
+        /** @var list<array{acting_identity_id: int|null, create_time: \OmegaUp\Timestamp, identity_id: int, token: string, user_id: int|null}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$identityId]

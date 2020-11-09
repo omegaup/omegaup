@@ -80,7 +80,8 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
      * @return list<array{alias: string}>
      */
     public static function getFrequentTagsByLevel(
-        string $problemLevel
+        string $problemLevel,
+        int $rows
     ) {
         $sql = '
             SELECT
@@ -110,12 +111,16 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             ORDER BY
                 COUNT(pt.problem_id)
             DESC
+            LIMIT ?
             ';
 
         /** @var list<array{alias: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$problemLevel]
+            [
+                $problemLevel,
+                $rows
+            ]
         );
     }
 }

@@ -45,7 +45,11 @@
     </div>
     <div class="form-group row">
       <div class="col-sm-10">
-        <button type="submit" class="btn btn-primary" :disabled="!canSubmit">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="!canSubmit || waitingForServerResponse"
+        >
           <omegaup-countdown
             v-if="!canSubmit"
             :target-time="nextSubmissionTimestamp"
@@ -87,6 +91,7 @@ export default class ArenaRunSubmit extends Vue {
   selectedLanguage = '';
   code = '';
   now: number = Date.now();
+  waitingForServerResponse = false;
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() < this.now;
@@ -178,6 +183,7 @@ export default class ArenaRunSubmit extends Vue {
       reader.onload = (e) => {
         const result = e.target?.result ?? null;
         if (result === null) return;
+        this.waitingForServerResponse = true;
         this.$emit('submit-run', result as string, this.selectedLanguage);
       };
 
@@ -227,6 +233,7 @@ export default class ArenaRunSubmit extends Vue {
       alert(T.arenaRunSubmitEmptyCode);
       return;
     }
+    this.waitingForServerResponse = true;
     this.$emit('submit-run', this.code, this.selectedLanguage);
   }
 
@@ -234,6 +241,7 @@ export default class ArenaRunSubmit extends Vue {
     this.code = '';
     this.inputFile.type = 'text';
     this.inputFile.type = 'file';
+    this.waitingForServerResponse = false;
   }
 }
 </script>

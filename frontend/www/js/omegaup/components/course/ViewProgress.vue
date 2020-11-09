@@ -20,6 +20,13 @@
                   >
                     {{ assignment.name }}<br />
                     <span>{{ getTotalPoints(assignment) }}</span>
+                    <a
+                      v-if="assignment.max_points === 0"
+                      data-toggle="tooltip"
+                      rel="tooltip"
+                      :title="T.studentProgressOnlyLecturesDescription"
+                      ><img src="/media/question.png"
+                    /></a>
                   </th>
                   <th class="text-center">{{ T.courseProgressGlobalScore }}</th>
                 </tr>
