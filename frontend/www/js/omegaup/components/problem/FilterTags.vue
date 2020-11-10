@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 @Component({
@@ -37,9 +37,10 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 export default class FilterTags extends Vue {
   @Prop() tags!: string[];
   @Prop() publicTags!: string[];
+  @Prop({ default: () => [] }) currentTags!: string[];
 
   T = T;
-  selectedTags: string[] = [];
+  selectedTags = this.currentTags;
 
   addOtherTag(tag: string): void {
     if (!this.tags.includes(tag)) {
@@ -53,6 +54,11 @@ export default class FilterTags extends Vue {
       return T[tagname];
     }
     return tagname;
+  }
+
+  @Watch('selectedTags')
+  onNewTagSelected(): void {
+    this.$emit('new-selected-tag', this.selectedTags);
   }
 }
 </script>

@@ -4,14 +4,31 @@
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-tags
-          :tags.sync="tags"
+          :current-tags="currentTags"
+          :tags.sync="availableTags"
           :public-tags="publicTags"
+          @new-selected-tag="
+            (selectedTags) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
+          "
         ></omegaup-problem-filter-tags>
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
           @change-difficulty="
             (difficulty) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                currentTags,
+              )
           "
         ></omegaup-problem-filter-difficulty>
       </div>
@@ -35,7 +52,13 @@
           :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                currentTags,
+              )
           "
         >
         </omegaup-problem-base-list>
@@ -64,7 +87,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop({ default: () => [] }) currentTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -78,10 +101,26 @@ export default class CollectionList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
+  @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
   level = this.data.level;
-  tags: string[] = this.data.frequentTags.map((element) => element.alias);
+
+  get availableTags(): string[] {
+    if (this.currentTags.length == 0) {
+      return this.data.frequentTags.map((element) => element.alias);
+    } else {
+      let tags: string[] = this.data.frequentTags.map(
+        (element) => element.alias,
+      );
+      this.currentTags.forEach((element) => {
+        if (!tags.includes(element)) {
+          tags.push(element);
+        }
+      });
+      return tags;
+    }
+  }
 
   get publicTags(): string[] {
     let tags: string[] = this.data.frequentTags.map((x) => x.alias);
