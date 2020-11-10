@@ -295,6 +295,7 @@ export default class Statistics extends Vue {
     return {
       chart: {
         type: 'bar',
+        height: `${data.length < 10 ? null : (data.length * 10) / 2}%`,
       },
       title: {
         text: title,
@@ -322,6 +323,7 @@ export default class Statistics extends Vue {
         {
           name: yName,
           data: data,
+          pointWidth: 15,
         },
       ],
     };
