@@ -107,19 +107,15 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
-    /**
-     * @return array{identity: \OmegaUp\DAO\VO\Identities, isMainIdentity: bool, loggedAsMainIdentity: bool}|null
-     */
     public static function resolveAssociatedIdentity(
         string $usernameOrEmail,
         \OmegaUp\DAO\VO\Identities $currentIdentity
-    ): ?array {
+    ): ?\OmegaUp\DAO\VO\Identities {
+        if (is_null($currentIdentity->user_id)) {
+            return null;
+        }
         $sql = 'SELECT
-                    i.*,
-                    aut.acting_identity_id,
-                    aut.user_id AS acting_user_id,
-                    u.main_identity_id,
-                    e.email
+                    i.*
                 FROM
                     Identities i
                 INNER JOIN
@@ -136,30 +132,17 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     aut.user_id = i.user_id
                 WHERE
                     i.user_id = ?
-                    AND i.username = ?
+                    AND (i.username = ? OR e.email = ?)
                 LIMIT 1;';
-        $args = [$currentIdentity->user_id, $usernameOrEmail];
+        $args = [$currentIdentity->user_id, $usernameOrEmail, $usernameOrEmail];
 
-        /** @var array{acting_identity_id: int|null, acting_user_id: int|null, country_id: null|string, current_identity_school_id: int|null, email: null|string, gender: null|string, identity_id: int, language_id: int|null, main_identity_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
         if (is_null($rs)) {
             return null;
         }
-        $isMainIdentity = $rs['identity_id'] === $rs['main_identity_id'];
-        $loggedAsMainIdentity = (
-            is_null($rs['acting_identity_id'])
-            || is_null($rs['acting_user_id'])
-        );
-        unset($rs['email']);
-        unset($rs['main_identity_id']);
-        unset($rs['acting_identity_id']);
-        unset($rs['acting_user_id']);
 
-        return [
-            'loggedAsMainIdentity' => $loggedAsMainIdentity,
-            'isMainIdentity' => $isMainIdentity,
-            'identity' => new \OmegaUp\DAO\VO\Identities($rs),
-        ];
+        return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
     public static function savePassword(\OmegaUp\DAO\VO\Identities $identities): int {
