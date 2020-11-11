@@ -6138,7 +6138,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      */
     public static function getCollectionsDetailsByAuthorForSmarty(\OmegaUp\Request $r): array {
         $problems = [];
-        $authors = [];
+        $authorsRanking = [];
 
         $offset = $r->ensureOptionalInt('offset') ?? 0;
         $pageSize = $r->ensureOptionalInt(
