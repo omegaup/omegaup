@@ -3589,7 +3589,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, sortOrder: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>}
+     * @return array{difficultyRange: array{0: int, 1: int}|null, keyword: string, language: string, minVisibility: int, sortOrder: string, orderBy: string, page: int, programmingLanguages: list<string>, requireAllTags: bool, tags: list<string>, authors: list<string>}
      *
      * @omegaup-request-param null|string $difficulty_range
      * @omegaup-request-param mixed $language
