@@ -113,8 +113,11 @@ try_define('OMEGAUP_FB_SECRET', 'xxxxx');
 # ####################################
 # GOOGLE LOGIN CONFIG
 # ####################################
-try_define('OMEGAUP_GOOGLE_SECRET', 'xxxxx');
-try_define('OMEGAUP_GOOGLE_CLIENTID', '');
+try_define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
+try_define(
+    'OMEGAUP_GOOGLE_CLIENTID',
+    '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com'
+);
 
 # ####################################
 # LINKEDIN LOGIN CONFIG
