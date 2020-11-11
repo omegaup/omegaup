@@ -28,7 +28,7 @@ class Request extends \ArrayObject {
      * The object of the identity currently logged in.
      * @var null|\OmegaUp\DAO\VO\Identities
      */
-    public $login_identity = null;
+    public $loginIdentity = null;
 
     /**
      * The method that will be called.
@@ -103,8 +103,8 @@ class Request extends \ArrayObject {
     public function isLoggedAsMainIdentity(): bool {
         return (
             !is_null($this->user)
-            && !is_null($this->login_identity)
-            && $this->user->main_identity_id === $this->login_identity->identity_id
+            && !is_null($this->loginIdentity)
+            && $this->user->main_identity_id === $this->loginIdentity->identity_id
         );
     }
 
@@ -427,7 +427,7 @@ class Request extends \ArrayObject {
         }
         $this->user = null;
         $this->identity = null;
-        $this->login_identity = null;
+        $this->loginIdentity = null;
         $session = \OmegaUp\Controllers\Session::getCurrentSession(
             $this
         );
@@ -435,7 +435,7 @@ class Request extends \ArrayObject {
             throw new \OmegaUp\Exceptions\UnauthorizedException();
         }
         $this->identity = $session['identity'];
-        $this->login_identity = $session['login_identity'];
+        $this->loginIdentity = $session['loginIdentity'];
         if (!is_null($session['user'])) {
             $this->user = $session['user'];
         }

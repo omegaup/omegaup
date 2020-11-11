@@ -1897,11 +1897,11 @@ export namespace types {
   export interface CurrentSession {
     associated_identities: types.AssociatedIdentity[];
     auth_token?: string;
-    classname?: string;
+    classname: string;
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;
-    login_identity?: dao.Identities;
+    loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
   }

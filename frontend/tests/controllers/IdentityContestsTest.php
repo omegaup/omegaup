@@ -6,6 +6,26 @@
  * @author juan.pablo
  */
 class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
+    /**
+     * @var string $identityName
+     */
+    protected $identityUsername;
+
+    /**
+     * @var string $password
+     */
+    protected $password;
+
+    /**
+     * @var \OmegaUp\DAO\VO\Identities $user
+     */
+    protected $user;
+
+    /**
+     * @var \OmegaUp\Test\ScopedLoginToken $login
+     */
+    protected $login;
+
     public function setUp(): void {
         parent::setUp();
         [
@@ -78,11 +98,6 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
-    protected $identityUsername;
-    protected $password;
-    protected $user;
-    protected $login;
-
     private function createRunWithIdentity(
         array $contestData,
         array $problemData,
@@ -119,11 +134,13 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     private function assertUserHasBeenInvitedToContests(
-        string $token,
-        array $contests
+        \OmegaUp\Test\ScopedLoginToken $userLogin,
+        array $contests,
+        bool $isMainIdentity = true
     ): void {
-        $r = new \OmegaUp\Request(['auth_token' => $token]);
-        $contestsList = \OmegaUp\Controllers\Contest::apiList($r);
+        $contestsList = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $userLogin->auth_token])
+        );
 
         // User has been invited to contests
         $this->assertEquals(
@@ -137,7 +154,13 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         }
 
-        $result = \OmegaUp\Controllers\Contest::apiMyList($r);
+        if (!$isMainIdentity) {
+            return;
+        }
+
+        $result = \OmegaUp\Controllers\Contest::apiMyList(
+            new \OmegaUp\Request(['auth_token' => $userLogin->auth_token])
+        );
 
         $this->assertArrayHasKey(
             'contests',
@@ -247,7 +270,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testSwitchBetweenAssociatedIdentities() {
         $this->assertUserHasBeenInvitedToContests(
-            $this->login->auth_token,
+            $this->login,
             /*$contests=*/['Contest_1', 'Contest_2']
         );
 
@@ -260,8 +283,9 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertUserHasBeenInvitedToContests(
-            $this->login->auth_token,
-            /*$contests=*/['Contest_0']
+            $this->login,
+            /*$contests=*/['Contest_0'],
+            /*$isMainIdentity=*/false
         );
     }
 
@@ -296,7 +320,7 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertUserHasBeenInvitedToContests(
-            $this->login->auth_token,
+            $this->login,
             /*$contests=*/['Contest_1', 'Contest_2']
         );
     }
@@ -313,8 +337,9 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         $this->login = self::login($identity);
 
         $this->assertUserHasBeenInvitedToContests(
-            $this->login->auth_token,
-            /*$contests=*/['Contest_0']
+            $this->login,
+            /*$contests=*/['Contest_0'],
+            /*$isMainIdentity=*/false
         );
 
         // User switch the account

@@ -119,17 +119,9 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 FROM
                     Identities i
                 INNER JOIN
-                    Users u
-                ON
-                    i.user_id = u.user_id
-                INNER JOIN
                     Emails e
                 ON
-                    e.email_id = u.main_email_id
-                LEFT JOIN
-                    Auth_Tokens aut
-                ON
-                    aut.user_id = i.user_id
+                    e.user_id = i.user_id
                 WHERE
                     i.user_id = ?
                     AND (i.username = ? OR e.email = ?)

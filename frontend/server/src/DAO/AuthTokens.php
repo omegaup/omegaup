@@ -40,61 +40,49 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
      * @return array{currentIdentity: array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}, loginIdentity: array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}}|null
      */
     public static function getIdentityByToken(string $authToken) {
-        $classnameQuery = 'IFNULL(
-            (
-                SELECT `urc`.`classname` FROM
-                    `User_Rank_Cutoffs` `urc`
-                WHERE
-                    `urc`.`score` <= (
-                            SELECT
-                                `ur`.`score`
-                            FROM
-                                `User_Rank` `ur`
-                            WHERE
-                                `ur`.`user_id` = `i`.`user_id`
-                        )
-                ORDER BY
-                    `urc`.`percentile` ASC
-                LIMIT
-                    1
-            ),
-            "user-rank-unranked"
-        ) `classname`';
         $sql = "SELECT
                     i.*,
-                    'identity' AS column_name,
-                    {$classnameQuery}
+                    aut.identity_id = i.identity_id AS `is_main_identity`,
+                    IFNULL(
+                        (
+                            SELECT `urc`.`classname` FROM
+                                `User_Rank_Cutoffs` `urc`
+                            WHERE
+                                `urc`.`score` <= (
+                                        SELECT
+                                            `ur`.`score`
+                                        FROM
+                                            `User_Rank` `ur`
+                                        WHERE
+                                            `ur`.`user_id` = `i`.`user_id`
+                                    )
+                            ORDER BY
+                                `urc`.`percentile` ASC
+                            LIMIT
+                                1
+                        ),
+                        'user-rank-unranked'
+                    ) `classname`
                 FROM
-                    `Identities` i
-                INNER JOIN
                     `Auth_Tokens` aut
+                INNER JOIN
+                    `Identities` i
                 ON
-                    aut.identity_id = i.identity_id
+                    i.identity_id IN (aut.identity_id, aut.acting_identity_id)
                 WHERE
                     aut.token = ?
-                UNION
-                SELECT
-                    i.*,
-                    'acting_identity' AS column_name,
-                    {$classnameQuery}
-                FROM
-                    `Identities` i
-                INNER JOIN
-                    `Auth_Tokens` aut
-                ON
-                    aut.acting_identity_id = i.identity_id
-                WHERE
-                    aut.token = ?;";
-        /** @var list<array{classname: string, column_name: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> */
+                ORDER BY
+                    `is_main_identity` DESC;";
+        /** @var list<array{classname: string, country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, is_main_identity: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
-            [$authToken, $authToken]
+            [$authToken]
         );
         if (empty($rs)) {
             return null;
         }
         if (count($rs) === 1) {
-            unset($rs[0]['column_name']);
+            unset($rs[0]['is_main_identity']);
             return [
                 'currentIdentity' => $rs[0],
                 'loginIdentity' => $rs[0],
@@ -102,8 +90,8 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
         }
         $currentIdentity = array_pop($rs);
         $loginIdentity = array_pop($rs);
-        unset($currentIdentity['column_name']);
-        unset($loginIdentity['column_name']);
+        unset($currentIdentity['is_main_identity']);
+        unset($loginIdentity['is_main_identity']);
 
         return [
             'currentIdentity' => $currentIdentity,
@@ -112,8 +100,8 @@ class AuthTokens extends \OmegaUp\DAO\Base\AuthTokens {
     }
 
     public static function updateActingIdentityId(
-        int $actingIdentityId,
-        string $token
+        string $token,
+        int $actingIdentityId
     ): int {
         $sql = 'UPDATE
                     `Auth_Tokens`
