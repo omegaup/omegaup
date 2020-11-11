@@ -373,7 +373,7 @@ export default class Runs extends Vue {
     ) {
       return this.runs;
     }
-    return this.runs.filter((run) => {
+    return this.runs.reverse().filter((run) => {
       if (this.filterVerdict) {
         if (this.filterVerdict == 'NO-AC') {
           if (run.verdict == 'AC') {
