@@ -6187,6 +6187,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'columns' => $result['columns'],
                     'tags' => $result['tags'],
                     'tagData' => $result['tagData'],
+                    'difficulty' => $result['difficulty'],
                 ],
                 'title' => new \OmegaUp\TranslationString(
                     'omegaupTitleCollectionsByAuthor'

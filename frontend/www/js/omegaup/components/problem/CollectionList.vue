@@ -8,7 +8,11 @@
           :public-tags="publicTags"
         ></omegaup-problem-filter-tags>
         <omegaup-problem-filter-difficulty
-          v-model="selectedDifficulty"
+          :selected-difficulty="difficulty"
+          @change-difficulty="
+            (difficulty) =>
+              $emit('apply-filter', columnName, sortOrder, difficulty)
+          "
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
@@ -31,7 +35,7 @@
           :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder)
+              $emit('apply-filter', columnName, sortOrder, difficulty)
           "
         >
         </omegaup-problem-base-list>
@@ -73,11 +77,11 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) tagsList!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() difficulty!: string;
 
   T = T;
   level = this.data.level;
   tags: string[] = this.data.frequentTags.map((element) => element.alias);
-  selectedDifficulty: null | string = null;
 
   get publicTags(): string[] {
     let tags: string[] = this.data.frequentTags.map((x) => x.alias);
