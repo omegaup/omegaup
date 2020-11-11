@@ -1387,7 +1387,8 @@ export namespace types {
   }
 
   export interface CollectionDetailsByAuthorPayload {
-    authors: types.AuthorsRank;
+    authors: string[];
+    authors_ranking: types.AuthorsRank;
     column: string;
     columns: string[];
     currentTags: string[];
