@@ -4,8 +4,8 @@
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-tags
-          :current-tags="currentTags"
-          :tags.sync="availableTags"
+          :selected-tags="currentTags"
+          :tags="availableTags"
           :public-tags="publicTags"
           @new-selected-tag="
             (selectedTags) =>
@@ -101,25 +101,16 @@ export default class CollectionList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
-  @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
   level = this.data.level;
 
   get availableTags(): string[] {
-    if (this.currentTags.length == 0) {
-      return this.data.frequentTags.map((element) => element.alias);
-    } else {
-      let tags: string[] = this.data.frequentTags.map(
-        (element) => element.alias,
-      );
-      this.currentTags.forEach((element) => {
-        if (!tags.includes(element)) {
-          tags.push(element);
-        }
-      });
-      return tags;
-    }
+    let tags: Set<string> = new Set(
+      this.data.frequentTags.map((element) => element.alias),
+    );
+    this.currentTags.forEach((element) => tags.add(element));
+    return Array.from(tags);
   }
 
   get publicTags(): string[] {

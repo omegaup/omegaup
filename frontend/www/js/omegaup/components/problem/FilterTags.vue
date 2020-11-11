@@ -5,7 +5,7 @@
       <div v-for="(tag, index) in tags" :key="index" class="form-check">
         <label class="form-check-label">
           <input
-            v-model="selectedTags"
+            v-model="currentSelectedTags"
             :value="tag"
             class="form-check-input"
             type="checkbox"
@@ -35,17 +35,16 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
   },
 })
 export default class FilterTags extends Vue {
-  @Prop() tags!: string[];
   @Prop() publicTags!: string[];
-  @Prop({ default: () => [] }) currentTags!: string[];
+  @Prop({ default: () => [] }) tags!: string[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
-  selectedTags = this.currentTags;
+  currentSelectedTags = this.selectedTags;
 
   addOtherTag(tag: string): void {
     if (!this.tags.includes(tag)) {
-      this.selectedTags.push(tag);
-      this.tags.push(tag);
+      this.currentSelectedTags.push(tag);
     }
   }
 
@@ -56,9 +55,9 @@ export default class FilterTags extends Vue {
     return tagname;
   }
 
-  @Watch('selectedTags')
+  @Watch('currentSelectedTags')
   onNewTagSelected(): void {
-    this.$emit('new-selected-tag', this.selectedTags);
+    this.$emit('new-selected-tag', this.currentSelectedTags);
   }
 }
 </script>
