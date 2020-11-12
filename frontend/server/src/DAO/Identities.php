@@ -107,6 +107,36 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
+    public static function resolveAssociatedIdentity(
+        string $usernameOrEmail,
+        \OmegaUp\DAO\VO\Identities $currentIdentity
+    ): ?\OmegaUp\DAO\VO\Identities {
+        if (is_null($currentIdentity->user_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    i.*
+                FROM
+                    Identities i
+                INNER JOIN
+                    Emails e
+                ON
+                    e.user_id = i.user_id
+                WHERE
+                    i.user_id = ?
+                    AND (i.username = ? OR e.email = ?)
+                LIMIT 1;';
+        $args = [$currentIdentity->user_id, $usernameOrEmail, $usernameOrEmail];
+
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
+        if (is_null($rs)) {
+            return null;
+        }
+
+        return new \OmegaUp\DAO\VO\Identities($rs);
+    }
+
     public static function savePassword(\OmegaUp\DAO\VO\Identities $identities): int {
         $sql = '
             UPDATE

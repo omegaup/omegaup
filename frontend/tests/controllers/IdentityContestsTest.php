@@ -6,6 +6,98 @@
  * @author juan.pablo
  */
 class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
+    /**
+     * @var string $identityName
+     */
+    protected $identityUsername;
+
+    /**
+     * @var string $password
+     */
+    protected $password;
+
+    /**
+     * @var \OmegaUp\DAO\VO\Identities $user
+     */
+    protected $user;
+
+    /**
+     * @var \OmegaUp\Test\ScopedLoginToken $login
+     */
+    protected $login;
+
+    public function setUp(): void {
+        parent::setUp();
+        [
+            'identity' => $creator,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creator,
+            null,
+            null,
+            null,
+            $creatorLogin
+        );
+
+        // Creator adds 3 contests, in the first one identity will be invited.
+        // In the other contests user will be invited.
+        // At the end, user associates the account with the identity and it can
+        // be able to see all the 3 contests switching between both accounts
+        $identityName = substr(\OmegaUp\Test\Utils::createRandomString(), - 10);
+        $this->identityUsername = "{$group['group']->alias}:{$identityName}";
+        $this->password = \OmegaUp\Test\Utils::createRandomString();
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'username' => $this->identityUsername,
+            'name' => $identityName,
+            'password' => $this->password,
+            'country_id' => 'MX',
+            'state_id' => 'QUE',
+            'gender' => 'male',
+            'school_name' => \OmegaUp\Test\Utils::createRandomString(),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        // Create the user to associate
+        [
+            'identity' => $this->user,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        $userContests = [
+            $this->identityUsername,
+            $this->user->username,
+            $this->user->username,
+        ];
+
+        $contests = [];
+        foreach ($userContests as $userId => $username) {
+            $contests[$userId] = \OmegaUp\Test\Factories\Contest::createContest(
+                new \OmegaUp\Test\Factories\ContestParams([
+                    'admissionMode' => 'private',
+                    'title' => "Contest_{$userId}",
+                ])
+            );
+
+            $directorLogin = self::login($contests[$userId]['director']);
+            \OmegaUp\Controllers\Contest::apiAddUser(new \OmegaUp\Request([
+                'auth_token' => $directorLogin->auth_token,
+                'contest_alias' => $contests[$userId]['request']['alias'],
+                'usernameOrEmail' => $username,
+            ]));
+        }
+
+        $this->login = self::login($this->user);
+        \OmegaUp\Controllers\User::apiAssociateIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $this->login->auth_token,
+                'username' => $this->identityUsername,
+                'password' => $this->password,
+            ])
+        );
+    }
+
     private function createRunWithIdentity(
         array $contestData,
         array $problemData,
@@ -39,6 +131,42 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
         ]);
 
         return \OmegaUp\Controllers\Run::apiCreate($runRequest);
+    }
+
+    private function assertUserHasBeenInvitedToContests(
+        \OmegaUp\Test\ScopedLoginToken $userLogin,
+        array $contests,
+        bool $isMainIdentity = true
+    ): void {
+        $contestsList = \OmegaUp\Controllers\Contest::apiList(
+            new \OmegaUp\Request(['auth_token' => $userLogin->auth_token])
+        );
+
+        // User has been invited to contests
+        $this->assertEquals(
+            count($contests),
+            $contestsList['number_of_results']
+        );
+        foreach ($contests as $index => $contest) {
+            $this->assertEquals(
+                $contest,
+                $contestsList['results'][$index]['title']
+            );
+        }
+
+        if (!$isMainIdentity) {
+            return;
+        }
+
+        $result = \OmegaUp\Controllers\Contest::apiMyList(
+            new \OmegaUp\Request(['auth_token' => $userLogin->auth_token])
+        );
+
+        $this->assertArrayHasKey(
+            'contests',
+            $result,
+            'Users with main identity should be able to see their contests list'
+        );
     }
 
     /**
@@ -133,6 +261,100 @@ class IdentityContestsTest extends \OmegaUp\Test\ControllerTestCase {
             );
         } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
             $this->assertEquals($e->getMessage(), 'userNotAllowed');
+        }
+    }
+
+    /**
+     * Basic test for creating a single identity with contests, associating it
+     * with a registred user
+     */
+    public function testSwitchBetweenAssociatedIdentities() {
+        $this->assertUserHasBeenInvitedToContests(
+            $this->login,
+            /*$contests=*/['Contest_1', 'Contest_2']
+        );
+
+        // User switch the account
+        \OmegaUp\Controllers\Identity::apiSelectIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $this->login->auth_token,
+                'usernameOrEmail' => $this->identityUsername,
+            ])
+        );
+
+        $this->assertUserHasBeenInvitedToContests(
+            $this->login,
+            /*$contests=*/['Contest_0'],
+            /*$isMainIdentity=*/false
+        );
+    }
+
+    /**
+     * No main identities should be restricted to do some stuff, like see their
+     * contests list, even when they have been associated to a user.
+     */
+    public function testIdentityPrivilegesAndRestrictions() {
+        // User switch the account
+        \OmegaUp\Controllers\Identity::apiSelectIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $this->login->auth_token,
+                'usernameOrEmail' => $this->identityUsername,
+            ])
+        );
+
+        try {
+            \OmegaUp\Controllers\Contest::apiMyList(new \OmegaUp\Request([
+                'auth_token' => $this->login->auth_token
+            ]));
+            $this->fail('identity does not have access to see apiMyList');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+
+        // This account can select the main identity
+        \OmegaUp\Controllers\Identity::apiSelectIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $this->login->auth_token,
+                'usernameOrEmail' => $this->user->username,
+            ])
+        );
+
+        $this->assertUserHasBeenInvitedToContests(
+            $this->login,
+            /*$contests=*/['Contest_1', 'Contest_2']
+        );
+    }
+
+    /**
+     * User login with a no-main identity is no able to switch between accounts
+     */
+    public function testUserLoggedAsIdentityCanNotSelectOtherIdentity() {
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $this->identityUsername
+        );
+        $identity->password = $this->password;
+
+        $this->login = self::login($identity);
+
+        $this->assertUserHasBeenInvitedToContests(
+            $this->login,
+            /*$contests=*/['Contest_0'],
+            /*$isMainIdentity=*/false
+        );
+
+        // User switch the account
+        try {
+            \OmegaUp\Controllers\Identity::apiSelectIdentity(
+                new \OmegaUp\Request([
+                    'auth_token' => $this->login->auth_token,
+                    'usernameOrEmail' => $this->user->username,
+                ])
+            );
+            $this->fail(
+                'identity should not have been able to switch identities'
+            );
+        } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
         }
     }
 }
