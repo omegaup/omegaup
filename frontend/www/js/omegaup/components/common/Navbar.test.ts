@@ -52,7 +52,7 @@ describe('Navbar.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
-        allIdentities: [{ username: 'user', default: true }],
+        associatedIdentities: [{ username: 'user', default: true }],
       },
     });
 
@@ -80,7 +80,7 @@ describe('Navbar.vue', () => {
         lockDownImage: 'data:image/png;base64...',
         navbarSection: '',
         omegaUpLockDown: false,
-        allIdentities: [{ username: 'user', default: true }],
+        associatedIdentities: [{ username: 'user', default: true }],
       },
     });
 

@@ -41,7 +41,7 @@ OmegaUp.on('ready', () => {
           isReviewer: this.isReviewer,
           gravatarURL51: this.gravatarURL51,
           gravatarURL128: payload.gravatarURL128,
-          allIdentities: payload.allIdentities,
+          associatedIdentities: payload.associatedIdentities,
           currentEmail: payload.currentEmail,
           currentName: payload.currentName,
           currentUsername: this.currentUsername,
@@ -69,7 +69,7 @@ OmegaUp.on('ready', () => {
               .catch(ui.apiError);
           },
           'change-account': (usernameOrEmail: string) => {
-            api.Identity.changeAccount({
+            api.Identity.selectIdentity({
               usernameOrEmail: usernameOrEmail,
             })
               .then(() => {

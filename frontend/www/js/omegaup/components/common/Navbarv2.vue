@@ -249,11 +249,11 @@
               </a>
               <div class="dropdown-menu dropdown-menu-right">
                 <template v-if="!omegaUpLockDown && !inContest">
-                  <div class="text-center mb-3">
+                  <div class="text-center mb-1">
                     <img
                       :src="gravatarURL128"
-                      height="90"
-                      class="rounded-circle mb-3"
+                      height="70"
+                      class="rounded-circle mb-1"
                       :title="currentUsername"
                     />
                     <h5 v-if="currentName !== ''" class="mx-2">
@@ -282,7 +282,7 @@
                     </div>
                   </a>
                   <div class="dropdown-divider"></div>
-                  <div v-if="allIdentities.length > 1" class="mb-3">
+                  <div v-if="associatedIdentities.length > 1" class="mb-1">
                     <div
                       v-for="identity in identitiesNotLogged"
                       :key="identity.username"
@@ -379,7 +379,7 @@ export default class Navbar extends Vue {
   @Prop() isReviewer!: boolean;
   @Prop() gravatarURL51!: string;
   @Prop() gravatarURL128!: string;
-  @Prop() allIdentities!: types.UsernameIdentity[];
+  @Prop() associatedIdentities!: types.AssociatedIdentity[];
   @Prop() currentEmail!: string;
   @Prop() currentName!: string;
   @Prop() currentUsername!: string;
@@ -401,8 +401,8 @@ export default class Navbar extends Vue {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
   }
 
-  get identitiesNotLogged(): types.UsernameIdentity[] {
-    return this.allIdentities.filter(
+  get identitiesNotLogged(): types.AssociatedIdentity[] {
+    return this.associatedIdentities.filter(
       (identity) => identity.username !== this.currentUsername,
     );
   }

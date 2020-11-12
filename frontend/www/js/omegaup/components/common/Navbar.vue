@@ -205,7 +205,7 @@
                 <div class="text-center">
                   <img
                     :src="gravatarURL128"
-                    height="90"
+                    height="70"
                     class="img-circle"
                     :title="currentUsername"
                   />
@@ -226,7 +226,7 @@
                   >
                 </li>
                 <li role="separator" class="divider"></li>
-                <template v-if="allIdentities.length > 1">
+                <template v-if="associatedIdentities.length > 1">
                   <li
                     v-for="identity in identitiesNotLogged"
                     :key="identity.username"
@@ -311,7 +311,7 @@ export default class Navbar extends Vue {
   @Prop() isReviewer!: boolean;
   @Prop() gravatarURL51!: string;
   @Prop() gravatarURL128!: string;
-  @Prop() allIdentities!: types.UsernameIdentity[];
+  @Prop() associatedIdentities!: types.AssociatedIdentity[];
   @Prop() currentEmail!: string;
   @Prop() currentName!: string;
   @Prop() currentUsername!: string;
@@ -332,8 +332,8 @@ export default class Navbar extends Vue {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
   }
 
-  get identitiesNotLogged(): types.UsernameIdentity[] {
-    return this.allIdentities.filter(
+  get identitiesNotLogged(): types.AssociatedIdentity[] {
+    return this.associatedIdentities.filter(
       (identity) => identity.username !== this.currentUsername,
     );
   }
