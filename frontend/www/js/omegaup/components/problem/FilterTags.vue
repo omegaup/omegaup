@@ -43,7 +43,7 @@ export default class FilterTags extends Vue {
   currentSelectedTags = this.selectedTags;
 
   addOtherTag(tag: string): void {
-    if (!this.tags.includes(tag)) {
+    if (!this.currentSelectedTags.includes(tag)) {
       this.currentSelectedTags.push(tag);
     }
   }

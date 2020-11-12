@@ -4,7 +4,7 @@
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-tags
-          :selected-tags="currentTags"
+          :selected-tags="selectedTags"
           :tags="availableTags"
           :public-tags="publicTags"
           @new-selected-tag="
@@ -27,7 +27,7 @@
                 columnName,
                 sortOrder,
                 difficulty,
-                currentTags,
+                selectedTags,
               )
           "
         ></omegaup-problem-filter-difficulty>
@@ -36,7 +36,7 @@
         <omegaup-problem-base-list
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="currentTags"
+          :current-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -57,7 +57,7 @@
                 columnName,
                 sortOrder,
                 difficulty,
-                currentTags,
+                selectedTags,
               )
           "
         >
@@ -87,7 +87,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop({ default: () => [] }) currentTags!: string[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -109,7 +109,7 @@ export default class CollectionList extends Vue {
     let tags: Set<string> = new Set(
       this.data.frequentTags.map((element) => element.alias),
     );
-    this.currentTags.forEach((element) => tags.add(element));
+    this.selectedTags.forEach((element) => tags.add(element));
     return Array.from(tags);
   }
 
