@@ -1901,6 +1901,7 @@ export namespace types {
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;
+    loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
   }

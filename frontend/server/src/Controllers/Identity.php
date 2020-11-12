@@ -565,6 +565,7 @@ class Identity extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
+     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param string $usernameOrEmail
      */
     public static function apiSelectIdentity(\OmegaUp\Request $r) {
@@ -577,7 +578,11 @@ class Identity extends \OmegaUp\Controllers\Controller {
             )
         );
 
-        // TODO: Call function loginWithAssociatedIdentity
+        \OmegaUp\Controllers\Session::loginWithAssociatedIdentity(
+            $r,
+            $usernameOrEmail,
+            $r->identity
+        );
 
         return [
             'status' => 'ok',
