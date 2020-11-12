@@ -2477,7 +2477,7 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'user_id' => $resolvedUser->user_id,
                     'contents' =>  json_encode(
                         [
-                            'type' => \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_MANUAL,
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_ADDED,
                             'body' => [
                                 'localizationString' => new \OmegaUp\TranslationString(
                                     'notificationCourseAddAdmin'

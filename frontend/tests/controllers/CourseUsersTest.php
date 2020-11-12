@@ -156,7 +156,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertCount(1, $response['notifications']);
         $this->assertEquals(
-            \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_MANUAL,
+            \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_ADDED,
             $notificationContents['type']
         );
         $this->assertEquals(
