@@ -22,10 +22,12 @@ class ScopedFacebook {
 
 /**
  * Session controller handles sessions.
+ * @psalm-type AssociatedIdentity=array{default: bool, username: string}
+ * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, auth_token: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
-    /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool} */
+    /** @var null|CurrentSession */
     private static $_currentSession = null;
     /** @var null|\OmegaUp\SessionManager */
     private static $_sessionManager = null;
@@ -63,7 +65,7 @@ class Session extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}, time: int}
+     * @return array{session: null|CurrentSession, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
         return [
@@ -99,7 +101,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{valid: bool, email: ?string, user: ?\OmegaUp\DAO\VO\Users, identity: ?\OmegaUp\DAO\VO\Identities, classname: string, auth_token: ?string, is_admin: bool}
+     * @return CurrentSession
      */
     public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
         if (
@@ -137,41 +139,40 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
+     * @return CurrentSession
      */
     private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
         $authToken = $r->ensureOptionalString('auth_token');
+        $emptySession = [
+            'valid' => false,
+            'email' => null,
+            'user' => null,
+            'identity' => null,
+            'loginIdentity' => null,
+            'classname' => 'user-rank-unranked',
+            'auth_token' => null,
+            'is_admin' => false,
+            'associated_identities' => [],
+        ];
         if (empty($authToken)) {
-            return [
-                'valid' => false,
-                'email' => null,
-                'user' => null,
-                'identity' => null,
-                'classname' => 'user-rank-unranked',
-                'auth_token' => null,
-                'is_admin' => false,
-            ];
+            return $emptySession;
         }
-
-        $currentIdentityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
-            $authToken
-        );
-        if (is_null($currentIdentityExt)) {
+        $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken($authToken);
+        if (is_null($identityExt)) {
             // Means user has auth token, but does not exist in DB
-            return [
-                'valid' => false,
-                'email' => null,
-                'user' => null,
-                'identity' => null,
-                'classname' => 'user-rank-unranked',
-                'auth_token' => null,
-                'is_admin' => false,
-            ];
+            return $emptySession;
         }
+        [
+            'currentIdentity' => $currentIdentityExt,
+            'loginIdentity' => $loginIdentityExt,
+        ] = $identityExt;
         $identityClassname = $currentIdentityExt['classname'];
         unset($currentIdentityExt['classname']);
+        unset($loginIdentityExt['classname']);
         $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
+        $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
+        $associatedIdentities = [];
         if (is_null($currentIdentity->user_id)) {
             $currentUser = null;
             $email = null;
@@ -185,6 +186,11 @@ class Session extends \OmegaUp\Controllers\Controller {
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;
+            if ($currentUser->main_identity_id === $loginIdentity->identity_id) {
+                $associatedIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
+                    $currentIdentity
+                );
+            }
         }
 
         return [
@@ -192,11 +198,13 @@ class Session extends \OmegaUp\Controllers\Controller {
             'email' => !empty($email) ? $email->email : '',
             'user' => $currentUser,
             'identity' => $currentIdentity,
+            'loginIdentity' => $loginIdentity,
             'classname' => $identityClassname,
             'auth_token' => $authToken,
             'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
                 $currentIdentity
             ),
+            'associated_identities' => $associatedIdentities,
         ];
     }
 
@@ -248,7 +256,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private static function registerSession(\OmegaUp\DAO\VO\Identities $identity): string {
+    private static function registerSession(
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user
+    ): string {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => intval($identity->identity_id),
@@ -500,6 +511,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             "Identity {$identity->username} has logged in natively."
         );
 
+        $user = null;
         if (!is_null($identity->user_id)) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
             if (is_null($user)) {
@@ -509,10 +521,64 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            return self::registerSession($identity);
+            return self::registerSession($identity, $user);
         } catch (\Exception $e) {
             self::$log->error($e);
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
+        }
+    }
+
+    /**
+     * Does login for an identity given username or email. Password no needed
+     * because user should have a successful native login
+     *
+     * @omegaup-request-param null|string $auth_token
+     */
+    public static function loginWithAssociatedIdentity(
+        \OmegaUp\Request $r,
+        string $usernameOrEmail,
+        \OmegaUp\DAO\VO\Identities $loggedIdentity
+    ): void {
+        // Only users that originally logged in from their main identities can
+        // select another identity.
+        if (!$r->isLoggedAsMainIdentity()) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'userNotAllowed'
+            );
+        }
+
+        $currentSession = self::getCurrentSession($r);
+        if (is_null($currentSession['auth_token'])) {
+            self::$log->warn('Auth token not found.');
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'loginRequired'
+            );
+        }
+
+        $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
+            $usernameOrEmail,
+            $loggedIdentity
+        );
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            self::$log->warn("Identity {$usernameOrEmail} not found.");
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        self::$log->info(
+            "User {$loggedIdentity->username} has logged with associated identity {$identity->username}."
+        );
+
+        try {
+            \OmegaUp\DAO\AuthTokens::updateActingIdentityId(
+                $currentSession['auth_token'],
+                $identity->identity_id
+            );
+            self::invalidateCache();
+
+            self::getCurrentSession($r);
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            self::$log->error($e);
+            throw $e;
         }
     }
 
@@ -599,8 +665,15 @@ class Session extends \OmegaUp\Controllers\Controller {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
+        if (is_null($identity->username) || is_null($identity->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
-        self::registerSession($identity);
+        self::registerSession($identity, $user);
         return ['status' => 'ok'];
     }
 

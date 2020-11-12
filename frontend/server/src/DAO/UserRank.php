@@ -10,6 +10,8 @@ namespace OmegaUp\DAO;
  * {@link \OmegaUp\DAO\VO\UserRank}.
  *
  * @access public
+ *
+ * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, country_id: null|string, username: string, name: null|string, classname: string}>, total: int}
  */
 class UserRank extends \OmegaUp\DAO\Base\UserRank {
     /**
@@ -99,7 +101,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
     }
 
     /**
-     * @return array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string,name: null|string, username: string}>, total: int}
+     * @return AuthorsRank
      */
     public static function getAuthorsRank(
         int $page,
@@ -166,7 +168,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
     }
 
     /**
-     * @return array{ranking: list<array{author_ranking: int, name: null|string, username: string}>, total: int}
+     * @return AuthorsRank
      */
     public static function getAuthorsRankWithQualityProblems(
         int $page,
@@ -175,8 +177,24 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
         $sqlSelect = '
             SELECT
                 IFNULL(`ur`.`author_ranking`, 0) AS `author_ranking`,
+                IFNULL(`ur`.`author_score`, 0) AS `author_score`,
+                `ur`.`country_id`,
                 `ur`.`username`,
-                `ur`.`name`
+                `ur`.`name`,
+                IFNULL(
+                    (
+                        SELECT
+                            `urc`.`classname`
+                        FROM
+                            `User_Rank_Cutoffs` `urc`
+                        WHERE
+                            `urc`.`score` <= `ur`.`score`
+                        ORDER BY
+                            `urc`.`percentile` ASC
+                        LIMIT 1
+                    ),
+                    "user-rank-unranked"
+                ) as `classname`
         ';
         $sqlFrom = '
             FROM
@@ -213,7 +231,7 @@ class UserRank extends \OmegaUp\DAO\Base\UserRank {
             []
         ) ?? 0;
 
-        /** @var list<array{author_ranking: int, name: null|string, username: string}> */
+        /** @var list<array{author_ranking: int, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$sqlSelect}{$sqlFrom}{$sqlOrderBy}{$sqlLimit}",
             [
