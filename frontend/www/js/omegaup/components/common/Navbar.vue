@@ -226,9 +226,9 @@
                   >
                 </li>
                 <li role="separator" class="divider"></li>
-                <template v-if="associatedIdentities.length > 1">
+                <template v-if="identitiesNotLoggedIn.length > 0">
                   <li
-                    v-for="identity in identitiesNotLogged"
+                    v-for="identity in identitiesNotLoggedIn"
                     :key="identity.username"
                   >
                     <button
@@ -332,7 +332,7 @@ export default class Navbar extends Vue {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
   }
 
-  get identitiesNotLogged(): types.AssociatedIdentity[] {
+  get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
     return this.associatedIdentities.filter(
       (identity) => identity.username !== this.currentUsername,
     );

@@ -282,9 +282,9 @@
                     </div>
                   </a>
                   <div class="dropdown-divider"></div>
-                  <div v-if="associatedIdentities.length > 1" class="mb-1">
+                  <div v-if="identitiesNotLoggedIn.length > 0" class="mb-1">
                     <div
-                      v-for="identity in identitiesNotLogged"
+                      v-for="identity in identitiesNotLoggedIn"
                       :key="identity.username"
                     >
                       <button
@@ -401,7 +401,7 @@ export default class Navbar extends Vue {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
   }
 
-  get identitiesNotLogged(): types.AssociatedIdentity[] {
+  get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
     return this.associatedIdentities.filter(
       (identity) => identity.username !== this.currentUsername,
     );
