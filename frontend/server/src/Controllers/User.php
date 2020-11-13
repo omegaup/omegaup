@@ -3909,31 +3909,24 @@ class User extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param string $code
      * @omegaup-request-param string $redirect
      * @omegaup-request-param string $state
+     * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
         $emailVerified = true;
         $redirectResponse = null;
+        $thirdPartyLogin = $r->ensureString('third_party_login');
 
-        if ($r->ensureOffsetExists('linkedin')) {
+        if ($thirdPartyLogin === 'linkedin') {
             $code = $r->ensureString('code');
             $state = $r->ensureString('state');
             $redirect = $r->ensureString('redirect');
-            $redirectResponse = self::loginViaLinkedIn(
+            \OmegaUp\Controllers\Session::loginViaLinkedIn(
                 $code,
                 $state,
                 $redirect
-            ) ?? $redirect;
-        } elseif ($r->ensureOffsetExists('linkedin')) {
-            self::loginViaFacebook();
-        }
-
-        if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
-            if ($redirectResponse && self::shouldRedirect($redirectResponse)) {
-                header("Location: {$redirectResponse}");
-                die();
-            }
-            header('Location: /profile/');
-            die();
+            );
+        } elseif ($thirdPartyLogin === 'facebook') {
+            \OmegaUp\Controllers\Session::loginViaFacebook();
         }
 
         return [
@@ -3947,127 +3940,6 @@ class User extends \OmegaUp\Controllers\Controller {
             ],
             'entrypoint' => 'login_signin',
         ];
-    }
-
-    private static function shouldRedirect(string $url): bool {
-        $redirectParsedUrl = parse_url($url);
-        // If a malformed URL is given, don't redirect.
-        if ($redirectParsedUrl === false) {
-            return false;
-        }
-        // Just the path portion of the URL was given.
-        if (
-            empty($redirectParsedUrl['scheme']) ||
-            empty($redirectParsedUrl['host'])
-        ) {
-            return ($redirectParsedUrl['path'] ?? '') != '/logout/';
-        }
-        $redirectUrl = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
-        if (isset($redirectParsedUrl['port'])) {
-            $redirectUrl .= ":{$redirectParsedUrl['port']}";
-        }
-        return $redirectUrl === OMEGAUP_URL;
-    }
-
-    /**
-     * Logs in via Facebook API.
-     */
-    public static function loginViaFacebook(): void {
-        // Mostly taken from
-        // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $scopedFacebook = new \OmegaUp\ScopedFacebook();
-        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
-        try {
-            $accessToken = $helper->getAccessToken();
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            $errorMessage = $e->getMessage();
-            self::$log->error("Graph returned an error: {$errorMessage}");
-            throw $e;
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            $errorMessage = $e->getMessage();
-            self::$log->error(
-                "Facebook SDK returned an error: {$errorMessage}"
-            );
-            throw $e;
-        }
-
-        if (is_null($accessToken) && !is_null($helper->getError())) {
-            $errorDescription = $helper->getErrorDescription();
-            self::$log->error(
-                "Unable to login via Facebook: {$errorDescription}"
-            );
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterNotFound',
-                'token'
-            );
-        }
-
-        try {
-            $fbResponse = $scopedFacebook->facebook->get(
-                '/me?fields=name,email',
-                $accessToken
-            );
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            self::$log->error("Unable to login via Facebook: {$e}");
-            throw $e;
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            self::$log->error("Unable to login via Facebook: {$e}");
-            throw $e;
-        }
-
-        $fbUserProfile = $fbResponse->getGraphUser();
-        self::$log->info('User is logged in via facebook !!');
-        if (is_null($fbUserProfile->getEmail())) {
-            self::$log->error('Facebook email empty');
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'loginFacebookEmptyEmailError',
-                'error'
-            );
-        }
-
-        \OmegaUp\Controllers\Session::thirdPartyLogin(
-            'Facebook',
-            strval($fbUserProfile->getEmail()),
-            $fbUserProfile->getName()
-        );
-    }
-
-    public static function loginViaLinkedIn(
-        string $code,
-        string $state,
-        ?string $redirect
-    ): ?string {
-        try {
-            $li = self::getLinkedInInstance($redirect);
-            $authToken = $li->getAuthToken($code, $state);
-            $profile = $li->getProfileInfo($authToken);
-            $redirect = $li->extractRedirect($state);
-
-            \OmegaUp\Controllers\Session::thirdPartyLogin(
-                'LinkedIn',
-                $profile['emailAddress'],
-                "{$profile['firstName']} {$profile['lastName']}"
-            );
-            return $redirect;
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error("Unable to login via LinkedIn: $e");
-            throw $e;
-        }
-    }
-
-    private static function getLinkedInInstance(
-        ?string $redirect = null
-    ): \OmegaUp\LinkedIn {
-        return new \OmegaUp\LinkedIn(
-            OMEGAUP_LINKEDIN_CLIENTID,
-            OMEGAUP_LINKEDIN_SECRET,
-            OMEGAUP_URL . '/login?linkedin',
-            $redirect
-        );
-    }
-
-    public static function getLinkedInLoginUrl(): string {
-        return self::getLinkedInInstance()->getLoginUrl();
     }
 }
 
