@@ -1,24 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
-
-class ScopedFacebook {
-    /** @var \OmegaUp\ScopedSession */
-    public $scopedSession;
-    /** @var \Facebook\Facebook */
-    public $facebook;
-
-    public function __construct() {
-        require_once 'libs/third_party/facebook-php-graph-sdk/src/Facebook/autoload.php';
-
-        $this->scopedSession = new \OmegaUp\ScopedSession();
-        $this->facebook = new \Facebook\Facebook([
-            'app_id' => OMEGAUP_FB_APPID,
-            'app_secret' => OMEGAUP_FB_SECRET,
-            'default_graph_version' => 'v2.5',
-        ]);
-    }
-}
+namespace OmegaUp\Controllers;
 
 /**
  * Session controller handles sessions.
@@ -42,7 +24,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     public static function getFacebookLoginUrl(): string {
-        $scopedFacebook = new ScopedFacebook();
+        $scopedFacebook = new \OmegaUp\ScopedFacebook();
         $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         return $helper->getLoginUrl(OMEGAUP_URL . '/login?fb', ['email']);
     }
@@ -398,7 +380,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         string $email,
         ?string $name = null
     ): array {
-        return self::ThirdPartyLogin('Google', $email, $name);
+        return self::thirdPartyLogin('Google', $email, $name);
     }
 
     /**
@@ -409,7 +391,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function LoginViaFacebook(): array {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $scopedFacebook = new ScopedFacebook();
+        $scopedFacebook = new \OmegaUp\ScopedFacebook();
         $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
         try {
             $accessToken = $helper->getAccessToken();
@@ -453,7 +435,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             ];
         }
 
-        return self::ThirdPartyLogin(
+        return self::thirdPartyLogin(
             'Facebook',
             strval($fbUserProfile->getEmail()),
             $fbUserProfile->getName()
@@ -613,7 +595,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $_GET['redirect'] = $redirect;
             }
 
-            return self::ThirdPartyLogin(
+            return self::thirdPartyLogin(
                 'LinkedIn',
                 $profile['emailAddress'],
                 $profile['firstName'] . ' ' . $profile['lastName']
@@ -627,7 +609,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @return array<string, string>
      */
-    private static function ThirdPartyLogin(
+    public static function thirdPartyLogin(
         string $provider,
         string $email,
         ?string $name = null

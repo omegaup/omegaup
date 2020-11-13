@@ -109,6 +109,13 @@ class Request extends \ArrayObject {
     }
 
     /**
+     * Ensures the key is present in the request.
+     */
+    public function ensureOffsetExists(string $key): bool {
+        return self::offsetExists($key);
+    }
+
+    /**
      * Ensures that the value associated with the key is a bool.
      */
     public function ensureBool(
