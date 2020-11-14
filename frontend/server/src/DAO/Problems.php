@@ -1180,7 +1180,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<array{name: string, problems_per_tag: int}>
      */
-    final public static function getProblemsPerTagCount(): array {
+    final public static function getQualityProblemsPerTagCount(): array {
         $sql = "SELECT
                     t.name, COUNT(p.problem_id) AS problems_per_tag
                 FROM
