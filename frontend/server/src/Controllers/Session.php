@@ -398,7 +398,7 @@ class Session extends \OmegaUp\Controllers\Controller {
         string $email,
         ?string $name = null
     ): array {
-        return self::thirdPartyLogin('Google', $email, $name);
+        return self::thirdPartyLoginDeprecated('Google', $email, $name);
     }
 
     /**
@@ -463,11 +463,9 @@ class Session extends \OmegaUp\Controllers\Controller {
             $fbUserProfile->getName()
         );
 
-        if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
-            $redirectUrl = self::getRedirectUrl();
-            header("Location: {$redirectUrl}");
-            die();
-        }
+        $redirectUrl = self::getRedirectUrl();
+        header("Location: {$redirectUrl}");
+        die();
     }
 
     public static function loginViaLinkedIn(
@@ -486,15 +484,13 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $profile['emailAddress'],
                 "{$profile['firstName']} {$profile['lastName']}"
             );
-            if (\OmegaUp\Controllers\Session::currentSessionAvailable()) {
-                $redirectUrl = self::getRedirectUrl($redirect);
-                header("Location: {$redirectUrl}");
-                die();
-            }
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error("Unable to login via LinkedIn: $e");
             throw $e;
         }
+        $redirectUrl = self::getRedirectUrl($redirect);
+        header("Location: {$redirectUrl}");
+        die();
     }
 
     private static function getLinkedInInstance(
@@ -589,7 +585,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             ];
         }
 
-        return self::thirdPartyLogin(
+        return self::thirdPartyLoginDeprecated(
             'Facebook',
             strval($fbUserProfile->getEmail()),
             $fbUserProfile->getName()
@@ -750,7 +746,7 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $_GET['redirect'] = $redirect;
             }
 
-            return self::thirdPartyLogin(
+            return self::thirdPartyLoginDeprecated(
                 'LinkedIn',
                 $profile['emailAddress'],
                 $profile['firstName'] . ' ' . $profile['lastName']
@@ -764,7 +760,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @return array<string, string>
      */
-    public static function thirdPartyLogin(
+    private static function thirdPartyLoginDeprecated(
         string $provider,
         string $email,
         ?string $name = null
@@ -812,6 +808,54 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         self::registerSession($identity, $user);
         return ['status' => 'ok'];
+    }
+
+    private static function thirdPartyLogin(
+        string $provider,
+        string $email,
+        ?string $name = null
+    ): void {
+        // We trust this user's identity
+        self::$log->info("User is logged in via $provider");
+        $results = \OmegaUp\DAO\Identities::findByEmail($email);
+
+        if (!is_null($results)) {
+            self::$log->info("User has been here before with $provider");
+            $identity = $results;
+        } else {
+            // The user has never been here before, let's register them
+            self::$log->info("LoginVia$provider: Creating new user for $email");
+
+            $username = self::getUniqueUsernameFromEmail($email);
+
+            try {
+                \OmegaUp\Controllers\User::createUser(
+                    new \OmegaUp\CreateUserParams([
+                        'name' => (!is_null($name) ? $name : $username),
+                        'username' => $username,
+                        'email' => $email,
+                    ]),
+                    /*ignorePassword=*/true,
+                    /*forceVerification=*/true
+                );
+            } catch (\OmegaUp\Exceptions\ApiException $e) {
+                self::$log->error("Unable to login via $provider: $e");
+                throw $e;
+            }
+            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
+            if (is_null($identity)) {
+                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+            }
+        }
+        if (is_null($identity->username) || is_null($identity->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        self::registerSession($identity, $user);
     }
 
     public static function setSessionManagerForTesting(

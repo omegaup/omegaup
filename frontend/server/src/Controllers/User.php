@@ -3913,20 +3913,27 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
         $emailVerified = true;
-        $redirectResponse = null;
-        $thirdPartyLogin = $r->ensureString('third_party_login');
+        $thirdPartyLogin = $r->ensureOptionalString('third_party_login') ?? '';
+        if ($r->offsetExists('linkedin')) {
+            $thirdPartyLogin = 'linkedin';
+        } elseif ($r->offsetExists('facebook')) {
+            $thirdPartyLogin = 'facebook';
+        }
 
-        if ($thirdPartyLogin === 'linkedin') {
-            $code = $r->ensureString('code');
-            $state = $r->ensureString('state');
-            $redirect = $r->ensureString('redirect');
-            \OmegaUp\Controllers\Session::loginViaLinkedIn(
-                $code,
-                $state,
-                $redirect
-            );
-        } elseif ($thirdPartyLogin === 'facebook') {
-            \OmegaUp\Controllers\Session::loginViaFacebook();
+        try {
+            if ($thirdPartyLogin === 'linkedin') {
+                \OmegaUp\Controllers\Session::loginViaLinkedIn(
+                    $r->ensureString('code'),
+                    $r->ensureString('state'),
+                    $r->ensureString('redirect')
+                );
+            } elseif ($thirdPartyLogin === 'facebook') {
+                \OmegaUp\Controllers\Session::loginViaFacebook();
+            }
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            throw $e;
+        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
+            throw $e;
         }
 
         return [
