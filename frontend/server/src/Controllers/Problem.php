@@ -6190,7 +6190,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         return [
             'smartyProperties' => [
                 'payload' => [
-                    'authors_ranking' => $authorsRanking,
+                    'authorsRanking' => $authorsRanking,
                     'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
                     'currentTags' => $result['currentTags'],

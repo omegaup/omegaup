@@ -80,43 +80,6 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @param list<string> $authors
-     */
-    final private static function addAuthorFilter(
-        array $authors,
-        string &$sql,
-        array &$args,
-        array &$clauses
-    ): void {
-        $placeholders = array_fill(0, count($authors), '?');
-        $placeholders = join(',', $placeholders);
-        $sql .= "
-            INNER JOIN (
-                SELECT
-                    pp.problem_id
-                FROM
-                    Problems pp
-                INNER JOIN
-                    ACLs acl
-                ON
-                    pp.acl_id = acl.acl_id
-                INNER JOIN
-                    User_Rank ur
-                ON
-                    ur.user_id = acl.owner_id
-                WHERE ur.user_id IN (
-                    SELECT
-                        user_id
-                    FROM
-                        User_Rank
-                    WHERE username IN ($placeholders)
-                )
-            ) pa ON pa.problem_id = p.problem_id";
-
-        $args = array_merge($args, $authors);
-    }
-
-    /**
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
@@ -371,12 +334,31 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         }
 
         if (!empty($authors)) {
-            self::addAuthorFilter(
-                $authors,
-                $sql,
-                $args,
-                $clauses
-            );
+            $placeholders = join(',', array_fill(0, count($authors), '?'));
+            $sql .= "
+                INNER JOIN (
+                    SELECT
+                        pp.problem_id
+                    FROM
+                        Problems pp
+                    INNER JOIN
+                        ACLs acl
+                    ON
+                        pp.acl_id = acl.acl_id
+                    INNER JOIN
+                        User_Rank ur
+                    ON
+                        ur.user_id = acl.owner_id
+                    WHERE ur.user_id IN (
+                        SELECT
+                            user_id
+                        FROM
+                            User_Rank
+                        WHERE username IN ($placeholders)
+                    )
+                ) pa ON pa.problem_id = p.problem_id";
+
+            $args = array_merge($args, $authors);
         }
 
         if ($onlyQualitySeal) {
