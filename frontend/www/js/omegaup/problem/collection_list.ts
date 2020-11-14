@@ -72,6 +72,7 @@ OmegaUp.on('ready', () => {
             columnName: string,
             sortOrder: omegaup.SortOrder,
             difficulty: string,
+            tag: string[],
           ): void => {
             const queryParameters = {
               language,
@@ -79,6 +80,7 @@ OmegaUp.on('ready', () => {
               order_by: columnName,
               sort_order: sortOrder,
               difficulty,
+              tag,
             };
             window.location.replace(
               `/problem/collection/${payload.level}/?${ui.buildURLQuery(

@@ -101,7 +101,7 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         $userDb = \OmegaUp\DAO\AuthTokens::getUserByToken($r['auth_token']);
         $identityDb = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
             $r['auth_token']
-        );
+        )['loginIdentity'];
         $graduationDate = null;
         if (!is_null($identityDb['current_identity_school_id'])) {
             $identitySchool = \OmegaUp\DAO\IdentitiesSchools::getByPK(

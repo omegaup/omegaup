@@ -546,6 +546,7 @@ const translations: { [key: string]: string; } = {
   noCoders: "(N0 c0d3r5.)",
   nominationsRangeHeader: "(Pr0b13m r3p0r75 (fr0m %(lowCount) 70 %(highCount)))",
   notProblemLevelTag: "(Th3 7ag 53n7 i5 n07 a 13v31 7ag.)",
+  notificationCourseAddAdmin: "(Y0u hav3 b33n invi73d 70 b3 an admini57ra70r f0r c0ur53 %(courseName).)",
   notificationCourseRegistrationAccepted: "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **acc3p73d**.)",
   notificationCourseRegistrationManual: "(Y0u hav3 b33n invi73d 70 j0in 7h3 c0ur53 %(courseName).)",
   notificationCourseRegistrationRejected: "(Y0ur r3gi57ra7i0n r3qu357 f0r c0ur53 %(courseName) ha5 b33n **r3j3c73d**.)",

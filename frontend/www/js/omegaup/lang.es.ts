@@ -546,6 +546,7 @@ const translations: { [key: string]: string; } = {
   noCoders: "No hay coders",
   nominationsRangeHeader: "Reportes de problemas (del %(lowCount) al %(highCount))",
   notProblemLevelTag: "La etiqueta enviada no es una etiqueta de nivel.",
+  notificationCourseAddAdmin: "Has sido invitado a ser administrador del curso %(courseName).",
   notificationCourseRegistrationAccepted: "Tu solicitud de registro en el curso %(courseName) ha sido **aceptada**.",
   notificationCourseRegistrationManual: "Has sido invitado a unirte al curso %(courseName).",
   notificationCourseRegistrationRejected: "Tu solicitud de registro en el curso %(courseName) ha sido **rechazada**.",
