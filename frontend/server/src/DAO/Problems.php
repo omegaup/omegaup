@@ -1195,6 +1195,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     t.tag_id = pt.tag_id
                 WHERE
                     t.name LIKE CONCAT('problemLevel','%')
+                    AND p.quality_seal = 1
                 GROUP BY
                     t.name;";
 
