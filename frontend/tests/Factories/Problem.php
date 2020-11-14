@@ -52,7 +52,7 @@ class ProblemParams {
 
     /**
      * @readonly
-     * @var int
+     * @var bool
      */
     public $quality_seal;
 
@@ -85,7 +85,7 @@ class ProblemParams {
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
-        $this->quality_seal = $params['quality_seal'] ?? 0;
+        $this->quality_seal = $params['quality_seal'] ?? false;
         $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
             [
                 'tagname' => 'problemLevelBasicIntroductionToProgramming',
@@ -264,8 +264,8 @@ class Problem {
             }
             \OmegaUp\DAO\Problems::update($problem);
         }
-        if ($params->quality_seal == 1) {
-            $problem->quality_seal = 1;
+        if ($params->quality_seal === true) {
+            $problem->quality_seal = true;
             \OmegaUp\DAO\Problems::update($problem);
         }
 
