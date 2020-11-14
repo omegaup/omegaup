@@ -5970,7 +5970,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             $authors
         );
 
-        $frequentTags = \OmegaUp\Controllers\Tag::getFrequentTagsByLevel(
+        $frequentTags = \OmegaUp\Controllers\Tag::getFrequentQualityTagsByLevel(
             $collectionLevel,
             /*$rows=*/15
         );
