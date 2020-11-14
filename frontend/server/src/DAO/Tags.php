@@ -90,6 +90,8 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
                 Problems_Tags pt
             INNER JOIN
                 Tags t ON t.tag_id = pt.tag_id
+            INNER JOIN
+	            Problems p ON p.problem_id = pt.problem_id
             WHERE
                 pt.problem_id
             IN (
@@ -106,6 +108,8 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
                         WHERE name = ? )
             ) AND
                 name LIKE "problemTag%"
+            AND
+                p.quality_seal = 1
             GROUP BY
                 t.name
             ORDER BY
