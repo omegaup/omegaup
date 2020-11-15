@@ -54,7 +54,7 @@ class ProblemParams {
      * @readonly
      * @var bool
      */
-    public $quality_seal;
+    public $qualitySeal;
 
     /**
      * @readonly
@@ -75,7 +75,7 @@ class ProblemParams {
     public $validator;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
+     * @param array{allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -85,7 +85,7 @@ class ProblemParams {
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
-        $this->quality_seal = $params['quality_seal'] ?? false;
+        $this->qualitySeal = $params['quality_seal'] ?? false;
         $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
             [
                 'tagname' => 'problemLevelBasicIntroductionToProgramming',
@@ -165,6 +165,7 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
+            'quality_seal' => $params->qualitySeal;
             'problem_level' => $params->problemLevel,
             'selected_tags' => $params->selectedTags,
         ]);
@@ -264,8 +265,8 @@ class Problem {
             }
             \OmegaUp\DAO\Problems::update($problem);
         }
-        if ($params->quality_seal === true) {
-            $problem->quality_seal = true;
+        if ($params->qualitySeal === true) {
+            $problem->qualitySeal = true;
             \OmegaUp\DAO\Problems::update($problem);
         }
 
