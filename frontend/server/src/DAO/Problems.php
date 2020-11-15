@@ -83,6 +83,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
+     * @param list<string> $authors
      * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int, problem_id: int}>, count: int}
      */
     final public static function byIdentityType(
@@ -102,7 +103,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         ?array $difficultyRange,
         bool $onlyQualitySeal,
         ?string $level,
-        string $difficulty
+        string $difficulty,
+        array $authors
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -329,6 +331,34 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 $args,
                 $clauses
             );
+        }
+
+        if (!empty($authors)) {
+            $placeholders = join(',', array_fill(0, count($authors), '?'));
+            $sql .= "
+                INNER JOIN (
+                    SELECT
+                        pp.problem_id
+                    FROM
+                        Problems pp
+                    INNER JOIN
+                        ACLs acl
+                    ON
+                        pp.acl_id = acl.acl_id
+                    INNER JOIN
+                        User_Rank ur
+                    ON
+                        ur.user_id = acl.owner_id
+                    WHERE ur.user_id IN (
+                        SELECT
+                            user_id
+                        FROM
+                            User_Rank
+                        WHERE username IN ($placeholders)
+                    )
+                ) pa ON pa.problem_id = p.problem_id";
+
+            $args = array_merge($args, $authors);
         }
 
         if ($onlyQualitySeal) {
