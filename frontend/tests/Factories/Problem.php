@@ -165,7 +165,7 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
-            'quality_seal' => $params->qualitySeal;
+            'quality_seal' => $params->qualitySeal,
             'problem_level' => $params->problemLevel,
             'selected_tags' => $params->selectedTags,
         ]);
@@ -265,7 +265,7 @@ class Problem {
             }
             \OmegaUp\DAO\Problems::update($problem);
         }
-        if ($params->qualitySeal === true) {
+        if ($params->qualitySeal) {
             $problem->qualitySeal = true;
             \OmegaUp\DAO\Problems::update($problem);
         }

@@ -31,7 +31,7 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
-          :path="`/problem/collection/author/`"
+          :path="'/problem/collection/author/'"
           @apply-filter="
             (columnName, sortOrder) =>
               $emit('apply-filter', columnName, sortOrder, difficulty)
