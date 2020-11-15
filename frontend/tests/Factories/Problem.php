@@ -266,7 +266,7 @@ class Problem {
             \OmegaUp\DAO\Problems::update($problem);
         }
         if ($params->qualitySeal) {
-            $problem->qualitySeal = true;
+            $problem->quality_seal = true;
             \OmegaUp\DAO\Problems::update($problem);
         }
 
