@@ -22,8 +22,8 @@ class ScopedFacebook {
 
 /**
  * Session controller handles sessions.
- * @psalm-type AssociatedIdentity=array{username: string, default: bool}
- * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
+ * @psalm-type AssociatedIdentity=array{default: bool, username: string}
+ * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, auth_token: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
@@ -148,6 +148,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             'email' => null,
             'user' => null,
             'identity' => null,
+            'loginIdentity' => null,
             'classname' => 'user-rank-unranked',
             'auth_token' => null,
             'is_admin' => false,
@@ -156,22 +157,25 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (empty($authToken)) {
             return $emptySession;
         }
-
-        $currentIdentityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
-            $authToken
-        );
-        if (is_null($currentIdentityExt)) {
+        $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken($authToken);
+        if (is_null($identityExt)) {
             // Means user has auth token, but does not exist in DB
             return $emptySession;
         }
+        [
+            'currentIdentity' => $currentIdentityExt,
+            'loginIdentity' => $loginIdentityExt,
+        ] = $identityExt;
         $identityClassname = $currentIdentityExt['classname'];
         unset($currentIdentityExt['classname']);
+        unset($loginIdentityExt['classname']);
         $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
+        $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
+        $associatedIdentities = [];
         if (is_null($currentIdentity->user_id)) {
             $currentUser = null;
             $email = null;
-            $associatedIdentities = [];
         } else {
             $currentUser = \OmegaUp\DAO\Users::getByPK(
                 $currentIdentity->user_id
@@ -182,8 +186,11 @@ class Session extends \OmegaUp\Controllers\Controller {
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;
-            // TODO: Fill this variable with the result of function getAssociatedIdentities
-            $associatedIdentities = [];
+            if ($currentUser->main_identity_id === $loginIdentity->identity_id) {
+                $associatedIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
+                    $currentIdentity
+                );
+            }
         }
 
         return [
@@ -191,6 +198,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             'email' => !empty($email) ? $email->email : '',
             'user' => $currentUser,
             'identity' => $currentIdentity,
+            'loginIdentity' => $loginIdentity,
             'classname' => $identityClassname,
             'auth_token' => $authToken,
             'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
@@ -517,6 +525,60 @@ class Session extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             self::$log->error($e);
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
+        }
+    }
+
+    /**
+     * Does login for an identity given username or email. Password no needed
+     * because user should have a successful native login
+     *
+     * @omegaup-request-param null|string $auth_token
+     */
+    public static function loginWithAssociatedIdentity(
+        \OmegaUp\Request $r,
+        string $usernameOrEmail,
+        \OmegaUp\DAO\VO\Identities $loggedIdentity
+    ): void {
+        // Only users that originally logged in from their main identities can
+        // select another identity.
+        if (!$r->isLoggedAsMainIdentity()) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'userNotAllowed'
+            );
+        }
+
+        $currentSession = self::getCurrentSession($r);
+        if (is_null($currentSession['auth_token'])) {
+            self::$log->warn('Auth token not found.');
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'loginRequired'
+            );
+        }
+
+        $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
+            $usernameOrEmail,
+            $loggedIdentity
+        );
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            self::$log->warn("Identity {$usernameOrEmail} not found.");
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        self::$log->info(
+            "User {$loggedIdentity->username} has logged with associated identity {$identity->username}."
+        );
+
+        try {
+            \OmegaUp\DAO\AuthTokens::updateActingIdentityId(
+                $currentSession['auth_token'],
+                $identity->identity_id
+            );
+            self::invalidateCache();
+
+            self::getCurrentSession($r);
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            self::$log->error($e);
+            throw $e;
         }
     }
 

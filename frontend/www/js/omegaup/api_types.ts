@@ -1387,7 +1387,8 @@ export namespace types {
   }
 
   export interface CollectionDetailsByAuthorPayload {
-    authors: types.AuthorsRank;
+    authors: string[];
+    authorsRanking: types.AuthorsRank;
     column: string;
     columns: string[];
     currentTags: string[];
@@ -1901,6 +1902,7 @@ export namespace types {
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;
+    loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
   }

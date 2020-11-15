@@ -4,18 +4,39 @@
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-tags
-          :tags.sync="tags"
+          :selected-tags="selectedTags"
+          :tags="availableTags"
           :public-tags="publicTags"
+          @new-selected-tag="
+            (selectedTags) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
+          "
         ></omegaup-problem-filter-tags>
         <omegaup-problem-filter-difficulty
-          v-model="selectedDifficulty"
+          :selected-difficulty="difficulty"
+          @change-difficulty="
+            (difficulty) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
+          "
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
         <omegaup-problem-base-list
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="currentTags"
+          :current-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -31,7 +52,13 @@
           :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
           "
         >
         </omegaup-problem-base-list>
@@ -60,7 +87,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -73,11 +100,18 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) tagsList!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() difficulty!: string;
 
   T = T;
   level = this.data.level;
-  tags: string[] = this.data.frequentTags.map((element) => element.alias);
-  selectedDifficulty: null | string = null;
+
+  get availableTags(): string[] {
+    let tags: Set<string> = new Set(
+      this.data.frequentTags.map((element) => element.alias),
+    );
+    this.selectedTags.forEach((element) => tags.add(element));
+    return Array.from(tags);
+  }
 
   get publicTags(): string[] {
     let tags: string[] = this.data.frequentTags.map((x) => x.alias);
