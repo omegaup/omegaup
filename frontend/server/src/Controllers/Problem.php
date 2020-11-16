@@ -4875,7 +4875,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'smartyProperties' => [
                 'payload' => [
                     'levelTags' => \OmegaUp\Controllers\Tag::getLevelTags(),
-                    'problemCount' => \OmegaUp\DAO\Problems::getProblemsPerTagCount(),
+                    'problemCount' => \OmegaUp\DAO\Problems::getQualityProblemsPerTagCount(),
                     'allTags' => $tags,
                 ],
                 'title' => new \OmegaUp\TranslationString(

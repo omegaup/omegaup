@@ -64,7 +64,7 @@
                 <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
               </template>
               <template #button>
-                <a class="btn btn-primary" href="/problem/author/">{{
+                <a class="btn btn-primary" href="/problem/collection/author/">{{
                   T.problemcollectionViewProblems
                 }}</a>
               </template>

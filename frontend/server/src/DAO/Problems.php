@@ -1210,7 +1210,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @return list<array{name: string, problems_per_tag: int}>
      */
-    final public static function getProblemsPerTagCount(): array {
+    final public static function getQualityProblemsPerTagCount(): array {
         $sql = "SELECT
                     t.name, COUNT(p.problem_id) AS problems_per_tag
                 FROM
@@ -1225,6 +1225,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     t.tag_id = pt.tag_id
                 WHERE
                     t.name LIKE CONCAT('problemLevel','%')
+                    AND p.quality_seal = 1
                 GROUP BY
                     t.name;";
 
