@@ -70,7 +70,7 @@
               </template>
             </omegaup-problem-collection>
             <omegaup-problem-collection
-              :title="T.problemCollectionRandomProblem"
+              :title="T.problemCollectionRandomLanguageProblem"
             >
               <template #icon>
                 <font-awesome-icon
@@ -79,6 +79,20 @@
               </template>
               <template #button>
                 <a class="btn btn-primary" href="/problem/random/">{{
+                  T.problemcollectionViewProblems
+                }}</a>
+              </template>
+            </omegaup-problem-collection>
+            <omegaup-problem-collection
+              :title="T.problemCollectionRandomKarelProblem"
+            >
+              <template #icon>
+                <font-awesome-icon
+                  :icon="['fas', 'random']"
+                ></font-awesome-icon>
+              </template>
+              <template #button>
+                <a class="btn btn-primary" href="/problem/randomkarel/">{{
                   T.problemcollectionViewProblems
                 }}</a>
               </template>
