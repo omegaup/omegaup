@@ -21,6 +21,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $problemsTagsMapping = [
             [
                 'title' => 'problem_1',
+                'alias' => 'problem_1',
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'tags' => [
                     'problemTagMatrices',
@@ -30,6 +31,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_2',
+                'alias' => 'problem_2',
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'tags' => [
                     'problemTagMatrices',
@@ -39,6 +41,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_3',
+                'alias' => 'problem_3',
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'tags' => [
                     'problemTagMatrices',
@@ -47,6 +50,11 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 ],
             ],
         ];
+
+        // Reviewer user
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
 
         foreach ($problemsTagsMapping as $problemTags) {
             // Get the problem data
@@ -59,6 +67,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             // Assign data to the request
             $r = $problemData['request'];
             $r['title'] = $problemTags['title'];
+            $r['problem_alias'] = $problemTags['alias'];
             $problemAuthor = $problemData['author'];
 
             // Login user
@@ -72,7 +81,20 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Call the API
             \OmegaUp\Controllers\Problem::apiCreate($r);
+
+            // Review problem as quality problem
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemTags['alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => true,
+                    'tag' => $problemTags['level'],
+                ]),
+            ]));
         }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
 
         // Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -179,7 +201,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
             ])
-        )['smartyProperties']['payload']['authors']['ranking'];
+        )['smartyProperties']['payload']['authorsRanking']['ranking'];
 
         foreach ($result as $key) {
             $this->assertArrayHasKey('author_ranking', $key);
