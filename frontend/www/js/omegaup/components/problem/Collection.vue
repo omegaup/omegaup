@@ -78,7 +78,7 @@
                 ></font-awesome-icon>
               </template>
               <template #button>
-                <a class="btn btn-primary" href="/problem/random/">{{
+                <a class="btn btn-primary" href="/problem/random/allproblems">{{
                   T.problemcollectionViewProblems
                 }}</a>
               </template>
@@ -92,7 +92,7 @@
                 ></font-awesome-icon>
               </template>
               <template #button>
-                <a class="btn btn-primary" href="/problem/randomkarel/">{{
+                <a class="btn btn-primary" href="/problem/random/karel/">{{
                   T.problemcollectionViewProblems
                 }}</a>
               </template>
