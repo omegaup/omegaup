@@ -1238,6 +1238,7 @@ const translations: { [key: string]: string; } = {
   wordsAlias: "Alias",
   wordsAll: "Todos",
   wordsAnswer: "Respuesta",
+  wordsAny: "Cualquiera",
   wordsAnyLanguage: "Cualquier Lenguaje",
   wordsAuthor: "Autor",
   wordsBack: "Atr\u00e1s",

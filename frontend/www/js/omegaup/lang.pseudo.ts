@@ -1238,6 +1238,7 @@ const translations: { [key: string]: string; } = {
   wordsAlias: "(A1ia5)",
   wordsAll: "(A11)",
   wordsAnswer: "(An5w3r)",
+  wordsAny: "(Any)",
   wordsAnyLanguage: "(Any Languag3)",
   wordsAuthor: "(Au7h0r)",
   wordsBack: "(Back)",
