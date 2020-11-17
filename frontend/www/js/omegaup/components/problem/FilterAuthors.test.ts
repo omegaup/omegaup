@@ -11,12 +11,22 @@ describe('Filter.vue', () => {
     const wrapper = mount(problem_FilterAuthors, {
       propsData: {
         authors: {
-            total: 1,
-            ranking: [
-              { author_score: 90, name: 'User', username: 'user', classname: 'user-rank-master' },
-              { author_score: 100, name: 'User 2', username: 'user2', classname: 'user-rank-master' },
-            ],
-          } as types.AuthorsRank,
+          total: 1,
+          ranking: [
+            {
+              author_score: 90,
+              name: 'User',
+              username: 'user',
+              classname: 'user-rank-master',
+            },
+            {
+              author_score: 100,
+              name: 'User 2',
+              username: 'user2',
+              classname: 'user-rank-master',
+            },
+          ],
+        } as types.AuthorsRank,
       },
     });
 
