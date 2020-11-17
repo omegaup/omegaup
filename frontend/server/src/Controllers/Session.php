@@ -462,10 +462,6 @@ class Session extends \OmegaUp\Controllers\Controller {
             strval($fbUserProfile->getEmail()),
             $fbUserProfile->getName()
         );
-
-        $redirectUrl = self::getRedirectUrl();
-        header("Location: {$redirectUrl}");
-        die();
     }
 
     public static function loginViaLinkedIn(
@@ -478,19 +474,16 @@ class Session extends \OmegaUp\Controllers\Controller {
             $authToken = $li->getAuthToken($code, $state);
             $profile = $li->getProfileInfo($authToken);
             $redirect = $li->extractRedirect($state);
-
-            \OmegaUp\Controllers\Session::thirdPartyLogin(
-                'LinkedIn',
-                $profile['emailAddress'],
-                "{$profile['firstName']} {$profile['lastName']}"
-            );
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             self::$log->error("Unable to login via LinkedIn: $e");
             throw $e;
         }
-        $redirectUrl = self::getRedirectUrl($redirect);
-        header("Location: {$redirectUrl}");
-        die();
+        \OmegaUp\Controllers\Session::thirdPartyLogin(
+            'LinkedIn',
+            $profile['emailAddress'],
+            "{$profile['firstName']} {$profile['lastName']}",
+            $redirect
+        );
     }
 
     private static function getLinkedInInstance(
@@ -813,7 +806,8 @@ class Session extends \OmegaUp\Controllers\Controller {
     private static function thirdPartyLogin(
         string $provider,
         string $email,
-        ?string $name = null
+        ?string $name = null,
+        ?string $redirect = null
     ): void {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
@@ -856,6 +850,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         self::registerSession($identity, $user);
+
+        $redirectUrl = self::getRedirectUrl($redirect);
+        header("Location: {$redirectUrl}");
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     public static function setSessionManagerForTesting(

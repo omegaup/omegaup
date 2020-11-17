@@ -26,7 +26,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
- * @psalm-type LoginDetailsPayload=array{facebookURL: string, linkedinURL: string, validateRecaptcha: bool}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3913,13 +3913,14 @@ class User extends \OmegaUp\Controllers\Controller {
      */
     public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
         $emailVerified = true;
-        $thirdPartyLogin = $r->ensureOptionalString('third_party_login') ?? '';
+        $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('linkedin')) {
             $thirdPartyLogin = 'linkedin';
         } elseif ($r->offsetExists('facebook')) {
             $thirdPartyLogin = 'facebook';
         }
 
+        $statusError = [];
         try {
             if ($thirdPartyLogin === 'linkedin') {
                 \OmegaUp\Controllers\Session::loginViaLinkedIn(
@@ -3931,22 +3932,23 @@ class User extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Controllers\Session::loginViaFacebook();
             }
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            throw $e;
-        } catch (\OmegaUp\Exceptions\NotFoundException $e) {
-            throw $e;
-        }
-
-        return [
-            'smartyProperties' => [
-                'payload' => [
-                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
-                    'facebookURL' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
-                    'linkedinURL' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
+            \OmegaUp\ApiCaller::logException($e);
+            $statusError = ['statusError' => $e->getErrorMessage()];
+        } finally {
+            return [
+                'smartyProperties' => [
+                    'payload' => array_merge($statusError, [
+                        'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                        'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                        'linkedinUrl' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
+                    ]),
+                    'title' => new \OmegaUp\TranslationString(
+                        'omegaupTitleLogin'
+                    ),
                 ],
-                'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
-            ],
-            'entrypoint' => 'login_signin',
-        ];
+                'entrypoint' => 'login_signin',
+            ];
+        }
     }
 }
 
