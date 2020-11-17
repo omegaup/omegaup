@@ -1407,7 +1407,6 @@ export namespace types {
   export interface CollectionDetailsByLevelPayload {
     column: string;
     columns: string[];
-    currentTags: string[];
     difficulty: string;
     frequentTags: { alias: string; name?: string }[];
     keyword: string;
@@ -1420,6 +1419,7 @@ export namespace types {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     publicTags: string[];
+    selectedTags: string[];
     tagData: { name?: string }[];
     tagsList: string[];
   }
