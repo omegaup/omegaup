@@ -380,33 +380,40 @@ export default class Runsv2 extends Vue {
     ) {
       return this.runs;
     }
-    return this.runs.reverse().filter((run) => {
-      if (this.filterVerdict) {
-        if (this.filterVerdict == 'NO-AC') {
-          if (run.verdict == 'AC') {
+    return this.sortedRuns;
+  }
+
+  get sortedRuns(): types.Run[] {
+    return this.runs
+      .slice()
+      .sort()
+      .filter((run) => {
+        if (this.filterVerdict) {
+          if (this.filterVerdict == 'NO-AC') {
+            if (run.verdict == 'AC') {
+              return false;
+            }
+          } else if (run.verdict != this.filterVerdict) {
             return false;
           }
-        } else if (run.verdict != this.filterVerdict) {
+        }
+        if (this.filterLanguage && run.language !== this.filterLanguage) {
           return false;
         }
-      }
-      if (this.filterLanguage && run.language !== this.filterLanguage) {
-        return false;
-      }
-      if (this.filterProblem && run.alias !== this.filterProblem) {
-        return false;
-      }
-      if (this.filterStatus && run.status !== this.filterStatus) {
-        return false;
-      }
-      if (this.filterUsername && run.username !== this.filterUsername) {
-        return false;
-      }
-      if (this.filterContest && run.contest_alias !== this.filterContest) {
-        return false;
-      }
-      return true;
-    });
+        if (this.filterProblem && run.alias !== this.filterProblem) {
+          return false;
+        }
+        if (this.filterStatus && run.status !== this.filterStatus) {
+          return false;
+        }
+        if (this.filterUsername && run.username !== this.filterUsername) {
+          return false;
+        }
+        if (this.filterContest && run.contest_alias !== this.filterContest) {
+          return false;
+        }
+        return true;
+      });
   }
 
   get newSubmissionUrl(): string {
