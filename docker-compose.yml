@@ -46,7 +46,7 @@ services:
     build:
       dockerfile: ./Dockerfile.broadcaster
       context: ./stuff/docker/
-    image: omegaup/dev-broadcaster:20201107
+    image: omegaup/dev-broadcaster:20201116
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -60,7 +60,7 @@ services:
     build:
       dockerfile: ./Dockerfile.grader
       context: ./stuff/docker/
-    image: omegaup/dev-grader:20201107
+    image: omegaup/dev-grader:20201116
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -75,7 +75,7 @@ services:
     build:
       dockerfile: ./Dockerfile.runner
       context: ./stuff/docker/
-    image: omegaup/dev-runner:20201107
+    image: omegaup/dev-runner:20201116
     user: "${UID_GID}"
     restart: always
     depends_on:
