@@ -44,7 +44,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
     /**
      * Returns each problem with the statistics of the runs submmited by the students
      *
-     * @return list<array{assignment_alias: string, assignment_id: int, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
+     * @return list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}>
      */
     public static function getAssignmentsProblemsStatistics(
         int $courseId,
@@ -124,7 +124,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             bpr.assignment_id, bpr.order, bpr.problem_id;
         ';
 
-        /** @var list<array{assignment_alias: string, assignment_id: int, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
+        /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
         $results = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [ $courseId, $groupId ]
