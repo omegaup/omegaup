@@ -75,6 +75,7 @@ module.exports = {
     logout: './frontend/www/js/omegaup/login/logout.ts',
     problem_collection: './frontend/www/js/omegaup/problem/collection.ts',
     problem_collection_list: './frontend/www/js/omegaup/problem/collection_list.ts',
+    problem_collection_list_by_author: './frontend/www/js/omegaup/problem/collection_list_by_author.ts',
     problem_edit: './frontend/www/js/omegaup/problem/edit.ts',
     problem_details: './frontend/www/js/omegaup/problem/details.ts',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',

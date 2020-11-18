@@ -8,6 +8,10 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\FileHandler::setFileUploaderForTesting(
             $this->createFileUploaderMock()
         );
+
+        // Reviewers
+        \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
+        \OmegaUp\Test\Factories\QualityNomination::initTopicTags();
     }
 
     /**
@@ -34,6 +38,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
         $problemsTagsMapping = [
             [
                 'title' => 'problem_1',
+                'alias' => 'problem_1',
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'tags' => [
                     'problemTagMatrices',
@@ -43,6 +48,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_2',
+                'alias' => 'problem_2',
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'tags' => [
                     'problemTagMatrices',
@@ -51,6 +57,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_3',
+                'alias' => 'problem_3',
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'tags' => [
                     'problemTagMatrices',
@@ -60,6 +67,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_4',
+                'alias' => 'problem_4',
                 'level' => 'problemLevelBasicIntroductionToProgramming',
                 'tags' => [
                     'problemTagMatrices',
@@ -68,6 +76,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_5',
+                'alias' => 'problem_5',
                 'level' => 'problemLevelIntermediateMathsInProgramming',
                 'tags' => [
                     'problemTagModularArithmetic',
@@ -76,6 +85,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_6',
+                'alias' => 'problem_6',
                 'level' => 'problemLevelIntermediateMathsInProgramming',
                 'tags' => [
                     'problemTagModularArithmetic',
@@ -84,12 +94,18 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
             ],
             [
                 'title' => 'problem_7',
+                'alias' => 'problem_7',
                 'level' => 'problemLevelIntermediateMathsInProgramming',
                 'tags' => [
                     'problemTagModularArithmetic',
                 ],
             ],
         ];
+
+        // Reviewer user
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
 
         foreach ($problemsTagsMapping as $problemTags) {
             // Get the problem data
@@ -102,6 +118,7 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
             // Assign data to the request
             $r = $problemData['request'];
             $r['title'] = $problemTags['title'];
+            $r['problem_alias'] = $problemTags['alias'];
             $problemAuthor = $problemData['author'];
 
             // Login user
@@ -115,7 +132,20 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
 
             // Call the API
             \OmegaUp\Controllers\Problem::apiCreate($r);
+
+            // Review problem as quality problem
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problemTags['alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => true,
+                    'tag' => $problemTags['level'],
+                ]),
+            ]));
         }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
 
         // Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -125,7 +155,8 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
         $request = \OmegaUp\Controllers\Tag::apiFrequentTags(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'problemLevel' => 'problemLevelBasicIntroductionToProgramming'
+                'problemLevel' => 'problemLevelBasicIntroductionToProgramming',
+                'rows' => 15
             ])
         );
 

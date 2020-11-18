@@ -267,6 +267,7 @@ export default class BaseList extends Vue {
   @Prop() tags!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() path!: string;
 
   T = T;
   ui = ui;
@@ -288,10 +289,10 @@ export default class BaseList extends Vue {
   ];
 
   hrefForProblemTag(currentTags: string[], problemTag: string): string {
-    if (!currentTags) return `/problem/?tag[]=${problemTag}`;
+    if (!currentTags) return `${this.path}?tag[]=${problemTag}`;
     let tags = currentTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
-    return `/problem/?tag[]=${tags.join('&tag[]=')}`;
+    return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
   }
 }
 </script>

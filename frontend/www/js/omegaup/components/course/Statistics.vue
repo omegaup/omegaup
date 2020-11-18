@@ -142,6 +142,8 @@ export default class Statistics extends Vue {
     return {
       chart: {
         type: 'bar',
+        height:
+          this.problems.length < 15 ? null : `${this.problems.length * 3}%`,
       },
       title: {
         text: T.courseStatisticsVerdicts,
@@ -161,6 +163,7 @@ export default class Statistics extends Vue {
       plotOptions: {
         series: {
           stacking: 'normal',
+          pointWidth: 15,
         },
         bar: {
           dataLabels: {
@@ -295,6 +298,7 @@ export default class Statistics extends Vue {
     return {
       chart: {
         type: 'bar',
+        height: data.length < 15 ? null : `${data.length * 3}%`,
       },
       title: {
         text: title,
@@ -322,6 +326,7 @@ export default class Statistics extends Vue {
         {
           name: yName,
           data: data,
+          pointWidth: 15,
         },
       ],
     };

@@ -34,8 +34,8 @@ OmegaUp.on('ready', () => {
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
-  if (payload.errorMessage) {
-    ui.error(payload.errorMessage);
+  if (payload.statusError) {
+    ui.error(payload.statusError);
   }
   new Vue({
     el: '#main-container',

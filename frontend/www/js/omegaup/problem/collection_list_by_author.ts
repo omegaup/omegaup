@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import problem_CollectionList from '../components/problem/CollectionList.vue';
+import problem_CollectionListAuthor from '../components/problem/CollectionListAuthor.vue';
 import { types } from '../api_types';
 import { omegaup, OmegaUp } from '../omegaup';
 import * as ui from '../ui';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.CollectionDetailsByLevelPayload();
+  const payload = types.payloadParsers.CollectionDetailsByAuthorPayload();
   const queryString = window.location.search;
   let sortOrder = 'desc';
   let columnName = 'problem_id';
@@ -48,10 +48,10 @@ OmegaUp.on('ready', () => {
   new Vue({
     el: '#main-container',
     components: {
-      'omegaup-problem-collection-list': problem_CollectionList,
+      'omegaup-problem-collection-list-author': problem_CollectionListAuthor,
     },
     render: function (createElement) {
-      return createElement('omegaup-problem-collection-list', {
+      return createElement('omegaup-problem-collection-list-author', {
         props: {
           data: payload,
           problems: payload.problems,
@@ -62,7 +62,6 @@ OmegaUp.on('ready', () => {
           language: payload.language,
           languages: payload.languages,
           keyword: payload.keyword,
-          tagsList: payload.tagsList,
           sortOrder: sortOrder,
           columnName: columnName,
           difficulty: difficulty,
@@ -72,7 +71,6 @@ OmegaUp.on('ready', () => {
             columnName: string,
             sortOrder: omegaup.SortOrder,
             difficulty: string,
-            tag: string[],
           ): void => {
             const queryParameters = {
               language,
@@ -80,10 +78,9 @@ OmegaUp.on('ready', () => {
               order_by: columnName,
               sort_order: sortOrder,
               difficulty,
-              tag,
             };
             window.location.replace(
-              `/problem/collection/${payload.level}/?${ui.buildURLQuery(
+              `/problem/collection/author/?${ui.buildURLQuery(
                 queryParameters,
               )}`,
             );

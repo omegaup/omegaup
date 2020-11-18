@@ -478,7 +478,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $run = new \OmegaUp\DAO\VO\Runs([
             'version' => $problem->current_version,
             'commit' => $problem->commit,
-            'status' => 'new',
+            'status' => 'uploading',
             'runtime' => 0,
             'penalty' => $submitDelay,
             'time' => \OmegaUp\Time::get(),
@@ -750,15 +750,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         self::$log->info("Run {$run->run_id} being rejudged");
 
         // Reset fields.
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-            $run->status = 'new';
-            \OmegaUp\DAO\Runs::update($run);
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        $run->status = 'new';
+        \OmegaUp\DAO\Runs::update($run);
 
         try {
             \OmegaUp\Grader::getInstance()->rejudge(
@@ -847,7 +840,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             // We did our best effort to invalidate the cache...
             self::$log->warn(
-                'Failed to invalidate cache on Rejudge, skipping: '
+                "Failed to invalidate cache on rejudge {$run->run_id}, skipping: ",
+                $e
             );
             self::$log->warn($e);
         }
