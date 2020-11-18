@@ -3947,26 +3947,6 @@ class User extends \OmegaUp\Controllers\Controller {
         }
         return $response;
     }
-
-    private static function shouldRedirect(string $url): bool {
-        $redirectParsedUrl = parse_url($url);
-        // If a malformed URL is given, don't redirect.
-        if ($redirectParsedUrl === false) {
-            return false;
-        }
-        // Just the path portion of the URL was given.
-        if (
-            empty($redirectParsedUrl['scheme']) ||
-            empty($redirectParsedUrl['host'])
-        ) {
-            return ($redirectParsedUrl['path'] ?? '') != '/logout/';
-        }
-        $redirectUrl = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
-        if (isset($redirectParsedUrl['port'])) {
-            $redirectUrl .= ":{$redirectParsedUrl['port']}";
-        }
-        return $redirectUrl === OMEGAUP_URL;
-    }
 }
 
 \OmegaUp\Controllers\User::$urlHelper = new \OmegaUp\UrlHelper();
