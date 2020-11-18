@@ -35,7 +35,7 @@ export default class FilterDifficulty extends Vue {
 
   difficulties: { [key: string]: { name: string; id: string } } = {
     anyDifficulty: {
-      name: T.wordsAny,
+      name: T.qualityFormDifficultyAny,
       id: 'all',
     },
     difficultyEasy: {

@@ -13,7 +13,7 @@ describe('FilterDifficulty.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.wordsAny);
+    expect(wrapper.text()).toContain(T.qualityFormDifficultyAny);
     expect(wrapper.text()).toContain(T.qualityFormDifficultyEasy);
     expect(wrapper.text()).toContain(T.qualityFormDifficultyMedium);
     expect(wrapper.text()).toContain(T.qualityFormDifficultyHard);
