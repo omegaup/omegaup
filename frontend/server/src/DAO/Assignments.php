@@ -54,7 +54,6 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         SELECT
             bpr.assignment_alias,
             bpr.problem_alias,
-            bpr.assignment_id,
             VARIANCE(bpr.max_user_score_for_problem) AS variance,
             AVG(bpr.max_user_score_for_problem) AS average,
             AVG(
