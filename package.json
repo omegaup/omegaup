@@ -6,9 +6,9 @@
   "private": true,
   "devDependencies": {
     "@babel/cli": "^7.10",
-    "@babel/core": "^7.11",
+    "@babel/core": "^7.12.3",
     "@babel/parser": "^7.11",
-    "@babel/preset-env": "^7.11",
+    "@babel/preset-env": "^7.12.1",
     "@babel/preset-typescript": "^7.10",
     "@babel/traverse": "^7.11",
     "@babel/types": "^7.11",
@@ -24,6 +24,7 @@
     "@typescript-eslint/parser": "^4.3.0",
     "@voerro/vue-tagsinput": "^2.0.2",
     "@vue/test-utils": "^1.0.3",
+    "babel-jest": "^26.6.3",
     "babel-loader": "^8.0.5",
     "copy-webpack-plugin": "^6.0",
     "core-js": "^3.6.5",
@@ -40,6 +41,7 @@
     "highcharts-vue": "^1.3.5",
     "html-webpack-plugin": "^4.0.0-beta.11",
     "istanbul-instrumenter-loader": "^3.0.1",
+    "jest": "^26.6.3",
     "jquery": "^3.5.1",
     "jsdom": "^15.2.1",
     "jsdom-global": "^3.0.2",
@@ -71,8 +73,8 @@
     "wrapper-webpack-plugin": "^2.0.0"
   },
   "scripts": {
-    "test": "mochapack --webpack-config webpack.config-test.js --require frontend/www/js/omegaup/test.setup.js 'frontend/www/js/**/*.test.ts'",
-    "test:watch": "mochapack --watch --webpack-config webpack.config-test.js --require frontend/www/js/omegaup/test.setup.js 'frontend/www/js/**/*.test.ts'",
+    "test": "jest --notify --config=babel.config.js -t 'frontend/www/js/**/*.test.ts'",
+    "test:watch": "jest --watchAll --notify --config=babel.config.js -t 'frontend/www/js/**/*.test.ts'",
     "test:coverage": "cross-env NODE_ENV=coverage NODE_OPTIONS=--max-old-space-size=6144 nyc --reporter=json --reporter=text yarn run test",
     "dev": "cross-env webpack --config-name=frontend --mode=development --display=minimal --display-chunk=false --color=true",
     "dev:watch": "cross-env webpack --config-name=frontend --watch --mode=development --display=minimal --display-chunk=false --color=true",
