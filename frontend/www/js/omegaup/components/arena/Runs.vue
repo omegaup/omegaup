@@ -373,15 +373,8 @@ export default class Runs extends Vue {
     ) {
       return this.runs;
     }
-    return this.sortedRuns;
-  }
-
-  get sortedRuns(): types.Run[] {
-    return this.runs
-      .slice()
-      .sort()
-      .filter((run) => {
-        if (this.filterVerdict) {
+    return this.runs.filter((run) => {
+      if (this.filterVerdict) {
           if (this.filterVerdict == 'NO-AC') {
             if (run.verdict == 'AC') {
               return false;
@@ -407,6 +400,12 @@ export default class Runs extends Vue {
         }
         return true;
       });
+  }
+
+  get sortedRuns(): types.Run[] {
+    return this.runs
+      .slice()
+      .sort(/* aquí debería haber una función anónima que haga el ordenamiento */);
   }
 
   get newSubmissionUrl(): string {
