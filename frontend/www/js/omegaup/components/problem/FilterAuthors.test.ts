@@ -6,8 +6,8 @@ import T from '../../lang';
 
 import problem_FilterAuthors from './FilterAuthors.vue';
 
-describe('Filter.vue', () => {
-  it('Should handle empty list of authors', async () => {
+describe('FilterAuthors.vue', () => {
+  it('Should handle list of authors', async () => {
     const wrapper = mount(problem_FilterAuthors, {
       propsData: {
         authors: {
@@ -15,8 +15,8 @@ describe('Filter.vue', () => {
           ranking: [
             {
               author_score: 90,
-              name: 'User',
-              username: 'user',
+              name: 'User 1',
+              username: 'user1',
               classname: 'user-rank-master',
             },
             {
@@ -32,7 +32,23 @@ describe('Filter.vue', () => {
 
     expect(wrapper.text()).toContain(T.problemCollectionAuthors);
 
-    expect(wrapper.find('input[value="user"]').exists()).toBe(true);
+    expect(wrapper.find('input[value="user1"]').exists()).toBe(true);
     expect(wrapper.find('input[value="user2"]').exists()).toBe(true);
+
+    const checkboxInput1 = <HTMLInputElement>(
+      wrapper.find('input[value="user1"]').element
+    );
+    const checkboxInput2 = <HTMLInputElement>(
+      wrapper.find('input[value="user2"]').element
+    );
+
+    checkboxInput1.click();
+    expect(checkboxInput1.checked).toBeTruthy();
+    expect(checkboxInput2.checked).toBeFalsy();
+
+    checkboxInput1.click();
+    checkboxInput2.click();
+    expect(checkboxInput1.checked).toBeFalsy();
+    expect(checkboxInput2.checked).toBeTruthy();
   });
 });
