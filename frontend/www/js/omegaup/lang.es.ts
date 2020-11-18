@@ -987,6 +987,7 @@ const translations: { [key: string]: string; } = {
   publicTagsPlaceholder: "Ej. Recursi\u00f3n, \u00c1rboles de segmentos, B\u00fasqueda binaria",
   qualityFormCongrats: "\u00a1Felicidades por resolver este problema!",
   qualityFormDifficulty: "\u00bfQu\u00e9 tan dif\u00edcil te pareci\u00f3 este problema?",
+  qualityFormDifficultyAny: "Cualquiera",
   qualityFormDifficultyEasy: "F\u00e1cil",
   qualityFormDifficultyHard: "Dif\u00edcil",
   qualityFormDifficultyMedium: "Medio",

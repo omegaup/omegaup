@@ -985,6 +985,7 @@ publicCourseInformationDescription = "Cursos sob demanda que o omegaUp oferece g
 publicTagsPlaceholder = "Ex. Recursão, Árvore de segmentos, Pesquisa Binária"
 qualityFormCongrats = "Parabéns por resolver esta problema!"
 qualityFormDifficulty = "Quão difícil você achou esse problema?"
+qualityFormDifficultyAny = "Qualquer"
 qualityFormDifficultyEasy = "Fácil"
 qualityFormDifficultyHard = "Difícil"
 qualityFormDifficultyMedium = "Médio"

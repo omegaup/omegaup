@@ -987,6 +987,7 @@ const translations: { [key: string]: string; } = {
   publicTagsPlaceholder: "Ex. Recursion, Segment Trees, Binary Search",
   qualityFormCongrats: "Congratulations for solving this problem!",
   qualityFormDifficulty: "How difficult did you find this problem?",
+  qualityFormDifficultyAny: "Any",
   qualityFormDifficultyEasy: "Easy",
   qualityFormDifficultyHard: "Hard",
   qualityFormDifficultyMedium: "Medium",

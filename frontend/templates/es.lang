@@ -985,6 +985,7 @@ publicCourseInformationDescription = "Cursos de programación bajo demanda que o
 publicTagsPlaceholder = "Ej. Recursión, Árboles de segmentos, Búsqueda binaria"
 qualityFormCongrats = "¡Felicidades por resolver este problema!"
 qualityFormDifficulty = "¿Qué tan difícil te pareció este problema?"
+qualityFormDifficultyAny = "Cualquiera"
 qualityFormDifficultyEasy = "Fácil"
 qualityFormDifficultyHard = "Difícil"
 qualityFormDifficultyMedium = "Medio"
