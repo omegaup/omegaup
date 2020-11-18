@@ -1233,15 +1233,47 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
     }
 
-    final public static function getRandomProblemAlias(): string {
-        $sql = 'SELECT
+    final public static function getRandomLanguageProblemAlias(): string {
+        $sql = "SELECT
                     alias
                 FROM
-                    Problems
+                    Problems p
+                    INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
                 WHERE
                     quality_seal = 1
+                    AND (t.name LIKE CONCAT('problemLevel','%') AND t.name NOT LIKE 'problemLevelBasicKarel')
                 ORDER BY
-                    RAND() LIMIT 1;';
+                    RAND() LIMIT 1;";
+
+        /** @var string */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    final public static function getRandomKarelProblemAlias(): string {
+        $sql = "SELECT
+                    alias
+                FROM
+                    Problems p
+                    INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
+                WHERE
+                    quality_seal = 1
+                    AND t.name = 'problemLevelBasicKarel'
+                ORDER BY
+                    RAND() LIMIT 1;";
 
         /** @var string */
         return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
