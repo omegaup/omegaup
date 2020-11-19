@@ -32,35 +32,42 @@
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
-        <omegaup-problem-base-list
-          :problems="problems"
-          :logged-in="loggedIn"
-          :current-tags="currentTags"
-          :pager-items="pagerItems"
-          :wizard-tags="wizardTags"
-          :language="language"
-          :languges="languages"
-          :keyword="keyword"
-          :modes="modes"
-          :columns="columns"
-          :mode="modes"
-          :column="column"
-          :tags="tagsList"
-          :sort-order="sortOrder"
-          :column-name="columnName"
-          :path="'/problem/collection/author/'"
-          @apply-filter="
-            (columnName, sortOrder) =>
-              $emit(
-                'apply-filter',
-                columnName,
-                sortOrder,
-                difficulty,
-                selectedAuthors,
-              )
-          "
-        >
-        </omegaup-problem-base-list>
+        <div v-if="problems.length == 0" class="card-body">
+          <div class="empty-table-message">
+            {{ T.courseAssignmentProblemsEmpty }}
+          </div>
+        </div>
+        <div v-else>
+          <omegaup-problem-base-list
+            :problems="problems"
+            :logged-in="loggedIn"
+            :current-tags="currentTags"
+            :pager-items="pagerItems"
+            :wizard-tags="wizardTags"
+            :language="language"
+            :languges="languages"
+            :keyword="keyword"
+            :modes="modes"
+            :columns="columns"
+            :mode="modes"
+            :column="column"
+            :tags="tagsList"
+            :sort-order="sortOrder"
+            :column-name="columnName"
+            :path="'/problem/collection/author/'"
+            @apply-filter="
+              (columnName, sortOrder) =>
+                $emit(
+                  'apply-filter',
+                  columnName,
+                  sortOrder,
+                  difficulty,
+                  selectedAuthors,
+                )
+            "
+          >
+          </omegaup-problem-base-list>
+        </div>
       </div>
     </div>
   </div>
