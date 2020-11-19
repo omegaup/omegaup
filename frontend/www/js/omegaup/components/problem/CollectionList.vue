@@ -33,42 +33,41 @@
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
-        <div v-if="problems.length == 0" class="card-body">
+        <div v-if="!problems || problems.length == 0" class="card-body">
           <div class="empty-table-message">
             {{ T.courseAssignmentProblemsEmpty }}
           </div>
         </div>
-        <div v-else>
-          <omegaup-problem-base-list
-            :problems="problems"
-            :logged-in="loggedIn"
-            :current-tags="selectedTags"
-            :pager-items="pagerItems"
-            :wizard-tags="wizardTags"
-            :language="language"
-            :languges="languages"
-            :keyword="keyword"
-            :modes="modes"
-            :columns="columns"
-            :mode="modes"
-            :column="column"
-            :tags="tagsList"
-            :sort-order="sortOrder"
-            :column-name="columnName"
-            :path="`/problem/collection/${level}/`"
-            @apply-filter="
-              (columnName, sortOrder) =>
-                $emit(
-                  'apply-filter',
-                  columnName,
-                  sortOrder,
-                  difficulty,
-                  selectedTags,
-                )
-            "
-          >
-          </omegaup-problem-base-list>
-        </div>
+        <omegaup-problem-base-list
+          v-else
+          :problems="problems"
+          :logged-in="loggedIn"
+          :current-tags="selectedTags"
+          :pager-items="pagerItems"
+          :wizard-tags="wizardTags"
+          :language="language"
+          :languges="languages"
+          :keyword="keyword"
+          :modes="modes"
+          :columns="columns"
+          :mode="modes"
+          :column="column"
+          :tags="tagsList"
+          :sort-order="sortOrder"
+          :column-name="columnName"
+          :path="`/problem/collection/${level}/`"
+          @apply-filter="
+            (columnName, sortOrder) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
+          "
+        >
+        </omegaup-problem-base-list>
       </div>
     </div>
   </div>
