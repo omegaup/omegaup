@@ -8,7 +8,7 @@ import login_Signin from '../components/login/Signin.vue';
 import VueRecaptcha from 'vue-recaptcha';
 
 OmegaUp.on('ready', () => {
-  function loginAndredirect(
+  function loginAndRedirect(
     usernameOrEmail: string,
     password: string,
     isAccountCreation: boolean,
@@ -18,19 +18,23 @@ OmegaUp.on('ready', () => {
       password: password,
     })
       .then(() => {
-        const params = new URL(document.location.toString()).searchParams;
-        const pathname = params.get('redirect');
-        if (pathname && pathname.indexOf('/') !== 0) {
-          window.location.href = pathname;
-          return;
-        }
-        if (isAccountCreation) {
-          window.location.href = '/profile/';
-          return;
-        }
-        window.location.href = '/';
+        redirect(isAccountCreation);
       })
       .catch(ui.apiError);
+  }
+
+  function redirect(isAccountCreation: boolean): void {
+    const params = new URL(document.location.toString()).searchParams;
+    const pathname = params.get('redirect');
+    if (pathname && pathname.indexOf('/') !== 0) {
+      window.location.href = pathname;
+      return;
+    }
+    if (isAccountCreation) {
+      window.location.href = '/profile/';
+      return;
+    }
+    window.location.href = '/';
   }
 
   const payload = types.payloadParsers.LoginDetailsPayload();
@@ -74,28 +78,31 @@ OmegaUp.on('ready', () => {
               recaptcha: recaptchaResponse,
             })
               .then(() => {
-                loginAndredirect(
+                loginAndRedirect(
                   username,
                   password,
-                  /*isAccountCreation*/ true,
+                  /*isAccountCreation=*/ true,
                 );
               })
               .catch(ui.apiError);
           },
           login: (usernameOrEmail: string, password: string) => {
-            loginAndredirect(
+            loginAndRedirect(
               usernameOrEmail,
               password,
-              /*isAccountCreation*/ false,
+              /*isAccountCreation=*/ false,
             );
           },
           'google-login': (idToken: string) => {
             // Only log in if the user actually clicked the sign-in button.
             api.Session.googleLogin({ storeToken: idToken })
-              .then(() => {
-                window.location.reload();
+              .then((data) => {
+                redirect(data.isAccountCreation);
               })
               .catch(ui.apiError);
+          },
+          'google-login-failure': () => {
+            ui.error(T.loginFederatedFailed);
           },
         },
       });

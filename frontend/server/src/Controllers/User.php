@@ -3915,7 +3915,7 @@ class User extends \OmegaUp\Controllers\Controller {
         $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
         if ($r->offsetExists('linkedin')) {
             $thirdPartyLogin = 'linkedin';
-        } elseif ($r->offsetExists('facebook')) {
+        } elseif ($r->offsetExists('fb')) {
             $thirdPartyLogin = 'facebook';
         }
 
@@ -3935,7 +3935,7 @@ class User extends \OmegaUp\Controllers\Controller {
                 \OmegaUp\Controllers\Session::loginViaLinkedIn(
                     $r->ensureString('code'),
                     $r->ensureString('state'),
-                    $r->ensureString('redirect')
+                    $r->ensureOptionalString('redirect')
                 );
             } elseif ($thirdPartyLogin === 'facebook') {
                 \OmegaUp\Controllers\Session::loginViaFacebook();

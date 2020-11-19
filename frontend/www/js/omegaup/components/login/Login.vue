@@ -85,7 +85,6 @@ export default class Login extends Vue {
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
-  window = window;
 
   mounted() {
     window.gapi.signin2.render('google-signin', {
@@ -94,17 +93,17 @@ export default class Login extends Vue {
       height: 45,
       longtitle: false,
       theme: 'light',
-      onsuccess: this.onHandleSuccess,
-      onfailure: this.onHandleFailure,
+      onsuccess: this.onSuccess,
+      onfailure: this.onFailure,
     });
   }
 
-  onHandleSuccess(googleUser: any) {
+  onSuccess(googleUser: gapi.auth2.GoogleUser) {
     this.$emit('google-login', googleUser.getAuthResponse().id_token);
   }
 
-  onHandleFailure() {
-    console.error('fail');
+  onFailure() {
+    this.$emit('google-login-failure');
   }
 }
 </script>

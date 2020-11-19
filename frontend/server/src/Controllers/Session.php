@@ -353,7 +353,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param string $storeToken
      *
-     * @return array<string, string>
+     * @return array{isAccountCreation: bool}
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -385,20 +385,20 @@ class Session extends \OmegaUp\Controllers\Controller {
         //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
         //    [locale] => en
 
-        return self::LoginViaGoogle(
+        $response = self::LoginViaGoogle(
             $payload['email'],
             (isset($payload['name']) ? $payload['name'] : null)
         );
+        return [
+            'isAccountCreation' => $response,
+        ];
     }
 
-    /**
-     * @return array<string, string>
-     */
     public static function LoginViaGoogle(
         string $email,
         ?string $name = null
-    ): array {
-        return self::thirdPartyLoginDeprecated('Google', $email, $name);
+    ): bool {
+        return self::thirdPartyLoginWithoutRedirection('Google', $email, $name);
     }
 
     /**
@@ -457,7 +457,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Controllers\Session::thirdPartyLogin(
+        \OmegaUp\Controllers\Session::thirdPartyLoginWithRedirection(
             'Facebook',
             strval($fbUserProfile->getEmail()),
             $fbUserProfile->getName()
@@ -467,7 +467,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     public static function loginViaLinkedIn(
         string $code,
         string $state,
-        string $redirect
+        ?string $redirect
     ): void {
         try {
             $li = self::getLinkedInInstance($redirect);
@@ -478,7 +478,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$log->error("Unable to login via LinkedIn: $e");
             throw $e;
         }
-        \OmegaUp\Controllers\Session::thirdPartyLogin(
+        \OmegaUp\Controllers\Session::thirdPartyLoginWithRedirection(
             'LinkedIn',
             $profile['emailAddress'],
             "{$profile['firstName']} {$profile['lastName']}",
@@ -803,19 +803,40 @@ class Session extends \OmegaUp\Controllers\Controller {
         return ['status' => 'ok'];
     }
 
-    private static function thirdPartyLogin(
+    private static function thirdPartyLoginWithoutRedirection(
+        string $provider,
+        string $email,
+        ?string $name = null
+    ): bool {
+        return self::thirdPartyLogin($provider, $email, $name);
+    }
+
+    private static function thirdPartyLoginWithRedirection(
         string $provider,
         string $email,
         ?string $name = null,
         ?string $redirect = null
     ): void {
+        self::thirdPartyLogin($provider, $email, $name);
+
+        $redirectUrl = self::getRedirectUrl($redirect);
+        header("Location: {$redirectUrl}");
+        throw new \OmegaUp\Exceptions\ExitException();
+    }
+
+    private static function thirdPartyLogin(
+        string $provider,
+        string $email,
+        ?string $name = null
+    ): bool {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
-
+        $isAccountCreation = true;
         if (!is_null($results)) {
             self::$log->info("User has been here before with $provider");
             $identity = $results;
+            $isAccountCreation = false;
         } else {
             // The user has never been here before, let's register them
             self::$log->info("LoginVia$provider: Creating new user for $email");
@@ -851,9 +872,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         self::registerSession($identity, $user);
 
-        $redirectUrl = self::getRedirectUrl($redirect);
-        header("Location: {$redirectUrl}");
-        throw new \OmegaUp\Exceptions\ExitException();
+        return $isAccountCreation;
     }
 
     public static function setSessionManagerForTesting(
