@@ -3927,6 +3927,9 @@ class User extends \OmegaUp\Controllers\Controller {
                     'linkedinUrl' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
+                'scripts' => [
+                    'https://apis.google.com/js/platform.js?onload=init',
+                ],
             ],
             'entrypoint' => 'login_signin',
         ];

@@ -87,15 +87,17 @@ export default class Login extends Vue {
   T = T;
 
   mounted() {
-    window.gapi.signin2.render('google-signin', {
-      scope: 'profile',
-      width: 45,
-      height: 45,
-      longtitle: false,
-      theme: 'light',
-      onsuccess: this.onSuccess,
-      onfailure: this.onFailure,
-    });
+    if (window.gapi) {
+      window.gapi.signin2.render('google-signin', {
+        scope: 'profile',
+        width: 45,
+        height: 45,
+        longtitle: false,
+        theme: 'light',
+        onsuccess: this.onSuccess,
+        onfailure: this.onFailure,
+      });
+    }
   }
 
   onSuccess(googleUser: gapi.auth2.GoogleUser) {
