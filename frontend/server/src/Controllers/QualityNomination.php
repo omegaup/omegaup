@@ -203,6 +203,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTagAnalysisOfRecurrences',
         'problemTagUnformattedInputAndOutput',
         'problemTagFileSeeking',
+        'problemTagLinearSearch',
+        'problemTagSetsMultisets',
+        'problemTagMapsMultimaps',
     ];
 
     const LEVEL_TAGS = [
