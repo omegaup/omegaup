@@ -41,7 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type CollectionDetailsByAuthorPayload=array{authorsRanking: AuthorsRank, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, authors: list<string>}
- * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<array{alias: string, name?: string}>, publicTags: list<string>, level: string, currentTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
+ * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<array{alias: string, name?: string}>, publicTags: list<string>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  */
@@ -5983,7 +5983,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     'level' => $collectionLevel,
                     'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
-                    'currentTags' => $result['currentTags'],
+                    'selectedTags' => $result['currentTags'],
                     'pagerItems' => $result['pagerItems'],
                     'keyword' => $result['keyword'],
                     'mode' => $result['mode'],
@@ -6007,9 +6007,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{alias: string}
      */
-    public static function apiRandomProblem(\OmegaUp\Request $r) {
+    public static function apiRandomLanguageProblem(\OmegaUp\Request $r) {
         return [
-            'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
+            'alias' => \OmegaUp\DAO\Problems::getRandomLanguageProblemAlias(),
+        ];
+    }
+
+    /**
+     * @return array{alias: string}
+     */
+    public static function apiRandomKarelProblem(\OmegaUp\Request $r) {
+        return [
+            'alias' => \OmegaUp\DAO\Problems::getRandomKarelProblemAlias(),
         ];
     }
 
