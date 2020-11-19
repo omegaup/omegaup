@@ -68,6 +68,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
             AVG(bpr.run_count) AS avg_runs
         FROM (
             SELECT
+                pr.assignment_id,
                 pr.assignment_alias,
                 pr.problem_alias,
                 pr.problem_id,
@@ -119,7 +120,7 @@ class Assignments extends \OmegaUp\DAO\Base\Assignments {
         GROUP BY
             bpr.problem_alias, bpr.assignment_alias
         ORDER BY
-            bpr.order, bpr.problem_id;
+            bpr.assignment_id, bpr.order, bpr.problem_id;
         ';
 
         /** @var list<array{assignment_alias: string, average: float|null, avg_runs: float|null, high_score_percentage: float|null, low_score_percentage: float|null, max_points: float, maximum: float|null, minimum: float|null, problem_alias: string, variance: float|null}> */
