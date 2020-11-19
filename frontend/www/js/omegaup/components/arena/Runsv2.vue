@@ -380,7 +380,7 @@ export default class Runsv2 extends Vue {
     ) {
       return this.runs;
     }
-    return this.runs.filter((run) => {
+    return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
         if (this.filterVerdict == 'NO-AC') {
           if (run.verdict == 'AC') {
@@ -410,9 +410,15 @@ export default class Runsv2 extends Vue {
   }
 
   get sortedRuns(): types.Run[] {
-    return this.runs
-      .slice()
-      .sort(/* aquí debería haber una función anónima que haga el ordenamiento */);
+    return this.runs.slice().sort((a, b) => {
+      if (a.time < b.time) {
+        return 1;
+      }
+      if (a.time > b.time) {
+        return -1;
+      }
+      return 0;
+    });
   }
 
   get newSubmissionUrl(): string {

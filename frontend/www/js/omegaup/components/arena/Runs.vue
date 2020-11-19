@@ -373,39 +373,45 @@ export default class Runs extends Vue {
     ) {
       return this.runs;
     }
-    return this.runs.filter((run) => {
+    return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
-          if (this.filterVerdict == 'NO-AC') {
-            if (run.verdict == 'AC') {
-              return false;
-            }
-          } else if (run.verdict != this.filterVerdict) {
+        if (this.filterVerdict == 'NO-AC') {
+          if (run.verdict == 'AC') {
             return false;
           }
-        }
-        if (this.filterLanguage && run.language !== this.filterLanguage) {
+        } else if (run.verdict != this.filterVerdict) {
           return false;
         }
-        if (this.filterProblem && run.alias !== this.filterProblem) {
-          return false;
-        }
-        if (this.filterStatus && run.status !== this.filterStatus) {
-          return false;
-        }
-        if (this.filterUsername && run.username !== this.filterUsername) {
-          return false;
-        }
-        if (this.filterContest && run.contest_alias !== this.filterContest) {
-          return false;
-        }
-        return true;
-      });
+      }
+      if (this.filterLanguage && run.language !== this.filterLanguage) {
+        return false;
+      }
+      if (this.filterProblem && run.alias !== this.filterProblem) {
+        return false;
+      }
+      if (this.filterStatus && run.status !== this.filterStatus) {
+        return false;
+      }
+      if (this.filterUsername && run.username !== this.filterUsername) {
+        return false;
+      }
+      if (this.filterContest && run.contest_alias !== this.filterContest) {
+        return false;
+      }
+      return true;
+    });
   }
 
   get sortedRuns(): types.Run[] {
-    return this.runs
-      .slice()
-      .sort(/* aquí debería haber una función anónima que haga el ordenamiento */);
+    return this.runs.slice().sort((a, b) => {
+      if (a.time < b.time) {
+        return 1;
+      }
+      if (a.time > b.time) {
+        return -1;
+      }
+      return 0;
+    });
   }
 
   get newSubmissionUrl(): string {
