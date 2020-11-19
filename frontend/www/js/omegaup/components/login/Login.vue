@@ -75,6 +75,7 @@
 </template>
 
 <script lang="ts">
+/* global gapi */
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
