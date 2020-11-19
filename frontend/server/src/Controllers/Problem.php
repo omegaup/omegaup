@@ -6007,9 +6007,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
     /**
      * @return array{alias: string}
      */
-    public static function apiRandomProblem(\OmegaUp\Request $r) {
+    public static function apiRandomLanguageProblem(\OmegaUp\Request $r) {
         return [
-            'alias' => \OmegaUp\DAO\Problems::getRandomProblemAlias(),
+            'alias' => \OmegaUp\DAO\Problems::getRandomLanguageProblemAlias(),
+        ];
+    }
+
+    /**
+     * @return array{alias: string}
+     */
+    public static function apiRandomKarelProblem(\OmegaUp\Request $r) {
+        return [
+            'alias' => \OmegaUp\DAO\Problems::getRandomKarelProblemAlias(),
         ];
     }
 

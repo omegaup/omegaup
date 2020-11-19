@@ -2066,8 +2066,9 @@ export namespace types {
   }
 
   export interface LoginDetailsPayload {
-    facebookURL: string;
-    linkedinURL: string;
+    facebookUrl: string;
+    linkedinUrl: string;
+    statusError?: string;
     validateRecaptcha: boolean;
   }
 
@@ -3599,8 +3600,10 @@ export namespace messages {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
   };
-  export type ProblemRandomProblemRequest = { [key: string]: any };
-  export type ProblemRandomProblemResponse = { alias: string };
+  export type ProblemRandomKarelProblemRequest = { [key: string]: any };
+  export type ProblemRandomKarelProblemResponse = { alias: string };
+  export type ProblemRandomLanguageProblemRequest = { [key: string]: any };
+  export type ProblemRandomLanguageProblemResponse = { alias: string };
   export type ProblemRejudgeRequest = { [key: string]: any };
   export type ProblemRejudgeResponse = {};
   export type ProblemRemoveAdminRequest = { [key: string]: any };
@@ -4371,9 +4374,12 @@ export namespace controllers {
     myList: (
       params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
-    randomProblem: (
-      params?: messages.ProblemRandomProblemRequest,
-    ) => Promise<messages.ProblemRandomProblemResponse>;
+    randomKarelProblem: (
+      params?: messages.ProblemRandomKarelProblemRequest,
+    ) => Promise<messages.ProblemRandomKarelProblemResponse>;
+    randomLanguageProblem: (
+      params?: messages.ProblemRandomLanguageProblemRequest,
+    ) => Promise<messages.ProblemRandomLanguageProblemResponse>;
     rejudge: (
       params?: messages.ProblemRejudgeRequest,
     ) => Promise<messages.ProblemRejudgeResponse>;
