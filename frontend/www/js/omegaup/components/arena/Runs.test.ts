@@ -1,9 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 
 import arena_Runs from './Runs.vue';
 
@@ -12,12 +10,10 @@ describe('Runs.vue', () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
-        globalRuns: true,
         runs: [],
       },
     });
 
-    expect(wrapper.find('.card-header').text()).toBe(T.wordsGlobalSubmissions);
     expect(wrapper.find('table tbody').text()).toBe('');
   });
 
@@ -26,7 +22,6 @@ describe('Runs.vue', () => {
     const wrapper = shallowMount(arena_Runs, {
       propsData: {
         contestAlias: 'admin',
-        globalRuns: true,
         runs: [
           {
             alias: 'alias',

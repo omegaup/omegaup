@@ -1,27 +1,18 @@
 <template>
-  <codemirror-editor
-    ref="cm-wrapper"
-    v-bind:options="editorOptions"
-    v-bind:value="value"
-    v-on:change="onChange"
-    v-on:input="onInput"
-  ></codemirror-editor>
+  <div data-code-mirror>
+    <codemirror-editor
+      ref="cm-wrapper"
+      :options="editorOptions"
+      :value="value"
+      @change="onChange"
+      @input="onInput"
+    ></codemirror-editor>
+  </div>
 </template>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-.vue-codemirror-wrap {
-  height: 95%;
-  .CodeMirror {
-    height: 100%;
-  }
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import * as ui from '../../ui';
 import { codemirror } from 'vue-codemirror-lite';
 
 const languageModeMap: {
@@ -86,6 +77,7 @@ export default class CodeView extends Vue {
   mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
 
   refresh() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore vue-codemirror-lite does not declare `editor` as a legitimate
     // property, so TypeScript cannot know about it.
     // It's also possible for the actual editor to not have been set yet if
@@ -116,3 +108,17 @@ export default class CodeView extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+[data-code-mirror] {
+  height: 100%;
+  .vue-codemirror-wrap {
+    height: 95%;
+    .CodeMirror {
+      height: 100%;
+    }
+  }
+}
+</style>

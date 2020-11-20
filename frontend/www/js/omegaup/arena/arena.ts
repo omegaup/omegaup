@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex from 'vuex';
 import * as Highcharts from 'highcharts/highstock';
 
 import * as api from '../api';
@@ -7,7 +7,6 @@ import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
 import * as time from '../time';
-import * as typeahead from '../typeahead';
 import * as ui from '../ui';
 import JSZip from 'jszip';
 import * as markdown from '../markdown';
@@ -18,13 +17,11 @@ import arena_Navbar_Miniranking from '../components/arena/NavbarMiniranking.vue'
 import arena_Navbar_Problems from '../components/arena/NavbarProblems.vue';
 import arena_RunDetails from '../components/arena/RunDetails.vue';
 import arena_RunSubmit from '../components/arena/RunSubmit.vue';
-import arena_CodeView from '../components/arena/CodeView.vue';
 import arena_Runs from '../components/arena/Runs.vue';
 import arena_Scoreboard from '../components/arena/Scoreboard.vue';
 import common_Navbar from '../components/common/Navbar.vue';
 import omegaup_Markdown from '../components/Markdown.vue';
 import problem_SettingsSummary from '../components/problem/SettingsSummary.vue';
-import notification_Clarifications from '../components/notification/Clarifications.vue';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 
 import ArenaAdmin from './admin_arena';
@@ -92,7 +89,7 @@ export const runsStore = new Vuex.Store<RunsState>({
   },
   mutations: {
     addRun(state, run: types.Run) {
-      if (state.index.hasOwnProperty(run.guid)) {
+      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
           state.index[run.guid],
@@ -117,7 +114,7 @@ export const myRunsStore = new Vuex.Store<RunsState>({
   },
   mutations: {
     addRun(state, run: types.Run) {
-      if (state.index.hasOwnProperty(run.guid)) {
+      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
         Vue.set(
           state.runs,
           state.index[run.guid],
@@ -167,6 +164,27 @@ function getMaxScore(
     }
   }
   return maxScore;
+}
+
+function findElement(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+): HTMLElement | null {
+  if (!element || itemSelector === null) {
+    return element;
+  }
+  return element.querySelector(itemSelector);
+}
+
+function setItemText(
+  element: HTMLElement | null,
+  itemSelector: string | null,
+  text: string,
+) {
+  element = findElement(element, itemSelector);
+  if (element) {
+    element.textContent = text;
+  }
 }
 
 export class Arena {
@@ -237,7 +255,7 @@ export class Arena {
   clarificationsOffset: number = 0;
   clarificationsRowcount: number = 20;
   activeTab: string = 'problems';
-  clarifications: { [key: number]: JQuery } = {};
+  clarifications: { [key: number]: HTMLElement } = {};
   submissionGap: number = 0;
 
   // Clarification refresh interval.
@@ -259,11 +277,11 @@ export class Arena {
 
   // UI elements
   elements: {
-    clarification: JQuery;
-    clock: JQuery;
-    loadingOverlay: JQuery;
-    ranking: JQuery;
-    socketStatus: JQuery;
+    clarification: HTMLElement | null;
+    clock: HTMLElement | null;
+    loadingOverlay: HTMLElement | null;
+    ranking: HTMLElement | null;
+    socketStatus: HTMLElement | null;
   };
 
   initialClarifications: types.Clarification[] = [];
@@ -311,6 +329,7 @@ export class Arena {
   markdownView: Vue & {
     markdown: string;
     imageMapping: markdown.ImageMapping;
+    sourceMapping: markdown.SourceMapping;
     problemSettings?: types.ProblemSettingsDistrib;
   };
 
@@ -343,11 +362,18 @@ export class Arena {
   rankingChart: Highcharts.Chart | null = null;
 
   constructor(options: ArenaOptions) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
     this.options = options;
 
     // All runs in this contest/problem.
     this.myRunsList = new Vue({
+      components: { 'omegaup-arena-runs': arena_Runs },
+      data: () => ({
+        isContestFinished: false,
+        isProblemsetOpened: true,
+        problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
+      }),
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -369,12 +395,6 @@ export class Arena {
           },
         });
       },
-      data: {
-        isContestFinished: false,
-        isProblemsetOpened: true,
-        problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
-      },
-      components: { 'omegaup-arena-runs': arena_Runs },
     });
     const myRunsListElement = document.querySelector('#problem table.runs');
     if (myRunsListElement) {
@@ -385,6 +405,16 @@ export class Arena {
     if (document.getElementById('common-navbar')) {
       const commonNavbar = (this.commonNavbar = new Vue({
         el: '#common-navbar',
+        components: {
+          'omegaup-common-navbar': common_Navbar,
+        },
+        data: () => ({
+          graderInfo: null,
+          graderQueueLength: -1,
+          errorMessage: null,
+          initialClarifications: [],
+          notifications: [],
+        }),
         render: function (createElement) {
           return createElement('omegaup-common-navbar', {
             props: {
@@ -393,6 +423,7 @@ export class Arena {
               isLoggedIn: options.payload.isLoggedIn,
               isReviewer: options.payload.isReviewer,
               gravatarURL51: options.payload.gravatarURL51,
+              gravatarURL128: options.payload.gravatarURL128,
               currentUsername: options.payload.currentUsername,
               isAdmin: options.payload.isAdmin,
               isMainUserIdentity: options.payload.isMainUserIdentity,
@@ -404,16 +435,6 @@ export class Arena {
               initialClarifications: this.initialClarifications,
             },
           });
-        },
-        data: {
-          graderInfo: null,
-          graderQueueLength: -1,
-          errorMessage: null,
-          initialClarifications: [],
-          notifications: [],
-        },
-        components: {
-          'omegaup-common-navbar': common_Navbar,
         },
       }));
 
@@ -450,16 +471,21 @@ export class Arena {
 
     // UI elements
     this.elements = {
-      clarification: $('#clarification'),
-      clock: $('#title .clock'),
-      loadingOverlay: $('#loading'),
-      ranking: $('#ranking div'),
-      socketStatus: $('#title .socket-status'),
+      clarification: document.querySelector('#clarification'),
+      clock: document.querySelector('#title .clock'),
+      loadingOverlay: document.querySelector('#loading'),
+      ranking: document.querySelector('#ranking div'),
+      socketStatus: document.querySelector('#title .socket-status'),
     };
 
     if (document.getElementById('arena-navbar-problems') !== null) {
       this.navbarProblems = new Vue({
         el: '#arena-navbar-problems',
+        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
+        data: () => ({
+          problems: [],
+          activeProblem: '',
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-navbar-problems', {
             props: {
@@ -478,11 +504,6 @@ export class Arena {
             },
           });
         },
-        data: {
-          problems: [],
-          activeProblem: '',
-        },
-        components: { 'omegaup-arena-navbar-problems': arena_Navbar_Problems },
       });
     }
 
@@ -498,6 +519,13 @@ export class Arena {
     ) {
       this.navbarMiniRanking = new Vue({
         el: '#arena-navbar-miniranking',
+        components: {
+          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
+        },
+        data: () => ({
+          showRanking: navbarPayload,
+          users: [],
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-navbar-miniranking', {
             props: {
@@ -506,19 +534,21 @@ export class Arena {
             },
           });
         },
-        data: {
-          showRanking: navbarPayload,
-          users: [],
-        },
-        components: {
-          'omegaup-arena-navbar-miniranking': arena_Navbar_Miniranking,
-        },
       });
     }
 
-    if (this.elements.ranking.length) {
+    if (this.elements.ranking) {
       this.scoreboard = new Vue({
-        el: this.elements.ranking[0],
+        el: this.elements.ranking,
+        components: {
+          'omegaup-arena-scoreboard': arena_Scoreboard,
+        },
+        data: () => ({
+          problems: [],
+          ranking: [],
+          lastUpdated: new Date(0),
+          showPenalty: true,
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-scoreboard', {
             props: {
@@ -532,15 +562,6 @@ export class Arena {
             },
           });
         },
-        data: {
-          problems: [],
-          ranking: [],
-          lastUpdated: new Date(0),
-          showPenalty: true,
-        },
-        components: {
-          'omegaup-arena-scoreboard': arena_Scoreboard,
-        },
       });
     }
 
@@ -548,16 +569,18 @@ export class Arena {
     if (document.getElementById('run-details') != null) {
       this.runDetailsView = new Vue({
         el: '#run-details',
+        components: {
+          'omegaup-arena-rundetails': arena_RunDetails,
+        },
+        data: () => ({
+          data: null,
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-rundetails', {
             props: {
               data: this.data,
             },
           });
-        },
-        data: { data: null },
-        components: {
-          'omegaup-arena-rundetails': arena_RunDetails,
         },
       });
     }
@@ -566,6 +589,14 @@ export class Arena {
     if (document.getElementById('run-submit') !== null) {
       self.runSubmitView = new Vue({
         el: '#run-submit',
+        components: {
+          'omegaup-arena-runsubmit': arena_RunSubmit,
+        },
+        data: () => ({
+          languages: [],
+          preferredLanguage: '',
+          nextSubmissionTimestamp: new Date(0),
+        }),
         render: function (createElement) {
           return createElement('omegaup-arena-runsubmit', {
             props: {
@@ -581,14 +612,6 @@ export class Arena {
             ref: 'component',
           });
         },
-        data: {
-          languages: [],
-          preferredLanguage: '',
-          nextSubmissionTimestamp: new Date(0),
-        },
-        components: {
-          'omegaup-arena-runsubmit': arena_RunSubmit,
-        },
       });
     }
 
@@ -597,15 +620,10 @@ export class Arena {
 
     // Contest summary view model
     this.summaryView = new Vue({
-      render: function (createElement) {
-        return createElement('omegaup-arena-contestsummary', {
-          props: {
-            contest: this.contest,
-            showRanking: !options.isPractice,
-          },
-        });
+      components: {
+        'omegaup-arena-contestsummary': arena_ContestSummary,
       },
-      data: {
+      data: () => ({
         contest: {
           start_time: new Date(),
           finish_time: null,
@@ -614,9 +632,14 @@ export class Arena {
           title: '',
           director: '',
         },
-      },
-      components: {
-        'omegaup-arena-contestsummary': arena_ContestSummary,
+      }),
+      render: function (createElement) {
+        return createElement('omegaup-arena-contestsummary', {
+          props: {
+            contest: this.contest,
+            showRanking: !options.isPractice,
+          },
+        });
       },
     });
     const summaryElement = document.getElementById('summary');
@@ -626,11 +649,21 @@ export class Arena {
 
     // Markdown view.
     this.markdownView = new Vue({
+      components: {
+        'omegaup-markdown': omegaup_Markdown,
+      },
+      data: () => ({
+        markdown: '',
+        imageMapping: <markdown.ImageMapping>{},
+        sourceMapping: <markdown.SourceMapping>{},
+        problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
+      }),
       render: function (createElement) {
         return createElement('omegaup-markdown', {
           props: {
             markdown: this.markdown,
             imageMapping: this.imageMapping,
+            sourceMapping: this.sourceMapping,
             problemSettings: this.problemSettings,
           },
           on: {
@@ -639,14 +672,6 @@ export class Arena {
             },
           },
         });
-      },
-      data: {
-        markdown: '',
-        imageMapping: <markdown.ImageMapping>{},
-        problemSettings: <types.ProblemSettingsDistrib | undefined>undefined,
-      },
-      components: {
-        'omegaup-markdown': omegaup_Markdown,
       },
     });
     const problemStatementElement = document.querySelector(
@@ -659,15 +684,16 @@ export class Arena {
     this.navbarAssignments = null;
   }
 
-  installLibinteractiveHooks(): void {
+  installProblemArtifactHooks(): void {
     $('.libinteractive-download form').on('submit', (e: Event) => {
       e.preventDefault();
 
-      const form = $(<HTMLElement>e.target);
+      const form = <HTMLElement>e.target;
       const alias = this.currentProblem.alias;
       const commit = this.currentProblem.commit;
-      const os = $('.download-os', form).val();
-      const lang = $('.download-lang', form).val();
+      const os = (<HTMLInputElement>form.querySelector('.download-os'))?.value;
+      const lang = (<HTMLInputElement>form.querySelector('.download-lang'))
+        ?.value;
       const extension = os == 'unix' ? '.tar.bz2' : '.zip';
 
       ui.navigateTo(
@@ -687,6 +713,11 @@ export class Arena {
         .find('.libinteractive-extension')
         .html(<string>$(<HTMLElement>e.target).val());
     });
+
+    $('.output-only-download a').attr(
+      'href',
+      `/probleminput/${this.currentProblem.alias}/${this.currentProblem.commit}/${this.currentProblem.alias}-input.zip`,
+    );
   }
 
   connectSocket(): boolean {
@@ -695,7 +726,7 @@ export class Arena {
       this.options.disableSockets ||
       this.options.contestAlias == 'admin'
     ) {
-      this.elements.socketStatus.html('✗').css('color', '#800');
+      this.updateSocketStatus('✗', '#800');
       return false;
     }
 
@@ -727,9 +758,17 @@ export class Arena {
       });
     };
 
-    this.elements.socketStatus.html('↻').css('color', '#888');
+    this.updateSocketStatus('↻', '#888');
     connect(uris, 0);
     return false;
+  }
+
+  updateSocketStatus(status: string, color: string): void {
+    if (!this.elements.socketStatus) {
+      return;
+    }
+    this.elements.socketStatus.textContent = status;
+    this.elements.socketStatus.style.color = color;
   }
 
   setupPolls(): void {
@@ -765,7 +804,7 @@ export class Arena {
     // Once the clock is ready, we can now connect to the socket.
     this.connectSocket();
     if (this.options.isPractice || !this.finishTime) {
-      this.elements.clock.html('&infin;');
+      setItemText(this.elements.clock, null, '∞');
       return;
     }
     if (deadline) this.submissionDeadline = deadline;
@@ -789,11 +828,11 @@ export class Arena {
 
       const problemsetCallback = () => {
         const now = Date.now();
-        this.elements.loadingOverlay.text(
-          `${problemsetId} ${time.formatDelta(
+        if (this.elements.loadingOverlay) {
+          this.elements.loadingOverlay.textContent = `${problemsetId} ${time.formatDelta(
             problemsetStartTime.getTime() - now,
-          )}`,
-        );
+          )}`;
+        }
         if (now < problemsetStartTime.getTime()) {
           setTimeout(problemsetCallback, 1000);
         } else {
@@ -805,7 +844,9 @@ export class Arena {
       setTimeout(problemsetCallback, 1000);
       return;
     }
-    this.elements.loadingOverlay.html('404');
+    if (this.elements.loadingOverlay) {
+      this.elements.loadingOverlay.textContent = '404';
+    }
   }
 
   problemsetLoaded(problemset: types.Problemset): void {
@@ -855,25 +896,27 @@ export class Arena {
     );
     this.initProblems(problemset);
 
-    const problemSelect = $('select', this.elements.clarification);
-    for (const problem of problemset.problems ?? []) {
-      const problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
+    const problemSelect = this.elements.clarification?.querySelector('select');
+    if (problemSelect) {
+      for (const problem of problemset.problems ?? []) {
+        const problemName = `${problem.letter}. ${ui.escape(problem.title)}`;
 
-      if (this.navbarProblems) {
-        this.navbarProblems.problems.push({
-          alias: problem.alias,
-          text: problemName,
-          acceptsSubmissions: problem.languages !== '',
-          bestScore: 0,
-          maxScore: problem.points,
-          hasRuns: false,
-        });
+        if (this.navbarProblems) {
+          this.navbarProblems.problems.push({
+            alias: problem.alias,
+            text: problemName,
+            acceptsSubmissions: problem.languages !== '',
+            bestScore: 0,
+            maxScore: problem.points,
+            hasRuns: false,
+          });
+        }
+
+        $('<option>')
+          .val(problem.alias)
+          .text(problemName)
+          .appendTo(<Element>problemSelect);
       }
-
-      $('<option>')
-        .val(problem.alias)
-        .text(problemName)
-        .appendTo(problemSelect);
     }
 
     if (!this.options.isPractice && !this.options.isInterview) {
@@ -883,7 +926,9 @@ export class Arena {
     // Trigger the event (useful on page load).
     this.onHashChanged();
 
-    this.elements.loadingOverlay.fadeOut('slow');
+    if (this.elements.loadingOverlay) {
+      this.elements.loadingOverlay.style.display = 'none';
+    }
     $('#root').fadeIn('slow');
 
     if (
@@ -894,6 +939,9 @@ export class Arena {
       const courseAlias = this.options.courseAlias;
       this.navbarAssignments = new Vue({
         el: '#arena-navbar-assignments',
+        components: {
+          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
+        },
         render: function (createElement) {
           return createElement('omegaup-arena-navbar-assignments', {
             props: {
@@ -909,9 +957,6 @@ export class Arena {
             },
           });
         },
-        components: {
-          'omegaup-arena-navbar-assignments': arena_Navbar_Assignments,
-        },
       });
     }
   }
@@ -920,7 +965,8 @@ export class Arena {
     this.currentProblemset = problemset;
     this.problemsetAdmin = problemset.admin ?? false;
     this.myRunsList.isProblemsetOpened =
-      !problemset.hasOwnProperty('opened') || (problemset.opened ?? false);
+      !Object.prototype.hasOwnProperty.call(problemset, 'opened') ||
+      (problemset.opened ?? false);
     const problemsetProblems = problemset.problems ?? [];
     for (const problemsetProblem of problemsetProblems) {
       const alias = problemsetProblem.alias;
@@ -967,7 +1013,7 @@ export class Arena {
     } else {
       clock = time.formatDelta(countdownTime.getTime() - now);
     }
-    this.elements.clock.text(clock);
+    setItemText(this.elements.clock, null, clock);
   }
 
   updateRunFallback(guid: string): void {
@@ -1068,7 +1114,7 @@ export class Arena {
 
     events.forEach((evt) => {
       const key = evt.username;
-      if (!originalContestRanking.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(originalContestRanking, key)) {
         originalContestRanking[key] = {
           country: evt.country,
           name: evt.name,
@@ -1208,11 +1254,8 @@ export class Arena {
       currentRankingState[username] = { place: rank.place ?? 0 };
 
       // Update problem scores.
-      let totalRuns = 0;
       for (const alias of Object.keys(order)) {
         const problem = rank.problems[order[alias]];
-        totalRuns += problem.runs;
-
         if (
           this.problems[alias] &&
           rank.username == OmegaUp.username &&
@@ -1334,7 +1377,7 @@ export class Arena {
     series: Highcharts.SeriesLineOptions[],
     navigatorSeries: number[][],
   ): void {
-    if (series.length == 0 || this.elements.ranking.length == 0) return;
+    if (series.length == 0 || !this.elements.ranking) return;
 
     this.rankingChart = Highcharts.stockChart(
       <HTMLElement>document.getElementById('ranking-chart'),
@@ -1400,7 +1443,7 @@ export class Arena {
   }
 
   updateClarification(clarification: types.Clarification): void {
-    let r: JQuery | null = null;
+    let r: HTMLElement | null = null;
     const anchor = `clarifications/clarification-${clarification.clarification_id}`;
     const clarifications =
       this.commonNavbar?.initialClarifications ?? this.initialClarifications;
@@ -1418,14 +1461,23 @@ export class Arena {
         clarifications.push(clarification);
       }
     } else {
-      r = $('.clarifications tbody.clarification-list tr.template')
-        .clone()
-        .removeClass('template')
-        .addClass('inserted');
-
+      r = <HTMLElement | null>(
+        document
+          .querySelector('.clarifications tbody.clarification-list tr.template')
+          ?.cloneNode(true)
+      );
+      if (r) {
+        r.classList.remove('template');
+        r.classList.add('inserted');
+        $('.clarifications tbody.clarification-list').prepend(r);
+        this.clarifications[clarification.clarification_id] = r;
+      }
       if (this.problemsetAdmin) {
         if (clarifications !== null) {
           clarifications.push(clarification);
+        }
+        if (!r) {
+          return;
         }
         ((id, answerNode) => {
           const responseFormNode = $('.create-response-form', answerNode)
@@ -1487,37 +1539,34 @@ export class Arena {
       }
     }
 
-    $('.anchor', r).attr('name', anchor);
-    $('.contest', r).text(clarification.contest_alias || '');
-    $('.problem', r).text(clarification.problem_alias);
-    if (this.problemsetAdmin) {
-      $('.author', r).text(clarification.author || '');
-    }
-    $('.time', r).html(time.formatTimestamp(clarification.time));
-    $('.message', r).text(clarification.message);
-    $('.answer pre', r).text(clarification.answer ?? '');
-    if (clarification.answer) {
-      this.answeredClarifications++;
-    }
-
-    if (!this.clarifications[clarification.clarification_id]) {
-      $('.clarifications tbody.clarification-list').prepend(r);
-      this.clarifications[clarification.clarification_id] = r;
-    }
-    if (clarification.answer == null) {
-      $('.answer pre', r).hide();
-      if (clarification.receiver != null) {
-        $(r).addClass('direct-message');
+    if (r) {
+      r.querySelector('.anchor')?.setAttribute('name', anchor);
+      setItemText(r, '.contest', clarification.contest_alias ?? '');
+      setItemText(r, '.problem', clarification.problem_alias);
+      if (this.problemsetAdmin) {
+        setItemText(r, '.author', clarification.author ?? '');
       }
-    } else {
-      $('.answer pre', r).show();
-      $(r).addClass('resolved');
-    }
-    if (clarification.public) {
-      $('.create-response-is-public', r).first().prop('checked', true);
+      setItemText(r, '.time', time.formatTimestamp(clarification.time));
+      setItemText(r, '.message', clarification.message);
+      setItemText(r, '.answer pre', clarification.answer ?? '');
+      if (clarification.answer) {
+        this.answeredClarifications++;
+      }
+
+      if (clarification.answer == null) {
+        $('.answer pre', r).hide();
+        if (clarification.receiver != null) {
+          $(r).addClass('direct-message');
+        }
+      } else {
+        $('.answer pre', r).show();
+        $(r).addClass('resolved');
+      }
+      if (clarification.public) {
+        $('.create-response-is-public', r).first().prop('checked', true);
+      }
     }
   }
-
   clarificationsChange(clarifications: types.Clarification[]): void {
     $('.clarifications tr.inserted').remove();
     if (
@@ -1605,7 +1654,7 @@ export class Arena {
       window.history.replaceState({}, '', `#${this.activeTab}`);
     }
 
-    const problemMatch = /#problems\/([^\/]+)(\/new-run)?/.exec(
+    const problemMatch = /#problems\/([^/]+)(\/new-run)?/.exec(
       window.location.hash,
     );
     // Check if we were already viewing this problem to avoid reloading
@@ -1636,15 +1685,17 @@ export class Arena {
         } else if (document.getElementById('problem-settings-summary')) {
           this.problemSettingsSummary = new Vue({
             el: '#problem-settings-summary',
+            components: {
+              'omegaup-problem-settings-summary': problem_SettingsSummary,
+            },
+            data: () => ({
+              problem: problem,
+            }),
             render: function (createElement) {
               return createElement('omegaup-problem-settings-summary', {
                 props: { problem: this.problem },
               });
             },
-            components: {
-              'omegaup-problem-settings-summary': problem_SettingsSummary,
-            },
-            data: { problem: problem },
           });
         }
         this.renderProblem(problem);
@@ -1802,6 +1853,12 @@ export class Arena {
     }
     this.qualityNominationForm = new Vue({
       el: '#qualitynomination-popup',
+      components: {
+        'qualitynomination-popup': qualitynomination_Popup,
+      },
+      data: () => ({
+        qualityPayload: qualityPayload,
+      }),
       mounted: () => {
         ui.reportEvent('quality-nomination', 'shown');
       },
@@ -1848,7 +1905,7 @@ export class Arena {
                 nomination: 'dismissal',
                 contents: JSON.stringify(contents),
               })
-                .then((data) => {
+                .then(() => {
                   ui.info(T.qualityNominationRateProblemDesc);
                   ui.reportEvent('quality-nomination', 'dismiss');
                 })
@@ -1856,12 +1913,6 @@ export class Arena {
             },
           },
         });
-      },
-      data: {
-        qualityPayload: qualityPayload,
-      },
-      components: {
-        'qualitynomination-popup': qualitynomination_Popup,
       },
     });
   }
@@ -1871,6 +1922,7 @@ export class Arena {
     if (problem.statement) {
       this.markdownView.markdown = problem.statement.markdown;
       this.markdownView.imageMapping = problem.statement.images;
+      this.markdownView.sourceMapping = problem.statement.sources;
       this.markdownView.problemSettings = problem.settings;
     }
     const creationDateElement = <HTMLElement>(
@@ -1896,7 +1948,7 @@ export class Arena {
         '',
       );
     }
-    this.installLibinteractiveHooks();
+    this.installProblemArtifactHooks();
 
     this.updateAllowedLanguages(this.currentProblem.languages);
 
@@ -1988,7 +2040,7 @@ export class Arena {
   onCloseSubmit(e: Event): void {
     if (
       (<HTMLElement>e.target).id !== 'overlay' &&
-      (<JQuery>(e.target as unknown)).closest('button.close') === null
+      (<HTMLElement>e.target).closest('button.close') === null
     ) {
       return;
     }
@@ -2051,8 +2103,8 @@ export class Arena {
 
         const currentProblem = this.problems[this.currentProblem.alias];
         if (!this.options.isOnlyProblem) {
-          this.problems[this.currentProblem.alias].lastSubmission = new Date();
-          this.problems[this.currentProblem.alias].nextSubmissionTimestamp =
+          currentProblem.lastSubmission = new Date();
+          currentProblem.nextSubmissionTimestamp =
             response.nextSubmissionTimestamp;
         }
         const run = {
@@ -2099,8 +2151,6 @@ export class Arena {
   }
 
   displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
-    const problemAdmin = data.admin;
-
     let sourceHTML,
       sourceLink = false;
     if (data.source?.indexOf('data:') === 0) {
@@ -2274,12 +2324,16 @@ export function GetDefaultOptions(): ArenaOptions {
     problemsetId: null,
     problemsetAdmin: false,
     payload: {
+      associatedIdentities: [],
       omegaUpLockDown: false,
       bootstrap4: false,
       inContest: false,
       isLoggedIn: false,
       isReviewer: false,
       gravatarURL51: '',
+      gravatarURL128: '',
+      currentEmail: '',
+      currentName: undefined,
       currentUsername: '',
       userClassname: 'user-rank-unranked',
       userCountry: 'xx',
@@ -2318,14 +2372,14 @@ export function GetOptionsFromLocation(
     arenaLocation.pathname.indexOf('/arena/problem/') !== -1
   ) {
     options.isOnlyProblem = true;
-    const match = /\/arena\/problem(?:v2)?\/([^\/]+)\/?/.exec(
+    const match = /\/arena\/problem(?:v2)?\/([^/]+)\/?/.exec(
       arenaLocation.pathname,
     );
     if (match) {
       options.onlyProblemAlias = match[1];
     }
   } else {
-    const match = /\/arena\/([^\/]+)\/?/.exec(arenaLocation.pathname);
+    const match = /\/arena\/([^/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];
     }
@@ -2373,9 +2427,9 @@ export class EventsSocket {
         const socket = new WebSocket(this.uri, 'com.omegaup.events');
 
         socket.onmessage = (message) => this.onmessage(message);
-        socket.onopen = (e: Event) => {
+        socket.onopen = () => {
           this.shouldRetry = true;
-          this.arena.elements.socketStatus.html('&bull;').css('color', '#080');
+          this.arena.updateSocketStatus('•', '#080');
           this.socketKeepalive = setInterval(
             () => socket.send('"ping"'),
             30000,
@@ -2419,6 +2473,7 @@ export class EventsSocket {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onclose(e: Event) {
     this.socket = null;
     if (this.socketKeepalive) {
@@ -2427,12 +2482,12 @@ export class EventsSocket {
     }
     if (this.shouldRetry && this.retries > 0) {
       this.retries--;
-      this.arena.elements.socketStatus.html('↻').css('color', '#888');
+      this.arena.updateSocketStatus('↻', '#888');
       setTimeout(() => this.connect(), Math.random() * 15000);
       return;
     }
 
-    this.arena.elements.socketStatus.html('✗').css('color', '#800');
+    this.arena.updateSocketStatus('✗', '#800');
   }
 }
 

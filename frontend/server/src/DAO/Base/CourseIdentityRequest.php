@@ -51,8 +51,10 @@ abstract class CourseIdentityRequest {
                     `course_id`,
                     `request_time`,
                     `last_update`,
-                    `accepted`
+                    `accepted`,
+                    `extra_note`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -73,6 +75,7 @@ abstract class CourseIdentityRequest {
                 intval($Course_Identity_Request->accepted) :
                 null
             ),
+            $Course_Identity_Request->extra_note,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         return \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();
@@ -94,7 +97,8 @@ abstract class CourseIdentityRequest {
             SET
                 `request_time` = ?,
                 `last_update` = ?,
-                `accepted` = ?
+                `accepted` = ?,
+                `extra_note` = ?
             WHERE
                 (
                     `identity_id` = ? AND
@@ -112,6 +116,7 @@ abstract class CourseIdentityRequest {
                 null :
                 intval($Course_Identity_Request->accepted)
             ),
+            $Course_Identity_Request->extra_note,
             (
                 is_null($Course_Identity_Request->identity_id) ?
                 null :
@@ -147,7 +152,8 @@ abstract class CourseIdentityRequest {
                 `Course_Identity_Request`.`course_id`,
                 `Course_Identity_Request`.`request_time`,
                 `Course_Identity_Request`.`last_update`,
-                `Course_Identity_Request`.`accepted`
+                `Course_Identity_Request`.`accepted`,
+                `Course_Identity_Request`.`extra_note`
             FROM
                 `Course_Identity_Request`
             WHERE
@@ -236,7 +242,8 @@ abstract class CourseIdentityRequest {
                 `Course_Identity_Request`.`course_id`,
                 `Course_Identity_Request`.`request_time`,
                 `Course_Identity_Request`.`last_update`,
-                `Course_Identity_Request`.`accepted`
+                `Course_Identity_Request`.`accepted`,
+                `Course_Identity_Request`.`extra_note`
             FROM
                 `Course_Identity_Request`
         ';
@@ -291,8 +298,10 @@ abstract class CourseIdentityRequest {
                     `course_id`,
                     `request_time`,
                     `last_update`,
-                    `accepted`
+                    `accepted`,
+                    `extra_note`
                 ) VALUES (
+                    ?,
                     ?,
                     ?,
                     ?,
@@ -321,6 +330,7 @@ abstract class CourseIdentityRequest {
                 null :
                 intval($Course_Identity_Request->accepted)
             ),
+            $Course_Identity_Request->extra_note,
         ];
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
         $affectedRows = \OmegaUp\MySQLConnection::getInstance()->Affected_Rows();

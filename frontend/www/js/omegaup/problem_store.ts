@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex from 'vuex';
 
 Vue.use(Vuex);
 

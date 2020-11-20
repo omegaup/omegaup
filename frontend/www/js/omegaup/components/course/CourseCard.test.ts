@@ -1,6 +1,5 @@
 import { mount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
 import T from '../../lang';
 import { types } from '../../api_types';
@@ -46,6 +45,7 @@ describe('CourseCard.vue', () => {
             start_time: new Date(),
           },
         ],
+        loggedIn: true,
         isOpen: false,
         showTopics: true,
       },
@@ -72,6 +72,7 @@ describe('CourseCard.vue', () => {
         progress: 70,
         content: [],
         isOpen: true,
+        loggedIn: true,
         showTopics: false,
       },
     });

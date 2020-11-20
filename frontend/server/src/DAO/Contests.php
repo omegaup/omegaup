@@ -909,4 +909,102 @@ class Contests extends \OmegaUp\DAO\Base\Contests {
 
         return $requestsUsersInfo === 'yes' || $requestsUsersInfo ===  'optional';
     }
+
+    /**
+     * @return list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}>
+     */
+    public static function getActivityReport(
+        \OmegaUp\DAO\VO\Contests $contest
+    ) {
+        $sql = '(
+            SELECT
+                i.username,
+                NULL AS alias,
+                pal.ip,
+                pal.`time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "open" AS event_type,
+                NULL AS clone_result,
+                NULL AS clone_token_payload,
+                NULL AS name
+            FROM
+                Problemset_Access_Log pal
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = pal.identity_id
+            WHERE
+                pal.problemset_id = ?
+        ) UNION (
+            SELECT
+                i.username,
+                p.alias,
+                sl.ip,
+                sl.`time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "submit" AS event_type,
+                NULL AS clone_result,
+                NULL AS clone_token_payload,
+                NULL AS name
+            FROM
+                Submission_Log sl
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = sl.identity_id
+            INNER JOIN
+                Submissions s
+            ON
+                s.submission_id = sl.submission_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            WHERE
+                sl.problemset_id = ?
+        ) ORDER BY time;';
+        /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$contest->problemset_id, $contest->problemset_id]
+        );
+    }
 }

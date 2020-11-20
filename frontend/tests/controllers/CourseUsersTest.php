@@ -98,7 +98,7 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         );
 
-        $this->assertEquals($response['template'], 'arena.course.intro.tpl');
+        $this->assertEquals($response['entrypoint'], 'course_intro');
     }
 
     public function testUserCanAccessToCourseDetailsWhenIsInvitedAsAdmin() {
@@ -131,5 +131,37 @@ class CourseUsersTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $this->assertEquals($response['entrypoint'], 'course_details');
+    }
+
+    public function testGetNotificationForAddAdministrator() {
+        $courseData = \OmegaUp\Test\Factories\Course::createCourse();
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        $adminLogin = \OmegaUp\Test\ControllerTestCase::login(
+            $courseData['admin']
+        );
+        \OmegaUp\Controllers\Course::apiAddAdmin(new \OmegaUp\Request([
+            'auth_token' => $adminLogin->auth_token,
+            'usernameOrEmail' => $identity->username,
+            'course_alias' => $courseData['course_alias'],
+        ]));
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Notification::apiMyList(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        );
+        $notificationContents = $response['notifications'][0]['contents'];
+
+        $this->assertCount(1, $response['notifications']);
+        $this->assertEquals(
+            \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_ADDED,
+            $notificationContents['type']
+        );
+        $this->assertEquals(
+            $courseData['course_name'],
+            $notificationContents['body']['localizationParams']['courseName']
+        );
     }
 }

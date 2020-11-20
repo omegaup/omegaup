@@ -1,83 +1,59 @@
 <template>
   <tr>
     <td class="text-center align-middle">
-      <a v-bind:href="studentProgressUrl">
+      <a :href="studentProgressUrl">
         {{ student.name || student.username }}
       </a>
     </td>
     <td
-      class="score flex-column justify-content-center align-items-center"
       v-for="assignment in assignments"
-      v-bind:key="assignment.alias"
+      :key="assignment.alias"
+      class="flex-column text-center text-nowrap justify-content-center align-items-center"
     >
-      <omegaup-markdown
-        v-bind:markdown="getProgressDescription(assignment.alias)"
-      ></omegaup-markdown>
+      {{ getProgressDescription(assignment.alias) }}
       <div class="d-flex justify-content-center">
-        <div v-if="!student.progress.hasOwnProperty(assignment.alias)">
-          {{ T.wordsProblemsUnsolved }}
-        </div>
         <div
-          v-else
+          v-if="
+            Object.prototype.hasOwnProperty.call(
+              student.progress,
+              assignment.alias,
+            )
+          "
           class="d-flex border border-dark"
-          v-bind:class="{ invisible: points(assignment.alias) === 0 }"
+          :class="{ invisible: points(assignment.alias) === 0 }"
         >
           <div
-            v-bind:key="index"
             v-for="(problem, index) in Object.keys(
               student.points[assignment.alias],
             )"
-            v-bind:class="getProblemColor(assignment.alias, problem)"
+            :key="index"
+            v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
+            :class="getProblemColor(assignment.alias, problem)"
             data-toggle="tooltip"
             data-placement="bottom"
-            v-tooltip="getProgressTooltipDescription(assignment.alias, problem)"
           ></div>
         </div>
       </div>
     </td>
+    <td data-global-score class="text-center font-weight-bold align-middle">
+      {{ globalScore }}%
+    </td>
   </tr>
 </template>
 
-<style lang="scss">
-@import '../../../../sass/main.scss';
-
-.box {
-  width: 20px;
-  height: 20px;
-  border: 1px solid $omegaup-dark-grey;
-}
-
-.bg-green {
-  background: $omegaup-green;
-}
-
-.bg-yellow {
-  background: yellow;
-}
-
-.bg-red {
-  background: red;
-}
-
-.bg-black {
-  background: $omegaup-grey;
-}
-</style>
-
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import * as ui from '../../ui';
 import T from '../../lang';
-import omegaup_Markdown from '../Markdown.vue';
 import 'v-tooltip/dist/v-tooltip.css';
 import { VTooltip } from 'v-tooltip';
+import * as markdown from '../../markdown';
+
+const markdownConverter = new markdown.Converter();
 
 @Component({
-  components: {
-    'omegaup-markdown': omegaup_Markdown,
-  },
   directives: {
     tooltip: VTooltip,
   },
@@ -86,11 +62,17 @@ export default class StudentProgress extends Vue {
   @Prop() course!: types.CourseDetails;
   @Prop() student!: types.StudentProgress;
   @Prop() assignments!: omegaup.Assignment[];
+  @Prop() problemTitles!: { [key: string]: string };
 
   T = T;
 
   progress(assignmentAlias: string): number {
-    if (!this.student.progress.hasOwnProperty(assignmentAlias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        this.student.progress,
+        assignmentAlias,
+      )
+    ) {
       return 0;
     }
     return (
@@ -105,7 +87,9 @@ export default class StudentProgress extends Vue {
   }
 
   score(assignmentAlias: string): number {
-    if (!this.student.score.hasOwnProperty(assignmentAlias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(this.student.score, assignmentAlias)
+    ) {
       return 0;
     }
     return Math.round(
@@ -118,7 +102,12 @@ export default class StudentProgress extends Vue {
   }
 
   points(assignmentAlias: string): number {
-    if (!this.student.points.hasOwnProperty(assignmentAlias)) {
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        this.student.points,
+        assignmentAlias,
+      )
+    ) {
       return 0;
     }
     return Object.values(this.student.points[assignmentAlias]).reduce(
@@ -127,16 +116,29 @@ export default class StudentProgress extends Vue {
     );
   }
 
+  get globalScore(): string {
+    const totalPoints = this.assignments
+      .map((assignment) => assignment.max_points ?? 0)
+      .reduce((acc, curr) => acc + curr, 0);
+    if (!totalPoints) {
+      return '0.00';
+    }
+
+    return this.assignments
+      .map((assignment) => (this.score(assignment.alias) * 100) / totalPoints)
+      .reduce((acc, curr) => acc + curr, 0)
+      .toFixed(0);
+  }
+
   getProgressDescription(assignmentAlias: string): string {
     const score = this.score(assignmentAlias);
     const points = this.points(assignmentAlias);
     if (points === 0) {
-      return T.studentProgressOnlyLecturesDescription;
+      return T.courseWithoutProblems;
     }
     return ui.formatString(T.studentProgressDescription, {
       score: score,
-      points: points,
-      progress: (points != 0 ? (score / points) * 100 : 0).toFixed(2),
+      progress: (points != 0 ? (score / points) * 100 : 0).toFixed(0),
     });
   }
 
@@ -168,12 +170,14 @@ export default class StudentProgress extends Vue {
     assignmentAlias: string,
     problemAlias: string,
   ): string {
-    return ui.formatString(T.studentProgressTooltipDescription, {
-      problem: problemAlias,
-      score: this.getScore(assignmentAlias, problemAlias),
-      points: this.getPoints(assignmentAlias, problemAlias),
-      progress: this.getProgress(assignmentAlias, problemAlias),
-    });
+    return markdownConverter.makeHtml(
+      ui.formatString(T.studentProgressTooltipDescription, {
+        problem: this.problemTitles[problemAlias],
+        score: this.getScore(assignmentAlias, problemAlias),
+        points: this.getPoints(assignmentAlias, problemAlias),
+        progress: this.getProgress(assignmentAlias, problemAlias),
+      }),
+    );
   }
 
   get studentProgressUrl(): string {
@@ -181,3 +185,29 @@ export default class StudentProgress extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+.box {
+  width: 20px;
+  height: 20px;
+  border: 1px solid $omegaup-dark-grey;
+}
+
+.bg-green {
+  background: $omegaup-green;
+}
+
+.bg-yellow {
+  background: yellow;
+}
+
+.bg-red {
+  background: red;
+}
+
+.bg-black {
+  background: $omegaup-grey;
+}
+</style>

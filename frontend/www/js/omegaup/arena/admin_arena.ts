@@ -4,6 +4,7 @@ import * as api from '../api';
 import { types } from '../api_types';
 import T from '../lang';
 import arena_Runs from '../components/arena/Runs.vue';
+import arena_Runsv2 from '../components/arena/Runsv2.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
@@ -15,6 +16,7 @@ export default class ArenaAdmin {
   runsList: Vue;
 
   constructor(arena: Arena) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
 
     this.arena = arena;
@@ -24,6 +26,9 @@ export default class ArenaAdmin {
     this.setUpPagers();
     this.runsList = new Vue({
       el: globalRuns ? '#main-container' : '#runs table.runs',
+      components: {
+        'omegaup-arena-runs': globalRuns ? arena_Runsv2 : arena_Runs,
+      },
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
@@ -48,7 +53,7 @@ export default class ArenaAdmin {
                 return;
               }
               api.Run.disqualify({ run_alias: run.guid })
-                .then((data) => {
+                .then(() => {
                   run.type = 'disqualified';
                   arena.updateRunFallback(run.guid);
                 })
@@ -59,7 +64,7 @@ export default class ArenaAdmin {
             },
             rejudge: (run: types.Run) => {
               api.Run.rejudge({ run_alias: run.guid, debug: false })
-                .then((data) => {
+                .then(() => {
                   run.status = 'rejudging';
                   self.arena.updateRunFallback(run.guid);
                 })
@@ -68,52 +73,55 @@ export default class ArenaAdmin {
           },
         });
       },
-      components: { 'omegaup-arena-runs': arena_Runs },
     });
   }
 
   setUpPagers(): void {
-    $('.clarifpager .clarifpagerprev').on('click', () => {
-      if (this.arena.clarificationsOffset > 0) {
-        this.arena.clarificationsOffset -= this.arena.clarificationsRowcount;
+    document
+      .querySelector('.clarifpager .clarifpagerprev')
+      ?.addEventListener('click', () => {
+        if (this.arena.clarificationsOffset > 0) {
+          this.arena.clarificationsOffset -= this.arena.clarificationsRowcount;
+          if (this.arena.clarificationsOffset < 0) {
+            this.arena.clarificationsOffset = 0;
+          }
+
+          this.refreshClarifications();
+        }
+      });
+
+    document
+      .querySelector('.clarifpager .clarifpagernext')
+      ?.addEventListener('click', () => {
+        this.arena.clarificationsOffset += this.arena.clarificationsRowcount;
         if (this.arena.clarificationsOffset < 0) {
           this.arena.clarificationsOffset = 0;
         }
 
         this.refreshClarifications();
+      });
+
+    this.arena.elements.clarification?.addEventListener('submit', () => {
+      const clarificationElement = this.arena.elements.clarification;
+      if (clarificationElement === null) {
+        return;
       }
-    });
-
-    $('.clarifpager .clarifpagernext').on('click', () => {
-      this.arena.clarificationsOffset += this.arena.clarificationsRowcount;
-      if (this.arena.clarificationsOffset < 0) {
-        this.arena.clarificationsOffset = 0;
-      }
-
-      this.refreshClarifications();
-    });
-
-    this.arena.elements.clarification.on('submit', (e: Event) => {
-      $('input', this.arena.elements.clarification).attr(
-        'disabled',
-        'disabled',
-      );
+      clarificationElement
+        .querySelectorAll('input')
+        .forEach((input) => input.setAttribute('disabled', 'disabled'));
       api.Clarification.create({
         contest_alias: this.arena.options.contestAlias,
-        problem_alias: $(
-          'select[name="problem"]',
-          this.arena.elements.clarification,
-        ).val(),
-        username: $(
-          'select[name="user"]',
-          this.arena.elements.clarification,
-        ).val(),
-        message: $(
-          'textarea[name="message"]',
-          this.arena.elements.clarification,
-        ).val(),
+        problem_alias: (<HTMLInputElement>(
+          clarificationElement.querySelector('select[name="problem"]')
+        )).value,
+        username: (<HTMLInputElement>(
+          clarificationElement.querySelector('select[name="user"]')
+        )).value,
+        message: (<HTMLInputElement>(
+          clarificationElement.querySelector('textarea[name="message"]')
+        )).value,
       })
-        .then((response) => {
+        .then(() => {
           this.arena.hideOverlay();
           this.refreshClarifications();
         })
@@ -121,7 +129,9 @@ export default class ArenaAdmin {
           alert(e.error);
         })
         .finally(() => {
-          $('input', this.arena.elements.clarification).prop('disabled', false);
+          clarificationElement
+            .querySelectorAll('input')
+            .forEach((input) => input.removeAttribute('disabled'));
         });
 
       return false;
@@ -131,7 +141,7 @@ export default class ArenaAdmin {
   refreshRuns(): void {
     const runsListComponent = <arena_Runs>this.runsList.$children[0];
 
-    var options = {
+    const options = {
       assignment_alias: <string | undefined>undefined,
       contest_alias: <string | undefined>undefined,
       course_alias: <string | undefined>undefined,

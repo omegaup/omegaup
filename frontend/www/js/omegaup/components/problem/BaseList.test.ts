@@ -1,15 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
-import T from '../../lang';
-import { omegaup } from '../../omegaup';
+import problem_BaseList from './BaseList.vue';
 
-import problem_List from './List.vue';
-
-describe('List.vue', () => {
+describe('BaseList.vue', () => {
   it('Should handle empty list of problems', async () => {
-    const wrapper = shallowMount(problem_List, {
+    const wrapper = shallowMount(problem_BaseList, {
       propsData: {
         isSysadmin: false,
         problems: [],

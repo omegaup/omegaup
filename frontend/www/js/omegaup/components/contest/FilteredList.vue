@@ -2,7 +2,7 @@
   <div v-if="contests.length === 0">
     <div class="empty-category">{{ T.contestListEmpty }}</div>
   </div>
-  <div v-else="">
+  <div v-else>
     <h5 v-if="recommended">{{ T.arenaPageRecommendedContestsText }}</h5>
     <div class="card-body">
       <table class="contest-list table">
@@ -12,7 +12,7 @@
             <th v-if="showTimes">{{ T.wordsStartTime }}</th>
             <th v-if="showTimes">{{ T.wordsEndTime }}</th>
             <th v-if="showTimes">{{ T.wordsDuration }}</th>
-            <th colspan="2" v-if="showPractice"></th>
+            <th v-if="showPractice" colspan="2"></th>
             <th v-if="showVirtual"></th>
             <th v-if="showPublicUpdated">
               {{ T.wordsPublicUpdated }}
@@ -23,22 +23,22 @@
           <template v-for="contest in page">
             <tr>
               <td class="">
-                <a v-bind:href="`/arena/${contest.alias}/`">
+                <a :href="`/arena/${contest.alias}/`">
                   <span>{{ ui.contestTitle(contest) }}</span>
                   <span
+                    v-if="contest.recommended"
                     class="glyphicon glyphicon-ok"
                     aria-hidden="true"
-                    v-if="contest.recommended"
                   ></span>
                 </a>
               </td>
               <td v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.start_time.iso())">{{
+                <a :href="getTimeLink(contest.start_time.iso())">{{
                   contest.start_time.long()
                 }}</a>
               </td>
               <td v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.finish_time.iso())">{{
+                <a :href="getTimeLink(contest.finish_time.iso())">{{
                   contest.finish_time.long()
                 }}</a>
               </td>
@@ -46,17 +46,17 @@
                 {{ time.toDDHHMM(contest.duration) }}
               </td>
               <td v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/practice/`">
+                <a :href="`/arena/${contest.alias}/practice/`">
                   <span>{{ T.wordsPractice }}</span>
                 </a>
               </td>
               <td v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/#ranking`">
+                <a :href="`/arena/${contest.alias}/#ranking`">
                   <span>{{ T.wordsContestsResults }}</span>
                 </a>
               </td>
               <td v-if="!ui.isVirtual(contest) && showVirtual">
-                <a v-bind:href="`/arena/${contest.alias}/virtual/`">
+                <a :href="`/arena/${contest.alias}/virtual/`">
                   <span>{{ T.virtualContest }}</span>
                 </a>
               </td>
@@ -73,14 +73,12 @@
         </tbody>
         <tfoot>
           <tr v-if="hasNext || hasPrevious" align="center">
-            <td class="no-wrap" v-bind:colspan="pagerColumns">
-              <a v-if="hasPrevious" v-on:click="previous" href="#">{{
+            <td class="no-wrap" :colspan="pagerColumns">
+              <a v-if="hasPrevious" href="#" @click="previous">{{
                 T.wordsPrevPage
               }}</a>
               <span class="page-num">{{ pageNumber }}</span>
-              <a v-if="hasNext" v-on:click="next" href="#">{{
-                T.wordsNextPage
-              }}</a>
+              <a v-if="hasNext" href="#" @click="next">{{ T.wordsNextPage }}</a>
             </td>
           </tr>
         </tfoot>
@@ -90,7 +88,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';

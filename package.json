@@ -20,6 +20,8 @@
     "@types/jszip": "3.1.4",
     "@types/mocha": "^7.0.2",
     "@types/prismjs": "^1.16.1",
+    "@typescript-eslint/eslint-plugin": "^4.3.0",
+    "@typescript-eslint/parser": "^4.3.0",
     "@voerro/vue-tagsinput": "^2.0.2",
     "@vue/test-utils": "^1.0.3",
     "babel-loader": "^8.0.5",
@@ -27,6 +29,9 @@
     "core-js": "^3.6.5",
     "cross-env": "^6.0.3",
     "css-loader": "^3.2.0",
+    "eslint": "^7.10.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-plugin-vue": "^7.0.0",
     "expect": "^26.0.1",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "file-loader": "^4.2.0",
@@ -102,6 +107,7 @@
     "vue-async-computed": "^3.8.1",
     "vue-async-computed-decorator": "^0.0.4",
     "vue-multiselect": "^2.1.6",
+    "vue-recaptcha": "^1.3.0",
     "vue-slider-component": "^3.0.25",
     "vue-typeahead-bootstrap": "^2.1.2"
   }

@@ -4,7 +4,6 @@ import Vue from 'vue';
 import T from '../lang';
 import contest_Edit from '../components/contest/Editv2.vue';
 import contest_AddProblem from '../components/contest/AddProblemv2.vue';
-import problem_Versions from '../components/problem/Versions.vue';
 import * as ui from '../ui';
 import * as api from '../api';
 
@@ -13,16 +12,77 @@ OmegaUp.on('ready', () => {
 
   const contestEdit = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-contest-edit': contest_Edit,
+    },
+    data: () => ({
+      details: payload.details,
+      problems: payload.problems,
+      requests: payload.requests,
+      users: payload.users,
+    }),
+    methods: {
+      arbitrateRequest: (username: string, resolution: boolean): void => {
+        const resolutionText = resolution ? T.wordAccepted : T.wordsDenied;
+        api.Contest.arbitrateRequest({
+          contest_alias: payload.details.alias,
+          username,
+          resolution,
+          note: resolutionText,
+        })
+          .then(() => {
+            ui.success(T.successfulOperation);
+            contestEdit.refreshRequests();
+          })
+          .catch(ui.apiError);
+      },
+      refreshDetails: (): void => {
+        api.Contest.adminDetails({
+          contest: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.details = response;
+          })
+          .catch(ui.apiError);
+      },
+      refreshProblems: (): void => {
+        api.Contest.problems({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.problems = response.problems;
+          })
+          .catch(ui.apiError);
+      },
+      refreshRequests: (): void => {
+        api.Contest.requests({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.requests = response.users;
+          })
+          .catch(ui.apiError);
+      },
+      refreshUsers: (): void => {
+        api.Contest.users({
+          contest_alias: payload.details.alias,
+        })
+          .then((response) => {
+            contestEdit.users = response.users;
+          })
+          .catch(ui.apiError);
+      },
+    },
     render: function (createElement) {
       return createElement('omegaup-contest-edit', {
         props: {
           admins: payload.admins,
-          details: payload.details,
+          details: this.details,
           groups: payload.groups,
           groupAdmins: payload.group_admins,
           problems: this.problems,
-          requests: payload.requests,
-          users: payload.users,
+          requests: this.requests,
+          users: this.users,
         },
         on: {
           'add-problem': (problem: types.ContestProblem) => {
@@ -98,25 +158,85 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'update-admission-mode': (admissionMode: string) => {
+            api.Contest.update({
+              contest_alias: payload.details.alias,
+              admission_mode: admissionMode,
+            })
+              .then(() => {
+                ui.success(`
+                  ${T.contestEditContestEdited} <a href="/arena/${payload.details.alias}/">${T.contestEditGoToContest}</a>
+                `);
+                this.refreshDetails();
+                if (admissionMode === 'registration') {
+                  this.refreshRequests();
+                }
+              })
+              .catch(ui.apiError);
+          },
+          'add-user': (contestants: string[]) => {
+            Promise.allSettled(
+              contestants.map((user: string) =>
+                api.Contest.addUser({
+                  contest_alias: payload.details.alias,
+                  usernameOrEmail: user,
+                }).catch(() => user),
+              ),
+            )
+              .then((results) => {
+                const contestantsWithError: string[] = results
+                  .filter(
+                    (result): result is PromiseRejectedResult =>
+                      result.status === 'rejected',
+                  )
+                  .map((result) => result.reason);
+                this.refreshUsers();
+                this.refreshRequests();
+                if (!contestantsWithError.length) {
+                  ui.success(T.bulkUserAddSuccess);
+                } else {
+                  ui.error(
+                    ui.formatString(T.bulkUserAddError, {
+                      userEmail: contestantsWithError.join('<br>'),
+                    }),
+                  );
+                }
+              })
+              .catch(ui.ignoreError);
+          },
+          'remove-user': (contestant: types.ContestUser) => {
+            api.Contest.removeUser({
+              contest_alias: payload.details.alias,
+              usernameOrEmail: contestant.username,
+            })
+              .then(() => {
+                ui.success(T.userRemoveSuccess);
+                this.refreshUsers();
+              })
+              .catch(ui.apiError);
+          },
+          'save-end-time': (user: types.ContestUser) => {
+            if (user.end_time === undefined) {
+              return;
+            }
+            api.Contest.updateEndTimeForIdentity({
+              contest_alias: payload.details.alias,
+              username: user.username,
+              end_time: user.end_time,
+            })
+              .then(() => {
+                ui.success(T.userEndTimeUpdatedSuccessfully);
+              })
+              .catch(ui.apiError);
+          },
+          'accept-request': (username: string) => {
+            this.arbitrateRequest(username, true);
+          },
+          'deny-request': (username: string) => {
+            this.arbitrateRequest(username, false);
+          },
         },
       });
-    },
-    data: {
-      problems: payload.problems,
-    },
-    components: {
-      'omegaup-contest-edit': contest_Edit,
-    },
-    methods: {
-      refreshProblems: (): void => {
-        api.Contest.problems({
-          contest_alias: payload.details.alias,
-        })
-          .then((response) => {
-            contestEdit.problems = response.problems;
-          })
-          .catch(ui.apiError);
-      },
     },
   });
 });

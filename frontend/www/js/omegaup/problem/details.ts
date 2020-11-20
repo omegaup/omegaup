@@ -20,6 +20,24 @@ OmegaUp.on('ready', () => {
   const locationHash = window.location.hash.substr(1).split('/');
   const problemDetails = new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-problem-details': problem_Details,
+    },
+    data: () => ({
+      initialClarifications: payload.clarifications,
+      solutionStatus: payload.solutionStatus,
+      solution: <types.ProblemStatement | null>null,
+      availableTokens: 0,
+      allTokens: 0,
+      allRuns: <types.Run[]>payload.allRuns,
+      runs: <types.Run[]>payload.runs,
+      runDetails: <types.RunDetails | null>null,
+      showNewRunWindow: locationHash.includes('new-run'),
+      showRunDetailsWindow: false,
+      activeTab: window.location.hash
+        ? window.location.hash.substr(1).split('/')[0]
+        : 'problems',
+    }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
         props: {
@@ -39,6 +57,12 @@ OmegaUp.on('ready', () => {
           allTokens: this.allTokens,
           showNewRunWindow: this.showNewRunWindow,
           showRunDetailsWindow: this.showRunDetailsWindow,
+          allowUserAddTags: payload.allowUserAddTags,
+          levelTags: payload.levelTags,
+          problemLevel: payload.problemLevel,
+          publicTags: payload.publicTags,
+          selectedPublicTags: payload.selectedPublicTags,
+          selectedPrivateTags: payload.selectedPrivateTags,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -99,7 +123,7 @@ OmegaUp.on('ready', () => {
               nomination: 'dismissal',
               contents: JSON.stringify(contents),
             })
-              .then((data) => {
+              .then(() => {
                 ui.info(T.qualityNominationRateProblemDesc);
               })
               .catch(ui.apiError);
@@ -211,7 +235,7 @@ OmegaUp.on('ready', () => {
               return;
             }
             api.Run.disqualify({ run_alias: run.guid })
-              .then((data) => {
+              .then(() => {
                 run.type = 'disqualified';
                 arenaInstance.updateRunFallback(run.guid);
               })
@@ -219,7 +243,7 @@ OmegaUp.on('ready', () => {
           },
           rejudge: (run: types.Run) => {
             api.Run.rejudge({ run_alias: run.guid, debug: false })
-              .then((data) => {
+              .then(() => {
                 run.status = 'rejudging';
                 arenaInstance.updateRunFallback(run.guid);
               })
@@ -235,24 +259,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      initialClarifications: payload.clarifications,
-      solutionStatus: payload.solutionStatus,
-      solution: <types.ProblemStatement | null>null,
-      availableTokens: 0,
-      allTokens: 0,
-      allRuns: <types.Run[]>payload.allRuns,
-      runs: <types.Run[]>payload.runs,
-      runDetails: <types.RunDetails | null>null,
-      showNewRunWindow: locationHash.includes('new-run'),
-      showRunDetailsWindow: false,
-      activeTab: window.location.hash
-        ? window.location.hash.substr(1).split('/')[0]
-        : 'problems',
-    },
-    components: {
-      'omegaup-problem-details': problem_Details,
     },
   });
 

@@ -4,10 +4,19 @@ import * as markdown from './markdown';
 
 describe('markdown', () => {
   describe('Converter', () => {
-    const converter = new markdown.Converter();
+    const converter = new markdown.Converter({ preview: true });
 
     it('Should handle trivial inputs', () => {
       expect(converter.makeHtml('Foo')).toEqual('<p>Foo</p>');
+    });
+
+    it('Should handle templates', () => {
+      expect(converter.makeHtml('{{libinteractive:download}}')).toEqual(
+        '<p><code class="libinteractive-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+      );
+      expect(converter.makeHtml('{{output-only:download}}')).toEqual(
+        '<p><code class="output-only-download"><i class="glyphicon glyphicon-download-alt"></i></code></p>',
+      );
     });
 
     it('Should handle path-style links', () => {
@@ -44,7 +53,17 @@ describe('markdown', () => {
       ).toEqual('');
     });
 
-    it('Should handle valid iframe tag', () => {
+    it('Should handle valid iframe tag form facebook', () => {
+      expect(
+        converter.makeHtml(
+          '<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup%2Fvideos%2F291451792022031%2F&show_text=0&width=560" width="560" height="315" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>',
+        ),
+      ).toEqual(
+        '<iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fomegaup%2Fvideos%2F291451792022031%2F&show_text=0&width=560" width="560" height="315" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true"></iframe>',
+      );
+    });
+
+    it('Should handle valid iframe tag from youtube', () => {
       expect(
         converter.makeHtml(`<figure class="video_container">
            <iframe src="https://www.youtube.com/embed/enMumwvLAug" frameborder="0" allowfullscreen="true"> </iframe>
@@ -90,9 +109,12 @@ Case #2: 15
       ).toEqual(`<h1>Ejemplo</h1>
 
 <table class="sample_io">
-<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead><tbody><tr><td><pre>1
-2</pre></td><td><pre>Case #1: 3</pre></td><td><p>Explicación</p></td></tr><tr><td><pre>5
-10</pre></td><td><pre>Case #2: 15</pre></td><td></td></tr></tbody>
+<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead>
+<tbody><tr><td><pre>1
+2</pre></td><td><pre>Case #1: 3</pre></td><td><p>Explicación</p></td></tr>
+<tr><td><pre>5
+10</pre></td><td><pre>Case #2: 15</pre></td><td></td></tr>
+</tbody>
 </table>`);
     });
 
@@ -139,7 +161,8 @@ Tags <b>hello</b>
       ).toEqual(`<h1>Ejemplo</h1>
 
 <table class="sample_io">
-<thead><tr><th>Entrada</th><th>Salida</th></tr></thead><tbody><tr><td><pre>5 5 2
+<thead><tr><th>Entrada</th><th>Salida</th></tr></thead>
+<tbody><tr><td><pre>5 5 2
 #####
 #A#B#
 #...#
@@ -170,7 +193,117 @@ Other escapes: $~~T~D~E32E
 
 Tags &lt;b&gt;hello&lt;/b&gt;
 
-&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td></tr></tbody>
+&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td></tr>
+</tbody>
+</table>`);
+    });
+
+    it('Should handle sample I/O tables from files', () => {
+      expect(
+        converter.makeHtmlWithImages(
+          `# Ejemplo
+
+||examplefile
+one
+||description
+yes
+||examplefile
+two
+||end`,
+          {},
+          {},
+          {
+            cases: {
+              one: {
+                in: 'hello',
+                out: 'world',
+              },
+              two: {
+                in: `5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+> hi <
+> hello <
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags <b>hello</b>
+
+<pre>hi</pre>`,
+                out: '0',
+              },
+            },
+            limits: {
+              ExtraWallTime: '0s',
+              MemoryLimit: 0,
+              OutputLimit: 0,
+              OverallWallTimeLimit: '0s',
+              TimeLimit: '0s',
+            },
+            validator: {
+              name: 'token',
+            },
+          },
+        ),
+      ).toEqual(`<h1>Ejemplo</h1>
+
+<table class="sample_io">
+<thead><tr><th>Entrada</th><th>Salida</th><th>Descripción</th></tr></thead>
+<tbody><tr><td><pre>hello</pre></td><td><pre>world</pre></td><td><p>yes</p></td></tr>
+<tr><td><pre>5 5 2
+#####
+#A#B#
+#...#
+#b#a#
+#####
+
+headers
+=======
+
+- lists
+
+****
+
+----
+
+____
+
+\`\`\`
+github flavored markdown
+\`\`\`
+
+&gt; hi &lt;
+&gt; hello &lt;
+
+    other kind of blockquote
+
+Other escapes: $~~T~D~E32E
+
+Tags &lt;b&gt;hello&lt;/b&gt;
+
+&lt;pre&gt;hi&lt;/pre&gt;</pre></td><td><pre>0</pre></td><td></td></tr>
+</tbody>
 </table>`);
     });
 
@@ -428,6 +561,28 @@ Tags &lt;b&gt;hello&lt;/b&gt;
         converter.makeHtml('```python\ndef foo(x):\n  return 3\n```'),
       ).toEqual(
         '<pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre>',
+      );
+    });
+
+    it('Should handle file transclusions', () => {
+      expect(
+        converter.makeHtmlWithImages(
+          '{{sample.py}}',
+          {},
+          { 'sample.py': 'def foo(x):\n  return 3\n' },
+        ),
+      ).toEqual(
+        '<p><pre><code class="language-python"><span class="token keyword">def</span> <span class="token function">foo</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>\n  <span class="token keyword">return</span> <span class="token number">3</span>\n</code></pre></p>',
+      );
+      // All Markdown special characters should be escaped.
+      expect(
+        converter.makeHtmlWithImages(
+          '{{Sample.in}}',
+          {},
+          { 'Sample.in': '<>&\n*foo* _bar_\n[img](img)\n\\\n' },
+        ),
+      ).toEqual(
+        '<p><pre><code class="language-in">&lt;&gt;&amp;\n*foo* _bar_\n[img](img)\n\\\n</code></pre></p>',
       );
     });
   });

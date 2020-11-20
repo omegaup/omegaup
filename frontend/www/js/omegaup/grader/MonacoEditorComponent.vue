@@ -8,8 +8,14 @@ import * as monaco from 'monaco-editor';
 
 export default {
   props: {
-    store: Object,
-    storeMapping: Object,
+    store: {
+      type: Object,
+      required: true,
+    },
+    storeMapping: {
+      type: Object,
+      required: true,
+    },
     theme: {
       type: String,
       default: 'vs-dark',
@@ -29,26 +35,6 @@ export default {
     initialLanguage: {
       type: String,
       default: null,
-    },
-  },
-  mounted: function () {
-    this._editor = monaco.editor.create(this.$el, {
-      autoIndent: true,
-      formatOnPaste: true,
-      formatOnType: true,
-      language: Util.languageMonacoModelMapping[this.language],
-      readOnly: this.readOnly,
-      theme: this.theme,
-      value: this.contents,
-    });
-    this._model = this._editor.getModel();
-    this._model.onDidChangeContent(() => {
-      this.contents = this._model.getValue();
-    });
-  },
-  methods: {
-    onResize: function () {
-      this._editor.layout();
     },
   },
   computed: {
@@ -92,6 +78,26 @@ export default {
     },
     contents: function (value) {
       if (this._model.getValue() != value) this._model.setValue(value);
+    },
+  },
+  mounted: function () {
+    this._editor = monaco.editor.create(this.$el, {
+      autoIndent: true,
+      formatOnPaste: true,
+      formatOnType: true,
+      language: Util.languageMonacoModelMapping[this.language],
+      readOnly: this.readOnly,
+      theme: this.theme,
+      value: this.contents,
+    });
+    this._model = this._editor.getModel();
+    this._model.onDidChangeContent(() => {
+      this.contents = this._model.getValue();
+    });
+  },
+  methods: {
+    onResize: function () {
+      this._editor.layout();
     },
   },
 };

@@ -5,6 +5,10 @@
 /**
  *  GroupController
  *
+ * @psalm-type Identity=array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}
+ * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
+ * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
+ *
  * @author joemmanuel
  */
 
@@ -66,7 +70,10 @@ class Group extends \OmegaUp\Controllers\Controller {
     public static function apiCreate(\OmegaUp\Request $r) {
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias');
+        $groupAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         \OmegaUp\Validators::validateStringNonEmpty(
             $r['description'],
@@ -74,7 +81,7 @@ class Group extends \OmegaUp\Controllers\Controller {
         );
 
         self::createGroup(
-            $r['alias'],
+            $groupAlias,
             $r['name'],
             $r['description'],
             $r->user->user_id
@@ -89,11 +96,10 @@ class Group extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      */
-    public static function validateGroup(
-        ?string $groupAlias,
+    public static function validateGroupAndOwner(
+        string $groupAlias,
         \OmegaUp\DAO\VO\Identities $identity
     ): ?\OmegaUp\DAO\VO\Groups {
-        \OmegaUp\Validators::validateStringNonEmpty($groupAlias, 'group_alias');
         $group = \OmegaUp\DAO\Groups::findByAlias($groupAlias);
         if (is_null($group)) {
             return null;
@@ -103,16 +109,6 @@ class Group extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
         return $group;
-    }
-
-    /**
-     * Validate common params for these APIs
-     */
-    private static function validateGroupAndOwner(
-        ?string $groupAlias,
-        \OmegaUp\DAO\VO\Identities $identity
-    ): ?\OmegaUp\DAO\VO\Groups {
-        return self::validateGroup($groupAlias, $identity);
     }
 
     /**
@@ -127,11 +123,11 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiAddUser(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidNamespacedAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
@@ -177,11 +173,11 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiRemoveUser(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidNamespacedAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
@@ -270,17 +266,17 @@ class Group extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<array{alias: string, create_time: string, description: null|string, name: string}>}
+     * @return array{group: array{create_time: int, alias: null|string, name: null|string, description: null|string}, scoreboards: list<GroupScoreboard>}
      *
      * @omegaup-request-param string $group_alias
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidNamespacedAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\NotFoundException('groupNotFound');
         }
@@ -301,7 +297,7 @@ class Group extends \OmegaUp\Controllers\Controller {
             'scoreboards' => [],
         ];
         foreach ($scoreboards as $scoreboard) {
-            /** @var array{alias: string, create_time: string, description: null|string, name: string} */
+            /** @var GroupScoreboard */
             $response['scoreboards'][] = $scoreboard->asFilteredArray([
                 'alias',
                 'create_time',
@@ -323,11 +319,11 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiMembers(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidNamespacedAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
-        $group = self::validateGroupAndOwner($r['group_alias'], $r->identity);
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
@@ -354,11 +350,11 @@ class Group extends \OmegaUp\Controllers\Controller {
      */
     public static function apiCreateScoreboard(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidNamespacedAlias(
-            $r['group_alias'],
-            'group_alias'
+        $groupAlias = $r->ensureString(
+            'group_alias',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
         );
-        $group = self::validateGroup($r['group_alias'], $r->identity);
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
         if (is_null($group)) {
             throw new \OmegaUp\Exceptions\InvalidParameterException(
                 'parameterNotFound',
@@ -366,7 +362,10 @@ class Group extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        \OmegaUp\Validators::validateValidAlias($r['alias'], 'alias');
+        $groupScoreboardAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
         \OmegaUp\Validators::validateStringNonEmpty($r['name'], 'name');
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['description'],
@@ -377,17 +376,19 @@ class Group extends \OmegaUp\Controllers\Controller {
             'group_id' => $group->group_id,
             'name' => $r['name'],
             'description' => $r['description'],
-            'alias' => $r['alias'],
+            'alias' => $groupScoreboardAlias,
             'create_time' => \OmegaUp\Time::get(),
         ]));
 
-        self::$log->info("New scoreboard created {$r['alias']}");
+        self::$log->info("New scoreboard created {$groupScoreboardAlias}");
 
         return ['status' => 'ok'];
     }
 
     /**
-     * @return array{smartyProperties: array{IS_ORGANIZER: bool, payload: array{countries: list<\OmegaUp\DAO\VO\Countries>}}, template: string}
+     * @return array{smartyProperties: array{IS_ORGANIZER: bool, payload: GroupEditPayload, title: \OmegaUp\TranslationString}, template: string}
+     *
+     * @omegaup-request-param string $group
      */
     public static function getGroupEditDetailsForSmarty(
         \OmegaUp\Request $r
@@ -400,17 +401,60 @@ class Group extends \OmegaUp\Controllers\Controller {
         ) && \OmegaUp\Authorization::canCreateGroupIdentities(
             $r->identity
         );
+
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
+        if (is_null($group) || is_null($group->group_id)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'group_alias'
+            );
+        }
+
+        $scoreboardsByGroup = \OmegaUp\DAO\GroupsScoreboards::getByGroup(
+            $group->group_id
+        );
+        $scoreboards = [];
+
+        foreach ($scoreboardsByGroup as $scoreboard) {
+            /** @var GroupScoreboard */
+            $scoreboards[] = $scoreboard->asFilteredArray([
+                'alias',
+                'create_time',
+                'description',
+                'name',
+            ]);
+        }
+
         return [
             'smartyProperties' => [
                 'IS_ORGANIZER' => $isOrganizer,
                 'payload' => [
+                    'groupAlias' => $groupAlias,
+                    'groupName' => $group->name,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,
                         'name'
                     ),
+                    'identities' => \OmegaUp\DAO\GroupsIdentities::getMemberIdentities(
+                        $group
+                    ),
+                    'isOrganizer' => \OmegaUp\Experiments::getInstance()->isEnabled(
+                        \OmegaUp\Experiments::IDENTITIES
+                    ) && \OmegaUp\Authorization::canCreateGroupIdentities(
+                        $r->identity
+                    ),
+                    'scoreboards' => $scoreboards,
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleGroupsEdit'
+                ),
             ],
+            // TODO: Replace the following line with 'entrypoint' => 'group_edit'
             'template' => 'group.edit.tpl',
         ];
     }

@@ -65,4 +65,52 @@ class Tag extends \OmegaUp\Controllers\Controller {
             'problemTag'
         );
     }
+
+    /**
+     * Return most frequent public tags of a certain level
+     *
+     * @return list<array{alias: string}>
+     */
+    public static function getFrequentQualityTagsByLevel(
+        string $problemLevel,
+        int $rows
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TAGS_LIST,
+            "level-{$problemLevel}-{$rows}",
+            fn () => \OmegaUp\DAO\Tags::getFrequentQualityTagsByLevel(
+                $problemLevel,
+                $rows
+            ),
+            APC_USER_CACHE_SESSION_TIMEOUT
+        );
+    }
+
+    /**
+     * Return most frequent public tags of a certain level
+     *
+     * @return array{frequent_tags: list<array{alias: string}>}
+     *
+     * @omegaup-request-param string $problemLevel
+     * @omegaup-request-param int $rows
+     */
+    public static function apiFrequentTags(\OmegaUp\Request $r): array {
+        $param = $r->ensureString(
+            'problemLevel',
+            fn (string $problemAlias) => \OmegaUp\Validators::alias(
+                $problemAlias
+            )
+        );
+
+        $rows = $r->ensureInt(
+            'rows'
+        );
+
+        return [
+            'frequent_tags' => self::getFrequentQualityTagsByLevel(
+                $param,
+                $rows
+            ),
+        ];
+    }
 }

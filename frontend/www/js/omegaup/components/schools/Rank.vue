@@ -21,15 +21,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(school, index) in rank">
+        <tr v-for="(school, index) in rank" :key="index">
           <th scope="row">
             {{ showHeader ? index + 1 : school.ranking || '' }}
           </th>
           <td class="text-truncate">
             <omegaup-countryflag
-              v-bind:country="school.country_id"
+              :country="school.country_id"
             ></omegaup-countryflag>
-            <a v-bind:href="`/schools/profile/${school.school_id}/`">{{
+            <a :href="`/schools/profile/${school.school_id}/`">{{
               school.name
             }}</a>
           </td>
@@ -39,26 +39,16 @@
         </tr>
       </tbody>
     </table>
-    <div class="card-footer" v-if="showHeader">
+    <div v-if="showHeader" class="card-footer">
       <a href="/rank/schools/">{{ T.wordsSeeGeneralRanking }}</a>
     </div>
-    <div class="card-footer" v-else="">
+    <div v-else class="card-footer">
       <omegaup-common-paginator
-        v-bind:pagerItems="pagerItems"
+        :pager-items="pagerItems"
       ></omegaup-common-paginator>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-// FIXME: This prevents wrapping a table cell when the name of the school is too long.
-// So, both tables (users rank and the current one) are perfectly aligned.
-// Another solution should  be taken in the future.
-.text-truncate {
-  max-width: 250px;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -88,3 +78,13 @@ export default class SchoolRank extends Vue {
   ui = ui;
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+// FIXME: This prevents wrapping a table cell when the name of the school is too long.
+// So, both tables (users rank and the current one) are perfectly aligned.
+// Another solution should  be taken in the future.
+.text-truncate {
+  max-width: 250px;
+}
+</style>

@@ -5,7 +5,7 @@
         <span>{{ T.wordsEditCourse }} {{ data.course.name }}</span>
         <small>
           &ndash;
-          <a v-bind:href="courseURL">
+          <a :href="courseURL">
             {{ T.courseEditGoToCourse }}
           </a>
         </small>
@@ -17,8 +17,8 @@
           href="#course"
           class="nav-link"
           data-tab-course
-          v-on:click="showTab = 'course'"
-          v-bind:class="{ active: showTab === 'course' }"
+          :class="{ active: showTab === 'course' }"
+          @click="showTab = 'course'"
           >{{ T.courseEdit }}</a
         >
       </li>
@@ -27,8 +27,8 @@
           href="#content"
           class="nav-link"
           data-tab-content
-          v-on:click="onSelectAssignmentTab"
-          v-bind:class="{ active: showTab === 'content' }"
+          :class="{ active: showTab === 'content' }"
+          @click="onSelectAssignmentTab"
           >{{ T.wordsContent }}</a
         >
       </li>
@@ -37,8 +37,8 @@
           href="#admission-mode"
           class="nav-link"
           data-tab-admission-mode
-          v-on:click="showTab = 'admission-mode'"
-          v-bind:class="{ active: showTab === 'admission-mode' }"
+          :class="{ active: showTab === 'admission-mode' }"
+          @click="showTab = 'admission-mode'"
           >{{ T.contestNewFormAdmissionMode }}</a
         >
       </li>
@@ -47,8 +47,8 @@
           href="#students"
           class="nav-link"
           data-tab-students
-          v-on:click="showTab = 'students'"
-          v-bind:class="{ active: showTab === 'students' }"
+          :class="{ active: showTab === 'students' }"
+          @click="showTab = 'students'"
           >{{ T.courseEditStudents }}</a
         >
       </li>
@@ -57,8 +57,8 @@
           href="#admins"
           class="nav-link"
           data-tab-admins
-          v-on:click="showTab = 'admins'"
-          v-bind:class="{ active: showTab === 'admins' }"
+          :class="{ active: showTab === 'admins' }"
+          @click="showTab = 'admins'"
           >{{ T.courseEditAdmins }}</a
         >
       </li>
@@ -67,90 +67,88 @@
           href="#clone"
           class="nav-link"
           data-tab-clone
-          v-on:click="showTab = 'clone'"
-          v-bind:class="{ active: showTab === 'clone' }"
+          :class="{ active: showTab === 'clone' }"
+          @click="showTab = 'clone'"
           >{{ T.courseEditClone }}</a
         >
       </li>
     </ul>
 
     <div class="tab-content">
-      <div class="tab-pane active" role="tabpanel" v-if="showTab === 'course'">
+      <div v-if="showTab === 'course'" class="tab-pane active" role="tabpanel">
         <omegaup-course-form
-          v-bind:update="true"
-          v-bind:course="data.course"
-          v-on:emit-cancel="onCancel"
-          v-on:submit="
+          :update="true"
+          :course="data.course"
+          @emit-cancel="onCancel"
+          @submit="
             (formComponent) => $emit('submit-edit-course', formComponent)
           "
         ></omegaup-course-form>
       </div>
 
       <div
+        v-if="showTab === 'content'"
         data-content-tab
         class="tab-pane active"
         role="tabpanel"
-        v-if="showTab === 'content'"
       >
         <omegaup-course-assignment-list
-          v-bind:content="assignments"
-          v-bind:course-alias="data.course.alias"
-          v-bind:assignment-form-mode="assignmentFormMode"
-          v-on:emit-new="onNewAssignment"
-          v-on:emit-edit="(assignment) => onEditAssignment(assignment)"
-          v-on:emit-add-problems="(assignment) => onAddProblems(assignment)"
-          v-on:emit-delete="
-            (assignment) => $emit('delete-assignment', assignment)
-          "
-          v-on:emit-sort-content="
+          :content="assignments"
+          :course-alias="data.course.alias"
+          :assignment-form-mode="assignmentFormMode"
+          @emit-new="onNewAssignment"
+          @emit-edit="(assignment) => onEditAssignment(assignment)"
+          @emit-add-problems="(assignment) => onAddProblems(assignment)"
+          @emit-delete="(assignment) => $emit('delete-assignment', assignment)"
+          @emit-sort-content="
             (courseAlias, contentAliases) =>
               $emit('sort-content', courseAlias, contentAliases)
           "
         ></omegaup-course-assignment-list>
         <omegaup-course-assignment-details
           ref="assignment-details"
-          v-bind:unlimited-duration-course="!data.course.finish_time"
-          v-bind:finish-time-course="data.course.finish_time"
-          v-bind:start-time-course="data.course.start_time"
-          v-bind:assignment="assignment"
-          v-bind:assignment-problems="assignmentProblems"
-          v-bind:tagged-problems="data.taggedProblems"
-          v-bind:invalid-parameter-name="invalidParameterName"
-          v-on:add-problem="
+          :unlimited-duration-course="!data.course.finish_time"
+          :finish-time-course="data.course.finish_time"
+          :start-time-course="data.course.start_time"
+          :assignment="assignment"
+          :assignment-problems="assignmentProblems"
+          :tagged-problems="data.taggedProblems"
+          :invalid-parameter-name="invalidParameterName"
+          :assignment-form-mode.sync="assignmentFormMode"
+          @add-problem="
             (assignment, problem) => $emit('add-problem', assignment, problem)
           "
-          v-bind:assignment-form-mode.sync="assignmentFormMode"
-          v-on:emit-add-problem="
+          @emit-add-problem="
             (assignment, problemAlias) =>
               $emit('add-problem', assignment, problemAlias)
           "
-          v-on:emit-select-assignment="
+          @emit-select-assignment="
             (assignment) => $emit('select-assignment', assignment)
           "
-          v-on:remove-problem="
+          @remove-problem="
             (assignment, problem) =>
               $emit('remove-problem', assignment, problem)
           "
-          v-on:sort-problems="
+          @sort-problems="
             (assignmentAlias, problemsAlias) =>
               $emit('sort-problems', assignmentAlias, problemsAlias)
           "
-          v-on:cancel="onResetAssignmentForm"
-          v-on:submit="
+          @cancel="onResetAssignmentForm"
+          @submit="
             (assignmentFormComponent, problems) =>
               $emit('submit-new-assignment', assignmentFormComponent, problems)
           "
-          v-on:get-versions="
+          @get-versions="
             (newProblemAlias, addProblemComponent) =>
               $emit('get-versions', newProblemAlias, addProblemComponent)
           "
         >
-          <template slot="page-header"><span></span></template>
-          <template slot="cancel-button">
+          <template #page-header><span></span></template>
+          <template #cancel-button>
             <button
               class="btn btn-secondary"
               type="reset"
-              v-on:click.prevent="onResetAssignmentForm"
+              @click.prevent="onResetAssignmentForm"
             >
               {{ T.wordsCancel }}
             </button></template
@@ -159,57 +157,53 @@
       </div>
 
       <div
+        v-if="showTab === 'admission-mode'"
         class="tab-pane active"
         role="tabpanel"
-        v-if="showTab === 'admission-mode'"
       >
         <omegaup-course-admision-mode
-          v-bind:initial-admission-mode="data.course.admission_mode"
-          v-bind:should-show-public-option="data.course.is_curator"
-          v-bind:course-alias="data.course.alias"
-          v-on:emit-update-admission-mode="
+          :initial-admission-mode="data.course.admission_mode"
+          :should-show-public-option="data.course.is_curator"
+          :course-alias="data.course.alias"
+          @emit-update-admission-mode="
             (admisionMode) => $emit('update-admission-mode', admisionMode)
           "
         ></omegaup-course-admision-mode>
       </div>
 
       <div
+        v-if="showTab === 'students'"
         data-students-tab
         class="tab-pane active"
         role="tabpanel"
-        v-if="showTab === 'students'"
       >
         <omegaup-course-add-students
-          v-bind:students="data.students"
-          v-bind:course-alias="data.course.alias"
-          v-bind:identity-requests="data.identityRequests"
-          v-on:emit-add-student="
+          :students="data.students"
+          :course-alias="data.course.alias"
+          :identity-requests="data.identityRequests"
+          @emit-add-student="
             (participants) => $emit('add-student', participants)
           "
-          v-on:emit-remove-student="
-            (student) => $emit('remove-student', student)
-          "
-          v-on:emit-accept-request="
-            (username) => $emit('accept-request', username)
-          "
-          v-on:emit-deny-request="(username) => $emit('deny-request', username)"
+          @emit-remove-student="(student) => $emit('remove-student', student)"
+          @emit-accept-request="(username) => $emit('accept-request', username)"
+          @emit-deny-request="(username) => $emit('deny-request', username)"
         ></omegaup-course-add-students>
       </div>
 
       <div
+        v-if="showTab === 'admins'"
         class="tab-pane active pane-admins d-flex row"
         role="tabpanel"
-        v-if="showTab === 'admins'"
       >
         <div class="col-md-6">
           <omegaup-common-admins
-            v-bind:initial-admins="data.admins"
-            v-bind:has-parent-component="true"
-            v-on:emit-add-admin="
+            :initial-admins="data.admins"
+            :has-parent-component="true"
+            @emit-add-admin="
               (addAdminComponent) =>
                 $emit('add-admin', addAdminComponent.username)
             "
-            v-on:emit-remove-admin="
+            @emit-remove-admin="
               (addAdminComponent) =>
                 $emit('remove-admin', addAdminComponent.selected.username)
             "
@@ -217,13 +211,13 @@
         </div>
         <div class="col-md-6">
           <omegaup-common-groupadmins
-            v-bind:initial-groups="data.groupsAdmins"
-            v-bind:has-parent-component="true"
-            v-on:emit-add-group-admin="
+            :initial-groups="data.groupsAdmins"
+            :has-parent-component="true"
+            @emit-add-group-admin="
               (groupAdminsComponent) =>
                 $emit('add-group-admin', groupAdminsComponent.groupAlias)
             "
-            v-on:emit-remove-group-admin="
+            @emit-remove-group-admin="
               (groupAdminsComponent) =>
                 $emit('remove-group-admin', groupAdminsComponent.groupAlias)
             "
@@ -231,23 +225,23 @@
         </div>
       </div>
 
-      <div class="tab-pane active" role="tabpanel" v-if="showTab === 'clone'">
+      <div v-if="showTab === 'clone'" class="tab-pane active" role="tabpanel">
         <div class="card">
           <div class="card-body">
             <omegaup-course-clone
               class="mb-4"
-              v-bind:initial-alias="data.course.alias"
-              v-bind:initial-name="data.course.name"
-              v-on:clone="
+              :initial-alias="data.course.alias"
+              :initial-name="data.course.name"
+              @clone="
                 (alias, name, startTime) =>
                   $emit('clone', alias, name, startTime)
               "
             ></omegaup-course-clone>
             <omegaup-course-generate-link-clone
               v-if="data.course.admission_mode !== admissionMode.Public"
-              v-bind:alias="data.course.alias"
-              v-bind:token="token"
-              v-on:generate-link="(alias) => $emit('generate-link', alias)"
+              :alias="data.course.alias"
+              :token="token"
+              @generate-link="(alias) => $emit('generate-link', alias)"
             ></omegaup-course-generate-link-clone>
           </div>
         </div>

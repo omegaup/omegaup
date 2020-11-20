@@ -260,7 +260,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
     /**
      * Returns a list of students within a course with their score and progress
      * by problem
-     * @return list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>
+     * @return array{allProgress: list<array{name: null|string, points: array<string, array<string, float>>, progress: array<string, array<string, float>>, score: array<string, array<string, float>>, username: string}>, problemTitles: array<string, string>}
      */
     public static function getStudentsInCourseWithProgressPerAssignment(
         int $courseId,
@@ -271,6 +271,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                     i.name,
                     pr.assignment_alias,
                     pr.problem_alias,
+                    pr.problem_title,
                     problem_points,
                     MAX(r.contest_score) AS problem_score
                 FROM
@@ -282,6 +283,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                             a.alias AS assignment_alias,
                             a.problemset_id,
                             p.problem_id,
+                            p.title AS problem_title,
                             p.alias AS problem_alias,
                             `psp`.`order`,
                             psp.points AS problem_points
@@ -310,13 +312,14 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 ORDER BY
                     `pr`.`order`;';
 
-        /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, username: string}> */
+        /** @var list<array{assignment_alias: string, name: null|string, problem_alias: string, problem_points: float, problem_score: float|null, problem_title: string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$courseId, $groupId]
         );
 
         $allProgress = [];
+        $problemTitles = [];
         foreach ($rs as $row) {
             $username = $row['username'];
             if (!isset($allProgress[$username])) {
@@ -331,6 +334,10 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
 
             $assignmentAlias = $row['assignment_alias'];
             $problemAlias = $row['problem_alias'];
+
+            if (!isset($problemTitles[$problemAlias])) {
+                $problemTitles[$problemAlias] =  $row['problem_title'];
+            }
 
             if (!isset($allProgress[$username]['progress'][$assignmentAlias])) {
                 $allProgress[$username]['progress'][$assignmentAlias] = [];
@@ -365,11 +372,15 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 !empty($b['name']) ? $b['name'] : $b['username']
             )
         );
-        return $allProgress;
+        return [
+            'allProgress' => $allProgress,
+            'problemTitles' => $problemTitles,
+        ];
     }
 
     /**
-     * Returns the score per assignment of a user, as well as the maximum score attainable
+     * Returns the score per assignment of a user, as well as the maximum score
+     * attainable
      *
      * @return array<string, array{score: float, max_score: float}>
      */
@@ -403,7 +414,7 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
                 GROUP BY bpr.assignment_id
             ) pr
             ON a.assignment_id = pr.assignment_id
-            where a.course_id = ?;
+            WHERE a.course_id = ?;
         ';
 
         /** @var list<array{assignment: string, max_score: float, score: float}> */
@@ -766,6 +777,156 @@ class Courses extends \OmegaUp\DAO\Base\Courses {
         return \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$course->acl_id]
+        );
+    }
+
+    /**
+     * @return list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null| string, time: \OmegaUp\Timestamp, username: string}>
+     */
+    public static function getActivityReport(\OmegaUp\DAO\VO\Courses $course) {
+        $sql = '(
+            SELECT
+                i.username,
+                NULL AS alias,
+                pal.ip,
+                pal.`time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "open" AS event_type,
+                NULL AS clone_result,
+                NULL AS clone_token_payload,
+                NULL AS name
+            FROM
+                Problemset_Access_Log pal
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = pal.identity_id
+            INNER JOIN
+                Assignments a
+            ON
+                a.problemset_id = pal.problemset_id
+            WHERE
+                a.course_id = ?
+        ) UNION (
+            SELECT
+                i.username,
+                p.alias,
+                sl.ip,
+                sl.`time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "submit" AS event_type,
+                NULL AS clone_result,
+                NULL AS clone_token_payload,
+                NULL AS name
+            FROM
+                Submission_Log sl
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = sl.identity_id
+            INNER JOIN
+                Submissions s
+            ON
+                s.submission_id = sl.submission_id
+            INNER JOIN
+                Problems p
+            ON
+                p.problem_id = s.problem_id
+            INNER JOIN
+                Assignments a
+            ON
+                a.problemset_id = sl.problemset_id
+            WHERE
+                a.course_id = ?
+        ) UNION (
+            SELECT
+                i.username,
+                c.alias,
+                INET_ATON(ccl.ip) AS `ip`,
+                ccl.`timestamp` AS `time`,
+                IFNULL(
+                    (
+                        SELECT `urc`.classname FROM
+                            `User_Rank_Cutoffs` urc
+                        WHERE
+                            `urc`.score <= (
+                                    SELECT
+                                        `ur`.`score`
+                                    FROM
+                                        `User_Rank` `ur`
+                                    WHERE
+                                        `ur`.user_id = `i`.`user_id`
+                                )
+                        ORDER BY
+                            `urc`.percentile ASC
+                        LIMIT
+                            1
+                    ),
+                    "user-rank-unranked"
+                ) `classname`,
+                "clone" AS event_type,
+                ccl.result AS clone_result,
+                ccl.token_payload AS clone_token_payload,
+                c.name
+            FROM
+            Course_Clone_Log ccl
+            INNER JOIN
+                Users u
+            ON
+                u.user_id = ccl.user_id
+            INNER JOIN
+                Identities i
+            ON
+                i.identity_id = u.main_identity_id
+            LEFT JOIN
+                Courses c
+            ON
+                c.course_id = ccl.new_course_id
+            WHERE
+                ccl.course_id = ?
+        ) ORDER BY time;';
+        /** @var list<array{alias: null|string, classname: string, clone_result: null|string, clone_token_payload: null|string, event_type: string, ip: int|null, name: null|string, time: \OmegaUp\Timestamp, username: string}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$course->course_id, $course->course_id, $course->course_id]
         );
     }
 }

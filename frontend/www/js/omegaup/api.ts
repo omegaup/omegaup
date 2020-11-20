@@ -679,8 +679,32 @@ export const Course = {
   >('/api/course/getProblemUsers/'),
   introDetails: apiCall<
     messages.CourseIntroDetailsRequest,
+    messages._CourseIntroDetailsServerResponse,
     messages.CourseIntroDetailsResponse
-  >('/api/course/introDetails/'),
+  >('/api/course/introDetails/', (x) => {
+    if (x.details)
+      x.details = ((x) => {
+        if (x.assignments)
+          x.assignments = ((x) => {
+            if (!Array.isArray(x)) {
+              return x;
+            }
+            return x.map((x) => {
+              if (x.finish_time)
+                x.finish_time = ((x: number) => new Date(x * 1000))(
+                  x.finish_time,
+                );
+              x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+              return x;
+            });
+          })(x.assignments);
+        if (x.finish_time)
+          x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+        x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+        return x;
+      })(x.details);
+    return x;
+  }),
   listAssignments: apiCall<
     messages.CourseListAssignmentsRequest,
     messages._CourseListAssignmentsServerResponse,
@@ -986,6 +1010,10 @@ export const Identity = {
     messages.IdentityCreateRequest,
     messages.IdentityCreateResponse
   >('/api/identity/create/'),
+  selectIdentity: apiCall<
+    messages.IdentitySelectIdentityRequest,
+    messages.IdentitySelectIdentityResponse
+  >('/api/identity/selectIdentity/'),
   update: apiCall<
     messages.IdentityUpdateRequest,
     messages.IdentityUpdateResponse
@@ -1138,6 +1166,14 @@ export const Problem = {
     messages.ProblemMyListRequest,
     messages.ProblemMyListResponse
   >('/api/problem/myList/'),
+  randomKarelProblem: apiCall<
+    messages.ProblemRandomKarelProblemRequest,
+    messages.ProblemRandomKarelProblemResponse
+  >('/api/problem/randomKarelProblem/'),
+  randomLanguageProblem: apiCall<
+    messages.ProblemRandomLanguageProblemRequest,
+    messages.ProblemRandomLanguageProblemResponse
+  >('/api/problem/randomLanguageProblem/'),
   rejudge: apiCall<
     messages.ProblemRejudgeRequest,
     messages.ProblemRejudgeResponse
@@ -1496,6 +1532,10 @@ export const Session = {
 };
 
 export const Tag = {
+  frequentTags: apiCall<
+    messages.TagFrequentTagsRequest,
+    messages.TagFrequentTagsResponse
+  >('/api/tag/frequentTags/'),
   list: apiCall<messages.TagListRequest, messages.TagListResponse>(
     '/api/tag/list/',
   ),

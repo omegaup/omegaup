@@ -1,10 +1,7 @@
 import { mount } from '@vue/test-utils';
 import expect from 'expect';
-import Vue from 'vue';
 
-import { types } from '../../api_types';
 import T from '../../lang';
-import { omegaup } from '../../omegaup';
 
 import problem_Tags from './Tags.vue';
 

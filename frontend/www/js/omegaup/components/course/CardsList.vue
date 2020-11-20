@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1 class="card-title">{{ T.navAllCourses }}</h1>
     <div class="card-header mb-3">
       <h1>{{ T.courseCardAboutCourses }}</h1>
       <p v-html="T.courseCardDescriptionCourses"></p>
@@ -11,71 +10,55 @@
       </div>
     </div>
     <div class="container">
-      <div
-        class="row"
-        v-for="(typeCourses, accessMode) in courses"
-        v-if="typeCourses.activeTab !== ''"
-      >
-        <div class="col-lg-5 p-3 d-flex" v-bind:class="accessMode">
-          <h3 class="flex-grow-1">{{ getDescription(accessMode) }}</h3>
-          <div
-            class="d-inline-block"
-            tabindex="0"
-            data-toggle="tooltip"
-            v-bind:title="T[`${accessMode}CourseInformationDescription`]"
-          >
-            <font-awesome-icon icon="info-circle" />
+      <template v-for="(typeCourses, accessMode) in courses">
+        <div v-if="typeCourses.activeTab !== ''" :key="accessMode" class="row">
+          <div class="col-lg-5 p-3 d-flex" :class="accessMode">
+            <h3 class="flex-grow-1">{{ getDescription(accessMode) }}</h3>
+            <div
+              class="d-inline-block"
+              tabindex="0"
+              data-toggle="tooltip"
+              :title="T[`${accessMode}CourseInformationDescription`]"
+            >
+              <font-awesome-icon icon="info-circle" />
+            </div>
+          </div>
+          <div class="col-lg-7 text-right align-middle">
+            <a :href="`/course/list/${accessMode}/`">{{
+              T.courseListSeeAllCourses
+            }}</a>
+          </div>
+          <div class="card col-lg-12 pt-3 mb-3">
+            <template
+              v-for="(filteredCourses, timeType) in typeCourses.filteredCourses"
+            >
+              <template v-if="timeType !== 'past'">
+                <omegaup-course-card
+                  v-for="course in filteredCourses.courses"
+                  :key="course.alias"
+                  :course-name="course.name"
+                  :course-alias="course.alias"
+                  :school-name="course.school_name"
+                  :finish-time="course.finish_time"
+                  :progress="course.progress"
+                  :content="
+                    course.admission_mode !== 'public' ? [] : course.assignments
+                  "
+                  :logged-in="loggedIn"
+                  :is-open="course.is_open"
+                  :show-topics="
+                    course.admission_mode === 'public' &&
+                    accessMode !== 'student'
+                  "
+                ></omegaup-course-card>
+              </template>
+            </template>
           </div>
         </div>
-        <div class="col-lg-7 text-right align-middle">
-          <a v-bind:href="`/course/list/${accessMode}/`">{{
-            T.courseListSeeAllCourses
-          }}</a>
-        </div>
-        <div class="card col-lg-12 pt-3 mb-3">
-          <template
-            v-for="(filteredCourses, timeType) in typeCourses.filteredCourses"
-          >
-            <omegaup-course-card
-              v-for="course in filteredCourses.courses"
-              v-if="timeType !== 'past'"
-              v-bind:key="course.alias"
-              v-bind:course-name="course.name"
-              v-bind:course-alias="course.alias"
-              v-bind:school-name="course.school_name"
-              v-bind:finish-time="course.finish_time"
-              v-bind:progress="course.progress"
-              v-bind:content="
-                course.admission_mode !== 'public' ? [] : course.assignments
-              "
-              v-bind:is-open="course.is_open"
-              v-bind:show-topics="
-                course.admission_mode === 'public' && accessMode !== 'student'
-              "
-            ></omegaup-course-card>
-          </template>
-        </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-
-.student,
-.public {
-  color: $omegaup-white;
-}
-
-.public {
-  background: $omegaup-pink;
-}
-
-.student {
-  background: $omegaup-blue;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
@@ -102,6 +85,7 @@ library.add(fas);
 })
 export default class CourseList extends Vue {
   @Prop() courses!: types.StudentCourses;
+  @Prop() loggedIn!: boolean;
 
   T = T;
 
@@ -112,3 +96,20 @@ export default class CourseList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+@import '../../../../sass/main.scss';
+
+.student,
+.public {
+  color: $omegaup-white;
+}
+
+.public {
+  background: $omegaup-pink;
+}
+
+.student {
+  background: $omegaup-blue;
+}
+</style>

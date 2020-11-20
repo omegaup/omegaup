@@ -52,6 +52,12 @@ class ProblemParams {
 
     /**
      * @readonly
+     * @var bool
+     */
+    public $qualitySeal;
+
+    /**
+     * @readonly
      * @var string
      */
     public $problemLevel;
@@ -60,10 +66,16 @@ class ProblemParams {
      * @readonly
      * @var string
      */
+    public $selectedTags;
+
+    /**
+     * @readonly
+     * @var string
+     */
     public $validator;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, validator?: string} $params
+     * @param array{allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
@@ -73,6 +85,13 @@ class ProblemParams {
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
         $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
+        $this->qualitySeal = $params['quality_seal'] ?? false;
+        $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
+            [
+                'tagname' => 'problemLevelBasicIntroductionToProgramming',
+                'public' => true,
+            ],
+        ]);
         $this->validator = $params['validator'] ?? 'token';
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
@@ -146,7 +165,9 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
-            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
+            'quality_seal' => $params->qualitySeal,
+            'problem_level' => $params->problemLevel,
+            'selected_tags' => $params->selectedTags,
         ]);
 
         // Set file upload context
@@ -242,6 +263,10 @@ class Problem {
                     $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
                     break;
             }
+            \OmegaUp\DAO\Problems::update($problem);
+        }
+        if ($params->qualitySeal) {
+            $problem->quality_seal = true;
             \OmegaUp\DAO\Problems::update($problem);
         }
 

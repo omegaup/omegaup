@@ -2,12 +2,12 @@
   <div>
     <div class="panel panel-primary contestants-input-area">
       <div class="panel-body">
-        <form class="form" v-on:submit.prevent="onSubmit">
+        <form class="form" @submit.prevent="onSubmit">
           <div class="form-group">
             <label>{{ T.wordsUser }}</label>
             <omegaup-autocomplete
-              v-bind:init="(el) => typeahead.userTypeahead(el)"
               v-model="contestant"
+              :init="(el) => typeahead.userTypeahead(el)"
             ></omegaup-autocomplete>
           </div>
           <button class="btn btn-primary user-add-single" type="submit">
@@ -17,9 +17,9 @@
           <div class="form-group">
             <label>{{ T.wordsMultipleUser }}</label>
             <textarea
+              v-model="contestants"
               class="form-control contestants"
               rows="4"
-              v-model="contestants"
             ></textarea>
           </div>
           <button class="btn btn-primary user-add-bulk" type="submit">
@@ -42,8 +42,8 @@
           <tr v-for="user in users">
             <td>
               <omegaup-user-username
-                v-bind:linkify="true"
-                v-bind:username="user.username"
+                :linkify="true"
+                :username="user.username"
               ></omegaup-user-username>
             </td>
             <td>
@@ -52,18 +52,18 @@
               </template>
             </td>
             <td v-if="contest.window_length !== null">
-              <div class="row" v-if="user.end_time">
+              <div v-if="user.end_time" class="row">
                 <div class="col-xs-10">
                   <omegaup-datetimepicker
-                    v-bind:finish="contest.finish_time"
-                    v-bind:start="contest.start_time"
                     v-model="user.end_time"
+                    :finish="contest.finish_time"
+                    :start="contest.start_time"
                   ></omegaup-datetimepicker>
                 </div>
                 <div class="col-xs-2">
                   <button
                     class="btn-link glyphicon glyphicon-floppy-disk"
-                    v-on:click="onSaveEndTime(user)"
+                    @click="onSaveEndTime(user)"
                   ></button>
                 </div>
               </div>
@@ -72,8 +72,8 @@
               <button
                 class="close"
                 type="button"
-                v-bind:title="T.contestAdduserRegisteredUserDelete"
-                v-on:click="onRemove(user)"
+                :title="T.contestAdduserRegisteredUserDelete"
+                @click="onRemove(user)"
               >
                 ×
               </button>
@@ -86,7 +86,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Emit, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import { omegaup } from '../../omegaup';
 import T from '../../lang';

@@ -9,7 +9,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type AuthorRankTablePayload=array{length: int, page: int, ranking: AuthorsRank, pagerItems: list<PageItem>}
  * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type AssociatedIdentity=array{username: string, default: bool}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<AssociatedIdentity>, omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL128: string, gravatarURL51: string, currentEmail: string, currentName: null|string, currentUsername: string, userClassname: string, userCountry: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
  * @psalm-type UserRankInfo=array{name: string, problems_solved: int, rank: int, author_ranking: int|null}
  * @psalm-type UserRank=array{rank: list<array{classname: string, country_id: null|string, name: null|string, problems_solved: int, ranking: null|int, score: float, user_id: int, username: string}>, total: int}
  * @psalm-type Problem=array{title: string, alias: string, submissions: int, accepted: int, difficulty: float}
@@ -25,6 +26,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -744,9 +746,9 @@ class User extends \OmegaUp\Controllers\Controller {
             $r['auth_token'],
             'auth_token'
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['contest_alias'],
-            'contest_alias'
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         $response = [];
@@ -1277,11 +1279,11 @@ class User extends \OmegaUp\Controllers\Controller {
                 }
 
                 // Add user to contest if needed
-                if (!is_null($r['contest_alias'])) {
+                if (!is_null($contestAlias)) {
                     $addUserRequest = new \OmegaUp\Request();
                     $addUserRequest['auth_token'] = $r['auth_token'];
                     $addUserRequest['usernameOrEmail'] = $username;
-                    $addUserRequest['contest_alias'] = $r['contest_alias'];
+                    $addUserRequest['contest_alias'] = $contestAlias;
                     \OmegaUp\Controllers\Contest::apiAddUser($addUserRequest);
                 }
             }
@@ -1784,13 +1786,13 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiInterviewStats(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['interview'],
-            'interview'
+        $interviewAlias = $r->ensureString(
+            'interview',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['username'], 'username');
 
-        $contest = \OmegaUp\DAO\Contests::getByAlias($r['interview']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($interviewAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'interviewNotFound'
@@ -2540,6 +2542,26 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
+     * Get authors of quality problems
+     *
+     * @return AuthorsRank
+     */
+    public static function getAuthorsRankWithQualityProblems(
+        int $offset,
+        int $rowCount
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::AUTHORS_RANK_WITH_QUALITY_PROBLEMS,
+            "{$offset}-{$rowCount}",
+            fn () => \OmegaUp\DAO\UserRank::getAuthorsRankWithQualityProblems(
+                $offset,
+                $rowCount
+            ),
+            APC_USER_CACHE_USER_RANK_TIMEOUT
+        );
+    }
+
+    /**
      * Prepare all the properties to be sent to the
      * author rank table view via smarty.
      *
@@ -2803,6 +2825,9 @@ class User extends \OmegaUp\Controllers\Controller {
                     );
                     if ($contestResponse['contest_admin']) {
                         $response['contest_admin'][] = $contestResponse['contest_alias'];
+                        $response['problemset_admin'][] = intval(
+                            $contestResponse['contest']->problemset_id
+                        );
                     }
                     break;
                 case 'problemset':
@@ -2820,13 +2845,16 @@ class User extends \OmegaUp\Controllers\Controller {
                         'tokens' => $tokens,
                     ]));
                     $contestAlias = $r2->ensureOptionalString(
-                        'contest_alias'
+                        'contest_alias',
+                        /*$required=*/false,
+                        fn (string $alias) => \OmegaUp\Validators::alias($alias)
                     );
                     if (
                         !empty($contestAlias) &&
                         ($r2->ensureOptionalBool('contest_admin') ?? false)
                     ) {
                         $response['contest_admin'][] = $contestAlias;
+                        $response['problemset_admin'][] = intval($tokens[2]);
                     }
                     break;
                 case 'problem':
@@ -2969,8 +2997,11 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiAddGroup(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
-        $group = self::validateAddRemoveGroup($r['group']);
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $group = self::validateAddRemoveGroup($groupAlias);
         \OmegaUp\DAO\GroupsIdentities::create(
             new \OmegaUp\DAO\VO\GroupsIdentities([
                 'identity_id' => $r->identity->identity_id,
@@ -2993,8 +3024,11 @@ class User extends \OmegaUp\Controllers\Controller {
     public static function apiRemoveGroup(\OmegaUp\Request $r): array {
         \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         $r->ensureMainUserIdentity();
-        \OmegaUp\Validators::validateStringNonEmpty($r['group'], 'group');
-        $group = self::validateAddRemoveGroup($r['group']);
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::namespacedAlias($alias)
+        );
+        $group = self::validateAddRemoveGroup($groupAlias);
 
         \OmegaUp\DAO\GroupsIdentities::delete(new \OmegaUp\DAO\VO\GroupsIdentities([
             'identity_id' => intval($r->identity->identity_id),
@@ -3296,7 +3330,7 @@ class User extends \OmegaUp\Controllers\Controller {
     /**
      * Get the identities that have been associated to the logged user
      *
-     * @return array{identities: list<array{username: string, default: bool}>}
+     * @return array{identities: list<AssociatedIdentity>}
      */
     public static function apiListAssociatedIdentities(\OmegaUp\Request $r): array {
         \OmegaUp\Experiments::getInstance()->ensureEnabled(
@@ -3306,7 +3340,7 @@ class User extends \OmegaUp\Controllers\Controller {
 
         return [
             'identities' => \OmegaUp\DAO\Identities::getAssociatedIdentities(
-                $r->user->user_id
+                $r->identity
             ),
         ];
     }
@@ -3867,6 +3901,52 @@ class User extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         return strpos($identity->username, ':') !== false;
+    }
+
+    /**
+     * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $code
+     * @omegaup-request-param string $redirect
+     * @omegaup-request-param string $state
+     * @omegaup-request-param string $third_party_login
+     */
+    public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
+        $emailVerified = true;
+        $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
+        if ($r->offsetExists('linkedin')) {
+            $thirdPartyLogin = 'linkedin';
+        } elseif ($r->offsetExists('facebook')) {
+            $thirdPartyLogin = 'facebook';
+        }
+
+        $response = [
+            'smartyProperties' => [
+                'payload' => [
+                    'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
+                    'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                    'linkedinUrl' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
+                ],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
+            ],
+            'entrypoint' => 'login_signin',
+        ];
+        try {
+            if ($thirdPartyLogin === 'linkedin') {
+                \OmegaUp\Controllers\Session::loginViaLinkedIn(
+                    $r->ensureString('code'),
+                    $r->ensureString('state'),
+                    $r->ensureString('redirect')
+                );
+            } elseif ($thirdPartyLogin === 'facebook') {
+                \OmegaUp\Controllers\Session::loginViaFacebook();
+            }
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
+            $response['smartyProperties']['payload']['statusError'] = $e->getErrorMessage();
+            return $response;
+        }
+        return $response;
     }
 }
 

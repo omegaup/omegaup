@@ -6,26 +6,26 @@
       </h2>
     </div>
     <div class="panel-body">
-      <form class="form bottom-margin" v-on:submit.prevent="onChangePassword">
+      <form class="form bottom-margin" @submit.prevent="onChangePassword">
         <div class="row">
           <div class="col-md-12">
             <button
               class="btn btn-default btn-block"
               type="button"
-              v-bind:disabled="verified"
-              v-on:click.prevent="onVerifyUser"
+              :disabled="verified"
+              @click.prevent="onVerifyUser"
             >
               <span v-if="verified"
                 ><span aria-hidden="true" class="glyphicon glyphicon-ok"></span>
                 {{ T.userVerified }}</span
-              ><span v-else="">{{ T.userVerify }}</span>
+              ><span v-else>{{ T.userVerify }}</span>
             </button>
           </div>
         </div>
       </form>
       <h4>{{ T.userEmails }}</h4>
       <ul class="list-group">
-        <li class="list-group-item" v-for="email in emails">{{ email }}</li>
+        <li v-for="email in emails" class="list-group-item">{{ email }}</li>
       </ul>
       <h4>{{ T.userRoles }}</h4>
       <table class="table">
@@ -34,9 +34,9 @@
             <td>
               <input
                 type="checkbox"
-                v-bind:checked="hasRole(role.name)"
-                v-bind:disabled="role == 'Admin'"
-                v-on:change.prevent="onChangeRole($event, role)"
+                :checked="hasRole(role.name)"
+                :disabled="role == 'Admin'"
+                @change.prevent="onChangeRole($event, role)"
               />
             </td>
 
@@ -51,11 +51,9 @@
             <td>
               <input
                 type="checkbox"
-                v-bind:checked="
-                  experiment.config || hasExperiment(experiment.name)
-                "
-                v-bind:disabled="experiment.config"
-                v-on:change.prevent="onChangeExperiment($event, experiment)"
+                :checked="experiment.config || hasExperiment(experiment.name)"
+                :disabled="experiment.config"
+                @change.prevent="onChangeExperiment($event, experiment)"
               />
             </td>
 

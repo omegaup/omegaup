@@ -13,13 +13,14 @@ namespace OmegaUp\DAO;
  */
 class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
     /**
-     * @return list<array{classname: string, country?: null|string, country_id?: null|string, name?: null|string, school?: null|string, school_id?: int|null, state?: null|string, state_id?: null|string, username: string}>
+     * @return list<array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}>
      */
-    public static function GetMemberIdentities(\OmegaUp\DAO\VO\Groups $group) {
+    public static function getMemberIdentities(\OmegaUp\DAO\VO\Groups $group) {
         $sql = '
             SELECT
                 i.username,
                 i.name,
+                i.gender,
                 c.name as country,
                 c.country_id,
                 s.name as state,
@@ -63,7 +64,7 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             WHERE
                 gi.group_id = ?;';
 
-        /** @var list<array{classname: string, country: null|string, country_id: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}> */
+        /** @var list<array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$group->group_id]
@@ -73,13 +74,41 @@ class GroupsIdentities extends \OmegaUp\DAO\Base\GroupsIdentities {
             if (strpos($row['username'], ':') === false) {
                 $identities[] = [
                     'username' => $row['username'],
+                    'name' => $row['name'],
                     'classname' => $row['classname'],
+                    'gender' => null,
+                    'country' => null,
+                    'country_id' => null,
+                    'school' => null,
+                    'school_id' => null,
+                    'state' => null,
+                    'state_id' => null,
                 ];
             } else {
                 $identities[] = $row;
             }
         }
         return $identities;
+    }
+
+    /**
+     * @return list<array{identity_id: int}>
+     */
+    public static function getGroupIdentities(\OmegaUp\DAO\VO\Groups $group) {
+        $sql = 'SELECT
+                i.identity_id
+            FROM
+                Groups_Identities gi
+            INNER JOIN
+                Identities i ON i.identity_id = gi.identity_id
+            WHERE
+                gi.group_id = ?;';
+
+        /** @var list<array{identity_id: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$group->group_id]
+        );
     }
 
     public static function GetMemberCountById(int $groupId): int {

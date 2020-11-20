@@ -52,6 +52,7 @@ describe('Details.vue', () => {
     source: 'omegaUp classics',
     statement: {
       images: {},
+      sources: {},
       language: 'es',
       markdown: '# test',
     },
@@ -98,6 +99,7 @@ describe('Details.vue', () => {
         solutionStatus: 'not_found',
         histogram: histogram,
         showNewRunWindow: false,
+        publicTags: [],
       },
     });
 

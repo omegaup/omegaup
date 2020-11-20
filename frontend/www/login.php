@@ -46,12 +46,12 @@ if (isset($_POST['request']) && ($_POST['request'] == 'login')) {
 if (isset($_GET['linkedin'])) {
     if (isset($_GET['code']) && isset($_GET['state'])) {
         /** @var array<string, mixed> */
-        $response = \OmegaUp\Controllers\Session::LoginViaLinkedIn();
+        $response = \OmegaUp\Controllers\Session::LoginViaLinkedInDeprecated();
     }
     $triedToLogin = true;
 } elseif (isset($_GET['fb'])) {
     /** @var array<string, mixed> */
-    $response = \OmegaUp\Controllers\Session::LoginViaFacebook();
+    $response = \OmegaUp\Controllers\Session::LoginViaFacebookDeprecated();
     $triedToLogin = true;
 }
 
@@ -70,7 +70,7 @@ function shouldRedirect(string $url): bool {
         empty($redirectParsedUrl['scheme']) ||
         empty($redirectParsedUrl['host'])
     ) {
-        return true;
+        return ($redirectParsedUrl['path'] ?? '') != '/logout/';
     }
     $redirect_url = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
     if (isset($redirectParsedUrl['port'])) {

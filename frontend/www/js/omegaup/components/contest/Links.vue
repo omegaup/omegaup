@@ -7,34 +7,34 @@
         <tbody class="contest-admin-links">
           <tr>
             <td>
-              <a v-bind:href="`/arena/${contest.alias}/admin/`">{{
+              <a :href="`/arena/${contest.alias}/admin/`">{{
                 T.wordsSubmissions
               }}</a>
             </td>
             <td>
-              <a v-bind:href="`/contest/${contest.alias}/stats/`">{{
+              <a :href="`/contest/${contest.alias}/stats/`">{{
                 T.profileStatistics
               }}</a>
             </td>
             <td>
-              <a v-bind:href="`/contest/${contest.alias}/activity/`">{{
-                T.wordsActivityReport
+              <a :href="`/contest/${contest.alias}/activity/`">{{
+                T.activityReport
               }}</a>
             </td>
             <td>
-              <a v-bind:href="`/arena/${contest.alias}/print/`">{{
+              <a :href="`/arena/${contest.alias}/print/`">{{
                 T.contestPrintableVersion
               }}</a>
             </td>
             <td>
               <a
-                v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}`"
+                :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url}`"
                 >{{ T.contestScoreboardLink }}</a
               >
             </td>
             <td>
               <a
-                v-bind:href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}`"
+                :href="`/arena/${contest.alias}/scoreboard/${contest.scoreboard_url_admin}`"
                 >{{ T.contestScoreboardAdminLink }}</a
               >
             </td>

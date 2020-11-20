@@ -12,28 +12,26 @@
         <p>
           <span class="font-weight-bold">{{ T.courseCloneCreatedBy }}: </span>
           <omegaup-username
-            v-bind:classname="classname"
-            v-bind:username="username"
-            v-bind:linkify="true"
+            :classname="classname"
+            :username="username"
+            :linkify="true"
           ></omegaup-username>
         </p>
         <p>
           <span class="font-weight-bold">{{ T.wordsDescription }}: </span>
-          <omegaup-markdown
-            v-bind:markdown="course.description"
-          ></omegaup-markdown>
+          <omegaup-markdown :markdown="course.description"></omegaup-markdown>
         </p>
         <li
           v-for="assignment of course.assignments"
-          v-bind:key="assignment.problemset_id"
+          :key="assignment.problemset_id"
         >
           {{ assignment.name }}
         </li>
       </div>
       <omegaup-course-clone
-        v-bind:initial-alias="course.alias"
-        v-bind:initial-name="course.name"
-        v-on:clone="
+        :initial-alias="aliasWithUsername"
+        :initial-name="course.name"
+        @clone="
           (alias, name, startTime) =>
             $emit('clone', alias, name, token, startTime)
         "
@@ -76,7 +74,12 @@ export default class CourseCloneWithToken extends Vue {
   @Prop() username!: string;
   @Prop() classname!: string;
   @Prop() token!: string;
+  @Prop() currentUsername!: string;
 
   T = T;
+
+  get aliasWithUsername(): string {
+    return `${this.course.alias}_${this.currentUsername}`;
+  }
 }
 </script>

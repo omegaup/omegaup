@@ -1,8 +1,6 @@
 import { OmegaUp } from '../omegaup';
-import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
-import T from '../lang';
 import Vue from 'vue';
 import login_PasswordReset from '../components/login/PasswordReset.vue';
 
@@ -11,8 +9,11 @@ OmegaUp.on('ready', () => {
     (<HTMLElement>document.getElementById('payload')).innerText,
   );
 
-  let loginPaswwordRecover = new Vue({
+  new Vue({
     el: '#main-container',
+    components: {
+      'omegaup-login-password-reset': login_PasswordReset,
+    },
     render: function (createElement) {
       return createElement('omegaup-login-password-reset', {
         props: {
@@ -39,9 +40,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    components: {
-      'omegaup-login-password-reset': login_PasswordReset,
     },
   });
 });

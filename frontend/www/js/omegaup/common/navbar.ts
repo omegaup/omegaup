@@ -10,6 +10,28 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.CommonPayload('header-payload');
   const commonNavbar = new Vue({
     el: '#common-navbar',
+    components: {
+      'omegaup-common-navbar': payload.bootstrap4
+        ? common_NavbarV2
+        : common_Navbar,
+    },
+    data: () => ({
+      omegaUpLockDown: payload.omegaUpLockDown,
+      inContest: payload.inContest,
+      isLoggedIn: payload.isLoggedIn,
+      isReviewer: payload.isReviewer,
+      gravatarURL51: payload.gravatarURL51,
+      currentUsername: payload.currentUsername,
+      isAdmin: payload.isAdmin,
+      isMainUserIdentity: payload.isMainUserIdentity,
+      lockDownImage: payload.lockDownImage,
+      navbarSection: payload.navbarSection,
+      notifications: <types.Notification[]>[],
+      graderInfo: <types.GraderStatus | null>null,
+      graderQueueLength: -1,
+      errorMessage: <string | null>null,
+      initialClarifications: [],
+    }),
     render: function (createElement) {
       return createElement('omegaup-common-navbar', {
         props: {
@@ -18,6 +40,10 @@ OmegaUp.on('ready', () => {
           isLoggedIn: this.isLoggedIn,
           isReviewer: this.isReviewer,
           gravatarURL51: this.gravatarURL51,
+          gravatarURL128: payload.gravatarURL128,
+          associatedIdentities: payload.associatedIdentities,
+          currentEmail: payload.currentEmail,
+          currentName: payload.currentName,
           currentUsername: this.currentUsername,
           isAdmin: this.isAdmin,
           isMainUserIdentity: this.isMainUserIdentity,
@@ -42,30 +68,17 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
+          'change-account': (usernameOrEmail: string) => {
+            api.Identity.selectIdentity({
+              usernameOrEmail: usernameOrEmail,
+            })
+              .then(() => {
+                window.location.reload();
+              })
+              .catch(ui.apiError);
+          },
         },
       });
-    },
-    data: {
-      omegaUpLockDown: payload.omegaUpLockDown,
-      inContest: payload.inContest,
-      isLoggedIn: payload.isLoggedIn,
-      isReviewer: payload.isReviewer,
-      gravatarURL51: payload.gravatarURL51,
-      currentUsername: payload.currentUsername,
-      isAdmin: payload.isAdmin,
-      isMainUserIdentity: payload.isMainUserIdentity,
-      lockDownImage: payload.lockDownImage,
-      navbarSection: payload.navbarSection,
-      notifications: <types.Notification[]>[],
-      graderInfo: <types.GraderStatus | null>null,
-      graderQueueLength: -1,
-      errorMessage: <string | null>null,
-      initialClarifications: [],
-    },
-    components: {
-      'omegaup-common-navbar': payload.bootstrap4
-        ? common_NavbarV2
-        : common_Navbar,
     },
   });
 

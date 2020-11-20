@@ -11,9 +11,9 @@
 					</div>
 
 					<div class="form-group col-md-6">
-						<label for="alias">{#contestNewFormShortTitle_alias_#}</label>
+						<label for="alias">{#contestNewFormShortTitleAlias#}</label>
 						<input id='alias' name='alias' value='' type='text' class="form-control" disabled="true">
-						<p class="help-block">{#contestNewFormShortTitle_alias_Desc#}</p>
+						<p class="help-block">{#contestNewFormShortTitleAliasDesc#}</p>
 					</div>
 				</div>
 				<div class="row">

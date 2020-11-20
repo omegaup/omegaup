@@ -35,18 +35,18 @@
                 <select v-model="newClarification.problemAlias">
                   <option
                     v-for="problem in contestProblems"
-                    v-bind:value="problem.alias"
-                    v-bind:key="problem.alias"
+                    :key="problem.alias"
+                    :value="problem.alias"
                   >
-                    {{ problem.title }}</option
-                  >
+                    {{ problem.title }}
+                  </option>
                 </select>
               </label>
               <textarea
+                v-model="newClarification.message"
                 class="w-100"
                 maxlength="200"
-                v-model="newClarification.message"
-                v-bind:placeholder="T.arenaClarificationCreateMaxLength"
+                :placeholder="T.arenaClarificationCreateMaxLength"
               ></textarea>
             </div>
             <div class="modal-footer">
@@ -60,7 +60,7 @@
               <button
                 type="button"
                 class="btn btn-primary"
-                v-on:click.prevent="sendClarification"
+                @click.prevent="sendClarification"
               >
                 {{ T.wordsSend }}
               </button>
@@ -73,10 +73,10 @@
       <table class="table mb-0">
         <thead>
           <tr>
-            <th class="text-center" scope="col" v-if="inContest">
+            <th v-if="inContest" class="text-center" scope="col">
               {{ T.wordsContest }}
             </th>
-            <th class="text-center" scope="col" v-else>
+            <th v-else class="text-center" scope="col">
               {{ T.wordsProblem }}
             </th>
             <th class="text-center" scope="col">{{ T.wordsAuthor }}</th>
@@ -88,10 +88,10 @@
         <tbody>
           <omegaup-clarification
             v-for="clarification in clarifications"
-            v-bind:in-contest="inContest"
-            v-bind:key="clarification.clarification_id"
-            v-bind:clarification="clarification"
-            v-on:clarification-response="
+            :key="clarification.clarification_id"
+            :in-contest="inContest"
+            :clarification="clarification"
+            @clarification-response="
               (id, responseText, isPublic) =>
                 $emit('clarification-response', id, responseText, isPublic)
             "
@@ -102,29 +102,10 @@
   </div>
 </template>
 
-<style lang="scss" scoped>
-// Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
-/deep/ pre {
-  display: block;
-  padding: 0.5rem;
-  font-size: 0.8rem;
-  line-height: 1.42857143;
-  color: #333;
-  word-break: break-all;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-}
-
-.modal-dialog {
-  max-width: 50%;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
-import * as ui from '../../ui';
 
 import arena_Clarification from './Clarification.vue';
 
@@ -156,3 +137,21 @@ export default class ArenaClarificationList extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+// Deep allows child components to inherit the styles (see: https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors)
+/deep/ pre {
+  display: block;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  line-height: 1.42857143;
+  color: #333;
+  word-break: break-all;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.modal-dialog {
+  max-width: 50%;
+}
+</style>
