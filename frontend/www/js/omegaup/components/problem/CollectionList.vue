@@ -42,7 +42,7 @@
           v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="selectedTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
