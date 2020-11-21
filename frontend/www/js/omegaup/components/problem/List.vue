@@ -23,7 +23,7 @@
     <omegaup-problem-base-list
       :problems="problems"
       :logged-in="loggedIn"
-      :current-tags="currentTags"
+      :selected-tags="selectedTags"
       :pager-items="pagerItems"
       :wizard-tags="wizardTags"
       :language="language"
@@ -65,7 +65,7 @@ import problem_BaseList from './BaseList.vue';
 export default class List extends Vue {
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop() selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
