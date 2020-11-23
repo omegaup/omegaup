@@ -284,7 +284,8 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop() initialPopupDisplayed!: omegaup.PopupDisplayed;
+  @Prop({ default: omegaup.PopupDisplayed.None })
+  initialPopupDisplayed!: omegaup.PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop() allowUserAddTags!: boolean;
   @Prop() levelTags!: string[];
