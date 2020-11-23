@@ -66,6 +66,7 @@ describe('Runsv2.vue', () => {
   it('Should handle order runs', async () => {
     const expectedDateProblem1 = '1/1/2020, 12:00:00 AM';
     const expectedDateProblem2 = '1/1/2020, 12:10:00 AM';
+    const expectedDateProblem3 = '1/1/2020, 12:15:00 AM';
     const wrapper = shallowMount(arena_Runsv2, {
       propsData: {
         contestAlias: 'admin',
@@ -95,11 +96,30 @@ describe('Runsv2.vue', () => {
             classname: '',
             contest_score: 0,
             country: 'xx',
-            guid: '1234',
+            guid: '1235',
             language: 'java',
             memory: 1933312,
             penalty: 0,
-            run_id: 227,
+            run_id: 228,
+            runtime: 316,
+            score: 100,
+            status: 'ready',
+            submit_delay: 0,
+            time: new Date(expectedDateProblem3),
+            type: 'normal',
+            username: 'username',
+            verdict: 'AC',
+          },
+          {
+            alias: 'alias',
+            classname: '',
+            contest_score: 0,
+            country: 'xx',
+            guid: '1236',
+            language: 'java',
+            memory: 1933312,
+            penalty: 0,
+            run_id: 229,
             runtime: 316,
             score: 100,
             status: 'ready',
