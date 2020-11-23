@@ -96,12 +96,22 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.problem.alias,
               nomination: 'suggestion',
               contents: JSON.stringify(contents),
-            }).catch(ui.apiError);
+            })
+              .then(() => {
+                ui.dismissNotifications();
+              })
+              .catch(ui.apiError);
           },
-          'dismiss-promotion': (source: qualitynomination_Promotion) => {
+          'dismiss-promotion': (
+            source: qualitynomination_Promotion,
+            isDismissed: boolean,
+          ) => {
             const contents: { before_ac?: boolean } = {};
             if (!source.solved && source.tried) {
               contents.before_ac = true;
+            }
+            if (!isDismissed) {
+              return;
             }
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,

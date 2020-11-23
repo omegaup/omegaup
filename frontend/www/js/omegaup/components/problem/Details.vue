@@ -79,9 +79,14 @@
               })
             }}
           </div>
+          <div>
+            <button class="btn btn-link" @click="onNewPromotion">
+              {{ T.qualityNominationRateProblem }}
+            </button>
+          </div>
         </template>
         <omegaup-quality-nomination-review
-          v-if="user.reviewer && !nominationStatus.already_reviewed"
+          v-if="user.reviewer && !nominationStatus.alreadyReviewed"
           :allow-user-add-tags="allowUserAddTags"
           :level-tags="levelTags"
           :problem-level="problemLevel"
@@ -100,25 +105,6 @@
               $emit('submit-demotion', qualityDemotionComponent)
           "
         ></omegaup-quality-nomination-demotion>
-        <omegaup-quality-nomination-promotion
-          v-if="user.loggedIn"
-          :can-nominate-problem="nominationStatus.canNoominateProblem"
-          :dismissed="nominationStatus.dismissed"
-          :dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
-          :nominated="nominationStatus.nominated"
-          :nomination-before-a-c="nominationStatus.nominationBeforeAC"
-          :solved="nominationStatus.solved"
-          :tried="nominationStatus.tried"
-          :problem-alias="problem.alias"
-          @submit="
-            (qualityPromotionComponent) =>
-              $emit('submit-promotion', qualityPromotionComponent)
-          "
-          @dismiss="
-            (qualityPromotionComponent) =>
-              $emit('dismiss-promotion', qualityPromotionComponent)
-          "
-        ></omegaup-quality-nomination-promotion>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="showOverlay"
@@ -135,6 +121,27 @@
                   onRunSubmitted(code, selectedLanguage)
               "
             ></omegaup-arena-runsubmit-popup>
+            <omegaup-quality-nomination-promotion
+              :can-nominate-problem="nominationStatus.canNominateProblem"
+              :dismissed="nominationStatus.dismissed"
+              :dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
+              :nominated="nominationStatus.nominated"
+              :nomination-before-a-c="nominationStatus.nominationBeforeAC"
+              :solved="nominationStatus.solved"
+              :tried="nominationStatus.tried"
+              :problem-alias="problem.alias"
+              @submit="
+                (qualityPromotionComponent) =>
+                  $emit('submit-promotion', qualityPromotionComponent)
+              "
+              @dismiss="
+                (qualityPromotionComponent, isDismissed) =>
+                  onPopupPromotionDismissed(
+                    qualityPromotionComponent,
+                    isDismissed,
+                  )
+              "
+            ></omegaup-quality-nomination-promotion>
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -211,7 +218,7 @@ import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
 import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
-import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
+import qualitynomination_Promotion from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopupv2.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
@@ -276,6 +283,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
   @Prop() showNewRunWindow!: boolean;
+  @Prop() showPromotionWindow!: boolean;
   @Prop() activeTab!: string;
   @Prop() allowUserAddTags!: boolean;
   @Prop() levelTags!: string[];
@@ -290,6 +298,7 @@ export default class ProblemDetails extends Vue {
   selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
   showFormRunSubmit = this.showNewRunWindow;
+  showFormPromotion = this.showPromotionWindow;
   showOverlay = this.showNewRunWindow;
   hasUnreadClarifications =
     this.initialClarifications?.length > 0 &&
@@ -334,10 +343,27 @@ export default class ProblemDetails extends Vue {
     this.showFormRunSubmit = true;
   }
 
+  onNewPromotion(): void {
+    if (!this.user.loggedIn) {
+      this.$emit('redirect-login-page');
+    }
+    this.showOverlay = true;
+    this.showFormPromotion = true;
+  }
+
   onPopupDismissed(): void {
     this.showOverlay = false;
     this.showFormRunSubmit = false;
+    this.showFormPromotion = false;
     this.$emit('update:activeTab', this.selectedTab);
+  }
+
+  onPopupPromotionDismissed(
+    qualityPromotionComponent: qualitynomination_Promotion,
+    isDismissed: boolean,
+  ): void {
+    this.onPopupDismissed();
+    this.$emit('dismiss-promotion', qualityPromotionComponent, isDismissed);
   }
 
   onRunSubmitted(code: string, selectedLanguage: string): void {
