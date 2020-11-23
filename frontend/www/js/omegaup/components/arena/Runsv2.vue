@@ -378,7 +378,7 @@ export default class Runsv2 extends Vue {
       !this.filterContest &&
       !this.filterVerdict
     ) {
-      return this.runs;
+      return this.sortedRuns;
     }
     return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
@@ -410,15 +410,9 @@ export default class Runsv2 extends Vue {
   }
 
   get sortedRuns(): types.Run[] {
-    return this.runs.slice().sort((a, b) => {
-      if (a.time < b.time) {
-        return 1;
-      }
-      if (a.time > b.time) {
-        return -1;
-      }
-      return 0;
-    });
+    return this.runs
+      .slice()
+      .sort((a, b) => b.time.getTime() - a.time.getTime());
   }
 
   get newSubmissionUrl(): string {
