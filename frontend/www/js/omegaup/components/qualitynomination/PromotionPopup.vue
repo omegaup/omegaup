@@ -131,9 +131,9 @@ export default class QualityPromotionPopup extends Vue {
   @Prop({ default: false }) solved!: boolean;
   @Prop({ default: true }) tried!: boolean;
   @Prop({ default: false }) nominated!: boolean;
-  @Prop({ default: false }) nominatedBeforeAC!: boolean;
+  @Prop({ default: false }) nominatedBeforeAc!: boolean;
   @Prop({ default: false }) dismissed!: boolean;
-  @Prop({ default: true }) dismissedBeforeAC!: boolean;
+  @Prop({ default: true }) dismissedBeforeAc!: boolean;
   @Prop({ default: true }) canNominateProblem!: boolean;
   @Prop({
     default: () => [
@@ -208,8 +208,8 @@ export default class QualityPromotionPopup extends Vue {
   difficulty = '';
   quality = '';
   showFormOverride = true;
-  localDismissed = this.dismissed || (this.dismissedBeforeAC && !this.solved);
-  localNominated = this.nominated || (this.nominatedBeforeAC && !this.solved);
+  localDismissed = this.dismissed || (this.dismissedBeforeAc && !this.solved);
+  localNominated = this.nominated || (this.nominatedBeforeAc && !this.solved);
   tags: string[] = [];
 
   get showForm(): boolean {

@@ -75,6 +75,15 @@ export namespace omegaup {
     AddProblem,
   }
 
+  export enum PopupDisplayed {
+    None,
+    RunSubmit,
+    RunDetails,
+    Promotion,
+    Demotion,
+    Reviewer,
+  }
+
   export enum AdmissionMode {
     Private = 'private',
     Registration = 'registration',

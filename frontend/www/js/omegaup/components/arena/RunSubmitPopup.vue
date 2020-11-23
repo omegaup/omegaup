@@ -43,7 +43,7 @@
           :readonly="false"
         ></omegaup-arena-code-view>
       </div>
-      <div class="form-group row">
+      <div class="form-group row mt-3">
         <label class="col-sm-3 col-form-label">
           {{ T.arenaRunSubmitUpload }}
         </label>
@@ -248,3 +248,10 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+.CodeMirror-scroll {
+  max-height: 580px;
+  min-height: 360px;
+}
+</style>

@@ -2,7 +2,7 @@ import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp, omegaup } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
@@ -11,6 +11,9 @@ import T from '../lang';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const locationHash = window.location.hash.substr(1).split('/');
+  const popup = locationHash.includes('new-run')
+    ? omegaup.PopupDisplayed.RunSubmit
+    : omegaup.PopupDisplayed.None;
   new Vue({
     el: '#main-container',
     components: {
@@ -22,7 +25,6 @@ OmegaUp.on('ready', () => {
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
       allTokens: 0,
-      showNewRunWindow: locationHash.includes('new-run'),
       activeTab: window.location.hash ? locationHash[0] : 'problems',
     }),
     render: function (createElement) {
@@ -41,7 +43,7 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          showNewRunWindow: this.showNewRunWindow,
+          initialPopupDisplayed: popup,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
           problemLevel: payload.problemLevel,

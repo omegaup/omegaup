@@ -107,14 +107,14 @@
         ></omegaup-quality-nomination-demotion>
         <omegaup-overlay
           v-if="user.loggedIn"
-          :show-overlay="showOverlay"
+          :show-overlay="popupDisplayed !== omegaup.PopupDisplayed.None"
           @overlay-hidden="onPopupDismissed"
         >
           <template #popup>
             <omegaup-arena-runsubmit-popup
+              v-show="popupDisplayed === omegaup.PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
-              :initial-show-form="showFormRunSubmit"
               @dismiss="onPopupDismissed"
               @submit-run="
                 (code, selectedLanguage) =>
@@ -122,11 +122,12 @@
               "
             ></omegaup-arena-runsubmit-popup>
             <omegaup-quality-nomination-promotion
+              v-show="popupDisplayed === omegaup.PopupDisplayed.Promotion"
               :can-nominate-problem="nominationStatus.canNominateProblem"
               :dismissed="nominationStatus.dismissed"
-              :dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
+              :dismissed-before-ac="nominationStatus.dismissedBeforeAC"
               :nominated="nominationStatus.nominated"
-              :nomination-before-a-c="nominationStatus.nominationBeforeAC"
+              :nomination-before-ac="nominationStatus.nominationBeforeAC"
               :solved="nominationStatus.solved"
               :tried="nominationStatus.tried"
               :problem-alias="problem.alias"
@@ -206,6 +207,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
+import { omegaup } from '../../omegaup';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
@@ -217,9 +219,9 @@ import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
-import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
-import qualitynomination_Promotion from '../qualitynomination/PromotionPopup.vue';
-import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopupv2.vue';
+import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
+import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
+import qualitynomination_ReviewerPopupv2 from '../qualitynomination/ReviewerPopupv2.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -259,9 +261,9 @@ interface Tab {
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
     'omegaup-problem-solution': problem_Solution,
-    'omegaup-quality-nomination-review': qualitynomination_QualityReview,
-    'omegaup-quality-nomination-demotion': qualitynomination_Demotion,
-    'omegaup-quality-nomination-promotion': qualitynomination_Promotion,
+    'omegaup-quality-nomination-review': qualitynomination_ReviewerPopupv2,
+    'omegaup-quality-nomination-demotion': qualitynomination_DemotionPopup,
+    'omegaup-quality-nomination-promotion': qualitynomination_PromotionPopup,
   },
 })
 export default class ProblemDetails extends Vue {
@@ -282,8 +284,7 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop() showNewRunWindow!: boolean;
-  @Prop() showPromotionWindow!: boolean;
+  @Prop() initialPopupDisplayed!: omegaup.PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop() allowUserAddTags!: boolean;
   @Prop() levelTags!: string[];
@@ -292,14 +293,13 @@ export default class ProblemDetails extends Vue {
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
 
+  omegaup = omegaup;
   T = T;
   ui = ui;
   time = time;
   selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
-  showFormRunSubmit = this.showNewRunWindow;
-  showFormPromotion = this.showPromotionWindow;
-  showOverlay = this.showNewRunWindow;
+  popupDisplayed = this.initialPopupDisplayed;
   hasUnreadClarifications =
     this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
@@ -338,28 +338,26 @@ export default class ProblemDetails extends Vue {
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
+      return;
     }
-    this.showOverlay = true;
-    this.showFormRunSubmit = true;
+    this.popupDisplayed = omegaup.PopupDisplayed.RunSubmit;
   }
 
   onNewPromotion(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
+      return;
     }
-    this.showOverlay = true;
-    this.showFormPromotion = true;
+    this.popupDisplayed = omegaup.PopupDisplayed.Promotion;
   }
 
   onPopupDismissed(): void {
-    this.showOverlay = false;
-    this.showFormRunSubmit = false;
-    this.showFormPromotion = false;
+    this.popupDisplayed = omegaup.PopupDisplayed.None;
     this.$emit('update:activeTab', this.selectedTab);
   }
 
   onPopupPromotionDismissed(
-    qualityPromotionComponent: qualitynomination_Promotion,
+    qualityPromotionComponent: qualitynomination_PromotionPopup,
     isDismissed: boolean,
   ): void {
     this.onPopupDismissed();
