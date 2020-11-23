@@ -16,34 +16,18 @@
               <div class="form-group w-100">
                 <label class="w-100">{{ T.qualityFormDifficulty }}</label>
                 <div class="container-fluid">
-                  <div class="form-check form-check-inline">
+                  <div
+                    v-for="difficultyLevel in difficultyLevels"
+                    :key="difficultyLevel.id"
+                    class="form-check form-check-inline"
+                  >
                     <label class="form-check-label">
-                      <input v-model="difficulty" type="radio" value="0" />
-                      {{ T.qualityFormDifficultyVeryEasy }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="difficulty" type="radio" value="1" />
-                      {{ T.qualityFormDifficultyEasy }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="difficulty" type="radio" value="2" />
-                      {{ T.qualityFormDifficultyMedium }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="difficulty" type="radio" value="3" />
-                      {{ T.qualityFormDifficultyHard }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="difficulty" type="radio" value="4" />
-                      {{ T.qualityFormDifficultyVeryHard }}
+                      <input
+                        v-model="difficulty"
+                        type="radio"
+                        :value="difficultyLevel.id"
+                      />
+                      {{ difficultyLevel.description }}
                     </label>
                   </div>
                 </div>
@@ -72,34 +56,18 @@
               <div class="w-100 mb-3">
                 <label class="mb-2 w-100">{{ T.qualityFormQuality }}</label>
                 <div class="container-fluid">
-                  <div class="form-check form-check-inline">
+                  <div
+                    v-for="qualityLevel in qualityLevels"
+                    :key="qualityLevel.id"
+                    class="form-check form-check-inline"
+                  >
                     <label class="form-check-label">
-                      <input v-model="quality" type="radio" value="0" />
-                      {{ T.qualityFormQualityVeryBad }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="quality" type="radio" value="1" />
-                      {{ T.qualityFormQualityBad }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="quality" type="radio" value="2" />
-                      {{ T.qualityFormQualityFair }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="quality" type="radio" value="3" />
-                      {{ T.qualityFormQualityGood }}
-                    </label>
-                  </div>
-                  <div class="form-check form-check-inline">
-                    <label class="form-check-label">
-                      <input v-model="quality" type="radio" value="4" />
-                      {{ T.qualityFormQualityVeryGood }}
+                      <input
+                        v-model="quality"
+                        type="radio"
+                        :value="qualityLevel.id"
+                      />
+                      {{ qualityLevel.description }}
                     </label>
                   </div>
                 </div>
@@ -137,7 +105,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
-import Multiselect from 'vue-multiselect';
 import T from '../../lang';
 
 interface ProblemTag {
@@ -145,10 +112,19 @@ interface ProblemTag {
   value: string;
 }
 
+interface DifficultyLevel {
+  id: number;
+  description: string;
+}
+
+interface QualityLevel {
+  id: number;
+  description: string;
+}
+
 @Component({
   components: {
     'omegaup-overlay-popup': omegaup_OverlayPopup,
-    Multiselect,
   },
 })
 export default class QualityPromotionPopup extends Vue {
@@ -205,6 +181,26 @@ export default class QualityPromotionPopup extends Vue {
     ],
   })
   possibleTags!: string[];
+  @Prop({
+    default: () => [
+      { id: 0, description: T.qualityFormDifficultyVeryEasy },
+      { id: 1, description: T.qualityFormDifficultyEasy },
+      { id: 2, description: T.qualityFormDifficultyMedium },
+      { id: 3, description: T.qualityFormDifficultyHard },
+      { id: 4, description: T.qualityFormDifficultyVeryHard },
+    ],
+  })
+  difficultyLevels!: DifficultyLevel[];
+  @Prop({
+    default: () => [
+      { id: 0, description: T.qualityFormQualityVeryBad },
+      { id: 1, description: T.qualityFormQualityBad },
+      { id: 2, description: T.qualityFormQualityFair },
+      { id: 3, description: T.qualityFormQualityGood },
+      { id: 4, description: T.qualityFormQualityVeryGood },
+    ],
+  })
+  qualityLevels!: QualityLevel[];
   @Prop() problemAlias!: string;
 
   T = T;
