@@ -33,10 +33,16 @@
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
+        <div v-if="!problems || problems.length == 0" class="card-body">
+          <div class="empty-table-message">
+            {{ T.courseAssignmentProblemsEmpty }}
+          </div>
+        </div>
         <omegaup-problem-base-list
+          v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="selectedTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"

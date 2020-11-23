@@ -44,8 +44,8 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-login-signin', {
         props: {
           validateRecaptcha: payload.validateRecaptcha,
-          facebookURL: payload.facebookURL,
-          linkedinURL: payload.linkedinURL,
+          facebookUrl: payload.facebookUrl,
+          linkedinUrl: payload.linkedinUrl,
         },
         on: {
           'register-and-login': (

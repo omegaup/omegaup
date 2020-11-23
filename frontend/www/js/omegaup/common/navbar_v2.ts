@@ -26,6 +26,10 @@ OmegaUp.on('ready', () => {
           isLoggedIn: payload.isLoggedIn,
           isReviewer: payload.isReviewer,
           gravatarURL51: payload.gravatarURL51,
+          gravatarURL128: payload.gravatarURL128,
+          associatedIdentities: payload.associatedIdentities,
+          currentEmail: payload.currentEmail,
+          currentName: payload.currentName,
           currentUsername: payload.currentUsername,
           isAdmin: payload.isAdmin,
           isMainUserIdentity: payload.isMainUserIdentity,
@@ -54,6 +58,15 @@ OmegaUp.on('ready', () => {
                 if (redirectTo) {
                   ui.navigateTo(redirectTo);
                 }
+              })
+              .catch(ui.apiError);
+          },
+          'change-account': (usernameOrEmail: string) => {
+            api.Identity.selectIdentity({
+              usernameOrEmail: usernameOrEmail,
+            })
+              .then(() => {
+                window.location.reload();
               })
               .catch(ui.apiError);
           },

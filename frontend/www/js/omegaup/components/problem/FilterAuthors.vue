@@ -9,7 +9,7 @@
       >
         <label class="form-check-label">
           <input
-            v-model="selectedAuthors"
+            v-model="currentSelectedAuthors"
             :value="author.username"
             class="form-check-input"
             type="checkbox"
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import { types } from '../../api_types';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
@@ -41,8 +41,14 @@ import user_Username from '../user/Username.vue';
 })
 export default class FilterAuthors extends Vue {
   @Prop() authors!: types.AuthorsRank;
+  @Prop({ default: () => [] }) selectedAuthors!: string[];
 
   T = T;
-  selectedAuthors: string[] = [];
+  currentSelectedAuthors = this.selectedAuthors;
+
+  @Watch('currentSelectedAuthors')
+  onNewAuthorSelected(): void {
+    this.$emit('new-selected-author', this.currentSelectedAuthors);
+  }
 }
 </script>

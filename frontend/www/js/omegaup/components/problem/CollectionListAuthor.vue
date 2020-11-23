@@ -4,21 +4,44 @@
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-authors
-          :authors.sync="authors"
+          :authors="authors"
+          :selected-authors="selectedAuthors"
+          @new-selected-author="
+            (selectedAuthors) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedAuthors,
+              )
+          "
         ></omegaup-problem-filter-authors>
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
           @change-difficulty="
             (difficulty) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedAuthors,
+              )
           "
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
+        <div v-if="!problems || problems.length == 0" class="card-body">
+          <div class="empty-table-message">
+            {{ T.courseAssignmentProblemsEmpty }}
+          </div>
+        </div>
         <omegaup-problem-base-list
+          v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="currentTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -34,7 +57,13 @@
           :path="'/problem/collection/author/'"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedAuthors,
+              )
           "
         >
         </omegaup-problem-base-list>
@@ -63,7 +92,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByAuthorPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop() selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -77,8 +106,9 @@ export default class CollectionList extends Vue {
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
   @Prop() difficulty!: string;
+  @Prop({ default: () => [] }) selectedAuthors!: string;
 
   T = T;
-  authors = this.data.authors;
+  authors = this.data.authorsRanking;
 }
 </script>
