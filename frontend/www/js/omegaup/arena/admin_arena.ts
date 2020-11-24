@@ -8,7 +8,8 @@ import arena_Runsv2 from '../components/arena/Runsv2.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
-import { Arena, runsStore } from './arena';
+import { Arena } from './arena';
+import { runsStore } from './RunsStore';
 
 export default class ArenaAdmin {
   arena: Arena;
