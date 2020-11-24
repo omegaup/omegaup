@@ -89,6 +89,11 @@
               {{ T.qualityNominationRateProblem }}
             </button>
           </div>
+          <div>
+            <button class="btn btn-link" @click="onReportInappropriateProblem">
+              {{ T.wordsReportProblem }}
+            </button>
+          </div>
         </template>
         <omegaup-quality-nomination-reviewer-popup
           v-if="user.reviewer && !nominationStatus.alreadyReviewed"
@@ -104,12 +109,6 @@
             (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
           "
         ></omegaup-quality-nomination-reviewer-popup>
-        <omegaup-quality-nomination-demotion-popup
-          @submit="
-            (qualityDemotionComponent) =>
-              $emit('submit-demotion', qualityDemotionComponent)
-          "
-        ></omegaup-quality-nomination-demotion-popup>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="popupDisplayed !== PopupDisplayed.None"
@@ -142,6 +141,14 @@
                   )
               "
             ></omegaup-quality-nomination-promotion-popup>
+            <omegaup-quality-nomination-demotion-popup
+              v-show="popupDisplayed === PopupDisplayed.Demotion"
+              @dismiss="popupDisplayed = PopupDisplayed.None"
+              @submit="
+                (qualityDemotionComponent) =>
+                  $emit('submit-demotion', qualityDemotionComponent)
+              "
+            ></omegaup-quality-nomination-demotion-popup>
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -217,7 +224,7 @@ import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
-import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
+import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopupv2.vue';
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopupv2 from '../qualitynomination/ReviewerPopupv2.vue';
 import user_Username from '../user/Username.vue';
@@ -358,6 +365,14 @@ export default class ProblemDetails extends Vue {
       return;
     }
     this.popupDisplayed = PopupDisplayed.Promotion;
+  }
+
+  onReportInappropriateProblem(): void {
+    if (!this.user.loggedIn) {
+      this.$emit('redirect-login-page');
+      return;
+    }
+    this.popupDisplayed = PopupDisplayed.Demotion;
   }
 
   onPopupDismissed(): void {
