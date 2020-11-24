@@ -32,10 +32,16 @@
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
+        <div v-if="!problems || problems.length == 0" class="card-body">
+          <div class="empty-table-message">
+            {{ T.courseAssignmentProblemsEmpty }}
+          </div>
+        </div>
         <omegaup-problem-base-list
+          v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="currentTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -86,7 +92,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByAuthorPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop() selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
