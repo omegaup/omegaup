@@ -2100,10 +2100,10 @@ export namespace types {
     alreadyReviewed: boolean;
     canNominateProblem: boolean;
     dismissed: boolean;
-    dismissedBeforeAC: boolean;
+    dismissedBeforeAc: boolean;
     language: string;
     nominated: boolean;
-    nominatedBeforeAC: boolean;
+    nominatedBeforeAc: boolean;
     solved: boolean;
     tried: boolean;
   }
@@ -2390,10 +2390,10 @@ export namespace types {
   export interface ProblemQualityPayload {
     canNominateProblem: boolean;
     dismissed: boolean;
-    dismissedBeforeAC: boolean;
+    dismissedBeforeAc: boolean;
     language?: string;
     nominated: boolean;
-    nominatedBeforeAC: boolean;
+    nominatedBeforeAc: boolean;
     problemAlias: string;
     solved: boolean;
     tried: boolean;

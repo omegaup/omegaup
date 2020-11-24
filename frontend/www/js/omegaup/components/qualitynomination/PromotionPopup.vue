@@ -11,7 +11,7 @@
               :onHide="onHide"
             >
               <p class="h4 font-weight-bold pb-4 text-center w-100">
-                {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAC }}
+                {{ solved ? T.qualityFormCongrats : T.qualityFormRateBeforeAc }}
               </p>
               <div class="form-group w-100">
                 <label class="w-100">{{ T.qualityFormDifficulty }}</label>

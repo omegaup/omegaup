@@ -1866,11 +1866,11 @@ export class Arena {
         return createElement('qualitynomination-popup', {
           props: {
             nominated: this.qualityPayload.nominated,
-            nominatedBeforeAC: this.qualityPayload.nominatedBeforeAC,
+            nominatedBeforeAc: this.qualityPayload.nominatedBeforeAc,
             solved: this.qualityPayload.solved,
             tried: this.qualityPayload.tried,
             dismissed: this.qualityPayload.dismissed,
-            dismissedBeforeAC: this.qualityPayload.dismissedBeforeAC,
+            dismissedBeforeAc: this.qualityPayload.dismissedBeforeAc,
             canNominateProblem: this.qualityPayload.canNominateProblem,
             problemAlias: this.qualityPayload.problemAlias,
           },

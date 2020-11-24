@@ -20,12 +20,12 @@ OmegaUp.on('ready', () => {
     (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
     !(
       payload.nominationStatus?.dismissed ||
-      (payload.nominationStatus?.dismissedBeforeAC &&
+      (payload.nominationStatus?.dismissedBeforeAc &&
         !payload.nominationStatus?.solved)
     ) &&
     !(
       payload.nominationStatus?.nominated ||
-      (payload.nominationStatus?.nominatedBeforeAC &&
+      (payload.nominationStatus?.nominatedBeforeAc &&
         !payload.nominationStatus?.solved)
     ) &&
     payload.nominationStatus?.canNominateProblem
@@ -46,7 +46,7 @@ OmegaUp.on('ready', () => {
       activeTab: window.location.hash ? locationHash[0] : 'problems',
       hasBeenNominated:
         payload.nominationStatus?.nominated ||
-        (payload.nominationStatus?.nominatedBeforeAC &&
+        (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
     }),
     render: function (createElement) {
