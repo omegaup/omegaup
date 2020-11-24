@@ -44,7 +44,7 @@ OmegaUp.on('ready', () => {
       availableTokens: 0,
       allTokens: 0,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
-      localNominated:
+      hasBeenNominated:
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAC &&
           !payload.nominationStatus?.solved),
@@ -72,7 +72,7 @@ OmegaUp.on('ready', () => {
           publicTags: payload.publicTags,
           selectedPublicTags: payload.selectedPublicTags,
           selectedPrivateTags: payload.selectedPrivateTags,
-          localNominated: this.localNominated,
+          hasBeenNominated: this.hasBeenNominated,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -123,7 +123,7 @@ OmegaUp.on('ready', () => {
               contents: JSON.stringify(contents),
             })
               .then(() => {
-                this.localNominated = true;
+                this.hasBeenNominated = true;
                 ui.dismissNotifications();
               })
               .catch(ui.apiError);

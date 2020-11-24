@@ -82,7 +82,7 @@
           <div
             v-if="
               (nominationStatus.tried || nominationStatus.solved) &&
-              !localNominated
+              !hasBeenNominated
             "
           >
             <button class="btn btn-link" @click="onNewPromotion">
@@ -300,7 +300,7 @@ export default class ProblemDetails extends Vue {
   @Prop() publicTags!: string[];
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
-  @Prop() localNominated!: boolean;
+  @Prop() hasBeenNominated!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
