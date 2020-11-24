@@ -1,13 +1,13 @@
 <template>
   <div>
     <div class="row">
-      <div class="col col-md-4">
+      <div class="col col-md-4 d-flex align-items-center">
         <a href="/problem/collection/" data-nav-problems-all>{{
           T.problemCollectionBackCollections
         }}</a>
       </div>
       <div class="col">
-        <h1 class="card-title">{{ T.omegaupTitleCollectionsByAuthor }}</h1>
+        <h1>{{ T.omegaupTitleCollectionsByAuthor }}</h1>
       </div>
     </div>
     <div class="row">
