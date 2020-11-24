@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
 import T from '../../lang';
 
@@ -129,12 +129,7 @@ interface QualityLevel {
 })
 export default class QualityPromotionPopup extends Vue {
   @Prop({ default: false }) solved!: boolean;
-  @Prop({ default: true }) tried!: boolean;
-  @Prop({ default: false }) nominated!: boolean;
-  @Prop({ default: false }) nominatedBeforeAc!: boolean;
-  @Prop({ default: false }) dismissed!: boolean;
-  @Prop({ default: true }) dismissedBeforeAc!: boolean;
-  @Prop({ default: true }) canNominateProblem!: boolean;
+  @Prop({ default: false }) tried!: boolean;
   @Prop({
     default: () => [
       'problemTopic2Sat',
@@ -201,30 +196,12 @@ export default class QualityPromotionPopup extends Vue {
     ],
   })
   qualityLevels!: QualityLevel[];
-  @Prop() problemAlias!: string;
 
   T = T;
   currentView = 'content';
   difficulty = '';
   quality = '';
-  showFormOverride = true;
-  localDismissed = this.dismissed || (this.dismissedBeforeAc && !this.solved);
-  localNominated = this.nominated || (this.nominatedBeforeAc && !this.solved);
   tags: string[] = [];
-
-  get showForm(): boolean {
-    return (
-      this.showFormOverride &&
-      (this.solved || this.tried) &&
-      !this.localNominated &&
-      !this.localDismissed &&
-      this.canNominateProblem
-    );
-  }
-
-  get showSuggestLink(): boolean {
-    return (this.tried || this.solved) && !this.localNominated;
-  }
 
   get sortedProblemTags(): ProblemTag[] {
     return this.possibleTags
@@ -245,34 +222,16 @@ export default class QualityPromotionPopup extends Vue {
     return this.sortedProblemTags.map((x: ProblemTag): string => x.text);
   }
 
-  get suggestLink(): string {
-    if (!this.problemAlias) {
-      return '#';
-    }
-    return `#problems/${this.problemAlias}`;
-  }
-
   onCloseModal(currentView: string): void {
     if (currentView !== 'thanks') {
       this.onDismiss();
       return;
     }
-    this.onLocalNominatedHide;
-  }
-
-  onHide(isDismissed: boolean): void {
-    this.showFormOverride = false;
-    this.$emit('dismiss', this, isDismissed);
-  }
-
-  onLocalNominatedHide(): void {
-    this.localNominated = true;
     this.onHide(false);
   }
 
-  onShowSuggestion(): void {
-    this.showFormOverride = true;
-    this.localDismissed = false;
+  onHide(isDismissed: boolean): void {
+    this.$emit('dismiss', this, isDismissed);
   }
 
   onDismiss(): void {
@@ -283,17 +242,7 @@ export default class QualityPromotionPopup extends Vue {
     this.$emit('submit', this);
     this.currentView = 'thanks';
 
-    setTimeout(() => this.onLocalNominatedHide(), 2000);
-  }
-
-  @Watch('dismissed')
-  onDismissedChange(newValue: boolean) {
-    this.localDismissed = newValue;
-  }
-
-  @Watch('nominated')
-  onNominatedChange(newValue: boolean) {
-    this.localNominated = newValue;
+    setTimeout(() => this.onHide(false), 2000);
   }
 }
 </script>

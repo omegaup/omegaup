@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import problem_Details from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
-import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
+import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { OmegaUp, omegaup } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -11,9 +11,25 @@ import T from '../lang';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const locationHash = window.location.hash.substr(1).split('/');
-  const popup = locationHash.includes('new-run')
-    ? omegaup.PopupDisplayed.RunSubmit
-    : omegaup.PopupDisplayed.None;
+  let popupDisplayed = omegaup.PopupDisplayed.None;
+  if (locationHash.includes('new-run')) {
+    popupDisplayed = omegaup.PopupDisplayed.RunSubmit;
+  } else if (
+    (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
+    !(
+      payload.nominationStatus?.dismissed ||
+      (payload.nominationStatus?.dismissedBeforeAC &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    !(
+      payload.nominationStatus?.nominated ||
+      (payload.nominationStatus?.nominatedBeforeAC &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    payload.nominationStatus?.canNominateProblem
+  ) {
+    popupDisplayed = omegaup.PopupDisplayed.Promotion;
+  }
   new Vue({
     el: '#main-container',
     components: {
@@ -26,6 +42,10 @@ OmegaUp.on('ready', () => {
       availableTokens: 0,
       allTokens: 0,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
+      localNominated:
+        payload.nominationStatus?.nominated ||
+        (payload.nominationStatus?.nominatedBeforeAC &&
+          !payload.nominationStatus?.solved),
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -43,13 +63,14 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          initialPopupDisplayed: popup,
+          initialPopupDisplayed: popupDisplayed,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
           problemLevel: payload.problemLevel,
           publicTags: payload.publicTags,
           selectedPublicTags: payload.selectedPublicTags,
           selectedPrivateTags: payload.selectedPrivateTags,
+          localNominated: this.localNominated,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -100,6 +121,7 @@ OmegaUp.on('ready', () => {
               contents: JSON.stringify(contents),
             })
               .then(() => {
+                this.localNominated = true;
                 ui.dismissNotifications();
               })
               .catch(ui.apiError);

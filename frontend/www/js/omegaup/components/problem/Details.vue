@@ -79,7 +79,12 @@
               })
             }}
           </div>
-          <div>
+          <div
+            v-if="
+              (nominationStatus.tried || nominationStatus.solved) &&
+              !localNominated
+            "
+          >
             <button class="btn btn-link" @click="onNewPromotion">
               {{ T.qualityNominationRateProblem }}
             </button>
@@ -123,14 +128,8 @@
             ></omegaup-arena-runsubmit-popup>
             <omegaup-quality-nomination-promotion
               v-show="popupDisplayed === omegaup.PopupDisplayed.Promotion"
-              :can-nominate-problem="nominationStatus.canNominateProblem"
-              :dismissed="nominationStatus.dismissed"
-              :dismissed-before-ac="nominationStatus.dismissedBeforeAC"
-              :nominated="nominationStatus.nominated"
-              :nomination-before-ac="nominationStatus.nominationBeforeAC"
               :solved="nominationStatus.solved"
               :tried="nominationStatus.tried"
-              :problem-alias="problem.alias"
               @submit="
                 (qualityPromotionComponent) =>
                   $emit('submit-promotion', qualityPromotionComponent)
@@ -293,6 +292,7 @@ export default class ProblemDetails extends Vue {
   @Prop() publicTags!: string[];
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
+  @Prop() localNominated!: boolean;
 
   omegaup = omegaup;
   T = T;
