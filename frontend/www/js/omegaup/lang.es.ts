@@ -647,6 +647,7 @@ const translations: { [key: string]: string; } = {
   privateTagsPlaceholder: "Ej. universidad, 2019, clase-2020",
   problemAliasExists: "El alias del problema ya existe, por favor selecciona otro.",
   problemCollectionAuthors: "Autores",
+  problemCollectionBackCollections: "\u25c4 Volver a colecciones",
   problemCollectionEducationLevel: "Por nivel educativo",
   problemCollectionOthers: "Otras colecciones",
   problemCollectionProblemCount: "%(count) problemas",
