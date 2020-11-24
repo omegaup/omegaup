@@ -1,9 +1,7 @@
 <template>
-  <form v-show="showForm" data-run-details-view>
-    <div class="close-container">
-      <button class="close" @click="$emit('dismiss')">❌</button>
-    </div>
+  <form data-run-details-view>
     <div v-if="data">
+      <button class="close">❌</button>
       <div v-if="data.groups" class="cases">
         <h3>{{ T.wordsCases }}</h3>
         <div></div>
@@ -184,15 +182,10 @@ const EMPTY_FIELD = '∅';
 })
 export default class ArenaRunDetails extends Vue {
   @Prop() data!: types.RunDetails;
-  @Prop({ default: true }) initialShowForm!: boolean;
 
   EMPTY_FIELD = EMPTY_FIELD;
   T = T;
   groupVisible: GroupVisibility = {};
-
-  get showForm(): boolean {
-    return this.initialShowForm;
-  }
 
   toggle(group: string): void {
     const visible = this.groupVisible[group];
@@ -220,7 +213,7 @@ export default class ArenaRunDetails extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 [data-overlay] {

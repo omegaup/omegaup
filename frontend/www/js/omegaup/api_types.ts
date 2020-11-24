@@ -1391,7 +1391,6 @@ export namespace types {
     authorsRanking: types.AuthorsRank;
     column: string;
     columns: string[];
-    currentTags: string[];
     keyword: string;
     language: string;
     languages: string[];
@@ -1400,6 +1399,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
+    selectedTags: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -2374,7 +2374,6 @@ export namespace types {
   export interface ProblemListPayload {
     column: string;
     columns: string[];
-    currentTags: string[];
     keyword: string;
     language: string;
     languages: string[];
@@ -2383,6 +2382,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
+    selectedTags: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -3832,7 +3832,7 @@ export namespace messages {
     time: number;
   };
   export type SessionGoogleLoginRequest = { [key: string]: any };
-  export type SessionGoogleLoginResponse = { [key: string]: string };
+  export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };

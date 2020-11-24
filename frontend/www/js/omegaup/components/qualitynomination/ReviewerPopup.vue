@@ -2,7 +2,6 @@
   <omegaup-popup
     :reviewer-nomination="true"
     :possible-tags="PROBLEM_CATEGORIES"
-    :value.sync="showOverlay"
     @submit="$emit('submit', tag, qualitySeal, selectedPublicTags)"
   >
     <template #link-title>
@@ -106,7 +105,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Prop, Component, Watch } from 'vue-property-decorator';
+import { Vue, Prop, Component } from 'vue-property-decorator';
 import Popup from './Popup.vue';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
@@ -136,7 +135,6 @@ export default class ReviewerPopup extends Vue {
   T = T;
   qualitySeal = true;
   tag = '';
-  showOverlay = false;
   publicTagsList = this.selectedPublicTags ?? [];
 
   PROBLEM_CATEGORIES = [
@@ -148,11 +146,6 @@ export default class ReviewerPopup extends Vue {
     'problemLevelIntermediateDataStructuresAndAlgorithms',
     'problemLevelIntermediateMathsInProgramming',
   ];
-
-  @Watch('showOverlay')
-  onShowOverlayChanged(newValue: boolean): void {
-    this.$emit('update:value', newValue);
-  }
 
   addOtherTag(tag: string): void {
     if (!this.publicTagsList.includes(tag)) {

@@ -67,7 +67,9 @@
         </div>
       </template>
       <template v-if="currentView == 'thanks'">
-        <h1>{{ T.reportProblemFormThanksForReview }}</h1>
+        <div class="centered">
+          <h1>{{ T.reportProblemFormThanksForReview }}</h1>
+        </div>
       </template>
     </form>
   </div>
@@ -90,7 +92,6 @@ export default class QualityNominationDemotionPopup extends Vue {
 
   onHide(): void {
     this.showReportDialog = false;
-    this.$emit('dismiss');
   }
 
   onReportInappropriateProblem(): void {
@@ -99,7 +100,6 @@ export default class QualityNominationDemotionPopup extends Vue {
     this.rationale = '';
     this.original = '';
     this.selectedReason = '';
-    this.$emit('update:value', true);
   }
 
   onSubmit(): void {

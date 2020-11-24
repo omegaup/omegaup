@@ -236,7 +236,6 @@ export default class QualityNominationPopup extends Vue {
     if (isDismissed) {
       this.$emit('dismiss', this);
     }
-    this.$emit('update:value', false);
   }
 
   onLocalNominatedHide(): void {
@@ -247,7 +246,6 @@ export default class QualityNominationPopup extends Vue {
   onShowSuggestion(): void {
     this.showFormOverride = true;
     this.localDismissed = false;
-    this.$emit('update:value', true);
   }
 
   onSubmit(): void {
@@ -269,7 +267,7 @@ export default class QualityNominationPopup extends Vue {
 }
 </script>
 
-<style scoped>
+<style>
 .qualitynomination-popup .popup {
   position: fixed;
   bottom: 10px;

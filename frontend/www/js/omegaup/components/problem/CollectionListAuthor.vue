@@ -1,6 +1,15 @@
 <template>
   <div>
-    <h1 class="card-title">{{ T.omegaupTitleCollectionsByAuthor }}</h1>
+    <div class="row">
+      <div class="col col-md-4 d-flex align-items-center">
+        <a href="/problem/collection/" data-nav-problems-all>{{
+          T.problemCollectionBackCollections
+        }}</a>
+      </div>
+      <div class="col">
+        <h1>{{ T.omegaupTitleCollectionsByAuthor }}</h1>
+      </div>
+    </div>
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-authors
@@ -41,7 +50,7 @@
           v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="currentTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -92,7 +101,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByAuthorPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop() selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;

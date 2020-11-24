@@ -1,13 +1,15 @@
 import Vue from 'vue';
-import problem_Details from '../components/problem/Details.vue';
+import problem_Details, {
+  PopupDisplayed,
+} from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
-import qualitynomination_Promotion from '../components/qualitynomination/Popup.vue';
 import {
   Arena,
   GetOptionsFromLocation,
   runsStore,
   myRunsStore,
 } from '../arena/arena';
+import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as time from '../time';
@@ -18,6 +20,25 @@ import T from '../lang';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const locationHash = window.location.hash.substr(1).split('/');
+  let popupDisplayed = PopupDisplayed.None;
+  if (locationHash.includes('new-run')) {
+    popupDisplayed = PopupDisplayed.RunSubmit;
+  } else if (
+    (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
+    !(
+      payload.nominationStatus?.dismissed ||
+      (payload.nominationStatus?.dismissedBeforeAC &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    !(
+      payload.nominationStatus?.nominated ||
+      (payload.nominationStatus?.nominatedBeforeAC &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    payload.nominationStatus?.canNominateProblem
+  ) {
+    popupDisplayed = PopupDisplayed.Promotion;
+  }
   const problemDetails = new Vue({
     el: '#main-container',
     components: {
@@ -25,6 +46,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       initialClarifications: payload.clarifications,
+      initialPopupDisplayed: popupDisplayed,
       solutionStatus: payload.solutionStatus,
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
@@ -32,11 +54,11 @@ OmegaUp.on('ready', () => {
       allRuns: <types.Run[]>payload.allRuns,
       runs: <types.Run[]>payload.runs,
       runDetails: <types.RunDetails | null>null,
-      showNewRunWindow: locationHash.includes('new-run'),
-      showRunDetailsWindow: false,
-      activeTab: window.location.hash
-        ? window.location.hash.substr(1).split('/')[0]
-        : 'problems',
+      activeTab: window.location.hash ? locationHash[0] : 'problems',
+      hasBeenNominated:
+        payload.nominationStatus?.nominated ||
+        (payload.nominationStatus?.nominatedBeforeAC &&
+          !payload.nominationStatus?.solved),
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -55,14 +77,14 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          showNewRunWindow: this.showNewRunWindow,
-          showRunDetailsWindow: this.showRunDetailsWindow,
+          initialPopupDisplayed: this.initialPopupDisplayed,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
           problemLevel: payload.problemLevel,
           publicTags: payload.publicTags,
           selectedPublicTags: payload.selectedPublicTags,
           selectedPrivateTags: payload.selectedPrivateTags,
+          hasBeenNominated: this.hasBeenNominated,
         },
         on: {
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
@@ -111,12 +133,23 @@ OmegaUp.on('ready', () => {
               problem_alias: payload.problem.alias,
               nomination: 'suggestion',
               contents: JSON.stringify(contents),
-            }).catch(ui.apiError);
+            })
+              .then(() => {
+                this.hasBeenNominated = true;
+                ui.dismissNotifications();
+              })
+              .catch(ui.apiError);
           },
-          'dismiss-promotion': (source: qualitynomination_Promotion) => {
+          'dismiss-promotion': (
+            source: qualitynomination_Promotion,
+            isDismissed: boolean,
+          ) => {
             const contents: { before_ac?: boolean } = {};
             if (!source.solved && source.tried) {
               contents.before_ac = true;
+            }
+            if (!isDismissed) {
+              return;
             }
             api.QualityNomination.create({
               problem_alias: payload.problem.alias,
@@ -280,13 +313,13 @@ OmegaUp.on('ready', () => {
         window.location.pathname,
       )}`;
     }
-    problemDetails.showNewRunWindow = true;
+    problemDetails.initialPopupDisplayed = PopupDisplayed.RunSubmit;
   };
 
   const detectRunDetails = () => {
     if (window.location.hash.indexOf('/show-run:') === -1) return;
     arenaInstance.detectShowRun();
-    problemDetails.showRunDetailsWindow = true;
+    problemDetails.initialPopupDisplayed = PopupDisplayed.RunDetails;
   };
 
   if (payload.runs && payload.user.loggedIn) {

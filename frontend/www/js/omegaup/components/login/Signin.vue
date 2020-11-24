@@ -3,6 +3,7 @@
     <omegaup-login
       :facebook-url="facebookUrl"
       :linkedin-url="linkedinUrl"
+      @google-login="(idToken) => $emit('google-login', idToken)"
       @login="(username, password) => $emit('login', username, password)"
     >
     </omegaup-login>

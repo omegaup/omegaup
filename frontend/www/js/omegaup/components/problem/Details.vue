@@ -79,9 +79,19 @@
               })
             }}
           </div>
+          <div
+            v-if="
+              (nominationStatus.tried || nominationStatus.solved) &&
+              !hasBeenNominated
+            "
+          >
+            <button class="btn btn-link" @click="onNewPromotion">
+              {{ T.qualityNominationRateProblem }}
+            </button>
+          </div>
         </template>
-        <omegaup-quality-nomination-review
-          v-if="user.reviewer && !nominationStatus.already_reviewed"
+        <omegaup-quality-nomination-reviewer-popup
+          v-if="user.reviewer && !nominationStatus.alreadyReviewed"
           :allow-user-add-tags="allowUserAddTags"
           :level-tags="levelTags"
           :problem-level="problemLevel"
@@ -93,48 +103,45 @@
           @submit="
             (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
           "
-        ></omegaup-quality-nomination-review>
-        <omegaup-quality-nomination-demotion
+        ></omegaup-quality-nomination-reviewer-popup>
+        <omegaup-quality-nomination-demotion-popup
           @submit="
             (qualityDemotionComponent) =>
               $emit('submit-demotion', qualityDemotionComponent)
           "
-        ></omegaup-quality-nomination-demotion>
-        <omegaup-quality-nomination-promotion
-          v-if="user.loggedIn"
-          :can-nominate-problem="nominationStatus.canNoominateProblem"
-          :dismissed="nominationStatus.dismissed"
-          :dismissed-before-a-c="nominationStatus.dismissedBeforeAC"
-          :nominated="nominationStatus.nominated"
-          :nomination-before-a-c="nominationStatus.nominationBeforeAC"
-          :solved="nominationStatus.solved"
-          :tried="nominationStatus.tried"
-          :problem-alias="problem.alias"
-          @submit="
-            (qualityPromotionComponent) =>
-              $emit('submit-promotion', qualityPromotionComponent)
-          "
-          @dismiss="
-            (qualityPromotionComponent) =>
-              $emit('dismiss-promotion', qualityPromotionComponent)
-          "
-        ></omegaup-quality-nomination-promotion>
+        ></omegaup-quality-nomination-demotion-popup>
         <omegaup-overlay
           v-if="user.loggedIn"
-          :show-overlay="showOverlay"
+          :show-overlay="popupDisplayed !== PopupDisplayed.None"
           @overlay-hidden="onPopupDismissed"
         >
           <template #popup>
             <omegaup-arena-runsubmit-popup
+              v-show="popupDisplayed === PopupDisplayed.RunSubmit"
               :preferred-language="problem.preferred_language"
               :languages="problem.languages"
-              :initial-show-form="showFormRunSubmit"
               @dismiss="onPopupDismissed"
               @submit-run="
                 (code, selectedLanguage) =>
                   onRunSubmitted(code, selectedLanguage)
               "
             ></omegaup-arena-runsubmit-popup>
+            <omegaup-quality-nomination-promotion-popup
+              v-show="popupDisplayed === PopupDisplayed.Promotion"
+              :solved="nominationStatus.solved"
+              :tried="nominationStatus.tried"
+              @submit="
+                (qualityPromotionComponent) =>
+                  $emit('submit-promotion', qualityPromotionComponent)
+              "
+              @dismiss="
+                (qualityPromotionComponent, isDismissed) =>
+                  onPopupPromotionDismissed(
+                    qualityPromotionComponent,
+                    isDismissed,
+                  )
+              "
+            ></omegaup-quality-nomination-promotion-popup>
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -222,9 +229,9 @@ import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
-import qualitynomination_Demotion from '../qualitynomination/DemotionPopup.vue';
-import qualitynomination_Promotion from '../qualitynomination/Popup.vue';
-import qualitynomination_QualityReview from '../qualitynomination/ReviewerPopupv2.vue';
+import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
+import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
+import qualitynomination_ReviewerPopupv2 from '../qualitynomination/ReviewerPopupv2.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -251,6 +258,15 @@ interface Tab {
   text: string;
 }
 
+export enum PopupDisplayed {
+  None,
+  RunSubmit,
+  RunDetails,
+  Promotion,
+  Demotion,
+  Reviewer,
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
@@ -265,9 +281,9 @@ interface Tab {
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
     'omegaup-problem-solution': problem_Solution,
-    'omegaup-quality-nomination-review': qualitynomination_QualityReview,
-    'omegaup-quality-nomination-demotion': qualitynomination_Demotion,
-    'omegaup-quality-nomination-promotion': qualitynomination_Promotion,
+    'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopupv2,
+    'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
+    'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
   },
 })
 export default class ProblemDetails extends Vue {
@@ -288,9 +304,9 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop() showNewRunWindow!: boolean;
-  @Prop() showRunDetailsWindow!: boolean;
   @Prop() runDetails!: types.RunDetails;
+  @Prop({ default: PopupDisplayed.None })
+  initialPopupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
   @Prop() allowUserAddTags!: boolean;
   @Prop() levelTags!: string[];
@@ -298,15 +314,15 @@ export default class ProblemDetails extends Vue {
   @Prop() publicTags!: string[];
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
+  @Prop() hasBeenNominated!: boolean;
 
+  PopupDisplayed = PopupDisplayed;
   T = T;
   ui = ui;
   time = time;
   selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
-  showOverlay = false;
-  showFormRunSubmit = false;
-  showFormRunDetails = false;
+  popupDisplayed = this.initialPopupDisplayed;
   clarificationsTabVisited = false;
   hasUnreadClarifications =
     this.initialClarifications?.length > 0 &&
@@ -346,29 +362,39 @@ export default class ProblemDetails extends Vue {
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
+      return;
     }
-    this.showOverlay = true;
-    this.showFormRunSubmit = true;
+    this.popupDisplayed = PopupDisplayed.RunSubmit;
+  }
+
+  onNewPromotion(): void {
+    if (!this.user.loggedIn) {
+      this.$emit('redirect-login-page');
+      return;
+    }
+    this.popupDisplayed = PopupDisplayed.Promotion;
   }
 
   onShowRunDetails(guid: string): void {
-    this.showOverlay = true;
-    this.showFormRunDetails = true;
-    console.log('heeeereeee');
+    this.popupDisplayed = PopupDisplayed.RunDetails;
     this.$emit('details', guid);
   }
 
   onDismissPopup(): void {
-    this.showOverlay = false;
-    this.showFormRunSubmit = false;
-    this.showFormRunDetails = false;
     this.$emit('dismiss-popup');
   }
 
   onPopupDismissed(): void {
-    this.showOverlay = false;
-    this.showFormRunSubmit = false;
+    this.popupDisplayed = PopupDisplayed.None;
     this.$emit('update:activeTab', this.selectedTab);
+  }
+
+  onPopupPromotionDismissed(
+    qualityPromotionComponent: qualitynomination_PromotionPopup,
+    isDismissed: boolean,
+  ): void {
+    this.onPopupDismissed();
+    this.$emit('dismiss-promotion', qualityPromotionComponent, isDismissed);
   }
 
   onRunSubmitted(code: string, selectedLanguage: string): void {
@@ -388,18 +414,6 @@ export default class ProblemDetails extends Vue {
   @Watch('initialClarifications')
   onInitialClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
-  }
-
-  @Watch('showNewRunWindow')
-  onShowNewRunWindowChanged(newValue: boolean): void {
-    if (!newValue) return;
-    this.onNewSubmission();
-  }
-
-  @Watch('showRunDetailsWindow')
-  onShowRunDetailsWindowChanged(newValue: boolean): void {
-    if (!newValue) return;
-    //this.onShowRunDetails();
   }
 
   @Watch('clarifications')

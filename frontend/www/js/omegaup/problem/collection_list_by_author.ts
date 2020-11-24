@@ -56,7 +56,7 @@ OmegaUp.on('ready', () => {
           data: payload,
           problems: payload.problems,
           loggedIn: payload.loggedIn,
-          currentTags: payload.currentTags,
+          selectedTags: payload.selectedTags,
           pagerItems: payload.pagerItems,
           wizardTags: payload.tagData,
           language: payload.language,

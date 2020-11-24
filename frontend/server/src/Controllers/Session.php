@@ -353,7 +353,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param string $storeToken
      *
-     * @return array<string, string>
+     * @return array{isAccountCreation: bool}
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -392,13 +392,13 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, string>
+     * @return array{isAccountCreation: bool}
      */
     public static function LoginViaGoogle(
         string $email,
         ?string $name = null
     ): array {
-        return self::thirdPartyLoginDeprecated('Google', $email, $name);
+        return self::thirdPartyLogin('Google', $email, $name);
     }
 
     /**
@@ -462,12 +462,14 @@ class Session extends \OmegaUp\Controllers\Controller {
             strval($fbUserProfile->getEmail()),
             $fbUserProfile->getName()
         );
+
+        self::redirect();
     }
 
     public static function loginViaLinkedIn(
         string $code,
         string $state,
-        string $redirect
+        ?string $redirect
     ): void {
         try {
             $li = self::getLinkedInInstance($redirect);
@@ -481,9 +483,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         \OmegaUp\Controllers\Session::thirdPartyLogin(
             'LinkedIn',
             $profile['emailAddress'],
-            "{$profile['firstName']} {$profile['lastName']}",
-            $redirect
+            "{$profile['firstName']} {$profile['lastName']}"
         );
+
+        self::redirect($redirect);
     }
 
     private static function getLinkedInInstance(
@@ -526,63 +529,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         return $redirectUrl === OMEGAUP_URL ? $url : $defaultRedirectUrl;
     }
 
-    /**
-     * Logs in via Facebook API.
-     *
-     * @return array<string, mixed>
-     */
-    public static function LoginViaFacebookDeprecated(): array {
-        // Mostly taken from
-        // https://developers.facebook.com/docs/php/howto/example_facebook_login
-        $scopedFacebook = new ScopedFacebook();
-        $helper = $scopedFacebook->facebook->getRedirectLoginHelper();
-        try {
-            $accessToken = $helper->getAccessToken();
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
-        }
-
-        if (is_null($accessToken)) {
-            $response = ['status' => 'error'];
-            if (!is_null($helper->getError())) {
-                $response['error'] = strval(
-                    $helper->getError()
-                ) . ' ' . strval(
-                    $helper->getErrorDescription()
-                );
-            }
-        }
-
-        try {
-            $fbResponse = $scopedFacebook->facebook->get(
-                '/me?fields=name,email',
-                $accessToken
-            );
-        } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
-        } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
-        }
-
-        $fbUserProfile = $fbResponse->getGraphUser();
-        self::$log->info('User is logged in via facebook !!');
-        if (is_null($fbUserProfile->getEmail())) {
-            self::$log->error('Facebook email empty');
-            return [
-                'status' => 'error',
-                'error' => \OmegaUp\Translations::getInstance()->get(
-                    'loginFacebookEmptyEmailError'
-                ),
-            ];
-        }
-
-        return self::thirdPartyLoginDeprecated(
-            'Facebook',
-            strval($fbUserProfile->getEmail()),
-            $fbUserProfile->getName()
-        );
+    private static function redirect(?string $redirect = null): void {
+        $redirectUrl = self::getRedirectUrl($redirect);
+        header("Location: {$redirectUrl}");
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     /**
@@ -707,115 +657,22 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
     }
 
-    public static function getLinkedInInstanceDeprecated(): \OmegaUp\LinkedIn {
-        return new \OmegaUp\LinkedIn(
-            OMEGAUP_LINKEDIN_CLIENTID,
-            OMEGAUP_LINKEDIN_SECRET,
-            OMEGAUP_URL . '/login?linkedin',
-            \OmegaUp\Request::getRequestVar('redirect')
-        );
-    }
-
-    public static function getLinkedInLoginUrlDeprecated(): string {
-        return self::getLinkedInInstanceDeprecated()->getLoginUrl();
-    }
-
     /**
-     * @return array<string, mixed>
+     * @return array{isAccountCreation: bool}
      */
-    public static function LoginViaLinkedInDeprecated(): array {
-        $code = \OmegaUp\Request::getRequestVar('code');
-        $state = \OmegaUp\Request::getRequestVar('state');
-        if (empty($code) || empty($state)) {
-            return ['status' => 'error'];
-        }
-
-        try {
-            $li = self::getLinkedInInstance();
-            $authToken = $li->getAuthToken($code, $state);
-            $profile = $li->getProfileInfo($authToken);
-            $redirect = $li->extractRedirect($state);
-            if (!is_null($redirect)) {
-                $_GET['redirect'] = $redirect;
-            }
-
-            return self::thirdPartyLoginDeprecated(
-                'LinkedIn',
-                $profile['emailAddress'],
-                $profile['firstName'] . ' ' . $profile['lastName']
-            );
-        } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error("Unable to login via LinkedIn: $e");
-            return $e->asResponseArray();
-        }
-    }
-
-    /**
-     * @return array<string, string>
-     */
-    private static function thirdPartyLoginDeprecated(
-        string $provider,
-        string $email,
-        ?string $name = null
-    ) {
-        // We trust this user's identity
-        self::$log->info("User is logged in via $provider");
-        $results = \OmegaUp\DAO\Identities::findByEmail($email);
-
-        if (!is_null($results)) {
-            self::$log->info("User has been here before with $provider");
-            $identity = $results;
-        } else {
-            // The user has never been here before, let's register them
-            self::$log->info("LoginVia$provider: Creating new user for $email");
-
-            $username = self::getUniqueUsernameFromEmail($email);
-
-            try {
-                \OmegaUp\Controllers\User::createUser(
-                    new \OmegaUp\CreateUserParams([
-                        'name' => (!is_null($name) ? $name : $username),
-                        'username' => $username,
-                        'email' => $email,
-                    ]),
-                    /*ignorePassword=*/true,
-                    /*forceVerification=*/true
-                );
-            } catch (\OmegaUp\Exceptions\ApiException $e) {
-                self::$log->error("Unable to login via $provider: $e");
-                /** @var array<string, string> */
-                return $e->asResponseArray();
-            }
-            $identity = \OmegaUp\DAO\Identities::findByUsername($username);
-            if (is_null($identity)) {
-                throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-            }
-        }
-        if (is_null($identity->username) || is_null($identity->user_id)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-        }
-        $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
-        if (is_null($user)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
-        }
-
-        self::registerSession($identity, $user);
-        return ['status' => 'ok'];
-    }
-
     private static function thirdPartyLogin(
         string $provider,
         string $email,
-        ?string $name = null,
-        ?string $redirect = null
-    ): void {
+        ?string $name = null
+    ): array {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
-
+        $isAccountCreation = true;
         if (!is_null($results)) {
             self::$log->info("User has been here before with $provider");
             $identity = $results;
+            $isAccountCreation = false;
         } else {
             // The user has never been here before, let's register them
             self::$log->info("LoginVia$provider: Creating new user for $email");
@@ -851,9 +708,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         self::registerSession($identity, $user);
 
-        $redirectUrl = self::getRedirectUrl($redirect);
-        header("Location: {$redirectUrl}");
-        throw new \OmegaUp\Exceptions\ExitException();
+        return ['isAccountCreation' => $isAccountCreation];
     }
 
     public static function setSessionManagerForTesting(

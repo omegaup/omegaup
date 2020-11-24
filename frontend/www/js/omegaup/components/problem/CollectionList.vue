@@ -1,6 +1,15 @@
 <template>
   <div>
-    <h1 class="card-title">{{ title }}</h1>
+    <div class="row">
+      <div class="col col-md-4 d-flex align-items-center">
+        <a href="/problem/collection/" data-nav-problems-all>{{
+          T.problemCollectionBackCollections
+        }}</a>
+      </div>
+      <div class="col">
+        <h1>{{ title }}</h1>
+      </div>
+    </div>
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-tags
@@ -42,7 +51,7 @@
           v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="selectedTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
