@@ -385,19 +385,19 @@ class Session extends \OmegaUp\Controllers\Controller {
         //    [picture] => https://lh3.googleusercontent.com/-zrLvBe-AU/AAAAAAAAAAI/AAAAAAAAATU/hh0yUXEisCI/photo.jpg
         //    [locale] => en
 
-        $response = self::LoginViaGoogle(
+        return self::LoginViaGoogle(
             $payload['email'],
             (isset($payload['name']) ? $payload['name'] : null)
         );
-        return [
-            'isAccountCreation' => $response,
-        ];
     }
 
+    /**
+     * @return array{isAccountCreation: bool}
+     */
     public static function LoginViaGoogle(
         string $email,
         ?string $name = null
-    ): bool {
+    ): array {
         return self::thirdPartyLogin('Google', $email, $name);
     }
 
@@ -463,9 +463,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             $fbUserProfile->getName()
         );
 
-        $redirectUrl = self::getRedirectUrl();
-        header("Location: {$redirectUrl}");
-        throw new \OmegaUp\Exceptions\ExitException();
+        self::redirect();
     }
 
     public static function loginViaLinkedIn(
@@ -488,9 +486,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             "{$profile['firstName']} {$profile['lastName']}"
         );
 
-        $redirectUrl = self::getRedirectUrl($redirect);
-        header("Location: {$redirectUrl}");
-        throw new \OmegaUp\Exceptions\ExitException();
+        self::redirect($redirect);
     }
 
     private static function getLinkedInInstance(
@@ -531,6 +527,12 @@ class Session extends \OmegaUp\Controllers\Controller {
             $redirectUrl .= ":{$redirectParsedUrl['port']}";
         }
         return $redirectUrl === OMEGAUP_URL ? $url : $defaultRedirectUrl;
+    }
+
+    private static function redirect(?string $redirect = null): void {
+        $redirectUrl = self::getRedirectUrl($redirect);
+        header("Location: {$redirectUrl}");
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     /**
@@ -655,11 +657,14 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
     }
 
+    /**
+     * @return array{isAccountCreation: bool}
+     */
     private static function thirdPartyLogin(
         string $provider,
         string $email,
         ?string $name = null
-    ): bool {
+    ): array {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
@@ -703,7 +708,7 @@ class Session extends \OmegaUp\Controllers\Controller {
 
         self::registerSession($identity, $user);
 
-        return $isAccountCreation;
+        return ['isAccountCreation' => $isAccountCreation];
     }
 
     public static function setSessionManagerForTesting(
