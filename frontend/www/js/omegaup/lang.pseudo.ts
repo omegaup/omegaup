@@ -646,6 +646,7 @@ const translations: { [key: string]: string; } = {
   privateTagsPlaceholder: "(Ex. univ3r5i7y, 2019, c1a55-2020)",
   problemAliasExists: "(Pr0b13m a1ia5 a1r3ady 3xi575. P13a53 7ry a diff3r3n7 0n3.)",
   problemCollectionAuthors: "(Au7h0r5)",
+  problemCollectionBackCollections: "(\u25c4 Back 70 c0113c7i0n5)",
   problemCollectionEducationLevel: "(By 3duca7i0na1 13v31)",
   problemCollectionOthers: "(O7h3r c0113c7i0n5)",
   problemCollectionProblemCount: "(%(count) pr0b13m5)",

@@ -645,6 +645,7 @@
 	"privateTagsPlaceholder": "Ex. university, 2019, class-2020",
 	"problemAliasExists": "Problem alias already exists. Please try a different one.",
 	"problemCollectionAuthors": "Authors",
+	"problemCollectionBackCollections": "\u25c4 Back to collections",
 	"problemCollectionEducationLevel": "By educational level",
 	"problemCollectionOthers": "Other collections",
 	"problemCollectionProblemCount": "%(count) problems",
