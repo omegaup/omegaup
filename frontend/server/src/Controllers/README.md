@@ -136,7 +136,8 @@
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
   - [`/api/problem/myList/`](#apiproblemmylist)
-  - [`/api/problem/randomProblem/`](#apiproblemrandomproblem)
+  - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
+  - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
   - [`/api/problem/rejudge/`](#apiproblemrejudge)
   - [`/api/problem/removeAdmin/`](#apiproblemremoveadmin)
   - [`/api/problem/removeGroupAdmin/`](#apiproblemremovegroupadmin)
@@ -2342,9 +2343,10 @@ Entry point for switching between associated identities for a user
 
 ### Parameters
 
-| Name              | Type     | Description |
-| ----------------- | -------- | ----------- |
-| `usernameOrEmail` | `string` |             |
+| Name              | Type           | Description |
+| ----------------- | -------------- | ----------- |
+| `usernameOrEmail` | `string`       |             |
+| `auth_token`      | `null\|string` |             |
 
 ### Returns
 
@@ -2741,7 +2743,17 @@ Gets a list of problems where current user is the owner
 | `pagerItems` | `types.PageItem[]`        |
 | `problems`   | `types.ProblemListItem[]` |
 
-## `/api/problem/randomProblem/`
+## `/api/problem/randomKarelProblem/`
+
+### Description
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `alias` | `string` |
+
+## `/api/problem/randomLanguageProblem/`
 
 ### Description
 
@@ -3716,9 +3728,9 @@ contestant's machine and the server.
 
 ### Returns
 
-```typescript
-{ [key: string]: string; }
-```
+| Name                | Type      |
+| ------------------- | --------- |
+| `isAccountCreation` | `boolean` |
 
 # Tag
 

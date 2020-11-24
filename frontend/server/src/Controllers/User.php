@@ -26,7 +26,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type UserProfileStats=array{date: null|string, runs: int, verdict: string}
  * @psalm-type UserListItem=array{label: string, value: string}
  * @psalm-type UserProfileDetailsPayload=array{statusError?: string, profile: UserProfileInfo, contests: UserProfileContests, solvedProblems: list<Problem>, unsolvedProblems: list<Problem>, createdProblems: list<Problem>, stats: list<UserProfileStats>, badges: list<string>, ownedBadges: list<Badge>, programmingLanguages: array<string,string>}
- * @psalm-type LoginDetailsPayload=array{facebookURL: string, linkedinURL: string, validateRecaptcha: bool}
+ * @psalm-type LoginDetailsPayload=array{facebookUrl: string, linkedinUrl: string, statusError?: string, validateRecaptcha: bool}
  */
 class User extends \OmegaUp\Controllers\Controller {
     /** @var bool */
@@ -3904,22 +3904,51 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     * @return array{entrypoint: string, smartyProperties: array{payload: LoginDetailsPayload, title: \OmegaUp\TranslationString}}
+     *
+     * @omegaup-request-param string $code
+     * @omegaup-request-param string $redirect
+     * @omegaup-request-param string $state
+     * @omegaup-request-param string $third_party_login
      */
     public static function getLoginDetailsForSmarty(\OmegaUp\Request $r) {
-        $triedToLogin = false;
-        $emailVerified = true;
-        return [
+        $thirdPartyLogin = $r->ensureOptionalString('third_party_login');
+        if ($r->offsetExists('linkedin')) {
+            $thirdPartyLogin = 'linkedin';
+        } elseif ($r->offsetExists('fb')) {
+            $thirdPartyLogin = 'facebook';
+        }
+
+        $response = [
             'smartyProperties' => [
                 'payload' => [
                     'validateRecaptcha' => OMEGAUP_VALIDATE_CAPTCHA,
-                    'facebookURL' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
-                    'linkedinURL' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
+                    'facebookUrl' => \OmegaUp\Controllers\Session::getFacebookLoginUrl(),
+                    'linkedinUrl' => \OmegaUp\Controllers\Session::getLinkedInLoginUrl(),
                 ],
                 'title' => new \OmegaUp\TranslationString('omegaupTitleLogin'),
+                'scripts' => [
+                    'https://apis.google.com/js/platform.js?onload=init',
+                ],
             ],
             'entrypoint' => 'login_signin',
         ];
+        try {
+            if ($thirdPartyLogin === 'linkedin') {
+                \OmegaUp\Controllers\Session::loginViaLinkedIn(
+                    $r->ensureString('code'),
+                    $r->ensureString('state'),
+                    $r->ensureOptionalString('redirect')
+                );
+            } elseif ($thirdPartyLogin === 'facebook') {
+                \OmegaUp\Controllers\Session::loginViaFacebook();
+            }
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            \OmegaUp\ApiCaller::logException($e);
+            $response['smartyProperties']['payload']['statusError'] = $e->getErrorMessage();
+            return $response;
+        }
+        return $response;
     }
 }
 

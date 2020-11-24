@@ -56,12 +56,13 @@ OmegaUp.on('ready', () => {
           data: payload,
           problems: payload.problems,
           loggedIn: payload.loggedIn,
-          currentTags: payload.currentTags,
+          selectedTags: payload.selectedTags,
           pagerItems: payload.pagerItems,
           wizardTags: payload.tagData,
           language: payload.language,
           languages: payload.languages,
           keyword: payload.keyword,
+          selectedAuthors: payload.authors,
           sortOrder: sortOrder,
           columnName: columnName,
           difficulty: difficulty,
@@ -71,6 +72,7 @@ OmegaUp.on('ready', () => {
             columnName: string,
             sortOrder: omegaup.SortOrder,
             difficulty: string,
+            author: string[],
           ): void => {
             const queryParameters = {
               language,
@@ -78,6 +80,7 @@ OmegaUp.on('ready', () => {
               order_by: columnName,
               sort_order: sortOrder,
               difficulty,
+              author,
             };
             window.location.replace(
               `/problem/collection/author/?${ui.buildURLQuery(

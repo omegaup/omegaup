@@ -167,8 +167,8 @@ class Validators {
     public static function usernameOrEmail(string $usernameOrEmail): bool {
         return (
             self::email($usernameOrEmail)
-            && self::normalUsername($usernameOrEmail)
-            && self::identityUsername($usernameOrEmail)
+            || self::normalUsername($usernameOrEmail)
+            || self::identityUsername($usernameOrEmail)
         );
     }
 

@@ -1,25 +1,57 @@
 <template>
   <div>
-    <h1 class="card-title">{{ title }}</h1>
+    <div class="row">
+      <div class="col col-md-4 d-flex align-items-center">
+        <a href="/problem/collection/" data-nav-problems-all>{{
+          T.problemCollectionBackCollections
+        }}</a>
+      </div>
+      <div class="col">
+        <h1>{{ title }}</h1>
+      </div>
+    </div>
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-tags
-          :tags.sync="tags"
+          :selected-tags="selectedTags"
+          :tags="availableTags"
           :public-tags="publicTags"
+          @new-selected-tag="
+            (selectedTags) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
+          "
         ></omegaup-problem-filter-tags>
         <omegaup-problem-filter-difficulty
           :selected-difficulty="difficulty"
           @change-difficulty="
             (difficulty) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
           "
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
+        <div v-if="!problems || problems.length == 0" class="card-body">
+          <div class="empty-table-message">
+            {{ T.courseAssignmentProblemsEmpty }}
+          </div>
+        </div>
         <omegaup-problem-base-list
+          v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="currentTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -35,7 +67,13 @@
           :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder, difficulty)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
           "
         >
         </omegaup-problem-base-list>
@@ -64,7 +102,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -81,7 +119,14 @@ export default class CollectionList extends Vue {
 
   T = T;
   level = this.data.level;
-  tags: string[] = this.data.frequentTags.map((element) => element.alias);
+
+  get availableTags(): string[] {
+    let tags: Set<string> = new Set(
+      this.data.frequentTags.map((element) => element.alias),
+    );
+    this.selectedTags.forEach((element) => tags.add(element));
+    return Array.from(tags);
+  }
 
   get publicTags(): string[] {
     let tags: string[] = this.data.frequentTags.map((x) => x.alias);

@@ -48,7 +48,7 @@ OmegaUp.on('ready', () => {
         props: {
           problems: payload.problems,
           loggedIn: payload.loggedIn,
-          currentTags: payload.currentTags,
+          selectedTags: payload.selectedTags,
           pagerItems: payload.pagerItems,
           wizardTags: payload.tagData,
           language: payload.language,

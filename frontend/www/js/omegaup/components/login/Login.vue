@@ -75,6 +75,7 @@
 </template>
 
 <script lang="ts">
+/* global gapi */
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
@@ -85,5 +86,27 @@ export default class Login extends Vue {
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
+
+  mounted() {
+    if (window.gapi) {
+      window.gapi.signin2.render('google-signin', {
+        scope: 'profile',
+        width: 45,
+        height: 45,
+        longtitle: false,
+        theme: 'light',
+        onsuccess: this.onSuccess,
+        onfailure: this.onFailure,
+      });
+    }
+  }
+
+  onSuccess(googleUser: gapi.auth2.GoogleUser) {
+    this.$emit('google-login', googleUser.getAuthResponse().id_token);
+  }
+
+  onFailure() {
+    this.$emit('google-login-failure');
+  }
 }
 </script>

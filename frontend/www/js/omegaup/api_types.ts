@@ -1387,10 +1387,10 @@ export namespace types {
   }
 
   export interface CollectionDetailsByAuthorPayload {
-    authors: types.AuthorsRank;
+    authors: string[];
+    authorsRanking: types.AuthorsRank;
     column: string;
     columns: string[];
-    currentTags: string[];
     keyword: string;
     language: string;
     languages: string[];
@@ -1399,6 +1399,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
+    selectedTags: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -1406,7 +1407,6 @@ export namespace types {
   export interface CollectionDetailsByLevelPayload {
     column: string;
     columns: string[];
-    currentTags: string[];
     difficulty: string;
     frequentTags: { alias: string; name?: string }[];
     keyword: string;
@@ -1419,6 +1419,7 @@ export namespace types {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
     publicTags: string[];
+    selectedTags: string[];
     tagData: { name?: string }[];
     tagsList: string[];
   }
@@ -1901,6 +1902,7 @@ export namespace types {
     email?: string;
     identity?: dao.Identities;
     is_admin: boolean;
+    loginIdentity?: dao.Identities;
     user?: dao.Users;
     valid: boolean;
   }
@@ -2064,8 +2066,9 @@ export namespace types {
   }
 
   export interface LoginDetailsPayload {
-    facebookURL: string;
-    linkedinURL: string;
+    facebookUrl: string;
+    linkedinUrl: string;
+    statusError?: string;
     validateRecaptcha: boolean;
   }
 
@@ -2371,7 +2374,6 @@ export namespace types {
   export interface ProblemListPayload {
     column: string;
     columns: string[];
-    currentTags: string[];
     keyword: string;
     language: string;
     languages: string[];
@@ -2380,6 +2382,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
+    selectedTags: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -3597,8 +3600,10 @@ export namespace messages {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
   };
-  export type ProblemRandomProblemRequest = { [key: string]: any };
-  export type ProblemRandomProblemResponse = { alias: string };
+  export type ProblemRandomKarelProblemRequest = { [key: string]: any };
+  export type ProblemRandomKarelProblemResponse = { alias: string };
+  export type ProblemRandomLanguageProblemRequest = { [key: string]: any };
+  export type ProblemRandomLanguageProblemResponse = { alias: string };
   export type ProblemRejudgeRequest = { [key: string]: any };
   export type ProblemRejudgeResponse = {};
   export type ProblemRemoveAdminRequest = { [key: string]: any };
@@ -3827,7 +3832,7 @@ export namespace messages {
     time: number;
   };
   export type SessionGoogleLoginRequest = { [key: string]: any };
-  export type SessionGoogleLoginResponse = { [key: string]: string };
+  export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -4369,9 +4374,12 @@ export namespace controllers {
     myList: (
       params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
-    randomProblem: (
-      params?: messages.ProblemRandomProblemRequest,
-    ) => Promise<messages.ProblemRandomProblemResponse>;
+    randomKarelProblem: (
+      params?: messages.ProblemRandomKarelProblemRequest,
+    ) => Promise<messages.ProblemRandomKarelProblemResponse>;
+    randomLanguageProblem: (
+      params?: messages.ProblemRandomLanguageProblemRequest,
+    ) => Promise<messages.ProblemRandomLanguageProblemResponse>;
     rejudge: (
       params?: messages.ProblemRejudgeRequest,
     ) => Promise<messages.ProblemRejudgeResponse>;
