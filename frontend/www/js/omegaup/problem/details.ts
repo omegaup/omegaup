@@ -1,8 +1,10 @@
 import Vue from 'vue';
-import problem_Details from '../components/problem/Details.vue';
+import problem_Details, {
+  PopupDisplayed,
+} from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
-import { OmegaUp, omegaup } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
@@ -11,9 +13,9 @@ import T from '../lang';
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const locationHash = window.location.hash.substr(1).split('/');
-  let popupDisplayed = omegaup.PopupDisplayed.None;
+  let popupDisplayed = PopupDisplayed.None;
   if (locationHash.includes('new-run')) {
-    popupDisplayed = omegaup.PopupDisplayed.RunSubmit;
+    popupDisplayed = PopupDisplayed.RunSubmit;
   } else if (
     (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
     !(
@@ -28,7 +30,7 @@ OmegaUp.on('ready', () => {
     ) &&
     payload.nominationStatus?.canNominateProblem
   ) {
-    popupDisplayed = omegaup.PopupDisplayed.Promotion;
+    popupDisplayed = PopupDisplayed.Promotion;
   }
   new Vue({
     el: '#main-container',

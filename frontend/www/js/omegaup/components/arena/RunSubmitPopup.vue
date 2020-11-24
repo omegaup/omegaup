@@ -248,10 +248,3 @@ export default class ArenaRunSubmitPopup extends Vue {
   }
 }
 </script>
-
-<style lang="scss">
-.CodeMirror-scroll {
-  max-height: 580px;
-  min-height: 360px;
-}
-</style>
