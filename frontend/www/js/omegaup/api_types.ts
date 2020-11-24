@@ -3832,7 +3832,7 @@ export namespace messages {
     time: number;
   };
   export type SessionGoogleLoginRequest = { [key: string]: any };
-  export type SessionGoogleLoginResponse = { [key: string]: string };
+  export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };

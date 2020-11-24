@@ -3728,9 +3728,9 @@ contestant's machine and the server.
 
 ### Returns
 
-```typescript
-{ [key: string]: string; }
-```
+| Name                | Type      |
+| ------------------- | --------- |
+| `isAccountCreation` | `boolean` |
 
 # Tag
 
