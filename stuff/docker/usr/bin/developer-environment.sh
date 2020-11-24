@@ -40,8 +40,6 @@ define('OMEGAUP_ENVIRONMENT', 'development');
 define('OMEGAUP_LOG_FILE', '/tmp/omegaup.log');
 define('OMEGAUP_ENABLE_SOCIAL_MEDIA_RESOURCES', false);
 define('SMARTY_CACHE_DIR', '/tmp');
-define('OMEGAUP_CACERT_URL', '/etc/omegaup/frontend/certificate.pem');
-define('OMEGAUP_SSLCERT_URL', '/etc/omegaup/frontend/certificate.pem');
 define('OMEGAUP_GITSERVER_URL', 'http://gitserver:33861');
 define('OMEGAUP_GRADER_URL', 'https://grader:21680');
 define('OMEGAUP_GITSERVER_SECRET_TOKEN', 'secret');
