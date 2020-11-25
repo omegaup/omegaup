@@ -1034,7 +1034,7 @@ const translations: { [key: string]: string; } = {
   reportProblemFormAdditionalComments: "Comentarios adicionales (opcional):",
   reportProblemFormCases: "Creo que los casos de prueba est\u00e1n mal.",
   reportProblemFormDuplicate: "Es un problema duplicado.",
-  reportProblemFormLinkToOriginalProblem: "Liga al problema original (required):",
+  reportProblemFormLinkToOriginalProblem: "Liga al problema original (requerido):",
   reportProblemFormNotAProblemStatement: "No describe un problema de programaci\u00f3n.",
   reportProblemFormOffensive: "Es ofensivo.",
   reportProblemFormOtherReason: "Otra raz\u00f3n.",

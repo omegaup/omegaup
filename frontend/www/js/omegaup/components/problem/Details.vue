@@ -79,14 +79,14 @@
               })
             }}
           </div>
-          <div
-            v-if="
-              (nominationStatus.tried || nominationStatus.solved) &&
-              !hasBeenNominated
-            "
-          >
+          <div v-if="visibilityOfPromotionButton">
             <button class="btn btn-link" @click="onNewPromotion">
               {{ T.qualityNominationRateProblem }}
+            </button>
+          </div>
+          <div v-if="user.loggedIn">
+            <button class="btn btn-link" @click="onReportInappropriateProblem">
+              {{ T.wordsReportProblem }}
             </button>
           </div>
         </template>
@@ -104,12 +104,6 @@
             (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
           "
         ></omegaup-quality-nomination-reviewer-popup>
-        <omegaup-quality-nomination-demotion-popup
-          @submit="
-            (qualityDemotionComponent) =>
-              $emit('submit-demotion', qualityDemotionComponent)
-          "
-        ></omegaup-quality-nomination-demotion-popup>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="popupDisplayed !== PopupDisplayed.None"
@@ -128,8 +122,8 @@
             ></omegaup-arena-runsubmit-popup>
             <omegaup-quality-nomination-promotion-popup
               v-show="popupDisplayed === PopupDisplayed.Promotion"
-              :solved="nominationStatus.solved"
-              :tried="nominationStatus.tried"
+              :solved="nominationStatus && nominationStatus.solved"
+              :tried="nominationStatus && nominationStatus.tried"
               @submit="
                 (qualityPromotionComponent) =>
                   $emit('submit-promotion', qualityPromotionComponent)
@@ -142,6 +136,14 @@
                   )
               "
             ></omegaup-quality-nomination-promotion-popup>
+            <omegaup-quality-nomination-demotion-popup
+              v-show="popupDisplayed === PopupDisplayed.Demotion"
+              @dismiss="popupDisplayed = PopupDisplayed.None"
+              @submit="
+                (qualityDemotionComponent) =>
+                  $emit('submit-demotion', qualityDemotionComponent)
+              "
+            ></omegaup-quality-nomination-demotion-popup>
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -217,7 +219,7 @@ import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
-import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
+import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopupv2.vue';
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
 import qualitynomination_ReviewerPopupv2 from '../qualitynomination/ReviewerPopupv2.vue';
 import user_Username from '../user/Username.vue';
@@ -344,6 +346,13 @@ export default class ProblemDetails extends Vue {
     return `(${this.clarifications.length})`;
   }
 
+  get visibilityOfPromotionButton(): boolean {
+    return (
+      (this.nominationStatus?.tried || this.nominationStatus?.solved) &&
+      !this.hasBeenNominated
+    );
+  }
+
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
@@ -358,6 +367,10 @@ export default class ProblemDetails extends Vue {
       return;
     }
     this.popupDisplayed = PopupDisplayed.Promotion;
+  }
+
+  onReportInappropriateProblem(): void {
+    this.popupDisplayed = PopupDisplayed.Demotion;
   }
 
   onPopupDismissed(): void {
