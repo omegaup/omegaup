@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
 import * as Highcharts from 'highcharts/highstock';
 
 import * as api from '../api';
 import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
+import { myRunsStore, runsStore } from './runsStore';
 import * as time from '../time';
 import * as ui from '../ui';
 import JSZip from 'jszip';
@@ -27,8 +27,6 @@ import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import ArenaAdmin from './admin_arena';
 
 export { ArenaAdmin };
-
-Vue.use(Vuex);
 
 export interface ArenaOptions {
   assignmentAlias: string | null;
@@ -73,64 +71,6 @@ export interface Problem {
   title: string;
   visibility: number;
 }
-
-export interface RunsState {
-  // The list of runs.
-  runs: types.Run[];
-
-  // The mapping of run GUIDs to indices on the runs array.
-  index: Record<string, number>;
-}
-
-export const runsStore = new Vuex.Store<RunsState>({
-  state: {
-    runs: [],
-    index: {},
-  },
-  mutations: {
-    addRun(state, run: types.Run) {
-      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
-        Vue.set(
-          state.runs,
-          state.index[run.guid],
-          Object.assign({}, state.runs[state.index[run.guid]], run),
-        );
-        return;
-      }
-      Vue.set(state.index, run.guid, state.runs.length);
-      state.runs.push(run);
-    },
-    clear(state) {
-      state.runs.splice(0);
-      state.index = {};
-    },
-  },
-});
-
-const myRunsStore = new Vuex.Store<RunsState>({
-  state: {
-    runs: [],
-    index: {},
-  },
-  mutations: {
-    addRun(state, run: types.Run) {
-      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
-        Vue.set(
-          state.runs,
-          state.index[run.guid],
-          Object.assign({}, state.runs[state.index[run.guid]], run),
-        );
-        return;
-      }
-      Vue.set(state.index, run.guid, state.runs.length);
-      state.runs.push(run);
-    },
-    clear(state) {
-      state.runs.splice(0);
-      state.index = {};
-    },
-  },
-});
 
 // Number of digits after the decimal point to show.
 const digitsAfterDecimalPoint: number = 2;
