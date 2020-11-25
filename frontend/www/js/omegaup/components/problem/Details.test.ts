@@ -70,9 +70,9 @@ describe('Details.vue', () => {
   const nominationStatus = <types.NominationStatus>{
     alreadyReviewed: false,
     dismissed: false,
-    dismissedBeforeAC: false,
+    dismissedBeforeAc: false,
     nominated: false,
-    nominatedBeforeAC: false,
+    nominatedBeforeAc: false,
     solved: false,
     tried: false,
   };

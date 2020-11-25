@@ -168,7 +168,7 @@
           <tr v-for="run in filteredRuns" :key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
-              <acronym :title="run.guid">
+              <acronym :title="run.guid" data-run-guid>
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
@@ -371,9 +371,9 @@ export default class Runs extends Vue {
       !this.filterContest &&
       !this.filterVerdict
     ) {
-      return this.runs;
+      return this.sortedRuns;
     }
-    return this.runs.filter((run) => {
+    return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
         if (this.filterVerdict == 'NO-AC') {
           if (run.verdict == 'AC') {
@@ -400,6 +400,12 @@ export default class Runs extends Vue {
       }
       return true;
     });
+  }
+
+  get sortedRuns(): types.Run[] {
+    return this.runs
+      .slice()
+      .sort((a, b) => b.time.getTime() - a.time.getTime());
   }
 
   get newSubmissionUrl(): string {
