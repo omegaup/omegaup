@@ -1002,7 +1002,7 @@ const translations: { [key: string]: string; } = {
   qualityFormQualityGood: "Bom",
   qualityFormQualityVeryBad: "Muito mal",
   qualityFormQualityVeryGood: "Muito bom",
-  qualityFormRateBeforeAC: "\u00a1Voc\u00ea j\u00e1 pode avaliar este problema!",
+  qualityFormRateBeforeAc: "\u00a1Voc\u00ea j\u00e1 pode avaliar este problema!",
   qualityFormTags: "Em que assunto(s) trata este problema?",
   qualityFormThanksForReview: "Obrigado por voc\u00ea reveja",
   qualityNominationMustHaveSolvedProblem: "Voc\u00ea deve resolver o problema antes de nome\u00e1-lo",

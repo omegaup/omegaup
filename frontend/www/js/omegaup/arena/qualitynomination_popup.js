@@ -16,11 +16,11 @@ OmegaUp.on('ready', function () {
       return createElement('qualitynomination-popup', {
         props: {
           nominated: this.nominated,
-          nominatedBeforeAC: this.nominatedBeforeAC,
+          nominatedBeforeAc: this.nominatedBeforeAc,
           solved: this.solved,
           tried: this.tried,
           dismissed: this.dismissed,
-          dismissedBeforeAC: this.dismissedBeforeAC,
+          dismissedBeforeAc: this.dismissedBeforeAc,
           canNominateProblem: this.canNominateProblem,
           problemAlias: this.problemAlias,
         },
@@ -65,11 +65,11 @@ OmegaUp.on('ready', function () {
     },
     data: {
       nominated: qualityPayload.nominated,
-      nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
+      nominatedBeforeAc: qualityPayload.nominatedBeforeAc,
       solved: qualityPayload.solved,
       tried: qualityPayload.tried,
       dismissed: qualityPayload.dismissed,
-      dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
+      dismissedBeforeAc: qualityPayload.dismissedBeforeAc,
       canNominateProblem: qualityPayload.can_nominate_problem,
       problemAlias: qualityPayload.problem_alias,
     },
