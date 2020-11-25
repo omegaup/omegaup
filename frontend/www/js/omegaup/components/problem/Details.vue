@@ -79,12 +79,7 @@
               })
             }}
           </div>
-          <div
-            v-if="
-              (nominationStatus?.tried || nominationStatus?.solved) &&
-              !hasBeenNominated
-            "
-          >
+          <div v-if="visibilityOfPromotionButton">
             <button class="btn btn-link" @click="onNewPromotion">
               {{ T.qualityNominationRateProblem }}
             </button>
@@ -349,6 +344,13 @@ export default class ProblemDetails extends Vue {
   get clarificationsCount(): string {
     if (this.clarifications.length === 0) return '';
     return `(${this.clarifications.length})`;
+  }
+
+  get visibilityOfPromotionButton(): boolean {
+    return (
+      (this.nominationStatus?.tried || this.nominationStatus?.solved) &&
+      !this.hasBeenNominated
+    );
   }
 
   onNewSubmission(): void {
