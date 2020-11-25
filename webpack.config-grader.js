@@ -30,7 +30,7 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader',
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
@@ -38,6 +38,10 @@ module.exports = {
     alias: {
       vue$: 'vue/dist/vue.common.js',
       'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
+    },
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      buffer: require.resolve('buffer/'),
     },
   },
   plugins: [

@@ -11,7 +11,7 @@ export function formatFutureDateRelative(futureDate: Date): string {
     momentInitialized = true;
   }
 
-  return moment(futureDate).endOf().fromNow();
+  return ((moment as any)?.default ?? moment)(futureDate).endOf().fromNow();
 }
 
 export function formatDelta(delta: number): string {

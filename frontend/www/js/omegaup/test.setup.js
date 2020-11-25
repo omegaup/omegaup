@@ -1,10 +1,8 @@
 const util = require('util');
 const process = require('process');
 
-require('jsdom-global')(undefined, {
-  pretendToBeVisual: true,
-  url: 'http://localhost:8001/',
-});
+require('jest-fetch-mock').enableMocks();
+
 global.jQuery = require('jquery');
 global.$ = global.jQuery;
 window.jQuery = global.jQuery;

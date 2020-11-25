@@ -1,4 +1,14 @@
-// babel.config.js
 module.exports = {
-  presets: [['@babel/preset-env', {targets: {node: 'current'}}]],
+  presets: [
+    [
+      '@babel/preset-env',
+      {
+        corejs: 3,
+        modules: false,
+        useBuiltIns: 'entry',
+        targets: 'supports es6',
+      },
+    ],
+  ],
+  plugins: ['@babel/plugin-transform-async-to-generator'],
 };
