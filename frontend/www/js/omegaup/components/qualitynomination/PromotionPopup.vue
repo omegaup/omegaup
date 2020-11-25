@@ -3,7 +3,7 @@
     <transition name="fade">
       <form class="popup h-auto w-auto" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
-          <template v-if="currentView === 'content'">
+          <template v-if="currentView === AvailableViews.Content">
             <slot
               name="popup-content"
               :onSubmit="onSubmit"
@@ -91,7 +91,7 @@
               </div>
             </slot>
           </template>
-          <template v-if="currentView === 'thanks'">
+          <template v-if="currentView === AvailableViews.Thanks">
             <div class="w-100 h-100 h3 text-center">
               {{ T.qualityFormThanksForReview }}
             </div>
@@ -105,6 +105,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
+import { AvailableViews } from './DemotionPopupv2.vue';
 import T from '../../lang';
 
 interface ProblemTag {
@@ -197,8 +198,9 @@ export default class QualityPromotionPopup extends Vue {
   })
   qualityLevels!: QualityLevel[];
 
+  AvailableViews = AvailableViews;
   T = T;
-  currentView = 'content';
+  currentView: AvailableViews = AvailableViews.Content;
   difficulty = '';
   quality = '';
   tags: string[] = [];
@@ -222,8 +224,8 @@ export default class QualityPromotionPopup extends Vue {
     return this.sortedProblemTags.map((x: ProblemTag): string => x.text);
   }
 
-  onCloseModal(currentView: string): void {
-    if (currentView !== 'thanks') {
+  onCloseModal(currentView: AvailableViews): void {
+    if (currentView !== AvailableViews.Thanks) {
       this.onDismiss();
       return;
     }
@@ -240,7 +242,7 @@ export default class QualityPromotionPopup extends Vue {
 
   onSubmit(): void {
     this.$emit('submit', this);
-    this.currentView = 'thanks';
+    this.currentView = AvailableViews.Thanks;
 
     setTimeout(() => this.onHide(false), 2000);
   }

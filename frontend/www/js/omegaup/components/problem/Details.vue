@@ -81,6 +81,7 @@
           </div>
           <div
             v-if="
+              nominationStatus &&
               (nominationStatus.tried || nominationStatus.solved) &&
               !hasBeenNominated
             "
@@ -90,7 +91,11 @@
             </button>
           </div>
           <div>
-            <button class="btn btn-link" @click="onReportInappropriateProblem">
+            <button
+              v-if="user.loggedIn"
+              class="btn btn-link"
+              @click="onReportInappropriateProblem"
+            >
               {{ T.wordsReportProblem }}
             </button>
           </div>
@@ -127,8 +132,8 @@
             ></omegaup-arena-runsubmit-popup>
             <omegaup-quality-nomination-promotion-popup
               v-show="popupDisplayed === PopupDisplayed.Promotion"
-              :solved="nominationStatus.solved"
-              :tried="nominationStatus.tried"
+              :solved="nominationStatus && nominationStatus.solved"
+              :tried="nominationStatus && nominationStatus.tried"
               @submit="
                 (qualityPromotionComponent) =>
                   $emit('submit-promotion', qualityPromotionComponent)
@@ -368,10 +373,6 @@ export default class ProblemDetails extends Vue {
   }
 
   onReportInappropriateProblem(): void {
-    if (!this.user.loggedIn) {
-      this.$emit('redirect-login-page');
-      return;
-    }
     this.popupDisplayed = PopupDisplayed.Demotion;
   }
 
