@@ -19,7 +19,9 @@ export default class OverlayPopup extends Vue {}
 div[data-overlay-popup] {
   background: #eee;
   width: 80%;
-  height: 90%;
+  height: -moz-max-content;
+  height: fit-content;
+  max-height: 90%;
   margin: auto;
   border: 2px solid #ccc;
   padding: 1em;

@@ -7,7 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
- * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}
+ * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepts_submissions: bool, accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
@@ -4220,8 +4220,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'tried' => false,
                     'nominated' => false,
                     'dismissed' => false,
-                    'nominatedBeforeAC' => false,
-                    'dismissedBeforeAC' => false,
+                    'nominatedBeforeAc' => false,
+                    'dismissedBeforeAc' => false,
                 ];
             } else {
                 $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(
