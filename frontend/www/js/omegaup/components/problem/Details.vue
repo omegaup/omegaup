@@ -81,8 +81,7 @@
           </div>
           <div
             v-if="
-              nominationStatus &&
-              (nominationStatus.tried || nominationStatus.solved) &&
+              (nominationStatus?.tried || nominationStatus?.solved) &&
               !hasBeenNominated
             "
           >
@@ -90,12 +89,8 @@
               {{ T.qualityNominationRateProblem }}
             </button>
           </div>
-          <div>
-            <button
-              v-if="user.loggedIn"
-              class="btn btn-link"
-              @click="onReportInappropriateProblem"
-            >
+          <div v-if="user.loggedIn">
+            <button class="btn btn-link" @click="onReportInappropriateProblem">
               {{ T.wordsReportProblem }}
             </button>
           </div>
