@@ -9,7 +9,7 @@ import * as ui from '../ui';
 import * as time from '../time';
 
 import { Arena } from './arena';
-import { runsStore } from './RunsStore';
+import { runsStore } from './runsStore';
 
 export default class ArenaAdmin {
   arena: Arena;

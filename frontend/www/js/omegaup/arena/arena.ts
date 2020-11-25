@@ -5,7 +5,7 @@ import * as api from '../api';
 import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
-import { myRunsStore, runsStore } from './RunsStore';
+import { myRunsStore, runsStore } from './runsStore';
 import * as time from '../time';
 import * as ui from '../ui';
 import JSZip from 'jszip';
