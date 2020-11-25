@@ -702,17 +702,18 @@ def update_users_stats(
         try:
             scores = update_user_rank(cur)
             update_user_rank_cutoffs(cur, scores)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update user ranking')
             raise
 
         try:
             update_author_rank(cur)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update authors ranking')
             raise
+        # We update both the general rank and the author's rank in the same
+        # transaction since both are stored in the same DB table.
+        dbconn.commit()
 
         if update_coder_of_the_month:
             try:
