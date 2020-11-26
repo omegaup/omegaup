@@ -62,9 +62,9 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $payload = $result['quality_payload'];
         $this->assertFalse($payload['nominated']);
-        $this->assertFalse($payload['nominatedBeforeAC']);
+        $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
-        $this->assertFalse($payload['dismissedBeforeAC']);
+        $this->assertFalse($payload['dismissedBeforeAc']);
         $this->assertFalse($payload['tried']);
         $this->assertFalse($payload['solved']);
 
@@ -83,9 +83,9 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $payload = $result['quality_payload'];
         $this->assertFalse($payload['nominated']);
-        $this->assertFalse($payload['nominatedBeforeAC']);
+        $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
-        $this->assertFalse($payload['dismissedBeforeAC']);
+        $this->assertFalse($payload['dismissedBeforeAc']);
         $this->assertTrue($payload['tried']);
         $this->assertFalse($payload['solved']);
 
@@ -106,9 +106,9 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $payload = $result['quality_payload'];
         $this->assertFalse($payload['nominated']);
-        $this->assertFalse($payload['nominatedBeforeAC']);
+        $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
-        $this->assertTrue($payload['dismissedBeforeAC']);
+        $this->assertTrue($payload['dismissedBeforeAc']);
         $this->assertTrue($payload['tried']);
         $this->assertFalse($payload['solved']);
 

@@ -71,14 +71,14 @@ class Tag extends \OmegaUp\Controllers\Controller {
      *
      * @return list<array{alias: string}>
      */
-    public static function getFrequentTagsByLevel(
+    public static function getFrequentQualityTagsByLevel(
         string $problemLevel,
         int $rows
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
             "level-{$problemLevel}-{$rows}",
-            fn () => \OmegaUp\DAO\Tags::getFrequentTagsByLevel(
+            fn () => \OmegaUp\DAO\Tags::getFrequentQualityTagsByLevel(
                 $problemLevel,
                 $rows
             ),
@@ -107,7 +107,10 @@ class Tag extends \OmegaUp\Controllers\Controller {
         );
 
         return [
-            'frequent_tags' => self::getFrequentTagsByLevel($param, $rows),
+            'frequent_tags' => self::getFrequentQualityTagsByLevel(
+                $param,
+                $rows
+            ),
         ];
     }
 }

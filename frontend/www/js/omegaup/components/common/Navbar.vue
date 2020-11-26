@@ -202,12 +202,49 @@
             ></a>
             <ul class="dropdown-menu">
               <template v-if="!omegaUpLockDown && !inContest">
+                <div class="text-center">
+                  <img
+                    :src="gravatarURL128"
+                    height="70"
+                    class="img-circle"
+                    :title="currentUsername"
+                  />
+                  <h4 v-if="currentName !== ''">
+                    <strong>{{ currentName }}</strong>
+                  </h4>
+                  <h4 v-else>
+                    <strong>{{ currentUsername }}</strong>
+                  </h4>
+                  <h5>
+                    <strong>{{ currentEmail }}</strong>
+                  </h5>
+                </div>
                 <li>
-                  <a href="/profile/" data-nav-profile
+                  <a href="/profile/" data-nav-profile class="text-center"
                     ><span class="glyphicon glyphicon-user"></span>
                     {{ T.navViewProfile }}</a
                   >
                 </li>
+                <li role="separator" class="divider"></li>
+                <template v-if="identitiesNotLoggedIn.length > 0">
+                  <li
+                    v-for="identity in identitiesNotLoggedIn"
+                    :key="identity.username"
+                  >
+                    <button
+                      class="btn btn-link dropdown-item"
+                      @click="$emit('change-account', identity.username)"
+                    >
+                      <img
+                        :src="gravatarURL51"
+                        height="45"
+                        class="img-circle"
+                        :title="identity.username"
+                      />{{ identity.username }}
+                    </button>
+                  </li>
+                  <li role="separator" class="divider"></li>
+                </template>
                 <li>
                   <a href="/badge/list/">{{ T.navViewBadges }}</a>
                 </li>
@@ -231,6 +268,7 @@
                   <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
                 </li>
               </template>
+              <li role="separator" class="divider"></li>
               <li>
                 <a href="/logout/"
                   ><span class="glyphicon glyphicon-log-out"></span>
@@ -272,6 +310,10 @@ export default class Navbar extends Vue {
   @Prop() isLoggedIn!: boolean;
   @Prop() isReviewer!: boolean;
   @Prop() gravatarURL51!: string;
+  @Prop() gravatarURL128!: string;
+  @Prop() associatedIdentities!: types.AssociatedIdentity[];
+  @Prop() currentEmail!: string;
+  @Prop() currentName!: string;
   @Prop() currentUsername!: string;
   @Prop() isAdmin!: boolean;
   @Prop() isMainUserIdentity!: boolean;
@@ -289,10 +331,16 @@ export default class Navbar extends Vue {
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
   }
+
+  get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
+    return this.associatedIdentities.filter(
+      (identity) => identity.username !== this.currentUsername,
+    );
+  }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 #root .navbar-default {

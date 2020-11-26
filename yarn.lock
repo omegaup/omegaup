@@ -1600,7 +1600,7 @@
   dependencies:
     "@types/gapi" "*"
 
-"@types/gapi@*", "@types/gapi@0.0.39":
+"@types/gapi@*", "@types/gapi@^0.0.39":
   version "0.0.39"
   resolved "https://registry.yarnpkg.com/@types/gapi/-/gapi-0.0.39.tgz#bc7fa8cd0cb175b36e3609790fb2ed73a33f6881"
   integrity sha512-R1TZeZbvvbIC60DBJMhuOEivQHzOQtzl3uMDOOENTYQTSSDB6oEMpJo8HVPOTWivdUTbyEcB5qQOVr/JCKRlCQ==
@@ -10310,6 +10310,16 @@ vue-form-wizard@^0.8.4:
   version "0.8.4"
   resolved "https://registry.yarnpkg.com/vue-form-wizard/-/vue-form-wizard-0.8.4.tgz#ddf864c9709b7ba2a6323f59e5d6d17536b7800e"
   integrity sha512-/Zk1+B7bz7qHFJ16mwu021lpPXWf/9Tlr2mTNG3J7M0Hdy3rgA802lWsbKYySns0B0qtsD8BYGjQ2Wyxgg+4uw==
+
+vue-gapi@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/vue-gapi/-/vue-gapi-0.3.1.tgz#24b8359d17b573b4bf2480c9b5fd5d95687e858b"
+  integrity sha512-ihmWPU8U7AD8kgsU1PvYe1cqJxd0JBkJ5OIxKDGj7hTchQ2iWIciKG2AIJUwUUdJaw8eZ9tSJe/60J0KvkTlrA==
+
+vue-google-oauth2@^1.5.5:
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/vue-google-oauth2/-/vue-google-oauth2-1.5.5.tgz#5d26a57c07679142f9299a0f9177aa9f9cc95879"
+  integrity sha512-5+sH+bcaxbH1rWJeMOC7SljFNLvthdssF5nXmt7S+WeDOAsnZgsh/0BLf4YmkiVIiaFnBKc70nhwir83zF4vEg==
 
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
