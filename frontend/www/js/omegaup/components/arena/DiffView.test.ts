@@ -1,3 +1,5 @@
+jest.mock('../../../../third_party/js/diff_match_patch.js');
+
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 

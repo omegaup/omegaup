@@ -14,12 +14,12 @@
               <!-- id-lint on -->
             </div>
             <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a :href="facebookURL" :title="T.loginWithFacebook">
+              <a :href="facebookUrl" :title="T.loginWithFacebook">
                 <img src="/css/fb-oauth.png" height="45px" width="45px" />
               </a>
             </div>
             <div class="col-xs-12 col-sm-4 text-center py-2">
-              <a :href="linkedinURL" :title="T.loginWithLinkedIn">
+              <a :href="linkedinUrl" :title="T.loginWithLinkedIn">
                 <img src="/css/ln-oauth.png" height="45px" width="45px" />
               </a>
             </div>
@@ -75,15 +75,38 @@
 </template>
 
 <script lang="ts">
+/* global gapi */
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
 export default class Login extends Vue {
-  @Prop() facebookURL!: string;
-  @Prop() linkedinURL!: string;
+  @Prop() facebookUrl!: string;
+  @Prop() linkedinUrl!: string;
   usernameOrEmail: string = '';
   password: string = '';
   T = T;
+
+  mounted() {
+    if (window.gapi) {
+      window.gapi.signin2.render('google-signin', {
+        scope: 'profile',
+        width: 45,
+        height: 45,
+        longtitle: false,
+        theme: 'light',
+        onsuccess: this.onSuccess,
+        onfailure: this.onFailure,
+      });
+    }
+  }
+
+  onSuccess(googleUser: gapi.auth2.GoogleUser) {
+    this.$emit('google-login', googleUser.getAuthResponse().id_token);
+  }
+
+  onFailure() {
+    this.$emit('google-login-failure');
+  }
 }
 </script>

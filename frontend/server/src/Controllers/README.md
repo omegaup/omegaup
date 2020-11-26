@@ -113,6 +113,7 @@
   - [`/api/identity/bulkCreate/`](#apiidentitybulkcreate)
   - [`/api/identity/changePassword/`](#apiidentitychangepassword)
   - [`/api/identity/create/`](#apiidentitycreate)
+  - [`/api/identity/selectIdentity/`](#apiidentityselectidentity)
   - [`/api/identity/update/`](#apiidentityupdate)
 - [Interview](#interview)
   - [`/api/interview/addUsers/`](#apiinterviewaddusers)
@@ -135,7 +136,8 @@
   - [`/api/problem/details/`](#apiproblemdetails)
   - [`/api/problem/list/`](#apiproblemlist)
   - [`/api/problem/myList/`](#apiproblemmylist)
-  - [`/api/problem/randomProblem/`](#apiproblemrandomproblem)
+  - [`/api/problem/randomKarelProblem/`](#apiproblemrandomkarelproblem)
+  - [`/api/problem/randomLanguageProblem/`](#apiproblemrandomlanguageproblem)
   - [`/api/problem/rejudge/`](#apiproblemrejudge)
   - [`/api/problem/removeAdmin/`](#apiproblemremoveadmin)
   - [`/api/problem/removeGroupAdmin/`](#apiproblemremovegroupadmin)
@@ -2333,6 +2335,23 @@ Entry point for Create an Identity API
 | ---------- | -------- |
 | `username` | `string` |
 
+## `/api/identity/selectIdentity/`
+
+### Description
+
+Entry point for switching between associated identities for a user
+
+### Parameters
+
+| Name              | Type           | Description |
+| ----------------- | -------------- | ----------- |
+| `usernameOrEmail` | `string`       |             |
+| `auth_token`      | `null\|string` |             |
+
+### Returns
+
+_Nothing_
+
 ## `/api/identity/update/`
 
 ### Description
@@ -2677,8 +2696,10 @@ List of public and user's private problems
 | Name                    | Type           | Description |
 | ----------------------- | -------------- | ----------- |
 | `only_quality_seal`     | `bool`         |             |
+| `difficulty`            | `null\|string` |             |
 | `difficulty_range`      | `null\|string` |             |
 | `language`              | `mixed`        |             |
+| `level`                 | `null\|string` |             |
 | `max_difficulty`        | `int\|null`    |             |
 | `min_difficulty`        | `int\|null`    |             |
 | `min_visibility`        | `int\|null`    |             |
@@ -2722,7 +2743,17 @@ Gets a list of problems where current user is the owner
 | `pagerItems` | `types.PageItem[]`        |
 | `problems`   | `types.ProblemListItem[]` |
 
-## `/api/problem/randomProblem/`
+## `/api/problem/randomKarelProblem/`
+
+### Description
+
+### Returns
+
+| Name    | Type     |
+| ------- | -------- |
+| `alias` | `string` |
+
+## `/api/problem/randomLanguageProblem/`
 
 ### Description
 
@@ -3680,10 +3711,10 @@ contestant's machine and the server.
 
 ### Returns
 
-| Name      | Type                                                                                                                                      |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `session` | `{ auth_token: string; classname: string; email: string; identity: dao.Identities; is_admin: boolean; user: dao.Users; valid: boolean; }` |
-| `time`    | `number`                                                                                                                                  |
+| Name      | Type                   |
+| --------- | ---------------------- |
+| `session` | `types.CurrentSession` |
+| `time`    | `number`               |
 
 ## `/api/session/googleLogin/`
 
@@ -3697,9 +3728,9 @@ contestant's machine and the server.
 
 ### Returns
 
-```typescript
-{ [key: string]: string; }
-```
+| Name                | Type      |
+| ------------------- | --------- |
+| `isAccountCreation` | `boolean` |
 
 # Tag
 
@@ -3716,6 +3747,7 @@ Return most frequent public tags of a certain level
 | Name           | Type     | Description |
 | -------------- | -------- | ----------- |
 | `problemLevel` | `string` |             |
+| `rows`         | `int`    |             |
 
 ### Returns
 
@@ -4073,9 +4105,9 @@ Get the identities that have been associated to the logged user
 
 ### Returns
 
-| Name         | Type                                        |
-| ------------ | ------------------------------------------- |
-| `identities` | `{ default: boolean; username: string; }[]` |
+| Name         | Type                         |
+| ------------ | ---------------------------- |
+| `identities` | `types.AssociatedIdentity[]` |
 
 ## `/api/user/listUnsolvedProblems/`
 

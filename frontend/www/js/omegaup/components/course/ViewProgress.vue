@@ -20,6 +20,13 @@
                   >
                     {{ assignment.name }}<br />
                     <span>{{ getTotalPoints(assignment) }}</span>
+                    <a
+                      v-if="assignment.max_points === 0"
+                      data-toggle="tooltip"
+                      rel="tooltip"
+                      :title="T.studentProgressOnlyLecturesDescription"
+                      ><img src="/media/question.png"
+                    /></a>
                   </th>
                   <th class="text-center">{{ T.courseProgressGlobalScore }}</th>
                 </tr>
@@ -79,12 +86,28 @@ import StudentProgress from './StudentProgress.vue';
 
 Vue.use(AsyncComputedPlugin);
 
-export function escapeCsv(cell: undefined | number | string): string {
-  if (typeof cell === 'undefined') {
+class Percentage {
+  value: number;
+
+  constructor(value: number) {
+    this.value = value;
+  }
+
+  toString() {
+    return `${(this.value * 100).toFixed(2)}%`;
+  }
+}
+
+type TableCell = undefined | null | number | string | Percentage;
+
+export function escapeCsv(cell: TableCell): string {
+  if (typeof cell === 'undefined' || cell === null) {
     return '';
   }
-  if (typeof cell === 'number') {
-    cell = Math.round(cell);
+  if (cell instanceof Percentage) {
+    cell = cell.toString();
+  } else if (typeof cell === 'number') {
+    cell = cell.toFixed(2);
   }
   if (typeof cell !== 'string') {
     cell = JSON.stringify(cell);
@@ -99,7 +122,7 @@ export function escapeCsv(cell: undefined | number | string): string {
   return '"' + cell.replace('"', '""') + '"';
 }
 
-export function escapeXml(cell: undefined | string | null): string {
+export function escapeXml(cell: TableCell): string {
   if (typeof cell !== 'string') return '';
   return cell
     .replace(/&/g, '&amp;')
@@ -109,20 +132,19 @@ export function escapeXml(cell: undefined | string | null): string {
     .replace(/"/g, '&quot;');
 }
 
-export function toCsv(table: (number | string)[][]): string {
+export function toCsv(table: TableCell[][]): string {
   return table.map((row) => row.map(escapeCsv).join(',')).join('\r\n');
 }
 
-export function toOds(
-  courseName: string,
-  table: (number | string)[][],
-): string {
+export function toOds(courseName: string, table: TableCell[][]): string {
   let result = `<table:table table:name="${escapeXml(courseName)}">\n`;
   result += `<table:table-column table:number-columns-repeated="${table[0].length}"/>\n`;
   for (const row of table) {
     result += '<table:table-row>\n';
     for (const cell of row) {
-      if (typeof cell === 'number') {
+      if (cell instanceof Percentage) {
+        result += `<table:table-cell office:value-type="percentage" office:value="${cell.value}"><text:p>${cell}</text:p></table:table-cell>`;
+      } else if (typeof cell === 'number') {
         const num: number = cell;
         result += `<table:table-cell office:value-type="float" office:value="${num}"><text:p>${num.toPrecision(
           2,
@@ -176,8 +198,8 @@ export default class CourseViewProgress extends Vue {
     return `/course/${this.course.alias}/`;
   }
 
-  get progressTable(): (number | string)[][] {
-    const table: (number | string)[][] = [];
+  get progressTable(): TableCell[][] {
+    const table: TableCell[][] = [];
     const header = [T.profileUsername, T.wordsName];
     for (const assignment of this.assignments) {
       header.push(assignment.name);
@@ -185,13 +207,12 @@ export default class CourseViewProgress extends Vue {
     header.push(T.courseProgressGlobalScore);
     table.push(header);
     for (const student of this.students) {
-      const row: (number | string)[] = [student.username, student.name || ''];
+      const row: TableCell[] = [student.username, student.name || ''];
 
       for (const assignment of this.assignments) {
         row.push(this.score(student, assignment));
       }
-      const globalScore = this.getGlobalScoreByStudent(student);
-      row.push(`${globalScore}%`);
+      row.push(this.getGlobalScoreByStudent(student));
 
       table.push(row);
     }
@@ -224,20 +245,19 @@ export default class CourseViewProgress extends Vue {
     });
   }
 
-  getGlobalScoreByStudent(student: types.StudentProgress): string {
+  getGlobalScoreByStudent(student: types.StudentProgress): Percentage {
     const totalPoints = this.assignments
       .map((assignment) => assignment.max_points ?? 0)
       .reduce((acc, curr) => acc + curr, 0);
     if (!totalPoints) {
-      return '0.00';
+      return new Percentage(0);
     }
 
-    return this.assignments
-      .map(
-        (assignment) => (this.score(student, assignment) * 100) / totalPoints,
-      )
-      .reduce((acc, curr) => acc + curr, 0)
-      .toFixed(2);
+    return new Percentage(
+      this.assignments
+        .map((assignment) => this.score(student, assignment) / totalPoints)
+        .reduce((acc, curr) => acc + curr, 0),
+    );
   }
 
   @AsyncComputed()

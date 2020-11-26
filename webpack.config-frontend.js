@@ -16,7 +16,7 @@ module.exports = {
       '@babel/polyfill',
       'unfetch/polyfill',
       './frontend/www/js/omegaup/polyfills.js',
-      './frontend/www/js/omegaup/omegaup.js',
+      './frontend/www/js/omegaup/omegaup-legacy.js',
     ],
     activity_feed: './frontend/www/js/omegaup/activity/feed.ts',
     admin_roles: './frontend/www/js/omegaup/admin/roles.js',
@@ -25,7 +25,8 @@ module.exports = {
     arena: './frontend/www/js/omegaup/arena/arena.ts',
     arena_admin: './frontend/www/js/omegaup/arena/admin.ts',
     arena_assignment: './frontend/www/js/omegaup/arena/assignment.ts',
-    arena_assignment_admin: './frontend/www/js/omegaup/arena/assignment_admin.ts',
+    arena_assignment_admin:
+      './frontend/www/js/omegaup/arena/assignment_admin.ts',
     arena_contest: './frontend/www/js/omegaup/arena/contest.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
     arena_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
@@ -71,9 +72,13 @@ module.exports = {
     group_list: './frontend/www/js/omegaup/group/list.js',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
+    login_signin: './frontend/www/js/omegaup/login/signin.ts',
     logout: './frontend/www/js/omegaup/login/logout.ts',
     problem_collection: './frontend/www/js/omegaup/problem/collection.ts',
-    problem_collection_list: './frontend/www/js/omegaup/problem/collection_list.ts',
+    problem_collection_list:
+      './frontend/www/js/omegaup/problem/collection_list.ts',
+    problem_collection_list_by_author:
+      './frontend/www/js/omegaup/problem/collection_list_by_author.ts',
     problem_edit: './frontend/www/js/omegaup/problem/edit.ts',
     problem_details: './frontend/www/js/omegaup/problem/details.ts',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
@@ -118,7 +123,7 @@ module.exports = {
 
     // use absolute paths in sourcemaps (important for debugging via IDE)
     devtoolModuleFilenameTemplate: '[absolute-resource-path]',
-    devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
+    devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]',
   },
 
   plugins: [
@@ -129,14 +134,14 @@ module.exports = {
           to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
           transform(content, filepath) {
             const iconPath = `${path.dirname(filepath)}/icon.svg`;
-            return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) :
-                                             defaultBadgeIcon;
+            return fs.existsSync(iconPath)
+              ? fs.readFileSync(iconPath)
+              : defaultBadgeIcon;
           },
           transformPath(targetPath, absolutePath) {
-            return `media/dist/badges/${
-                path.basename(
-                    path.dirname(absolutePath),
-                    )}.svg`;
+            return `media/dist/badges/${path.basename(
+              path.dirname(absolutePath),
+            )}.svg`;
           },
         },
       ],
@@ -169,7 +174,7 @@ module.exports = {
           priority: 20,
         },
         vendor: {
-          name: module => {
+          name: (module) => {
             const packageName = module.context.match(
               /\/node_modules\/([^@\/]+)/,
             )[1];

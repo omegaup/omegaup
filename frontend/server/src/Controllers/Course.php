@@ -7,7 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
- * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}
+ * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepts_submissions: bool, accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
@@ -2468,6 +2468,32 @@ class Course extends \OmegaUp\Controllers\Controller {
             intval($resolvedUser->user_id)
         );
 
+        if (
+            $resolvedUser->user_id !== $r->identity->user_id
+            && !is_null($resolvedUser->user_id)
+        ) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $resolvedUser->user_id,
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_ADDED,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseAddAdmin'
+                                ),
+                                'localizationParams' => [
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
+
         return [
             'status' => 'ok',
         ];
@@ -3586,10 +3612,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         $courseDetails = self::getBasicCourseDetails($course);
         $commonDetails = [];
         if (
+            is_null($identity) &&
             $shouldShowIntro &&
             $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
         }
         if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
             $commonDetails = [
@@ -4193,8 +4220,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'tried' => false,
                     'nominated' => false,
                     'dismissed' => false,
-                    'nominatedBeforeAC' => false,
-                    'dismissedBeforeAC' => false,
+                    'nominatedBeforeAc' => false,
+                    'dismissedBeforeAc' => false,
                 ];
             } else {
                 $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(

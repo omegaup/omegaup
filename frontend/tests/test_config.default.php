@@ -50,7 +50,6 @@ try_define('DUMP_MYSQL_QUERY_RESULT_TYPES', true);
 # ####################################
 try_define('IMAGES_PATH', OMEGAUP_TEST_ROOT . 'img/');
 try_define('IMAGES_URL_PATH', '/img/');
-try_define('OMEGAUP_CACERT_URL', "{$_omegaUpRoot}/omegaup.pem");
 try_define('OMEGAUP_GITSERVER_PORT', 33863 + $_testShard);
 try_define(
     'OMEGAUP_GITSERVER_URL',
@@ -60,7 +59,6 @@ try_define(
     'OMEGAUP_GITSERVER_SECRET_TOKEN',
     'cbaf89d3bb2ee6b0a90bc7a90d937f9ade16739ed9f573c76e1ac72064e397aac2b35075040781dd0df9a8f1d6fc4bd4a4941eb6b0b62541b0a35fb0f89cfc3f'
 );
-try_define('OMEGAUP_SSLCERT_URL', "{$_omegaUpRoot}/omegaup.pem");
 try_define('TEMPLATES_PATH', OMEGAUP_TEST_ROOT . '/templates/');
 try_define('INPUTS_PATH', OMEGAUP_TEST_ROOT . '/probleminput/');
 
