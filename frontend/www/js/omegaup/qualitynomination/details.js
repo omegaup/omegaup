@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import qualitynomination_Details from '../components/qualitynomination/Details.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
 import * as api from '../api';
 import * as ui from '../ui';

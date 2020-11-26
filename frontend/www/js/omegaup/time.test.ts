@@ -98,7 +98,7 @@ describe('time', () => {
   });
 
   describe('remoteTimeAdapter', () => {
-    before(() => {
+    beforeEach(() => {
       time._setRemoteDeltaTime(1);
     });
 
