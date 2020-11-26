@@ -118,7 +118,9 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
             ON
                 `iu`.identity_id = `s`.identity_id
             WHERE
-                `r`.verdict = 'AC' AND `s`.type = 'normal'
+                `r`.verdict = 'AC' AND
+                `s`.type = 'normal' AND
+                `iu`.user_id IS NOT NULL
             GROUP BY
                 `iu`.user_id, `s`.`problem_id`
         ) AS up
