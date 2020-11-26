@@ -3,6 +3,7 @@ import expect from 'expect';
 
 import T from '../../lang';
 
+import { AvailableTabs } from './Edit.vue';
 import group_Edit from './Edit.vue';
 
 describe('Edit.vue', () => {
@@ -13,10 +14,10 @@ describe('Edit.vue', () => {
         groupName: 'Hello omegaUp',
         countries: [{ country_id: 'MX', name: 'Mexico' }],
         isOrganizer: true,
-        initialTab: 'members',
-        initialIdentities: [],
-        initialIdentitiesCsv: [],
-        initialScoreboards: [],
+        tab: AvailableTabs.Members,
+        identities: [],
+        identitiesCsv: [],
+        scoreboards: [],
       },
     });
 
@@ -30,10 +31,10 @@ describe('Edit.vue', () => {
         groupName: 'Hello omegaUp',
         countries: [{ country_id: 'MX', name: 'Mexico' }],
         isOrganizer: true,
-        initialTab: 'members',
-        initialIdentities: [],
-        initialIdentitiesCsv: [],
-        initialScoreboards: [],
+        tab: AvailableTabs.Members,
+        identities: [],
+        identitiesCsv: [],
+        scoreboards: [],
       },
     });
 

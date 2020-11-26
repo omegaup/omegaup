@@ -13,8 +13,8 @@
           href="#"
           class="nav-link"
           data-tab-members
-          :class="{ active: showTab === 'members' }"
-          @click="showTab = 'members'"
+          :class="{ active: selectedTab === AvailableTabs.Members }"
+          @click="selectedTab = AvailableTabs.Members"
           >{{ T.groupEditMembers }}</a
         >
       </li>
@@ -23,8 +23,8 @@
           href="#"
           class="nav-link"
           data-tab-scoreboards
-          :class="{ active: showTab === 'scoreboards' }"
-          @click="showTab = 'scoreboards'"
+          :class="{ active: selectedTab === AvailableTabs.Scoreboards }"
+          @click="selectedTab = AvailableTabs.Scoreboards"
           >{{ T.groupEditScoreboards }}</a
         >
       </li>
@@ -33,18 +33,22 @@
           href="#"
           class="nav-link"
           data-tab-identities
-          :class="{ active: showTab === 'identities' }"
-          @click="showTab = 'identities'"
+          :class="{ active: selectedTab === AvailableTabs.Identities }"
+          @click="selectedTab = AvailableTabs.Identities"
           >{{ T.groupCreateIdentities }}</a
         >
       </li>
     </ul>
 
     <div class="tab-content">
-      <div v-if="showTab === 'members'" class="tab-pane active" role="tabpanel">
+      <div
+        v-if="selectedTab === AvailableTabs.Members"
+        class="tab-pane active"
+        role="tabpanel"
+      >
         <omegaup-group-members
-          :identities="identities"
-          :identities-csv="identitiesCsv"
+          :identities="currentIdentities"
+          :identities-csv="currentIdentitiesCsv"
           :group-alias="groupAlias"
           :countries="countries"
           @add-member="
@@ -98,13 +102,13 @@
       </div>
 
       <div
-        v-if="showTab === 'scoreboards'"
+        v-if="selectedTab === AvailableTabs.Scoreboards"
         class="tab-pane active"
         role="tabpanel"
       >
         <omegaup-group-scoreboards
           :group-alias="groupAlias"
-          :scoreboards.sync="scoreboards"
+          :scoreboards.sync="currentScoreboards"
           @create-scoreboard="
             (title, alias, description) =>
               $emit('create-scoreboard', title, alias, description)
@@ -113,7 +117,7 @@
       </div>
 
       <div
-        v-if="showTab === 'identities'"
+        v-if="selectedTab === AvailableTabs.Identities"
         class="tab-pane active"
         role="tabpanel"
       >
@@ -146,7 +150,11 @@ import T from '../../lang';
 import { dao, types } from '../../api_types';
 import * as ui from '../../ui';
 
-const availableTabs = ['memebers', 'scoreboards', 'identities'];
+export enum AvailableTabs {
+  Members = 'memebers',
+  Scoreboards = 'scoreboards',
+  Identities = 'identities',
+}
 
 @Component({
   components: {
@@ -160,41 +168,42 @@ export default class GroupEdit extends Vue {
   @Prop() groupName!: string;
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;
-  @Prop() initialTab!: string;
-  @Prop() initialIdentities!: types.Identity[];
-  @Prop() initialIdentitiesCsv!: types.Identity[];
-  @Prop() initialScoreboards!: types.GroupScoreboard[];
+  @Prop() tab!: AvailableTabs;
+  @Prop() identities!: types.Identity[];
+  @Prop() identitiesCsv!: types.Identity[];
+  @Prop() scoreboards!: types.GroupScoreboard[];
 
   T = T;
   ui = ui;
-  showTab = this.initialTab;
-  userErrorRow = null;
-  identities = this.initialIdentities;
-  identitiesCsv = this.initialIdentitiesCsv;
-  scoreboards = this.initialScoreboards;
+  AvailableTabs = AvailableTabs;
+  selectedTab: AvailableTabs = this.tab;
+  userErrorRow: string | null = null;
+  currentIdentities = this.identities;
+  currentIdentitiesCsv = this.identitiesCsv;
+  currentScoreboards = this.scoreboards;
 
-  @Watch('initialTab')
-  onInitialTabChanged(newValue: string): void {
-    if (!availableTabs.includes(this.initialTab)) {
-      this.showTab = 'members';
+  @Watch('tab')
+  onInitialTabChanged(newValue: AvailableTabs): void {
+    if (!Object.values(AvailableTabs).includes(this.tab)) {
+      this.selectedTab = AvailableTabs.Members;
       return;
     }
-    this.showTab = newValue;
+    this.selectedTab = newValue;
   }
 
-  @Watch('initialIdentities')
+  @Watch('identities')
   onInitialIdentitiesChanged(newValue: types.Identity[]): void {
-    this.identities = newValue;
+    this.currentIdentities = newValue;
   }
 
-  @Watch('initialIdentitiesCsv')
+  @Watch('identitiesCsv')
   onInitialIdentitiesCsvChanged(newValue: types.Identity[]): void {
-    this.identitiesCsv = newValue;
+    this.currentIdentitiesCsv = newValue;
   }
 
-  @Watch('initialScoreboards')
+  @Watch('scoreboards')
   onInitialScoreboardsChanged(newValue: types.GroupScoreboard[]): void {
-    this.scoreboards = newValue;
+    this.currentScoreboards = newValue;
   }
 }
 </script>
