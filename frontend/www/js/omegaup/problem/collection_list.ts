@@ -63,6 +63,7 @@ OmegaUp.on('ready', () => {
           languages: payload.languages,
           keyword: payload.keyword,
           tagsList: payload.tagsList,
+          frequentTags: payload.frequentTags,
           sortOrder: sortOrder,
           columnName: columnName,
           difficulty: difficulty,

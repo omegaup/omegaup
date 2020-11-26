@@ -6,16 +6,16 @@
         <label class="form-check-label">
           <input
             v-model="currentSelectedTags"
-            :value="tag"
+            :value="tag.alias"
             class="form-check-input"
             type="checkbox"
-          />{{ T[tag] }}
+          />{{ T[tag.alias] }} {{ tag.total }}
         </label>
       </div>
       <div class="form-group">
         <vue-typeahead-bootstrap
-          :data="publicTags"
-          :serializer="publicTagsSerializer"
+          :data="publicQualityTags"
+          :serializer="publicQualityTagsSerializer"
           :placeholder="T.collecionOtherTags"
           @hit="addOtherTag"
         >
@@ -35,7 +35,7 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
   },
 })
 export default class FilterTags extends Vue {
-  @Prop() publicTags!: string[];
+  @Prop() publicQualityTags!: string[];
   @Prop({ default: () => [] }) tags!: string[];
   @Prop({ default: () => [] }) selectedTags!: string[];
 
@@ -48,11 +48,11 @@ export default class FilterTags extends Vue {
     }
   }
 
-  publicTagsSerializer(tagname: string): string {
-    if (Object.prototype.hasOwnProperty.call(T, tagname)) {
-      return T[tagname];
+  publicQualityTagsSerializer(alias: string, total: number): string {
+    if (Object.prototype.hasOwnProperty.call(T, alias)) {
+      return T[alias].concat(' (', total.toString(), ')');
     }
-    return tagname;
+    return alias.concat(' (', total.toString(), ')');
   }
 
   @Watch('currentSelectedTags')

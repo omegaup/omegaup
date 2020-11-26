@@ -6,7 +6,7 @@
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
           :tags="availableTags"
-          :public-tags="publicTags"
+          :public-quality-tags="publicQualityTags"
           @new-selected-tag="
             (selectedTags) =>
               $emit(
@@ -111,17 +111,30 @@ export default class CollectionList extends Vue {
   T = T;
   level = this.data.level;
 
-  get availableTags(): string[] {
-    let tags: Set<string> = new Set(
-      this.data.frequentTags.map((element) => element.alias),
+  get availableTags(): { alias: string; total: number }[] {
+    let tags: { alias: string; total: number }[] = this.data.frequentTags.slice(
+      0,
+      15,
     );
-    this.selectedTags.forEach((element) => tags.add(element));
-    return Array.from(tags);
+    let simpleTags: string[] = tags.map((x) => x.alias);
+    let list: {
+      alias: string;
+      total: number;
+    }[] = this.data.frequentTags.filter((x) => !tags.includes(x));
+    this.selectedTags.forEach((element) => {
+      if (!simpleTags.includes(element)) {
+        tags.push(list.find((x) => x.alias === element)!);
+      }
+    });
+    return tags;
   }
 
-  get publicTags(): string[] {
-    let tags: string[] = this.data.frequentTags.map((x) => x.alias);
-    return this.data.publicTags.filter((x) => !tags.includes(x));
+  get publicQualityTags(): { alias: string; total: number }[] {
+    let tags: { alias: string; total: number }[] = this.data.frequentTags.slice(
+      0,
+      15,
+    );
+    return this.data.frequentTags.filter((x) => !tags.includes(x));
   }
 
   get title(): string {

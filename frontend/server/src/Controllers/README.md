@@ -3751,9 +3751,9 @@ Return most frequent public tags of a certain level
 
 ### Returns
 
-| Name            | Type                   |
-| --------------- | ---------------------- |
-| `frequent_tags` | `{ alias: string; }[]` |
+| Name            | Type                                  |
+| --------------- | ------------------------------------- |
+| `frequent_tags` | `{ alias: string; total: number; }[]` |
 
 ## `/api/tag/list/`
 

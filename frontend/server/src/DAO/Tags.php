@@ -77,15 +77,15 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     }
 
     /**
-     * @return list<array{alias: string}>
+     * @return list<array{alias: string, total: int}>
      */
     public static function getFrequentQualityTagsByLevel(
-        string $problemLevel,
-        int $rows
+        string $problemLevel
     ) {
         $sql = '
             SELECT
-                t.name AS alias
+                t.name AS alias,
+                COUNT(t.name) AS total
             FROM
                 Problems_Tags pt
             INNER JOIN
@@ -115,15 +115,13 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             ORDER BY
                 COUNT(pt.problem_id)
             DESC
-            LIMIT ?
             ';
 
-        /** @var list<array{alias: string}> */
+        /** @var list<array{alias: string, total: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
                 $problemLevel,
-                $rows
             ]
         );
     }

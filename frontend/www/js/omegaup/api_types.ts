@@ -1408,7 +1408,7 @@ export namespace types {
     column: string;
     columns: string[];
     difficulty: string;
-    frequentTags: { alias: string; name?: string }[];
+    frequentTags: { alias: string; total: number }[];
     keyword: string;
     language: string;
     languages: string[];
@@ -1418,7 +1418,6 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
-    publicTags: string[];
     selectedTags: string[];
     tagData: { name?: string }[];
     tagsList: string[];
@@ -3836,7 +3835,9 @@ export namespace messages {
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
-  export type TagFrequentTagsResponse = { frequent_tags: { alias: string }[] };
+  export type TagFrequentTagsResponse = {
+    frequent_tags: { alias: string; total: number }[];
+  };
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
 
