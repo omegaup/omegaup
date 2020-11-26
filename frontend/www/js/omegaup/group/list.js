@@ -1,5 +1,5 @@
 import group_GroupList from '../components/group/GroupList.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import Vue from 'vue';
 
 OmegaUp.on('ready', function () {

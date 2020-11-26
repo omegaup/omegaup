@@ -5,7 +5,7 @@
       <div v-for="(tag, index) in tags" :key="index" class="form-check">
         <label class="form-check-label">
           <input
-            v-model="selectedTags"
+            v-model="currentSelectedTags"
             :value="tag"
             class="form-check-input"
             type="checkbox"
@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 @Component({
@@ -34,17 +34,17 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
     'vue-typeahead-bootstrap': VueTypeaheadBootstrap,
   },
 })
-export default class CollectionFilterTags extends Vue {
-  @Prop() tags!: string[];
+export default class FilterTags extends Vue {
   @Prop() publicTags!: string[];
+  @Prop({ default: () => [] }) tags!: string[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
-  selectedTags: string[] = [];
+  currentSelectedTags = this.selectedTags;
 
   addOtherTag(tag: string): void {
-    if (!this.tags.includes(tag)) {
-      this.selectedTags.push(tag);
-      this.tags.push(tag);
+    if (!this.currentSelectedTags.includes(tag)) {
+      this.currentSelectedTags.push(tag);
     }
   }
 
@@ -53,6 +53,11 @@ export default class CollectionFilterTags extends Vue {
       return T[tagname];
     }
     return tagname;
+  }
+
+  @Watch('currentSelectedTags')
+  onNewTagSelected(): void {
+    this.$emit('new-selected-tag', this.currentSelectedTags);
   }
 }
 </script>

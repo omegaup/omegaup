@@ -38,7 +38,7 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($runData['response']['guid'], $response['guid']);
         $this->assertEquals('JE', $response['verdict']);
-        $this->assertEquals('new', $response['status']);
+        $this->assertEquals('uploading', $response['status']);
     }
 
     /**

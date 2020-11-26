@@ -930,33 +930,6 @@ class Runs extends \OmegaUp\DAO\Base\Runs {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
     }
 
-    final public static function isRunInsideSubmissionGap(
-        ?int $problemsetId,
-        ?\OmegaUp\DAO\VO\Contests $contest,
-        int $problemId,
-        int $identityId
-    ): bool {
-        $lastRunTime = \OmegaUp\DAO\Submissions::getLastSubmissionTime(
-            $identityId,
-            $problemId,
-            $problemsetId
-        );
-        if (is_null($lastRunTime)) {
-            return true;
-        }
-
-        $submissionGap = \OmegaUp\Controllers\Run::$defaultSubmissionGap;
-        if (!is_null($contest)) {
-            // Get submissions gap
-            $submissionGap = max(
-                $submissionGap,
-                intval($contest->submissions_gap)
-            );
-        }
-
-        return \OmegaUp\Time::get() >= ($lastRunTime->time + $submissionGap);
-    }
-
     /**
      * Returns the time of the next submission to the current problem
      */

@@ -79,6 +79,49 @@ class Run extends \OmegaUp\Controllers\Controller {
     public const STATUS = ['new', 'waiting', 'compiling', 'running', 'ready'];
 
     /**
+     * Validates that a run is happening within the submission gap.
+     *
+     * This needs to be called within the transaction that creates the run to
+     * avoid races where multiple concurrent requests can go in and multiple
+     * runs be created.
+     */
+    private static function validateWithinSubmissionGap(
+        \OmegaUp\DAO\VO\Identities $identity,
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?\OmegaUp\DAO\VO\Contests $contest
+    ): void {
+        if (is_null($contest)) {
+            if (
+                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
+                    null,
+                    null,
+                    intval($problem->problem_id),
+                    intval($identity->identity_id)
+                ) &&
+                !\OmegaUp\Authorization::isSystemAdmin($identity)
+            ) {
+                    throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
+                        'runWaitGap'
+                    );
+            }
+        } else {
+            if (
+                !\OmegaUp\DAO\Submissions::isInsideSubmissionGap(
+                    intval($contest->problemset_id),
+                    $contest,
+                    intval($problem->problem_id),
+                    intval($identity->identity_id)
+                ) &&
+                !\OmegaUp\Authorization::isAdmin($identity, $contest)
+            ) {
+                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
+                    'runWaitGap'
+                );
+            }
+        }
+    }
+
+    /**
      * Validates Create Run request
      *
      * @throws \OmegaUp\Exceptions\ApiException
@@ -186,42 +229,28 @@ class Run extends \OmegaUp\Controllers\Controller {
                 $problem->problem_id
             );
             if (
-                \OmegaUp\DAO\Problems::isVisible($problem) ||
-                \OmegaUp\Authorization::isProblemAdmin(
+                !\OmegaUp\DAO\Problems::isVisible($problem) &&
+                !\OmegaUp\Authorization::isProblemAdmin(
                     $r->identity,
                     $problem
-                ) ||
-                (
+                ) &&
+                !(
                     is_null($practiceDeadline) ||
                     \OmegaUp\Time::get() > $practiceDeadline->time
                 )
             ) {
-                if (
-                    !\OmegaUp\DAO\Runs::isRunInsideSubmissionGap(
-                        null,
-                        null,
-                        intval($problem->problem_id),
-                        intval($r->identity->identity_id)
-                    )
-                        && !\OmegaUp\Authorization::isSystemAdmin($r->identity)
-                ) {
-                        throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                            'runWaitGap'
-                        );
-                }
-
-                return [
-                    'isPractice' => true,
-                    'problem' => $problem,
-                    'contest' => null,
-                    'problemsetContainer' => null,
-                    'problemset' => null,
-                ];
-            } else {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
                     'problemIsNotPublic'
                 );
             }
+
+            return [
+                'isPractice' => true,
+                'problem' => $problem,
+                'contest' => null,
+                'problemsetContainer' => null,
+                'problemset' => null,
+            ];
         }
         if (is_null($problemsetContainer)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
@@ -303,20 +332,6 @@ class Run extends \OmegaUp\Controllers\Controller {
             ) {
                 throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
                     'runNotInsideContest'
-                );
-            }
-
-            // Validate if the user is allowed to submit given the submissions_gap
-            if (
-                !\OmegaUp\DAO\Runs::isRunInsideSubmissionGap(
-                    intval($problemsetId),
-                    $contest,
-                    intval($problem->problem_id),
-                    intval($r->identity->identity_id)
-                )
-            ) {
-                throw new \OmegaUp\Exceptions\NotAllowedToSubmitException(
-                    'runWaitGap'
                 );
             }
         }
@@ -463,7 +478,7 @@ class Run extends \OmegaUp\Controllers\Controller {
         $run = new \OmegaUp\DAO\VO\Runs([
             'version' => $problem->current_version,
             'commit' => $problem->commit,
-            'status' => 'new',
+            'status' => 'uploading',
             'runtime' => 0,
             'penalty' => $submitDelay,
             'time' => \OmegaUp\Time::get(),
@@ -475,6 +490,15 @@ class Run extends \OmegaUp\Controllers\Controller {
 
         try {
             \OmegaUp\DAO\DAO::transBegin();
+
+            // _Now_ that we are in a transaction, we can check whether the run
+            // is within the submission gap.
+            self::validateWithinSubmissionGap(
+                $r->identity,
+                $problem,
+                $contest
+            );
+
             // Push run into DB
             \OmegaUp\DAO\Submissions::create($submission);
             $run->submission_id = $submission->submission_id;
@@ -726,15 +750,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         self::$log->info("Run {$run->run_id} being rejudged");
 
         // Reset fields.
-        try {
-            \OmegaUp\DAO\DAO::transBegin();
-            $run->status = 'new';
-            \OmegaUp\DAO\Runs::update($run);
-            \OmegaUp\DAO\DAO::transEnd();
-        } catch (\Exception $e) {
-            \OmegaUp\DAO\DAO::transRollback();
-            throw $e;
-        }
+        $run->status = 'new';
+        \OmegaUp\DAO\Runs::update($run);
 
         try {
             \OmegaUp\Grader::getInstance()->rejudge(
@@ -823,7 +840,8 @@ class Run extends \OmegaUp\Controllers\Controller {
         } catch (\Exception $e) {
             // We did our best effort to invalidate the cache...
             self::$log->warn(
-                'Failed to invalidate cache on Rejudge, skipping: '
+                "Failed to invalidate cache on rejudge {$run->run_id}, skipping: ",
+                $e
             );
             self::$log->warn($e);
         }

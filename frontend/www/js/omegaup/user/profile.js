@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
 import * as api from '../api';
 import * as ui from '../ui';
@@ -170,15 +170,10 @@ OmegaUp.on('ready', function () {
 
   api.User.contestStats({ username: profile.username })
     .then((result) => {
+      const now = new Date();
       viewProfile.contests = Object.values(result.contests)
-        .map((contest) => {
-          const now = new Date();
-          if (contest.place === null || now <= contest.data.finish_time) {
-            return null;
-          }
-          return new ContestResult(contest);
-        })
-        .filter((contest) => !!contest);
+        .filter((contest) => contest.place && now > contest.data.finish_time)
+        .map((contest) => new ContestResult(contest));
     })
     .catch(ui.apiError);
 

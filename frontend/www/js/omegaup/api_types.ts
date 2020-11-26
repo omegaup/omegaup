@@ -2,6 +2,11 @@
 
 // DAO types
 export namespace dao {
+  export interface Countries {
+    country_id?: string;
+    name?: string;
+  }
+
   export interface Identities {
     country_id?: string;
     current_identity_school_id?: number;
@@ -127,9 +132,17 @@ export namespace types {
       );
     }
 
-    export function CollectionDetailsPayload(
+    export function CollectionDetailsByAuthorPayload(
       elementId: string = 'payload',
-    ): types.CollectionDetailsPayload {
+    ): types.CollectionDetailsByAuthorPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
+    export function CollectionDetailsByLevelPayload(
+      elementId: string = 'payload',
+    ): types.CollectionDetailsByLevelPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -718,6 +731,14 @@ export namespace types {
       );
     }
 
+    export function GroupEditPayload(
+      elementId: string = 'payload',
+    ): types.GroupEditPayload {
+      return JSON.parse(
+        (<HTMLElement>document.getElementById(elementId)).innerText,
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -758,6 +779,41 @@ export namespace types {
     export function IntroDetailsPayload(
       elementId: string = 'payload',
     ): types.IntroDetailsPayload {
+      return ((x) => {
+        if (x.details)
+          x.details = ((x) => {
+            if (x.assignments)
+              x.assignments = ((x) => {
+                if (!Array.isArray(x)) {
+                  return x;
+                }
+                return x.map((x) => {
+                  if (x.finish_time)
+                    x.finish_time = ((x: number) => new Date(x * 1000))(
+                      x.finish_time,
+                    );
+                  x.start_time = ((x: number) => new Date(x * 1000))(
+                    x.start_time,
+                  );
+                  return x;
+                });
+              })(x.assignments);
+            if (x.finish_time)
+              x.finish_time = ((x: number) => new Date(x * 1000))(
+                x.finish_time,
+              );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          })(x.details);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
+    export function LoginDetailsPayload(
+      elementId: string = 'payload',
+    ): types.LoginDetailsPayload {
       return JSON.parse(
         (<HTMLElement>document.getElementById(elementId)).innerText,
       );
@@ -1215,6 +1271,11 @@ export namespace types {
     [key: string]: types.Progress;
   }
 
+  export interface AssociatedIdentity {
+    default: boolean;
+    username: string;
+  }
+
   export interface AuthorRankTablePayload {
     length: number;
     page: number;
@@ -1325,10 +1386,42 @@ export namespace types {
     options?: { canChooseCoder: boolean; coderIsSelected: boolean };
   }
 
-  export interface CollectionDetailsPayload {
-    collection: { alias: string; name?: string }[];
+  export interface CollectionDetailsByAuthorPayload {
+    authors: string[];
+    authorsRanking: types.AuthorsRank;
+    column: string;
+    columns: string[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
+    selectedTags: string[];
+    tagData: { name?: string }[];
+    tags: string[];
+  }
+
+  export interface CollectionDetailsByLevelPayload {
+    column: string;
+    columns: string[];
+    difficulty: string;
+    frequentTags: { alias: string; name?: string }[];
+    keyword: string;
+    language: string;
+    languages: string[];
+    level: string;
+    loggedIn: boolean;
+    mode: string;
+    modes: string[];
+    pagerItems: types.PageItem[];
+    problems: types.ProblemListItem[];
     publicTags: string[];
-    type: string;
+    selectedTags: string[];
+    tagData: { name?: string }[];
+    tagsList: string[];
   }
 
   export interface CommitRunsDiff {
@@ -1336,8 +1429,12 @@ export namespace types {
   }
 
   export interface CommonPayload {
+    associatedIdentities: types.AssociatedIdentity[];
     bootstrap4: boolean;
+    currentEmail: string;
+    currentName?: string;
     currentUsername: string;
+    gravatarURL128: string;
     gravatarURL51: string;
     inContest: boolean;
     isAdmin: boolean;
@@ -1798,6 +1895,18 @@ export namespace types {
     student: types.FilteredCourse[];
   }
 
+  export interface CurrentSession {
+    associated_identities: types.AssociatedIdentity[];
+    auth_token?: string;
+    classname: string;
+    email?: string;
+    identity?: dao.Identities;
+    is_admin: boolean;
+    loginIdentity?: dao.Identities;
+    user?: dao.Users;
+    valid: boolean;
+  }
+
   export interface Event {
     courseAlias?: string;
     courseName?: string;
@@ -1831,11 +1940,40 @@ export namespace types {
     status: string;
   }
 
+  export interface GroupEditPayload {
+    countries: dao.Countries[];
+    groupAlias: string;
+    groupName?: string;
+    identities: types.Identity[];
+    isOrganizer: boolean;
+    scoreboards: types.GroupScoreboard[];
+  }
+
+  export interface GroupScoreboard {
+    alias: string;
+    create_time: string;
+    description?: string;
+    name: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
     quality: number;
     qualityHistogram?: string;
+  }
+
+  export interface Identity {
+    classname: string;
+    country?: string;
+    country_id?: string;
+    gender?: string;
+    name?: string;
+    school?: string;
+    school_id?: number;
+    state?: string;
+    state_id?: string;
+    username: string;
   }
 
   export interface IdentityRequest {
@@ -1893,10 +2031,16 @@ export namespace types {
     templates: { [key: string]: string };
   }
 
+  export interface IntroCourseDetails {
+    details: types.CourseDetails;
+    progress: { [key: string]: { [key: string]: number } };
+    shouldShowFirstAssociatedIdentityRunWarning: boolean;
+  }
+
   export interface IntroDetailsPayload {
     alias: string;
-    currentUsername: string;
     description: string;
+    details?: types.CourseDetails;
     isFirstTimeAccess: boolean;
     name: string;
     needsBasicInformation: boolean;
@@ -1919,6 +2063,13 @@ export namespace types {
     OutputLimit: number | string;
     OverallWallTimeLimit: string;
     TimeLimit: string;
+  }
+
+  export interface LoginDetailsPayload {
+    facebookUrl: string;
+    linkedinUrl: string;
+    statusError?: string;
+    validateRecaptcha: boolean;
   }
 
   export interface NominationListItem {
@@ -1949,10 +2100,10 @@ export namespace types {
     alreadyReviewed: boolean;
     canNominateProblem: boolean;
     dismissed: boolean;
-    dismissedBeforeAC: boolean;
+    dismissedBeforeAc: boolean;
     language: string;
     nominated: boolean;
-    nominatedBeforeAC: boolean;
+    nominatedBeforeAc: boolean;
     solved: boolean;
     tried: boolean;
   }
@@ -2083,11 +2234,17 @@ export namespace types {
 
   export interface ProblemDetailsv2Payload {
     allRuns?: types.Run[];
+    allowUserAddTags?: boolean;
     clarifications?: types.Clarification[];
     histogram: types.Histogram;
+    levelTags?: string[];
     nominationStatus?: types.NominationStatus;
     problem: types.ProblemInfo;
+    problemLevel?: string;
+    publicTags?: string[];
     runs?: types.Run[];
+    selectedPrivateTags?: string[];
+    selectedPublicTags?: string[];
     solutionStatus?: string;
     solvers?: types.BestSolvers[];
     user: types.UserInfoForProblem;
@@ -2193,6 +2350,7 @@ export namespace types {
   }
 
   export interface ProblemListCollectionPayload {
+    allTags: types.Tag[];
     levelTags: string[];
     problemCount: { name: string; problems_per_tag: number }[];
   }
@@ -2216,7 +2374,6 @@ export namespace types {
   export interface ProblemListPayload {
     column: string;
     columns: string[];
-    currentTags: string[];
     keyword: string;
     language: string;
     languages: string[];
@@ -2225,6 +2382,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
+    selectedTags: string[];
     tagData: { name?: string }[];
     tags: string[];
   }
@@ -2232,10 +2390,10 @@ export namespace types {
   export interface ProblemQualityPayload {
     canNominateProblem: boolean;
     dismissed: boolean;
-    dismissedBeforeAC: boolean;
+    dismissedBeforeAc: boolean;
     language?: string;
     nominated: boolean;
-    nominatedBeforeAC: boolean;
+    nominatedBeforeAc: boolean;
     problemAlias: string;
     solved: boolean;
     tried: boolean;
@@ -2647,6 +2805,7 @@ export namespace types {
 
   export interface StudentsProgressPayload {
     course: types.CourseDetails;
+    problemTitles: { [key: string]: string };
     students: types.StudentProgress[];
   }
 
@@ -2670,6 +2829,10 @@ export namespace types {
     pagerItems: types.PageItem[];
     submissions: types.Submission[];
     totalRows: number;
+  }
+
+  export interface Tag {
+    name: string;
   }
 
   export interface UserInfoForProblem {
@@ -3170,6 +3333,7 @@ export namespace messages {
   export type CourseGetProblemUsersRequest = { [key: string]: any };
   export type CourseGetProblemUsersResponse = { identities: string[] };
   export type CourseIntroDetailsRequest = { [key: string]: any };
+  export type _CourseIntroDetailsServerResponse = any;
   export type CourseIntroDetailsResponse = types.IntroDetailsPayload;
   export type CourseListAssignmentsRequest = { [key: string]: any };
   export type _CourseListAssignmentsServerResponse = any;
@@ -3248,12 +3412,7 @@ export namespace messages {
       description?: string;
       name?: string;
     };
-    scoreboards: {
-      alias: string;
-      create_time: string;
-      description?: string;
-      name: string;
-    }[];
+    scoreboards: types.GroupScoreboard[];
   };
   export type GroupListRequest = { [key: string]: any };
   export type GroupListResponse = { label: string; value: string }[];
@@ -3353,6 +3512,8 @@ export namespace messages {
   export type IdentityChangePasswordResponse = {};
   export type IdentityCreateRequest = { [key: string]: any };
   export type IdentityCreateResponse = { username: string };
+  export type IdentitySelectIdentityRequest = { [key: string]: any };
+  export type IdentitySelectIdentityResponse = {};
   export type IdentityUpdateRequest = { [key: string]: any };
   export type IdentityUpdateResponse = {};
 
@@ -3439,8 +3600,10 @@ export namespace messages {
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
   };
-  export type ProblemRandomProblemRequest = { [key: string]: any };
-  export type ProblemRandomProblemResponse = { alias: string };
+  export type ProblemRandomKarelProblemRequest = { [key: string]: any };
+  export type ProblemRandomKarelProblemResponse = { alias: string };
+  export type ProblemRandomLanguageProblemRequest = { [key: string]: any };
+  export type ProblemRandomLanguageProblemResponse = { alias: string };
   export type ProblemRejudgeRequest = { [key: string]: any };
   export type ProblemRejudgeResponse = {};
   export type ProblemRemoveAdminRequest = { [key: string]: any };
@@ -3665,19 +3828,11 @@ export namespace messages {
   // Session
   export type SessionCurrentSessionRequest = { [key: string]: any };
   export type SessionCurrentSessionResponse = {
-    session?: {
-      auth_token?: string;
-      classname: string;
-      email?: string;
-      identity?: dao.Identities;
-      is_admin: boolean;
-      user?: dao.Users;
-      valid: boolean;
-    };
+    session?: types.CurrentSession;
     time: number;
   };
   export type SessionGoogleLoginRequest = { [key: string]: any };
-  export type SessionGoogleLoginResponse = { [key: string]: string };
+  export type SessionGoogleLoginResponse = { isAccountCreation: boolean };
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
@@ -3753,7 +3908,7 @@ export namespace messages {
   export type UserListResponse = types.UserListItem[];
   export type UserListAssociatedIdentitiesRequest = { [key: string]: any };
   export type UserListAssociatedIdentitiesResponse = {
-    identities: { default: boolean; username: string }[];
+    identities: types.AssociatedIdentity[];
   };
   export type UserListUnsolvedProblemsRequest = { [key: string]: any };
   export type UserListUnsolvedProblemsResponse = { problems: types.Problem[] };
@@ -4150,6 +4305,9 @@ export namespace controllers {
     create: (
       params?: messages.IdentityCreateRequest,
     ) => Promise<messages.IdentityCreateResponse>;
+    selectIdentity: (
+      params?: messages.IdentitySelectIdentityRequest,
+    ) => Promise<messages.IdentitySelectIdentityResponse>;
     update: (
       params?: messages.IdentityUpdateRequest,
     ) => Promise<messages.IdentityUpdateResponse>;
@@ -4216,9 +4374,12 @@ export namespace controllers {
     myList: (
       params?: messages.ProblemMyListRequest,
     ) => Promise<messages.ProblemMyListResponse>;
-    randomProblem: (
-      params?: messages.ProblemRandomProblemRequest,
-    ) => Promise<messages.ProblemRandomProblemResponse>;
+    randomKarelProblem: (
+      params?: messages.ProblemRandomKarelProblemRequest,
+    ) => Promise<messages.ProblemRandomKarelProblemResponse>;
+    randomLanguageProblem: (
+      params?: messages.ProblemRandomLanguageProblemRequest,
+    ) => Promise<messages.ProblemRandomLanguageProblemResponse>;
     rejudge: (
       params?: messages.ProblemRejudgeRequest,
     ) => Promise<messages.ProblemRejudgeResponse>;
