@@ -2,9 +2,7 @@
   <div class="group-edit">
     <div class="page-header">
       <h1>
-        <span>
-          {{ ui.formatString(T.groupEditTitleWithName, { name: groupName }) }}
-        </span>
+        {{ ui.formatString(T.groupEditTitleWithName, { name: groupName }) }}
       </h1>
     </div>
     <ul class="nav nav-pills">
