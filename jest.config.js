@@ -26,6 +26,8 @@ module.exports = {
   moduleFileExtensions: ['js', 'ts', 'vue'],
   moduleDirectories: ['node_modules'],
   moduleNameMapper: {
+    'vue-async-computed-decorator':
+      '<rootDir>/node_modules/vue-async-computed-decorator/dist/index.js',
     '^@/(.*)$': '<rootDir>/frontend/www/$1',
     '\\.(css|less)$':
       '<rootDir>/frontend/www/js/omegaup/__mocks__/styleMock.js',

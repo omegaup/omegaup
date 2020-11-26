@@ -1,3 +1,5 @@
+jest.mock('../../../third_party/js/diff_match_patch.js');
+
 import expect from 'expect';
 
 import * as arena from './arena';
