@@ -89,21 +89,12 @@
               {{ T.wordsReportProblem }}
             </button>
           </div>
+          <div v-if="user.reviewer && !nominationStatus.alreadyReviewed">
+            <button class="btn btn-link" @click="onNewPromotionAsReviewer">
+              {{ T.reviewerNomination }}
+            </button>
+          </div>
         </template>
-        <omegaup-quality-nomination-reviewer-popup
-          v-if="user.reviewer && !nominationStatus.alreadyReviewed"
-          :allow-user-add-tags="allowUserAddTags"
-          :level-tags="levelTags"
-          :problem-level="problemLevel"
-          :public-tags="publicTags"
-          :selected-public-tags="selectedPublicTags"
-          :selected-private-tags="selectedPrivateTags"
-          :problem-alias="problem.alias"
-          :problem-title="problem.title"
-          @submit="
-            (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
-          "
-        ></omegaup-quality-nomination-reviewer-popup>
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="popupDisplayed !== PopupDisplayed.None"
@@ -144,6 +135,21 @@
                   $emit('submit-demotion', qualityDemotionComponent)
               "
             ></omegaup-quality-nomination-demotion-popup>
+            <omegaup-quality-nomination-reviewer-popup
+              v-show="popupDisplayed === PopupDisplayed.Reviewer"
+              :allow-user-add-tags="allowUserAddTags"
+              :level-tags="levelTags"
+              :problem-level="problemLevel"
+              :public-tags="publicTags"
+              :selected-public-tags="selectedPublicTags"
+              :selected-private-tags="selectedPrivateTags"
+              :problem-alias="problem.alias"
+              :problem-title="problem.title"
+              @dismiss="popupDisplayed = PopupDisplayed.None"
+              @submit="
+                (tag, qualitySeal) => $emit('submit-reviewer', tag, qualitySeal)
+              "
+            ></omegaup-quality-nomination-reviewer-popup>
           </template>
         </omegaup-overlay>
         <omegaup-arena-runs
@@ -367,6 +373,10 @@ export default class ProblemDetails extends Vue {
       return;
     }
     this.popupDisplayed = PopupDisplayed.Promotion;
+  }
+
+  onNewPromotionAsReviewer(): void {
+    this.popupDisplayed = PopupDisplayed.Reviewer;
   }
 
   onReportInappropriateProblem(): void {
