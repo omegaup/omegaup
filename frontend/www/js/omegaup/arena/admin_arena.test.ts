@@ -1,3 +1,5 @@
+jest.mock('../../../third_party/js/diff_match_patch.js');
+
 import expect from 'expect';
 
 import * as arena from './arena';
@@ -6,7 +8,7 @@ import { OmegaUp } from '../omegaup';
 
 describe('arena', () => {
   describe('ArenaAdmin', () => {
-    before(() => {
+    beforeEach(() => {
       // Create the mountpoint for the arena.Runs component.
       const runsDiv = document.createElement('div');
       runsDiv.id = 'runs';
