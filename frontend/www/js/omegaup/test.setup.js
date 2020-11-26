@@ -1,6 +1,8 @@
 const util = require('util');
 const process = require('process');
 
+// Intercept all API calls. Only let `API.Session.currentSession()` work and
+// fail everything else.
 require('jest-fetch-mock').enableMocks();
 fetchMock.mockIf(/^\/api\/.*/, (req) => {
   if (req.url != '/api/session/currentSession/') {
@@ -60,5 +62,3 @@ process.on('warning', (warning) => {
 
 // https://github.com/vuejs/vue-test-utils/issues/936
 window.Date = Date;
-
-global.this = window;

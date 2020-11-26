@@ -1,8 +1,11 @@
-// diff_match_patch is not a well-behaved module. We need to mock it to avoid
-// requiring it.
+// diff_match_patch is not a well-behaved module, since it tries to modify
+// `this` (instead of `global` or `window`, which it shouldn't do regardless).
+// So, by requiring, it will cause a runtime error since `this` is not defined
+// in that context.
+// We need to mock it to avoid requiring it.
 
 function diff_match_patch() {}
-diff_match_patch.prototype.diff_main = function () {
+diff_match_patch.prototype.diff_main = function() {
   return [];
 };
 

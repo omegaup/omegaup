@@ -11,6 +11,9 @@ export function formatFutureDateRelative(futureDate: Date): string {
     momentInitialized = true;
   }
 
+  // moment is a weird library. The top-level import can be a function or an
+  // object, and it depends on whether it was processed by webpack (in regular
+  // compilation) or just babel (in tests).
   return ((moment as any)?.default ?? moment)(futureDate).endOf().fromNow();
 }
 

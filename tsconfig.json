@@ -5,7 +5,12 @@
     "target": "es6",
     "downlevelIteration": true,
     "strict": true,
-    "lib": ["DOM", "ES5", "ScriptHost", "ES2020.Promise"],
+    "lib": [
+        "DOM",
+        "ES5",
+        "ScriptHost",
+        "ES2020.Promise"
+    ],
     "module": "es6",
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -13,11 +18,15 @@
     "baseUrl": ".",
     "allowSyntheticDefaultImports": true,
     "importHelpers": true,
-    "importsNotUsedAsValues": "preserve",
     "paths": {
       "@/*": ["frontend/www/*"]
     }
   },
-  "include": ["./frontend/www/js/omegaup/**/*.vue", "./frontend/www/**/*.ts"],
-  "exclude": ["./node_modules"]
+  "include": [
+    "./frontend/www/js/omegaup/**/*.vue",
+    "./frontend/www/**/*.ts"
+  ],
+  "exclude": [
+    "./node_modules"
+  ]
 }
