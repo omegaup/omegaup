@@ -1,6 +1,6 @@
 const path = require('path');
 
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const RemoveSourceWebpackPlugin = require('remove-source-webpack-plugin');
 
 const omegaupStylesRegExp = /omegaup_styles\.js/;
@@ -15,8 +15,9 @@ module.exports = {
     publicPath: '/',
   },
   plugins: [
-    new MiniCssExtractPlugin({
+    new ExtractTextPlugin({
       filename: 'css/dist/[name].css',
+      allChunks: true,
     }),
     new RemoveSourceWebpackPlugin([omegaupStylesRegExp]),
   ],
@@ -24,7 +25,10 @@ module.exports = {
     rules: [
       {
         test: /\.scss$/,
-        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'sass-loader'],
+        }),
       },
     ],
   },

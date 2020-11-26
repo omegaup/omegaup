@@ -3,6 +3,7 @@ const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
@@ -24,8 +25,7 @@ module.exports = {
     arena: './frontend/www/js/omegaup/arena/arena.ts',
     arena_admin: './frontend/www/js/omegaup/arena/admin.ts',
     arena_assignment: './frontend/www/js/omegaup/arena/assignment.ts',
-    arena_assignment_admin:
-      './frontend/www/js/omegaup/arena/assignment_admin.ts',
+    arena_assignment_admin: './frontend/www/js/omegaup/arena/assignment_admin.ts',
     arena_contest: './frontend/www/js/omegaup/arena/contest.ts',
     arena_contest_list: './frontend/www/js/omegaup/arena/contest_list.ts',
     arena_scoreboard: './frontend/www/js/omegaup/arena/scoreboard.ts',
@@ -73,10 +73,8 @@ module.exports = {
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
     logout: './frontend/www/js/omegaup/login/logout.ts',
     problem_collection: './frontend/www/js/omegaup/problem/collection.ts',
-    problem_collection_list:
-      './frontend/www/js/omegaup/problem/collection_list.ts',
-    problem_collection_list_by_author:
-      './frontend/www/js/omegaup/problem/collection_list_by_author.ts',
+    problem_collection_list: './frontend/www/js/omegaup/problem/collection_list.ts',
+    problem_collection_list_by_author: './frontend/www/js/omegaup/problem/collection_list_by_author.ts',
     problem_edit: './frontend/www/js/omegaup/problem/edit.ts',
     problem_details: './frontend/www/js/omegaup/problem/details.ts',
     problem_feedback: './frontend/www/js/omegaup/problem/feedback.js',
@@ -121,7 +119,7 @@ module.exports = {
 
     // use absolute paths in sourcemaps (important for debugging via IDE)
     devtoolModuleFilenameTemplate: '[absolute-resource-path]',
-    devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]',
+    devtoolFallbackModuleFilenameTemplate: '[absolute-resource-path]?[hash]'
   },
 
   plugins: [
@@ -132,25 +130,21 @@ module.exports = {
           to: path.resolve(__dirname, './frontend/www/media/dist/badges'),
           transform(content, filepath) {
             const iconPath = `${path.dirname(filepath)}/icon.svg`;
-            return fs.existsSync(iconPath)
-              ? fs.readFileSync(iconPath)
-              : defaultBadgeIcon;
+            return fs.existsSync(iconPath) ? fs.readFileSync(iconPath) :
+                                             defaultBadgeIcon;
           },
           transformPath(targetPath, absolutePath) {
-            return `media/dist/badges/${path.basename(
-              path.dirname(absolutePath),
-            )}.svg`;
+            return `media/dist/badges/${
+                path.basename(
+                    path.dirname(absolutePath),
+                    )}.svg`;
           },
         },
       ],
     }),
     new VueLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin({
-      typescript: {
-        extensions: {
-          vue: true,
-        },
-      },
+      vue: true,
       formatter: 'codeframe',
       async: false,
     }),
@@ -176,14 +170,14 @@ module.exports = {
           priority: 20,
         },
         vendor: {
-          name: (module) => {
+          name: module => {
             const packageName = module.context.match(
-              /\/node_modules\/([^@/]+)/,
+              /\/node_modules\/([^@\/]+)/,
             )[1];
 
             return `npm.${packageName}`;
           },
-          test: /\/node_modules\/[^@/]+/,
+          test: /\/node_modules\/[^@\/]+/,
           chunks: 'initial',
           minChunks: 2,
           minSize: 50 * 1024,
@@ -227,10 +221,7 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        options: {
-          cacheDirectory: true,
-        },
+        loader: 'babel-loader?cacheDirectory',
         exclude: /node_modules/,
       },
       {
@@ -238,11 +229,11 @@ module.exports = {
         loader: 'file-loader',
         options: { name: '[name].[ext]?[hash]' },
       },
-      // inline styles on vue components
       {
         test: /\.css$/,
-        use: ['vue-style-loader', 'css-loader'],
+        loader: 'style-loader!css-loader',
       },
+      // inline scss styles on vue components
       {
         test: /\.scss$/,
         use: ['vue-style-loader', 'css-loader', 'sass-loader'],

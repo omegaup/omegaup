@@ -45,5 +45,6 @@ module.exports = {
     ],
     '.*\\.[jt]sx?$': ['babel-jest', babelConfig],
   },
+  transformIgnorePatterns: ['node_modules/(?!(vue-.*|@voerro/vue-tagsinput)/)'],
   testURL: 'http://localhost:8001/',
 };

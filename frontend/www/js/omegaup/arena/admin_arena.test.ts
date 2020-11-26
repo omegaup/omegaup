@@ -6,7 +6,7 @@ import { OmegaUp } from '../omegaup';
 
 describe('arena', () => {
   describe('ArenaAdmin', () => {
-    before(() => {
+    beforeEach(() => {
       // Create the mountpoint for the arena.Runs component.
       const runsDiv = document.createElement('div');
       runsDiv.id = 'runs';

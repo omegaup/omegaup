@@ -46,7 +46,7 @@ describe('arena', () => {
   });
 
   describe('Arena', () => {
-    before(() => {
+    beforeEach(() => {
       OmegaUp.ready = true;
     });
 
