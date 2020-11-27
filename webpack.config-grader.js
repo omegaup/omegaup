@@ -33,6 +33,10 @@ module.exports = {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.ttf$/,
+        use: ['file-loader'],
+      },
     ],
   },
   resolve: {
@@ -40,17 +44,16 @@ module.exports = {
       vue$: 'vue/dist/vue.common.js',
       'vue-async-computed': 'vue-async-computed/dist/vue-async-computed.js',
     },
+    fallback: {
+      buffer: require.resolve('buffer/'),
+      stream: require.resolve('stream-browserify'),
+    },
   },
-  plugins: [
-    new VueLoaderPlugin(),
-    new MonacoWebpackPlugin({
-      output: './js/dist',
-    }),
-  ],
+  plugins: [new VueLoaderPlugin(), new MonacoWebpackPlugin()],
   output: {
-    path: path.resolve(__dirname, './frontend/www/'),
-    publicPath: '/',
-    filename: 'js/dist/[name].js',
+    path: path.resolve(__dirname, './frontend/www/js/dist/'),
+    publicPath: '/js/dist/',
+    filename: '[name].js',
     library: '[name]',
     libraryTarget: 'umd',
   },
