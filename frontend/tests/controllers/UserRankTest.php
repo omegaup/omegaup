@@ -629,7 +629,11 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Adding some problems
         $problemsData = [];
         foreach (range(0, 2) as $_) {
-            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                ])
+            );
         }
 
         // Identity creator group member will upload csv file
