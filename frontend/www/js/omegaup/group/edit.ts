@@ -1,4 +1,4 @@
-import group_Edit from '../components/group/Edit.vue';
+import group_Edit, { AvailableTabs } from '../components/group/Edit.vue';
 import group_Members from '../components/group/Members.vue';
 import group_Scoreboards from '../components/group/Scoreboards.vue';
 import group_Identities from '../components/group/Identities.vue';
@@ -18,9 +18,9 @@ OmegaUp.on('ready', () => {
       'omegaup-group-edit': group_Edit,
     },
     data: () => ({
-      initialTab: window.location.hash
+      tab: window.location.hash
         ? window.location.hash.substr(1)
-        : 'members',
+        : AvailableTabs.Members,
       identities: payload.identities.filter(
         (identity) => identity.username.split(':').length === 1,
       ),
@@ -81,10 +81,10 @@ OmegaUp.on('ready', () => {
           groupName: payload.groupName,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
-          initialTab: this.initialTab,
-          initialIdentities: this.identities,
-          initialIdentitiesCsv: this.identitiesCsv,
-          initialScoreboards: this.scoreboards,
+          tab: this.tab,
+          identities: this.identities,
+          identitiesCsv: this.identitiesCsv,
+          scoreboards: this.scoreboards,
         },
         on: {
           'create-scoreboard': (
@@ -215,7 +215,7 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 this.refreshMemberList();
-                this.initialTab = 'members';
+                this.tab = AvailableTabs.Members;
                 ui.success(T.groupsIdentitiesSuccessfullyCreated);
               })
               .catch(function (data) {
