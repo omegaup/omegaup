@@ -1964,13 +1964,15 @@ export namespace types {
   }
 
   export interface Identity {
-    classname: string;
+    classname?: string;
     country?: string;
     country_id?: string;
     gender?: string;
     name?: string;
+    password?: string;
     school?: string;
     school_id?: number;
+    school_name?: string;
     state?: string;
     state_id?: string;
     username: string;

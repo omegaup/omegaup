@@ -2,7 +2,7 @@ import group_Edit, { AvailableTabs } from '../components/group/Edit.vue';
 import group_Members from '../components/group/Members.vue';
 import group_Scoreboards from '../components/group/Scoreboards.vue';
 import group_Identities from '../components/group/Identities.vue';
-import { omegaup, OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
@@ -120,7 +120,7 @@ OmegaUp.on('ready', () => {
           },
           'edit-identity': (
             source: group_Members,
-            identity: omegaup.Identity,
+            identity: types.Identity,
           ) => {
             source.showEditForm = true;
             source.showChangePasswordForm = false;
@@ -207,7 +207,7 @@ OmegaUp.on('ready', () => {
           },
           'bulk-identities': (
             source: group_Identities,
-            identities: omegaup.Identity[],
+            identities: types.Identity[],
           ) => {
             api.Identity.bulkCreate({
               identities: JSON.stringify(identities),
@@ -223,7 +223,7 @@ OmegaUp.on('ready', () => {
                 source.userErrorRow = data.parameter;
               });
           },
-          'download-identities': (identities: omegaup.Identity[]) => {
+          'download-identities': (identities: types.Identity[]) => {
             const dialect = {
               dialect: {
                 csvddfVersion: 1.2,
@@ -266,7 +266,7 @@ OmegaUp.on('ready', () => {
             source.identities = [];
             CSV.fetch({
               file: fileUpload.files ? fileUpload.files[0] : null,
-            }).done((dataset: any) => {
+            }).done((dataset: CSV.Dataset) => {
               if (dataset.fields.length != 6) {
                 ui.error(T.groupsInvalidCsv);
                 return;
