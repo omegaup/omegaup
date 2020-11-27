@@ -526,18 +526,18 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         $problems = [];
 
         ['user' => $users[0], 'identity' => $identities[0]] = \OmegaUp\Test\Factories\User::createUser();
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[0]
         );
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[0]
         );
 
         ['user' => $users[1], 'identity' => $identities[1]] = \OmegaUp\Test\Factories\User::createUser();
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[1]
         );
-        $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+        $problems[] = \OmegaUp\Test\Factories\Problem::createQualityProblemWithAuthor(
             $identities[1]
         );
 

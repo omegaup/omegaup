@@ -198,6 +198,20 @@ class Problem {
     /**
      * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}
      */
+    public static function createQualityProblemWithAuthor(
+        \OmegaUp\DAO\VO\Identities $author,
+        \OmegaUp\Test\ScopedLoginToken $login = null
+    ): array {
+        return self::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
+            'visibility' => 'public',
+            'author' => $author,
+            'quality_seal' => true,
+        ]), $login);
+    }
+
+    /**
+     * @return array{author: \OmegaUp\DAO\VO\Identities, authorUser: \OmegaUp\DAO\VO\Users, problem: \OmegaUp\DAO\VO\Problems, request: \OmegaUp\Request}
+     */
     public static function createProblem(
         ?\OmegaUp\Test\Factories\ProblemParams $params = null,
         \OmegaUp\Test\ScopedLoginToken $login = null
