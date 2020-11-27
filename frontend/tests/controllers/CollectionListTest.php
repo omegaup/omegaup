@@ -222,7 +222,11 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
 
             $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
-                $identities[$i]
+                $identities[$i],
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'problem_level' => $level,
+                    'quality_seal' => true,
+                ])
             );
         }
 

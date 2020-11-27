@@ -1734,7 +1734,11 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
     */
     public function testAggregateFeedback() {
         for ($i = 0; $i < 5; $i++) {
-            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $problemData[$i] = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                ])
+            );
         }
         $userData = [];
         $identityData = [];

@@ -118,8 +118,10 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
         ) AS up
         INNER JOIN
             `Problems` AS `p`
-        ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0 AND
-        `p`.quality_seal = 1
+        ON
+            `p`.`problem_id` = up.`problem_id`
+            AND `p`.visibility > 0
+            AND `p`.quality_seal = 1
         INNER JOIN
             `Identities` AS `i` ON `i`.`identity_id` = up.`identity_id`
         LEFT JOIN
