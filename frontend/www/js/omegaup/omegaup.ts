@@ -21,7 +21,7 @@ export class Experiments {
   // The list of all enabled experiments for a particular request should have
   // been injected into the DOM by Smarty.
   static loadGlobal(): Experiments {
-    const experimentsNode = document.getElementById(
+    const experimentsNode = document?.getElementById(
       'omegaup-enabled-experiments',
     );
     let experimentsList: Array<string> = [];

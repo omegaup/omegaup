@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import user_Privacy_Policy from '../components/user/PrivacyPolicy.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
 import * as api from '../api';
 import * as ui from '../ui';

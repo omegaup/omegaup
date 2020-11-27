@@ -1,5 +1,5 @@
 import contest_List from '../components/contest/ContestList.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
 import Vue from 'vue';
 

@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import user_BasicEdit from '../components/user/BasicEdit.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
 import * as ui from '../ui';
 
