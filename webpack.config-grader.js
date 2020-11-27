@@ -22,15 +22,16 @@ module.exports = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader?cacheDirectory',
+          loader: 'babel-loader',
           options: {
             presets: ['@babel/env'],
+            cacheDirectory: true,
           },
         },
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader',
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
