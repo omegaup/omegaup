@@ -155,16 +155,15 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
         $request = \OmegaUp\Controllers\Tag::apiFrequentTags(
             new \OmegaUp\Request([
                 'auth_token' => $login->auth_token,
-                'problemLevel' => 'problemLevelBasicIntroductionToProgramming',
-                'rows' => 15
+                'problemLevel' => 'problemLevelBasicIntroductionToProgramming'
             ])
         );
 
         $exepectedTagsList = [
-            ['alias' => 'problemTagMatrices'],
-            ['alias' => 'problemTagDiophantineEquations'],
-            ['alias' => 'problemTagInputAndOutput'],
-            ['alias' => 'problemTagArrays'],
+            ['alias' => 'problemTagMatrices', 'total' => '4'],
+            ['alias' => 'problemTagDiophantineEquations', 'total' => '3'],
+            ['alias' => 'problemTagInputAndOutput', 'total' => '2'],
+            ['alias' => 'problemTagArrays', 'total' => '1'],
         ];
 
         $this->assertEquals($request['frequent_tags'], $exepectedTagsList);
