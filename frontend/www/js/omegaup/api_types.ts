@@ -1418,6 +1418,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
+    publicTags: { alias: string; total: number }[];
     selectedTags: string[];
     tagData: { name?: string }[];
     tagsList: string[];

@@ -79,7 +79,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     /**
      * @return list<array{alias: string, total: int}>
      */
-    public static function getFrequentQualityTagsByLevel(
+    public static function getPublicQualityTagsByLevel(
         string $problemLevel
     ) {
         $sql = '
@@ -121,7 +121,60 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
+                $problemLevel
+            ]
+        );
+    }
+
+    /**
+     * @return list<array{alias: string, total: int}>
+     */
+    public static function getFrequentQualityTagsByLevel(
+        string $problemLevel,
+        int $rows
+    ) {
+        $sql = '
+            SELECT
+                t.name AS alias,
+                COUNT(t.name) AS total
+            FROM
+                Problems_Tags pt
+            INNER JOIN
+                Tags t ON t.tag_id = pt.tag_id
+            INNER JOIN
+	            Problems p ON p.problem_id = pt.problem_id
+            WHERE
+                pt.problem_id
+            IN (
+                SELECT
+                    problem_id
+                FROM
+                    Problems_Tags
+                WHERE
+                    tag_id = (
+                        SELECT
+                            tag_id
+                        FROM
+                            Tags
+                        WHERE name = ? )
+            ) AND
+                name LIKE "problemTag%"
+            AND
+                p.quality_seal = 1
+            GROUP BY
+                t.name
+            ORDER BY
+                COUNT(pt.problem_id)
+            DESC
+            LIMIT ?
+            ';
+
+        /** @var list<array{alias: string, total: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
                 $problemLevel,
+                $rows
             ]
         );
     }

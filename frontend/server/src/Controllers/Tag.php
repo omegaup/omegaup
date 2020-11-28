@@ -71,14 +71,34 @@ class Tag extends \OmegaUp\Controllers\Controller {
      *
      * @return list<array{alias: string, total: int}>
      */
-    public static function getFrequentQualityTagsByLevel(
+    public static function getPublicQualityTagsByLevel(
         string $problemLevel
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
             "level-{$problemLevel}",
-            fn () => \OmegaUp\DAO\Tags::getFrequentQualityTagsByLevel(
+            fn () => \OmegaUp\DAO\Tags::getPublicQualityTagsByLevel(
                 $problemLevel
+            ),
+            APC_USER_CACHE_SESSION_TIMEOUT
+        );
+    }
+
+    /**
+     * Return most frequent public tags of a certain level
+     *
+     * @return list<array{alias: string, total: int}>
+     */
+    public static function getFrequentQualityTagsByLevel(
+        string $problemLevel,
+        int $rows
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TAGS_LIST,
+            "level-{$problemLevel}-{$rows}",
+            fn () => \OmegaUp\DAO\Tags::getFrequentQualityTagsByLevel(
+                $problemLevel,
+                $rows
             ),
             APC_USER_CACHE_SESSION_TIMEOUT
         );

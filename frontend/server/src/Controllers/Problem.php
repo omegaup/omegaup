@@ -41,7 +41,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
  * @psalm-type CollectionDetailsByAuthorPayload=array{authorsRanking: AuthorsRank, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, authors: list<string>}
- * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<array{alias: string, total: int}>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
+ * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<array{alias: string, total: int}>, publicTags: list<array{alias: string, total: int}>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  */
@@ -5971,12 +5971,18 @@ class Problem extends \OmegaUp\Controllers\Controller {
         );
 
         $frequentTags = \OmegaUp\Controllers\Tag::getFrequentQualityTagsByLevel(
+            $collectionLevel,
+            /*$rows=*/15
+        );
+
+        $publicTags = \OmegaUp\Controllers\Tag::getPublicQualityTagsByLevel(
             $collectionLevel
         );
 
         return [
             'smartyProperties' => [
                 'payload' => [
+                    'publicTags' => $publicTags,
                     'frequentTags' => $frequentTags,
                     'level' => $collectionLevel,
                     'problems' => $result['problems'],
