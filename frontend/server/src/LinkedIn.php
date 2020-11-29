@@ -41,6 +41,7 @@ class LinkedIn {
             'client_id' => $this->_clientId,
             'redirect_uri' => $this->_redirectUrl,
             'state' => json_encode($this->_state),
+            'scope' => 'r_liteprofile r_emailaddress w_member_social',
         ]);
         {
             $scopedSession = \OmegaUp\Controllers\Session::getSessionManagerInstance()->sessionStart();
@@ -88,17 +89,31 @@ class LinkedIn {
      * @return array<string, string>
      */
     public function getProfileInfo(string $accessToken): array {
+        // Couldn't get all the profile information in a single roundtrip.
+        // More info: https://docs.microsoft.com/en-us/linkedin/consumer/integrations/self-serve/sign-in-with-linkedin?context=linkedin/consumer/context
         $curl = new \OmegaUp\CurlSession(
-            'https://api.linkedin.com/v1/people/~:(first-name,last-name,email-address)?format=json',
+            'https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))',
             ["Authorization: Bearer {$accessToken}"]
         );
-        $profile = $curl->get();
-        if (empty($profile['emailAddress'])) {
+        /** @var array{elements: list<array{handle: string, handle~: array{emailAddress: string}}>} */
+        $emailInfo = $curl->get();
+        $handle = $emailInfo['elements'][0]['handle~'];
+        if (empty($handle['emailAddress'])) {
             throw new \OmegaUp\Exceptions\PreconditionFailedException(
                 'loginLinkedInEmptyEmailError'
             );
         }
-        return $profile;
+        $curl = new \OmegaUp\CurlSession(
+            'https://api.linkedin.com/v2/me',
+            ["Authorization: Bearer {$accessToken}"]
+        );
+
+        $userInfo = $curl->get();
+        return [
+            'emailAddress' => $handle['emailAddress'],
+            'firstName' => $userInfo['localizedFirstName'],
+            'lastName' => $userInfo['localizedLastName'],
+        ];
     }
 
     public function extractRedirect(string $state): ?string {
