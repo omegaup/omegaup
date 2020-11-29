@@ -114,11 +114,13 @@ export default class CollectionList extends Vue {
   get availableTags(): { alias: string; total: number }[] {
     let tags: { alias: string; total: number }[] = this.data.frequentTags;
     let simpleTags: string[] = tags.map((x) => x.alias);
-    let list: { alias: string; total: number } [] = this.data.publicTags.filter(({ alias: x }) => !tags.some(({ alias: y }) => y === x));
+    let list: { alias: string; total: number }[] = this.data.publicTags.filter(
+      ({ alias: x }) => !tags.some(({ alias: y }) => y === x),
+    );
 
-    this.selectedTags.forEach(element => {
-      if(!simpleTags.includes(element)){
-        tags.push(list.find(({alias: x}) => x === element)!);
+    this.selectedTags.forEach((element) => {
+      if (!simpleTags.includes(element)) {
+        tags.push(list.find(({ alias: x }) => x === element)!);
       }
     });
 
@@ -127,7 +129,9 @@ export default class CollectionList extends Vue {
 
   get publicQualityTags(): { alias: string; total: number }[] {
     let tags: { alias: string; total: number }[] = this.data.frequentTags;
-    return this.data.publicTags.filter(({ alias: x }) => !tags.some(({ alias: y }) => y === x));
+    return this.data.publicTags.filter(
+      ({ alias: x }) => !tags.some(({ alias: y }) => y === x),
+    );
   }
 
   get title(): string {
