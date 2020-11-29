@@ -112,29 +112,22 @@ export default class CollectionList extends Vue {
   level = this.data.level;
 
   get availableTags(): { alias: string; total: number }[] {
-    let tags: { alias: string; total: number }[] = this.data.frequentTags.slice(
-      0,
-      15,
-    );
+    let tags: { alias: string; total: number }[] = this.data.frequentTags;
     let simpleTags: string[] = tags.map((x) => x.alias);
-    let list: {
-      alias: string;
-      total: number;
-    }[] = this.data.frequentTags.filter((x) => !tags.includes(x));
-    this.selectedTags.forEach((element) => {
-      if (!simpleTags.includes(element)) {
-        tags.push(list.find((x) => x.alias === element)!);
+    let list: { alias: string; total: number } [] = this.data.publicTags.filter(({ alias: x }) => !tags.some(({ alias: y }) => y === x));
+
+    this.selectedTags.forEach(element => {
+      if(!simpleTags.includes(element)){
+        tags.push(list.find(({alias: x}) => x === element)!);
       }
     });
+
     return tags;
   }
 
   get publicQualityTags(): { alias: string; total: number }[] {
-    let tags: { alias: string; total: number }[] = this.data.frequentTags.slice(
-      0,
-      15,
-    );
-    return this.data.frequentTags.filter((x) => !tags.includes(x));
+    let tags: { alias: string; total: number }[] = this.data.frequentTags;
+    return this.data.publicTags.filter(({ alias: x }) => !tags.some(({ alias: y }) => y === x));
   }
 
   get title(): string {

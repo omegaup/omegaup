@@ -19,7 +19,7 @@ describe('CollectionList.vue', () => {
             { alias: 'problemTagArrays' },
           ],
           publicTags: <string[]>['problemTagConditionals', 'problemTagLoops'],
-        } as types.CollectionDetailsByLevelPayload,
+        },
         difficulty: 'easy',
         selectedTags: <string[]>[
           'problemTagMatrices',
@@ -121,7 +121,7 @@ describe('CollectionList.vue', () => {
           level: 'problemLevelBasicIntroductionToProgramming',
           frequentTags: [{ alias: 'problemTagMatrices' }],
           publicTags: <string[]>['problemTagConditionals'],
-        } as types.CollectionDetailsByLevelPayload,
+        },
         difficulty: 'all',
       },
     });

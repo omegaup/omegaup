@@ -116,13 +116,18 @@ class Tag extends \OmegaUp\Controllers\Controller {
         $param = $r->ensureString(
             'problemLevel',
             fn (string $problemAlias) => \OmegaUp\Validators::alias(
-                $problemAlias
+                $problemAlias,
             )
+        );
+
+        $rows = $r->ensureInt(
+            'rows'
         );
 
         return [
             'frequent_tags' => self::getFrequentQualityTagsByLevel(
-                $param
+                $param,
+                $rows
             ),
         ];
     }
