@@ -120,7 +120,10 @@ export default class CollectionList extends Vue {
 
     this.selectedTags.forEach((element) => {
       if (!simpleTags.includes(element)) {
-        tags.push(list.find(({ alias: x }) => x === element)!);
+        const tag = list.find(({ alias: x }) => x === element);
+        if (typeof tag !== 'undefined') {
+          tags.push(tag);
+        }
       }
     });
 
