@@ -43,6 +43,65 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Tests getCoderOfTheMonth
+     */
+    public function testCoderOfTheMonth() {
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'testuser1']
+            )
+        );
+        foreach (range(0, 4) as $_) {
+            $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+                ])
+            );
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $contestantIdentity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 100, 'AC');
+        }
+
+        ['user' => $contestant, 'identity' => $contestantIdentity] = \OmegaUp\Test\Factories\User::createUser(
+            new \OmegaUp\Test\Factories\UserParams(
+                ['username' => 'testuser2']
+            )
+        );
+        foreach (range(0, 4) as $_) {
+            if ($_ === 3) {
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+                    new \OmegaUp\Test\Factories\ProblemParams([
+                    'quality_seal' => true,
+                    ])
+                );
+            } else {
+                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+            }
+            $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problemData,
+                $contestantIdentity
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($runData, 100, 'AC');
+        }
+
+        // Refresh Rank
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request([
+                'date' => date('Y-m-d', \OmegaUp\Time::get()),
+                'category' => 'all'
+                ])
+        );
+        $this->assertEquals(
+            $response['coderinfo']['username'],
+            'testuser1'
+        );
+    }
+
+    /**
      * Tests refreshUserRank not displaying private profiles
      */
     public function testPrivateUserInRanking() {
