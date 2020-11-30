@@ -21,6 +21,10 @@ declare module '@/third_party/js/csv.js/csv.js' {
     fields: Array<string>;
     records: Array<any>;
   }
+
+  interface Promise<T> {
+    done(arg0: (dataset: Dataset) => void): Dataset;
+  }
   export function serialize(dataToSerialize: any, dialect: Dialect): string;
-  export function fetch(dataset: Source): Promise<any>;
+  export function fetch<T>(dataset: Source): Promise<T>;
 }
