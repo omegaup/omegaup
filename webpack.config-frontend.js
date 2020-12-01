@@ -3,7 +3,6 @@ const path = require('path');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 const defaultBadgeIcon = fs.readFileSync('./frontend/badges/default_icon.svg');
@@ -148,7 +147,11 @@ module.exports = {
     }),
     new VueLoaderPlugin(),
     new ForkTsCheckerWebpackPlugin({
-      vue: true,
+      typescript: {
+        extensions: {
+          vue: true,
+        },
+      },
       formatter: 'codeframe',
       async: false,
     }),
@@ -174,14 +177,14 @@ module.exports = {
           priority: 20,
         },
         vendor: {
-          name: (module) => {
+          name: module => {
             const packageName = module.context.match(
-              /\/node_modules\/([^@\/]+)/,
+              /\/node_modules\/([^@/]+)/,
             )[1];
 
             return `npm.${packageName}`;
           },
-          test: /\/node_modules\/[^@\/]+/,
+          test: /\/node_modules\/[^@/]+/,
           chunks: 'initial',
           minChunks: 2,
           minSize: 50 * 1024,
@@ -225,7 +228,10 @@ module.exports = {
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader?cacheDirectory',
+        loader: 'babel-loader',
+        options: {
+          cacheDirectory: true,
+        },
         exclude: /node_modules/,
       },
       {
@@ -233,11 +239,11 @@ module.exports = {
         loader: 'file-loader',
         options: { name: '[name].[ext]?[hash]' },
       },
+      // inline scss styles on vue components
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader',
+        use: ['vue-style-loader', 'css-loader'],
       },
-      // inline scss styles on vue components
       {
         test: /\.scss$/,
         use: ['vue-style-loader', 'css-loader', 'sass-loader'],
