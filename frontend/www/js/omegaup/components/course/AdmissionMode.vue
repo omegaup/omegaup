@@ -52,9 +52,6 @@
               </span>
             </div>
           </div>
-          <p class="help-block">
-            <span v-html="admissionModeDescription"></span>
-          </p>
         </div>
         <div class="text-right">
           <button class="btn btn-primary change-admission-mode" type="submit">
@@ -90,7 +87,6 @@ Vue.use(Clipboard);
 })
 export default class CourseAdmissionMode extends Vue {
   @Prop() initialAdmissionMode!: string;
-  @Prop() admissionModeDescription!: string;
   @Prop() courseAlias!: string;
   @Prop() shouldShowPublicOption!: boolean;
 

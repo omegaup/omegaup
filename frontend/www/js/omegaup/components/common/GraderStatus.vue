@@ -21,11 +21,11 @@
     </li>
     <li v-if="status === 'ok'" class="grader grader-queues">
       Queues:
-      <pre
-        v-if="graderInfo !== null"
-        style="width: 50em"
-        v-html="ui.prettyPrintJSON(graderInfo.queue)"
-      ></pre>
+      <pre v-if="graderInfo !== null" style="width: 40em">
+        <omegaup-markdown
+          :markdown="ui.prettyPrintJSON(graderInfo.queue)"
+        ></omegaup-markdown>
+      </pre>
     </li>
   </ul>
 </template>
@@ -35,8 +35,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class GraderStatus extends Vue {
   @Prop() status!: string;
   @Prop() error!: string;
@@ -80,5 +85,16 @@ ul {
 ol,
 ul {
   list-style: none;
+}
+
+pre {
+  padding: 9.5px;
+  margin: 0 0 10px;
+  line-height: 1.42857143;
+  word-break: break-all;
+  word-wrap: break-word;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 </style>
