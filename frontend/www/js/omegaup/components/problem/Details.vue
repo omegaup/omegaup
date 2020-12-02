@@ -111,6 +111,11 @@
                   onRunSubmitted(code, selectedLanguage)
               "
             ></omegaup-arena-runsubmit-popup>
+            <omegaup-arena-rundetails-popup
+              v-show="popupDisplayed === PopupDisplayed.RunDetails"
+              :data="runDetailsData"
+              @dismiss="onPopupDismissed"
+            ></omegaup-arena-rundetails-popup>
             <omegaup-quality-nomination-promotion-popup
               v-show="popupDisplayed === PopupDisplayed.Promotion"
               :solved="nominationStatus && nominationStatus.solved"
@@ -157,6 +162,7 @@
           :runs="runs"
           :show-details="true"
           :problemset-problems="[]"
+          @details="(run) => onRunDetails(run.guid)"
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
@@ -221,6 +227,7 @@ import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
+import arena_RunDetailsPopup from '../arena/RunDetailsPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
@@ -269,6 +276,7 @@ export enum PopupDisplayed {
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
+    'omegaup-arena-rundetails-popup': arena_RunDetailsPopup,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
     'omegaup-overlay': omegaup_Overlay,
@@ -309,6 +317,8 @@ export default class ProblemDetails extends Vue {
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
   @Prop() hasBeenNominated!: boolean;
+  @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
+  @Prop() guid!: string;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -359,12 +369,24 @@ export default class ProblemDetails extends Vue {
     );
   }
 
+  mounted() {
+    if (!this.guid) {
+      return;
+    }
+    this.onRunDetails(this.guid);
+  }
+
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
       return;
     }
     this.popupDisplayed = PopupDisplayed.RunSubmit;
+  }
+
+  onRunDetails(guid: string): void {
+    this.$emit('show-run', this, guid);
+    this.popupDisplayed = PopupDisplayed.RunDetails;
   }
 
   onNewPromotion(): void {
