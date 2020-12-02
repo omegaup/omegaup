@@ -366,7 +366,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         }
 
         // TODO(#3696): Change to ASC once duplicates are removed.
-        $sqlOrder = ' ORDER BY p.alias ASC, qn.qualitynomination_id DESC';
+        $sqlOrder = ' ORDER BY qn.time ASC, p.alias ASC, qn.qualitynomination_id DESC';
         $sqlLimit = ' LIMIT ?, ?;';
 
         /** @var int */
