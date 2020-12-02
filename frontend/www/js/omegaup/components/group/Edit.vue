@@ -141,7 +141,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import group_Identities from './Identities.vue';
+import group_Identities from './Identitiesv2.vue';
 import group_Members from './Members.vue';
 import group_Scoreboards from './Scoreboards.vue';
 import T from '../../lang';
