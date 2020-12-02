@@ -4790,7 +4790,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Defaults for offset and pageSize
-        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $offset = $r->ensureOptionalInt('offset') ?? null;
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
@@ -5928,7 +5928,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $frequentTags = [];
 
-        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $offset = $r->ensureOptionalInt('offset') ?? null;
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
@@ -6149,7 +6149,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problems = [];
         $authorsRanking = [];
 
-        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $offset = $r->ensureOptionalInt('offset') ?? null;
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
