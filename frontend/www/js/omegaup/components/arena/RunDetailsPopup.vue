@@ -43,10 +43,10 @@
                       : element.score
                   }}
                 </th>
-                <th class="text-center" width="10">
-                  {{ element.max_score ? '/' : '' }}
-                </th>
-                <th>{{ element.max_score ? element.max_score : '' }}</th>
+                <template v-if="element.max_score">
+                  <th class="text-center" width="10">/</th>
+                  <th>{{ element.max_score }}</th>
+                </template>
               </tr>
               <template v-if="groupVisible[element.group]">
                 <template v-for="problemCase in element.cases">
@@ -55,11 +55,7 @@
                     <td class="text-center">{{ problemCase.name }}</td>
                     <td class="text-center">{{ problemCase.verdict }}</td>
                     <td class="text-right">
-                      {{
-                        problemCase.contest_score
-                          ? problemCase.contest_score
-                          : problemCase.score
-                      }}
+                      {{ problemCase.contest_score ?? problemCase.score }}
                     </td>
                     <td class="text-center" width="10">
                       {{ problemCase.max_score ? '/' : '' }}
@@ -223,13 +219,4 @@ export default class ArenaRunDetailsPopup extends Vue {
 
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
-pre {
-  padding: 9.5px;
-  margin: 0 0 10px;
-  word-break: break-all;
-  word-wrap: break-word;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
 </style>
