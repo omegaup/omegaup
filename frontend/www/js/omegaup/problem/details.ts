@@ -305,8 +305,5 @@ OmegaUp.on('ready', () => {
       return;
     }
     myRunsStore.commit('addRun', run);
-    if (run.status !== 'ready') {
-      return;
-    }
   }
 });
