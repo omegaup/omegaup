@@ -4,6 +4,7 @@ import problem_Details, {
 } from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
+import { myRunsStore, runsStore } from '../arena/runsStore';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -12,6 +13,7 @@ import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
+  const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   let popupDisplayed = PopupDisplayed.None;
   if (locationHash.includes('new-run')) {
@@ -75,6 +77,39 @@ OmegaUp.on('ready', () => {
           hasBeenNominated: this.hasBeenNominated,
         },
         on: {
+          'submit-run': (code: string, language: string) => {
+            api.Run.create({
+              problem_alias: payload.problem.alias,
+              language: language,
+              source: code,
+            })
+              .then((response) => {
+                ui.reportEvent('submission', 'submit');
+
+                updateRun({
+                  guid: response.guid,
+                  submit_delay: response.submit_delay,
+                  username: commonPayload.currentUsername,
+                  classname: commonPayload.userClassname,
+                  country: 'xx',
+                  status: 'new',
+                  alias: payload.problem.alias,
+                  time: new Date(),
+                  penalty: 0,
+                  runtime: 0,
+                  memory: 0,
+                  verdict: 'JE',
+                  score: 0,
+                  language: language,
+                });
+              })
+              .catch((run) => {
+                alert(run.error ?? run);
+                if (run.errorname) {
+                  ui.reportEvent('submission', 'submit-fail', run.errorname);
+                }
+              });
+          },
           'submit-reviewer': (tag: string, qualitySeal: boolean) => {
             const contents: { quality_seal?: boolean; tag?: string } = {};
             if (tag) {
@@ -246,4 +281,32 @@ OmegaUp.on('ready', () => {
       });
     },
   });
+
+  function updateRun(run: types.Run): void {
+    trackRun(run);
+
+    if (run.status != 'ready') {
+      updateRunFallback(run.guid);
+      return;
+    }
+  }
+
+  function updateRunFallback(guid: string): void {
+    setTimeout(() => {
+      api.Run.status({ run_alias: guid })
+        .then((response) => updateRun(response))
+        .catch(ui.ignoreError);
+    }, 5000);
+  }
+
+  function trackRun(run: types.Run): void {
+    runsStore.commit('addRun', run);
+    if (run.username !== OmegaUp.username) {
+      return;
+    }
+    myRunsStore.commit('addRun', run);
+    if (run.status !== 'ready') {
+      return;
+    }
+  }
 });
