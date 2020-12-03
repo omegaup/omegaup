@@ -21,11 +21,13 @@
     </li>
     <li v-if="status === 'ok'" class="grader grader-queues">
       Queues:
-      <pre v-if="graderInfo !== null" style="width: 40em">
-        <omegaup-markdown
-          :markdown="ui.prettyPrintJSON(graderInfo.queue)"
-        ></omegaup-markdown>
-      </pre>
+      <!-- eslint-disable vue/no-v-html -->
+      <pre
+        v-if="graderInfo !== null"
+        style="width: 50em"
+        v-html="ui.prettyPrintJSON(graderInfo.queue)"
+      ></pre>
+      <!-- eslint-enable -->
     </li>
   </ul>
 </template>
@@ -56,7 +58,7 @@ export default class GraderStatus extends Vue {
 }
 </script>
 
-<style>
+<style lang="scss" scoped>
 .grader-submissions,
 a.grader-submissions-link {
   background-color: #fff;
@@ -85,16 +87,5 @@ ul {
 ol,
 ul {
   list-style: none;
-}
-
-pre {
-  padding: 9.5px;
-  margin: 0 0 10px;
-  line-height: 1.42857143;
-  word-break: break-all;
-  word-wrap: break-word;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
-  border-radius: 4px;
 }
 </style>
