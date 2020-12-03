@@ -3681,7 +3681,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         } else {
             $programmingLanguages = [];
         }
-
+        print_r($difficultyRangeParam);
         return [
             'sortOrder' => strval($r['sort_order']),
             'page' => intval($r['page']),
@@ -4794,7 +4794,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
-
+            //print_r($r);
         [
             'sortOrder' => $sortOrder,
             'page' => $page,
@@ -4808,7 +4808,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
             'authors' => $authors,
         ] = self::validateListParams($r);
-
+            //print_r($difficultyRange);
         $result = self::getList(
             $page,
             $language,

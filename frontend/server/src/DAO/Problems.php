@@ -151,22 +151,19 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 'FIND_IN_SET(?, p.languages) > 0',
                 [$programmingLanguage],
             ];
-        }print_r("Rango de dificultad" . $difficultyRange);
+        }print_r($difficultyRange);
         if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
             $conditions = 'p.difficulty >= ? AND p.difficulty < ?';
             if ($difficultyRange[0] === 0) {
                 $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty < ?))';
             }
-            if($difficultyRange[0] === 0 && $difficultyRange[1] === 0){
+            if ($difficultyRange[0] === 0 && $difficultyRange[1] === 0) {
                 $difficultyRange[1] = 0.5;
-            } else if ($difficultyRange[0] === 4 && $difficultyRange[1] === 4){
+            } elseif ($difficultyRange[0] === 4 && $difficultyRange[1] === 4) {
                 $difficultyRange[0] = 3.5;
                 $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
             } else {
                 switch ($difficultyRange[0]) {
-                    // case '0':
-                    //     # code...
-                    //     break;
                     case '1':
                         $difficultyRange[0] = 0.5;
                         break;
@@ -175,32 +172,29 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         break;
                     case '3':
                         $difficultyRange[0] = 2.5;
-                        break;                                                                                
+                        break;
                     default:
                         # code...
                         break;
                 }
                 switch ($difficultyRange[1]) {
-                    // case '0':
-                    //     # code...
-                    //     break;
                     case '1':
-                        $difficultyRange[0] = 1.5;
+                        $difficultyRange[1] = 1.5;
                         break;
                     case '2':
-                        $difficultyRange[0] = 2.5;
+                        $difficultyRange[1] = 2.5;
                         break;
                     case '3':
-                        $difficultyRange[0] = 3.5;
-                        break;                                                                                
+                        $difficultyRange[1] = 3.5;
+                        break;
                     default:
-                        if($difficultyRange[0] === 0){
+                        if ($difficultyRange[0] === 0) {
                             $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty <= ?))';
-                        }else{
+                        } else {
                             $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
                         }
                         break;
-                }                
+                }
             }
             $clauses[] = [
                 $conditions,
@@ -450,7 +444,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $sql .= ' LIMIT ?, ? ';
         $args[] = $offset;
         $args[] = $rowcount;
-
+        print_r($select . $sql);
+        print_r($args);
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, points: float|null, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, ratio: float|null, score: float, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $result = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             "{$select} {$sql};",
