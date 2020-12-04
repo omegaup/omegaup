@@ -3268,10 +3268,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Entry point for Problem runs API
      *
      * @omegaup-request-param null|string $language
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param null|string $problem_alias
-     * @omegaup-request-param mixed $rowcount
-     * @omegaup-request-param mixed $show_all
+     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param bool|null $show_all
      * @omegaup-request-param null|string $status
      * @omegaup-request-param null|string $username
      * @omegaup-request-param null|string $verdict
@@ -3296,7 +3296,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $response = [];
 
-        if ($r['show_all']) {
+        if ($r->ensureOptionalBool('show_all') ?? false) {
             if (
                 !\OmegaUp\Authorization::isProblemAdmin(
                     $r->identity,
@@ -3327,8 +3327,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problem->problem_id,
                     $r->ensureOptionalString('language'),
                     !is_null($identity) ? intval($identity->identity_id) : null,
-                    !is_null($r['offset']) ? intval($r['offset']) : null,
-                    !is_null($r['rowcount']) ? intval($r['rowcount']) : null
+                    $r->ensureOptionalInt('offset'),
+                    $r->ensureOptionalInt('rowcount')
                 ) as $run
             ) {
                 unset($run['run_id']);

@@ -4,7 +4,7 @@ import problem_Details, {
 } from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
-import { myRunsStore, runsStore } from '../arena/runsStore';
+import { myRunsStore, runsStore, RunFilters } from '../arena/runsStore';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -34,6 +34,18 @@ OmegaUp.on('ready', () => {
   ) {
     popupDisplayed = PopupDisplayed.Promotion;
   }
+  const runs =
+    payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
+  if (runs) {
+    for (const run of runs) {
+      trackRun(run);
+    }
+  }
+  if (payload.user.admin) {
+    setInterval(() => {
+      refreshRuns();
+    }, 5 * 60 * 1000);
+  }
   new Vue({
     el: '#main-container',
     components: {
@@ -55,9 +67,9 @@ OmegaUp.on('ready', () => {
       return createElement('omegaup-problem-details', {
         props: {
           activeTab: this.activeTab,
-          allRuns: payload.allRuns,
+          allRuns: runsStore.state.runs,
           problem: payload.problem,
-          runs: payload.runs,
+          runs: myRunsStore.state.runs,
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: payload.nominationStatus,
@@ -77,6 +89,24 @@ OmegaUp.on('ready', () => {
           hasBeenNominated: this.hasBeenNominated,
         },
         on: {
+          'apply-filter': (filter: string, value: string) => {
+            const filterSelected: RunFilters = {};
+            switch (filter) {
+              case 'verdict':
+                filterSelected.verdict = value;
+                break;
+              case 'language':
+                filterSelected.language = value;
+                break;
+              case 'username':
+                filterSelected.username = value;
+                break;
+              case 'status':
+                filterSelected.status = value;
+                break;
+            }
+            runsStore.commit('applyFilter', filterSelected);
+          },
           'submit-run': (code: string, language: string) => {
             api.Run.create({
               problem_alias: payload.problem.alias,
@@ -305,5 +335,25 @@ OmegaUp.on('ready', () => {
       return;
     }
     myRunsStore.commit('addRun', run);
+  }
+
+  function refreshRuns(): void {
+    api.Problem.runs({
+      problem_alias: payload.problem.alias,
+      show_all: true,
+      offset: runsStore.state.filters?.offset,
+      rowcount: runsStore.state.filters?.rowcount,
+      verdict: runsStore.state.filters?.verdict,
+      language: runsStore.state.filters?.language,
+      username: runsStore.state.filters?.username,
+      status: runsStore.state.filters?.status,
+    })
+      .then((response) => {
+        runsStore.commit('clear');
+        for (const run of response.runs) {
+          trackRun(run);
+        }
+      })
+      .catch(ui.apiError);
   }
 });
