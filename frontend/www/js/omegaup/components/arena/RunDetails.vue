@@ -216,7 +216,7 @@ export default class ArenaRunDetails extends Vue {
 <style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
-[data-overlay] {
+#overlay {
   display: none;
   position: fixed;
   top: 0;

@@ -93,7 +93,7 @@
     {js_include entrypoint="problem_solution"}
   </div>
 </div>
-<div id="overlay" data-overlay>
+<div id="overlay">
   <div id="run-submit"></div>
   <div id="run-details"></div>
 </div>

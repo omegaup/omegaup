@@ -3,16 +3,9 @@ import problem_Details, {
   PopupDisplayed,
 } from '../components/problem/Details.vue';
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
-import {
-  Arena,
-  GetOptionsFromLocation,
-  runsStore,
-  myRunsStore,
-} from '../arena/arena';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
-import * as time from '../time';
 import * as api from '../api';
 import * as ui from '../ui';
 import T from '../lang';
@@ -39,21 +32,17 @@ OmegaUp.on('ready', () => {
   ) {
     popupDisplayed = PopupDisplayed.Promotion;
   }
-  const problemDetails = new Vue({
+  new Vue({
     el: '#main-container',
     components: {
       'omegaup-problem-details': problem_Details,
     },
     data: () => ({
       initialClarifications: payload.clarifications,
-      initialPopupDisplayed: popupDisplayed,
       solutionStatus: payload.solutionStatus,
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
       allTokens: 0,
-      allRuns: <types.Run[]>payload.allRuns,
-      runs: <types.Run[]>payload.runs,
-      runDetails: <types.RunDetails | null>null,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
       hasBeenNominated:
         payload.nominationStatus?.nominated ||
@@ -65,9 +54,8 @@ OmegaUp.on('ready', () => {
         props: {
           activeTab: this.activeTab,
           allRuns: payload.allRuns,
-          runDetails: this.runDetails,
           problem: payload.problem,
-          runs: this.runs,
+          runs: payload.runs,
           solvers: payload.solvers,
           user: payload.user,
           nominationStatus: payload.nominationStatus,
@@ -77,7 +65,7 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          initialPopupDisplayed: this.initialPopupDisplayed,
+          initialPopupDisplayed: popupDisplayed,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
           problemLevel: payload.problemLevel,
@@ -246,42 +234,6 @@ OmegaUp.on('ready', () => {
               })
               .catch(ui.apiError);
           },
-          'tab-selected': (tabName: string) => {
-            arenaInstance.activeTab = tabName;
-            window.location.replace(`#${arenaInstance.activeTab}`);
-          },
-          'submit-run': (code: string, language: string) => {
-            arenaInstance.submitRun(code, language);
-            this.runs = myRunsStore.state.runs;
-          },
-          'dismiss-popup': () => {
-            window.location.replace(`#${arenaInstance.activeTab}`);
-          },
-          details: (guid: string) => {
-            window.location.replace(
-              `#${arenaInstance.activeTab}/show-run:${guid}`,
-            );
-            arenaInstance.detectShowRun();
-          },
-          disqualify: (run: types.Run) => {
-            if (!window.confirm(T.runDisqualifyConfirm)) {
-              return;
-            }
-            api.Run.disqualify({ run_alias: run.guid })
-              .then(() => {
-                run.type = 'disqualified';
-                arenaInstance.updateRunFallback(run.guid);
-              })
-              .catch(ui.ignoreError);
-          },
-          rejudge: (run: types.Run) => {
-            api.Run.rejudge({ run_alias: run.guid, debug: false })
-              .then(() => {
-                run.status = 'rejudging';
-                arenaInstance.updateRunFallback(run.guid);
-              })
-              .catch(ui.ignoreError);
-          },
           'update:activeTab': (tabName: string) => {
             window.location.replace(`#${tabName}`);
           },
@@ -294,74 +246,4 @@ OmegaUp.on('ready', () => {
       });
     },
   });
-
-  const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
-
-  const onlyProblemHashChanged = () => {
-    if (arenaInstance.activeTab !== 'problems') {
-      return;
-    }
-    detectNewRun();
-    detectRunDetails();
-  };
-
-  const detectNewRun = () => {
-    if (window.location.hash.indexOf('/new-run') === -1) return;
-    if (!payload.user.loggedIn) {
-      window.location.href = `/login/?redirect=${escape(
-        window.location.pathname,
-      )}`;
-    }
-    problemDetails.initialPopupDisplayed = PopupDisplayed.RunSubmit;
-  };
-
-  const detectRunDetails = () => {
-    if (window.location.hash.indexOf('/show-run:') === -1) return;
-    arenaInstance.detectShowRun();
-    problemDetails.initialPopupDisplayed = PopupDisplayed.RunDetails;
-  };
-
-  if (payload.runs && payload.user.loggedIn) {
-    for (const run of payload.runs) {
-      arenaInstance.trackRun(run);
-    }
-  }
-
-  if (payload.user.admin) {
-    setInterval(() => {
-      api.Problem.runs({
-        problem_alias: payload.problem.alias,
-        show_all: true,
-        offset: 0,
-        rowcount: 100,
-      })
-        .then(time.remoteTimeAdapter)
-        .then((response) => {
-          runsStore.commit('clear');
-          for (const run of response.runs) {
-            arenaInstance.trackRun(run);
-          }
-          problemDetails.allRuns = runsStore.state.runs;
-        })
-        .catch(ui.apiError);
-      api.Problem.clarifications({
-        problem_alias: payload.problem.alias,
-        offset: 0,
-        rowcount: 100,
-      })
-        .then(time.remoteTimeAdapter)
-        .then(
-          (response) =>
-            (problemDetails.initialClarifications = response.clarifications),
-        )
-        .catch(ui.apiError);
-    }, 5 * 60 * 1000);
-  }
-
-  window.addEventListener('hashchange', () => {
-    onlyProblemHashChanged();
-  });
-
-  // Everything is loaded
-  onlyProblemHashChanged();
 });

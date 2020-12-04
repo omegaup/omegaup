@@ -1,5 +1,5 @@
 <template>
-  <form v-show="showForm" data-run-submit @submit.prevent="onSubmit">
+  <form data-run-submit @submit.prevent="onSubmit">
     <div class="close-container">
       <button type="button" class="close" @click="$emit('dismiss')">❌</button>
     </div>
@@ -85,18 +85,13 @@ export default class ArenaRunSubmit extends Vue {
   @Prop({ default: () => new Date() }) nextSubmissionTimestamp!: Date;
   @Prop() inputLimit!: number;
   @Prop() preferredLanguage!: string;
-  @Prop({ default: true }) initialShowForm!: boolean;
 
   T = T;
   omegaup = omegaup;
-  selectedLanguage = this.preferredLanguage;
+  selectedLanguage = '';
   code = '';
   now: number = Date.now();
   waitingForServerResponse = false;
-
-  get showForm(): boolean {
-    return this.initialShowForm;
-  }
 
   get canSubmit(): boolean {
     return this.nextSubmissionTimestamp.getTime() < this.now;

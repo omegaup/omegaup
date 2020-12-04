@@ -157,7 +157,6 @@
           :runs="runs"
           :show-details="true"
           :problemset-problems="[]"
-          @details="(run) => onShowRunDetails(run.guid)"
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
@@ -186,13 +185,6 @@
         class="tab-pane fade p-4"
         :class="{ 'show active': selectedTab === 'runs' }"
       >
-        <omegaup-overlay v-if="user.loggedIn" :show-overlay="showOverlay">
-          <omegaup-arena-rundetails
-            :data="runDetails"
-            :initial-show-form="showFormRunDetails"
-            @dismiss="onDismissPopup"
-          ></omegaup-arena-rundetails>
-        </omegaup-overlay>
         <omegaup-arena-runs
           :runs="allRuns"
           :show-details="true"
@@ -231,7 +223,6 @@ import * as time from '../../time';
 import * as ui from '../../ui';
 import arena_ClarificationList from '../arena/ClarificationList.vue';
 import arena_Runs from '../arena/Runs.vue';
-import arena_RunDetails from '../arena/RunDetails.vue';
 import arena_RunSubmitPopup from '../arena/RunSubmitPopup.vue';
 import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
@@ -280,7 +271,6 @@ export enum PopupDisplayed {
     FontAwesomeIcon,
     'omegaup-arena-clarification-list': arena_ClarificationList,
     'omegaup-arena-runs': arena_Runs,
-    'omegaup-arena-rundetails': arena_RunDetails,
     'omegaup-arena-runsubmit-popup': arena_RunSubmitPopup,
     'omegaup-arena-solvers': arena_Solvers,
     'omegaup-markdown': omegaup_Markdown,
@@ -312,7 +302,6 @@ export default class ProblemDetails extends Vue {
   @Prop({ default: 0 }) availableTokens!: number;
   @Prop({ default: 0 }) allTokens!: number;
   @Prop() histogram!: types.Histogram;
-  @Prop() runDetails!: types.RunDetails;
   @Prop({ default: PopupDisplayed.None })
   initialPopupDisplayed!: PopupDisplayed;
   @Prop() activeTab!: string;
@@ -331,7 +320,6 @@ export default class ProblemDetails extends Vue {
   selectedTab = this.activeTab;
   clarifications = this.initialClarifications || [];
   popupDisplayed = this.initialPopupDisplayed;
-  clarificationsTabVisited = false;
   hasUnreadClarifications =
     this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
@@ -395,10 +383,6 @@ export default class ProblemDetails extends Vue {
     this.$emit('details', guid);
   }
 
-  onDismissPopup(): void {
-    this.$emit('dismiss-popup');
-  }
-
   onNewPromotionAsReviewer(): void {
     this.popupDisplayed = PopupDisplayed.Reviewer;
   }
@@ -437,6 +421,12 @@ export default class ProblemDetails extends Vue {
   @Watch('initialClarifications')
   onInitialClarificationsChanged(newValue: types.Clarification[]): void {
     this.clarifications = newValue;
+  }
+
+  @Watch('showNewRunWindow')
+  onShowNewRunWindowChanged(newValue: boolean): void {
+    if (!newValue) return;
+    this.onNewSubmission();
   }
 
   @Watch('clarifications')

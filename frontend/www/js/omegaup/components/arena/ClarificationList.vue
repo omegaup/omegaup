@@ -1,7 +1,7 @@
 <template>
   <div class="card">
     <h5 class="card-header">{{ T.wordsClarifications }}</h5>
-    <div v-if="inContest && contestProblems" class="card-body">
+    <div v-if="inContest" class="card-body">
       <button
         type="button"
         class="btn btn-primary"
