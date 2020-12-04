@@ -44,9 +44,10 @@ OmegaUp.on('ready', () => {
   if (payload.user.admin) {
     setInterval(() => {
       refreshRuns();
+      refreshClarifications();
     }, 5 * 60 * 1000);
   }
-  new Vue({
+  const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
       'omegaup-problem-details': problem_Details,
@@ -354,6 +355,19 @@ OmegaUp.on('ready', () => {
           trackRun(run);
         }
       })
+      .catch(ui.apiError);
+  }
+
+  function refreshClarifications(): void {
+    api.Problem.clarifications({
+      problem_alias: payload.problem.alias,
+      offset: 0, // Updating offset is missing
+      rowcount: 0, // Updating rowcount is missing
+    })
+      .then(
+        (response) =>
+          (problemDetailsView.initialClarifications = response.clarifications),
+      )
       .catch(ui.apiError);
   }
 });

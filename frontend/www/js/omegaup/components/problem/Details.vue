@@ -350,6 +350,7 @@ export default class ProblemDetails extends Vue {
 
   get clarificationsCount(): string {
     if (this.clarifications.length === 0) return '';
+    if (this.clarifications.length > 9) return '(9+)';
     return `(${this.clarifications.length})`;
   }
 
