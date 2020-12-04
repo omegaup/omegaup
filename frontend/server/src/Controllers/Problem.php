@@ -4702,6 +4702,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     /*$problemsetId=*/null,
                     intval($r->identity->identity_id)
                 ),
+                'solvers' => \OmegaUp\DAO\Runs::getBestSolvingRunsForProblem(
+                    intval($problem->problem_id)
+                ),
                 'solutionStatus' => self::getProblemSolutionStatus(
                     $problem,
                     $r->identity
