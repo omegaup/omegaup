@@ -113,7 +113,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the authors rank with a by a request
+     * Test for the authors rank with quality problems by a request
      */
     public function testCollectionAuthors() {
         $identities = [];
@@ -213,6 +213,9 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(4, $result);
     }
 
+    /**
+     * Test for the difficulty of quality problems
+     */
     public function testDifficultyOfQualityProblems() {
         $identities = [];
         $problems = [];
@@ -379,5 +382,99 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties']['payload']['problems'];
 
         $this->assertCount(4, $result);
+    }
+
+    /**
+     * Test for the problem paginator
+     */
+    public function testProblemPaginator() {
+        // Reviewer user
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+
+        for ($i = 0; $i < 4; $i++) {
+            $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+
+            // Login user
+            $login = self::login($problemData['author']);
+
+            // Call the API
+            \OmegaUp\Controllers\Problem::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'title' => 'problem_' . $i,
+                'problem_alias' => 'problem_' . $i,
+                'problem_level' => 'problemLevelBasicIntroductionToProgramming',
+                'source' => 'yo',
+                'visibility' => '2',
+                'selected_tags' => json_encode([
+                    ['tagname' => 'problemTagMatrices', 'public' => true],
+                    ['tagname' => 'problemTagInputAndOutput', 'public' => true],
+                    ['tagname' => 'problemTagDiophantineEquations', 'public' => true],
+                ]),
+            ]));
+
+            // Review problem as quality problem
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => 'problem_' . $i,
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => true,
+                    'tag' => 'problemLevelBasicIntroductionToProgramming',
+                ]),
+            ]));
+        }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Call getCollectionsDetailsByLevelForSmarty
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+                'sort_order' => 'asc'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(4, $result);
+        $this->assertEquals('problem_0', $result[0]['alias']);
+        $this->assertEquals('problem_1', $result[1]['alias']);
+        $this->assertEquals('problem_2', $result[2]['alias']);
+        $this->assertEquals('problem_3', $result[3]['alias']);
+
+        // Call getCollectionsDetailsByLevelForSmarty with 2 as rowcount and 1 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+                'rowcount' => '2',
+                'page' => '1',
+                'sort_order' => 'asc'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(2, $result);
+        $this->assertEquals('problem_0', $result[0]['alias']);
+        $this->assertEquals('problem_1', $result[1]['alias']);
+
+        // Call getCollectionsDetailsByLevelForSmarty with 2 as rowcount and 2 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByLevelForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'level' => 'problemLevelBasicIntroductionToProgramming',
+                'rowcount' => '2',
+                'page' => '2',
+                'sort_order' => 'asc'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(2, $result);
+        $this->assertEquals('problem_2', $result[0]['alias']);
+        $this->assertEquals('problem_3', $result[1]['alias']);
     }
 }
