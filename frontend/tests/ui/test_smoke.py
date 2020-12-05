@@ -133,7 +133,7 @@ def prepare_run(driver, problem_alias):
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
                  'a[data-nav-problems-all]'))).click()
-    
+
     driver.wait.until(
         EC.element_to_be_clickable(
             (By.CSS_SELECTOR,
