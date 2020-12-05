@@ -57,7 +57,7 @@ def test_create_group_with_identities_and_restrictions(driver):
             EC.visibility_of(
                 navbar.find_element_by_css_selector(
                     'li.nav-problems .dropdown-menu')))
-        for present_href in ['/problem/', '/submissions/']:
+        for present_href in ['/problem/collection/', '/submissions/']:
             assert problems_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % present_href), (
                     '%s item is not present!' % present_href)
