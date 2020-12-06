@@ -152,75 +152,86 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 [$programmingLanguage],
             ];
         }
-        if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
-            $conditions = 'p.difficulty >= ? AND p.difficulty < ?';
-            if ($difficultyRange[0] === 0) {
-                $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty < ?))';
-            }
-            if ($difficultyRange[0] === 0 && $difficultyRange[1] === 0) {
-                $difficultyRange[1] = 0.5;
-            } elseif ($difficultyRange[0] === 4 && $difficultyRange[1] === 4) {
-                $difficultyRange[0] = 3.5;
-                $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
-            } else {
-                switch ($difficultyRange[0]) {
-                    case '1':
-                        $difficultyRange[0] = 0.5;
-                        break;
-                    case '2':
-                        $difficultyRange[0] = 1.5;
-                        break;
-                    case '3':
-                        $difficultyRange[0] = 2.5;
-                        break;
-                    default:
-                        # code...
-                        break;
-                }
-                switch ($difficultyRange[1]) {
-                    case '1':
-                        $difficultyRange[1] = 1.5;
-                        break;
-                    case '2':
-                        $difficultyRange[1] = 2.5;
-                        break;
-                    case '3':
-                        $difficultyRange[1] = 3.5;
-                        break;
-                    default:
-                        if ($difficultyRange[0] === 0) {
-                            $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty <= ?))';
-                        } else {
-                            $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
-                        }
-                        break;
-                }
-            }
-            $clauses[] = [
-                $conditions,
-                $difficultyRange,
-            ];
-        }
 
         $difficulties = ['easy', 'medium', 'hard'];
 
-        if (in_array($difficulty, $difficulties, true)) {
-            if ($difficulty === $difficulties[0]) {
-                $clauses[] = [
-                    'p.difficulty < 1.5',
-                    [],
-                ];
-            } elseif ($difficulty === $difficulties[1]) {
-                $clauses[] = [
-                    'p.difficulty >= 1.5 AND p.difficulty < 2.5',
-                    [],
-                ];
-            } else {
-                $clauses[] = [
-                    'p.difficulty >= 2.5',
-                    [],
-                ];
+        // Convert the difficulty in text form to a range
+        if (is_null($difficultyRange)) {
+            $difficultyRange = [];
+            if (in_array($difficulty, $difficulties, true)) {
+                if ($difficulty === $difficulties[0]) {
+                    $difficultyRange[] = 0;
+                    $difficultyRange[] = 1;
+                } elseif ($difficulty === $difficulties[1]) {
+                    $difficultyRange[] = 2;
+                    $difficultyRange[] = 2;
+                } else {
+                    $difficultyRange[] = 3;
+                    $difficultyRange[] = 4;
+                }
             }
+        }
+
+        if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
+            $difficultyBounds = [];
+            $conditions = 'p.difficulty >= ? AND p.difficulty < ?';
+            switch ($difficultyRange[0]) {
+                case '0':
+                    $difficultyBounds[] = 0;
+                    break;
+                case '1':
+                    $difficultyBounds[] = 0.5;
+                    break;
+                case '2':
+                    $difficultyBounds[] = 1.5;
+                    break;
+                case '3':
+                    $difficultyBounds[] = 2.5;
+                    break;
+                case '4':
+                    $difficultyBounds[] = 3.5;
+                    break;
+                default:
+                    break;
+            }
+            switch ($difficultyRange[1]) {
+                case '0':
+                    $difficultyBounds[] = 0.5;
+                    break;
+                case '1':
+                    $difficultyBounds[] = 1.5;
+                    break;
+                case '2':
+                    $difficultyBounds[] = 2.5;
+                    break;
+                case '3':
+                    $difficultyBounds[] = 3.5;
+                    break;
+                case '4':
+                    $difficultyBounds[] = 4;
+                    break;
+                default:
+                    break;
+            }
+
+            // If the lower limit is equal to 0,
+            // take into consideration the problems without difficulty
+            if ($difficultyBounds[0] === 0) {
+                if ($difficultyBounds[1] === 4) {
+                    $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty <= ?))';
+                } else {
+                    $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty < ?))';
+                }
+            } else {
+                if ($difficultyBounds[1] === 4) {
+                    $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
+                }
+            }
+
+            $clauses[] = [
+                $conditions,
+                $difficultyBounds,
+            ];
         }
 
         if (!is_null($query)) {
