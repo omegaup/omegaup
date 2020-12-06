@@ -119,7 +119,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             DESC
             ';
 
-        /** @var list<array{name: string, problemCount: int}> */
+        /** @var list<TagWithProblemCount> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -171,7 +171,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             LIMIT ?
             ';
 
-        /** @var list<array{name: string, problemCount: int}> */
+        /** @var list<TagWithProblemCount> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [

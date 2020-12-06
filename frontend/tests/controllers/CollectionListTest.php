@@ -108,7 +108,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
             ])
         )['smartyProperties']['payload']['frequentTags'];
 
-        $this->assertEquals('problemTagMatrices', $result['0']['alias']);
+        $this->assertEquals('problemTagMatrices', $result['0']['name']);
         $this->assertCount(6, $result);
     }
 
