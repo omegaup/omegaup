@@ -4,6 +4,8 @@
 
 /**
  * TagController
+ *
+ * @psalm-type TagWithProblemCount=array { name: string, problemCount: int }
  */
 class Tag extends \OmegaUp\Controllers\Controller {
     public static function normalize(string $name): string {
@@ -69,7 +71,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return list<array{alias: string, total: int}>
+     * @return list<TagWithProblemCount>
      */
     public static function getPublicQualityTagsByLevel(
         string $problemLevel
@@ -87,7 +89,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return list<array{alias: string, total: int}>
+     * @return list<TagWithProblemCount>
      */
     public static function getFrequentQualityTagsByLevel(
         string $problemLevel,
@@ -107,7 +109,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return array{frequent_tags: list<array{alias: string, total: int}>}
+     * @return array{frequent_tags: list<TagWithProblemCount>}
      *
      * @omegaup-request-param string $problemLevel
      * @omegaup-request-param int $rows

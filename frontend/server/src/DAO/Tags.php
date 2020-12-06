@@ -79,7 +79,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     }
 
     /**
-     * @return TagWithProblemCount
+     * @return list<TagWithProblemCount>
      */
     public static function getPublicQualityTagsByLevel(
         string $problemLevel
@@ -119,7 +119,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             DESC
             ';
 
-        /** @var list<TagWithProblemCount> */
+        /** @var list<array{name: string, problemCount: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
@@ -129,7 +129,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     }
 
     /**
-     * @return TagWithProblemCount
+     * @return list<TagWithProblemCount>
      */
     public static function getFrequentQualityTagsByLevel(
         string $problemLevel,
@@ -171,7 +171,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             LIMIT ?
             ';
 
-        /** @var list<TagWithProblemCount> */
+        /** @var list<array{name: string, problemCount: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [

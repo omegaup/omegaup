@@ -3842,7 +3842,7 @@ export namespace messages {
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
   export type TagFrequentTagsResponse = {
-    frequent_tags: { alias: string; total: number }[];
+    frequent_tags: types.TagWithProblemCount[];
   };
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
