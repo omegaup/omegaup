@@ -111,16 +111,16 @@ export default class CollectionList extends Vue {
   T = T;
   level = this.data.level;
 
-  get availableTags(): { alias: string; total: number }[] {
-    let tags: { alias: string; total: number }[] = this.data.frequentTags;
-    let simpleTags: string[] = tags.map((x) => x.alias);
-    let list: { alias: string; total: number }[] = this.data.publicTags.filter(
-      ({ alias: x }) => !tags.some(({ alias: y }) => y === x),
+  get availableTags(): types.TagWithProblemCount[] {
+    let tags: types.TagWithProblemCount[] = this.data.frequentTags;
+    let simpleTags: string[] = tags.map((x) => x.name);
+    let list: types.TagWithProblemCount[] = this.data.publicTags.filter(
+      ({ name: x }) => !tags.some(({ name: y }) => y === x),
     );
 
     this.selectedTags.forEach((element) => {
       if (!simpleTags.includes(element)) {
-        const tag = list.find(({ alias: x }) => x === element);
+        const tag = list.find(({ name: x }) => x === element);
         if (typeof tag !== 'undefined') {
           tags.push(tag);
         }
@@ -130,10 +130,10 @@ export default class CollectionList extends Vue {
     return tags;
   }
 
-  get publicQualityTags(): { alias: string; total: number }[] {
-    let tags: { alias: string; total: number }[] = this.data.frequentTags;
+  get publicQualityTags(): types.TagWithProblemCount[] {
+    let tags: types.TagWithProblemCount[] = this.data.frequentTags;
     return this.data.publicTags.filter(
-      ({ alias: x }) => !tags.some(({ alias: y }) => y === x),
+      ({ name: x }) => !tags.some(({ name: y }) => y === x),
     );
   }
 

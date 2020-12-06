@@ -76,7 +76,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
-            "level-{$problemLevel}",
+            "publicquality-level-{$problemLevel}",
             fn () => \OmegaUp\DAO\Tags::getPublicQualityTagsByLevel(
                 $problemLevel
             ),

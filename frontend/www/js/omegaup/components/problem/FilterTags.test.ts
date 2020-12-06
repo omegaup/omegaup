@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
+import { types } from '../../api_types';
 
 import problem_FilterTags from './FilterTags.vue';
 
@@ -9,19 +10,19 @@ describe('Filter.vue', () => {
   it('Should handle list of tags', async () => {
     const wrapper = mount(problem_FilterTags, {
       propsData: {
-        tags: <{ alias: string; total: number }[]>[
-          { alias: 'problemTagMatrices', total: 5 },
-          { alias: 'problemTagDiophantineEquations', total: 4 },
-          { alias: 'problemTagInputAndOutput', total: 3 },
-          { alias: 'problemTagArrays', total: 2 },
+        tags: <types.TagWithProblemCount[]>[
+          { name: 'problemTagMatrices', problemCount: 5 },
+          { name: 'problemTagDiophantineEquations', problemCount: 4 },
+          { name: 'problemTagInputAndOutput', problemCount: 3 },
+          { name: 'problemTagArrays', problemCount: 2 },
         ],
-        publicQualityTags: <{ alias: string; total: number }[]>[
-          { alias: 'problemTagConditionals', total: 1 },
-          { alias: 'problemTagLoops', total: 1 },
-          { alias: 'problemTagFunctions', total: 1 },
-          { alias: 'problemTagCharsAndStrings', total: 1 },
-          { alias: 'problemTagSimulation', total: 1 },
-          { alias: 'problemTagAnalyticGeometry', total: 1 },
+        publicQualityTags: <types.TagWithProblemCount[]>[
+          { name: 'problemTagConditionals', problemCount: 1 },
+          { name: 'problemTagLoops', problemCount: 1 },
+          { name: 'problemTagFunctions', problemCount: 1 },
+          { name: 'problemTagCharsAndStrings', problemCount: 1 },
+          { name: 'problemTagSimulation', problemCount: 1 },
+          { name: 'problemTagAnalyticGeometry', problemCount: 1 },
         ],
       },
     });

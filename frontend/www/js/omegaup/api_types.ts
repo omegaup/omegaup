@@ -1408,7 +1408,7 @@ export namespace types {
     column: string;
     columns: string[];
     difficulty: string;
-    frequentTags: { alias: string; total: number }[];
+    frequentTags: types.TagWithProblemCount[];
     keyword: string;
     language: string;
     languages: string[];
@@ -1418,7 +1418,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
-    publicTags: { alias: string; total: number }[];
+    publicTags: types.TagWithProblemCount[];
     selectedTags: string[];
     tagData: { name?: string }[];
     tagsList: string[];
@@ -2833,6 +2833,11 @@ export namespace types {
 
   export interface Tag {
     name: string;
+  }
+
+  export interface TagWithProblemCount {
+    name: string;
+    problemCount: number;
   }
 
   export interface UserInfoForProblem {

@@ -6,10 +6,10 @@
         <label class="form-check-label">
           <input
             v-model="currentSelectedTags"
-            :value="tag.alias"
+            :value="tag.name"
             class="form-check-input"
             type="checkbox"
-          />{{ T[tag.alias].concat(' (', tag.total, ')') }}
+          />{{ `${T[tag.name]}  (${tag.problemCount})` }}
         </label>
       </div>
       <div class="form-group">
@@ -28,6 +28,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
+import { types } from '../../api_types';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 @Component({
   components: {
@@ -35,15 +36,15 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
   },
 })
 export default class FilterTags extends Vue {
-  @Prop() publicQualityTags!: { alias: string; total: number }[];
-  @Prop({ default: () => [] }) tags!: { alias: string; total: number }[];
+  @Prop() publicQualityTags!: types.TagWithProblemCount[];
+  @Prop({ default: () => [] }) tags!: types.TagWithProblemCount[];
   @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
   currentSelectedTags = this.selectedTags;
 
   get publicQualityTagsText(): string[] {
-    return this.publicQualityTags.map((x) => x.alias);
+    return this.publicQualityTags.map((x) => x.name);
   }
 
   addOtherTag(tag: string): void {
@@ -52,11 +53,11 @@ export default class FilterTags extends Vue {
     }
   }
 
-  publicQualityTagsSerializer(alias: string): string {
-    if (Object.prototype.hasOwnProperty.call(T, alias)) {
-      return T[alias];
+  publicQualityTagsSerializer(name: string): string {
+    if (Object.prototype.hasOwnProperty.call(T, name)) {
+      return T[name];
     }
-    return alias;
+    return name;
   }
 
   @Watch('currentSelectedTags')
