@@ -172,7 +172,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             }
         }
 
-        if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
+        if (count($difficultyRange) === 2) {
             $difficultyBounds = [];
             $conditions = 'p.difficulty >= ? AND p.difficulty < ?';
             switch ($difficultyRange[0]) {
