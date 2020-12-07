@@ -1,8 +1,8 @@
 <template>
-  <div class="omegaup-edit-identity card">
-    <h2 class="mx-2">
-      <span>{{ identity.username }}</span>
-    </h2>
+  <div class="card">
+    <h5 class="card-title mx-2">
+      {{ identity.username }}
+    </h5>
     <div class="card-body">
       <form role="form" @submit.prevent="onEditMember">
         <div class="form-row">
@@ -103,55 +103,54 @@ import Autocomplete from '../Autocomplete.vue';
   },
 })
 export default class IdentityEdit extends Vue {
-  @Prop() identity!: omegaup.Identity;
+  @Prop({ default: null }) identity!: omegaup.Identity;
   @Prop() countries!: iso3166.Country[];
 
   T = T;
   typeahead = typeahead;
-  username = this.identity.username;
-  name = this.identity.name;
-  gender = this.identity.gender;
-  school = this.identity.school;
-  schoolId = this.identity.school_id;
-  selectedCountry = this.identity.country_id ?? 'MX';
-  selectedState = this.identity.state_id;
+  selectedIdentity = Object.assign(
+    <omegaup.Identity>{
+      username: '',
+      classname: '',
+      name: '',
+      gender: '',
+      school: '',
+      school_id: 0,
+      country_id: '',
+      state_id: '',
+    },
+    this.identity,
+  );
 
   @Watch('identity')
   onIdentityChanged(newIdentity: omegaup.Identity) {
-    this.username = newIdentity.username;
-    this.name = newIdentity.name;
-    this.gender = newIdentity.gender;
-    this.school = newIdentity.school;
-    this.schoolId = newIdentity.school_id;
-    this.selectedCountry = newIdentity.country_id ?? 'MX';
-    this.selectedState = newIdentity.state_id;
+    Object.assign(this.identity, newIdentity);
   }
 
   @Watch('selectedCountry')
   onPropertyChanged(newContry: string) {
     if (this.identity.country_id == newContry) {
-      this.selectedState = this.identity.state_id;
+      this.selectedIdentity.state_id = this.identity.state_id;
     } else {
-      this.selectedState = Object.keys(this.countryStates)[0].split('-')[1];
+      this.selectedIdentity.state_id = Object.keys(this.countryStates)[0].split(
+        '-',
+      )[1];
     }
   }
 
   get groupName(): string {
-    if (typeof this.identity === 'undefined') {
-      return '';
-    }
-    return `${this.identity.username.split(':')[0]}`;
+    return `${this.selectedIdentity.username.split(':')[0]}`;
   }
 
   get identityName(): string {
-    return this.username.split(':')[1];
+    return this.selectedIdentity.username.split(':')[1];
   }
   set identityName(username: string) {
-    this.username = `${this.groupName}:${username}`;
+    this.selectedIdentity.username = `${this.groupName}:${username}`;
   }
 
   get countryStates(): iso3166.Subdivisions {
-    const countrySelected = iso3166.country(this.selectedCountry);
+    const countrySelected = iso3166.country(this.selectedIdentity.country_id);
     return countrySelected.sub;
   }
 
@@ -159,13 +158,13 @@ export default class IdentityEdit extends Vue {
     this.$emit(
       'edit-identity-member',
       this.identity.username,
-      this.username,
-      this.name,
-      this.gender,
-      this.selectedCountry,
-      this.selectedState,
-      this.school,
-      this.schoolId,
+      this.selectedIdentity.username,
+      this.selectedIdentity.name,
+      this.selectedIdentity.gender,
+      this.selectedIdentity.country_id,
+      this.selectedIdentity.state_id,
+      this.selectedIdentity.school,
+      this.selectedIdentity.school_id,
     );
   }
 }
