@@ -150,7 +150,8 @@ export default class IdentityEdit extends Vue {
   }
 
   get countryStates(): iso3166.Subdivisions {
-    const countrySelected = iso3166.country(this.selectedIdentity.country_id);
+    const countryId = this.selectedIdentity.country_id || 'MX';
+    const countrySelected = iso3166.country(countryId);
     return countrySelected.sub;
   }
 
