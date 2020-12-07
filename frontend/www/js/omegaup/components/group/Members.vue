@@ -132,7 +132,7 @@ interface EditMemberComponent {
     'omegaup-identity-change-password': identity_ChangePassword,
   },
 })
-export default class GroupMembers extends Vue {
+export default class Members extends Vue {
   @Prop() identities!: omegaup.Identity[];
   @Prop() identitiesCsv!: omegaup.Identity[];
   @Prop() groupAlias!: string;

@@ -136,7 +136,7 @@ library.add(faEdit, faLock, faTrashAlt);
     'omegaup-identity-change-password': identity_ChangePassword,
   },
 })
-export default class GroupMemebers extends Vue {
+export default class Memebers extends Vue {
   @Prop() identities!: omegaup.Identity[];
   @Prop() identitiesCsv!: omegaup.Identity[];
   @Prop() groupAlias!: string;
