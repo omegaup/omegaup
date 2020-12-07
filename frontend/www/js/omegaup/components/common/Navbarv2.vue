@@ -126,7 +126,7 @@
                 <a
                   class="dropdown-item"
                   href="/problem/collection/"
-                  data-nav-problems-all
+                  data-nav-problems-collection
                   >{{ T.problemcollectionViewProblems }}</a
                 >
                 <a

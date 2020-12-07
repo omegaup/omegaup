@@ -101,7 +101,7 @@
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/problem/collection/" data-nav-problems-all>{{
+                <a href="/problem/collection/" data-nav-problems-collection>{{
                   T.problemcollectionViewProblems
                 }}</a>
               </li>
