@@ -17,7 +17,7 @@ describe('Solution.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.solutionLocked.split('<br/>')[0]);
+    expect(wrapper.text()).toContain(T.solutionLocked.split('\n')[0]);
   });
 
   it('Should handle an empty/unlocked solution', () => {
@@ -30,7 +30,7 @@ describe('Solution.vue', () => {
       },
     });
 
-    expect(wrapper.text()).toContain(T.solutionConfirm.split('<br/>')[0]);
+    expect(wrapper.text()).toContain(T.solutionConfirm);
   });
 
   it('Should handle a non-empty, unlocked solution', () => {
