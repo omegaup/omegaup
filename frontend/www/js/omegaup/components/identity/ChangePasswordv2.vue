@@ -61,6 +61,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
+import * as ui from '../../ui';
 import T from '../../lang';
 
 @Component
@@ -68,6 +69,7 @@ export default class IdentityChangePassword extends Vue {
   @Prop() username!: string;
 
   T = T;
+  ui = ui;
   newPassword = '';
   newPasswordRepeat = '';
 }
