@@ -136,8 +136,8 @@ def prepare_run(driver, problem_alias):
 
     driver.wait.until(
         EC.element_to_be_clickable(
-            (By.By.XPATH,
-             'a[data-nav-problems-all]'))).click()
+            (By.CSS_SELECTOR,
+             'a[data-nav-problems-collection]'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(

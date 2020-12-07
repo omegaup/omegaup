@@ -5,9 +5,12 @@
         <h1 class="card-title">{{ T.collectionTitle }}</h1>
       </div>
       <div class="col-md-5 text-right align-self-end">
-        <a class="btn btn-primary" href="/problem/" data-nav-problems-all>{{
-          T.navAllProblems
-        }}</a>
+        <a
+          class="btn btn-primary"
+          href="/problem/"
+          data-nav-problems-collection
+          >{{ T.navAllProblems }}</a
+        >
       </div>
     </div>
     <div class="card panel panel-default">
