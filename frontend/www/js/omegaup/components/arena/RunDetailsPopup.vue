@@ -70,9 +70,11 @@
                     </tr>
                     <tr :key="`input-${problemCase.name}`">
                       <td colspan="6">
-                        <pre>{{
-                          showDataCase(data.cases, problemCase.name, 'in')
-                        }}</pre>
+                        <pre>
+                          <code>{{
+                            showDataCase(data.cases, problemCase.name, 'in')
+                          }}</code>
+                        </pre>
                       </td>
                     </tr>
                     <tr :key="`diffs-title-${problemCase.name}`">
@@ -109,11 +111,15 @@
         ></omegaup-arena-code-view>
         <div v-if="data.compile_error" class="compile_error">
           <h3>{{ T.wordsCompilerOutput }}</h3>
-          <pre class="compile_error" v-text="data.compile_error"></pre>
+          <pre class="compile_error">
+            <code v-text="data.compile_error"></code>
+          </pre>
         </div>
         <div v-if="data.logs" class="logs">
           <h3>{{ T.wordsLogs }}</h3>
-          <pre v-text="data.logs"></pre>
+          <pre>
+            <code v-text="data.logs"></code>
+          </pre>
         </div>
         <div class="download">
           <h3>{{ T.wordsDownload }}</h3>
@@ -146,7 +152,9 @@
         </div>
         <div v-if="data.judged_by" class="judged_by">
           <h3>{{ T.wordsJudgedBy }}</h3>
-          <pre v-text="data.judged_by"></pre>
+          <pre>
+            <code v-text="data.judged_by"></code>
+          </pre>
         </div>
       </div>
     </form>
