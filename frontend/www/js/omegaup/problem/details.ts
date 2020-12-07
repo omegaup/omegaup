@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
     setInterval(() => {
       refreshRuns();
       refreshClarifications();
-    }, 5 * 1000);
+    }, 5 * 60 * 1000);
   }
   const problemDetailsView = new Vue({
     el: '#main-container',
