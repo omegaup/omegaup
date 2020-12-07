@@ -45,7 +45,7 @@ OmegaUp.on('ready', () => {
     setInterval(() => {
       refreshRuns();
       refreshClarifications();
-    }, 5 * 60 * 1000);
+    }, 5 * 1000);
   }
   const problemDetailsView = new Vue({
     el: '#main-container',
@@ -90,23 +90,19 @@ OmegaUp.on('ready', () => {
           hasBeenNominated: this.hasBeenNominated,
         },
         on: {
-          'apply-filter': (filter: string, value: string) => {
-            const filterSelected: RunFilters = {};
-            switch (filter) {
-              case 'verdict':
-                filterSelected.verdict = value;
-                break;
-              case 'language':
-                filterSelected.language = value;
-                break;
-              case 'username':
-                filterSelected.username = value;
-                break;
-              case 'status':
-                filterSelected.status = value;
-                break;
+          'apply-filter': (
+            filter: 'verdict' | 'language' | 'username' | 'status',
+            value: string,
+          ) => {
+            if (!value) {
+              runsStore.commit('removeFilter', filter);
+              refreshRuns();
+              return;
             }
-            runsStore.commit('applyFilter', filterSelected);
+            runsStore.commit('applyFilter', {
+              [filter]: value,
+            } as RunFilters);
+            refreshRuns();
           },
           'submit-run': (code: string, language: string) => {
             api.Run.create({
@@ -135,7 +131,7 @@ OmegaUp.on('ready', () => {
                 });
               })
               .catch((run) => {
-                alert(run.error ?? run);
+                ui.error(run.error ?? run);
                 if (run.errorname) {
                   ui.reportEvent('submission', 'submit-fail', run.errorname);
                 }
@@ -316,6 +312,8 @@ OmegaUp.on('ready', () => {
   function updateRun(run: types.Run): void {
     trackRun(run);
 
+    // TODO: Implement websocket support
+
     if (run.status != 'ready') {
       updateRunFallback(run.guid);
       return;
@@ -361,8 +359,8 @@ OmegaUp.on('ready', () => {
   function refreshClarifications(): void {
     api.Problem.clarifications({
       problem_alias: payload.problem.alias,
-      offset: 0, // Updating offset is missing
-      rowcount: 0, // Updating rowcount is missing
+      offset: 0, // TODO: Updating offset is missing
+      rowcount: 0, // TODO: Updating rowcount is missing
     })
       .then(
         (response) =>

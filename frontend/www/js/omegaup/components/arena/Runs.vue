@@ -66,7 +66,7 @@
                 <option value="lua">Lua (5.3)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
-                <option value="cat">{#wordsJustOutput#}</option>
+                <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
 

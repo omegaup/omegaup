@@ -193,7 +193,9 @@
           :show-pager="true"
           :show-disqualify="true"
           :problemset-problems="[]"
-          @filter-changed="onFilterChanged"
+          @filter-changed="
+            (filter, value) => $emit('apply-filter', filter, value)
+          "
         ></omegaup-arena-runs>
       </div>
       <div
@@ -401,10 +403,6 @@ export default class ProblemDetails extends Vue {
   onRunSubmitted(code: string, selectedLanguage: string): void {
     this.$emit('submit-run', code, selectedLanguage);
     this.onPopupDismissed();
-  }
-
-  onFilterChanged(value: string, filter: string): void {
-    this.$emit('apply-filter', filter, value);
   }
 
   @Emit('update:activeTab')

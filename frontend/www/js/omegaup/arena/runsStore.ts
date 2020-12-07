@@ -47,33 +47,16 @@ export const runsStore = new Vuex.Store<RunsState>({
       state.index = {};
     },
     applyFilter(state, filter: RunFilters) {
-      const filterType: string[] = Object.keys(filter);
-      switch (filterType[0]) {
-        case 'verdict':
-          if (!filter.verdict) {
-            delete state.filters?.verdict;
-            return;
-          }
-          break;
-        case 'language':
-          if (!filter.language) {
-            delete state.filters?.language;
-            return;
-          }
-          break;
-        case 'username':
-          if (!filter.username) {
-            delete state.filters?.username;
-            return;
-          }
-          break;
-        case 'status':
-          if (!filter.status) {
-            delete state.filters?.status;
-            return;
-          }
-      }
       state.filters = Object.assign(state.filters, filter);
+    },
+    removeFilter(
+      state,
+      filter: 'verdict' | 'language' | 'username' | 'status',
+    ) {
+      if (!state.filters) {
+        return;
+      }
+      delete state.filters[filter];
     },
   },
 });
