@@ -1,8 +1,12 @@
 <template>
   <div class="card">
-    <h2 class="mx-2">
-      <span>{{ T.userEditChangePassword }}: {{ username }}</span>
-    </h2>
+    <h5 class="card-title mx-2">
+      {{
+        ui.formatString(T.userEditChangePasswordToUsername, {
+          username: username,
+        })
+      }}
+    </h5>
     <div class="card-body">
       <form
         role="form"
