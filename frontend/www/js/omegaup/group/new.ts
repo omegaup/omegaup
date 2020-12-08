@@ -17,6 +17,26 @@ OmegaUp.on('ready', function () {
           T: T,
         },
         on: {
+          'alias-changed': (alias: string): void => {
+            if (!alias) {
+              return;
+            }
+            api.Group.details({ group_alias: alias }, { quiet: true })
+              .then(() => {
+                ui.error(
+                  ui.formatString(T.aliasAlreadyInUse, {
+                    alias: ui.escape(alias),
+                  }),
+                );
+              })
+              .catch((error) => {
+                if (error.httpStatusCode == 404) {
+                  ui.dismissNotifications();
+                  return;
+                }
+                ui.apiError(error);
+              });
+          },
           'create-group': (
             name: string,
             alias: string,

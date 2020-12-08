@@ -6,13 +6,14 @@
       </h3>
     </div>
     <div class="card-body">
-      <form class="needs-validation" data-group-new>
+      <form class="needs-validation" data-group-new @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-6">
             <label class="control-label w-100">
               {{ T.wordsName }}
               <input
                 v-model="name"
+                name="title"
                 required
                 type="text"
                 class="form-control"
@@ -26,6 +27,7 @@
               {{ T.contestNewFormShortTitleAlias }}
               <input
                 v-model="alias"
+                name="alias"
                 required
                 type="text"
                 class="form-control"
@@ -43,6 +45,7 @@
               <textarea
                 v-model="description"
                 required
+                name="description"
                 cols="30"
                 rows="5"
                 class="form-control"
@@ -52,20 +55,10 @@
         </div>
 
         <div class="form-group">
-          <button
-            v-if="isUpdate"
-            type="submit"
-            class="btn btn-primary"
-            @click.prevent="$emit('update-group', name, alias, description)"
-          >
+          <button v-if="isUpdate" type="submit" class="btn btn-primary">
             {{ T.groupNewFormUpdateGroup }}
           </button>
-          <button
-            v-else
-            type="submit"
-            class="btn btn-primary"
-            @click.prevent="$emit('create-group', name, alias, description)"
-          >
+          <button v-else type="submit" class="btn btn-primary">
             {{ T.groupNewFormCreateGroup }}
           </button>
         </div>
@@ -75,7 +68,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
 import latinize from 'latinize';
 
@@ -87,6 +80,14 @@ export default class GroupForm extends Vue {
   alias: string = '';
   description: string = '';
   name: string = '';
+
+  onSubmit(): void {
+    if (this.isUpdate) {
+      this.$emit('update-group', this.name, this.alias, this.description);
+      return;
+    }
+    this.$emit('create-group', this.name, this.alias, this.description);
+  }
 
   onGenerateAlias(): void {
     if (this.isUpdate) {
@@ -105,6 +106,14 @@ export default class GroupForm extends Vue {
     generatedAlias = generatedAlias.substring(0, 32);
 
     this.alias = generatedAlias;
+  }
+
+  @Watch('alias')
+  onValueChanged(newValue: string): void {
+    if (this.isUpdate) {
+      return;
+    }
+    this.$emit('alias-changed', newValue);
   }
 }
 </script>
