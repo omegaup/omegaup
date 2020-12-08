@@ -1,19 +1,23 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <div class="upload-csv">
+      <div class="upload-csv mb-4">
         <div>
           <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
           {{ T.groupsUploadCsvFile }}
-          <input name="identities" type="file" @change="readCsv" />
+          <input
+            name="identities"
+            type="file"
+            accept=".csv, .txt"
+            @change="readCsv"
+          />
         </div>
       </div>
-      <br />
-      <div v-show="identities.length > 0" class="card no-bottom-margin">
+      <div v-show="data.identities.length > 0" class="card no-bottom-margin">
         <div class="card-header">
           <h3 class="card-title">{{ T.wordsIdentities }}</h3>
         </div>
-        <table class="identities-table table">
+        <table class="table" data-identities-table>
           <thead>
             <tr>
               <th>{{ T.profileUsername }}</th>
@@ -27,7 +31,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="identity in identities"
+              v-for="identity in data.identities"
               :key="identity.username"
               :class="{ 'alert-danger': userErrorRow === identity.username }"
             >
@@ -43,19 +47,19 @@
             </tr>
           </tbody>
         </table>
-        <div class="card-header">
-          <button
-            class="btn btn-primary"
-            name="create-identities"
-            @click.prevent="onBulkIdentities"
-          >
-            {{ T.groupCreateIdentities }}
-          </button>
-        </div>
         <div class="card-footer">
+          <div class="w-100">
+            <button
+              class="btn btn-primary"
+              name="create-identities"
+              @click.prevent="$emit('bulk-identities', data.identities)"
+            >
+              {{ T.groupCreateIdentities }}
+            </button>
+          </div>
           <button
             class="btn"
-            @click.prevent="$emit('download-identities', identities)"
+            @click.prevent="$emit('download-identities', data.identities)"
           >
             <font-awesome-icon :icon="['fas', 'download']" />
           </button>
@@ -89,11 +93,11 @@ export default class Identities extends Vue {
   @Prop() userErrorRow!: string | null;
 
   T = T;
-  identities: types.Identity[] = [];
+  data: { identities: types.Identity[] } = { identities: [] };
 
-  readCsv(ev: InputEvent): void {
+  readCsv(ev: Event): void {
     const fileUpload = <HTMLInputElement>ev.target;
-    this.identities = [];
+    this.data.identities = [];
     if (fileUpload.value == '') {
       return;
     }
@@ -103,11 +107,7 @@ export default class Identities extends Vue {
       ui.error(T.groupsInvalidCsv);
       return;
     }
-    this.$emit('read-csv', this, fileUpload);
-  }
-
-  onBulkIdentities(): void {
-    this.$emit('bulk-identities', this, this.identities);
+    this.$emit('read-csv', this.data, fileUpload);
   }
 }
 </script>
