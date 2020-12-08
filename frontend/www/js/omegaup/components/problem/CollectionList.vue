@@ -111,29 +111,18 @@ export default class CollectionList extends Vue {
   T = T;
   level = this.data.level;
 
-  get availableTags(): types.TagWithProblemCount[] {
-    let tags: types.TagWithProblemCount[] = this.data.frequentTags;
-    let simpleTags: string[] = tags.map((x) => x.name);
-    let list: types.TagWithProblemCount[] = this.data.publicTags.filter(
-      ({ name: x }) => !tags.some(({ name: y }) => y === x),
+  get publicQualityTags(): types.TagWithProblemCount[] {
+    const tagNames: Set<string> = new Set(
+      this.data.frequentTags.map((x) => x.name),
     );
-
-    this.selectedTags.forEach((element) => {
-      if (!simpleTags.includes(element)) {
-        const tag = list.find(({ name: x }) => x === element);
-        if (typeof tag !== 'undefined') {
-          tags.push(tag);
-        }
-      }
-    });
-
-    return tags;
+    return this.data.publicTags.filter((tag) => !tagNames.has(tag.name));
   }
 
-  get publicQualityTags(): types.TagWithProblemCount[] {
-    let tags: types.TagWithProblemCount[] = this.data.frequentTags;
-    return this.data.publicTags.filter(
-      ({ name: x }) => !tags.some(({ name: y }) => y === x),
+  get availableTags(): types.TagWithProblemCount[] {
+    const tags: types.TagWithProblemCount[] = this.data.frequentTags;
+    const selectedTagNames = new Set<string>(this.selectedTags);
+    return tags.concat(
+      this.publicQualityTags.filter((tag) => selectedTagNames.has(tag.name)),
     );
   }
 

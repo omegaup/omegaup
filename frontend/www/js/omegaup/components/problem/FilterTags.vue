@@ -14,7 +14,7 @@
       </div>
       <div class="form-group">
         <vue-typeahead-bootstrap
-          :data="publicQualityTagsText"
+          :data="publicQualityTagNames"
           :serializer="publicQualityTagsSerializer"
           :placeholder="T.collecionOtherTags"
           @hit="addOtherTag"
@@ -43,7 +43,7 @@ export default class FilterTags extends Vue {
   T = T;
   currentSelectedTags = this.selectedTags;
 
-  get publicQualityTagsText(): string[] {
+  get publicQualityTagNames(): string[] {
     return this.publicQualityTags.map((x) => x.name);
   }
 

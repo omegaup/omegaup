@@ -108,7 +108,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
                                 Tags
                             WHERE name = ?
                         )
-                    ) AND
+                ) AND
                 name LIKE "problemTag%"
             AND
                 p.quality_seal = 1
