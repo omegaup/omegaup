@@ -9,6 +9,7 @@ import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
+import * as time from '../time';
 import T from '../lang';
 
 OmegaUp.on('ready', () => {
@@ -94,14 +95,13 @@ OmegaUp.on('ready', () => {
             filter: 'verdict' | 'language' | 'username' | 'status',
             value: string,
           ) => {
-            if (!value) {
+            if (value) {
+              runsStore.commit('applyFilter', {
+                [filter]: value,
+              } as RunFilters);
+            } else {
               runsStore.commit('removeFilter', filter);
-              refreshRuns();
-              return;
             }
-            runsStore.commit('applyFilter', {
-              [filter]: value,
-            } as RunFilters);
             refreshRuns();
           },
           'submit-run': (code: string, language: string) => {
@@ -288,6 +288,7 @@ OmegaUp.on('ready', () => {
                 api.Problem.clarifications({
                   problem_alias: payload.problem.alias,
                 })
+                  .then(time.remoteTimeAdapter)
                   .then(
                     (response) =>
                       (this.initialClarifications = response.clarifications),
@@ -323,6 +324,7 @@ OmegaUp.on('ready', () => {
   function updateRunFallback(guid: string): void {
     setTimeout(() => {
       api.Run.status({ run_alias: guid })
+        .then(time.remoteTimeAdapter)
         .then((response) => updateRun(response))
         .catch(ui.ignoreError);
     }, 5000);
@@ -347,6 +349,7 @@ OmegaUp.on('ready', () => {
       username: runsStore.state.filters?.username,
       status: runsStore.state.filters?.status,
     })
+      .then(time.remoteTimeAdapter)
       .then((response) => {
         runsStore.commit('clear');
         for (const run of response.runs) {
@@ -362,6 +365,7 @@ OmegaUp.on('ready', () => {
       offset: 0, // TODO: Updating offset is missing
       rowcount: 0, // TODO: Updating rowcount is missing
     })
+      .then(time.remoteTimeAdapter)
       .then(
         (response) =>
           (problemDetailsView.initialClarifications = response.clarifications),
