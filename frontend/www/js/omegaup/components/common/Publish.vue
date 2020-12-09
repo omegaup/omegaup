@@ -19,9 +19,9 @@
               {{ T.wordsPublic }}
             </option>
           </select>
-          <p class="help-block">
-            <span v-html="admissionModeDescription"></span>
-          </p>
+          <omegaup-markdown
+            :markdown="admissionModeDescription"
+          ></omegaup-markdown>
         </div>
         <button class="btn btn-primary change-admission-mode" type="submit">
           {{ T.wordsSaveChanges }}
@@ -35,8 +35,13 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class Publish extends Vue {
   @Prop() initialAdmissionMode!: omegaup.AdmissionMode;
   @Prop() admissionModeDescription!: string;
