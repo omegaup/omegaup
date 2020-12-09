@@ -13,7 +13,7 @@
           />
         </div>
       </div>
-      <div v-show="data.identities.length > 0" class="card no-bottom-margin">
+      <div v-show="identities.length > 0" class="card no-bottom-margin">
         <div class="card-header">
           <h3 class="card-title">{{ T.wordsIdentities }}</h3>
         </div>
@@ -31,7 +31,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="identity in data.identities"
+              v-for="identity in identities"
               :key="identity.username"
               :class="{ 'alert-danger': userErrorRow === identity.username }"
             >
@@ -52,14 +52,14 @@
             <button
               class="btn btn-primary"
               name="create-identities"
-              @click.prevent="$emit('bulk-identities', data.identities)"
+              @click.prevent="$emit('bulk-identities', identities)"
             >
               {{ T.groupCreateIdentities }}
             </button>
           </div>
           <button
             class="btn"
-            @click.prevent="$emit('download-identities', data.identities)"
+            @click.prevent="$emit('download-identities', identities)"
           >
             <font-awesome-icon :icon="['fas', 'download']" />
           </button>
@@ -97,7 +97,7 @@ export default class Identities extends Vue {
 
   readCsv(ev: Event): void {
     const fileUpload = <HTMLInputElement>ev.target;
-    this.data.identities = [];
+    this.identities = [];
     if (fileUpload.value == '') {
       return;
     }
