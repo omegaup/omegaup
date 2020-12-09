@@ -8,7 +8,7 @@
           <input
             name="identities"
             type="file"
-            accept=".csv, .txt"
+            accept=".csv,.txt"
             @change="readCsv"
           />
         </div>
@@ -93,7 +93,7 @@ export default class Identities extends Vue {
   @Prop() userErrorRow!: string | null;
 
   T = T;
-  data: { identities: types.Identity[] } = { identities: [] };
+  identities: types.Identity[] = [];
 
   readCsv(ev: Event): void {
     const fileUpload = <HTMLInputElement>ev.target;
@@ -107,7 +107,7 @@ export default class Identities extends Vue {
       ui.error(T.groupsInvalidCsv);
       return;
     }
-    this.$emit('read-csv', this.data, fileUpload);
+    this.$emit('read-csv', { identities: this.identities }, fileUpload);
   }
 }
 </script>
