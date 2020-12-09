@@ -125,9 +125,9 @@
               <div class="dropdown-menu">
                 <a
                   class="dropdown-item"
-                  href="/problem/"
-                  data-nav-problems-all
-                  >{{ T.navAllProblems }}</a
+                  href="/problem/collection/"
+                  data-nav-problems-collection
+                  >{{ T.problemcollectionViewProblems }}</a
                 >
                 <a
                   v-if="isLoggedIn && isMainUserIdentity"

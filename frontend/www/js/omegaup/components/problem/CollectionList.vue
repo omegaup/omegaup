@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <div class="col col-md-4 d-flex align-items-center">
-        <a href="/problem/collection/" data-nav-problems-all>{{
+        <a href="/problem/collection/" data-nav-problems-collection>{{
           T.problemCollectionBackCollections
         }}</a>
       </div>
