@@ -36,10 +36,10 @@
               >
                 {{ T.aboutToStart }}
               </p>
-              <p
+              <omegaup-markdown
                 v-if="needsBasicInformation"
-                v-html="T.contestBasicInformationNeeded"
-              ></p>
+                :markdown="T.contestBasicInformationNeeded"
+              ></omegaup-markdown>
               <template v-if="requestsUserInformation !== 'no'">
                 <omegaup-markdown
                   :markdown="(statement && statement.markdown) || ''"

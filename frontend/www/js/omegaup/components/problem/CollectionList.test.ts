@@ -1,8 +1,8 @@
 import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
-import { types } from '../../api_types';
 import T from '../../lang';
+import { types } from '../../api_types';
 
 import problem_CollectionList from './CollectionList.vue';
 
@@ -12,14 +12,14 @@ describe('CollectionList.vue', () => {
       propsData: {
         data: {
           level: 'problemLevelBasicIntroductionToProgramming',
-          frequentTags: [
-            { alias: 'problemTagMatrices' },
-            { alias: 'problemTagDiophantineEquations' },
-            { alias: 'problemTagInputAndOutput' },
-            { alias: 'problemTagArrays' },
+          frequentTags: <types.TagWithProblemCount[]>[
+            { name: 'problemTagMatrices', problemCount: 1 },
+            { name: 'problemTagDiophantineEquations', problemCount: 1 },
+            { name: 'problemTagInputAndOutput', problemCount: 1 },
+            { name: 'problemTagArrays', problemCount: 1 },
           ],
           publicTags: <string[]>['problemTagConditionals', 'problemTagLoops'],
-        } as types.CollectionDetailsByLevelPayload,
+        },
         difficulty: 'easy',
         selectedTags: <string[]>[
           'problemTagMatrices',
@@ -121,7 +121,7 @@ describe('CollectionList.vue', () => {
           level: 'problemLevelBasicIntroductionToProgramming',
           frequentTags: [{ alias: 'problemTagMatrices' }],
           publicTags: <string[]>['problemTagConditionals'],
-        } as types.CollectionDetailsByLevelPayload,
+        },
         difficulty: 'all',
       },
     });

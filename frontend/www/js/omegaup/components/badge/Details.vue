@@ -36,7 +36,9 @@
         <div class="font-weight-bold badge-data">
           {{ assignationDate }}
         </div>
-        <div class="badge-text" v-html="ownedMessage"></div>
+        <div class="badge-text">
+          <omegaup-markdown :markdown="ownedMessage"></omegaup-markdown>
+        </div>
       </div>
     </div>
   </div>
@@ -47,8 +49,13 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class BadgeDetails extends Vue {
   @Prop() badge!: types.Badge;
 
