@@ -1136,6 +1136,7 @@ const translations: { [key: string]: string; } = {
   userEditChangePasswordNewPassword: "Nova senha",
   userEditChangePasswordOldPassword: "Senha antiga",
   userEditChangePasswordRepeatNewPassword: "Repita nova senha",
+  userEditChangePasswordToUsername: "Alterar senha: %(username)",
   userEditCountry: "Pa\u00eds / Regi\u00e3o",
   userEditDoctorate: "Doutorado",
   userEditEarlyChildhood: "Primeira inf\u00e2ncia",
