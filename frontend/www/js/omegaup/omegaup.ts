@@ -369,8 +369,9 @@ export namespace omegaup {
 
   export interface QueryParameters {
     some_tags: boolean;
-    min_difficulty: number;
-    max_difficulty: number;
+    min_difficulty?: number;
+    max_difficulty?: number;
+    difficulty_range: string;
     order_by: string;
     sort_order: string;
     only_karel?: boolean;

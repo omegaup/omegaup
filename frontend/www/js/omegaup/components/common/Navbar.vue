@@ -101,8 +101,8 @@
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/problem/" data-nav-problems-all>{{
-                  T.navAllProblems
+                <a href="/problem/collection/" data-nav-problems-collection>{{
+                  T.problemcollectionViewProblems
                 }}</a>
               </li>
               <li v-if="isLoggedIn && isMainUserIdentity">
