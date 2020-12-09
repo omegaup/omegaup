@@ -6,7 +6,7 @@ namespace OmegaUp\Controllers;
  * ProblemsController
  *
  * @psalm-type Clarification=array{answer: null|string, author: null|string, clarification_id: int, contest_alias: null|string, message: string, problem_alias: string, public: bool, receiver: null|string, time: \OmegaUp\Timestamp}
- * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language: string, nominated: bool, nominatedBeforeAC: bool, solved: bool, tried: bool}
+ * @psalm-type NominationStatus=array{alreadyReviewed: bool, canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language: string, nominated: bool, nominatedBeforeAc: bool, solved: bool, tried: bool}
  * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
  * @psalm-type LimitsSettings=array{ExtraWallTime: string, MemoryLimit: int|string, OutputLimit: int|string, OverallWallTimeLimit: string, TimeLimit: string}
  * @psalm-type InteractiveSettingsDistrib=array{idl: string, module_name: string, language: string, main_source: string, templates: array<string, string>}
@@ -4305,7 +4305,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{karel_problem: bool, nomination_payload: array{already_reviewed: bool, problem_alias: string, reviewer: bool, problemLevel: null|string, publicTags: list<string>, levelTags: list<string>, allowUserAddTags: bool, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, problemTitle: null|string}, payload: ProblemDetailsPayload, problem_admin: bool, problemsetter: ProblemsetterInfo|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAC?: bool, language?: string, nominated: bool, nominatedBeforeAC?: bool, problem_alias?: string, solved: bool, tried: bool}, sample_input?: string, settings_summary_payload: ProblemSettingsSummaryPayload, solvers: list<BestSolvers>, source: null|string}, template: string}
+     * @return array{smartyProperties: array{karel_problem: bool, nomination_payload: array{already_reviewed: bool, problem_alias: string, reviewer: bool, problemLevel: null|string, publicTags: list<string>, levelTags: list<string>, allowUserAddTags: bool, selectedPublicTags: list<string>, selectedPrivateTags: list<string>, problemTitle: null|string}, payload: ProblemDetailsPayload, problem_admin: bool, problemsetter: ProblemsetterInfo|null, quality_payload: array{can_nominate_problem?: bool, dismissed: bool, dismissedBeforeAc?: bool, language?: string, nominated: bool, nominatedBeforeAc?: bool, problem_alias?: string, solved: bool, tried: bool}, sample_input?: string, settings_summary_payload: ProblemSettingsSummaryPayload, solvers: list<BestSolvers>, source: null|string}, template: string}
      *
      * @omegaup-request-param null|string $contest_alias
      * @omegaup-request-param null|string $lang
@@ -4676,9 +4676,9 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 $problem
             ),
             'dismissed' => $nominationStatus['dismissed'],
-            'dismissedBeforeAC' => $nominationStatus['dismissedBeforeAC'],
+            'dismissedBeforeAc' => $nominationStatus['dismissedBeforeAc'],
             'nominated' => $nominationStatus['nominated'],
-            'nominatedBeforeAC' => $nominationStatus['nominatedBeforeAC'],
+            'nominatedBeforeAc' => $nominationStatus['nominatedBeforeAc'],
             'language' => $details['statement']['language'],
             'canNominateProblem' => !is_null($r->user),
             'solved' => false,
@@ -4791,7 +4791,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         }
 
         // Defaults for offset and pageSize
-        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $offset = $r->ensureOptionalInt('offset');
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
@@ -5929,7 +5929,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $frequentTags = [];
 
-        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $offset = $r->ensureOptionalInt('offset');
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;
@@ -6154,7 +6154,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
         $problems = [];
         $authorsRanking = [];
 
-        $offset = $r->ensureOptionalInt('offset') ?? 0;
+        $offset = $r->ensureOptionalInt('offset');
         $pageSize = $r->ensureOptionalInt(
             'rowcount'
         ) ?? \OmegaUp\Controllers\Problem::PAGE_SIZE;

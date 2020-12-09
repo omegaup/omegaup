@@ -18,7 +18,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
     const MAX_NUM_TOPICS = 5;
 
     /**
-     * @return array{dismissed: bool, dismissedBeforeAC: bool, nominated: bool, nominatedBeforeAC: bool}
+     * @return array{dismissed: bool, dismissedBeforeAc: bool, nominated: bool, nominatedBeforeAc: bool}
      */
     public static function getNominationStatusForProblem(
         int $problemId,
@@ -27,8 +27,8 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
         $response = [
             'nominated' => false,
             'dismissed' => false,
-            'nominatedBeforeAC' => false,
-            'dismissedBeforeAC' => false,
+            'nominatedBeforeAc' => false,
+            'dismissedBeforeAc' => false,
         ];
 
         $sql = "SELECT
@@ -59,7 +59,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 $suggestionContents['before_ac']
             ) {
                 $response['nominated'] = false;
-                $response['nominatedBeforeAC'] = true;
+                $response['nominatedBeforeAc'] = true;
             }
         }
 
@@ -95,7 +95,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
                 $dismissalContents['before_ac']
             ) {
                 $response['dismissed'] = false;
-                $response['dismissedBeforeAC'] = true;
+                $response['dismissedBeforeAc'] = true;
             }
         }
 
@@ -365,8 +365,7 @@ class QualityNominations extends \OmegaUp\DAO\Base\QualityNominations {
             $sqlFrom .= " AND qn.status = '{$status}'";
         }
 
-        // TODO(#3696): Change to ASC once duplicates are removed.
-        $sqlOrder = ' ORDER BY p.alias ASC, qn.qualitynomination_id DESC';
+        $sqlOrder = ' ORDER BY qn.qualitynomination_id ASC';
         $sqlLimit = ' LIMIT ?, ?;';
 
         /** @var int */

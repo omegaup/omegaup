@@ -70,12 +70,14 @@ def connect(args: argparse.Namespace) -> MySQLdb.connections.Connection:
     assert host is not None, 'Missing --host parameter'
     assert password is not None, 'Missing --password parameter'
 
-    return MySQLdb.connect(
+    dbconn = MySQLdb.connect(
         host=host,
         user=user,
         passwd=password,
         db=args.database
     )
+    dbconn.autocommit(False)
+    return dbconn
 
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
