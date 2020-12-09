@@ -6,7 +6,7 @@
     </div>
     <div class="m-3">
       <div class="float-left align-middle">
-        <p v-html="impartedBy"></p>
+        <omegaup-markdown :markdown="impartedBy"></omegaup-markdown>
       </div>
       <div class="float-right">
         <a :href="`/course/${courseAlias}/`" class="btn btn-primary">{{
@@ -44,8 +44,13 @@ import { types } from '../../api_types';
 import * as time from '../../time';
 import * as ui from '../../ui';
 import T from '../../lang';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class CourseCard extends Vue {
   @Prop() courseName!: string;
   @Prop() courseAlias!: string;

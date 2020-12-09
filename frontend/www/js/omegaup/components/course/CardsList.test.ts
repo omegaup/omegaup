@@ -1,4 +1,4 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
@@ -55,15 +55,13 @@ const coursesListProps = {
 
 describe('CardsList.vue', () => {
   it('Should handle empty courses list for user', () => {
-    const wrapper = shallowMount(course_CardsList, {
+    const wrapper = mount(course_CardsList, {
       propsData: coursesListProps,
     });
 
     expect(wrapper.text()).toContain(T.courseCardAboutCourses);
     expect(wrapper.text()).toContain(
-      T.courseCardDescriptionCourses.split(
-        /[<ul>|</ul>|<li>|</li>|<p>|</p>]+/,
-      )[0],
+      T.courseCardDescriptionCourses.split('\n')[0],
     );
     expect(wrapper.text()).toContain(T.wordsReadMore);
   });

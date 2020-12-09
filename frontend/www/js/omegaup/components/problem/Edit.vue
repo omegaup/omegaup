@@ -250,7 +250,9 @@
                 <div class="alert alert-danger">
                   <h4 class="alert-heading">{{ T.wordsDangerZone }}</h4>
                   <hr />
-                  <span v-html="T.wordsDangerZoneDesc"></span>
+                  <omegaup-markdown
+                    :markdown="T.wordsDangerZoneDesc"
+                  ></omegaup-markdown>
                   <br /><br />
                   <button class="btn btn-danger" type="submit">
                     {{ T.wordsDelete }}
@@ -275,9 +277,11 @@ import problem_Admins from '../common/Admins.vue';
 import problem_GroupAdmins from '../common/GroupAdmins.vue';
 import T from '../../lang';
 import { types } from '../../api_types';
+import omegaup_Markdown from '../Markdown.vue';
 
 @Component({
   components: {
+    'omegaup-markdown': omegaup_Markdown,
     'omegaup-problem-form': problem_Form,
     'omegaup-problem-tags': problem_Tags,
     'omegaup-problem-versions': problem_Versions,

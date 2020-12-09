@@ -6,16 +6,16 @@
         <label class="form-check-label">
           <input
             v-model="currentSelectedTags"
-            :value="tag"
+            :value="tag.name"
             class="form-check-input"
             type="checkbox"
-          />{{ T[tag] }}
+          />{{ `${T[tag.name]}  (${tag.problemCount})` }}
         </label>
       </div>
       <div class="form-group">
         <vue-typeahead-bootstrap
-          :data="publicTags"
-          :serializer="publicTagsSerializer"
+          :data="publicQualityTagNames"
+          :serializer="publicQualityTagsSerializer"
           :placeholder="T.collecionOtherTags"
           @hit="addOtherTag"
         >
@@ -28,6 +28,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
+import { types } from '../../api_types';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 @Component({
   components: {
@@ -35,12 +36,16 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
   },
 })
 export default class FilterTags extends Vue {
-  @Prop() publicTags!: string[];
-  @Prop({ default: () => [] }) tags!: string[];
+  @Prop() publicQualityTags!: types.TagWithProblemCount[];
+  @Prop({ default: () => [] }) tags!: types.TagWithProblemCount[];
   @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
   currentSelectedTags = this.selectedTags;
+
+  get publicQualityTagNames(): string[] {
+    return this.publicQualityTags.map((x) => x.name);
+  }
 
   addOtherTag(tag: string): void {
     if (!this.currentSelectedTags.includes(tag)) {
@@ -48,11 +53,11 @@ export default class FilterTags extends Vue {
     }
   }
 
-  publicTagsSerializer(tagname: string): string {
-    if (Object.prototype.hasOwnProperty.call(T, tagname)) {
-      return T[tagname];
+  publicQualityTagsSerializer(name: string): string {
+    if (Object.prototype.hasOwnProperty.call(T, name)) {
+      return T[name];
     }
-    return tagname;
+    return name;
   }
 
   @Watch('currentSelectedTags')

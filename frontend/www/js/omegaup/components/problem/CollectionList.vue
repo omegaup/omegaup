@@ -15,7 +15,7 @@
         <omegaup-problem-filter-tags
           :selected-tags="selectedTags"
           :tags="availableTags"
-          :public-tags="publicTags"
+          :public-quality-tags="publicQualityTags"
           @new-selected-tag="
             (selectedTags) =>
               $emit(
@@ -120,17 +120,19 @@ export default class CollectionList extends Vue {
   T = T;
   level = this.data.level;
 
-  get availableTags(): string[] {
-    let tags: Set<string> = new Set(
-      this.data.frequentTags.map((element) => element.alias),
+  get publicQualityTags(): types.TagWithProblemCount[] {
+    const tagNames: Set<string> = new Set(
+      this.data.frequentTags.map((x) => x.name),
     );
-    this.selectedTags.forEach((element) => tags.add(element));
-    return Array.from(tags);
+    return this.data.publicTags.filter((tag) => !tagNames.has(tag.name));
   }
 
-  get publicTags(): string[] {
-    let tags: string[] = this.data.frequentTags.map((x) => x.alias);
-    return this.data.publicTags.filter((x) => !tags.includes(x));
+  get availableTags(): types.TagWithProblemCount[] {
+    const tags: types.TagWithProblemCount[] = this.data.frequentTags;
+    const selectedTagNames = new Set<string>(this.selectedTags);
+    return tags.concat(
+      this.publicQualityTags.filter((tag) => selectedTagNames.has(tag.name)),
+    );
   }
 
   get title(): string {

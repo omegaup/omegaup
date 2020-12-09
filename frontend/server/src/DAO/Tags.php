@@ -12,6 +12,8 @@ namespace OmegaUp\DAO;
  * @author alanboy
  * @access public
  * @package docs
+ *
+ * @psalm-type TagWithProblemCount=array { name: string, problemCount: int }
  */
 class Tags extends \OmegaUp\DAO\Base\Tags {
     final public static function getByName(string $name): ?\OmegaUp\DAO\VO\Tags {
@@ -77,7 +79,57 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     }
 
     /**
-     * @return list<array{alias: string}>
+     * @return list<TagWithProblemCount>
+     */
+    public static function getPublicQualityTagsByLevel(
+        string $problemLevel
+    ) {
+        $sql = '
+            SELECT
+                t.name AS name,
+                COUNT(t.name) AS problemCount
+            FROM
+                Problems_Tags pt
+            INNER JOIN
+                Tags t ON t.tag_id = pt.tag_id
+            INNER JOIN
+	            Problems p ON p.problem_id = pt.problem_id
+            WHERE
+                pt.problem_id IN (
+                    SELECT
+                        problem_id
+                    FROM
+                        Problems_Tags
+                    WHERE
+                        tag_id = (
+                            SELECT
+                                tag_id
+                            FROM
+                                Tags
+                            WHERE name = ?
+                        )
+                ) AND
+                name LIKE "problemTag%"
+            AND
+                p.quality_seal = 1
+            GROUP BY
+                t.name
+            ORDER BY
+                COUNT(pt.problem_id)
+            DESC
+            ';
+
+        /** @var list<array{name: string, problemCount: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [
+                $problemLevel
+            ]
+        );
+    }
+
+    /**
+     * @return list<TagWithProblemCount>
      */
     public static function getFrequentQualityTagsByLevel(
         string $problemLevel,
@@ -85,7 +137,8 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
     ) {
         $sql = '
             SELECT
-                t.name AS alias
+                t.name AS name,
+                COUNT(t.name) AS problemCount
             FROM
                 Problems_Tags pt
             INNER JOIN
@@ -118,7 +171,7 @@ class Tags extends \OmegaUp\DAO\Base\Tags {
             LIMIT ?
             ';
 
-        /** @var list<array{alias: string}> */
+        /** @var list<array{name: string, problemCount: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [
