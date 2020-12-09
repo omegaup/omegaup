@@ -30,7 +30,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $runCreationDate = date('Y-m-d', \OmegaUp\Time::get());
         }
         $contest = \OmegaUp\Test\Factories\Contest::createContest();
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => true,
+            ])
+        );
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problem,
             $contest
