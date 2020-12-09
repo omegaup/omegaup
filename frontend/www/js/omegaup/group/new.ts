@@ -17,7 +17,7 @@ OmegaUp.on('ready', function () {
           T: T,
         },
         on: {
-          'alias-changed': (alias: string): void => {
+          'validate-unused-alias': (alias: string): void => {
             if (!alias) {
               return;
             }

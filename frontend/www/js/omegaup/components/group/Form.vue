@@ -17,7 +17,6 @@
                 required
                 type="text"
                 class="form-control"
-                @blur="onGenerateAlias"
               />
             </label>
           </div>
@@ -89,13 +88,9 @@ export default class GroupForm extends Vue {
     this.$emit('create-group', this.name, this.alias, this.description);
   }
 
-  onGenerateAlias(): void {
-    if (this.isUpdate) {
-      return;
-    }
-
+  generateAlias(name: string): string {
     // Remove accents
-    let generatedAlias = latinize(this.name);
+    let generatedAlias = latinize(name);
 
     // Replace whitespace
     generatedAlias = generatedAlias.replace(/\s+/g, '-');
@@ -105,15 +100,23 @@ export default class GroupForm extends Vue {
 
     generatedAlias = generatedAlias.substring(0, 32);
 
-    this.alias = generatedAlias;
+    return generatedAlias;
   }
 
   @Watch('alias')
-  onValueChanged(newValue: string): void {
+  onAliasChanged(newValue: string): void {
     if (this.isUpdate) {
       return;
     }
-    this.$emit('alias-changed', newValue);
+    this.$emit('validate-unused-alias', newValue);
+  }
+
+  @Watch('name')
+  onNameChanged(newValue: string): void {
+    if (this.isUpdate) {
+      return;
+    }
+    this.alias = this.generateAlias(newValue);
   }
 }
 </script>
