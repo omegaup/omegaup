@@ -103,7 +103,7 @@ import Autocomplete from '../Autocomplete.vue';
   },
 })
 export default class IdentityEdit extends Vue {
-  @Prop({ default: null }) identity!: omegaup.Identity;
+  @Prop({ default: null }) identity!: omegaup.Identity | null;
   @Prop() countries!: iso3166.Country[];
 
   T = T;
@@ -116,7 +116,7 @@ export default class IdentityEdit extends Vue {
       gender: '',
       school: '',
       school_id: 0,
-      country_id: '',
+      country_id: 'MX',
       state_id: '',
     },
     this.identity,
@@ -128,9 +128,9 @@ export default class IdentityEdit extends Vue {
   }
 
   @Watch('selectedCountry')
-  onPropertyChanged(newContry: string) {
-    if (this.identity.country_id == newContry) {
-      this.selectedIdentity.state_id = this.identity.state_id;
+  onPropertyChanged(newCountry: string) {
+    if (this.identity?.country_id === newCountry) {
+      this.selectedIdentity.state_id = this.identity?.state_id;
     } else {
       this.selectedIdentity.state_id = Object.keys(this.countryStates)[0].split(
         '-',
@@ -139,7 +139,7 @@ export default class IdentityEdit extends Vue {
   }
 
   get groupName(): string {
-    return `${this.selectedIdentity.username.split(':')[0]}`;
+    return this.selectedIdentity.username.split(':')[0];
   }
 
   get identityName(): string {
@@ -158,14 +158,8 @@ export default class IdentityEdit extends Vue {
   onEditMember(): void {
     this.$emit(
       'edit-identity-member',
-      this.identity.username,
-      this.selectedIdentity.username,
-      this.selectedIdentity.name,
-      this.selectedIdentity.gender,
-      this.selectedIdentity.country_id,
-      this.selectedIdentity.state_id,
-      this.selectedIdentity.school,
-      this.selectedIdentity.school_id,
+      this.identity?.username,
+      this.selectedIdentity,
     );
   }
 }
