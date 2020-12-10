@@ -142,7 +142,7 @@ export default class ReviewerPopup extends Vue {
     ],
   })
   possibleTags!: string[];
-  @Prop() publicTags!: string[];
+  @Prop({ default: () => [] }) publicTags!: string[];
   @Prop() selectedPublicTags!: string[];
   @Prop() selectedPrivateTags!: string[];
   @Prop() problemAlias!: string;
