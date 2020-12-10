@@ -1515,7 +1515,7 @@ export class Arena {
     ) {
       $('#clarifications-count').html(`(${clarifications.length})`);
     } else if (clarifications.length >= this.clarificationsRowcount) {
-      $('#clarifications-count').html(`(${clarifications.length}+)`);
+      $('#clarifications-count').html(`(${this.clarificationsRowcount}+)`);
     }
 
     const previouslyAnswered = this.answeredClarifications;

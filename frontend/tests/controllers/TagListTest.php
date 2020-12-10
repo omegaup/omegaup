@@ -161,10 +161,10 @@ class TagListTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $exepectedTagsList = [
-            ['alias' => 'problemTagMatrices'],
-            ['alias' => 'problemTagDiophantineEquations'],
-            ['alias' => 'problemTagInputAndOutput'],
-            ['alias' => 'problemTagArrays'],
+            ['name' => 'problemTagMatrices', 'problemCount' => '4'],
+            ['name' => 'problemTagDiophantineEquations', 'problemCount' => '3'],
+            ['name' => 'problemTagInputAndOutput', 'problemCount' => '2'],
+            ['name' => 'problemTagArrays', 'problemCount' => '1'],
         ];
 
         $this->assertEquals($request['frequent_tags'], $exepectedTagsList);
