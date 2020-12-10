@@ -6,16 +6,16 @@
       :image-mapping="solution.images"
     ></omegaup-markdown>
     <div v-else class="interstitial">
-      <p v-html="statusMessage"></p>
-      <p
+      <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
+      <omegaup-markdown
         v-show="allTokens !== null && availableTokens !== null"
-        v-html="
+        :markdown="
           ui.formatString(T.solutionTokens, {
             available: availableTokens,
             total: allTokens,
           })
         "
-      ></p>
+      ></omegaup-markdown>
       <div class="text-center">
         <button
           v-if="status === 'unlocked'"
