@@ -20,13 +20,13 @@
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profile }}
-              <input v-model="name" class="form-control" />
+              <input v-model="selectedIdentity.name" class="form-control" />
             </label>
           </div>
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.wordsGender }}
-              <select v-model="gender" class="form-control">
+              <select v-model="selectedIdentity.gender" class="form-control">
                 <option value="female">{{ T.wordsGenderFemale }}</option>
                 <option value="male">{{ T.wordsGenderMale }}</option>
                 <option value="other">{{ T.wordsGenderOther }}</option>
@@ -66,11 +66,11 @@
             <label class="d-block">
               {{ T.profileSchool }}
               <omegaup-autocomplete
-                v-model="school"
+                v-model="selectedIdentity.school"
                 class="form-control"
                 :init="(el) => typeahead.schoolTypeahead(el)"
               ></omegaup-autocomplete>
-              <input type="hidden" :value="schoolId" />
+              <input type="hidden" :value="selectedIdentity.schoolId" />
             </label>
           </div>
         </div>
@@ -121,6 +121,8 @@ export default class IdentityEdit extends Vue {
     },
     this.identity,
   );
+  selectedCountry = 'MX';
+  selectedState = '';
 
   @Watch('identity')
   onIdentityChanged(newIdentity: omegaup.Identity) {
@@ -129,6 +131,7 @@ export default class IdentityEdit extends Vue {
 
   @Watch('selectedCountry')
   onPropertyChanged(newCountry: string) {
+    this.selectedIdentity.country_id = newCountry;
     if (this.identity?.country_id === newCountry) {
       this.selectedIdentity.state_id = this.identity?.state_id;
     } else {

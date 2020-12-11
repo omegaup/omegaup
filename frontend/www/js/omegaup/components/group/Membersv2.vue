@@ -118,8 +118,8 @@ import { dao } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
-import identity_Edit from '../identity/Edit.vue';
-import identity_ChangePassword from '../identity/ChangePassword.vue';
+import identity_Edit from '../identity/Editv2.vue';
+import identity_ChangePassword from '../identity/ChangePasswordv2.vue';
 import Autocomplete from '../Autocomplete.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -177,26 +177,9 @@ export default class Memebers extends Vue {
 
   onChildEditIdentityMember(
     originalUsername: string,
-    username: string,
-    name: string,
-    gender: string,
-    selectedCountry: string,
-    selectedState: string,
-    school: string,
-    schoolId: number,
+    user: omegaup.Identity,
   ): void {
-    this.$emit(
-      'edit-identity-member',
-      this,
-      originalUsername,
-      username,
-      name,
-      gender,
-      selectedCountry,
-      selectedState,
-      school,
-      schoolId,
-    );
+    this.$emit('edit-identity-member', this, originalUsername, user);
   }
 
   onChildCancel(): void {

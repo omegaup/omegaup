@@ -8,7 +8,17 @@
     <ul class="nav nav-pills">
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          :href="`#${selectedTab}`"
+          class="nav-link"
+          data-tab-edit
+          :class="{ active: selectedTab === AvailableTabs.Edit }"
+          @click="selectedTab = AvailableTabs.Edit"
+          >{{ T.groupEditEdit }}</a
+        >
+      </li>
+      <li class="nav-item" role="presentation">
+        <a
+          :href="`#${selectedTab}`"
           class="nav-link"
           data-tab-members
           :class="{ active: selectedTab === AvailableTabs.Members }"
@@ -18,7 +28,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          :href="`#${selectedTab}`"
           class="nav-link"
           data-tab-scoreboards
           :class="{ active: selectedTab === AvailableTabs.Scoreboards }"
@@ -28,7 +38,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          href="#"
+          :href="`#${selectedTab}`"
           class="nav-link"
           data-tab-identities
           :class="{ active: selectedTab === AvailableTabs.Identities }"
@@ -39,6 +49,22 @@
     </ul>
 
     <div class="tab-content">
+      <div
+        v-if="selectedTab === AvailableTabs.Edit"
+        class="tab-pane active"
+        role="tabpanel"
+      >
+        <omegaup-group-form
+          :is-update="true"
+          :group-name="groupName"
+          :group-alias="groupAlias"
+          :group-description="groupDescription"
+          @update-group="
+            (name, description) => $emit('update-group', name, description)
+          "
+        ></omegaup-group-form>
+      </div>
+
       <div
         v-if="selectedTab === AvailableTabs.Members"
         class="tab-pane active"
@@ -142,6 +168,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import group_Identities from './Identities.vue';
+group_Form;
+import group_Form from './Form.vue';
 import group_Members from './Membersv2.vue';
 import group_Scoreboards from './Scoreboards.vue';
 import T from '../../lang';
@@ -149,6 +177,7 @@ import { dao, types } from '../../api_types';
 import * as ui from '../../ui';
 
 export enum AvailableTabs {
+  Edit = 'edit',
   Members = 'memebers',
   Scoreboards = 'scoreboards',
   Identities = 'identities',
@@ -157,12 +186,14 @@ export enum AvailableTabs {
 @Component({
   components: {
     'omegaup-group-create-identities': group_Identities,
+    'omegaup-group-form': group_Form,
     'omegaup-group-members': group_Members,
     'omegaup-group-scoreboards': group_Scoreboards,
   },
 })
 export default class GroupEdit extends Vue {
   @Prop() groupAlias!: string;
+  @Prop() groupDescription!: string;
   @Prop() groupName!: string;
   @Prop() countries!: dao.Countries[];
   @Prop() isOrganizer!: boolean;

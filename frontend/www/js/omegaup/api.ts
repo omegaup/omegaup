@@ -963,6 +963,9 @@ export const Group = {
     messages.GroupRemoveUserRequest,
     messages.GroupRemoveUserResponse
   >('/api/group/removeUser/'),
+  update: apiCall<messages.GroupUpdateRequest, messages.GroupUpdateResponse>(
+    '/api/group/update/',
+  ),
 };
 
 export const GroupScoreboard = {

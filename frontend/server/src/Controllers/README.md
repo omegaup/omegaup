@@ -104,6 +104,7 @@
   - [`/api/group/members/`](#apigroupmembers)
   - [`/api/group/myList/`](#apigroupmylist)
   - [`/api/group/removeUser/`](#apigroupremoveuser)
+  - [`/api/group/update/`](#apigroupupdate)
 - [GroupScoreboard](#groupscoreboard)
   - [`/api/groupScoreboard/addContest/`](#apigroupscoreboardaddcontest)
   - [`/api/groupScoreboard/details/`](#apigroupscoreboarddetails)
@@ -2179,6 +2180,24 @@ Remove user from group
 | ----------------- | -------- | ----------- |
 | `group_alias`     | `string` |             |
 | `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/group/update/`
+
+### Description
+
+Update an existing group
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
 
 ### Returns
 
