@@ -421,7 +421,6 @@ const translations: { [key: string]: string; } = {
   groupEditScoreboardsContestsAdded: "(C0n7357 5ucc355fu11y add3d!)",
   groupEditScoreboardsContestsRemoved: "(C0n7357 5ucc355fu11y r3m0v3d!)",
   groupEditTitleWithName: "(Edi7 gr0up %(name))",
-  groupEditUpdated: "(Th3 gr0up ha5 b33n upda73d 5ucc355fu11y)",
   groupNewFormCreateGroup: "(Cr3a73 gr0up)",
   groupNewFormDescription: "(Gr0up d35crip7i0n)",
   groupNewFormOnlyAC: "(On1y c0un7 AC5)",
