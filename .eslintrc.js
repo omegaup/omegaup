@@ -31,11 +31,12 @@ module.exports = {
     // work all the time in Vue 2.
     'vue/no-deprecated-v-bind-sync': 'off',
 
-    // TODO(#4626): Remove all uses of v-html.
-    'vue/no-v-html': 'off',
-
     // TODO(#4778): Add key to ALL v-for.
     'vue/require-v-for-key': 'off',
+
+    // TODO: Remove when we migrate to Vue 3, beacuse of 
+    // https://v3.vuejs.org/guide/migration/key-attribute.html#with-template-v-for
+    'vue/no-v-for-template-key-on-child': 'off',
 
     // TODO: Remove all these exceptions.
     '@typescript-eslint/explicit-module-boundary-types': 'off',

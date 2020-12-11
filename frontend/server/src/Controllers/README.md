@@ -2841,10 +2841,10 @@ Entry point for Problem runs API
 | Name            | Type           | Description |
 | --------------- | -------------- | ----------- |
 | `language`      | `null\|string` |             |
-| `offset`        | `mixed`        |             |
+| `offset`        | `int\|null`    |             |
 | `problem_alias` | `null\|string` |             |
-| `rowcount`      | `mixed`        |             |
-| `show_all`      | `mixed`        |             |
+| `rowcount`      | `int\|null`    |             |
+| `show_all`      | `bool\|null`   |             |
 | `status`        | `null\|string` |             |
 | `username`      | `null\|string` |             |
 | `verdict`       | `null\|string` |             |
@@ -3751,9 +3751,9 @@ Return most frequent public tags of a certain level
 
 ### Returns
 
-| Name            | Type                   |
-| --------------- | ---------------------- |
-| `frequent_tags` | `{ alias: string; }[]` |
+| Name            | Type                          |
+| --------------- | ----------------------------- |
+| `frequent_tags` | `types.TagWithProblemCount[]` |
 
 ## `/api/tag/list/`
 
