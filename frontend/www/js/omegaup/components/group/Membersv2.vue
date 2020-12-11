@@ -1,9 +1,9 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-body">
+  <div class="card">
+    <div class="card-body">
       <form class="form" @submit.prevent="onAddMember">
         <div class="form-group">
-          <label
+          <label class="d-inline"
             >{{ T.wordsMember }}
             <omegaup-autocomplete
               v-model="searchedUsername"
@@ -25,7 +25,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="identity in identities">
+        <tr v-for="identity in identities" :key="identity.username">
           <td>
             <omegaup-user-username
               :classname="identity.classname"
@@ -34,12 +34,13 @@
             ></omegaup-user-username>
           </td>
           <td>
-            <a
-              class="glyphicon glyphicon-remove"
-              href="#"
+            <button
+              class="btn btn-link"
               :title="T.groupEditMembersRemove"
               @click="$emit('remove', identity.username)"
-            ></a>
+            >
+              <font-awesome-icon :icon="['fas', 'trash-alt']" />
+            </button>
           </td>
         </tr>
       </tbody>
@@ -69,24 +70,27 @@
           <td>{{ identity.state }}</td>
           <td>{{ identity.school }}</td>
           <td>
-            <a
-              class="glyphicon glyphicon-edit"
-              href="#"
+            <button
+              class="btn btn-link"
               :title="T.groupEditMembersEdit"
               @click="onEdit(identity)"
-            ></a>
-            <a
-              class="glyphicon glyphicon-lock"
-              href="#"
+            >
+              <font-awesome-icon :icon="['fas', 'edit']" />
+            </button>
+            <button
+              class="btn btn-link"
               :title="T.groupEditMembersChangePassword"
               @click="onChangePass(identity.username)"
-            ></a>
-            <a
-              class="glyphicon glyphicon-remove"
-              href="#"
+            >
+              <font-awesome-icon :icon="['fas', 'lock']" />
+            </button>
+            <button
+              class="btn btn-link"
               :title="T.groupEditMembersRemove"
               @click="$emit('remove', identity.username)"
-            ></a>
+            >
+              <font-awesome-icon :icon="['fas', 'trash-alt']" />
+            </button>
           </td>
         </tr>
       </tbody>
@@ -95,11 +99,8 @@
       v-if="showEditForm"
       :countries="countries"
       :identity="identity"
-      :selected-country="identity.country_id"
-      :selected-state="identity.state_id"
-      :username="username"
-      @emit-cancel="onChildCancel"
-      @emit-edit-identity-member="onChildEditIdentityMember"
+      @cancel="onChildCancel"
+      @edit-identity-member="onChildEditIdentityMember"
     ></omegaup-identity-edit>
     <omegaup-identity-change-password
       v-if="showChangePasswordForm"
@@ -112,7 +113,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { omegaup } from '../../omegaup';
+import { dao } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
@@ -120,23 +122,25 @@ import identity_Edit from '../identity/Edit.vue';
 import identity_ChangePassword from '../identity/ChangePassword.vue';
 import Autocomplete from '../Autocomplete.vue';
 
-interface EditMemberComponent {
-  username: string;
-}
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faEdit, faLock, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+library.add(faEdit, faLock, faTrashAlt);
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-autocomplete': Autocomplete,
     'omegaup-user-username': user_Username,
     'omegaup-identity-edit': identity_Edit,
     'omegaup-identity-change-password': identity_ChangePassword,
   },
 })
-export default class Members extends Vue {
-  @Prop() identities!: types.Identity[];
-  @Prop() identitiesCsv!: types.Identity[];
+export default class Memebers extends Vue {
+  @Prop() identities!: omegaup.Identity[];
+  @Prop() identitiesCsv!: omegaup.Identity[];
   @Prop() groupAlias!: string;
-  @Prop() countries!: Array<string>;
+  @Prop() countries!: Array<dao.Countries>;
 
   T = T;
   typeahead = typeahead;
@@ -150,7 +154,7 @@ export default class Members extends Vue {
     this.$emit('add-member', this, this.searchedUsername);
   }
 
-  onEdit(identity: types.Identity): void {
+  onEdit(identity: omegaup.Identity): void {
     this.$emit('edit-identity', this, identity);
   }
 
@@ -172,18 +176,26 @@ export default class Members extends Vue {
   }
 
   onChildEditIdentityMember(
-    editMemeberComponent: EditMemberComponent,
-    identity: types.Identity,
+    originalUsername: string,
+    username: string,
+    name: string,
+    gender: string,
     selectedCountry: string,
     selectedState: string,
+    school: string,
+    schoolId: number,
   ): void {
     this.$emit(
       'edit-identity-member',
-      editMemeberComponent,
       this,
-      identity,
+      originalUsername,
+      username,
+      name,
+      gender,
       selectedCountry,
       selectedState,
+      school,
+      schoolId,
     );
   }
 
@@ -196,9 +208,3 @@ export default class Members extends Vue {
   }
 }
 </script>
-
-<style>
-label {
-  display: inline;
-}
-</style>

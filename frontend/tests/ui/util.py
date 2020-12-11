@@ -441,9 +441,7 @@ def create_group(driver, group_title, description):
     with driver.page_transition():
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//form[contains(concat(" ", normalize-space(@class), '
-                 '" "), " new-group-form ")]'))).submit()
+                (By.CSS_SELECTOR, 'form[data-group-new]'))).submit()
 
     group_alias = re.search(r'/group/([^/]*)/edit/',
                             driver.browser.current_url).group(1)

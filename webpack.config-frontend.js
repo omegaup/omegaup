@@ -66,6 +66,7 @@ module.exports = {
     course_students: './frontend/www/js/omegaup/course/students.ts',
     group_identities: './frontend/www/js/omegaup/group/identities.js',
     group_members: './frontend/www/js/omegaup/group/members.js',
+    group_new: './frontend/www/js/omegaup/group/new.ts',
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
     group_list: './frontend/www/js/omegaup/group/list.js',

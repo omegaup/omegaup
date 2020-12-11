@@ -4,18 +4,30 @@ import { types } from '../api_types';
 
 Vue.use(Vuex);
 
+export interface RunFilters {
+  offset?: number;
+  rowcount?: number;
+  verdict?: string;
+  language?: string;
+  username?: string;
+  status?: string;
+}
+
 export interface RunsState {
   // The list of runs.
   runs: types.Run[];
 
   // The mapping of run GUIDs to indices on the runs array.
   index: Record<string, number>;
+
+  filters?: RunFilters;
 }
 
 export const runsStore = new Vuex.Store<RunsState>({
   state: {
     runs: [],
     index: {},
+    filters: {},
   },
   mutations: {
     addRun(state, run: types.Run) {
@@ -33,6 +45,18 @@ export const runsStore = new Vuex.Store<RunsState>({
     clear(state) {
       state.runs.splice(0);
       state.index = {};
+    },
+    applyFilter(state, filter: RunFilters) {
+      state.filters = Object.assign(state.filters, filter);
+    },
+    removeFilter(
+      state,
+      filter: 'verdict' | 'language' | 'username' | 'status',
+    ) {
+      if (!state.filters) {
+        return;
+      }
+      delete state.filters[filter];
     },
   },
 });
