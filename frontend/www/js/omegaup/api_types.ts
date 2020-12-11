@@ -1943,7 +1943,7 @@ export namespace types {
   export interface GroupEditPayload {
     countries: dao.Countries[];
     groupAlias: string;
-    groupDescription: string;
+    groupDescription?: string;
     groupName?: string;
     identities: types.Identity[];
     isOrganizer: boolean;
