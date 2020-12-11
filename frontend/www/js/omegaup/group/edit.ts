@@ -130,25 +130,14 @@ OmegaUp.on('ready', () => {
           'edit-identity-member': (
             membersSource: group_Members,
             originalUsername: string,
-            username: string,
-            name: string,
-            gender: string,
-            countryId: string,
-            stateId: string,
-            school: string,
-            schoolId: string,
+            user: types.Identity,
           ) => {
-            api.Identity.update({
-              username: username,
-              name: name,
-              gender: gender,
-              country_id: countryId,
-              state_id: stateId,
-              school_name: school,
-              school_id: schoolId,
+            const request = Object.assign({}, user, {
               group_alias: payload.groupAlias,
               original_username: originalUsername,
-            })
+              school_name: user.school,
+            });
+            api.Identity.update(request)
               .then(() => {
                 ui.success(T.groupEditMemberUpdated);
                 membersSource.showEditForm = false;
