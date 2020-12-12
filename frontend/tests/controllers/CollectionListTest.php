@@ -113,7 +113,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the authors rank with quality problems by a request
+     * Test for the authors rank with quality problems by a request and the paginator of problems
      */
     public function testCollectionAuthors() {
         $identities = [];
@@ -121,7 +121,11 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create 4 user with 2 problems each
         for ($i = 0; $i < 4; $i++) {
-            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => 'author_' . $i]
+                )
+            );
 
             for ($j = 0; $j < 2; $j++) {
                 $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
@@ -211,6 +215,40 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         $this->assertCount(4, $result);
+
+        // Test the paginator
+
+        // Call getCollectionsDetailsByAuthorForSmarty
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(8, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'author' => 'author_0'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(2, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author, 1 as rowcount
+        // and 2 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'author' => 'author_0',
+                'rowcount' => 1,
+                'page' => 2
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(1, $result);
     }
 
     /**
@@ -385,9 +423,9 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the problem paginator
+     * Test for paginator of problems by level
      */
-    public function testProblemPaginator() {
+    public function testProblemsByLevelPaginator() {
         // Reviewer user
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
@@ -477,24 +515,5 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(2, $result);
         $this->assertEquals('problem_2', $result[0]['alias']);
         $this->assertEquals('problem_3', $result[1]['alias']);
-
-
-
-
-
-
-
-
-        // Call getCollectionsDetailsByAuthorForSmarty
-        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
-            new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'sort_order' => 'asc',
-                'author[]' => 'author_0'
-            ])
-        )['smartyProperties']['payload']['problems'];
-
-        $this->assertCount(4, $result);
-        $this->assertEquals('problem_0', $result[0]['alias']);  
     }
 }

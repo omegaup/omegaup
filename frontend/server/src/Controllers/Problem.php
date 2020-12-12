@@ -6174,7 +6174,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'minVisibility' => $minVisibility,
             'authors' => $authors,
         ] = self::validateListParams($r);
-        
+
         $result = self::getList(
             $page,
             $language,
@@ -6201,7 +6201,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             /*$offset*/            1,
             /*$rowCount*/15
         );
-        
+
         return [
             'smartyProperties' => [
                 'payload' => [
