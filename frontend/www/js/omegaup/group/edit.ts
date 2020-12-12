@@ -21,11 +21,11 @@ OmegaUp.on('ready', () => {
       tab: window.location.hash
         ? window.location.hash.substr(1)
         : AvailableTabs.Members,
-      identities: payload.identities.filter(
-        (identity) => identity.username.split(':').length === 1,
+      identities: payload.identities.filter((identity) =>
+        identity.username.includes(':'),
       ),
       identitiesCsv: payload.identities.filter(
-        (identity) => identity.username.split(':').length !== 1,
+        (identity) => !identity.username.includes(':'),
       ),
       scoreboards: payload.scoreboards,
     }),
@@ -40,11 +40,11 @@ OmegaUp.on('ready', () => {
       refreshMemberList: (): void => {
         api.Group.members({ group_alias: payload.groupAlias })
           .then((data) => {
-            groupEdit.identities = data.identities.filter(
-              (identity) => identity.username.split(':').length === 1,
+            groupEdit.identities = data.identities.filter((identity) =>
+              identity.username.includes(':'),
             );
             groupEdit.identitiesCsv = data.identities.filter(
-              (identity) => identity.username.split(':').length !== 1,
+              (identity) => !identity.username.includes(':'),
             );
           })
           .catch(ui.apiError);
@@ -260,15 +260,22 @@ OmegaUp.on('ready', () => {
                 ui.error(T.groupsInvalidCsv);
                 return;
               }
-              for (const cells of dataset.records) {
+              for (const [
+                username,
+                name,
+                country_id,
+                state_id,
+                gender,
+                school_name,
+              ] of dataset.records) {
                 source.identities.push({
-                  username: `${payload.groupAlias}:${cells[0]}`,
-                  name: cells[1],
+                  username: `${payload.groupAlias}:${username}`,
+                  name,
                   password: this.generatePassword(),
-                  country_id: cells[2],
-                  state_id: cells[3],
-                  gender: cells[4],
-                  school_name: cells[5],
+                  country_id,
+                  state_id,
+                  gender,
+                  school_name,
                 });
               }
               source.userErrorRow = null;
