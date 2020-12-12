@@ -15,6 +15,91 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Creates 8 quality problems with author
+     */
+    private function createQualityProblemsWithAuthor() {
+        $identities = [];
+        $problems = [];
+
+        // Create 4 user with 2 problems each
+        for ($i = 0; $i < 4; $i++) {
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser(
+                new \OmegaUp\Test\Factories\UserParams(
+                    ['username' => 'author_' . $i]
+                )
+            );
+
+            for ($j = 0; $j < 2; $j++) {
+                $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
+                    $identities[$i]
+                );
+            }
+        }
+
+        // The four users solve and rate the 8 problems
+        for ($i = 0; $i < 4; $i++) {
+            for ($j = 0; $j < 8; $j++) {
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problems[$j],
+                    $identities[$i]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.5, 'AC');
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                    $identities[$i],
+                    $problems[$j]['request']['problem_alias'],
+                    /*$difficulty=*/1,
+                    /*$quality=*/4,
+                    [],
+                    false
+                );
+            }
+        }
+
+        // Create another 4 non-author users that solve and rate the problems
+        for ($i = 4; $i < 8; $i++) {
+            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
+
+            for ($j = 0; $j < 8; $j++) {
+                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                    $problems[$j],
+                    $identities[$i]
+                );
+                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.5, 'AC');
+                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
+                    $identities[$i],
+                    $problems[$j]['request']['problem_alias'],
+                    /*$difficulty=*/1,
+                    /*$quality=*/3,
+                    [],
+                    false
+                );
+            }
+        }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        // Review problems as quality problems
+        $reviewerLogin = self::login(
+            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
+        );
+        foreach ($problems as $problem) {
+            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $reviewerLogin->auth_token,
+                'problem_alias' => $problem['request']['problem_alias'],
+                'nomination' => 'quality_tag',
+                'contents' => json_encode([
+                    'quality_seal' => true,
+                    'tag' => 'problemLevelBasicIntroductionToProgramming',
+                    'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
+                ]),
+            ]));
+        }
+
+        \OmegaUp\Test\Utils::runAggregateFeedback();
+    }
+
+    /**
      * Test for the most frequent tags of a level with a level parameter in a request
      */
     public function testCollectionTags() {
@@ -113,84 +198,10 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the authors rank with quality problems by a request
+     * Test for the authors rank with quality problems by a request and the paginator of problems
      */
     public function testCollectionAuthors() {
-        $identities = [];
-        $problems = [];
-
-        // Create 4 user with 2 problems each
-        for ($i = 0; $i < 4; $i++) {
-            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
-
-            for ($j = 0; $j < 2; $j++) {
-                $problems[] = \OmegaUp\Test\Factories\Problem::createProblemWithAuthor(
-                    $identities[$i]
-                );
-            }
-        }
-
-        // The four users solve and rate the 8 problems
-        for ($i = 0; $i < 4; $i++) {
-            for ($j = 0; $j < 8; $j++) {
-                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-                    $problems[$j],
-                    $identities[$i]
-                );
-                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.5, 'AC');
-                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
-                    $identities[$i],
-                    $problems[$j]['request']['problem_alias'],
-                    /*$difficulty=*/1,
-                    /*$quality=*/4,
-                    [],
-                    false
-                );
-            }
-        }
-
-        // Create another 4 non-author users that solve and rate the problems
-        for ($i = 4; $i < 8; $i++) {
-            ['identity' => $identities[$i]] = \OmegaUp\Test\Factories\User::createUser();
-
-            for ($j = 0; $j < 8; $j++) {
-                $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
-                    $problems[$j],
-                    $identities[$i]
-                );
-                \OmegaUp\Test\Factories\Run::gradeRun($runData, 1.5, 'AC');
-                \OmegaUp\Test\Factories\QualityNomination::createSuggestion(
-                    $identities[$i],
-                    $problems[$j]['request']['problem_alias'],
-                    /*$difficulty=*/1,
-                    /*$quality=*/3,
-                    [],
-                    false
-                );
-            }
-        }
-
-        \OmegaUp\Test\Utils::runAggregateFeedback();
-        \OmegaUp\Test\Utils::runUpdateRanks();
-
-        // Review problems as quality problems
-        $reviewerLogin = self::login(
-            \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
-        );
-        foreach ($problems as $problem) {
-            \OmegaUp\Controllers\QualityNomination::apiCreate(new \OmegaUp\Request([
-                'auth_token' => $reviewerLogin->auth_token,
-                'problem_alias' => $problem['request']['problem_alias'],
-                'nomination' => 'quality_tag',
-                'contents' => json_encode([
-                    'quality_seal' => true,
-                    'tag' => 'problemLevelBasicIntroductionToProgramming',
-                    'tags' => ['problemTagBitManipulation', 'problemTagRecursion'],
-                ]),
-            ]));
-        }
-
-        \OmegaUp\Test\Utils::runAggregateFeedback();
+        self::createQualityProblemsWithAuthor();
 
         // Create user
         ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -385,9 +396,9 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Test for the problem paginator
+     * Test for paginator of problems by level
      */
-    public function testProblemPaginator() {
+    public function testProblemsByLevelPaginator() {
         // Reviewer user
         $reviewerLogin = self::login(
             \OmegaUp\Test\Factories\QualityNomination::$reviewers[0]
@@ -405,6 +416,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'title' => 'problem_' . $i,
                 'problem_alias' => 'problem_' . $i,
                 'problem_level' => 'problemLevelBasicIntroductionToProgramming',
+                'author' => 'author_' . $i,
                 'source' => 'yo',
                 'visibility' => '2',
                 'selected_tags' => json_encode([
@@ -476,5 +488,48 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(2, $result);
         $this->assertEquals('problem_2', $result[0]['alias']);
         $this->assertEquals('problem_3', $result[1]['alias']);
+    }
+
+    /**
+     * Test for paginator of problems by author
+     */
+    public function testProblemsByAuthorPaginator() {
+        self::createQualityProblemsWithAuthor();
+
+        // Create user
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+
+        // Call getCollectionsDetailsByAuthorForSmarty
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(8, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'author' => 'author_0'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(2, $result);
+
+        // Call getCollectionsDetailsByAuthorForSmarty with a username of an author, 1 as rowcount
+        // and 2 as page
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'author' => 'author_0',
+                'rowcount' => 1,
+                'page' => 2
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(1, $result);
     }
 }

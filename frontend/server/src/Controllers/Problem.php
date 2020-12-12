@@ -6083,6 +6083,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order_by' => $orderBy,
             'sort_order' => $sortOrder,
             'tag' => $tags,
+            'author' => $authors,
             'difficulty' => $difficulty
         ];
 
