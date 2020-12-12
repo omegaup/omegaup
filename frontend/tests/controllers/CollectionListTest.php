@@ -405,6 +405,7 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
                 'title' => 'problem_' . $i,
                 'problem_alias' => 'problem_' . $i,
                 'problem_level' => 'problemLevelBasicIntroductionToProgramming',
+                'author' => 'author_' . $i,
                 'source' => 'yo',
                 'visibility' => '2',
                 'selected_tags' => json_encode([
@@ -476,5 +477,24 @@ class CollectionListTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertCount(2, $result);
         $this->assertEquals('problem_2', $result[0]['alias']);
         $this->assertEquals('problem_3', $result[1]['alias']);
+
+
+
+
+
+
+
+
+        // Call getCollectionsDetailsByAuthorForSmarty
+        $result = \OmegaUp\Controllers\Problem::getCollectionsDetailsByAuthorForSmarty(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'sort_order' => 'asc',
+                'author[]' => 'author_0'
+            ])
+        )['smartyProperties']['payload']['problems'];
+
+        $this->assertCount(4, $result);
+        $this->assertEquals('problem_0', $result[0]['alias']);  
     }
 }
