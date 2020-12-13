@@ -40,8 +40,9 @@ namespace OmegaUp\Controllers;
  * @psalm-type RunsDiff=array{guid: string, new_score: float|null, new_status: null|string, new_verdict: null|string, old_score: float|null, old_status: null|string, old_verdict: null|string, problemset_id: int|null, username: string}
  * @psalm-type CommitRunsDiff=array<string, list<RunsDiff>>
  * @psalm-type AuthorsRank=array{ranking: list<array{author_ranking: int|null, author_score: float, classname: string, country_id: null|string, name: null|string, username: string}>, total: int}
+ * @psalm-type TagWithProblemCount=array { name: string, problemCount: int }
  * @psalm-type CollectionDetailsByAuthorPayload=array{authorsRanking: AuthorsRank, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tags: list<string>, authors: list<string>}
- * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<array{alias: string, name?: string}>, publicTags: list<string>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
+ * @psalm-type CollectionDetailsByLevelPayload=array{frequentTags: list<TagWithProblemCount>, publicTags: list<TagWithProblemCount>, level: string, selectedTags: list<string>, loggedIn: bool, pagerItems: list<PageItem>, problems: list<ProblemListItem>, keyword: string, language: string, mode: string, column: string, languages: list<string>, columns: list<string>, modes: list<string>, tagData: list<array{name: null|string}>, tagsList: list<string>, difficulty: string}
  * @psalm-type Tag=array{name: string}
  * @psalm-type ProblemListCollectionPayload=array{levelTags: list<string>, problemCount: list<array{name: string, problems_per_tag: int}>, allTags: list<Tag>}
  */
@@ -3268,10 +3269,10 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * Entry point for Problem runs API
      *
      * @omegaup-request-param null|string $language
-     * @omegaup-request-param mixed $offset
+     * @omegaup-request-param int|null $offset
      * @omegaup-request-param null|string $problem_alias
-     * @omegaup-request-param mixed $rowcount
-     * @omegaup-request-param mixed $show_all
+     * @omegaup-request-param int|null $rowcount
+     * @omegaup-request-param bool|null $show_all
      * @omegaup-request-param null|string $status
      * @omegaup-request-param null|string $username
      * @omegaup-request-param null|string $verdict
@@ -3296,7 +3297,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
 
         $response = [];
 
-        if ($r['show_all']) {
+        if ($r->ensureOptionalBool('show_all') ?? false) {
             if (
                 !\OmegaUp\Authorization::isProblemAdmin(
                     $r->identity,
@@ -3327,8 +3328,8 @@ class Problem extends \OmegaUp\Controllers\Controller {
                     $problem->problem_id,
                     $r->ensureOptionalString('language'),
                     !is_null($identity) ? intval($identity->identity_id) : null,
-                    !is_null($r['offset']) ? intval($r['offset']) : null,
-                    !is_null($r['rowcount']) ? intval($r['rowcount']) : null
+                    $r->ensureOptionalInt('offset'),
+                    $r->ensureOptionalInt('rowcount')
                 ) as $run
             ) {
                 unset($run['run_id']);
@@ -5975,11 +5976,15 @@ class Problem extends \OmegaUp\Controllers\Controller {
             /*$rows=*/15
         );
 
+        $publicTags = \OmegaUp\Controllers\Tag::getPublicQualityTagsByLevel(
+            $collectionLevel
+        );
+
         return [
             'smartyProperties' => [
                 'payload' => [
+                    'publicTags' => $publicTags,
                     'frequentTags' => $frequentTags,
-                    'publicTags' => \OmegaUp\Controllers\Tag::getPublicTags(),
                     'level' => $collectionLevel,
                     'problems' => $result['problems'],
                     'loggedIn' => !is_null($r->identity),
@@ -6078,6 +6083,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
             'order_by' => $orderBy,
             'sort_order' => $sortOrder,
             'tag' => $tags,
+            'author' => $authors,
             'difficulty' => $difficulty
         ];
 

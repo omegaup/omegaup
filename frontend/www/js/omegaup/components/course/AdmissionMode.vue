@@ -52,9 +52,9 @@
               </span>
             </div>
           </div>
-          <p class="help-block">
-            <span v-html="admissionModeDescription"></span>
-          </p>
+          <omegaup-markdown
+            :markdown="admissionModeDescription"
+          ></omegaup-markdown>
         </div>
         <div class="text-right">
           <button class="btn btn-primary change-admission-mode" type="submit">
@@ -70,6 +70,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import Clipboard from 'v-clipboard';
 import T from '../../lang';
+import omegaup_Markdown from '../Markdown.vue';
 
 import {
   FontAwesomeIcon,
@@ -86,11 +87,11 @@ Vue.use(Clipboard);
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class CourseAdmissionMode extends Vue {
   @Prop() initialAdmissionMode!: string;
-  @Prop() admissionModeDescription!: string;
   @Prop() courseAlias!: string;
   @Prop() shouldShowPublicOption!: boolean;
 

@@ -151,8 +151,7 @@ export default class ProblemFinderWizard extends Vue {
     // Build query parameters
     let queryParameters: omegaup.QueryParameters = {
       some_tags: true,
-      min_difficulty: this.difficultyRange[0],
-      max_difficulty: this.difficultyRange[1],
+      difficulty_range: `${this.difficultyRange[0].toString()},${this.difficultyRange[1].toString()}`,
       order_by: this.selectedPriority,
       sort_order: 'desc',
     };
