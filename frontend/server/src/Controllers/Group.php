@@ -57,28 +57,6 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * Utility function to update an existing group.
-     */
-    private static function updateGroup(
-        \OmegaUp\DAO\VO\Groups $group,
-        string $name,
-        string $description
-    ): \OmegaUp\DAO\VO\Groups {
-        $group->name = $name;
-        $group->description = $description;
-
-        try {
-            \OmegaUp\DAO\Groups::update($group);
-
-            self::$log->info("Group {$group->alias} updated succesfully.");
-        } catch (\Exception $e) {
-            throw $e;
-        }
-
-        return $group;
-    }
-
-    /**
      * New group
      *
      * @param \OmegaUp\Request $r
@@ -128,8 +106,6 @@ class Group extends \OmegaUp\Controllers\Controller {
             'alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $groupName = $r->ensureString('name');
-        $groupDescription = $r->ensureString('description');
 
         $group = self::validateGroupAndOwner($groupAlias, $r->identity);
         if (is_null($group)) {
@@ -139,7 +115,10 @@ class Group extends \OmegaUp\Controllers\Controller {
             );
         }
 
-        self::updateGroup($group, $groupName, $groupDescription);
+        $group->name = $r->ensureString('name');
+        $group->description = $r->ensureString('description');
+        \OmegaUp\DAO\Groups::update($group);
+        self::$log->info("Group {$group->alias} updated succesfully.");
 
         return ['status' => 'ok'];
     }

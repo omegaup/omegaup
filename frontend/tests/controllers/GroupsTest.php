@@ -91,9 +91,6 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             'description' => $description,
         ]));
 
-        $updatedName = \OmegaUp\Test\Utils::createRandomString();
-        $updatedDescription = \OmegaUp\Test\Utils::createRandomString();
-
         $login = self::login($identity);
 
         try {
