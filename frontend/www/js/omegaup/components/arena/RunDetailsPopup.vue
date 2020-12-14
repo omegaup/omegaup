@@ -223,19 +223,8 @@ export default class ArenaRunDetailsPopup extends Vue {
     return cases[name]?.contestantOutput ?? '';
   }
 
-  contestScore(problemCase: {
-    contest_score: number;
-    max_score: number;
-    meta: types.RunMetadata;
-    name: string;
-    score: number;
-    verdict: string;
-  }): number {
+  contestScore(problemCase: types.CaseResult): number {
     return problemCase.contest_score ?? problemCase.score;
   }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-</style>

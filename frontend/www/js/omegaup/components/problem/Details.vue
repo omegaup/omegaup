@@ -113,7 +113,7 @@
             ></omegaup-arena-runsubmit-popup>
             <omegaup-arena-rundetails-popup
               v-show="popupDisplayed === PopupDisplayed.RunDetails"
-              :data="runDetailsData"
+              :data="currentRunDetailsData"
               @dismiss="onPopupDismissed"
             ></omegaup-arena-rundetails-popup>
             <omegaup-quality-nomination-promotion-popup
@@ -223,7 +223,8 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Emit, Watch } from 'vue-property-decorator';
-import { types } from '../../api_types';
+import { omegaup } from '../../omegaup';
+import { messages, types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
 import * as ui from '../../ui';
@@ -322,6 +323,7 @@ export default class ProblemDetails extends Vue {
   @Prop() hasBeenNominated!: boolean;
   @Prop({ default: null }) runDetailsData!: types.RunDetails | null;
   @Prop() guid!: string;
+  @Prop() isAdmin!: boolean;
 
   PopupDisplayed = PopupDisplayed;
   T = T;
@@ -333,6 +335,7 @@ export default class ProblemDetails extends Vue {
   hasUnreadClarifications =
     this.initialClarifications?.length > 0 &&
     this.activeTab !== 'clarifications';
+  currentRunDetailsData = this.runDetailsData;
 
   get availableTabs(): Tab[] {
     const tabs = [
@@ -371,13 +374,6 @@ export default class ProblemDetails extends Vue {
       (this.nominationStatus?.tried || this.nominationStatus?.solved) &&
       !this.hasBeenNominated
     );
-  }
-
-  mounted() {
-    if (!this.guid) {
-      return;
-    }
-    this.onRunDetails(this.guid);
   }
 
   onNewSubmission(): void {
@@ -427,6 +423,80 @@ export default class ProblemDetails extends Vue {
     this.onPopupDismissed();
   }
 
+  displayRunDetails(guid: string, data: messages.RunDetailsResponse): void {
+    let sourceHTML,
+      sourceLink = false;
+    if (data.source?.indexOf('data:') === 0) {
+      sourceLink = true;
+      sourceHTML = data.source;
+    } else if (data.source == 'lockdownDetailsDisabled') {
+      sourceHTML =
+        (typeof sessionStorage !== 'undefined' &&
+          sessionStorage.getItem(`run:${guid}`)) ||
+        T.lockdownDetailsDisabled;
+    } else {
+      sourceHTML = data.source;
+    }
+
+    const numericSort = <T extends { [key: string]: any }>(key: string) => {
+      const isDigit = (ch: string) => '0' <= ch && ch <= '9';
+      return (x: T, y: T) => {
+        let i = 0,
+          j = 0;
+        for (; i < x[key].length && j < y[key].length; i++, j++) {
+          if (isDigit(x[key][i]) && isDigit(x[key][j])) {
+            let nx = 0,
+              ny = 0;
+            while (i < x[key].length && isDigit(x[key][i]))
+              nx = nx * 10 + parseInt(x[key][i++]);
+            while (j < y[key].length && isDigit(y[key][j]))
+              ny = ny * 10 + parseInt(y[key][j++]);
+            i--;
+            j--;
+            if (nx != ny) return nx - ny;
+          } else if (x[key][i] < y[key][j]) {
+            return -1;
+          } else if (x[key][i] > y[key][j]) {
+            return 1;
+          }
+        }
+        return x[key].length - i - (y[key].length - j);
+      };
+    };
+    const detailsGroups = data.details && data.details.groups;
+    let groups = undefined;
+    if (detailsGroups && detailsGroups.length) {
+      detailsGroups.sort(numericSort('group'));
+      for (const detailGroup of detailsGroups) {
+        if (!detailGroup.cases) {
+          continue;
+        }
+        detailGroup.cases.sort(numericSort('name'));
+      }
+      groups = detailsGroups;
+    }
+
+    Vue.set(
+      this,
+      'currentRunDetailsData',
+      Object.assign({}, data, {
+        logs: data.logs || '',
+        judged_by: data.judged_by || '',
+        source: sourceHTML,
+        source_link: sourceLink,
+        source_url: window.URL.createObjectURL(
+          new Blob([data.source || ''], { type: 'text/plain' }),
+        ),
+        source_name: `Main.${data.language}`,
+        groups: groups,
+        show_diff: this.isAdmin ? data.show_diff : 'none',
+        feedback: <omegaup.SubmissionFeedback>omegaup.SubmissionFeedback.None,
+      }),
+    );
+
+    window.location.hash = `#problems/show-run:${guid}/`;
+  }
+
   @Emit('update:activeTab')
   onTabSelected(tabName: string): string {
     if (this.selectedTab === 'clarifications') {
@@ -441,10 +511,16 @@ export default class ProblemDetails extends Vue {
     this.clarifications = newValue;
   }
 
-  @Watch('showNewRunWindow')
-  onShowNewRunWindowChanged(newValue: boolean): void {
-    if (!newValue) return;
-    this.onNewSubmission();
+  @Watch('initialPopupDisplayed')
+  onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    if (newValue === PopupDisplayed.None) return;
+    if (newValue === PopupDisplayed.RunSubmit) {
+      this.onNewSubmission();
+      return;
+    }
+    if (newValue === PopupDisplayed.RunDetails && this.guid) {
+      this.onRunDetails(this.guid);
+    }
   }
 
   @Watch('clarifications')

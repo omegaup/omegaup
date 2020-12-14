@@ -1321,6 +1321,16 @@ export namespace types {
     username: string;
   }
 
+  export interface CaseResult {
+    contest_score: number;
+    max_score: number;
+    meta: types.RunMetadata;
+    name?: string;
+    out_diff?: string;
+    score: number;
+    verdict: string;
+  }
+
   export interface CertificateDetailsPayload {
     uuid: string;
   }
@@ -2582,14 +2592,7 @@ export namespace types {
       compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
       groups?: {
-        cases: {
-          contest_score: number;
-          max_score: number;
-          meta: types.RunMetadata;
-          name: string;
-          score: number;
-          verdict: string;
-        }[];
+        cases: types.CaseResult[];
         contest_score: number;
         group: string;
         max_score: number;
@@ -2748,15 +2751,7 @@ export namespace types {
     place?: number;
     points: number;
     run_details?: {
-      cases?: {
-        contest_score: number;
-        max_score: number;
-        meta: types.RunMetadata;
-        name?: string;
-        out_diff: string;
-        score: number;
-        verdict: string;
-      }[];
+      cases?: types.CaseResult[];
       details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
     };
     runs: number;
@@ -3177,15 +3172,7 @@ export namespace messages {
         place?: number;
         points: number;
         run_details?: {
-          cases?: {
-            contest_score: number;
-            max_score: number;
-            meta: types.RunMetadata;
-            name?: string;
-            out_diff: string;
-            score: number;
-            verdict: string;
-          }[];
+          cases?: types.CaseResult[];
           details: { groups: { cases: { meta: types.RunMetadata }[] }[] };
         };
         runs: number;
@@ -3787,14 +3774,7 @@ export namespace messages {
       compile_meta?: { [key: string]: types.RunMetadata };
       contest_score: number;
       groups?: {
-        cases: {
-          contest_score: number;
-          max_score: number;
-          meta: types.RunMetadata;
-          name: string;
-          score: number;
-          verdict: string;
-        }[];
+        cases: types.CaseResult[];
         contest_score: number;
         group: string;
         max_score: number;

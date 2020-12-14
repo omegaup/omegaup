@@ -18,6 +18,7 @@ namespace OmegaUp\Controllers;
  * @psalm-type ProblemInfo=array{accepts_submissions: boolean, commit: string, alias: string, input_limit: int, karel_problem: bool, languages: list<string>, letter?: string, limits: array{input_limit: string, memory_limit: string, overall_wall_time_limit: string, time_limit: string}, points: float, preferred_language: null|string, problem_id: int, problemsetter: ProblemsetterInfo|null, quality_seal: bool, sample_input: null|string, settings: ProblemSettingsDistrib, source: null|string, statement: ProblemStatement, title: string, visibility: int}
  * @psalm-type UserInfoForProblem=array{loggedIn: bool, admin: bool, reviewer: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: null|string, out_diff?: string, score: float, verdict: string}
  * @psalm-type ProblemListItem=array{alias: string, difficulty: float|null, difficulty_histogram: list<int>, points: float, problem_id: int, quality: float|null, quality_histogram: list<int>, quality_seal: bool, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}
  * @psalm-type Statements=array<string, string>
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
@@ -3532,7 +3533,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
                 /*missingOk=*/true
             );
             if (!is_null($detailsJson)) {
-                /** @var null|array{verdict: string, compile_meta: array{Main: RunMetadata}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<array{verdict: string, name: string, score: int, contest_score: int, max_score: int, meta: RunMetadata}>}>} */
+                /** @var null|array{verdict: string, compile_meta: array{Main: RunMetadata}, score: int, contest_score: int, max_score: int, time: float, wall_time: float, memory: int, judged_by: string, groups: list<array{group: string, score: float, contest_score: int, max_score: int, cases: list<CaseResult>}>} */
                 $details = json_decode($detailsJson, /*associative=*/true);
                 if (!is_array($details)) {
                     self::$log->error(
@@ -3556,12 +3557,12 @@ class Problem extends \OmegaUp\Controllers\Controller {
                                     $casesStats['counts']
                                 )
                             ) {
-                                $casesStats['counts'][$case['name']] = 0;
+                                $casesStats['counts'][$caseName] = 0;
                             }
-                            if ($case['score'] === 0) {
+                            if ($case['score'] === 0.0) {
                                 continue;
                             }
-                            $casesStats['counts'][$case['name']]++;
+                            $casesStats['counts'][$caseName]++;
                         }
                     }
                 }

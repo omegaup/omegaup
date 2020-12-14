@@ -5,8 +5,8 @@ import problem_Details, {
 import qualitynomination_Demotion from '../components/qualitynomination/DemotionPopup.vue';
 import qualitynomination_Promotion from '../components/qualitynomination/PromotionPopup.vue';
 import { myRunsStore, runsStore, RunFilters } from '../arena/runsStore';
-import { omegaup, OmegaUp } from '../omegaup';
-import { types, messages } from '../api_types';
+import { OmegaUp } from '../omegaup';
+import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
@@ -17,31 +17,6 @@ OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
-  let popupDisplayed = PopupDisplayed.None;
-  let guid: string | null = null;
-  if (locationHash.includes('new-run')) {
-    popupDisplayed = PopupDisplayed.RunSubmit;
-  } else if (locationHash[1] && locationHash[1].includes('show-run:')) {
-    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
-    const showRunMatch = window.location.hash.match(showRunRegex);
-    guid = showRunMatch ? showRunMatch[1] : null;
-    popupDisplayed = PopupDisplayed.RunDetails;
-  } else if (
-    (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
-    !(
-      payload.nominationStatus?.dismissed ||
-      (payload.nominationStatus?.dismissedBeforeAc &&
-        !payload.nominationStatus?.solved)
-    ) &&
-    !(
-      payload.nominationStatus?.nominated ||
-      (payload.nominationStatus?.nominatedBeforeAc &&
-        !payload.nominationStatus?.solved)
-    ) &&
-    payload.nominationStatus?.canNominateProblem
-  ) {
-    popupDisplayed = PopupDisplayed.Promotion;
-  }
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
   if (runs) {
@@ -62,6 +37,7 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       initialClarifications: payload.clarifications,
+      initialPopupDisplayed: PopupDisplayed.None,
       runDetailsData: <types.RunDetails | null>null,
       solutionStatus: payload.solutionStatus,
       solution: <types.ProblemStatement | null>null,
@@ -72,6 +48,7 @@ OmegaUp.on('ready', () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
+      guid: <null | string>null,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -89,7 +66,7 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          initialPopupDisplayed: popupDisplayed,
+          initialPopupDisplayed: this.initialPopupDisplayed,
           runDetailsData: this.runDetailsData,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
@@ -98,14 +75,15 @@ OmegaUp.on('ready', () => {
           selectedPublicTags: payload.selectedPublicTags,
           selectedPrivateTags: payload.selectedPrivateTags,
           hasBeenNominated: this.hasBeenNominated,
-          guid: guid,
+          guid: this.guid,
+          isAdmin: commonPayload.isAdmin,
         },
         on: {
           'show-run': (source: problem_Details, guid: string) => {
             api.Run.details({ run_alias: guid })
               .then((data) => {
                 if (data.show_diff === 'none' || !commonPayload.isAdmin) {
-                  displayRunDetails(guid, data);
+                  source.displayRunDetails(guid, data);
                   return;
                 }
                 fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
@@ -153,7 +131,7 @@ OmegaUp.on('ready', () => {
                         }
                       });
                     });
-                    displayRunDetails(guid, data);
+                    source.displayRunDetails(guid, data);
                   })
                   .catch(ui.apiError);
               })
@@ -381,83 +359,6 @@ OmegaUp.on('ready', () => {
     },
   });
 
-  function displayRunDetails(
-    guid: string,
-    data: messages.RunDetailsResponse,
-  ): void {
-    let sourceHTML,
-      sourceLink = false;
-    if (data.source?.indexOf('data:') === 0) {
-      sourceLink = true;
-      sourceHTML = data.source;
-    } else if (data.source == 'lockdownDetailsDisabled') {
-      sourceHTML =
-        (typeof sessionStorage !== 'undefined' &&
-          sessionStorage.getItem(`run:${guid}`)) ||
-        T.lockdownDetailsDisabled;
-    } else {
-      sourceHTML = data.source;
-    }
-
-    const numericSort = <T extends { [key: string]: any }>(key: string) => {
-      const isDigit = (ch: string) => '0' <= ch && ch <= '9';
-      return (x: T, y: T) => {
-        let i = 0,
-          j = 0;
-        for (; i < x[key].length && j < y[key].length; i++, j++) {
-          if (isDigit(x[key][i]) && isDigit(x[key][j])) {
-            let nx = 0,
-              ny = 0;
-            while (i < x[key].length && isDigit(x[key][i]))
-              nx = nx * 10 + parseInt(x[key][i++]);
-            while (j < y[key].length && isDigit(y[key][j]))
-              ny = ny * 10 + parseInt(y[key][j++]);
-            i--;
-            j--;
-            if (nx != ny) return nx - ny;
-          } else if (x[key][i] < y[key][j]) {
-            return -1;
-          } else if (x[key][i] > y[key][j]) {
-            return 1;
-          }
-        }
-        return x[key].length - i - (y[key].length - j);
-      };
-    };
-    const detailsGroups = data.details && data.details.groups;
-    let groups = undefined;
-    if (detailsGroups && detailsGroups.length) {
-      detailsGroups.sort(numericSort('group'));
-      for (const detailGroup of detailsGroups) {
-        if (!detailGroup.cases) {
-          continue;
-        }
-        detailGroup.cases.sort(numericSort('name'));
-      }
-      groups = detailsGroups;
-    }
-
-    Vue.set(
-      problemDetailsView,
-      'runDetailsData',
-      Object.assign({}, data, {
-        logs: data.logs || '',
-        judged_by: data.judged_by || '',
-        source: sourceHTML,
-        source_link: sourceLink,
-        source_url: window.URL.createObjectURL(
-          new Blob([data.source || ''], { type: 'text/plain' }),
-        ),
-        source_name: `Main.${data.language}`,
-        groups: groups,
-        show_diff: commonPayload.isAdmin ? data.show_diff : 'none',
-        feedback: <omegaup.SubmissionFeedback>omegaup.SubmissionFeedback.None,
-      }),
-    );
-
-    window.location.hash = `#problems/show-run:${guid}/`;
-  }
-
   function updateRun(run: types.Run): void {
     trackRun(run);
 
@@ -519,5 +420,29 @@ OmegaUp.on('ready', () => {
           (problemDetailsView.initialClarifications = response.clarifications),
       )
       .catch(ui.apiError);
+  }
+
+  if (locationHash.includes('new-run')) {
+    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunSubmit;
+  } else if (locationHash[1] && locationHash[1].includes('show-run:')) {
+    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
+    const showRunMatch = window.location.hash.match(showRunRegex);
+    problemDetailsView.guid = showRunMatch ? showRunMatch[1] : null;
+    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunDetails;
+  } else if (
+    (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
+    !(
+      payload.nominationStatus?.dismissed ||
+      (payload.nominationStatus?.dismissedBeforeAc &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    !(
+      payload.nominationStatus?.nominated ||
+      (payload.nominationStatus?.nominatedBeforeAc &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    payload.nominationStatus?.canNominateProblem
+  ) {
+    problemDetailsView.initialPopupDisplayed = PopupDisplayed.Promotion;
   }
 });
