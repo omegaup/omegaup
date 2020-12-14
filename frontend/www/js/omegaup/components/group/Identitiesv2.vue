@@ -79,6 +79,10 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 library.add(faDownload);
 
+export function readFile(e: HTMLInputElement): File | null {
+  return (e.files && e.files[0]) || null;
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
@@ -92,33 +96,21 @@ export default class Identities extends Vue {
   T = T;
   identities: types.Identity[] = [];
 
-  readCsv(ev: InputEvent): void {
-    const file = this.takeFile(ev);
-    if (typeof file === 'undefined') {
+  readCsv(ev: HTMLInputElement): void {
+    const file = readFile(ev);
+    if (!file || file.name === '') {
+      return;
+    }
+
+    const regex = /.*\.(?:csv|txt)$/;
+
+    if (!regex.test(file.name.toLowerCase())) {
+      this.$emit('invalid-file');
       return;
     }
 
     this.identities = [];
     this.$emit('read-csv', { identities: this.identities }, file);
-  }
-
-  takeFile(ev: InputEvent): File | undefined {
-    const fileUpload = <HTMLInputElement>ev.target;
-    if (fileUpload.value === '') {
-      return;
-    }
-    const regex = /.*\.(?:csv|txt)$/;
-
-    if (!regex.test(fileUpload.value.toLowerCase())) {
-      this.$emit('invalid-file');
-      return;
-    }
-
-    if (!fileUpload.files) {
-      return;
-    }
-
-    return fileUpload.files[0];
   }
 }
 </script>
