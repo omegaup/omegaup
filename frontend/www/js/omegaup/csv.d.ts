@@ -11,16 +11,22 @@ declare module '@/third_party/js/csv.js/csv.js' {
       commentChar: string;
     };
   }
-  interface Source {
-    file: File | null;
-    encoding?: string;
-    url?: string;
-    data?: any;
-  }
+  type Source =
+    | {
+        file: File;
+        encoding?: string;
+      }
+    | {
+        url: string;
+      }
+    | {
+        data: string;
+      };
   export interface Dataset {
-    fields: Array<string>;
-    records: Array<any>;
+    fields?: string[];
+    records: (null | number | string)[][];
   }
 
+  export function fetch(source: Source): Promise<Dataset>;
   export function serialize(dataToSerialize: any, dialect: Dialect): string;
 }

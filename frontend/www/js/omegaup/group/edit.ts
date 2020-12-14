@@ -253,10 +253,13 @@ OmegaUp.on('ready', () => {
             fileUpload: HTMLInputElement,
           ) => {
             source.identities = [];
+            if (!fileUpload.files) {
+              return;
+            }
             CSV.fetch({
-              file: fileUpload.files ? fileUpload.files[0] : null,
+              file: fileUpload.files[0],
             }).done((dataset: CSV.Dataset) => {
-              if (dataset.fields.length != 6) {
+              if (!dataset.fields || dataset.fields.length != 6) {
                 ui.error(T.groupsInvalidCsv);
                 return;
               }
