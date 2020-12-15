@@ -1,4 +1,5 @@
 declare module '@/third_party/js/csv.js/csv.js' {
+  import * as $ from 'jquery';
   interface Dialect {
     dialect: {
       csvddfVersion: number;
@@ -24,9 +25,9 @@ declare module '@/third_party/js/csv.js/csv.js' {
       };
   export interface Dataset {
     fields?: string[];
-    records: (null | number | string)[][];
+    records: (null | string)[][];
   }
 
-  export function fetch(source: Source): Promise<Dataset>;
+  export function fetch(source: Source): $.Promise;
   export function serialize(dataToSerialize: any, dialect: Dialect): string;
 }

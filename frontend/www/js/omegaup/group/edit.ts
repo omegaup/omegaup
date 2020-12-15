@@ -273,12 +273,12 @@ OmegaUp.on('ready', () => {
               ] of dataset.records) {
                 source.identities.push({
                   username: `${payload.groupAlias}:${username}`,
-                  name,
+                  name: name ?? undefined,
                   password: this.generatePassword(),
-                  country_id,
-                  state_id,
-                  gender,
-                  school_name,
+                  country_id: country_id ?? undefined,
+                  state_id: state_id ?? undefined,
+                  gender: gender ?? undefined,
+                  school_name: school_name ?? undefined,
                 });
               }
               source.userErrorRow = null;
