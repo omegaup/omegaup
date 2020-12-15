@@ -8,7 +8,7 @@
     <ul class="nav nav-pills">
       <li class="nav-item" role="presentation">
         <a
-          :href="`#${selectedTab}`"
+          :href="`#${AvailableTabs.Edit}`"
           class="nav-link"
           data-tab-edit
           :class="{ active: selectedTab === AvailableTabs.Edit }"
@@ -18,7 +18,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          :href="`#${selectedTab}`"
+          :href="`#${AvailableTabs.Members}`"
           class="nav-link"
           data-tab-members
           :class="{ active: selectedTab === AvailableTabs.Members }"
@@ -28,7 +28,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          :href="`#${selectedTab}`"
+          :href="`#${AvailableTabs.Scoreboards}`"
           class="nav-link"
           data-tab-scoreboards
           :class="{ active: selectedTab === AvailableTabs.Scoreboards }"
@@ -38,7 +38,7 @@
       </li>
       <li class="nav-item" role="presentation">
         <a
-          :href="`#${selectedTab}`"
+          :href="`#${AvailableTabs.Identities}`"
           class="nav-link"
           data-tab-identities
           :class="{ active: selectedTab === AvailableTabs.Identities }"

@@ -1,8 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
-import { omegaup } from '../../omegaup';
-import { dao } from '../../api_types';
+import { dao, types } from '../../api_types';
 
 import identity_Edit from './Edit.vue';
 
@@ -13,7 +12,7 @@ describe('Edit.vue', () => {
         identity: {
           username: 'hello',
           name: 'hello',
-        } as omegaup.Identity,
+        } as types.Identity,
         countries: [{ country_id: 'mx', name: 'Mexico' }] as dao.Countries[],
       },
     });

@@ -91,7 +91,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 import * as typeahead from '../../typeahead';
@@ -103,13 +103,13 @@ import Autocomplete from '../Autocomplete.vue';
   },
 })
 export default class IdentityEdit extends Vue {
-  @Prop({ default: null }) identity!: omegaup.Identity | null;
+  @Prop({ default: null }) identity!: types.Identity | null;
   @Prop() countries!: iso3166.Country[];
 
   T = T;
   typeahead = typeahead;
   selectedIdentity = Object.assign(
-    <omegaup.Identity>{
+    <types.Identity>{
       username: '',
       classname: '',
       name: '',
@@ -125,7 +125,7 @@ export default class IdentityEdit extends Vue {
   selectedState = '';
 
   @Watch('identity')
-  onIdentityChanged(newIdentity: omegaup.Identity) {
+  onIdentityChanged(newIdentity: types.Identity) {
     Object.assign(this.identity, newIdentity);
   }
 
