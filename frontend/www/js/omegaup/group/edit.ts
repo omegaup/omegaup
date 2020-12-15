@@ -49,30 +49,6 @@ OmegaUp.on('ready', () => {
           })
           .catch(ui.apiError);
       },
-      generatePassword: (): string => {
-        const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
-        const len = 8;
-        // Browser supports window.crypto
-        if (typeof window.crypto == 'object') {
-          const arr = new Uint8Array(2 * len);
-          window.crypto.getRandomValues(arr);
-          return Array.from(
-            arr.filter((value) => value <= 255 - (255 % validChars.length)),
-            (value) => validChars[value % validChars.length],
-          )
-            .join('')
-            .substr(0, len);
-        }
-
-        // Browser does not support window.crypto
-        let password = '';
-        for (let i = 0; i < len; i++) {
-          password += validChars.charAt(
-            Math.floor(Math.random() * validChars.length),
-          );
-        }
-        return password;
-      },
     },
     render: function (createElement) {
       return createElement('omegaup-group-edit', {
@@ -207,7 +183,7 @@ OmegaUp.on('ready', () => {
                 this.tab = AvailableTabs.Members;
                 ui.success(T.groupsIdentitiesSuccessfullyCreated);
               })
-              .catch(function (data) {
+              .catch((data) => {
                 ui.error(data.error);
                 source.userErrorRow = data.parameter;
               });
@@ -258,34 +234,79 @@ OmegaUp.on('ready', () => {
             }
             CSV.fetch({
               file: fileUpload.files[0],
-            }).done((dataset: CSV.Dataset) => {
-              if (!dataset.fields || dataset.fields.length != 6) {
-                ui.error(T.groupsInvalidCsv);
-                return;
-              }
-              for (const [
-                username,
-                name,
-                country_id,
-                state_id,
-                gender,
-                school_name,
-              ] of dataset.records) {
-                source.identities.push({
-                  username: `${payload.groupAlias}:${username}`,
-                  name: name ?? undefined,
-                  password: this.generatePassword(),
-                  country_id: country_id ?? undefined,
-                  state_id: state_id ?? undefined,
-                  gender: gender ?? undefined,
-                  school_name: school_name ?? undefined,
-                });
-              }
-              source.userErrorRow = null;
-            });
+            })
+              .done((dataset: CSV.Dataset) => {
+                if (!dataset.fields || dataset.fields.length != 6) {
+                  ui.error(T.groupsInvalidCsv);
+                  return;
+                }
+                for (const [
+                  username,
+                  name,
+                  country_id,
+                  state_id,
+                  gender,
+                  school_name,
+                ] of cleanRecords(dataset.records)) {
+                  source.identities.push({
+                    username: `${payload.groupAlias}:${username}`,
+                    name,
+                    password: generatePassword(),
+                    country_id,
+                    state_id,
+                    gender,
+                    school_name,
+                  });
+                }
+                source.userErrorRow = null;
+              })
+              .fail((data) => {
+                ui.error(data.error);
+              });
           },
         },
       });
     },
   });
+
+  function cleanRecords(
+    records: (null | number | string)[][],
+  ): (undefined | string)[][] {
+    return records.map((row) =>
+      row.map((cell) => {
+        if (cell === null) {
+          return undefined;
+        }
+        if (typeof cell !== 'string') {
+          return String(cell);
+        }
+        return cell;
+      }),
+    );
+  }
+
+  function generatePassword(): string {
+    const validChars = 'acdefhjkmnpqruvwxyACDEFHJKLMNPQRUVWXY346';
+    const len = 8;
+    // Browser supports window.crypto
+    if (typeof window.crypto == 'object') {
+      const arr = new Uint8Array(2 * len);
+      window.crypto.getRandomValues(arr);
+      return Array.from(
+        arr.filter((value) => value <= 255 - (255 % validChars.length)),
+        (value) => validChars[value % validChars.length],
+      )
+        .join('')
+        .substr(0, len);
+    }
+
+    // Browser does not support window.crypto
+    let password = '';
+    for (let i = 0; i < len; i++) {
+      password += validChars.charAt(
+        Math.floor(Math.random() * validChars.length),
+      );
+    }
+    return password;
+  }
 });
