@@ -32,7 +32,7 @@ describe('Identitiesv2.vue', () => {
     const file_input = wrapper.find('input[type=file]');
     file_input.trigger('change');
 
-    expect(wrapper.emitted()['invalid-file']).toBeDefined();
+    expect(wrapper.emitted('invalid-file')).toBeDefined();
   });
 
   it('Should handle a valid csv file', () => {
@@ -50,6 +50,6 @@ describe('Identitiesv2.vue', () => {
     const file_input = wrapper.find('input[type=file]');
     file_input.trigger('change');
 
-    expect(wrapper.emitted()['read-csv']).toBeDefined();
+    expect(wrapper.emitted('read-csv')).toBeDefined();
   });
 });
