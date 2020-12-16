@@ -22,7 +22,8 @@ describe('Identitiesv2.vue', () => {
         groupAlias: 'Hello',
       },
     });
-    const invalidFile = { type: 'text/html', name: 'fake.html' };
+
+    const invalidFile = new File([''], 'fake.html', { type: 'text/html' });
     const mockMethod = jest
       .spyOn(wrapper.vm, 'readFile')
       .mockImplementation(() => invalidFile);
@@ -39,7 +40,7 @@ describe('Identitiesv2.vue', () => {
       },
     });
 
-    const validFile = { type: 'text/csv', name: 'users.csv' };
+    const validFile = new File([''], 'users.csv', { type: 'text/csv' });
     const mockMethod = jest
       .spyOn(wrapper.vm, 'readFile')
       .mockImplementation(() => validFile);
