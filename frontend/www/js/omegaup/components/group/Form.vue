@@ -73,16 +73,19 @@ import latinize from 'latinize';
 
 @Component
 export default class GroupForm extends Vue {
+  @Prop({ default: '' }) groupAlias!: string;
+  @Prop({ default: '' }) groupDescription!: string;
+  @Prop({ default: '' }) groupName!: string;
   @Prop({ default: false }) isUpdate!: boolean;
 
   T = T;
-  alias: string = '';
-  description: string = '';
-  name: string = '';
+  alias: string = this.groupAlias;
+  description: string = this.groupDescription;
+  name: string = this.groupName;
 
   onSubmit(): void {
     if (this.isUpdate) {
-      this.$emit('update-group', this.name, this.alias, this.description);
+      this.$emit('update-group', this.name, this.description);
       return;
     }
     this.$emit('create-group', this.name, this.alias, this.description);

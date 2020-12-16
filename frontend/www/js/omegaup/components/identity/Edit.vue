@@ -114,16 +114,16 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 
 @Component
 export default class IdentityEdit extends Vue {
-  @Prop() identity!: omegaup.Identity;
+  @Prop() identity!: types.Identity;
   @Prop() countries!: iso3166.Country[];
   @Prop({ default: 'MX' }) selectedCountry!: string;
-  @Prop() selectedState!: string;
+  @Prop() selectedState!: string | undefined;
   @Prop() username!: string;
 
   T = T;
