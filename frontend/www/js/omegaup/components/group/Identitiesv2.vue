@@ -79,10 +79,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 library.add(faDownload);
 
-export function readFile(e: HTMLInputElement): File | null {
-  return (e.files && e.files[0]) || null;
-}
-
 @Component({
   components: {
     FontAwesomeIcon,
@@ -96,8 +92,12 @@ export default class Identities extends Vue {
   T = T;
   identities: types.Identity[] = [];
 
+  readFile(e: HTMLInputElement): File | null {
+    return (e.files && e.files[0]) || null;
+  }
+
   readCsv(ev: HTMLInputElement): void {
-    const file = readFile(ev);
+    const file = this.readFile(ev);
     if (!file || file.name === '') {
       return;
     }
