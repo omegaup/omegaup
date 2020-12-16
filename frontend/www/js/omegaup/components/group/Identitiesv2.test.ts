@@ -24,13 +24,14 @@ describe('Identitiesv2.vue', () => {
     });
 
     const invalidFile = new File([''], 'fake.html', { type: 'text/html' });
-    const mockMethod = jest
+    const mockReadFileMethod = jest
       .spyOn(wrapper.vm, 'readFile')
       .mockImplementation(() => invalidFile);
     const fileInput = wrapper.find('input[type=file]');
     await fileInput.trigger('change');
-    expect(mockMethod).toHaveBeenCalled();
+    expect(mockReadFileMethod).toHaveBeenCalled();
     expect(wrapper.emitted('invalid-file')).toBeDefined();
+    mockReadFileMethod.mockRestore();
   });
 
   it('Should handle a valid csv file', async () => {
@@ -41,12 +42,13 @@ describe('Identitiesv2.vue', () => {
     });
 
     const validFile = new File([''], 'users.csv', { type: 'text/csv' });
-    const mockMethod = jest
+    const mockReadFileMethod = jest
       .spyOn(wrapper.vm, 'readFile')
       .mockImplementation(() => validFile);
     const fileInput = wrapper.find('input[type=file]');
     await fileInput.trigger('change');
-    expect(mockMethod).toHaveBeenCalled();
+    expect(mockReadFileMethod).toHaveBeenCalled();
     expect(wrapper.emitted('read-csv')).toBeDefined();
+    mockReadFileMethod.mockRestore();
   });
 });
