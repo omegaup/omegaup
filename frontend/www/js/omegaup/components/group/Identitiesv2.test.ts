@@ -1,11 +1,9 @@
-jest.mock('./Identitiesv2.vue');
 import { mount, shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
 import T from '../../lang';
 
-import group_Identitiesv2, { readFile } from './Identitiesv2.vue';
-const readFileMock = readFile as jest.Mock;
+import group_Identitiesv2 from './Identitiesv2.vue';
 
 describe('Identitiesv2.vue', () => {
   it('Should handle identities view', () => {
@@ -24,12 +22,13 @@ describe('Identitiesv2.vue', () => {
         groupAlias: 'Hello',
       },
     });
-
-    readFileMock.mockResolvedValue({ type: 'text/html', name: 'fake.html' });
-
+    const invalidFile = { type: 'text/html', name: 'fake.html' };
+    const mockMethod = jest
+      .spyOn(group_Identitiesv2.methods, 'readFile')
+      .mockImplementation(() => invalidFile);
     const fileInput = wrapper.find('input[type=file]');
     await fileInput.trigger('change');
-
+    expect(mockMethod).toHaveBeenCalled();
     expect(wrapper.emitted('invalid-file')).toBeDefined();
   });
 
@@ -40,11 +39,13 @@ describe('Identitiesv2.vue', () => {
       },
     });
 
-    readFileMock.mockResolvedValue({ type: 'text/csv', name: 'users.csv' });
-
+    const validFile = { type: 'text/csv', name: 'users.csv' };
+    const mockMethod = jest
+      .spyOn(group_Identitiesv2.methods, 'readFile')
+      .mockImplementation(() => validFile);
     const fileInput = wrapper.find('input[type=file]');
     await fileInput.trigger('change');
-
+    expect(mockMethod).toHaveBeenCalled();
     expect(wrapper.emitted('read-csv')).toBeDefined();
   });
 });
