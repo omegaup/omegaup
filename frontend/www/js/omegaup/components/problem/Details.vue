@@ -274,6 +274,32 @@ export enum PopupDisplayed {
   Reviewer,
 }
 
+const numericSort = <T extends { [key: string]: any }>(key: string) => {
+  const isDigit = (ch: string) => '0' <= ch && ch <= '9';
+  return (x: T, y: T) => {
+    let i = 0,
+      j = 0;
+    for (; i < x[key].length && j < y[key].length; i++, j++) {
+      if (isDigit(x[key][i]) && isDigit(x[key][j])) {
+        let nx = 0,
+          ny = 0;
+        while (i < x[key].length && isDigit(x[key][i]))
+          nx = nx * 10 + parseInt(x[key][i++]);
+        while (j < y[key].length && isDigit(y[key][j]))
+          ny = ny * 10 + parseInt(y[key][j++]);
+        i--;
+        j--;
+        if (nx != ny) return nx - ny;
+      } else if (x[key][i] < y[key][j]) {
+        return -1;
+      } else if (x[key][i] > y[key][j]) {
+        return 1;
+      }
+    }
+    return x[key].length - i - (y[key].length - j);
+  };
+};
+
 @Component({
   components: {
     FontAwesomeIcon,
@@ -438,31 +464,6 @@ export default class ProblemDetails extends Vue {
       sourceHTML = data.source;
     }
 
-    const numericSort = <T extends { [key: string]: any }>(key: string) => {
-      const isDigit = (ch: string) => '0' <= ch && ch <= '9';
-      return (x: T, y: T) => {
-        let i = 0,
-          j = 0;
-        for (; i < x[key].length && j < y[key].length; i++, j++) {
-          if (isDigit(x[key][i]) && isDigit(x[key][j])) {
-            let nx = 0,
-              ny = 0;
-            while (i < x[key].length && isDigit(x[key][i]))
-              nx = nx * 10 + parseInt(x[key][i++]);
-            while (j < y[key].length && isDigit(y[key][j]))
-              ny = ny * 10 + parseInt(y[key][j++]);
-            i--;
-            j--;
-            if (nx != ny) return nx - ny;
-          } else if (x[key][i] < y[key][j]) {
-            return -1;
-          } else if (x[key][i] > y[key][j]) {
-            return 1;
-          }
-        }
-        return x[key].length - i - (y[key].length - j);
-      };
-    };
     const detailsGroups = data.details && data.details.groups;
     let groups = undefined;
     if (detailsGroups && detailsGroups.length) {
@@ -494,7 +495,7 @@ export default class ProblemDetails extends Vue {
       }),
     );
 
-    window.location.hash = `#problems/show-run:${guid}/`;
+    this.$emit('change-show-run-location', this.guid);
   }
 
   @Emit('update:activeTab')

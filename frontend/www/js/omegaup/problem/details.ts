@@ -354,6 +354,9 @@ OmegaUp.on('ready', () => {
               window.location.pathname,
             )}`;
           },
+          'change-show-run-location': (guid: string) => {
+            window.location.hash = `#problems/show-run:${guid}/`;
+          },
         },
       });
     },

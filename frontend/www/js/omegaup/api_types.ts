@@ -1325,7 +1325,7 @@ export namespace types {
     contest_score: number;
     max_score: number;
     meta: types.RunMetadata;
-    name?: string;
+    name: string;
     out_diff?: string;
     score: number;
     verdict: string;
