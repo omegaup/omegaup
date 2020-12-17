@@ -17,7 +17,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @param list<string> $tags
      */
-    final private static function addTagFilter(
+    private static function addTagFilter(
         string $identityType,
         ?int $identityId,
         array $tags,
