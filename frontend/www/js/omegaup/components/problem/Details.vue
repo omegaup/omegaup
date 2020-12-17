@@ -160,8 +160,8 @@
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
-          :quality-histogram="histogram.qualityHistogram"
-          :difficulty-histogram="histogram.difficultyHistogram"
+          :quality-histogram="JSON.parse(histogram.qualityHistogram)"
+          :difficulty-histogram="JSON.parse(histogram.difficultyHistogram)"
           :quality-score="histogram.quality"
           :difficulty-score="histogram.difficulty"
         ></omegaup-problem-feedback>
