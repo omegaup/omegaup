@@ -73,6 +73,11 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
+export enum HistogramType {
+  Quality = 'quality',
+  Difficulty = 'difficulty',
+}
+
 @Component
 export default class ProblemHistogram extends Vue {
   @Prop() type!: string;
@@ -82,7 +87,7 @@ export default class ProblemHistogram extends Vue {
   T = T;
 
   get tags(): string[] {
-    return this.type === 'quality'
+    return this.type === HistogramType.Quality
       ? [
           T.qualityFormQualityVeryGood,
           T.qualityFormQualityGood,
@@ -100,11 +105,15 @@ export default class ProblemHistogram extends Vue {
   }
 
   get title(): string {
-    return this.type === 'quality' ? T.wordsQuality : T.wordsDifficulty;
+    return this.type === HistogramType.Quality
+      ? T.wordsQuality
+      : T.wordsDifficulty;
   }
 
   get customHistogram(): number[] {
-    return this.type === 'quality' ? this.histogram.reverse() : this.histogram;
+    return this.type === HistogramType.Quality
+      ? this.histogram.reverse()
+      : this.histogram;
   }
 
   get totalVotes(): number {
@@ -112,9 +121,9 @@ export default class ProblemHistogram extends Vue {
   }
 
   get barsWidth(): number[] {
-    const maxValue = Math.max(...this.histogram);
+    const maxValue = Math.max(...this.customHistogram);
     if (maxValue === 0) return [0, 0, 0, 0, 0];
-    return this.histogram.map((value) => (value / maxValue) * 100);
+    return this.customHistogram.map((value) => (value / maxValue) * 100);
   }
 }
 </script>

@@ -20,13 +20,13 @@
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profile }}
-              <input v-model="name" class="form-control" />
+              <input v-model="selectedIdentity.name" class="form-control" />
             </label>
           </div>
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.wordsGender }}
-              <select v-model="gender" class="form-control">
+              <select v-model="selectedIdentity.gender" class="form-control">
                 <option value="female">{{ T.wordsGenderFemale }}</option>
                 <option value="male">{{ T.wordsGenderMale }}</option>
                 <option value="other">{{ T.wordsGenderOther }}</option>
@@ -66,11 +66,11 @@
             <label class="d-block">
               {{ T.profileSchool }}
               <omegaup-autocomplete
-                v-model="school"
+                v-model="selectedIdentity.school"
                 class="form-control"
                 :init="(el) => typeahead.schoolTypeahead(el)"
               ></omegaup-autocomplete>
-              <input type="hidden" :value="schoolId" />
+              <input type="hidden" :value="selectedIdentity.schoolId" />
             </label>
           </div>
         </div>
@@ -91,7 +91,7 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 import * as typeahead from '../../typeahead';
@@ -103,13 +103,13 @@ import Autocomplete from '../Autocomplete.vue';
   },
 })
 export default class IdentityEdit extends Vue {
-  @Prop({ default: null }) identity!: omegaup.Identity | null;
+  @Prop({ default: null }) identity!: types.Identity | null;
   @Prop() countries!: iso3166.Country[];
 
   T = T;
   typeahead = typeahead;
   selectedIdentity = Object.assign(
-    <omegaup.Identity>{
+    <types.Identity>{
       username: '',
       classname: '',
       name: '',
@@ -121,14 +121,17 @@ export default class IdentityEdit extends Vue {
     },
     this.identity,
   );
+  selectedCountry = 'MX';
+  selectedState = '';
 
   @Watch('identity')
-  onIdentityChanged(newIdentity: omegaup.Identity) {
+  onIdentityChanged(newIdentity: types.Identity) {
     Object.assign(this.identity, newIdentity);
   }
 
   @Watch('selectedCountry')
   onPropertyChanged(newCountry: string) {
+    this.selectedIdentity.country_id = newCountry;
     if (this.identity?.country_id === newCountry) {
       this.selectedIdentity.state_id = this.identity?.state_id;
     } else {

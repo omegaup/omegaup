@@ -104,6 +104,7 @@
   - [`/api/group/members/`](#apigroupmembers)
   - [`/api/group/myList/`](#apigroupmylist)
   - [`/api/group/removeUser/`](#apigroupremoveuser)
+  - [`/api/group/update/`](#apigroupupdate)
 - [GroupScoreboard](#groupscoreboard)
   - [`/api/groupScoreboard/addContest/`](#apigroupscoreboardaddcontest)
   - [`/api/groupScoreboard/details/`](#apigroupscoreboarddetails)
@@ -1012,14 +1013,14 @@ Returns a detailed report of the contest
 
 ### Returns
 
-| Name          | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; out_diff: string; score: number; verdict: string; }[]; details: { groups: { cases: { meta: types.RunMetadata; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
-| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Name          | Type                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `finish_time` | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
+| `problems`    | `{ alias: string; order: number; }[]`                                                                                                                                                                                                                                                                                                                                         |
+| `ranking`     | `{ country: string; is_invited: boolean; name: string; place?: number; problems: { alias: string; penalty: number; percent: number; place?: number; points: number; run_details?: { cases?: types.CaseResult[]; details: { groups: { cases: { meta: types.RunMetadata; }[]; }[]; }; }; runs: number; }[]; total: { penalty: number; points: number; }; username: string; }[]` |
+| `start_time`  | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
+| `time`        | `Date`                                                                                                                                                                                                                                                                                                                                                                        |
+| `title`       | `string`                                                                                                                                                                                                                                                                                                                                                                      |
 
 ## `/api/contest/requests/`
 
@@ -2179,6 +2180,24 @@ Remove user from group
 | ----------------- | -------- | ----------- |
 | `group_alias`     | `string` |             |
 | `usernameOrEmail` | `string` |             |
+
+### Returns
+
+_Nothing_
+
+## `/api/group/update/`
+
+### Description
+
+Update an existing group
+
+### Parameters
+
+| Name          | Type     | Description |
+| ------------- | -------- | ----------- |
+| `alias`       | `string` |             |
+| `description` | `string` |             |
+| `name`        | `string` |             |
 
 ### Returns
 
@@ -3580,11 +3599,11 @@ Used in the arena, any contestant can view its own codes and compile errors
 
 ### Returns
 
-| Name            | Type                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `details`       | `{ compile_meta?: { [key: string]: types.RunMetadata; }; contest_score: number; groups?: { cases: { contest_score: number; max_score: number; meta: types.RunMetadata; name: string; score: number; verdict: string; }[]; contest_score: number; group: string; max_score: number; score: number; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
-| `source`        | `string`                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| Name            | Type                                                                                                                                                                                                                                                                                                                             |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `compile_error` | `string`                                                                                                                                                                                                                                                                                                                         |
+| `details`       | `{ compile_meta?: { [key: string]: types.RunMetadata; }; contest_score: number; groups?: { cases: types.CaseResult[]; contest_score: number; group: string; max_score: number; score: number; }[]; judged_by: string; max_score?: number; memory?: number; score: number; time?: number; verdict: string; wall_time?: number; }` |
+| `source`        | `string`                                                                                                                                                                                                                                                                                                                         |
 
 ## `/api/run/status/`
 

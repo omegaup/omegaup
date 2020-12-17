@@ -10,31 +10,13 @@ import { types } from '../api_types';
 import * as api from '../api';
 import * as ui from '../ui';
 import * as time from '../time';
+import JSZip from 'jszip';
 import T from '../lang';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
-  let popupDisplayed = PopupDisplayed.None;
-  if (locationHash.includes('new-run')) {
-    popupDisplayed = PopupDisplayed.RunSubmit;
-  } else if (
-    (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
-    !(
-      payload.nominationStatus?.dismissed ||
-      (payload.nominationStatus?.dismissedBeforeAc &&
-        !payload.nominationStatus?.solved)
-    ) &&
-    !(
-      payload.nominationStatus?.nominated ||
-      (payload.nominationStatus?.nominatedBeforeAc &&
-        !payload.nominationStatus?.solved)
-    ) &&
-    payload.nominationStatus?.canNominateProblem
-  ) {
-    popupDisplayed = PopupDisplayed.Promotion;
-  }
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
   if (runs) {
@@ -55,6 +37,8 @@ OmegaUp.on('ready', () => {
     },
     data: () => ({
       initialClarifications: payload.clarifications,
+      initialPopupDisplayed: PopupDisplayed.None,
+      runDetailsData: <types.RunDetails | null>null,
       solutionStatus: payload.solutionStatus,
       solution: <types.ProblemStatement | null>null,
       availableTokens: 0,
@@ -64,6 +48,7 @@ OmegaUp.on('ready', () => {
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
           !payload.nominationStatus?.solved),
+      guid: <null | string>null,
     }),
     render: function (createElement) {
       return createElement('omegaup-problem-details', {
@@ -81,7 +66,8 @@ OmegaUp.on('ready', () => {
           solution: this.solution,
           availableTokens: this.availableTokens,
           allTokens: this.allTokens,
-          initialPopupDisplayed: popupDisplayed,
+          initialPopupDisplayed: this.initialPopupDisplayed,
+          runDetailsData: this.runDetailsData,
           allowUserAddTags: payload.allowUserAddTags,
           levelTags: payload.levelTags,
           problemLevel: payload.problemLevel,
@@ -89,8 +75,71 @@ OmegaUp.on('ready', () => {
           selectedPublicTags: payload.selectedPublicTags,
           selectedPrivateTags: payload.selectedPrivateTags,
           hasBeenNominated: this.hasBeenNominated,
+          guid: this.guid,
+          isAdmin: commonPayload.isAdmin,
         },
         on: {
+          'show-run': (source: problem_Details, guid: string) => {
+            api.Run.details({ run_alias: guid })
+              .then((data) => {
+                if (data.show_diff === 'none' || !commonPayload.isAdmin) {
+                  source.displayRunDetails(guid, data);
+                  return;
+                }
+                fetch(`/api/run/download/run_alias/${guid}/show_diff/true/`)
+                  .then((response) => {
+                    if (!response.ok) {
+                      return Promise.reject(new Error(response.statusText));
+                    }
+                    return Promise.resolve(response.blob());
+                  })
+                  .then(JSZip.loadAsync)
+                  .then((zip: JSZip) => {
+                    const result: {
+                      cases: string[];
+                      promises: Promise<string>[];
+                    } = { cases: [], promises: [] };
+                    zip.forEach(async (relativePath, zipEntry) => {
+                      const pos = relativePath.lastIndexOf('.');
+                      const basename = relativePath.substring(0, pos);
+                      const extension = relativePath.substring(pos + 1);
+                      if (
+                        extension !== 'out' ||
+                        relativePath.indexOf('/') !== -1
+                      ) {
+                        return;
+                      }
+                      if (
+                        data.show_diff === 'examples' &&
+                        relativePath.indexOf('sample/') === 0
+                      ) {
+                        return;
+                      }
+                      result.cases.push(basename);
+                      result.promises.push(
+                        zip.file(zipEntry.name).async('text'),
+                      );
+                    });
+                    return result;
+                  })
+                  .then((response) => {
+                    Promise.allSettled(response.promises).then((results) => {
+                      results.forEach((result: any, index: number) => {
+                        if (data.cases[response.cases[index]]) {
+                          data.cases[response.cases[index]].contestantOutput =
+                            result.value;
+                        }
+                      });
+                    });
+                    source.displayRunDetails(guid, data);
+                  })
+                  .catch(ui.apiError);
+              })
+              .catch((error) => {
+                ui.apiError(error);
+                source.popupDisplayed = PopupDisplayed.None;
+              });
+          },
           'apply-filter': (
             filter: 'verdict' | 'language' | 'username' | 'status',
             value: string,
@@ -305,6 +354,9 @@ OmegaUp.on('ready', () => {
               window.location.pathname,
             )}`;
           },
+          'change-show-run-location': (guid: string) => {
+            window.location.hash = `#problems/show-run:${guid}/`;
+          },
         },
       });
     },
@@ -371,5 +423,29 @@ OmegaUp.on('ready', () => {
           (problemDetailsView.initialClarifications = response.clarifications),
       )
       .catch(ui.apiError);
+  }
+
+  if (locationHash.includes('new-run')) {
+    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunSubmit;
+  } else if (locationHash[1] && locationHash[1].includes('show-run:')) {
+    const showRunRegex = /.*\/show-run:([a-fA-F0-9]+)/;
+    const showRunMatch = window.location.hash.match(showRunRegex);
+    problemDetailsView.guid = showRunMatch ? showRunMatch[1] : null;
+    problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunDetails;
+  } else if (
+    (payload.nominationStatus?.solved || payload.nominationStatus?.tried) &&
+    !(
+      payload.nominationStatus?.dismissed ||
+      (payload.nominationStatus?.dismissedBeforeAc &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    !(
+      payload.nominationStatus?.nominated ||
+      (payload.nominationStatus?.nominatedBeforeAc &&
+        !payload.nominationStatus?.solved)
+    ) &&
+    payload.nominationStatus?.canNominateProblem
+  ) {
+    problemDetailsView.initialPopupDisplayed = PopupDisplayed.Promotion;
   }
 });
