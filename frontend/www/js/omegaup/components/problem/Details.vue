@@ -98,7 +98,7 @@
         <omegaup-overlay
           v-if="user.loggedIn"
           :show-overlay="popupDisplayed !== PopupDisplayed.None"
-          @overlay-hidden="onPopupDismissed"
+          @hide-overlay="onPopupDismissed"
         >
           <template #popup>
             <omegaup-arena-runsubmit-popup
