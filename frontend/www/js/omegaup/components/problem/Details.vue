@@ -160,8 +160,8 @@
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
-          :quality-histogram="JSON.parse(histogram.qualityHistogram)"
-          :difficulty-histogram="JSON.parse(histogram.difficultyHistogram)"
+          :quality-histogram="parsedQualityHistogram"
+          :difficulty-histogram="parsedDifficultyHistogram"
           :quality-score="histogram.quality"
           :difficulty-score="histogram.difficulty"
         ></omegaup-problem-feedback>
@@ -364,6 +364,14 @@ export default class ProblemDetails extends Vue {
       (this.nominationStatus?.tried || this.nominationStatus?.solved) &&
       !this.hasBeenNominated
     );
+  }
+
+  get parsedQualityHistogram(): number[] {
+    return JSON.parse(this.histogram?.qualityHistogram ?? '');
+  }
+
+  get parsedDifficultyHistogram(): number[] {
+    return JSON.parse(this.histogram?.difficultyHistogram ?? '');
   }
 
   onNewSubmission(): void {

@@ -79,9 +79,9 @@ describe('Details.vue', () => {
 
   const histogram = <types.Histogram>{
     difficulty: 0.0,
-    difficultyHistogram: undefined,
+    difficultyHistogram: '[0,1,2,3,4]',
     quality: 0.0,
-    qualityHistogram: undefined,
+    qualityHistogram: '[0,1,2,3,4]',
   };
 
   it('Should handle no nomination payload', () => {
