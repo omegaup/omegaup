@@ -55,7 +55,7 @@
                     <td class="text-center">{{ problemCase.name }}</td>
                     <td class="text-center">{{ problemCase.verdict }}</td>
                     <td class="text-right">
-                      {{ problemCase.contest_score ?? problemCase.score }}
+                      {{ contestScore(problemCase) }}
                     </td>
                     <td class="text-center" width="10">
                       {{ problemCase.max_score ? '/' : '' }}
@@ -222,9 +222,9 @@ export default class ArenaRunDetailsPopup extends Vue {
   getContestantOutput(cases: types.ProblemCasesContents, name: string): string {
     return cases[name]?.contestantOutput ?? '';
   }
+
+  contestScore(problemCase: types.CaseResult): number {
+    return problemCase.contest_score ?? problemCase.score;
+  }
 }
 </script>
-
-<style lang="scss" scoped>
-@import '../../../../sass/main.scss';
-</style>

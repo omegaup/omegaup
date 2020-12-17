@@ -16,6 +16,7 @@ export default class Overlay extends Vue {
   onOverlayClicked(evt: Event) {
     if (typeof $(evt.composedPath()[0]).attr('data-overlay') !== 'undefined') {
       this.isOverlayShown = false;
+      this.$emit('hide-overlay');
     }
   }
 
