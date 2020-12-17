@@ -1408,7 +1408,7 @@ export namespace types {
     column: string;
     columns: string[];
     difficulty: string;
-    frequentTags: { alias: string; name?: string }[];
+    frequentTags: types.TagWithProblemCount[];
     keyword: string;
     language: string;
     languages: string[];
@@ -1418,7 +1418,7 @@ export namespace types {
     modes: string[];
     pagerItems: types.PageItem[];
     problems: types.ProblemListItem[];
-    publicTags: string[];
+    publicTags: types.TagWithProblemCount[];
     selectedTags: string[];
     tagData: { name?: string }[];
     tagsList: string[];
@@ -1943,6 +1943,7 @@ export namespace types {
   export interface GroupEditPayload {
     countries: dao.Countries[];
     groupAlias: string;
+    groupDescription?: string;
     groupName?: string;
     identities: types.Identity[];
     isOrganizer: boolean;
@@ -1964,13 +1965,15 @@ export namespace types {
   }
 
   export interface Identity {
-    classname: string;
+    classname?: string;
     country?: string;
     country_id?: string;
     gender?: string;
     name?: string;
+    password?: string;
     school?: string;
     school_id?: number;
+    school_name?: string;
     state?: string;
     state_id?: string;
     username: string;
@@ -2835,6 +2838,11 @@ export namespace types {
     name: string;
   }
 
+  export interface TagWithProblemCount {
+    name: string;
+    problemCount: number;
+  }
+
   export interface UserInfoForProblem {
     admin: boolean;
     loggedIn: boolean;
@@ -3442,6 +3450,8 @@ export namespace messages {
   };
   export type GroupRemoveUserRequest = { [key: string]: any };
   export type GroupRemoveUserResponse = {};
+  export type GroupUpdateRequest = { [key: string]: any };
+  export type GroupUpdateResponse = {};
 
   // GroupScoreboard
   export type GroupScoreboardAddContestRequest = { [key: string]: any };
@@ -3836,7 +3846,9 @@ export namespace messages {
 
   // Tag
   export type TagFrequentTagsRequest = { [key: string]: any };
-  export type TagFrequentTagsResponse = { frequent_tags: { alias: string }[] };
+  export type TagFrequentTagsResponse = {
+    frequent_tags: types.TagWithProblemCount[];
+  };
   export type TagListRequest = { [key: string]: any };
   export type TagListResponse = { name: string }[];
 
@@ -4278,6 +4290,9 @@ export namespace controllers {
     removeUser: (
       params?: messages.GroupRemoveUserRequest,
     ) => Promise<messages.GroupRemoveUserResponse>;
+    update: (
+      params?: messages.GroupUpdateRequest,
+    ) => Promise<messages.GroupUpdateResponse>;
   }
 
   export interface GroupScoreboard {

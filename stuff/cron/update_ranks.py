@@ -599,7 +599,10 @@ def update_coder_of_the_month_candidates(
                 s.time >= %s AND s.time <= %s
             ) AS up
           INNER JOIN
-            Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
+            Problems ps ON
+            ps.problem_id = up.problem_id
+            AND ps.visibility >= 1
+            AND ps.quality_seal = 1
           INNER JOIN
             Identities i ON i.identity_id = up.identity_id
           LEFT JOIN

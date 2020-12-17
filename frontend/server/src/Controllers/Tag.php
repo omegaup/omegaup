@@ -4,6 +4,8 @@
 
 /**
  * TagController
+ *
+ * @psalm-type TagWithProblemCount=array { name: string, problemCount: int }
  */
 class Tag extends \OmegaUp\Controllers\Controller {
     public static function normalize(string $name): string {
@@ -69,7 +71,25 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return list<array{alias: string}>
+     * @return list<TagWithProblemCount>
+     */
+    public static function getPublicQualityTagsByLevel(
+        string $problemLevel
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TAGS_LIST,
+            "publicquality-level-{$problemLevel}",
+            fn () => \OmegaUp\DAO\Tags::getPublicQualityTagsByLevel(
+                $problemLevel
+            ),
+            APC_USER_CACHE_SESSION_TIMEOUT
+        );
+    }
+
+    /**
+     * Return most frequent public tags of a certain level
+     *
+     * @return list<TagWithProblemCount>
      */
     public static function getFrequentQualityTagsByLevel(
         string $problemLevel,
@@ -89,7 +109,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return array{frequent_tags: list<array{alias: string}>}
+     * @return array{frequent_tags: list<TagWithProblemCount>}
      *
      * @omegaup-request-param string $problemLevel
      * @omegaup-request-param int $rows
@@ -98,7 +118,7 @@ class Tag extends \OmegaUp\Controllers\Controller {
         $param = $r->ensureString(
             'problemLevel',
             fn (string $problemAlias) => \OmegaUp\Validators::alias(
-                $problemAlias
+                $problemAlias,
             )
         );
 

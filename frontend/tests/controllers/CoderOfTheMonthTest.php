@@ -21,7 +21,8 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
     private function createRuns(
         \OmegaUp\DAO\VO\Identities $identity = null,
         string $runCreationDate = null,
-        int $n = 5
+        int $n = 5,
+        bool $quality = true
     ) {
         if (!$identity) {
             ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
@@ -30,7 +31,11 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
             $runCreationDate = date('Y-m-d', \OmegaUp\Time::get());
         }
         $contest = \OmegaUp\Test\Factories\Contest::createContest();
-        $problem = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'quality_seal' => $quality,
+            ])
+        );
         \OmegaUp\Test\Factories\Contest::addProblemToContest(
             $problem,
             $contest
@@ -202,6 +207,103 @@ class CoderOfTheMonthTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
         // Now check if the third user has not participated in the coder of the
         // month in that category.
+        $this->assertEquals(
+            $identity->username,
+            $response['coders'][0]['username']
+        );
+        $this->assertEquals(
+            $extraIdentity->username,
+            $response['coders'][1]['username']
+        );
+    }
+
+    /**
+     * @dataProvider coderOfTheMonthCategoryProvider
+     */
+    public function testCoderOfMonthWithQualityProblems(string $category) {
+        $gender = $category == 'all' ? 'male' : 'female';
+        [
+            'user' => $user,
+            'identity' => $identity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($identity, $gender);
+        [
+            'user' => $extraUser,
+            'identity' => $extraIdentity,
+        ] = \OmegaUp\Test\Factories\User::createUser();
+        self::updateIdentity($extraIdentity, $gender);
+
+        // Add a custom school
+        $login = self::login($identity);
+        $school = \OmegaUp\Test\Factories\Schools::createSchool()['school'];
+        \OmegaUp\Controllers\User::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'school_id' => $school->school_id,
+        ]));
+
+        // First user solves two problems, second user solves just one, third
+        // solves same problems than first.
+        $runCreationDate = (new DateTimeImmutable(
+            date(
+                'Y-m-d',
+                \OmegaUp\Time::get()
+            )
+        ))
+            ->modify('first day of last month')
+            ->format('Y-m-d');
+
+        $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns($identity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns(
+            $extraIdentity,
+            $runCreationDate,
+            1 /*numRuns*/,
+            false
+        );
+        $this->createRuns(
+            $extraIdentity,
+            $runCreationDate,
+            1 /*numRuns*/,
+            false
+        );
+        $this->createRuns($extraIdentity, $runCreationDate, 1 /*numRuns*/);
+        $this->createRuns($extraIdentity, $runCreationDate, 1 /*numRuns*/);
+
+        \OmegaUp\Test\Utils::runUpdateRanks($runCreationDate);
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        $this->assertEquals(
+            $identity->username,
+            $response['coderinfo']['username']
+        );
+        $this->assertFalse(array_key_exists('email', $response['coderinfo']));
+
+        // Calling API again to verify response is the same that in first time
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonth(
+            new \OmegaUp\Request(['category' => $category])
+        );
+
+        $this->assertEquals(
+            $identity->username,
+            $response['coderinfo']['username']
+        );
+
+        // CoderOfTheMonth school_id should match with identity school_id
+        $this->assertEquals(
+            $school->school_id,
+            $response['coderinfo']['school_id']
+        );
+
+        // Now check if the other user has been saved on database too
+        $response = \OmegaUp\Controllers\User::apiCoderOfTheMonthList(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'date' => date('Y-m-d', \OmegaUp\Time::get()),
+            'category' => $category,
+        ]));
+
         $this->assertEquals(
             $identity->username,
             $response['coders'][0]['username']

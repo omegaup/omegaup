@@ -3,7 +3,7 @@
     <div class="panel-body">
       <div class="upload-csv">
         <div class="panel-heading">
-          <div v-html="T.groupsCsvHelp"></div>
+          <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
           {{ T.groupsUploadCsvFile }}
           <input name="identities" type="file" @change="readCsv" />
         </div>
@@ -74,17 +74,22 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as ui from '../../ui';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class Identities extends Vue {
   @Prop() groupAlias!: string;
   @Prop() userErrorRow!: string | null;
 
   T = T;
-  identities: omegaup.Identity[] = [];
+  identities: types.Identity[] = [];
 
   readCsv(ev: InputEvent): void {
     const fileUpload = <HTMLInputElement>ev.target;

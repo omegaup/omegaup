@@ -196,6 +196,9 @@
           @details="(run) => onShowRunDetails(run.guid)"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
+          @filter-changed="
+            (filter, value) => $emit('apply-filter', filter, value)
+          "
         ></omegaup-arena-runs>
       </div>
       <div
@@ -352,6 +355,7 @@ export default class ProblemDetails extends Vue {
 
   get clarificationsCount(): string {
     if (this.clarifications.length === 0) return '';
+    if (this.clarifications.length > 9) return '(9+)';
     return `(${this.clarifications.length})`;
   }
 
