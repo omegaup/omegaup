@@ -1953,6 +1953,7 @@ export namespace types {
   export interface GroupEditPayload {
     countries: dao.Countries[];
     groupAlias: string;
+    groupDescription?: string;
     groupName?: string;
     identities: types.Identity[];
     isOrganizer: boolean;
@@ -1974,13 +1975,15 @@ export namespace types {
   }
 
   export interface Identity {
-    classname: string;
+    classname?: string;
     country?: string;
     country_id?: string;
     gender?: string;
     name?: string;
+    password?: string;
     school?: string;
     school_id?: number;
+    school_name?: string;
     state?: string;
     state_id?: string;
     username: string;
@@ -3434,6 +3437,8 @@ export namespace messages {
   };
   export type GroupRemoveUserRequest = { [key: string]: any };
   export type GroupRemoveUserResponse = {};
+  export type GroupUpdateRequest = { [key: string]: any };
+  export type GroupUpdateResponse = {};
 
   // GroupScoreboard
   export type GroupScoreboardAddContestRequest = { [key: string]: any };
@@ -4265,6 +4270,9 @@ export namespace controllers {
     removeUser: (
       params?: messages.GroupRemoveUserRequest,
     ) => Promise<messages.GroupRemoveUserResponse>;
+    update: (
+      params?: messages.GroupUpdateRequest,
+    ) => Promise<messages.GroupUpdateResponse>;
   }
 
   export interface GroupScoreboard {

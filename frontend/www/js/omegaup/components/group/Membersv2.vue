@@ -113,13 +113,12 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
-import { dao } from '../../api_types';
+import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
-import identity_Edit from '../identity/Edit.vue';
-import identity_ChangePassword from '../identity/ChangePassword.vue';
+import identity_Edit from '../identity/Editv2.vue';
+import identity_ChangePassword from '../identity/ChangePasswordv2.vue';
 import Autocomplete from '../Autocomplete.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -137,8 +136,8 @@ library.add(faEdit, faLock, faTrashAlt);
   },
 })
 export default class Memebers extends Vue {
-  @Prop() identities!: omegaup.Identity[];
-  @Prop() identitiesCsv!: omegaup.Identity[];
+  @Prop() identities!: types.Identity[];
+  @Prop() identitiesCsv!: types.Identity[];
   @Prop() groupAlias!: string;
   @Prop() countries!: Array<dao.Countries>;
 
@@ -154,7 +153,7 @@ export default class Memebers extends Vue {
     this.$emit('add-member', this, this.searchedUsername);
   }
 
-  onEdit(identity: omegaup.Identity): void {
+  onEdit(identity: types.Identity): void {
     this.$emit('edit-identity', this, identity);
   }
 
@@ -177,26 +176,9 @@ export default class Memebers extends Vue {
 
   onChildEditIdentityMember(
     originalUsername: string,
-    username: string,
-    name: string,
-    gender: string,
-    selectedCountry: string,
-    selectedState: string,
-    school: string,
-    schoolId: number,
+    identity: types.Identity,
   ): void {
-    this.$emit(
-      'edit-identity-member',
-      this,
-      originalUsername,
-      username,
-      name,
-      gender,
-      selectedCountry,
-      selectedState,
-      school,
-      schoolId,
-    );
+    this.$emit('edit-identity-member', this, originalUsername, identity);
   }
 
   onChildCancel(): void {

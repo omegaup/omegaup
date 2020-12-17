@@ -1,5 +1,6 @@
 import * as ui from './ui';
 import * as api from './api';
+import { types } from './api_types';
 import * as errors from './errors';
 import * as time from './time';
 
@@ -279,19 +280,6 @@ export namespace omegaup {
     name: string;
   }
 
-  export interface Identity extends User {
-    name: string;
-    username: string;
-    school: string;
-    school_name?: string;
-    gender?: string;
-    password?: string;
-    school_id: number;
-    country_id: string;
-    state_id: string;
-    classname: string;
-  }
-
   export interface IdentityContest {
     username: string;
     end_time?: Date;
@@ -555,7 +543,7 @@ export namespace omegaup {
     ready: boolean = false;
     experiments: Experiments | null = null;
     email?: string;
-    identity?: omegaup.Identity;
+    identity?: types.Identity;
 
     _documentReady: boolean = false;
     _initialized: boolean = false;

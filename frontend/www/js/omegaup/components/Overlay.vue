@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOverlayShown" data-overlay>
+  <div v-if="isOverlayShown" data-overlay @click="onOverlayClicked">
     <slot name="popup" :isOverlayShown="isOverlayShown"></slot>
   </div>
 </template>
@@ -12,6 +12,12 @@ export default class Overlay extends Vue {
   @Prop({ default: false }) showOverlay!: boolean;
 
   isOverlayShown = this.showOverlay;
+
+  onOverlayClicked(evt: Event) {
+    if (typeof $(evt.composedPath()[0]).attr('data-overlay') !== 'undefined') {
+      this.isOverlayShown = false;
+    }
+  }
 
   @Watch('showOverlay')
   overlayVisibilityChanged(newValue: boolean): void {

@@ -166,8 +166,8 @@
           @new-submission="onNewSubmission"
         ></omegaup-arena-runs>
         <omegaup-problem-feedback
-          :quality-histogram="histogram.qualityHistogram"
-          :difficulty-histogram="histogram.difficultyHistogram"
+          :quality-histogram="parsedQualityHistogram"
+          :difficulty-histogram="parsedDifficultyHistogram"
           :quality-score="histogram.quality"
           :difficulty-score="histogram.difficulty"
         ></omegaup-problem-feedback>
@@ -199,6 +199,9 @@
           :show-pager="true"
           :show-disqualify="true"
           :problemset-problems="[]"
+          @details="(run) => onShowRunDetails(run.guid)"
+          @rejudge="(run) => $emit('rejudge', run)"
+          @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
             (filter, value) => $emit('apply-filter', filter, value)
           "
@@ -402,6 +405,14 @@ export default class ProblemDetails extends Vue {
     );
   }
 
+  get parsedQualityHistogram(): number[] {
+    return JSON.parse(this.histogram?.qualityHistogram ?? '');
+  }
+
+  get parsedDifficultyHistogram(): number[] {
+    return JSON.parse(this.histogram?.difficultyHistogram ?? '');
+  }
+
   onNewSubmission(): void {
     if (!this.user.loggedIn) {
       this.$emit('redirect-login-page');
@@ -421,6 +432,11 @@ export default class ProblemDetails extends Vue {
       return;
     }
     this.popupDisplayed = PopupDisplayed.Promotion;
+  }
+
+  onShowRunDetails(guid: string): void {
+    this.popupDisplayed = PopupDisplayed.RunDetails;
+    this.$emit('details', guid);
   }
 
   onNewPromotionAsReviewer(): void {
