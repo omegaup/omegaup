@@ -419,7 +419,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, template: string}
+     * @return array{smartyProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $group
      */
