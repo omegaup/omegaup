@@ -37,7 +37,10 @@
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.userEditCountry }}
-              <select v-model="selectedCountry" class="form-control">
+              <select
+                v-model="selectedIdentity.country_id"
+                class="form-control"
+              >
                 <option
                   v-for="country in countries"
                   :key="country.country_id"
@@ -51,7 +54,7 @@
           <div class="form-group col-lg-4 col-md-6 col-sm-6">
             <label class="d-block">
               {{ T.profileState }}
-              <select v-model="selectedState" class="form-control">
+              <select v-model="selectedIdentity.state_id" class="form-control">
                 <option
                   v-for="[code, state] in Object.entries(countryStates)"
                   :key="code"
@@ -68,7 +71,13 @@
               <omegaup-autocomplete
                 v-model="selectedIdentity.school"
                 class="form-control"
-                :init="(el) => typeahead.schoolTypeahead(el)"
+                :init="
+                  (el) =>
+                    typeahead.schoolTypeahead(el, (event, item) => {
+                      selectedIdentity.school = item.value;
+                      selectedIdentity.school_id = item.id;
+                    })
+                "
               ></omegaup-autocomplete>
               <input type="hidden" :value="selectedIdentity.schoolId" />
             </label>
@@ -90,7 +99,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
@@ -102,7 +111,7 @@ import Autocomplete from '../Autocomplete.vue';
     'omegaup-autocomplete': Autocomplete,
   },
 })
-export default class IdentityEdit extends Vue {
+export default class IdentityEditv2 extends Vue {
   @Prop({ default: null }) identity!: types.Identity | null;
   @Prop() countries!: iso3166.Country[];
 
@@ -121,25 +130,6 @@ export default class IdentityEdit extends Vue {
     },
     this.identity,
   );
-  selectedCountry = 'MX';
-  selectedState = '';
-
-  @Watch('identity')
-  onIdentityChanged(newIdentity: types.Identity) {
-    Object.assign(this.identity, newIdentity);
-  }
-
-  @Watch('selectedCountry')
-  onPropertyChanged(newCountry: string) {
-    this.selectedIdentity.country_id = newCountry;
-    if (this.identity?.country_id === newCountry) {
-      this.selectedIdentity.state_id = this.identity?.state_id;
-    } else {
-      this.selectedIdentity.state_id = Object.keys(this.countryStates)[0].split(
-        '-',
-      )[1];
-    }
-  }
 
   get groupName(): string {
     return this.selectedIdentity.username.split(':')[0];

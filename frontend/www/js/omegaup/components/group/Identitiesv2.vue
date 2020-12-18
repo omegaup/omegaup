@@ -96,8 +96,8 @@ export default class Identities extends Vue {
     return (e.files && e.files[0]) || null;
   }
 
-  readCsv(ev: HTMLInputElement): void {
-    const file = this.readFile(ev);
+  readCsv(ev: Event): void {
+    const file = this.readFile(ev.target as HTMLInputElement);
     if (!file || file.name === '') {
       return;
     }

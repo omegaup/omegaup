@@ -405,6 +405,7 @@ const translations: { [key: string]: string; } = {
   groupAdminRemoved: "Grupo de administradores eliminado correctamente",
   groupCreateIdentities: "Crear identidades",
   groupEditEdit: "Editar",
+  groupEditGroupUpdated: "El grupo se actualiz\u00f3 correctamente.",
   groupEditMemberAdded: "Miembro agregado correctamente.",
   groupEditMemberPasswordUpdated: "Contrase\u00f1a de la identidad actualizada correctamente.",
   groupEditMemberRemoved: "Miembro eliminado correctamente.",

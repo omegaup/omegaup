@@ -149,16 +149,15 @@
           :group-alias="groupAlias"
           :user-error-row="userErrorRow"
           @bulk-identities="
-            (identitiesComponent, identities) =>
-              $emit('bulk-identities', identitiesComponent, identities)
+            (identities) => $emit('bulk-identities', identities)
           "
           @download-identities="
             (identities) => $emit('download-identities', identities)
           "
           @read-csv="
-            (identitiesComponent, fileUpload) =>
-              $emit('read-csv', identitiesComponent, fileUpload)
+            (source, fileUpload) => $emit('read-csv', source, fileUpload)
           "
+          @invalid-file="$emit('invalid-file')"
         ></omegaup-group-create-identities>
       </div>
     </div>
@@ -200,12 +199,12 @@ export default class GroupEdit extends Vue {
   @Prop() identities!: types.Identity[];
   @Prop() identitiesCsv!: types.Identity[];
   @Prop() scoreboards!: types.GroupScoreboard[];
+  @Prop() userErrorRow!: null | string;
 
   T = T;
   ui = ui;
   AvailableTabs = AvailableTabs;
   selectedTab: AvailableTabs = this.tab;
-  userErrorRow: string | null = null;
   currentIdentities = this.identities;
   currentIdentitiesCsv = this.identitiesCsv;
   currentScoreboards = this.scoreboards;

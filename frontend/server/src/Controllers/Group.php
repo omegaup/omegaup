@@ -419,7 +419,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{IS_ORGANIZER: bool, payload: GroupEditPayload, title: \OmegaUp\TranslationString}, template: string}
+     * @return array{smartyProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, template: string}
      *
      * @omegaup-request-param string $group
      */
@@ -464,7 +464,6 @@ class Group extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'IS_ORGANIZER' => $isOrganizer,
                 'payload' => [
                     'groupAlias' => $groupAlias,
                     'groupName' => $group->name,
@@ -488,8 +487,7 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleGroupsEdit'
                 ),
             ],
-            // TODO: Replace the following line with 'entrypoint' => 'group_edit'
-            'template' => 'group.edit.tpl',
+            'entrypoint' => 'group_edit',
         ];
     }
 
