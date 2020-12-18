@@ -1,5 +1,5 @@
 import group_Edit, { AvailableTabs } from '../components/group/Edit.vue';
-import group_Members from '../components/group/Members.vue';
+import group_Members from '../components/group/Membersv2.vue';
 import group_Scoreboards from '../components/group/Scoreboards.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
