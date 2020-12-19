@@ -192,6 +192,7 @@
         :class="{ 'show active': selectedTab === 'runs' }"
       >
         <omegaup-arena-runs
+          :show-all-runs="true"
           :runs="allRuns"
           :show-details="true"
           :show-user="true"
@@ -405,12 +406,20 @@ export default class ProblemDetails extends Vue {
     );
   }
 
-  get parsedQualityHistogram(): number[] {
+  get parsedQualityHistogram(): null | number[] {
+    const qualityHistogram = this.histogram?.qualityHistogram;
+    if (!qualityHistogram) {
+      return null;
+    }
     return JSON.parse(this.histogram?.qualityHistogram ?? '');
   }
 
-  get parsedDifficultyHistogram(): number[] {
-    return JSON.parse(this.histogram?.difficultyHistogram ?? '');
+  get parsedDifficultyHistogram(): null | number[] {
+    const difficultyHistogram = this.histogram?.difficultyHistogram;
+    if (!difficultyHistogram) {
+      return null;
+    }
+    return JSON.parse(difficultyHistogram);
   }
 
   onNewSubmission(): void {
@@ -511,7 +520,7 @@ export default class ProblemDetails extends Vue {
       }),
     );
 
-    this.$emit('change-show-run-location', this.guid);
+    this.$emit('change-show-run-location', guid);
   }
 
   @Emit('update:activeTab')
@@ -530,9 +539,14 @@ export default class ProblemDetails extends Vue {
 
   @Watch('initialPopupDisplayed')
   onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    this.popupDisplayed = newValue;
     if (newValue === PopupDisplayed.None) return;
     if (newValue === PopupDisplayed.RunSubmit) {
       this.onNewSubmission();
+      return;
+    }
+    if (newValue === PopupDisplayed.Promotion) {
+      ui.reportEvent('quality-nomination', 'shown');
       return;
     }
     if (newValue === PopupDisplayed.RunDetails && this.guid) {

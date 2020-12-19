@@ -1,7 +1,7 @@
 <template>
   <omegaup-overlay-popup @dismiss="onHide">
     <transition name="fade">
-      <form class="popup h-auto w-auto">
+      <form data-demotion-popup class="h-auto w-auto">
         <template v-if="currentView === AvailableViews.Question">
           <div class="form-group">
             <div class="font-weight-bold pb-4">

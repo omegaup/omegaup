@@ -1,7 +1,7 @@
 <template>
   <omegaup-overlay-popup @dismiss="onHide">
     <transition name="fade">
-      <form class="popup h-auto w-auto" @submit.prevent="">
+      <form data-reviewewr-popup class="h-auto w-auto" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
             <p class="h4 font-weight-bold pb-4 text-center w-100">
@@ -26,7 +26,7 @@
                     :key="problemTopic.value"
                     class="tag-select"
                   >
-                    <label class="tag-select"
+                    <label class="tag-label"
                       ><input
                         v-model="tag"
                         type="radio"
@@ -210,5 +210,11 @@ ul.tag-select {
   overflow: auto;
   border: 1px solid #ccc;
   background: #fff;
+  list-style-type: none;
+}
+.tag-label {
+  width: -webkit-fill-available;
+  margin-bottom: 0;
+  padding-bottom: 0.5rem;
 }
 </style>
