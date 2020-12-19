@@ -2291,9 +2291,11 @@ export function GetOptionsFromLocation(
     options.isPractice = true;
   }
 
-  const match = /\/arena\/([^/]+)\/?/.exec(arenaLocation.pathname);
-  if (match) {
-    options.contestAlias = match[1];
+  if (arenaLocation.pathname.indexOf('/arena/problem/') === -1) {
+    const match = /\/arena\/([^/]+)\/?/.exec(arenaLocation.pathname);
+    if (match) {
+      options.contestAlias = match[1];
+    }
   }
 
   if (arenaLocation.search.indexOf('ws=off') !== -1) {
