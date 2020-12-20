@@ -112,7 +112,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
@@ -133,8 +133,8 @@ interface EditMemberComponent {
   },
 })
 export default class Members extends Vue {
-  @Prop() identities!: omegaup.Identity[];
-  @Prop() identitiesCsv!: omegaup.Identity[];
+  @Prop() identities!: types.Identity[];
+  @Prop() identitiesCsv!: types.Identity[];
   @Prop() groupAlias!: string;
   @Prop() countries!: Array<string>;
 
@@ -150,7 +150,7 @@ export default class Members extends Vue {
     this.$emit('add-member', this, this.searchedUsername);
   }
 
-  onEdit(identity: omegaup.Identity): void {
+  onEdit(identity: types.Identity): void {
     this.$emit('edit-identity', this, identity);
   }
 
@@ -173,7 +173,7 @@ export default class Members extends Vue {
 
   onChildEditIdentityMember(
     editMemeberComponent: EditMemberComponent,
-    identity: omegaup.Identity,
+    identity: types.Identity,
     selectedCountry: string,
     selectedState: string,
   ): void {
