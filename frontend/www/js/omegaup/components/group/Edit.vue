@@ -154,9 +154,7 @@
           @download-identities="
             (identities) => $emit('download-identities', identities)
           "
-          @read-csv="
-            (source, fileUpload) => $emit('read-csv', source, fileUpload)
-          "
+          @read-csv="(source) => $emit('read-csv', source)"
           @invalid-file="$emit('invalid-file')"
         ></omegaup-group-create-identities>
       </div>
@@ -166,9 +164,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import group_Identities from './Identitiesv2.vue';
+import group_Identities from './Identities.vue';
 import group_Form from './Form.vue';
-import group_Members from './Membersv2.vue';
+import group_Members from './Members.vue';
 import group_Scoreboards from './Scoreboards.vue';
 import T from '../../lang';
 import { dao, types } from '../../api_types';

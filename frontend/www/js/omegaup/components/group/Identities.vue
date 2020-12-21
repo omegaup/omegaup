@@ -110,7 +110,7 @@ export default class Identities extends Vue {
     }
 
     this.identities = [];
-    this.$emit('read-csv', { identities: this.identities }, file);
+    this.$emit('read-csv', { identities: this.identities, file: file });
   }
 }
 </script>

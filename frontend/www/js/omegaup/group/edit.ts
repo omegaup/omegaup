@@ -1,5 +1,5 @@
 import group_Edit, { AvailableTabs } from '../components/group/Edit.vue';
-import group_Members from '../components/group/Membersv2.vue';
+import group_Members from '../components/group/Members.vue';
 import group_Scoreboards from '../components/group/Scoreboards.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
@@ -235,13 +235,14 @@ OmegaUp.on('ready', () => {
             hiddenElement.download = 'identities.csv';
             hiddenElement.click();
           },
-          'read-csv': (
-            source: { identities: types.Identity[] },
-            fileUpload: File,
-          ) => {
-            CSV.fetch({
-              file: fileUpload,
-            })
+          'read-csv': ({
+            identities,
+            file,
+          }: {
+            identities: types.Identity[];
+            file: File;
+          }) => {
+            CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
                 if (!dataset.fields || dataset.fields.length != 6) {
                   ui.error(T.groupsInvalidCsv);
@@ -255,7 +256,7 @@ OmegaUp.on('ready', () => {
                   gender,
                   school_name,
                 ] of cleanRecords(dataset.records)) {
-                  source.identities.push({
+                  identities.push({
                     username: `${payload.groupAlias}:${username}`,
                     name,
                     password: generatePassword(),

@@ -4,11 +4,11 @@ import expect from 'expect';
 import { dao, types } from '../../api_types';
 import T from '../../lang';
 
-import group_Membersv2 from './Membersv2.vue';
+import group_Members from './Members.vue';
 
-describe('Membersv2.vue', () => {
+describe('Members.vue', () => {
   it('Should handle an empty list of members and identities', () => {
-    const wrapper = shallowMount(group_Membersv2, {
+    const wrapper = shallowMount(group_Members, {
       propsData: {
         groupAlias: 'omegaUp',
         identities: [] as types.Identity[],
@@ -21,7 +21,7 @@ describe('Membersv2.vue', () => {
   });
 
   it('Should handle a list of members and identities', () => {
-    const wrapper = mount(group_Membersv2, {
+    const wrapper = mount(group_Members, {
       propsData: {
         groupAlias: 'omegaUp',
         identities: [

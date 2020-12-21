@@ -3,11 +3,11 @@ import expect from 'expect';
 
 import T from '../../lang';
 
-import group_Identitiesv2 from './Identitiesv2.vue';
+import group_Identities from './Identities.vue';
 
-describe('Identitiesv2.vue', () => {
+describe('Identities.vue', () => {
   it('Should handle identities view', () => {
-    const wrapper = shallowMount(group_Identitiesv2, {
+    const wrapper = shallowMount(group_Identities, {
       propsData: {
         groupAlias: 'Hello',
       },
@@ -17,7 +17,7 @@ describe('Identitiesv2.vue', () => {
   });
 
   it('Should handle an invalid csv file', async () => {
-    const wrapper = mount(group_Identitiesv2, {
+    const wrapper = mount(group_Identities, {
       propsData: {
         groupAlias: 'Hello',
       },
@@ -35,7 +35,7 @@ describe('Identitiesv2.vue', () => {
   });
 
   it('Should handle a valid csv file', async () => {
-    const wrapper = mount(group_Identitiesv2, {
+    const wrapper = mount(group_Identities, {
       propsData: {
         groupAlias: 'Hello',
       },

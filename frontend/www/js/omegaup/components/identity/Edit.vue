@@ -111,7 +111,7 @@ import Autocomplete from '../Autocomplete.vue';
     'omegaup-autocomplete': Autocomplete,
   },
 })
-export default class IdentityEditv2 extends Vue {
+export default class IdentityEdit extends Vue {
   @Prop({ default: null }) identity!: types.Identity | null;
   @Prop() countries!: iso3166.Country[];
 

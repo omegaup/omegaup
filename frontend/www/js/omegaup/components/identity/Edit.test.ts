@@ -3,7 +3,7 @@ import expect from 'expect';
 
 import { dao, types } from '../../api_types';
 
-import identity_Editv2 from './Editv2.vue';
+import identity_Editv2 from './Edit.vue';
 
 describe('Editv2.vue', () => {
   it('Should handle edit identity view with an identity given', () => {

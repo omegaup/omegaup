@@ -117,8 +117,8 @@ import { dao, types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import user_Username from '../user/Username.vue';
-import identity_Edit from '../identity/Editv2.vue';
-import identity_ChangePassword from '../identity/ChangePasswordv2.vue';
+import identity_Edit from '../identity/Edit.vue';
+import identity_ChangePassword from '../identity/ChangePassword.vue';
 import Autocomplete from '../Autocomplete.vue';
 
 import { library } from '@fortawesome/fontawesome-svg-core';

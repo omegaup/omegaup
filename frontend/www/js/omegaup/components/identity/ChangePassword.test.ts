@@ -1,11 +1,11 @@
 import { shallowMount } from '@vue/test-utils';
 import expect from 'expect';
 
-import identity_ChangePasswordv2 from './ChangePasswordv2.vue';
+import identity_ChangePassword from './ChangePassword.vue';
 
-describe('ChangePasswordv2.vue', () => {
+describe('ChangePassword.vue', () => {
   it('Should handle change password view for an identity given', () => {
-    const wrapper = shallowMount(identity_ChangePasswordv2, {
+    const wrapper = shallowMount(identity_ChangePassword, {
       propsData: {
         username: 'hello omegaUp',
       },
