@@ -385,11 +385,7 @@ OmegaUp.on('ready', () => {
       return;
     }
     if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-      Vue.set(
-        problemDetailsView,
-        'nominationStatus',
-        Object.assign({}, problemDetailsView.nominationStatus, { tried: true }),
-      );
+      problemDetailsView.nominationStatus.tried = true;
     }
     if (run.verdict === 'AC') {
       Vue.set(

@@ -4313,7 +4313,7 @@ class Problem extends \OmegaUp\Controllers\Controller {
      * @omegaup-request-param mixed $problemset_id
      * @omegaup-request-param null|string $statement_type
      */
-    public static function getProblemDetailsForSmartyV2(
+    public static function getProblemDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
         try {

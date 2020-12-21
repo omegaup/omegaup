@@ -21,7 +21,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         $r = new \OmegaUp\Request([
             'problem_alias' => $problemData['request']['problem_alias'],
         ]);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             $r
         )['smartyProperties'];
 
@@ -36,7 +36,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
         $r['auth_token'] = $login->auth_token;
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             $r
         )['smartyProperties'];
 
@@ -54,7 +54,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
 
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -75,7 +75,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA', 60);
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -98,7 +98,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode(['before_ac' => true]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -128,7 +128,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'contents' => json_encode([]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -151,7 +151,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 ]),
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -176,7 +176,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Problem author should get the problem as unlocked
         $login = self::login($problemData['author']);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -193,7 +193,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
             'identity' => $identity,
         ] = \OmegaUp\Test\Factories\User::createUser();
         $login = self::login($identity);
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,
@@ -210,7 +210,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
             ])
         );
-        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmartyV2(
+        $result = \OmegaUp\Controllers\Problem::getProblemDetailsForSmarty(
             new \OmegaUp\Request([
                 'problem_alias' => $problemData['request']['problem_alias'],
                 'auth_token' => $login->auth_token,

@@ -240,9 +240,9 @@ import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
-import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopupv2.vue';
+import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
-import qualitynomination_ReviewerPopupv2 from '../qualitynomination/ReviewerPopupv2.vue';
+import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -318,7 +318,7 @@ const numericSort = <T extends { [key: string]: any }>(key: string) => {
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
     'omegaup-problem-solution': problem_Solution,
-    'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopupv2,
+    'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
     'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
     'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
   },
@@ -411,7 +411,7 @@ export default class ProblemDetails extends Vue {
     if (!qualityHistogram) {
       return null;
     }
-    return JSON.parse(this.histogram?.qualityHistogram ?? '');
+    return JSON.parse(qualityHistogram);
   }
 
   get parsedDifficultyHistogram(): null | number[] {

@@ -105,7 +105,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
-import { AvailableViews } from './DemotionPopupv2.vue';
+import { AvailableViews } from './DemotionPopup.vue';
 import T from '../../lang';
 
 interface ProblemTag {
