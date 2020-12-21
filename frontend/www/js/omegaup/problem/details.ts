@@ -14,7 +14,7 @@ import JSZip from 'jszip';
 import T from '../lang';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.ProblemDetailsv2Payload();
+  const payload = types.payloadParsers.ProblemDetailsPayload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =

@@ -819,9 +819,9 @@ export namespace types {
       );
     }
 
-    export function ProblemDetailsv2Payload(
+    export function ProblemDetailsPayload(
       elementId: string = 'payload',
-    ): types.ProblemDetailsv2Payload {
+    ): types.ProblemDetailsPayload {
       return ((x) => {
         if (x.allRuns)
           x.allRuns = ((x) => {
@@ -2134,7 +2134,7 @@ export namespace types {
     visits: number;
   }
 
-  export interface ProblemDetailsv2Payload {
+  export interface ProblemDetailsPayload {
     allRuns?: types.Run[];
     allowUserAddTags?: boolean;
     clarifications?: types.Clarification[];
