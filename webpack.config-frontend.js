@@ -64,11 +64,10 @@ module.exports = {
     course_statistics: './frontend/www/js/omegaup/course/statistics.ts',
     course_student: './frontend/www/js/omegaup/course/student.ts',
     course_students: './frontend/www/js/omegaup/course/students.ts',
-    group_identities: './frontend/www/js/omegaup/group/identities.js',
-    group_members: './frontend/www/js/omegaup/group/members.js',
-    group_new: './frontend/www/js/omegaup/group/new.ts',
     course_submissions_list:
       './frontend/www/js/omegaup/course/submissions_list.ts',
+    group_edit: './frontend/www/js/omegaup/group/edit.ts',
+    group_new: './frontend/www/js/omegaup/group/new.ts',
     group_list: './frontend/www/js/omegaup/group/list.js',
     login_password_recover: './frontend/www/js/omegaup/login/recover.ts',
     login_password_reset: './frontend/www/js/omegaup/login/reset.ts',
