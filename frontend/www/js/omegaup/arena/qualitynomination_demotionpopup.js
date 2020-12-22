@@ -1,21 +1,21 @@
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import qualitynomination_demotionPopup from '../components/qualitynomination/DemotionPopup.vue';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let reportProblemPayload = JSON.parse(
     document.getElementById('qualitynomination-reportproblem-payload')
       .innerText,
   );
   let qualitynominationdemotionForm = new Vue({
     el: '#qualitynomination-demotionpopup',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('qualitynomination-demotionpopup', {
         props: {},
         on: {
-          submit: function(ev) {
+          submit: function (ev) {
             api.QualityNomination.create({
               problem_alias: reportProblemPayload.problem_alias,
               nomination: 'demotion',
@@ -24,7 +24,7 @@ OmegaUp.on('ready', function() {
                 reason: ev.selectedReason,
                 original: ev.original,
               }),
-            }).catch(UI.apiError);
+            }).catch(ui.apiError);
           },
         },
       });

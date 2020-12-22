@@ -93,7 +93,7 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
         // Create a user and sumbit a run with him
         ['user' => $contestant2, 'identity' => $identity2] = \OmegaUp\Test\Factories\User::createUser();
         $problemDataPrivate = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private',
         ]));
         $runDataPrivate = \OmegaUp\Test\Factories\Run::createRunToProblem(
             $problemDataPrivate,
@@ -586,5 +586,143 @@ class UserRankTest extends \OmegaUp\Test\ControllerTestCase {
             $results[0]['author_ranking'],
             $results[1]['author_ranking']
         );
+    }
+
+    public function testUserWithIdentitiesRank() {
+        // Adding some problems
+        $problemsData = [];
+        foreach (range(0, 2) as $_) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
+        }
+
+        // Identity creator group member will upload csv file
+        [
+            'identity' => $creator,
+        ] = \OmegaUp\Test\Factories\User::createGroupIdentityCreator();
+        $creatorLogin = self::login($creator);
+        $group = \OmegaUp\Test\Factories\Groups::createGroup(
+            $creator,
+            /*$name=*/ null,
+            /*$description=*/ null,
+            /*$alias=*/ null,
+            $creatorLogin
+        );
+        $password = \OmegaUp\Test\Utils::createRandomString();
+
+        // Call api using identity creator group member
+        \OmegaUp\Controllers\Identity::apiBulkCreate(new \OmegaUp\Request([
+            'auth_token' => $creatorLogin->auth_token,
+            'identities' => \OmegaUp\Test\Factories\Identity::getCsvData(
+                'identities.csv',
+                $group['group']->alias,
+                $password
+            ),
+            'group_alias' => $group['group']->alias,
+        ]));
+
+        // Getting all identity members associated to the group
+        $membersResponse = \OmegaUp\Controllers\Group::apiMembers(
+            new \OmegaUp\Request([
+                'auth_token' => $creatorLogin->auth_token,
+                'group_alias' => $group['group']->alias,
+            ])
+        );
+        $associatedIdentity = $membersResponse['identities'][0];
+        $unassociatedIdentity = $membersResponse['identities'][1];
+
+        $usersRankExpected = [];
+
+        // Create the user to associate with an identity
+        ['identity' => $contestant] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($contestant);
+
+        $usersRankExpected[0] = [
+            'username' => $contestant->username,
+            'problems_solved' => 0,
+        ];
+
+        // Associate first identity to contestant
+        $response = \OmegaUp\Controllers\User::apiAssociateIdentity(
+            new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'username' => $associatedIdentity['username'],
+                'password' => $password,
+            ])
+        );
+
+        // User sumbits a run for a problem 0
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $contestant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        $usersRankExpected[0]['problems_solved'] += 1;
+
+        // Associated identity submits a run for problem 1
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $associatedIdentity['username']
+        );
+        $identity->password = $password;
+        $login = self::login($identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[1],
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        $usersRankExpected[0]['problems_solved'] += 1;
+
+        // Unassociated identity submits a run for problem 2
+        $identity = \OmegaUp\Controllers\Identity::resolveIdentity(
+            $unassociatedIdentity['username']
+        );
+        $identity->password = $password;
+        $login = self::login($identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[2],
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        // A new user, with no associated identities, submits a run
+        ['identity' => $user] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($user);
+
+        // User sumbits a run for a problem 0
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemsData[0],
+            $user
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+        $usersRankExpected[1] = [
+            'username' => $user->username,
+            'problems_solved' => 1,
+        ];
+
+        // Refresh Rank
+        \OmegaUp\Test\Utils::runUpdateRanks();
+
+        // Call function
+        $response = \OmegaUp\Controllers\User::getRankByProblemsSolved(
+            /*$loggedIdentity=*/            null,
+            /*$filteredBy=*/ '',
+            /*$offset=*/ 1,
+            /*$rowcount=*/ 100
+        );
+
+        // Unassociated identities do not appear in user rank report
+        $this->assertEquals($response['total'], count($usersRankExpected));
+        foreach ($response['rank'] as $i => $entry) {
+            $this->assertEquals(
+                $entry['username'],
+                $usersRankExpected[$i]['username']
+            );
+            $this->assertEquals(
+                $entry['problems_solved'],
+                $usersRankExpected[$i]['problems_solved']
+            );
+            $this->assertEquals($entry['ranking'], $i + 1);
+        }
     }
 }

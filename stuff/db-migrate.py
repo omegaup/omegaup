@@ -28,6 +28,7 @@ import logging
 import os.path
 import sys
 import time
+import urllib.error
 from typing import Iterator, List, Optional, Sequence, Tuple
 
 import database_utils
@@ -49,7 +50,7 @@ def _revision(args: argparse.Namespace, auth: Sequence[str]) -> int:
             auth=auth).strip())
 
 
-def _scripts() -> Sequence[Tuple[int, str, str]]:
+def _scripts() -> List[Tuple[int, str, str]]:
     '''
     Returns the list of scripts in the frontend/database/ directory in the
     omegaUp checkout, ordered by revision.
@@ -70,37 +71,55 @@ def _scripts() -> Sequence[Tuple[int, str, str]]:
 
 def _set_aws_rds_timeout(args: argparse.Namespace,
                          auth: Sequence[str],
-                         timeout: Optional[int] = None) -> None:
+                         timeout: Optional[int] = None,
+                         retries: int = 10) -> None:
     '''Set the MySQL through AWS RDS timeouts.'''
     del auth  # unused
     access_key, secret_key = aws.get_credentials(args.aws_username)
-    if timeout is None:
-        aws.request(access_key,
-                    secret_key,
-                    region=args.aws_rds_region,
-                    service='rds',
-                    request_parameters={
-                        'Action': 'ResetDBParameterGroup',
-                        'DBParameterGroupName':
-                        args.aws_rds_parameter_group_name,
-                        'Parameters.member.1.ApplyMethod': 'immediate',
-                        'Parameters.member.1.ParameterName': 'wait_timeout',
-                        'Version': '2014-09-01',
-                    })
-    else:
-        aws.request(access_key,
-                    secret_key,
-                    region=args.aws_rds_region,
-                    service='rds',
-                    request_parameters={
-                        'Action': 'ModifyDBParameterGroup',
-                        'DBParameterGroupName':
-                        args.aws_rds_parameter_group_name,
-                        'Parameters.member.1.ApplyMethod': 'immediate',
-                        'Parameters.member.1.ParameterName': 'wait_timeout',
-                        'Parameters.member.1.ParameterValue': '10',
-                        'Version': '2014-09-01',
-                    })
+
+    while True:
+        try:
+            if timeout is None:
+                aws.request(access_key,
+                            secret_key,
+                            region=args.aws_rds_region,
+                            service='rds',
+                            request_parameters={
+                                'Action': 'ResetDBParameterGroup',
+                                'DBParameterGroupName':
+                                args.aws_rds_parameter_group_name,
+                                'Parameters.member.1.ApplyMethod': 'immediate',
+                                'Parameters.member.1.ParameterName':
+                                'wait_timeout',
+                                'Version': '2014-09-01',
+                            })
+            else:
+                aws.request(access_key,
+                            secret_key,
+                            region=args.aws_rds_region,
+                            service='rds',
+                            request_parameters={
+                                'Action': 'ModifyDBParameterGroup',
+                                'DBParameterGroupName':
+                                args.aws_rds_parameter_group_name,
+                                'Parameters.member.1.ApplyMethod': 'immediate',
+                                'Parameters.member.1.ParameterName':
+                                'wait_timeout',
+                                'Parameters.member.1.ParameterValue': '10',
+                                'Version': '2014-09-01',
+                            })
+            return
+        except urllib.error.HTTPError as e:
+            body = e.read()
+            logging.error('Request failed. headers=%r, body=%s',
+                          tuple(e.headers.items()), body)
+            if (e.code != 400
+                    or b'<Code>InvalidDBParameterGroupState</Code>' not in body
+                    or retries == 0):
+                raise e
+            logging.info('Retrying, %d tries left...', retries)
+            retries -= 1
+            time.sleep(10)
 
 
 def _set_mysql_timeout(args: argparse.Namespace,
@@ -208,12 +227,18 @@ def migrate(args: argparse.Namespace,
     latest_revision = 0
     if update_metadata:
         latest_revision = _revision(args, auth)
+    scripts = _scripts()
+    if not scripts:
+        # If there are no scripts that need to be run, there is no need to even
+        # touch the connection timeout.
+        return
+
     with _connection_timeout_wrapper(
             args,
             auth,
             lower_timeout=args.lower_timeout,
             kill_other_connections=args.kill_other_connections):
-        for revision, name, path in _scripts():
+        for revision, name, path in scripts:
             if latest_revision >= revision:
                 continue
             if args.limit and revision > args.limit:
@@ -354,6 +379,9 @@ def main() -> None:
         default=database_utils.default_config_file(),
         help='.my.cnf file that stores credentials')
     parser.add_argument(
+        '--hostname', default=None, type=str,
+        help='Hostname of the MySQL server')
+    parser.add_argument(
         '--username', default='root', help='MySQL root username')
     parser.add_argument('--password', default='omegaup', help='MySQL password')
     parser.add_argument('--verbose', action='store_true')
@@ -454,7 +482,8 @@ def main() -> None:
     auth = database_utils.authentication(
         config_file=args.mysql_config_file,
         username=args.username,
-        password=args.password)
+        password=args.password,
+        hostname=args.hostname)
     args.func(args, auth)
 
 

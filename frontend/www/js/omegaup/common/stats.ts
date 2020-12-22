@@ -8,7 +8,7 @@ import * as ui from '../ui';
 import * as Highcharts from 'highcharts';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.StatsPayload('stats-payload');
+  const payload = types.payloadParsers.StatsPayload();
   const callStatsApiTimeout = 10 * 1000;
   const updatePendingRunsChartTimeout = callStatsApiTimeout / 2;
 
@@ -20,19 +20,20 @@ OmegaUp.on('ready', () => {
   const getStats = (entityType: string): void => {
     if (entityType === 'contest') {
       api.Contest.stats({ contest_alias: payload.alias })
-        .then(s => Vue.set(statsChart, 'stats', s))
+        .then((s) => Vue.set(statsChart, 'stats', s))
         .catch(ui.apiError);
     } else {
       api.Problem.stats({ problem_alias: payload.alias })
-        .then(s => Vue.set(statsChart, 'stats', s))
+        .then((s) => Vue.set(statsChart, 'stats', s))
         .catch(ui.apiError);
     }
   };
 
   const normalizeRunCounts = (stats: types.StatsPayload) => {
-    let result = [];
+    const result = [];
     for (const verdict in stats.verdict_counts) {
-      if (!stats.verdict_counts.hasOwnProperty(verdict)) continue;
+      if (!Object.prototype.hasOwnProperty.call(stats.verdict_counts, verdict))
+        continue;
       if (verdict === 'NO-AC') continue;
       if (verdict === 'AC') {
         result.push({
@@ -71,33 +72,12 @@ OmegaUp.on('ready', () => {
     return categoriesDistributionValues;
   };
 
-  let statsChart = new Vue({
-    el: '#common-stats',
-    render: function(createElement) {
-      return createElement('omegaup-common-stats', {
-        props: {
-          stats: this.stats,
-          verdictChartOptions: this.verdictChartOptions,
-          distributionChartOptions: this.distributionChartOptions,
-          pendingChartOptions: this.pendingChartOptions,
-        },
-        on: {
-          'update-series': (series: types.StatsPayload): void => {
-            statsChart.verdictChartOptions.series[0].data = normalizeRunCounts(
-              series,
-            );
-            statsChart.distributionChartOptions.series[0].data = getDistribution(
-              series,
-            );
-            statsChart.distributionChartOptions.xAxis.categories = getCategories(
-              series,
-            );
-            statsChart.stats.pending_runs = series.pending_runs;
-          },
-        },
-      });
+  const statsChart = new Vue({
+    el: '#main-container',
+    components: {
+      'omegaup-common-stats': common_Stats,
     },
-    data: {
+    data: () => ({
       stats: payload,
       verdictChartOptions: {
         chart: {
@@ -205,9 +185,30 @@ OmegaUp.on('ready', () => {
           useUTC: true,
         },
       },
-    },
-    components: {
-      'omegaup-common-stats': common_Stats,
+    }),
+    render: function (createElement) {
+      return createElement('omegaup-common-stats', {
+        props: {
+          stats: this.stats,
+          verdictChartOptions: this.verdictChartOptions,
+          distributionChartOptions: this.distributionChartOptions,
+          pendingChartOptions: this.pendingChartOptions,
+        },
+        on: {
+          'update-series': (series: types.StatsPayload): void => {
+            statsChart.verdictChartOptions.series[0].data = normalizeRunCounts(
+              series,
+            );
+            statsChart.distributionChartOptions.series[0].data = getDistribution(
+              series,
+            );
+            statsChart.distributionChartOptions.xAxis.categories = getCategories(
+              series,
+            );
+            statsChart.stats.pending_runs = series.pending_runs;
+          },
+        },
+      });
     },
   });
 

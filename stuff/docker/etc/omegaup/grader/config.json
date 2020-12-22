@@ -3,11 +3,11 @@
 		"File": ""
 	},
 	"Broadcaster": {
-		"FrontendURL": "http://frontend:8000"
+		"FrontendURL": "http://frontend:8001"
 	},
 	"DB": {
 		"Driver": "mysql",
-		"DataSourceName": "omegaup:omegaup@tcp(mysql)/omegaup"
+		"DataSourceName": "omegaup:omegaup@tcp(mysql)/omegaup?parseTime=true"
 	},
 	"Grader": {
 		"BroadcasterURL": "https://broadcaster:32672/broadcast/",

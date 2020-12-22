@@ -1,0 +1,365 @@
+body#practice { background: #668 url(/media/gradient.png) repeat-x 0 0; font-family: sans-serif; overflow-y: scroll; }
+body#report { background: white; font-family: sans-serif; overflow-y: scroll; }
+body { background: #e4e8ec linear-gradient(to top, #e4e8ec, #f3f6f9) fixed no-repeat; font-family: sans-serif; overflow-y: scroll; }
+
+h1 {
+	margin: 1em auto 1em auto;
+	font-size: 1.5em;
+}
+h2 {
+	margin: 2em auto 1em auto;
+}
+p {
+	margin: 0.1em auto 0.5em auto;
+}
+abbr {
+	border-bottom: 1px dotted #000;
+}
+iframe {
+	width: 100%;
+	min-height: 40em;
+}
+fieldset {
+	border: 1px solid #000;
+	border-radius: 4px;
+	margin: 1em;
+	padding: 0.5em;
+}
+legend {
+	margin: 0 0.2em 0 0.2em;
+}
+
+#root,
+#problem,
+#ranking,
+#clarifications,
+#runs,
+#solution {
+	display: none;
+}
+
+#only-problem #root,
+#only-problem #problem {
+	display: block;
+}
+
+#problems.active { display: block; }
+
+#title img {
+	position: absolute;
+	right: 1em;
+	top: 2em;
+}
+
+#title h1 {
+	text-align: center;
+	font-size: 2em;
+	margin: 0.5em;
+}
+
+#title .clock {
+	text-align: center;
+	font-size: 2em;
+}
+#practice #title .clock {
+	font-size: 6em;
+	line-height: .4em;
+	margin-bottom: .2em;
+}
+
+.tabs {
+	padding-left: 0.5em;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+	display: block;
+	text-align: center;
+	background-color: white;
+	margin: 0.5em 0 0 0;
+}
+
+.tabs li {
+	display: inline;
+}
+
+.tabs a {
+	display: inline-block;
+	padding: 0.5em 1em;
+	text-decoration: none;
+	color: #000;
+}
+
+.tabs a:hover {
+	background-color: #fff;
+}
+
+.tabs a.active {
+	background-color: #ddd;
+}
+
+body#only-problem .tabs {
+	max-width: 900px;
+	margin: 1em auto 0 auto;
+	border-top: 0;
+}
+
+.navleft {
+	overflow: hidden;
+}
+
+.navleft .navbar {
+	width: 18em;
+	float: left;
+	background: transparent;
+}
+
+.navleft .main {
+	margin-left: 19em;
+	border: 1px solid #ccc;
+	border-width: 0 0 1px 1px;
+}
+body#only-problem .tab {
+	max-width: 900px;
+	margin: 0 auto;
+	border: none;
+	padding: 0;
+}
+body#only-problem #problems .main {
+	margin: 0;
+	padding: 2em 7em;
+}
+
+.tab {
+	padding: 1em;
+}
+
+#problem, #summary {
+	background: #fff;
+	padding: 1em;
+	margin-top: -1.5em;
+	margin-right: -1em;
+}
+
+#summary {
+	min-height: 10em;
+}
+
+#summary td {
+	border: 1px solid #000;
+	padding: 0.2em;
+}
+
+#problem hr {
+	width: 90%;
+	border: 0;
+	border-top: 1px solid #ccc;
+	margin: 1em auto;
+}
+
+#problem .source {
+	font-style: italic;
+}
+
+.runs, .best-solvers {
+	width: 100%;
+	border: 1px solid #ccc;
+	margin-top: 2em;
+}
+
+.runs caption, .best-solvers caption {
+	font-weight: bold;
+	font-size: 1.em;
+	margin-bottom: 1em;
+}
+
+.runs td, .best-solvers td,
+.runs th, .best-solvers th {
+	border: 1px solid #ccc;
+	border-width: 1px 0;
+	text-align: center;
+}
+
+.runs tfoot td a {
+	display: block;
+	padding: 0.5em;
+	text-decoration: none;
+	color: #000;
+	background: #ccc;
+	text-align: center;
+}
+.runs tfoot td a:hover {
+	background: #fff;
+}
+
+table.clarifications {
+	width: 100%;
+	margin: 0 auto;
+}
+
+.clarifications tbody td {
+	border: 1px solid #000;
+	padding: 0.4em;
+	padding-left: 7px;
+}
+
+.clarifications tbody tr.resolved {
+	color: rgb(70, 136, 71);
+	background-image: linear-gradient(rgb(223, 240, 216) 0px, rgb(200, 229, 188) 100%);
+	background-color: rgb(223, 240, 216);
+}
+
+.clarifications tbody tr.direct-message {
+	color: rgb(125, 117, 18);
+	background-image: linear-gradient(rgb(253, 245, 154) 0px, rgba(255, 249, 181, .5) 100%);
+	background-color: rgb(223, 240, 216);
+}
+
+.clarifications tfoot td a {
+	display: block;
+	padding: 0.5em;
+	border: 1px solid #000;
+	text-decoration: none;
+	color: #000;
+	background: #ccc;
+	text-align: center;
+}
+
+.clarifications .problem {
+	width: 7em;
+}
+
+.clarifications .time {
+	width: 10em;
+}
+
+#title {
+	min-height: 80px;
+}
+
+#title h1#arena-title {
+	/*margin-top: 2em;*/
+	font-size: 3em;
+}
+
+#main.container { margin-top: 20px; max-width: 930px; }
+
+.karel-js-link {
+	border: 1px solid #eee;
+	border-left: 0;
+	border-radius: 3px;
+	margin: 2em;
+}
+.karel-js-link a {
+	border-left: 5px solid #1b809e;
+	display: block;
+	padding: 1em;
+}
+
+.no-wrap { white-space: nowrap; }
+.hide { display: none; }
+
+/* typeahead */
+.typeahead,
+.tt-query,
+.tt-hint {
+  padding: 8px 12px;
+  border: 2px solid #ccc;
+  -webkit-border-radius: 8px;
+     -moz-border-radius: 8px;
+          border-radius: 8px;
+  outline: none;
+}
+
+.typeahead {
+  background-color: #fff;
+}
+
+.typeahead:focus {
+  border: 2px solid #0097cf;
+}
+
+.tt-query {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-menu,
+.tt-dropdown-menu {
+  text-align: left;
+  width: 422px;
+  margin: 12px 0;
+  padding: 8px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 8px;
+     -moz-border-radius: 8px;
+          border-radius: 8px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+}
+
+.tt-suggestion:hover {
+  cursor: pointer;
+  color: #fff;
+  background-color: #0097cf;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #0097cf;
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+td.numeric,
+th.numeric {
+	text-align: right;
+}
+
+#announcement {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.contest-list .page-num {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
+.contest-list tr:nth-child(4n+3), .contest-list tr:nth-child(4n+4) {
+  background: #f9f9f9;
+  margin-bottom: 0;
+}
+
+.contest-list tr:nth-child(4n+2) td, .contest-list tr:nth-child(4n+4) td {
+   border: none;
+}
+
+.dropdown-menu li.empty {
+  padding: 1em;
+  color: #888;
+  text-align: center;
+}
+
+#status {
+	position: -webkit-sticky; /* Safari */
+	position: sticky;
+	z-index: 99999999;
+	max-width: 900px;
+	margin-right: auto;
+	margin-left: auto;
+	top: 0px;
+	width: 100%;
+}

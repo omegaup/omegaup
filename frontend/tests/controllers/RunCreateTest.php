@@ -164,7 +164,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Validate defaults
         $run = \OmegaUp\DAO\Runs::getByPK($submission->current_run_id);
-        $this->assertEquals('new', $run->status);
+        $this->assertEquals('uploading', $run->status);
         $this->assertEquals(0, $run->runtime);
         $this->assertEquals(0, $run->memory);
         $this->assertEquals(0, $run->score);
@@ -210,6 +210,9 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Check problem submissions (1)
         $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
         $this->assertEquals(1, $problem->submissions);
+
+        $run = \OmegaUp\DAO\Runs::getByGUID($response['guid']);
+        $this->assertEquals($problem->commit, $run->commit);
     }
 
     /**
@@ -723,7 +726,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Create public problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0,
+            'visibility' => 'private',
             'author' => $contestData['director']
         ]));
 
@@ -917,7 +920,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+             'visibility' => 'public_banned',
              'message' => 'public_banned',
         ]));
 
@@ -946,7 +949,7 @@ class RunCreateTest extends \OmegaUp\Test\ControllerTestCase {
         \OmegaUp\Controllers\Problem::apiUpdate(new \OmegaUp\Request([
              'auth_token' => $login->auth_token,
              'problem_alias' => $problem->alias,
-             'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED,
+             'visibility' => 'private_banned',
              'message' => 'private_banned',
         ]));
 

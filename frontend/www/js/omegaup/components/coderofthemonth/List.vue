@@ -1,5 +1,5 @@
 <template>
-  <div class="container-lg p-5">
+  <div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="nav-item">
         <a
@@ -8,9 +8,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="codersOfTheMonth"
-          v-bind:class="{ active: selectedTab === 'codersOfTheMonth' }"
-          v-bind:aria-selected="selectedTab === 'codersOfTheMonth'"
-          v-on:click="selectedTab = 'codersOfTheMonth'"
+          :class="{ active: selectedTab === 'codersOfTheMonth' }"
+          :aria-selected="selectedTab === 'codersOfTheMonth'"
+          @click="selectedTab = 'codersOfTheMonth'"
         >
           {{
             category == 'all' ? T.codersOfTheMonth : T.codersOfTheMonthFemale
@@ -24,9 +24,9 @@
           data-toggle="tab"
           role="tab"
           aria-controls="codersOfPreviousMonth"
-          v-bind:class="{ active: selectedTab === 'codersOfPreviousMonth' }"
-          v-bind:aria-selected="selectedTab === 'codersOfPreviousMonth'"
-          v-on:click="selectedTab = 'codersOfPreviousMonth'"
+          :class="{ active: selectedTab === 'codersOfPreviousMonth' }"
+          :aria-selected="selectedTab === 'codersOfPreviousMonth'"
+          @click="selectedTab = 'codersOfPreviousMonth'"
         >
           {{
             category == 'all'
@@ -42,11 +42,11 @@
           data-toggle="tab"
           role="tab"
           aria-controls="candidatesToCoderOfTheMonth"
-          v-bind:class="{
+          :class="{
             active: selectedTab === 'candidatesToCoderOfTheMonth',
           }"
-          v-bind:aria-selected="selectedTab === 'candidatesToCoderOfTheMonth'"
-          v-on:click="selectedTab = 'candidatesToCoderOfTheMonth'"
+          :aria-selected="selectedTab === 'candidatesToCoderOfTheMonth'"
+          @click="selectedTab = 'candidatesToCoderOfTheMonth'"
         >
           {{
             category == 'all'
@@ -65,75 +65,75 @@
           </th>
           <th scope="col" class="text-center">{{ T.codersOfTheMonthUser }}</th>
           <th
+            v-if="selectedTab == 'codersOfTheMonth'"
             scope="col"
             class="text-center"
-            v-if="selectedTab == 'codersOfTheMonth'"
           >
             {{ T.codersOfTheMonthDate }}
           </th>
           <th
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
             scope="col"
             class="text-right"
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
           >
             {{ T.profileStatisticsNumberOfSolvedProblems }}
           </th>
           <th
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
             scope="col"
             class="text-right"
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
           >
             {{ T.rankScore }}
           </th>
           <th
+            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
             scope="col"
             class="text-center"
-            v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
           >
             {{ T.wordsActions }}
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-bind:key="index" v-for="(coder, index) in visibleCoders">
+        <tr v-for="(coder, index) in visibleCoders" :key="index">
           <td class="text-center">
-            <img v-bind:src="coder.gravatar_32" />
+            <img :src="coder.gravatar_32" />
           </td>
           <td class="text-center">
             <omegaup-countryflag
-              v-bind:country="coder.country_id"
+              :country="coder.country_id"
             ></omegaup-countryflag>
           </td>
           <td class="text-center">
             <omegaup-user-username
-              v-bind:classname="coder.classname"
-              v-bind:linkify="true"
-              v-bind:username="coder.username"
+              :classname="coder.classname"
+              :linkify="true"
+              :username="coder.username"
             ></omegaup-user-username>
           </td>
           <td v-if="selectedTab == 'codersOfTheMonth'" class="text-center">
             {{ coder.date }}
           </td>
           <td
-            class="text-right"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+            class="text-right"
           >
             {{ coder.problems_solved }}
           </td>
           <td
-            class="text-right"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth'"
+            class="text-right"
           >
             {{ coder.score }}
           </td>
           <td
-            class="text-center"
             v-if="selectedTab == 'candidatesToCoderOfTheMonth' && isMentor"
+            class="text-center"
           >
             <button
-              class="btn btn-sm btn-primary"
               v-if="canChooseCoder && !coderIsSelected"
-              v-on:click="$emit('select-coder', coder.username, category)"
+              class="btn btn-sm btn-primary"
+              @click="$emit('select-coder', coder.username, category)"
             >
               {{
                 category == 'all'

@@ -64,6 +64,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(false, $response['admin']);
         $this->assertEmpty($response['problem_admin']);
         $this->assertEmpty($response['contest_admin']);
+        $this->assertEmpty($response['problemset_admin']);
     }
 
     public function testOtherUsersEvents() {
@@ -112,7 +113,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($identity);
         \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
             'auth_token' => $login->auth_token,
-            'filter' => "/problemset/{$contest->problemset_id}",
+            'filter' => "/contest/{$contest->alias}",
         ]));
     }
 
@@ -134,7 +135,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-                'filter' => "/problemset/{$contest->problemset_id}",
+                'filter' => "/contest/{$contest->alias}",
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -168,7 +169,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
 
         try {
             \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-                'filter' => "/problemset/{$contest->problemset_id}",
+                'filter' => "/contest/{$contest->alias}",
             ]));
             $this->fail('should have failed');
         } catch (\OmegaUp\Exceptions\UnauthorizedException $e) {
@@ -187,10 +188,10 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $contest->problemset_id . '/' .
-                        $problemset->scoreboard_url,
+            'filter' => "/problemset/{$problemset->problemset_id}/{$problemset->scoreboard_url}",
         ]));
         $this->assertEmpty($response['contest_admin']);
+        $this->assertEmpty($response['problemset_admin']);
     }
 
     public function testAnonymousContestWithToken() {
@@ -204,10 +205,10 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $problemset->problemset_id . '/' .
-                        $problemset->scoreboard_url,
+            'filter' => "/contest/{$contest->alias}/{$problemset->scoreboard_url}",
         ]));
         $this->assertEmpty($response['contest_admin']);
+        $this->assertEmpty($response['problemset_admin']);
     }
 
     public function testAnonymousProblemsetWithAdminToken() {
@@ -221,10 +222,13 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $problemset->problemset_id . '/' .
-                        $problemset->scoreboard_url_admin,
+            'filter' => "/problemset/{$problemset->problemset_id}/{$problemset->scoreboard_url_admin}",
         ]));
         $this->assertContains($contest->alias, $response['contest_admin']);
+        $this->assertContains(
+            $problemset->problemset_id,
+            $response['problemset_admin']
+        );
         $this->assertNull($response['user']);
     }
 
@@ -239,10 +243,13 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
         );
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problemset/' . $problemset->problemset_id . '/' .
-                        $problemset->scoreboard_url_admin,
+            'filter' => "/contest/{$contest->alias}/{$problemset->scoreboard_url_admin}",
         ]));
         $this->assertContains($contest->alias, $response['contest_admin']);
+        $this->assertContains(
+            $problemset->problemset_id,
+            $response['problemset_admin']
+        );
         $this->assertNull($response['user']);
     }
 
@@ -252,7 +259,7 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
 
         $login = self::login($identity);
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problem/' . $problem->alias,
+            'filter' => "/problem/{$problem->alias}",
             'auth_token' => $login->auth_token,
         ]));
         $this->assertEquals($identity->username, $response['user']);
@@ -262,14 +269,14 @@ class UserFilterTest extends \OmegaUp\Test\ControllerTestCase {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem()['problem'];
 
         $response = \OmegaUp\Controllers\User::apiValidateFilter(new \OmegaUp\Request([
-            'filter' => '/problem/' . $problem->alias,
+            'filter' => "/problem/{$problem->alias}",
         ]));
         $this->assertNull($response['user']);
     }
 
     public function testAnonymousProblemAccess() {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private',
         ]))['problem'];
 
         try {

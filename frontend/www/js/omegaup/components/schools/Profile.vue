@@ -1,34 +1,28 @@
 <template>
-  <div class="row">
-    <div class="page-header">
-      <h1 class="text-center">
-        <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
-        {{ name }}
-      </h1>
-    </div>
-    <div class="row">
+  <div class="container-lg p-5">
+    <h2 class="text-center mb-4">
+      <span v-if="rank !== 0" class="rank-number">#{{ rank }} </span>
+      {{ name }}
+    </h2>
+    <div class="row mb-4">
       <div class="col-md-4">
-        <div class="panel panel-default" v-if="country">
-          <ul class="list-group">
-            <li class="list-group-item">
-              <strong>{{ T.wordsCountry }}:</strong>
-              {{ country.name }}
-              <omegaup-country-flag
-                v-bind:country="country.id"
-              ></omegaup-country-flag>
-            </li>
-            <li class="list-group-item" v-if="stateName">
-              <strong>{{ T.profileState }}:</strong> {{ stateName }}
-            </li>
-          </ul>
-        </div>
+        <ul v-if="country" class="list-group mb-3">
+          <li class="list-group-item">
+            <strong>{{ T.wordsCountry }}:</strong>
+            {{ country.name }}
+            <omegaup-country-flag :country="country.id"></omegaup-country-flag>
+          </li>
+          <li v-if="stateName" class="list-group-item">
+            <strong>{{ T.profileState }}:</strong> {{ stateName }}
+          </li>
+        </ul>
         <omegaup-grid-paginator
-          v-bind:columns="1"
-          v-bind:items="codersOfTheMonth"
-          v-bind:items-per-page="5"
-          v-bind:title="T.codersOfTheMonth"
+          :columns="1"
+          :items="codersOfTheMonth"
+          :items-per-page="5"
+          :title="T.codersOfTheMonth"
         >
-          <template slot="table-header">
+          <template #table-header>
             <thead>
               <tr>
                 <th>{{ T.codersOfTheMonthUser }}</th>
@@ -39,12 +33,9 @@
         </omegaup-grid-paginator>
       </div>
       <div class="col-md-8">
-        <div class="panel panel-default">
-          <div class="panel-body">
-            <omegaup-school-chart
-              v-bind:data="monthlySolvedProblemsCount"
-              v-bind:school="name"
-            ></omegaup-school-chart>
+        <div class="card">
+          <div class="card-body">
+            <highcharts :options="chartOptions"></highcharts>
           </div>
         </div>
       </div>
@@ -52,28 +43,30 @@
     <div class="row">
       <div class="col-md-12">
         <omegaup-grid-paginator
-          v-bind:columns="1"
-          v-bind:show-page-offset="true"
-          v-bind:items="schoolUsers"
-          v-bind:items-per-page="30"
-          v-bind:title="T.schoolUsers"
-          v-bind:sort-options="sortOptions"
-          v-on:sort-option-change="updateUsers"
+          :columns="1"
+          :show-page-offset="true"
+          :items="schoolUsers"
+          :items-per-page="30"
+          :title="T.schoolUsers"
+          :sort-options="sortOptions"
+          @sort-option-change="updateUsers"
         >
-          <template slot="table-header">
+          <template #table-header>
             <thead>
               <tr>
-                <th class="text-center">{{ T.profileContestsTablePlace }}</th>
-                <th>{{ T.username }}</th>
-                <th class="numericColumn">{{ sortByTableTitle }}</th>
+                <th scope="col" class="text-center">
+                  {{ T.profileContestsTablePlace }}
+                </th>
+                <th scope="col">{{ T.username }}</th>
+                <th scope="col" class="text-right">{{ sortByTableTitle }}</th>
               </tr>
             </thead>
           </template>
-          <template slot="item-data" slot-scope="slotProps">
+          <template #item-data="slotProps">
             <omegaup-username
-              v-bind:username="slotProps.item.toString()"
-              v-bind:classname="slotProps.item.classname"
-              v-bind:linkify="true"
+              :username="slotProps.item.toString()"
+              :classname="slotProps.item.classname"
+              :linkify="true"
             ></omegaup-username>
           </template>
         </omegaup-grid-paginator>
@@ -82,34 +75,25 @@
   </div>
 </template>
 
-<style>
-.list-group-item strong {
-  display: inline-block;
-  width: 60px;
-}
-
-.rank-number {
-  color: gray;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import * as ui from '../../ui';
+
 import CountryFlag from '../CountryFlag.vue';
-import SchoolChart from './Chart.vue';
-import GridPaginator from '../GridPaginator.vue';
+import GridPaginator from '../common/GridPaginator.vue';
 import UserName from '../user/Username.vue';
 import { types } from '../../api_types';
-import { SchoolCoderOfTheMonth, SchoolUser } from '../../types.ts';
+import { SchoolCoderOfTheMonth, SchoolUser } from '../../linkable_resource';
+import { Chart } from 'highcharts-vue';
 
 @Component({
   components: {
     'omegaup-country-flag': CountryFlag,
-    'omegaup-school-chart': SchoolChart,
     'omegaup-grid-paginator': GridPaginator,
     'omegaup-username': UserName,
+    highcharts: Chart,
   },
 })
 export default class SchoolProfile extends Vue {
@@ -120,8 +104,10 @@ export default class SchoolProfile extends Vue {
   @Prop() monthlySolvedProblemsCount!: types.SchoolProblemsSolved[];
   @Prop() users!: SchoolUser[];
   @Prop() codersOfTheMonth!: SchoolCoderOfTheMonth;
+  @Prop() chartOptions!: Chart;
 
   T = T;
+  ui = ui;
   sortBy = 'solved_problems';
   sortOptions = [
     {
@@ -160,8 +146,19 @@ export default class SchoolProfile extends Vue {
   }
 
   updateUsers(newSortBy: string): void {
-    this.users.forEach(user => (user.displayField = newSortBy));
+    this.users.forEach((user) => (user.displayField = newSortBy));
     this.sortBy = newSortBy;
   }
 }
 </script>
+
+<style>
+.list-group-item strong {
+  display: inline-block;
+  width: 60px;
+}
+
+.rank-number {
+  color: gray;
+}
+</style>

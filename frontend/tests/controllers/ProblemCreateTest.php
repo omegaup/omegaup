@@ -83,6 +83,26 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->difficulty);
     }
 
+    public function testCreateWithInvlaidAlias() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest();
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+        $r['problem_alias'] = 'Invalid alias';
+
+        // Call the API
+        try {
+            \OmegaUp\Controllers\Problem::apiCreate($r);
+            $this->fail('Problem creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals($e->getMessage(), 'parameterInvalid');
+        }
+    }
+
     /**
      * Basic test for slow problems
      */
@@ -411,7 +431,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         // Delete the image and check that it exists after
         // regeneration.
         unlink(IMAGES_PATH . $imagePath);
-        $this->assertFileNotExists(IMAGES_PATH . $imagePath);
+        $this->assertFileDoesNotExist(IMAGES_PATH . $imagePath);
         \OmegaUp\Controllers\Problem::regenerateImage(
             $r['problem_alias'],
             $imageGitObjectId,
@@ -420,6 +440,45 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertFileExists(IMAGES_PATH . $imagePath);
         $actualImageHash = sha1(file_get_contents(IMAGES_PATH . $imagePath));
         $this->assertEquals($expectedImageHash, $actualImageHash);
+    }
+
+    /**
+     * Test that source files (for statements / solutions) work.
+     */
+    public function testSources() {
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos_sources.zip'
+        ]));
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+
+        // Check that the sources are there.
+        $response = \OmegaUp\Controllers\Problem::apiDetails(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $r['problem_alias'],
+        ]));
+        $this->assertEquals(
+            $response['statement']['sources'],
+            [
+                'plantilla.py' => '#!/usr/bin/python3
+
+def _main() -> None:
+    n = int(input().strip())
+    aristas = map(int, input().strip().split())
+
+if __name__ == \'__main__\':
+    _main()
+',
+            ]
+        );
     }
 
     /**
@@ -480,7 +539,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $login = self::login($problemAuthor);
         $r['auth_token'] = $login->auth_token;
         $expectedTags = [
-            ['tagname' => 'math', 'public' => true],
+            ['tagname' => 'problemTagMatrices', 'public' => true],
             ['tagname' => 'geometry', 'public' => false],
         ];
 
@@ -488,7 +547,7 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $expectedTags + [
                 // The following tags will be ignored:
                 ['tagname' => 'karel', 'public' => true],
-                ['tagname' => 'solo-salida', 'public' => false],
+                ['tagname' => 'problemRestrictedTagOnlyOutput', 'public' => false],
             ]
         );
 
@@ -501,16 +560,65 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         ]))['tags'];
 
         foreach ($expectedTags as $selectedTag) {
-            $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-                return $tag['name'] == $selectedTag['tagname'];
-            });
+            $this->assertArrayContainsWithPredicate(
+                $tags,
+                fn ($tag) => $tag['name'] == $selectedTag['tagname']
+            );
         }
-        $this->assertArrayContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-            return $tag['name'] == 'lenguaje';
-        });
-        $this->assertArrayNotContainsWithPredicate($tags, function ($tag) use ($selectedTag) {
-            return ($tag['name'] == 'karel' || $tag['name'] == 'solo-salida');
-        });
+        $this->assertArrayContainsWithPredicate(
+            $tags,
+            fn ($tag) => $tag['name'] == 'problemRestrictedTagLanguage'
+        );
+        $this->assertArrayNotContainsWithPredicate(
+            $tags,
+            fn ($tag) => (
+                $tag['name'] == 'problemRestrictedTagKarel' ||
+                $tag['name'] == 'problemRestrictedTagOnlyOutput'
+            )
+        );
+    }
+
+    /**
+     * test for count problems whit levelTag
+     */
+    public function testCountProblemsWithLevelTags() {
+        // Create problems by level
+        $problemLevelMapping = [
+            'problemLevelBasicIntroductionToProgramming' => 5,
+            'problemLevelIntermediateMathsInProgramming' => 5,
+            'problemLevelIntermediateDataStructuresAndAlgorithms' => 5,
+            'problemLevelIntermediateAnalysisAndDesignOfAlgorithms' => 5,
+            'problemLevelAdvancedCompetitiveProgramming' => 5,
+            'problemLevelAdvancedSpecializedTopics' => 5,
+            'problemLevelBasicKarel' => 5,
+        ];
+        $problemData = [];
+        foreach ($problemLevelMapping as $level => $numberOfProblems) {
+            foreach (range(0, $numberOfProblems - 1) as $_) {
+                $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
+                    new \OmegaUp\Test\Factories\ProblemParams([
+                        'problem_level' => $level,
+                        'quality_seal' => true,
+                    ])
+                );
+            }
+        }
+
+        $problemsCount = [];
+        $total = 0;
+        $response = \OmegaUp\Controllers\Problem::getProblemCollectionDetailsForSmarty(
+            new \OmegaUp\Request([])
+        )['smartyProperties']['payload'];
+        foreach ($response['problemCount'] as $levelTag) {
+            $problemsCount[] = $levelTag['problems_per_tag'];
+            $total += $levelTag['problems_per_tag'];
+            $this->assertEquals(
+                $problemLevelMapping[$levelTag['name']],
+                $levelTag['problems_per_tag']
+            );
+        }
+
+        $this->assertEquals(35, $total);
     }
 
     /**
@@ -666,6 +774,11 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
         $this->assertEquals(0, $problem->accepted);
         $this->assertEquals(0, $problem->difficulty);
 
+        \OmegaUp\Controllers\Problem::regenerateTemplates(
+            $problem->alias,
+            $problem->commit
+        );
+
         // Verify that the templates were generated.
         $this->assertTrue(
             file_exists(
@@ -677,6 +790,60 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
                 TEMPLATES_PATH . "/{$problem->alias}/{$problem->commit}/{$problem->alias}_windows_cpp.zip"
             )
         );
+    }
+
+    /**
+     * Test that we are able to generate the input .zip of a problem that
+     * admits an output-only solution.
+     */
+    public function testGenerateInputZip() {
+        // Get the problem data
+        $problemData = \OmegaUp\Test\Factories\Problem::getRequest(new \OmegaUp\Test\Factories\ProblemParams([
+            'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'triangulos.zip',
+            'languages' => 'cat',
+        ]));
+        $r = $problemData['request'];
+        $problemAuthor = $problemData['author'];
+
+        // Login user
+        $login = self::login($problemAuthor);
+        $r['auth_token'] = $login->auth_token;
+
+        // Call the API
+        $response = \OmegaUp\Controllers\Problem::apiCreate($r);
+        $this->assertEquals('ok', $response['status']);
+
+        $problem = \OmegaUp\DAO\Problems::getByTitle($r['title'])[0];
+
+        $filename = "{$problem->alias}-input.zip";
+        \OmegaUp\Controllers\Problem::generateInputZip(
+            $problem,
+            $problem->commit,
+            $filename
+        );
+
+        // Verify that the templates were generated.
+        $zipPath = INPUTS_PATH . "{$problem->alias}/{$problem->commit}/{$filename}";
+        $this->assertTrue(file_exists($zipPath));
+
+        $zipArchive = new \ZipArchive();
+        try {
+            /** @var true|int */
+            $err = $zipArchive->open($zipPath, \ZipArchive::RDONLY);
+            $this->assertTrue($err);
+
+            /** @var list<string> */
+            $filenames = [];
+            for ($i = 0; $i < $zipArchive->numFiles; ++$i) {
+                $filenames[] = $zipArchive->getNameIndex($i);
+            }
+            $this->assertEqualsCanonicalizing(
+                $filenames,
+                ['1.in', '2.in', '3.in', '4.in']
+            );
+        } finally {
+            $zipArchive->close();
+        }
     }
 
     public function testProblemParams() {
@@ -741,6 +908,13 @@ class ProblemCreateTest extends \OmegaUp\Test\ControllerTestCase {
             'title' => $title,
             'problem_alias' => $problemAlias,
             'source' => 'yo',
+            'problem_level' => 'problemLevelBasicIntroductionToProgramming',
+            'selected_tags' => json_encode([
+                [
+                    'tagname' => 'problemTagBinarySearchTree',
+                    'public' => true,
+                ],
+            ]),
         ]));
 
         $response = \OmegaUp\Controllers\Problem::apiDetails(

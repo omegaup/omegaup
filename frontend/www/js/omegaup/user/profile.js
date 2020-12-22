@@ -1,17 +1,17 @@
 import Vue from 'vue';
 import user_Profile from '../components/user/Profile.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
 import * as api from '../api';
 import * as ui from '../ui';
-import { Problem, ContestResult } from '../types';
+import { Problem, ContestResult } from '../linkable_resource';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
-  const profile = payload.profile;
+  const profile = payload.payload;
   let viewProfile = new Vue({
     el: '#user-profile',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-user-profile', {
         props: {
           profile: this.profile,
@@ -31,7 +31,7 @@ OmegaUp.on('ready', function() {
             e.periodStatisticOptions.xAxis.categories = categories;
             e.periodStatisticOptions.series = data;
           },
-          'update-aggregate-statistics': e =>
+          'update-aggregate-statistics': (e) =>
             (e.aggregateStatisticOptions.series[0].data =
               e.normalizedRunCounts),
         },
@@ -146,7 +146,7 @@ OmegaUp.on('ready', function() {
       },
     },
     computed: {
-      rank: function() {
+      rank: function () {
         switch (profile.classname) {
           case 'user-rank-unranked':
             return T.profileRankUnrated;
@@ -169,63 +169,58 @@ OmegaUp.on('ready', function() {
   });
 
   api.User.contestStats({ username: profile.username })
-    .then(result => {
+    .then((result) => {
+      const now = new Date();
       viewProfile.contests = Object.values(result.contests)
-        .map(contest => {
-          const now = new Date();
-          if (contest.place === null || now <= contest.data.finish_time) {
-            return null;
-          }
-          return new ContestResult(contest);
-        })
-        .filter(contest => !!contest);
+        .filter((contest) => contest.place && now > contest.data.finish_time)
+        .map((contest) => new ContestResult(contest));
     })
     .catch(ui.apiError);
 
   api.User.problemsSolved({ username: profile.username })
-    .then(result => {
+    .then((result) => {
       viewProfile.solvedProblems = result.problems.map(
-        problem => new Problem(problem),
+        (problem) => new Problem(problem),
       );
     })
     .catch(ui.apiError);
 
   api.User.listUnsolvedProblems({ username: profile.username })
-    .then(result => {
+    .then((result) => {
       viewProfile.unsolvedProblems = result.problems.map(
-        problem => new Problem(problem),
+        (problem) => new Problem(problem),
       );
     })
     .catch(ui.apiError);
 
   api.User.problemsCreated({ username: profile.username })
-    .then(result => {
+    .then((result) => {
       viewProfile.createdProblems = result.problems.map(
-        problem => new Problem(problem),
+        (problem) => new Problem(problem),
       );
     })
     .catch(ui.apiError);
 
   if (payload.logged_in) {
     api.Badge.myList({})
-      .then(result => {
+      .then((result) => {
         viewProfile.visitorBadges = new Set(
-          result.badges.map(badge => badge.badge_alias),
+          result.badges.map((badge) => badge.badge_alias),
         );
       })
       .catch(ui.apiError);
   }
 
   api.Badge.userList({ target_username: profile.username })
-    .then(result => {
+    .then((result) => {
       viewProfile.profileBadges = new Set(
-        result.badges.map(badge => badge.badge_alias),
+        result.badges.map((badge) => badge.badge_alias),
       );
     })
     .catch(ui.apiError);
 
   api.User.stats({ username: profile.username })
-    .then(result => {
+    .then((result) => {
       viewProfile.charts = result;
     })
     .catch(ui.apiError);

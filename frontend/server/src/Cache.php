@@ -11,7 +11,7 @@ abstract class CacheAdapter {
 
     public static function getInstance(): CacheAdapter {
         if (is_null(CacheAdapter::$_instance)) {
-            if (function_exists('apcu_clear_cache')) {
+            if (function_exists('apcu_enabled') && \apcu_enabled()) {
                 CacheAdapter::$_instance = new APCCacheAdapter();
             } else {
                 CacheAdapter::$_instance = new InProcessCacheAdapter();
@@ -21,10 +21,11 @@ abstract class CacheAdapter {
     }
 
     /**
+     * @psalm-template T
      * @param string $key
-     * @param mixed $defaultVar
+     * @param T $defaultVar
      * @param int $ttl
-     * @return mixed
+     * @return T
      */
     abstract public function entry(string $key, $defaultVar, int $ttl = 0);
 
@@ -58,18 +59,17 @@ abstract class CacheAdapter {
  */
 class APCCacheAdapter extends CacheAdapter {
     /**
+     * @psalm-template T
      * @param string $key
-     * @param mixed $defaultVar
+     * @param T $defaultVar
      * @param int $ttl
-     * @return mixed
+     * @return T
      */
     public function entry(string $key, $defaultVar, int $ttl = 0) {
+        /** @var T */
         return apcu_entry(
             $key,
-            /** @return mixed */
-            function (string $key) use ($defaultVar) {
-                return $defaultVar;
-            },
+            fn (string $key) => $defaultVar,
             $ttl
         );
     }
@@ -123,15 +123,17 @@ class InProcessCacheAdapter extends CacheAdapter {
     private $cache = [];
 
     /**
+     * @psalm-template T
      * @param string $key
-     * @param mixed $defaultVar
+     * @param T $defaultVar
      * @param int $ttl
-     * @return mixed
+     * @return T
      */
     public function entry(string $key, $defaultVar, int $ttl = 0) {
         if (!array_key_exists($key, $this->cache)) {
             $this->cache[$key] = $defaultVar;
         }
+        /** @var T */
         return $this->cache[$key];
     }
 
@@ -200,6 +202,7 @@ class InProcessCacheAdapter extends CacheAdapter {
  */
 class Cache {
     const AUTHORS_RANK = 'authors-rank-';
+    const AUTHORS_RANK_WITH_QUALITY_PROBLEMS = 'authors-rank-quality-problems-';
     const SESSION_PREFIX = 'session-';
     const CONTESTANT_SCOREBOARD_PREFIX = 'scoreboard-';
     const ADMIN_SCOREBOARD_PREFIX = 'scoreboard-admin-';
@@ -207,6 +210,7 @@ class Cache {
     const ADMIN_SCOREBOARD_EVENTS_PREFIX = 'scoreboard-events-admin-';
     const CODERS_OF_THE_MONTH = 'coders-of-the-month';
     const CONTEST_INFO = 'contest-info-';
+    const PROBLEM_SETTINGS = 'problem-settings-json-';
     const PROBLEM_SETTINGS_DISTRIB = 'problem-settings-distrib-json-';
     const PROBLEM_STATEMENT = 'statement-';
     const PROBLEM_SOLUTION = 'solution-';
@@ -223,6 +227,9 @@ class Cache {
     const SCHOOL_RANK = 'school-rank';
     const SCHOOLS_OF_THE_MONTH = 'schools-of-the-month';
     const TAGS_LIST = 'tags-list-';
+    const PROBLEM_CASES_CONTENTS = 'problem-cases-contents-';
+    const DATA_CASES_FILES = 'data-cases-files-';
+    const PROBLEM_CASES_METADATA = 'problem-cases-metadata-';
 
     /** @var \Logger */
     private $log;
@@ -424,8 +431,7 @@ class Cache {
      * @param string $prefix
      */
     private static function getVersion(string $prefix): int {
-        $key = "v{$prefix}";
-        return intval(CacheAdapter::getInstance()->entry($key, 0));
+        return CacheAdapter::getInstance()->entry("v{$prefix}", 0);
     }
 
     /**

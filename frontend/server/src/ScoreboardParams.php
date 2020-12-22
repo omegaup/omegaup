@@ -57,7 +57,7 @@ class ScoreboardParams {
     public $show_all_runs;
 
     /**
-     * @param array<string, mixed> $params
+     * @param array<string, \OmegaUp\Timestamp|null|int|string|bool> $params
      */
     public function __construct(array $params) {
         ScoreboardParams::validateParameter(
@@ -255,9 +255,9 @@ class ScoreboardParams {
     /**
      * Checks if array contains a key defined by $parameter
      * @param string $parameter
-     * @param array<string, mixed> $array
+     * @param array<string, \OmegaUp\Timestamp|null|int|string|bool> $array
      * @param boolean $required
-     * @param ?mixed $default
+     * @param \OmegaUp\Timestamp|null|int|string|bool $default
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
     private static function validateParameter(
@@ -275,7 +275,6 @@ class ScoreboardParams {
                 $parameter
             );
         }
-        /** @var mixed */
         $array[$parameter] = $default;
     }
 }

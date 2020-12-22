@@ -107,6 +107,36 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
         return new \OmegaUp\DAO\VO\Identities($rs);
     }
 
+    public static function resolveAssociatedIdentity(
+        string $usernameOrEmail,
+        \OmegaUp\DAO\VO\Identities $currentIdentity
+    ): ?\OmegaUp\DAO\VO\Identities {
+        if (is_null($currentIdentity->user_id)) {
+            return null;
+        }
+        $sql = 'SELECT
+                    i.*
+                FROM
+                    Identities i
+                INNER JOIN
+                    Emails e
+                ON
+                    e.user_id = i.user_id
+                WHERE
+                    i.user_id = ?
+                    AND (i.username = ? OR e.email = ?)
+                LIMIT 1;';
+        $args = [$currentIdentity->user_id, $usernameOrEmail, $usernameOrEmail];
+
+        /** @var array{country_id: null|string, current_identity_school_id: int|null, gender: null|string, identity_id: int, language_id: int|null, name: null|string, password: null|string, state_id: null|string, user_id: int|null, username: string}|null $rs */
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $args);
+        if (is_null($rs)) {
+            return null;
+        }
+
+        return new \OmegaUp\DAO\VO\Identities($rs);
+    }
+
     public static function savePassword(\OmegaUp\DAO\VO\Identities $identities): int {
         $sql = '
             UPDATE
@@ -198,7 +228,7 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     }
 
     /**
-     * @return array{country: string, state: null|string, school: null|string, email: null|string, locale: null|string}|null
+     * @return array{birth_date: \OmegaUp\Timestamp|null, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null
      */
     final public static function getExtendedProfileDataByPk(?int $identityId): ?array {
         if (is_null($identityId)) {
@@ -208,8 +238,34 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     IFNULL(c.`name`, "xx") AS country,
                     s.`name` AS state,
                     sc.`name` AS school,
+                    isc.`graduation_date` AS graduation_date,
                     e.`email`,
-                    l.`name` AS locale
+                    l.`name` AS locale,
+                    u.`birth_date`,
+                    u.`scholar_degree`,
+                    u.`hide_problem_tags`,
+                    u.`verified`,
+                    i.`gender`,
+                    IFNULL(
+                        (
+                            SELECT urc.classname FROM
+                                User_Rank_Cutoffs urc
+                            WHERE
+                                urc.score <= (
+                                        SELECT
+                                            ur.score
+                                        FROM
+                                            User_Rank ur
+                                        WHERE
+                                            ur.user_id = i.user_id
+                                    )
+                            ORDER BY
+                                urc.percentile ASC
+                            LIMIT
+                                1
+                        ),
+                        \'user-rank-unranked\'
+                    ) AS classname
                 FROM
                     Identities i
                 LEFT JOIN
@@ -230,11 +286,23 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                     i.`identity_id` = ?
                 LIMIT
                     1;';
-        /** @var array{country: string, email: null|string, locale: null|string, school: null|string, state: null|string}|null */
-        return \OmegaUp\MySQLConnection::getInstance()->GetRow(
+        /** @var array{birth_date: null|string, classname: string, country: string, email: null|string, gender: null|string, graduation_date: null|string, hide_problem_tags: bool|null, locale: null|string, scholar_degree: null|string, school: null|string, state: null|string, verified: bool|null}|null */
+        $identity = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$identityId]
         );
+        if (is_null($identity)) {
+            return null;
+        }
+
+        $identity['hide_problem_tags'] = boolval(
+            $identity['hide_problem_tags']
+        );
+        $identity['birth_date'] = \OmegaUp\DAO\DAO::fromMySQLTimestamp(
+            $identity['birth_date']
+        );
+
+        return $identity;
     }
 
     public static function isUserAssociatedWithIdentityOfGroup(
@@ -292,7 +360,12 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
     /**
      * @return list<array{username: string, default: bool}>
      */
-    public static function getAssociatedIdentities(int $userId): array {
+    public static function getAssociatedIdentities(
+        \OmegaUp\DAO\VO\Identities $identity
+    ): array {
+        if (is_null($identity->user_id)) {
+            return [];
+        }
         $sql = '
             SELECT
                 i.username,
@@ -309,7 +382,10 @@ class Identities extends \OmegaUp\DAO\Base\Identities {
                 ';
 
         /** @var list<array{identity_id: int, main_identity_id: int|null, username: string}> */
-        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, [$userId]);
+        $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
+            $sql,
+            [$identity->user_id]
+        );
         $result = [];
         foreach ($rs as $identity) {
             $result[] = [

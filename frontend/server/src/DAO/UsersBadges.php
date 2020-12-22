@@ -15,11 +15,15 @@ namespace OmegaUp\DAO;
  */
 class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
     /**
-     * @return list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string}>
+     * @return list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}>
      */
     public static function getUserOwnedBadges(\OmegaUp\DAO\VO\Users $user): array {
         $sql = 'SELECT
-                    ub.badge_alias, ub.assignation_time
+                    ub.badge_alias,
+                    ub.assignation_time,
+                    CAST(NULL AS DATETIME) AS first_assignation,
+                    0 as owners_count,
+                    0 as total_users
                 FROM
                     Users_Badges ub
                 WHERE
@@ -27,7 +31,7 @@ class UsersBadges extends \OmegaUp\DAO\Base\UsersBadges {
                 ORDER BY
                     ub.assignation_time ASC;';
         $args = [$user->user_id];
-        /** @var list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string}> */
+        /** @var list<array{assignation_time: \OmegaUp\Timestamp, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $args);
     }
 

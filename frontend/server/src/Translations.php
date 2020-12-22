@@ -26,7 +26,7 @@ class Translations {
      */
     private function __construct() {
         $lang = \OmegaUp\Controllers\Identity::getPreferredLanguage(
-            /*$identity=*/ null
+            /*$identity=*/            null
         );
         $filename = sprintf("%s/templates/{$lang}.lang", strval(OMEGAUP_ROOT));
         /** @var array<int, string> $match */
@@ -62,11 +62,14 @@ class Translations {
      *
      * @param string $key the translation string to look up.
      *
-     * @return null|string the translated string.
+     * @return string the translated string.
      */
-    public function get(string $key): ?string {
+    public function get(string $key): string {
         if (!array_key_exists($key, $this->_translations)) {
-            return null;
+            \Logger::getLogger('Translations')->error(
+                "Untranslated error message: {$key}"
+            );
+            return "{untranslated:{$key}}";
         }
         return $this->_translations[$key];
     }

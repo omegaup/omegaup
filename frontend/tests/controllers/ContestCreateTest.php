@@ -102,7 +102,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             \OmegaUp\Controllers\Contest::apiCreate($r);
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('titleInUse', $e->getMessage());
+            $this->assertEquals('aliasInUse', $e->getMessage());
         }
     }
 
@@ -129,6 +129,26 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
             $this->fail('Should have failed');
         } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
             $this->assertEquals('contestLengthTooLong', $e->getMessage());
+        }
+    }
+
+    public function testCreateContestWithInvalidAlias() {
+        // Create a valid contest Request object
+        $contestData = \OmegaUp\Test\Factories\Contest::getRequest();
+        $r = $contestData['request'];
+        $contestDirector = $contestData['director'];
+
+        $r['alias'] = 'blank spaces not allowed';
+
+        // Log in the user and set the auth token in the new request
+        $login = self::login($contestDirector);
+        $r['auth_token'] = $login->auth_token;
+
+        try {
+            \OmegaUp\Controllers\Contest::apiCreate($r);
+            $this->fail('Should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -198,7 +218,7 @@ class ContestCreateTest extends \OmegaUp\Test\ControllerTestCase {
      */
     public function testCreatePublicContestWithPrivateProblems() {
         $problem = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private'
         ]));
 
         // Create a valid contest Request object

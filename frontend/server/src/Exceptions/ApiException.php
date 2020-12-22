@@ -77,13 +77,13 @@ abstract class ApiException extends \Exception {
     }
 
     public function getErrorMessage(): string {
+        /**
+         * @psalm-suppress TranslationStringNotALiteralString this is being
+         * checked from the constructor of the exception
+         */
         $localizedText = \OmegaUp\Translations::getInstance()->get(
             $this->message
         );
-        if (is_null($localizedText)) {
-            self::$log->error("Untranslated error message: {$this->message}");
-            return "{untranslated:{$this->message}}";
-        }
         return \OmegaUp\ApiUtils::formatString(
             $localizedText,
             $this->_customMessage

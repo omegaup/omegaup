@@ -1,17 +1,18 @@
 <template>
-  <omegaup-arena-codemirror
-    ref="cm-wrapper"
-    v-bind:options="editorOptions"
-    v-bind:value="value"
-    v-on:change="onChange"
-    v-on:input="onInput"
-  ></omegaup-arena-codemirror>
+  <div data-code-mirror>
+    <codemirror-editor
+      ref="cm-wrapper"
+      :options="editorOptions"
+      :value="value"
+      @change="onChange"
+      @input="onInput"
+    ></codemirror-editor>
+  </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop, Ref, Watch } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
 import { codemirror } from 'vue-codemirror-lite';
 
 const languageModeMap: {
@@ -63,16 +64,26 @@ interface EditorOptions {
 
 @Component({
   components: {
-    'omegaup-arena-codemirror': codemirror,
+    'codemirror-editor': codemirror,
   },
 })
-export default class ArenaCodeView extends Vue {
+export default class CodeView extends Vue {
   @Prop() language!: string;
   @Prop({ default: false }) readonly!: boolean;
   @Prop() value!: string;
+  @Ref('cm-wrapper') readonly cmWrapper!: codemirror;
 
   T = T;
   mode = languageModeMap[this.language] || languageModeMap['cpp17-gcc'];
+
+  refresh() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore vue-codemirror-lite does not declare `editor` as a legitimate
+    // property, so TypeScript cannot know about it.
+    // It's also possible for the actual editor to not have been set yet if
+    // this method is used before the mounted event handler is called.
+    this.cmWrapper.editor?.refresh();
+  }
 
   get editorOptions(): EditorOptions {
     return {
@@ -97,3 +108,21 @@ export default class ArenaCodeView extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../sass/main.scss';
+
+[data-code-mirror] {
+  height: 100%;
+  .vue-codemirror-wrap {
+    height: 95%;
+    .CodeMirror {
+      height: 100%;
+      .CodeMirror-scroll {
+        max-height: 638px;
+        min-height: 360px;
+      }
+    }
+  }
+}
+</style>

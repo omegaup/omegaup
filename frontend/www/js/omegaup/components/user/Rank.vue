@@ -1,106 +1,91 @@
 <template>
-  <div v-bind:class="{ 'container-lg p-5': !isIndex }">
-    <div class="card">
-      <h5 class="card-header">
-        {{
-          isIndex
-            ? UI.formatString(T.userRankOfTheMonthHeader, {
-                count: length,
-              })
-            : UI.formatString(T.rankRangeHeader, {
-                lowCount: (page - 1) * length + 1,
-                highCount: page * length,
-              })
-        }}
-      </h5>
-      <div class="card-body" v-if="!isIndex">
-        <label
-          ><omegaup-autocomplete
-            class="form-control"
-            v-bind:init="el => typeahead.userTypeahead(el)"
-            v-model="searchedUsername"
-          ></omegaup-autocomplete
-        ></label>
-        <button class="btn btn-primary" type="button" v-on:click="onSubmit">
-          {{ T.searchUser }}
-        </button>
-        <template v-if="page &gt; 1">
-          <a v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a>
-          <span v-show="shouldShowNextPage">|</span>
-        </template>
-        <a v-bind:href="nextPageFilter" v-show="shouldShowNextPage">{{
-          T.wordsNextPage
-        }}</a>
-        <template v-if="Object.keys(availableFilters).length &gt; 0">
-          <select class="filter" v-model="filter" v-on:change="onFilterChange">
-            <option value="">
-              {{ T.wordsSelectFilter }}
-            </option>
-            <option
-              v-bind:key="index"
-              v-bind:value="key"
-              v-for="(item, key, index) in availableFilters"
+  <div class="card">
+    <h5 class="card-header">
+      {{
+        isIndex
+          ? ui.formatString(T.userRankOfTheMonthHeader, {
+              count: length,
+            })
+          : ui.formatString(T.rankRangeHeader, {
+              lowCount: (page - 1) * length + 1,
+              highCount: page * length,
+            })
+      }}
+    </h5>
+    <div v-if="!isIndex" class="card-body">
+      <label
+        ><omegaup-autocomplete
+          v-model="searchedUsername"
+          class="form-control"
+          :init="(el) => typeahead.userTypeahead(el)"
+        ></omegaup-autocomplete
+      ></label>
+      <button class="btn btn-primary" type="button" @click="onSubmit">
+        {{ T.searchUser }}
+      </button>
+      <template v-if="Object.keys(availableFilters).length &gt; 0">
+        <select v-model="filter" class="filter" @change="onFilterChange">
+          <option value="">
+            {{ T.wordsSelectFilter }}
+          </option>
+          <option
+            v-for="(item, key, index) in availableFilters"
+            :key="index"
+            :value="key"
+          >
+            {{ item }}
+          </option>
+        </select>
+      </template>
+      <template v-else-if="!isLogged &amp;&amp; !isIndex">
+        <span class="badge badge-info">{{ T.mustLoginToFilterUsers }}</span>
+      </template>
+      <template v-else-if="!isIndex">
+        <span class="badge badge-info">{{
+          T.mustUpdateBasicInfoToFilterUsers
+        }}</span>
+      </template>
+    </div>
+    <table class="table mb-0">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">{{ T.wordsUser }}</th>
+          <th scope="col" class="text-right">{{ T.rankScore }}</th>
+          <th v-if="!isIndex" scope="col" class="text-right">
+            {{ T.rankSolved }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(user, index) in ranking" :key="index">
+          <th scope="row">{{ user.rank }}</th>
+          <td>
+            <omegaup-countryflag :country="user.country"></omegaup-countryflag>
+            <omegaup-user-username
+              :classname="user.classname"
+              :linkify="true"
+              :username="user.username"
+            ></omegaup-user-username>
+            <span v-if="user.name && length !== 5"
+              ><br />
+              {{ user.name }}</span
             >
-              {{ item }}
-            </option>
-          </select>
-        </template>
-        <template v-else-if="!isLogged &amp;&amp; !isIndex">
-          <span class="badge badge-info">{{ T.mustLoginToFilterUsers }}</span>
-        </template>
-        <template v-else-if="!isIndex">
-          <span class="badge badge-info">{{
-            T.mustUpdateBasicInfoToFilterUsers
-          }}</span>
-        </template>
-      </div>
-      <table class="table mb-0">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">{{ T.wordsUser }}</th>
-            <th scope="col" class="text-right">{{ T.rankScore }}</th>
-            <th scope="col" class="text-right" v-if="!isIndex">
-              {{ T.rankSolved }}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-bind:key="index" v-for="(user, index) in ranking">
-            <th scope="row">{{ user.rank }}</th>
-            <td>
-              <omegaup-countryflag
-                v-bind:country="user.country"
-              ></omegaup-countryflag>
-              <omegaup-user-username
-                v-bind:classname="user.classname"
-                v-bind:linkify="true"
-                v-bind:username="user.username"
-              ></omegaup-user-username>
-              <span v-if="user.name && length !== 5"
-                ><br />
-                {{ user.name }}</span
-              >
-            </td>
-            <td class="text-right">{{ user.score }}</td>
-            <td class="text-right" v-if="!isIndex">
-              {{ user.problems_solved }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="card-footer" v-if="isIndex">
-        <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
-      </div>
-      <div class="card-footer" v-else-if="showControls">
-        <template v-if="page > 1">
-          <a v-bind:href="prevPageFilter">{{ T.wordsPrevPage }}</a>
-          <span v-show="shouldShowNextPage">|</span>
-        </template>
-        <a v-bind:href="nextPageFilter" v-show="shouldShowNextPage">{{
-          T.wordsNextPage
-        }}</a>
-      </div>
+          </td>
+          <td class="text-right">{{ user.score }}</td>
+          <td v-if="!isIndex" class="text-right">
+            {{ user.problems_solved }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div v-if="isIndex" class="card-footer">
+      <a href="/rank/">{{ T.wordsSeeGeneralRanking }}</a>
+    </div>
+    <div v-else class="card-footer">
+      <omegaup-common-paginator
+        :pager-items="pagerItems"
+      ></omegaup-common-paginator>
     </div>
   </div>
 </template>
@@ -108,13 +93,14 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 
-import { OmegaUp } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
 import CountryFlag from '../CountryFlag.vue';
 import user_Username from '../user/Username.vue';
+import common_Paginator from '../common/Paginatorv2.vue';
 
 interface Rank {
   country: string;
@@ -130,6 +116,7 @@ interface Rank {
     'omegaup-autocomplete': Autocomplete,
     'omegaup-countryflag': CountryFlag,
     'omegaup-user-username': user_Username,
+    'omegaup-common-paginator': common_Paginator,
   },
 })
 export default class UserRank extends Vue {
@@ -141,9 +128,10 @@ export default class UserRank extends Vue {
   @Prop() filter!: string;
   @Prop() ranking!: Rank[];
   @Prop() resultTotal!: number;
+  @Prop() pagerItems!: types.PageItem[];
 
   T = T;
-  UI = UI;
+  ui = ui;
   typeahead = typeahead;
   searchedUsername = '';
 
@@ -168,7 +156,7 @@ export default class UserRank extends Vue {
     } else {
       delete queryParameters['filter'];
     }
-    window.location.search = UI.buildURLQuery(queryParameters);
+    window.location.search = ui.buildURLQuery(queryParameters);
   }
 
   get nextPageFilter(): string {
@@ -185,14 +173,6 @@ export default class UserRank extends Vue {
         this.filter,
       )}`;
     else return `/rank?page=${this.page - 1}`;
-  }
-
-  get shouldShowNextPage(): boolean {
-    return this.length * this.page < this.resultTotal;
-  }
-
-  get showControls(): boolean {
-    return !this.isIndex && (this.shouldShowNextPage || this.page > 1);
   }
 }
 </script>

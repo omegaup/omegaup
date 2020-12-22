@@ -3,7 +3,9 @@
   <div id="summary" class="main">
     <!-- id-lint on -->
     <h1>{{ ui.contestTitle(contest) }}</h1>
-    <p>{{ contest.description }}</p>
+    <omegaup-markdown
+      :markdown="(contest && contest.description) || ''"
+    ></omegaup-markdown>
     <table>
       <tr v-if="showDeadlines">
         <td>
@@ -26,8 +28,8 @@
       <tr
         v-if="
           showRanking &&
-            typeof contest.scoreboard === 'number' &&
-            duration != Infinity
+          typeof contest.scoreboard === 'number' &&
+          duration != Infinity
         "
       >
         <td>
@@ -55,9 +57,7 @@
           <strong>{{ T.arenaContestOrganizer }}</strong>
         </td>
         <td>
-          <a v-bind:href="`/profile/${contest.director}/`">{{
-            contest.director
-          }}</a>
+          <a :href="`/profile/${contest.director}/`">{{ contest.director }}</a>
         </td>
       </tr>
     </table>
@@ -65,14 +65,19 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import { types } from '../../api_types';
 import { omegaup } from '../../omegaup';
 import * as ui from '../../ui';
 import * as time from '../../time';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class ContestSummary extends Vue {
   @Prop() contest!: omegaup.Contest;
   @Prop({ default: true }) showDeadlines!: boolean;

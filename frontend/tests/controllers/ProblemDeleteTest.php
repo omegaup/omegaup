@@ -20,7 +20,7 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'visibility' => 'public',
                 'author' => $identity,
             ])
         );
@@ -76,14 +76,14 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         // Get problems
         $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'visibility' => 'public',
                 'author' => $identity,
             ])
         );
 
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'visibility' => 'public',
                 'author' => $identity
             ])
         );
@@ -132,13 +132,13 @@ class ProblemDeleteTest extends \OmegaUp\Test\ControllerTestCase {
         // Get problems
         $deletedProblemData = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'visibility' => 'public',
                 'author' => $identity
             ])
         );
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
             new \OmegaUp\Test\Factories\ProblemParams([
-                'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+                'visibility' => 'public',
                 'author' => $identity
             ])
         );

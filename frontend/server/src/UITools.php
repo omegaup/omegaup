@@ -3,7 +3,9 @@
 namespace OmegaUp;
 
 /**
- * @psalm-type CommonPayload=array{omegaUpLockDown: bool, bootstrap4: bool, inContest: bool, isLoggedIn: bool, isReviewer: bool, gravatarURL51: string, currentUsername: string, profileProgress: float, isMainUserIdentity: bool, isAdmin: bool, lockDownImage: string, navbarSection: string}
+ * @psalm-type CommonPayload=array{associatedIdentities: list<array{default: bool, username: string}>, bootstrap4: bool, currentEmail: string, currentName: null|string, currentUsername: string, gravatarURL128: string, gravatarURL51: string, inContest: bool, isAdmin: bool, isLoggedIn: bool, isMainUserIdentity: bool, isReviewer: bool, lockDownImage: string, navbarSection: string, omegaUpLockDown: bool, profileProgress: float, userClassname: null|string, userCountry: string}
+ * @psalm-type AssociatedIdentity=array{username: string, default: bool}
+ * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, classname: string, auth_token: string|null, is_admin: bool}
  */
 class UITools {
     /** @var ?\Smarty */
@@ -22,9 +24,7 @@ class UITools {
         }
         header(
             'Location: /login.php?redirect=' . urlencode(
-                strval(
-                    $_SERVER['REQUEST_URI']
-                )
+                \OmegaUp\Request::getServerVar('REQUEST_URI') ?? '/'
             )
         );
         die();
@@ -79,12 +79,13 @@ class UITools {
 
         // Not sure why this makes Psalm complain, but no other invocation of
         // getCurrentSession() does so.
-        /** @var array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
+        /** @var CurrentSession */
         [
             'email' => $email,
             'identity' => $identity,
             'user' => $user,
             'is_admin' => $isAdmin,
+            'associated_identities' => $associatedIdentities,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         if (!is_null($identity) && !is_null($identity->username)) {
             $smarty->assign('LOGGED_IN', '1');
@@ -221,8 +222,10 @@ class UITools {
         [
             'email' => $email,
             'identity' => $identity,
+            'classname' => $userClassname,
             'user' => $user,
             'is_admin' => $isAdmin,
+            'associated_identities' => $associatedIdentities,
         ] = \OmegaUp\Controllers\Session::getCurrentSession();
         return [
             'omegaUpLockDown' => OMEGAUP_LOCKDOWN,
@@ -239,11 +242,23 @@ class UITools {
                 '' :
                 self::getFormattedGravatarURL(md5($email), '51')
             ),
+            'gravatarURL128' => (
+                is_null($email) ?
+                '' :
+                self::getFormattedGravatarURL(md5($email), '128')
+            ),
             'currentUsername' => (
                 !is_null($identity) && !is_null($identity->username) ?
                 $identity->username :
                 ''
             ),
+            'currentName' => !is_null($identity) ? $identity->name : null,
+            'currentEmail' => $email ?? '',
+            'associatedIdentities' => $associatedIdentities,
+            'userClassname' => $userClassname,
+            'userCountry' => (!is_null(
+                $identity
+            ) ? $identity->country_id : null) ?? 'xx',
             'profileProgress' => \OmegaUp\Controllers\User::getProfileProgress(
                 $user
             ),
@@ -255,7 +270,7 @@ class UITools {
     }
 
     /**
-     * @param callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, template?: string, entrypoint?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
+     * @param callable(\OmegaUp\Request):array{smartyProperties: array{fullWidth?: bool, payload: array<string, mixed>, scripts?: list<string>, title: \OmegaUp\TranslationString}, entrypoint: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string}|callable(\OmegaUp\Request):array{smartyProperties: array<string, mixed>, entrypoint?: string, template?: string, inContest?: bool, supportsBootstrap4?: bool, navbarSection?: string} $callback
      */
     public static function render(callable $callback): void {
         $smarty = self::getSmartyInstance();
@@ -269,22 +284,33 @@ class UITools {
             $navbarSection = $response['navbarSection'] ?? '';
             /** @var array<string, mixed> */
             $payload = $smartyProperties['payload'] ?? [];
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // The callback explicitly requested to exit.
+            exit;
         } catch (\Exception $e) {
             \OmegaUp\ApiCaller::handleException($e);
         }
 
         if (!is_null($entrypoint)) {
-            if (!isset($smartyProperties['title'])) {
+            if (
+                isset($smartyProperties['title'])  &&
+                is_object($smartyProperties['title']) &&
+                is_a($smartyProperties['title'], 'OmegaUp\TranslationString')
+            ) {
+                $titleVar = $smartyProperties['title']->message;
+            } elseif (
+                !isset($smartyProperties['title']) ||
+                !is_string($smartyProperties['title'])
+            ) {
                 $titleVar = (
                     'omegaupTitle' .
                     str_replace('_', '', ucwords($entrypoint, '_'))
                 );
             } else {
-                $titleVar = strval($smartyProperties['title']);
+                $titleVar = $smartyProperties['title'];
             }
-            $smartyProperties['title'] = strval(
-                $smarty->getConfigVars($titleVar)
-            );
+            /** @var string */
+            $smartyProperties['title'] = $smarty->getConfigVars($titleVar);
         }
 
         /** @var mixed $value */
@@ -322,5 +348,16 @@ class UITools {
                 )
             );
         }
+    }
+
+    /**
+     * Return the path of a Smarty template.
+     */
+    public static function templatePath(string $templateName): string {
+        return sprintf(
+            '%s/templates/%s.tpl',
+            strval(OMEGAUP_ROOT),
+            $templateName
+        );
     }
 }

@@ -58,14 +58,14 @@ function typeaheadWrapper<T>(
     }
     pendingRequest = true;
     searchFn({ query: query })
-      .then(data => asyncResults(data))
+      .then((data) => asyncResults(data))
       .catch(ui.ignoreError)
       .finally(() => {
         pendingRequest = false;
 
         // If there is a pending request, send it out now.
         if (!lastRequest) return;
-        let currentRequest = lastRequest;
+        const currentRequest = lastRequest;
         lastRequest = null;
         wrappedCall(...currentRequest);
       });
@@ -90,7 +90,7 @@ function typeahead<T extends { label: string; value: string }>(
         limit: 100,
         display: 'label',
         templates: {
-          suggestion: val =>
+          suggestion: (val) =>
             ui.formatString('<div data-value="%(value)">%(label)</div>', val),
         },
       },
@@ -119,7 +119,7 @@ export function problemTypeahead(
           (options: { query: string }) =>
             new Promise<types.ProblemListItem[]>((resolve, reject) =>
               api.Problem.list({ query: options.query })
-                .then(data => resolve(data.results))
+                .then((data) => resolve(data.results))
                 .catch(reject),
             ),
         ),
@@ -127,7 +127,7 @@ export function problemTypeahead(
         limit: 10,
         display: 'alias',
         templates: {
-          suggestion: val =>
+          suggestion: (val) =>
             ui.formatString(
               '<div data-value="%(alias)"><strong>%(title)</strong> (%(alias))</div>',
               val,
@@ -140,7 +140,7 @@ export function problemTypeahead(
     .trigger('change');
 }
 
-export function problemContestTypeahead(
+export function problemsetProblemTypeahead(
   elem: JQuery<HTMLElement>,
   problemDataset: () => { alias: string; title: string }[],
   cb?: CallbackType<{ alias: string; title: string }>,
@@ -154,7 +154,7 @@ export function problemContestTypeahead(
 
     // Filter out the results that contain the query substring.
     syncResults(
-      problemDataset().filter(problem => substringRegex.test(problem.alias)),
+      problemDataset().filter((problem) => substringRegex.test(problem.alias)),
     );
   };
 
@@ -174,7 +174,7 @@ export function problemContestTypeahead(
         async: true,
         display: 'alias',
         templates: {
-          suggestion: val =>
+          suggestion: (val) =>
             ui.formatString('<div data-value="%(alias)">%(alias)</div>', val),
         },
       },
@@ -204,7 +204,7 @@ export function schoolTypeahead(
         display: 'label',
         templates: {
           empty: T.schoolToBeAdded,
-          suggestion: val =>
+          suggestion: (val) =>
             ui.formatString('<div data-value="%(value)">%(label)</div>', val),
         },
       },
@@ -243,7 +243,9 @@ export function userContestTypeahead(
   contestAlias: string,
 ): void {
   const cb = (event: Event, val: { label: string; value: string }) =>
-    $(<EventTarget>event.target).val(val.label);
+    $(<EventTarget>event.target)
+      .attr('data-value', val.value)
+      .val(val.label);
   elem
     .typeahead<{ label: string; value: string }>(
       {
@@ -258,7 +260,7 @@ export function userContestTypeahead(
                 query: options.query,
                 contest_alias: contestAlias,
               })
-                .then(data => resolve(data))
+                .then((data) => resolve(data))
                 .catch(reject),
             ),
         ),
@@ -266,7 +268,7 @@ export function userContestTypeahead(
         limit: 10,
         display: 'label',
         templates: {
-          suggestion: val =>
+          suggestion: (val) =>
             ui.formatString(
               '<div data-value="%(value)"><strong>%(label)</strong> (%(value))</div>',
               val,

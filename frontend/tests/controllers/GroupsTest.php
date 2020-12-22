@@ -38,6 +38,77 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
+     * Basic update group test
+     */
+    public function testUpdateGroup() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $originalName = \OmegaUp\Test\Utils::createRandomString();
+        $originalDescription = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($identity);
+        \OmegaUp\Controllers\Group::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $originalName,
+            'alias' => $alias,
+            'description' => $originalDescription,
+        ]));
+
+        $updatedName = \OmegaUp\Test\Utils::createRandomString();
+        $updatedDescription = \OmegaUp\Test\Utils::createRandomString();
+
+        $response = \OmegaUp\Controllers\Group::apiUpdate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $updatedName,
+            'alias' => $alias,
+            'description' => $updatedDescription,
+        ]));
+
+        $this->assertEquals('ok', $response['status']);
+
+        $group = \OmegaUp\DAO\Groups::findByAlias($alias);
+
+        $this->assertNotNull($group);
+        $this->assertEquals($updatedDescription, $group->description);
+        $this->assertEquals($updatedName, $group->name);
+    }
+
+    /**
+     * Basic update group test
+     */
+    public function testUpdateGroupWithWrongIdentity() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        ['identity' => $owner] = \OmegaUp\Test\Factories\User::createUser();
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $description = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($owner);
+        \OmegaUp\Controllers\Group::apiCreate(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'name' => $name,
+            'alias' => $alias,
+            'description' => $description,
+        ]));
+
+        $login = self::login($identity);
+
+        try {
+            \OmegaUp\Controllers\Group::apiUpdate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => $alias,
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail(
+                'Group update should have failed because user is not the owner'
+            );
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals('userNotAllowed', $e->getMessage());
+        }
+    }
+
+    /**
      * Attempts to create groups with a restricted alias should fail.
      */
     public function testCreateGroupRestrictedAlias() {
@@ -52,8 +123,25 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
                 'description' => \OmegaUp\Test\Utils::createRandomString(),
             ]));
             $this->fail('Group creation should have failed');
-        } catch (\OmegaUp\Exceptions\DuplicatedEntryInDatabaseException $e) {
-            $this->assertEquals('aliasInUse', $e->getMessage());
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
+    }
+
+    public function testCreateGroupWithInvalidAlias() {
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        try {
+            $login = self::login($identity);
+            \OmegaUp\Controllers\Group::apiCreate(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'name' => \OmegaUp\Test\Utils::createRandomString(),
+                'alias' => 'invalid alias',
+                'description' => \OmegaUp\Test\Utils::createRandomString(),
+            ]));
+            $this->fail('Group creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
         }
     }
 
@@ -252,6 +340,29 @@ class GroupsTest extends \OmegaUp\Test\ControllerTestCase {
             $groupData['group']->group_id,
             $groupScoreboard->group_id
         );
+    }
+
+    public function testCreateScoreboardWithInvalidAlias() {
+        $groupData = \OmegaUp\Test\Factories\Groups::createGroup();
+        $name = \OmegaUp\Test\Utils::createRandomString();
+        $description = \OmegaUp\Test\Utils::createRandomString();
+        $alias = \OmegaUp\Test\Utils::createRandomString();
+
+        $login = self::login($groupData['owner']);
+        try {
+            \OmegaUp\Controllers\Group::apiCreateScoreboard(
+                new \OmegaUp\Request([
+                    'auth_token' => $login->auth_token,
+                    'group_alias' => $groupData['group']->alias,
+                    'name' => \OmegaUp\Test\Utils::createRandomString(),
+                    'alias' => 'invalid alias',
+                    'description' => \OmegaUp\Test\Utils::createRandomString()
+                ])
+            );
+            $this->fail('Group creation should have failed');
+        } catch (\OmegaUp\Exceptions\InvalidParameterException $e) {
+            $this->assertEquals('parameterInvalid', $e->getMessage());
+        }
     }
 
     /**

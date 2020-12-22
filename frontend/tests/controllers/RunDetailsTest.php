@@ -23,7 +23,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a problem
         $this->problemData = \OmegaUp\Test\Factories\Problem::createProblem(
-            /*$params=*/null,
+            /*$params=*/            null,
             $adminLogin
         );
 
@@ -136,6 +136,70 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
         );
     }
 
+    public function testDownload() {
+        $adminLogin = self::login($this->admin);
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $this->problemData,
+            $this->identity,
+            $login
+        );
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+        );
+
+        ob_start();
+        try {
+            \OmegaUp\Controllers\Run::apiDownload(new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+                'show_diff' => true,
+            ]));
+        } catch (\OmegaUp\Exceptions\ExitException $e) {
+            // This is expected.
+        }
+        $zipFile = tmpfile();
+        $zipPath = stream_get_meta_data($zipFile)['uri'];
+        file_put_contents($zipPath, ob_get_contents());
+        ob_end_clean();
+
+        $zip = new \ZipArchive();
+        if ($zip->open($zipPath, \ZipArchive::RDONLY) !== true) {
+            throw new \OmegaUp\Exceptions\NotFoundException();
+        }
+
+        foreach ($outputFilesContent as $file => $fileContent) {
+            $this->assertEquals($zip->statName($file)['name'], $file);
+            $fp = $zip->getStream($file);
+            if (!$fp) {
+                throw new \OmegaUp\Exceptions\NotFoundException();
+            }
+            $content = '';
+            while (!feof($fp)) {
+                $content .= fread($fp, 1024);
+            }
+            fclose($fp);
+
+            $this->assertEquals($content, $fileContent);
+        }
+    }
+
     /**
      * User only can see run details for submissions when gets the verdict AC
      */
@@ -187,6 +251,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'contest_alias' => $this->contestData['request']['alias'],
             'feedback' => $feedback,
+            'languages' => 'c11-gcc',
         ]));
 
         $waRunData = \OmegaUp\Test\Factories\Run::createRun(
@@ -215,6 +280,12 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $acRunData['response']['guid'],
             $this->admin
         );
+
+        // Asserts contest alias in problem details is the same that the provided
+        $this->assertEquals(
+            $this->contestData['request']['alias'],
+            $acRunData['details']['runs'][0]['contest_alias']
+        );
     }
 
     /**
@@ -235,6 +306,7 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             'auth_token' => $adminLogin->auth_token,
             'contest_alias' => $this->contestData['request']['alias'],
             'feedback' => $feedback,
+            'languages' => 'c11-gcc',
         ]));
 
         $waRunData = \OmegaUp\Test\Factories\Run::createRun(
@@ -284,5 +356,125 @@ class RunDetailsTest extends \OmegaUp\Test\ControllerTestCase {
             $acRunData['response']['guid'],
             $this->identity
         );
+
+        // Asserts contest alias in problem details is the same that the provided
+        $this->assertEquals(
+            $this->contestData['request']['alias'],
+            $acRunData['details']['runs'][0]['contest_alias']
+        );
+    }
+
+    /**
+     * A PHPUnit data provider for the test with valid show_diff values.
+     *
+    * @return list<array{0: string, 1: array<string, array<string, string>>}>
+     */
+    public function showDiffValueProvider(): array {
+        return [
+            ['none', []],
+            ['examples', ['sample' => ['in' => "1 2\n", 'out' => "3\n"]]],
+            ['all', [
+                    'easy.00' => ['in' => "1 2\n", 'out' => "3\n"],
+                    'easy.01' => ['in' => "2 3\n", 'out' => "5\n"],
+                    'medium.00' => ['in' => "100 200\n", 'out' => "300\n"],
+                    'medium.01' => ['in' => "1234 5678\n", 'out' => "6912\n"],
+                    'sample' => ['in' => "1 2\n", 'out' => "3\n"],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, array<string, string>> $cases
+     * @dataProvider showDiffValueProvider
+     */
+    public function testRunDetailsForProblemWithValidShowDiffValues(
+        string $showDiffValue,
+        array $cases
+    ) {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'show_diff' => $showDiffValue,
+            ])
+        );
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $this->identity,
+            $login
+        );
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+        );
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(
+            new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        $this->assertEquals($response['cases'], $cases);
+    }
+
+    public function testRunDetailsCasesAreHiddenWhenFileIsLargerThan4KB() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'bigtestproblem.zip',
+                'show_diff' => 'all',
+            ])
+        );
+        $login = self::login($this->identity);
+
+        $runData = \OmegaUp\Test\Factories\Run::createRunToProblem(
+            $problemData,
+            $this->identity,
+            $login
+        );
+        $outputFilesContent = [
+            'easy.00.out' => '3',
+            'easy.01.out' => '5',
+            'medium.00.out' => '300',
+            'medium.01.out' => '6912',
+            'sample.out' => '3',
+        ];
+
+        \OmegaUp\Test\Factories\Run::gradeRun(
+            $runData,
+            /*$points=*/1,
+            /*$verdict=*/'AC',
+            /*$submitDelay=*/50,
+            /*$runGuid=*/null,
+            /*$runID*/null,
+            /*$problemsetPoints*/100,
+            \OmegaUp\Test\Utils::zipFileForContents($outputFilesContent)
+        );
+
+        $response = \OmegaUp\Controllers\Run::apiDetails(
+            new \OmegaUp\Request([
+                'run_alias' => $runData['response']['guid'],
+                'auth_token' => $login->auth_token,
+            ])
+        );
+
+        // Cases are not visible, because of the size file restrictions
+        $this->assertEquals($response['show_diff'], 'none');
+        $this->assertEquals($response['cases'], []);
     }
 }

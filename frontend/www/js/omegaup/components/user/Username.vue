@@ -1,24 +1,56 @@
 <template>
-  <span v-if="linkify">
+  <span :class="classname" :title="username">
     <omegaup-countryflag
-      v-bind:country="country"
       v-if="country != null"
+      :country="country"
     ></omegaup-countryflag>
-    <a
-      v-bind:class="classname"
-      v-bind:title="username"
-      v-bind:href="`/profile/${username}/`"
-      >{{ username }}</a
-    ></span
-  >
-  <span v-bind:class="classname" v-bind:title="username" v-else="">
-    <omegaup-countryflag
-      v-bind:country="country"
-      v-if="country != null"
-    ></omegaup-countryflag
-    >{{ username }}</span
-  >
+
+    <template v-if="linkify">
+      <a
+        v-if="emitClickEvent"
+        href="#"
+        :class="classname"
+        :title="username"
+        @click="$emit('click', username)"
+        >{{ nameWithUsername }}</a
+      >
+      <a
+        v-else
+        :class="classname"
+        :title="username"
+        :href="`/profile/${username}/`"
+        >{{ nameWithUsername }}</a
+      >
+    </template>
+    <template v-else> {{ nameWithUsername }}</template>
+  </span>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import CountryFlag from '../CountryFlag.vue';
+
+@Component({
+  components: {
+    'omegaup-countryflag': CountryFlag,
+  },
+})
+export default class Username extends Vue {
+  @Prop() username!: string;
+  @Prop({ default: null }) name!: string;
+  @Prop() classname!: string;
+  @Prop() linkify!: boolean;
+  @Prop() country!: string;
+  @Prop({ default: false }) emitClickEvent!: boolean;
+
+  get nameWithUsername(): string {
+    if (this.name) {
+      return `${this.name} (${this.username})`;
+    }
+    return this.username;
+  }
+}
+</script>
 
 <style>
 .user-rank-unranked,
@@ -50,20 +82,3 @@
   color: #cb000a;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import CountryFlag from '../CountryFlag.vue';
-
-@Component({
-  components: {
-    'omegaup-countryflag': CountryFlag,
-  },
-})
-export default class UserName extends Vue {
-  @Prop() username!: string;
-  @Prop() classname!: string;
-  @Prop() linkify!: boolean;
-  @Prop() country!: string;
-}
-</script>

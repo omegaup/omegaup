@@ -25,9 +25,14 @@ class InvalidParameterException extends \OmegaUp\Exceptions\ApiException {
         parent::__construct($message, 'HTTP/1.1 400 BAD REQUEST', 400);
         $this->parameter = $parameter;
         $this->additionalParameters = $additionalParameters;
+        $this->addCustomMessageToArray('parameter', $parameter);
     }
 
     public function getErrorMessage(): string {
+        /**
+         * @psalm-suppress TranslationStringNotALiteralString this is being
+         * checked from the constructor of the exception
+         */
         $localizedText = \OmegaUp\Translations::getInstance()->get(
             $this->message
         );

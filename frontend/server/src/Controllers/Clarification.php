@@ -25,25 +25,25 @@ class Clarification extends \OmegaUp\Controllers\Controller {
     /**
      * Creates a Clarification
      *
-     * @omegaup-request-param mixed $contest_alias
-     * @omegaup-request-param mixed $message
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $username
-     *
      * @return array{clarification_id: int}
+     *
+     * @omegaup-request-param string $contest_alias
+     * @omegaup-request-param null|string $message
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param null|string $username
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureIdentity();
 
         // Validate request
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['contest_alias'],
-            'contest_alias'
+        $contestAlias = $r->ensureString(
+            'contest_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateOptionalStringNonEmpty(
             $r['username'],
@@ -56,12 +56,12 @@ class Clarification extends \OmegaUp\Controllers\Controller {
             200
         );
 
-        $contest = \OmegaUp\DAO\Contests::getByAlias($r['contest_alias']);
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
         if (is_null($contest)) {
             throw new \OmegaUp\Exceptions\NotFoundException('contestNotFound');
         }
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -159,9 +159,9 @@ class Clarification extends \OmegaUp\Controllers\Controller {
      *
      * @return array{status: string}
      *
-     * @omegaup-request-param mixed $answer
+     * @omegaup-request-param null|string $answer
      * @omegaup-request-param int $clarification_id
-     * @omegaup-request-param mixed $message
+     * @omegaup-request-param null|string $message
      * @omegaup-request-param bool|null $public
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
@@ -250,7 +250,7 @@ class Clarification extends \OmegaUp\Controllers\Controller {
                 );
                 if (is_null($identity)) {
                     throw new \OmegaUp\Exceptions\NotFoundException(
-                        'userNotFound'
+                        'userNotExist'
                     );
                 }
             }

@@ -1,30 +1,30 @@
-omegaup.OmegaUp.on('ready', function() {
+omegaup.OmegaUp.on('ready', function () {
   var original_locale = null;
   var original_school = null;
   var original_school_id = null;
   $('#birth_date')
     .datepicker()
-    .on('changeDate', function(e) {
+    .on('changeDate', function (e) {
       $(this).data('date', e.date);
     });
   $('#graduation_date')
     .datepicker()
-    .on('changeDate', function(e) {
+    .on('changeDate', function (e) {
       $(this).data('date', e.date);
     });
   $('#school_id').val('');
-  omegaup.Typeahead.schoolTypeahead($('#school'), function(item, val, text) {
+  omegaup.Typeahead.schoolTypeahead($('#school'), function (item, val, text) {
     $('#school_id').val(val.id);
     $('#school_name').val(val.label);
   });
 
-  $('#school').on('change', function() {
+  $('#school').on('change', function () {
     if ($('#school').val() === '' || original_school !== $('#school').val()) {
       $('#school_id').val('');
     }
   });
 
-  $('#country_id').on('change', function() {
+  $('#country_id').on('change', function () {
     // Clear select
     $('#state_id option').remove();
     $('#state_id').val('');
@@ -37,26 +37,24 @@ omegaup.OmegaUp.on('ready', function() {
     }
     $('#state_id').prop('disabled', false);
 
-    var subdivisions = Object.keys(country.sub).map(function(code) {
+    var subdivisions = Object.keys(country.sub).map(function (code) {
       return { code: code, name: country.sub[code].name };
     });
 
-    subdivisions.sort(function(a, b) {
+    subdivisions.sort(function (a, b) {
       return Intl.Collator().compare(a.name, b.name);
     });
 
-    subdivisions.forEach(function(subdivision) {
+    subdivisions.forEach(function (subdivision) {
       var id = subdivision.code.split('-')[1];
       $('#state_id').append(
-        $('<option></option')
-          .attr('value', id)
-          .text(subdivision.name),
+        $('<option></option').attr('value', id).text(subdivision.name),
       );
     });
   });
 
   omegaup.API.User.profile()
-    .then(function(data) {
+    .then(function (data) {
       $('#username').text(data.username);
       $('#username').val(data.username);
       $('#name').val(data.name);
@@ -95,7 +93,7 @@ omegaup.OmegaUp.on('ready', function() {
     })
     .catch(omegaup.UI.apiError);
 
-  $('form#user_profile_form').on('submit', function(ev) {
+  $('form#user_profile_form').on('submit', function (ev) {
     ev.preventDefault();
     var birth_date = new Date($('#birth_date').data('date'));
     birth_date.setHours(23);
@@ -128,7 +126,7 @@ omegaup.OmegaUp.on('ready', function() {
       graduation_date: graduation_date.getTime() / 1000,
       school_name: $('#school').val(),
       locale: $('#locale').val(),
-      preferred_language: $('#programming_language').val(),
+      preferred_language: $('#programming_language').val() || undefined,
       is_private: $('#is_private').prop('checked'),
       hide_problem_tags: $('#hide_problem_tags').prop('checked'),
     };
@@ -138,7 +136,7 @@ omegaup.OmegaUp.on('ready', function() {
     }
 
     omegaup.API.User.update(user)
-      .then(function(response) {
+      .then(function (response) {
         if (locale_changed) {
           window.location.reload();
         } else {
@@ -148,7 +146,7 @@ omegaup.OmegaUp.on('ready', function() {
       .catch(omegaup.UI.apiError);
   });
 
-  $('form#change-password-form').on('submit', function(ev) {
+  $('form#change-password-form').on('submit', function (ev) {
     ev.preventDefault();
     var newPassword = $('#new-password-1').val();
     var newPassword2 = $('#new-password-2').val();
@@ -161,7 +159,7 @@ omegaup.OmegaUp.on('ready', function() {
       old_password: $('#old-password').val(),
       password: newPassword,
     })
-      .then(function() {
+      .then(function () {
         omegaup.UI.success(omegaup.T.passwordResetResetSuccess);
       })
       .catch(omegaup.UI.apiError);

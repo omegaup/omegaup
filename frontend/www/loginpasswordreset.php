@@ -1,10 +1,22 @@
 <?php
-require_once('../server/bootstrap_smarty.php');
-if (isset($_GET['email']) && isset($_GET['reset_token'])) {
-    $smarty->assign('EMAIL', $_GET['email']);
-    $smarty->assign('RESET_TOKEN', $_GET['reset_token']);
-} else {
-    die(header('Location: /'));
-}
+namespace OmegaUp;
+require_once(dirname(__DIR__, 1) . '/server/bootstrap.php');
 
-$smarty->display('../templates/login.password.reset.tpl');
+if (!isset($_GET['email']) || !isset($_GET['reset_token'])) {
+    header('Location: /');
+    die();
+}
+\OmegaUp\UITools::render(
+    fn (\OmegaUp\Request $r) => [
+        'smartyProperties' => [
+            'payload' => [
+                'email' => $_GET['email'],
+                'resetToken' => $_GET['reset_token']
+            ],
+            'title' => new \OmegaUp\TranslationString(
+                'passwordResetResetTitle'
+            ),
+        ],
+        'entrypoint' => 'login_password_reset',
+    ]
+);

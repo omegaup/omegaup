@@ -11,7 +11,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas",
                 "problem_alias": "sumas",
                 "validator": "token-numeric",
@@ -24,7 +24,9 @@
                 "input_limit": 10240,
                 "source": "omegaUp classics",
                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                "email_clarifications": 1
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -33,7 +35,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_2",
                 "problem_alias": "sumas_2",
                 "validator": "token-numeric",
@@ -46,7 +48,9 @@
                 "input_limit": 10240,
                 "source": "omegaUp classics",
                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                "email_clarifications": 1
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -55,7 +59,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_3",
                 "problem_alias": "sumas_3",
                 "validator": "token-numeric",
@@ -68,7 +72,9 @@
                 "input_limit": 10240,
                 "source": "omegaUp classics",
                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                "email_clarifications": 1
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -77,7 +83,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_4",
                 "problem_alias": "sumas_4",
                 "validator": "token-numeric",
@@ -90,7 +96,9 @@
                 "input_limit": 10240,
                 "source": "omegaUp classics",
                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                "email_clarifications": 1
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -99,7 +107,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_5",
                 "problem_alias": "sumas_5",
                 "validator": "token-numeric",
@@ -112,7 +120,9 @@
                 "input_limit": 10240,
                 "source": "omegaUp classics",
                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                "email_clarifications": 1
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"

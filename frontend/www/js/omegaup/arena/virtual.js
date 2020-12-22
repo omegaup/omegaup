@@ -1,20 +1,20 @@
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import arena_virtual from '../components/arena/Virtual.vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let contestAlias = /\/arena\/([^\/]+)\/virtual/.exec(
     window.location.pathname,
   )[1];
   let detail;
   api.Contest.publicDetails({ contest_alias: contestAlias })
-    .then(function(detail) {
+    .then(function (detail) {
       let virtual_ = new Vue({
         el: '#arena-virtual',
-        render: function(createElement) {
+        render: function (createElement) {
           return createElement('omegaup-arena-virtual', {
             props: {
               title: detail.title,
@@ -25,17 +25,17 @@ OmegaUp.on('ready', function() {
               submissionsGap: detail.submissions_gap,
             },
             on: {
-              submit: function(ev) {
+              submit: function (ev) {
                 api.Contest.createVirtual({
                   alias: contestAlias,
                   start_time: ev.virtualContestStartTime.getTime() / 1000,
                 })
-                  .then(function(response) {
+                  .then(function (response) {
                     let virtualContestAlias = response.alias;
                     window.location =
                       '/contest/' + virtualContestAlias + '/edit/';
                   })
-                  .catch(UI.apiError);
+                  .catch(ui.apiError);
               },
             },
           });
@@ -43,5 +43,5 @@ OmegaUp.on('ready', function() {
         components: { 'omegaup-arena-virtual': arena_virtual },
       });
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 });

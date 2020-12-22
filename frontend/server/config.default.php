@@ -71,22 +71,15 @@ try_define(
 try_define('OMEGAUP_GITSERVER_SECRET_TOKEN', '');
 try_define('OMEGAUP_GRADER_SECRET', 'secret');
 try_define(
-    'OMEGAUP_SSLCERT_URL',
-    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
-);
-try_define(
-    'OMEGAUP_CACERT_URL',
-    sprintf('%s/omegaup.pem', strval(OMEGAUP_ROOT))
-);
-try_define(
-    'BIN_PATH',
-    sprintf('%s/../bin', strval(OMEGAUP_ROOT))
-);
-try_define(
     'IMAGES_PATH',
     sprintf('%s/www/img/', strval(OMEGAUP_ROOT))
 );
 try_define('IMAGES_URL_PATH', '/img/');
+try_define(
+    'INPUTS_PATH',
+    sprintf('%s/www/probleminput/', strval(OMEGAUP_ROOT))
+);
+try_define('INPUTS_URL_PATH', '/probleminput/');
 try_define(
     'TEMPLATES_PATH',
     sprintf('%s/www/templates/', strval(OMEGAUP_ROOT))
@@ -94,6 +87,14 @@ try_define(
 try_define('TEMPLATES_URL_PATH', '/templates/');
 try_define('OMEGAUP_ENABLE_REJUDGE_ON_PROBLEM_UPDATE', true);
 try_define('OMEGAUP_GRADER_FAKE', false);
+
+# ####################################
+# COURSE CLONE CONFIG
+# ####################################
+try_define(
+    'OMEGAUP_COURSE_CLONE_SECRET_KEY',
+    '6f8xSU_xkrelmCTSahbbxl3PRovgAfkrThyrqQ9JesE'
+);
 
 # ####################################
 # FACEBOOK LOGIN CONFIG
@@ -104,8 +105,11 @@ try_define('OMEGAUP_FB_SECRET', 'xxxxx');
 # ####################################
 # GOOGLE LOGIN CONFIG
 # ####################################
-try_define('OMEGAUP_GOOGLE_SECRET', 'xxxxx');
-try_define('OMEGAUP_GOOGLE_CLIENTID', '');
+try_define('OMEGAUP_GOOGLE_SECRET', 'acmtr0Y37vnTVJV4BwmdhOsK');
+try_define(
+    'OMEGAUP_GOOGLE_CLIENTID',
+    '982542692060-lf9htvij4ba13fiufpqeldic0qqqvird.apps.googleusercontent.com'
+);
 
 # ####################################
 # LINKEDIN LOGIN CONFIG

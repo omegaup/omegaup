@@ -240,9 +240,15 @@ let store = new Vuex.Store({
     settingsCases(state) {
       let resultMap = {};
       for (let caseName in state.request.input.cases) {
-        if (!state.request.input.cases.hasOwnProperty(caseName)) continue;
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            state.request.input.cases,
+            caseName,
+          )
+        )
+          continue;
         let tokens = caseName.split('.', 2);
-        if (!resultMap.hasOwnProperty(tokens[0])) {
+        if (!Object.prototype.hasOwnProperty.call(resultMap, tokens[0])) {
           resultMap[tokens[0]] = {
             Name: tokens[0],
             Cases: [],
@@ -258,7 +264,8 @@ let store = new Vuex.Store({
       }
       let result = [];
       for (let groupName in resultMap) {
-        if (!resultMap.hasOwnProperty(groupName)) continue;
+        if (!Object.prototype.hasOwnProperty.call(resultMap, groupName))
+          continue;
         resultMap[groupName].Cases.sort((a, b) => {
           if (a.Name < b.Name) return -1;
           if (a.Name > b.Name) return 1;
@@ -382,13 +389,23 @@ let store = new Vuex.Store({
     },
     Validator(state, value) {
       if (value == 'token-numeric') {
-        if (!state.request.input.validator.hasOwnProperty('tolerance'))
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            state.request.input.validator,
+            'tolerance',
+          )
+        )
           Vue.set(state.request.input.validator, 'tolerance', 1e-9);
       } else {
         Vue.delete(state.request.input.validator, 'tolerance');
       }
       if (value == 'custom') {
-        if (!state.request.input.validator.hasOwnProperty('custom_validator')) {
+        if (
+          !Object.prototype.hasOwnProperty.call(
+            state.request.input.validator,
+            'custom_validator',
+          )
+        ) {
           Vue.set(state.request.input.validator, 'custom_validator', {
             source: defaultValidatorSource,
             language: 'py3',
@@ -437,7 +454,12 @@ let store = new Vuex.Store({
     },
 
     createCase(state, caseData) {
-      if (!state.request.input.cases.hasOwnProperty(caseData.name)) {
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          state.request.input.cases,
+          caseData.name,
+        )
+      ) {
         Vue.set(state.request.input.cases, caseData.name, {
           in: '',
           out: '',
@@ -449,7 +471,10 @@ let store = new Vuex.Store({
       state.dirty = true;
     },
     removeCase(state, name) {
-      if (!state.request.input.cases.hasOwnProperty(name)) return;
+      if (
+        !Object.prototype.hasOwnProperty.call(state.request.input.cases, name)
+      )
+        return;
       if (name == 'sample') return;
       if (name == state.currentCase) state.currentCase = 'sample';
       Vue.delete(state.request.input.cases, name);
@@ -738,7 +763,7 @@ const layout = new GoldenLayout(
 );
 
 function RegisterVueComponent(layout, componentName, component, componentMap) {
-  layout.registerComponent(componentName, function(container, componentState) {
+  layout.registerComponent(componentName, function (container, componentState) {
     container.on('open', () => {
       let vueComponents = {};
       vueComponents[componentName] = component;
@@ -748,12 +773,12 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       };
       for (let k in componentState) {
         if (k == 'id') continue;
-        if (!componentState.hasOwnProperty(k)) continue;
+        if (!Object.prototype.hasOwnProperty.call(componentState, k)) continue;
         props[k] = componentState[k];
       }
       let vue = new Vue({
         el: container.getElement()[0],
-        render: function(createElement) {
+        render: function (createElement) {
           return createElement(componentName, {
             props: props,
           });
@@ -763,7 +788,7 @@ function RegisterVueComponent(layout, componentName, component, componentMap) {
       let vueComponent = vue.$children[0];
       if (vueComponent.title) {
         container.setTitle(vueComponent.title);
-        vueComponent.$watch('title', function(title) {
+        vueComponent.$watch('title', function (title) {
           container.setTitle(title);
         });
       }
@@ -821,7 +846,7 @@ function initialize() {
     sourceAndSettings.addChild(validatorSettings);
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isCustomValidator').get,
-    function(value) {
+    function (value) {
       if (value) sourceAndSettings.addChild(validatorSettings);
       else layout.root.getItemsById(validatorSettings.id)[0].remove();
     },
@@ -834,7 +859,7 @@ function initialize() {
   }
   store.watch(
     Object.getOwnPropertyDescriptor(store.getters, 'isInteractive').get,
-    function(value) {
+    function (value) {
       if (value) {
         sourceAndSettings.addChild(interactiveIdlSettings);
         sourceAndSettings.addChild(interactiveMainSourceSettings);
@@ -886,7 +911,7 @@ function initialize() {
     // Whenever a case is selected, show the cases tab.
     store.watch(
       Object.getOwnPropertyDescriptor(store.getters, 'currentCase').get,
-      value => {
+      (value) => {
         if (store.getters.isUpdatingSettings) return;
         casesColumn.parent.setActiveContentItem(casesColumn);
       },
@@ -910,16 +935,24 @@ if (window.ResizeObserver) {
 }
 onResized();
 
-document.getElementById('language').addEventListener('change', function() {
+document.getElementById('language').addEventListener('change', function () {
   store.commit('request.language', this.value);
   document.getElementById('language').value = this.value;
-  if (!Util.languageExtensionMapping.hasOwnProperty(this.value)) return;
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      Util.languageExtensionMapping,
+      this.value,
+    )
+  )
+    return;
   let language = Util.languageExtensionMapping[this.value];
   if (store.getters.isInteractive) {
-    if (!interactiveTemplates.hasOwnProperty(language)) return;
+    if (!Object.prototype.hasOwnProperty.call(interactiveTemplates, language))
+      return;
     store.commit('request.source', interactiveTemplates[language]);
   } else {
-    if (!sourceTemplates.hasOwnProperty(language)) return;
+    if (!Object.prototype.hasOwnProperty.call(sourceTemplates, language))
+      return;
     store.commit('request.source', sourceTemplates[language]);
   }
 });
@@ -938,10 +971,10 @@ function onFilesZipReady(blob) {
     return;
   }
   let reader = new FileReader();
-  reader.addEventListener('loadend', e => {
+  reader.addEventListener('loadend', (e) => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
-      .then(zip => {
+      .then((zip) => {
         if (componentMapping.zipviewer) {
           componentMapping.zipviewer.zip = zip;
         }
@@ -950,7 +983,7 @@ function onFilesZipReady(blob) {
           zip.file('Main/compile.err').async('string'),
           zip.file('Main/compile.out').async('string'),
         ])
-          .then(values => {
+          .then((values) => {
             for (let value of values) {
               if (!value) continue;
               store.commit('compilerOutput', value);
@@ -964,7 +997,7 @@ function onFilesZipReady(blob) {
           zip
             .file(filename)
             .async('string')
-            .then(contents => {
+            .then((contents) => {
               store.commit('output', {
                 name: filename,
                 contents: contents,
@@ -980,7 +1013,7 @@ function onFilesZipReady(blob) {
 
 store.watch(
   Object.getOwnPropertyDescriptor(store.getters, 'isDirty').get,
-  function(value) {
+  function (value) {
     let downloadLabelElement = document.getElementById('download-label');
     if (!value || !downloadLabelElement) return;
 
@@ -995,20 +1028,21 @@ store.watch(
   },
 );
 
-document.getElementById('upload').addEventListener('change', e => {
+document.getElementById('upload').addEventListener('change', (e) => {
   let files = e.target.files;
   if (!files.length) return;
 
   let reader = new FileReader();
-  reader.addEventListener('loadend', e => {
+  reader.addEventListener('loadend', (e) => {
     if (e.target.readyState != FileReader.DONE) return;
     JSZip.loadAsync(reader.result)
-      .then(zip => {
+      .then((zip) => {
         store.commit('reset');
         store.commit('removeCase', 'long');
         let cases = {};
         for (let fileName in zip.files) {
-          if (!zip.files.hasOwnProperty(fileName)) continue;
+          if (!Object.prototype.hasOwnProperty.call(zip.files, fileName))
+            continue;
 
           if (fileName.startsWith('cases/') && fileName.endsWith('.in')) {
             let caseName = fileName.substring(
@@ -1017,7 +1051,10 @@ document.getElementById('upload').addEventListener('change', e => {
             );
             cases[caseName] = true;
             let caseOutFileName = `cases/${caseName}.out`;
-            if (!zip.files.hasOwnProperty(caseOutFileName)) continue;
+            if (
+              !Object.prototype.hasOwnProperty.call(zip.files, caseOutFileName)
+            )
+              continue;
             store.commit('createCase', {
               name: caseName,
               weight: 1,
@@ -1026,7 +1063,7 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('currentCase', caseName);
                 store.commit('inputIn', value);
               })
@@ -1034,19 +1071,24 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(caseOutFileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('currentCase', caseName);
                 store.commit('inputOut', value);
               })
               .catch(Util.asyncError);
           } else if (fileName.startsWith('validator.')) {
             let extension = fileName.substring('validator.'.length);
-            if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+            if (
+              !Object.prototype.hasOwnProperty.call(
+                Util.languageExtensionMapping,
+                extension,
+              )
+            )
               continue;
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('Validator', 'custom');
                 store.commit('ValidatorLanguage', extension);
                 store.commit(
@@ -1066,7 +1108,7 @@ document.getElementById('upload').addEventListener('change', e => {
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('Interactive', true);
                 store.commit('InteractiveModuleName', moduleName);
                 store.commit('request.input.interactive.idl', value);
@@ -1074,12 +1116,17 @@ document.getElementById('upload').addEventListener('change', e => {
               .catch(Util.asyncError);
           } else if (fileName.startsWith('interactive/Main.')) {
             let extension = fileName.substring('interactive/Main.'.length);
-            if (!Util.languageExtensionMapping.hasOwnProperty(extension))
+            if (
+              !Object.prototype.hasOwnProperty.call(
+                Util.languageExtensionMapping,
+                extension,
+              )
+            )
               continue;
             zip
               .file(fileName)
               .async('string')
-              .then(value => {
+              .then((value) => {
                 store.commit('Interactive', true);
                 store.commit('InteractiveLanguage', extension);
                 store.commit('request.input.interactive.main_source', value);
@@ -1088,17 +1135,18 @@ document.getElementById('upload').addEventListener('change', e => {
           }
         }
 
-        if (zip.files.hasOwnProperty('testplan')) {
+        if (Object.prototype.hasOwnProperty.call(zip.files, 'testplan')) {
           zip
             .file('testplan')
             .async('string')
-            .then(value => {
+            .then((value) => {
               for (let line of value.split('\n')) {
                 if (line.startsWith('#') || line.trim() == '') continue;
                 let tokens = line.split(/\s+/);
                 if (tokens.length != 2) continue;
                 let [caseName, weight] = tokens;
-                if (!cases.hasOwnProperty(caseName)) continue;
+                if (!Object.prototype.hasOwnProperty.call(cases, caseName))
+                  continue;
                 store.commit('createCase', {
                   name: caseName,
                   weight: parseFloat(weight),
@@ -1107,13 +1155,13 @@ document.getElementById('upload').addEventListener('change', e => {
             })
             .catch(Util.asyncError);
         }
-        if (zip.files.hasOwnProperty('settings.json')) {
+        if (Object.prototype.hasOwnProperty.call(zip.files, 'settings.json')) {
           zip
             .file('settings.json')
             .async('string')
-            .then(value => {
+            .then((value) => {
               value = JSON.parse(value);
-              if (value.hasOwnProperty('Limits')) {
+              if (Object.prototype.hasOwnProperty.call(value, 'Limits')) {
                 for (let name of [
                   'TimeLimit',
                   'OverallWallTimeLimit',
@@ -1121,15 +1169,23 @@ document.getElementById('upload').addEventListener('change', e => {
                   'MemoryLimit',
                   'OutputLimit',
                 ]) {
-                  if (!value.Limits.hasOwnProperty(name)) continue;
+                  if (!Object.prototype.hasOwnProperty.call(value.Limits, name))
+                    continue;
                   store.commit(name, value.Limits[name]);
                 }
               }
-              if (value.hasOwnProperty('Validator')) {
-                if (value.Validator.hasOwnProperty('Name')) {
+              if (Object.prototype.hasOwnProperty.call(value, 'Validator')) {
+                if (
+                  Object.prototype.hasOwnProperty.call(value.Validator, 'Name')
+                ) {
                   store.commit('Validator', value.Validator.Name);
                 }
-                if (value.Validator.hasOwnProperty('Tolerance')) {
+                if (
+                  Object.prototype.hasOwnProperty.call(
+                    value.Validator,
+                    'Tolerance',
+                  )
+                ) {
                   store.commit('Tolerance', value.Validator.Tolerance);
                 }
               }
@@ -1142,7 +1198,7 @@ document.getElementById('upload').addEventListener('change', e => {
   reader.readAsArrayBuffer(files[0]);
 });
 
-document.getElementById('download').addEventListener('click', e => {
+document.getElementById('download').addEventListener('click', (e) => {
   let downloadLabelElement = document.getElementById('download-label');
   if (downloadLabelElement.className.indexOf('fa-download') != -1) return true;
   e.preventDefault();
@@ -1152,7 +1208,13 @@ document.getElementById('download').addEventListener('click', e => {
 
   let testplan = '';
   for (let caseName in store.state.request.input.cases) {
-    if (!store.state.request.input.cases.hasOwnProperty(caseName)) continue;
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        store.state.request.input.cases,
+        caseName,
+      )
+    )
+      continue;
 
     cases.file(`${caseName}.in`, store.state.request.input.cases[caseName].in);
     cases.file(
@@ -1166,10 +1228,20 @@ document.getElementById('download').addEventListener('click', e => {
   let settingsValidator = {
     Name: store.state.request.input.validator.name,
   };
-  if (store.state.request.input.validator.hasOwnProperty('tolerance')) {
+  if (
+    Object.prototype.hasOwnProperty.call(
+      store.state.request.input.validator,
+      'tolerance',
+    )
+  ) {
     settingsValidator.Tolerance = store.state.request.input.validator.Tolerance;
   }
-  if (store.state.request.input.validator.hasOwnProperty('custom_validator')) {
+  if (
+    Object.prototype.hasOwnProperty.call(
+      store.state.request.input.validator,
+      'custom_validator',
+    )
+  ) {
     settingsValidator.Lang =
       store.state.request.input.validator.custom_validator.lang;
   }
@@ -1207,7 +1279,7 @@ document.getElementById('download').addEventListener('click', e => {
 
   zip
     .generateAsync({ type: 'blob' })
-    .then(blob => {
+    .then((blob) => {
       downloadLabelElement.className = downloadLabelElement.className.replace(
         'fa-file-archive-o',
         'fa-download',
@@ -1219,7 +1291,7 @@ document.getElementById('download').addEventListener('click', e => {
     .catch(Util.asyncError);
 });
 
-document.getElementsByTagName('form')[0].addEventListener('submit', e => {
+document.getElementsByTagName('form')[0].addEventListener('submit', (e) => {
   e.preventDefault();
   document.getElementsByTagName('button')[0].setAttribute('disabled', '');
   fetch('run/new/', {
@@ -1229,7 +1301,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
     }),
     body: JSON.stringify(store.state.request),
   })
-    .then(response => {
+    .then((response) => {
       if (!response.ok) return null;
       history.replaceState(
         undefined,
@@ -1238,7 +1310,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
       );
       return response.formData();
     })
-    .then(formData => {
+    .then((formData) => {
       document.getElementsByTagName('button')[0].removeAttribute('disabled');
       if (!formData) {
         onDetailsJsonReady({
@@ -1253,7 +1325,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
 
       if (formData.has('details.json')) {
         let reader = new FileReader();
-        reader.addEventListener('loadend', function() {
+        reader.addEventListener('loadend', function () {
           onDetailsJsonReady(JSON.parse(reader.result));
         });
         reader.readAsText(formData.get('details.json'));
@@ -1261,7 +1333,7 @@ document.getElementsByTagName('form')[0].addEventListener('submit', e => {
 
       if (formData.has('logs.txt.gz')) {
         let reader = new FileReader();
-        reader.addEventListener('loadend', function() {
+        reader.addEventListener('loadend', function () {
           if (reader.result.byteLength == 0) {
             store.commit('logs', '');
             return;
@@ -1289,7 +1361,7 @@ function setSettings(settings) {
   store.commit('MemoryLimit', settings.limits.MemoryLimit * 1024);
   store.commit('OutputLimit', settings.limits.OutputLimit);
   for (let name of ['TimeLimit', 'OverallWallTimeLimit', 'ExtraWallTime']) {
-    if (!settings.limits.hasOwnProperty(name)) continue;
+    if (!Object.prototype.hasOwnProperty.call(settings.limits, name)) continue;
     store.commit(name, Util.parseDuration(settings.limits[name]));
   }
   store.commit('Validator', settings.validator.name);
@@ -1298,7 +1370,13 @@ function setSettings(settings) {
   store.commit('Interactive', !!settings.interactive);
   if (settings.interactive) {
     for (let language in settings.interactive.templates) {
-      if (!settings.interactive.templates.hasOwnProperty(language)) continue;
+      if (
+        !Object.prototype.hasOwnProperty.call(
+          settings.interactive.templates,
+          language,
+        )
+      )
+        continue;
       interactiveTemplates[language] = settings.interactive.templates[language];
     }
     store.commit('request.source', interactiveTemplates.cpp);
@@ -1311,7 +1389,8 @@ function setSettings(settings) {
     );
   }
   for (let caseName in settings.cases) {
-    if (!settings.cases.hasOwnProperty(caseName)) continue;
+    if (!Object.prototype.hasOwnProperty.call(settings.cases, caseName))
+      continue;
     let caseData = settings.cases[caseName];
     store.commit('createCase', {
       name: caseName,
@@ -1336,7 +1415,7 @@ function setSettings(settings) {
 // popped into a full-blown tab.
 window.addEventListener(
   'message',
-  e => {
+  (e) => {
     if (e.origin != window.location.origin || !e.data) return;
 
     switch (e.data.method) {
@@ -1359,11 +1438,11 @@ function onHashChanged() {
 
   let token = window.location.hash.substring(1);
   fetch(`run/${token}/request.json`)
-    .then(response => {
+    .then((response) => {
       if (!response.ok) return null;
       return response.json();
     })
-    .then(request => {
+    .then((request) => {
       if (!request) {
         store.commit('reset');
         store.commit('logs', '');
@@ -1392,25 +1471,25 @@ function onHashChanged() {
       }
       store.commit('request', request);
       fetch(`run/${token}/details.json`)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) return {};
           return response.json();
         })
         .then(onDetailsJsonReady)
         .catch(Util.asyncError);
       fetch(`run/${token}/files.zip`)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) return null;
           return response.blob();
         })
         .then(onFilesZipReady)
         .catch(Util.asyncError);
       fetch(`run/${token}/logs.txt`)
-        .then(response => {
+        .then((response) => {
           if (!response.ok) return '';
           return response.text();
         })
-        .then(text => store.commit('logs', text))
+        .then((text) => store.commit('logs', text))
         .catch(Util.asyncError);
     })
     .catch(Util.asyncError);

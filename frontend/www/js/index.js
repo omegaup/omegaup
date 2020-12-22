@@ -1,4 +1,4 @@
-(function() {
+(function () {
   if (
     typeof omegaup === 'undefined' ||
     typeof omegaup.API === 'undefined' ||
@@ -14,7 +14,7 @@
     var ttNode = document.createElement('tt');
     ttNode.appendChild(
       document.createTextNode(
-        'cd /opt/omegaup && yarn install && yarn run dev',
+        'cd /opt/omegaup && yarn install && yarn run dev-all',
       ),
     );
     statusMessageElement.appendChild(ttNode);

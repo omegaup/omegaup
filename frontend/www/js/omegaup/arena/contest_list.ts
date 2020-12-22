@@ -1,15 +1,12 @@
 import { OmegaUp } from '../omegaup';
 import * as time from '../time';
 import { types } from '../api_types';
-import T from '../lang';
 import Vue from 'vue';
 import arena_ContestList from '../components/arena/ContestList.vue';
 
 OmegaUp.on('ready', () => {
   time.setSugarLocale();
-  const payload = types.payloadParsers.ContestListPayload(
-    'arena-contest-list-payload',
-  );
+  const payload = types.payloadParsers.ContestListPayload();
   for (const contestList of Object.values(payload.contests)) {
     if (!contestList) {
       // The `participating` entry could be undefined.
@@ -21,9 +18,15 @@ OmegaUp.on('ready', () => {
       contest.start_time = time.remoteDate(contest.start_time);
     });
   }
-  const contestList = new Vue({
-    el: '#arena-contest-list',
-    render: function(createElement) {
+  new Vue({
+    el: '#main-container',
+    components: { 'omegaup-arena-contestlist': arena_ContestList },
+    data: () => ({
+      initialQuery: payload.query,
+      isLogged: payload.isLogged,
+      contests: payload.contests,
+    }),
+    render: function (createElement) {
       return createElement('omegaup-arena-contestlist', {
         props: {
           initialQuery: this.initialQuery,
@@ -32,11 +35,5 @@ OmegaUp.on('ready', () => {
         },
       });
     },
-    data: {
-      initialQuery: payload.query,
-      isLogged: payload.isLogged,
-      contests: payload.contests,
-    },
-    components: { 'omegaup-arena-contestlist': arena_ContestList },
   });
 });

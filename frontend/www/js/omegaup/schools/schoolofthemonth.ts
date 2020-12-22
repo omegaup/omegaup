@@ -8,9 +8,16 @@ import schoolOfTheMonth_List from '../components/schoolofthemonth/List.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.SchoolOfTheMonthPayload();
-  let schoolOfTheMonthList = new Vue({
+  const schoolOfTheMonthList = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    components: {
+      'school-of-the-month-list': schoolOfTheMonth_List,
+    },
+    data: () => ({
+      schoolIsSelected:
+        payload.isMentor && payload.options && payload.options.schoolIsSelected,
+    }),
+    render: function (createElement) {
       return createElement('school-of-the-month-list', {
         props: {
           schoolsOfPreviousMonth: payload.schoolsOfPreviousMonth,
@@ -24,7 +31,7 @@ OmegaUp.on('ready', () => {
           schoolIsSelected: this.schoolIsSelected,
         },
         on: {
-          'select-school': function(schoolId: number) {
+          'select-school': function (schoolId: number) {
             api.School.selectSchoolOfTheMonth({
               school_id: schoolId,
             })
@@ -36,13 +43,6 @@ OmegaUp.on('ready', () => {
           },
         },
       });
-    },
-    data: {
-      schoolIsSelected:
-        payload.isMentor && payload.options && payload.options.schoolIsSelected,
-    },
-    components: {
-      'school-of-the-month-list': schoolOfTheMonth_List,
     },
   });
 });

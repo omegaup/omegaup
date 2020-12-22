@@ -35,6 +35,12 @@ class RequestParam {
     public $type;
 
     /**
+     * @var bool
+     * @readonly
+     */
+    public $isOptional;
+
+    /**
      * @var string
      * @readonly
      */
@@ -51,6 +57,12 @@ class RequestParam {
         ?string $description
     ) {
         $this->type = $type;
+        $this->isOptional = !empty(
+            array_intersect(
+                ['null', 'mixed'],
+                explode('|', $type)
+            )
+        );
         $this->name = $name;
         $this->description = $description;
     }
@@ -96,7 +108,72 @@ class RequestParam {
                 $annotationDescription
             );
         }
+        usort(
+            $result,
+            fn (RequestParam $a, RequestParam $b) => $a->compare($b)
+        );
         return $result;
+    }
+
+    /**
+     * A comparison function to order all required parameters before the
+     * non-required ones. Within each region, parameters are ordered
+     * lexicographically.
+     */
+    public function compare(RequestParam $b): int {
+        if ($this->isOptional != $b->isOptional) {
+            return ($this->isOptional ? 1 : 0) - ($b->isOptional ? 1 : 0);
+        }
+        return strcmp($this->name, $b->name);
+    }
+
+    /**
+     * The Python equivalent of the primitive type. It does not take into
+     * account the optionality of arguments.
+     */
+    public function pythonPrimitiveType(): string {
+        if ($this->type == 'mixed') {
+            return 'Any';
+        }
+        $splitTypes = [];
+        foreach (
+            array_diff(
+                explode('|', $this->type),
+                ['null']
+            ) as $splitType
+        ) {
+            if ($splitType[0] == "'") {
+                $splitTypes = ['str'];
+                break;
+            }
+            if ($splitType == 'string') {
+                $splitTypes[] = 'str';
+                continue;
+            }
+            if ($splitType == 'OmegaUp\\Timestamp') {
+                $splitTypes[] = 'datetime.datetime';
+                continue;
+            }
+            $splitTypes[] = $splitType;
+        }
+        if (count($splitTypes) > 1) {
+            return 'Union[' . implode(', ', $splitTypes) . ']';
+        }
+        return $splitTypes[0];
+    }
+
+    /**
+     * A stringified version of the value for Python.
+     */
+    public function pythonStringifiedValue(): string {
+        switch ($this->pythonPrimitiveType()) {
+            case 'str':
+                return $this->name;
+            case 'datetime.datetime':
+                return "str(int({$this->name}.timestamp()))";
+            default:
+                return "str({$this->name})";
+        }
     }
 }
 
@@ -218,6 +295,7 @@ class TypeMapper {
                 if ($type instanceof \Psalm\Type\Atomic\ObjectLike) {
                     $convertedProperties = [];
                     $propertyTypes = [];
+                    ksort($type->properties);
                     foreach ($type->properties as $propertyName => $propertyType) {
                         if (is_numeric($propertyName)) {
                             throw new \Exception(
@@ -261,7 +339,7 @@ class TypeMapper {
                         }
                         $propertyTypes[] = "{$propertyName}: {$conversionResult->typescriptExpansion};";
                     }
-                    $conversionFunction[] = 'x => { ' . join(
+                    $conversionFunction[] = '(x) => { ' . join(
                         ' ',
                         $convertedProperties
                     ) . ' return x; }';
@@ -275,7 +353,7 @@ class TypeMapper {
                     if (!is_null($conversionResult->conversionFunction)) {
                         $requiresConversion = true;
                         $conversionFunction[] = (
-                            "x => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
+                            "(x) => { if (!Array.isArray(x)) { return x; } return x.map({$conversionResult->conversionFunction}); }"
                         );
                     }
                     $typeNames[] = "{$conversionResult->typescriptExpansion}[]";
@@ -300,7 +378,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
+                                "(x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;
@@ -315,7 +393,7 @@ class TypeMapper {
                         if (!is_null($conversionResult->conversionFunction)) {
                             $requiresConversion = true;
                             $conversionFunction[] = (
-                                "x => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
+                                "(x) => { if (x instanceof Object) { Object.keys(x).forEach(y => x[y] = ({$conversionResult->conversionFunction})(x[y])); } return x; }"
                             );
                         }
                         continue;
@@ -387,21 +465,19 @@ class TypeMapper {
                 join(', ', $conversionFunction)
             );
         }
+        sort($typeNames);
         return new ConversionResult(
             join('|', $typeNames),
             $requiresConversion ? $conversionFunction[0] : null
         );
     }
 
-    /**
-     * @param array{description: string, specials: array<string, array<int, string>>} $docComment
-     */
     public function convertMethod(
         \ReflectionMethod $reflectionMethod,
-        $docComment,
+        \Psalm\Internal\Scanner\ParsedDocblock $docComment,
         string $controllerClassBasename
     ): Method {
-        $returns = $docComment['specials']['return'];
+        $returns = $docComment->tags['return'];
         if (count($returns) != 1) {
             throw new \Exception('More @return annotations than expected!');
         }
@@ -456,9 +532,9 @@ class TypeMapper {
                 $reflectionMethod->name,
                 3
             ),
-            $docComment['description'],
+            $docComment->description,
             RequestParam::parse(
-                $docComment['specials']['omegaup-request-param'] ?? []
+                $docComment->tags['omegaup-request-param'] ?? []
             ),
             $conversionResult,
             $responseTypeMapping
@@ -480,16 +556,22 @@ class APIGenerator {
         $this->typeMapper = new TypeMapper($this->daoTypes);
     }
 
+    private function parseDocComment(string $docblock): \Psalm\Internal\Scanner\ParsedDocblock {
+        return \Psalm\DocComment::parsePreservingLength(
+            new \PhpParser\Comment\Doc($docblock)
+        );
+    }
+
     public function addController(string $controllerClassBasename): void {
         /** @var class-string */
         $controllerClassName = "\\OmegaUp\\Controllers\\{$controllerClassBasename}";
         $reflectionClass = new \ReflectionClass($controllerClassName);
 
-        $docComment = \Psalm\DocComment::parse(
-            $reflectionClass->getDocComment()
+        $docComment = $this->parseDocComment(
+            strval($reflectionClass->getDocComment())
         );
-        if (isset($docComment['specials']['psalm-type'])) {
-            foreach ($docComment['specials']['psalm-type'] as $typeAlias) {
+        if (isset($docComment->tags['psalm-type'])) {
+            foreach ($docComment->tags['psalm-type'] as $typeAlias) {
                 [
                     $typeName,
                     $typeExpansion,
@@ -513,7 +595,7 @@ class APIGenerator {
 
         $controller = new Controller(
             $controllerClassBasename,
-            $docComment['description']
+            $docComment->description
         );
 
         foreach (
@@ -533,8 +615,8 @@ class APIGenerator {
                 // JavaScript, so they are not exposed.
                 continue;
             }
-            $docComment = \Psalm\DocComment::parse(
-                $reflectionMethod->getDocComment()
+            $docComment = $this->parseDocComment(
+                strval($reflectionMethod->getDocComment())
             );
             $apiMethodName = strtolower(
                 $reflectionMethod->name[3]
@@ -574,10 +656,10 @@ class APIGenerator {
                         ReflectionProperty::IS_PUBLIC
                     ) as $reflectionProperty
                 ) {
-                    $docComment = \Psalm\DocComment::parse(
-                        $reflectionProperty->getDocComment()
+                    $docComment = $this->parseDocComment(
+                        strval($reflectionProperty->getDocComment())
                     );
-                    $returns = $docComment['specials']['var'];
+                    $returns = $docComment->tags['var'];
                     if (count($returns) != 1) {
                         throw new \Exception(
                             'More @var annotations than expected!'
@@ -592,7 +674,7 @@ class APIGenerator {
                         $returnType->removeType('null');
                     }
                     $properties[
-                        strval($reflectionProperty->name)
+                        $reflectionProperty->getName()
                     ] = $this->typeMapper->convertTypeToTypeScript(
                         $returnType,
                         $typeName
@@ -677,10 +759,15 @@ class APIGenerator {
     }
 
     public function generateApi(): void {
-        echo "// generated by frontend/server/cmd/APITool.php. DO NOT EDIT.\n";
-        echo "import { messages } from './api_types';\n";
-        echo "import { addError } from './errors';\n\n";
         echo <<<'EOD'
+// generated by frontend/server/cmd/APITool.php. DO NOT EDIT.
+import { messages } from './api_types';
+import { addError } from './errors';
+
+interface ApiCallOptions {
+  quiet?: boolean;
+}
+
 export function apiCall<
   RequestType extends { [key: string]: any },
   ServerResponseType,
@@ -688,23 +775,31 @@ export function apiCall<
 >(
   url: string,
   transform?: (result: ServerResponseType) => ResponseType,
-): (params?: RequestType) => Promise<ResponseType> {
-  return (params?: RequestType) =>
+): (params?: RequestType, options?: ApiCallOptions) => Promise<ResponseType> {
+  return (params?: RequestType, options?: ApiCallOptions) =>
     new Promise((accept, reject) => {
       let responseOk = true;
+      let responseStatus = 200;
       fetch(
         url,
         params
           ? {
               method: 'POST',
               body: Object.keys(params)
-                .filter(key => typeof params[key] !== 'undefined')
-                .map(
-                  key =>
-                    `${encodeURIComponent(key)}=${encodeURIComponent(
-                      params[key],
-                    )}`,
+                .filter(
+                  (key) =>
+                    params[key] !== null && typeof params[key] !== 'undefined',
                 )
+                .map((key) => {
+                  if (params[key] instanceof Date) {
+                    return `${encodeURIComponent(key)}=${encodeURIComponent(
+                      Math.round(params[key].getTime() / 1000),
+                    )}`;
+                  }
+                  return `${encodeURIComponent(key)}=${encodeURIComponent(
+                    params[key],
+                  )}`;
+                })
                 .join('&'),
               headers: {
                 'Content-Type':
@@ -713,19 +808,26 @@ export function apiCall<
             }
           : undefined,
       )
-        .then(response => {
+        .then((response) => {
           if (response.status == 499) {
             // If we cancel the connection, let's just swallow the error since
             // the user is not going to see it.
             return;
           }
           responseOk = response.ok;
+          responseStatus = response.status;
           return response.json();
         })
-        .then(data => {
+        .then((data) => {
           if (!responseOk) {
-            addError(data);
-            console.error(data);
+            if (typeof data === 'object' && !Array.isArray(data)) {
+              data.status = 'error';
+              data.httpStatusCode = responseStatus;
+            }
+            if (!options?.quiet) {
+              addError(data);
+              console.error(data);
+            }
             reject(data);
             return;
           }
@@ -735,10 +837,16 @@ export function apiCall<
             accept(data);
           }
         })
-        .catch(err => {
-          const errorData = { status: 'error', error: err };
-          addError(errorData);
-          console.error(errorData);
+        .catch((err) => {
+          const errorData = {
+            status: 'error',
+            error: err,
+            httpStatusCode: responseStatus,
+          };
+          if (!options?.quiet) {
+            addError(errorData);
+            console.error(errorData);
+          }
           reject(errorData);
         });
     });
@@ -800,7 +908,11 @@ EOD;
                     echo "| Name | Type | Description |\n";
                     echo "|------|------|-------------|\n";
                     foreach ($method->requestParams as $requestParam) {
-                        echo "| `{$requestParam->name}` | `{$requestParam->type}` | {$requestParam->description} |\n";
+                        echo "| `{$requestParam->name}` | `" . str_replace(
+                            '|',
+                            '\\|',
+                            $requestParam->type
+                        ) . "` | {$requestParam->description} |\n";
                     }
                 }
 
@@ -814,11 +926,192 @@ EOD;
                 } else {
                     echo "| Name | Type |\n";
                     echo "|------|------|\n";
+                    ksort($method->responseTypeMapping);
                     foreach ($method->responseTypeMapping as $paramName => $paramType) {
-                        echo "| `{$paramName}` | `{$paramType}` |\n";
+                        echo "| `{$paramName}` | `" . str_replace(
+                            '|',
+                            '\\|',
+                            $paramType
+                        ) . "` |\n";
                     }
                 }
             }
+        }
+    }
+
+    public function generatePythonApi(): void {
+        echo "\"\"\"A Python implementation of the omegaUp API.\"\"\"\n";
+        echo "import datetime\n";
+        echo "import logging\n";
+        echo "import urllib.parse\n";
+        echo "\n";
+        echo "from typing import Any, BinaryIO, Dict, Iterable, Mapping, Optional\n";
+        echo "\n";
+        echo "import requests\n";
+        echo "\n";
+        echo "_DEFAULT_TIMEOUT = datetime.timedelta(minutes=1)\n";
+        echo "\n";
+        echo "\n";
+        echo "def _filterKeys(d: Mapping[str, Any], keys: Iterable[str]) -> Dict[str, Any]:\n";
+        echo "    \"\"\"Returns a copy of the mapping with certain values redacted.\n";
+        echo "\n";
+        echo "    Any of values mapped to the keys in the `keys` iterable will be replaced\n";
+        echo "    with the string '[REDACTED]'.\n";
+        echo "    \"\"\"\n";
+        echo "    result: Dict[str, Any] = dict(d)\n";
+        echo "    for key in keys:\n";
+        echo "        if key in result:\n";
+        echo "            result[key] = '[REDACTED]'\n";
+        echo "    return result\n";
+        echo "\n";
+        echo "\n";
+        echo "ApiReturnType = Dict[str, Any]\n";
+        echo "\"\"\"The return type of any of the API requests.\"\"\"\n";
+        echo "\n";
+        ksort($this->controllers);
+        foreach ($this->controllers as $controller) {
+            echo "\n";
+            echo "class {$controller->classBasename}:\n";
+            echo '    r"""' . str_replace(
+                "\n",
+                "\n    ",
+                $controller->docstringComment
+            ) . "\n";
+            echo "    \"\"\"\n";
+            echo "    def __init__(self, client: 'Client') -> None:\n";
+            echo "        self._client = client\n\n";
+            foreach ($controller->methods as $apiMethodName => $method) {
+                echo "    def {$apiMethodName}(\n";
+                echo "            self,\n";
+                echo "            *,\n";
+                foreach ($method->requestParams as $requestParam) {
+                    if ($requestParam->isOptional) {
+                        continue;
+                    }
+                    echo "            {$requestParam->name}: {$requestParam->pythonPrimitiveType()},\n";
+                }
+                foreach ($method->requestParams as $requestParam) {
+                    if (!$requestParam->isOptional) {
+                        continue;
+                    }
+                    echo "            {$requestParam->name}: Optional[{$requestParam->pythonPrimitiveType()}] = None,\n";
+                }
+                echo "            # Out-of-band parameters:\n";
+                echo "            files_: Optional[Mapping[str, BinaryIO]] = None,\n";
+                echo "            check_: bool = True,\n";
+                echo "            timeout_: datetime.timedelta = _DEFAULT_TIMEOUT) -> ApiReturnType:\n";
+                echo '        r"""' . str_replace(
+                    "\n",
+                    "\n        ",
+                    $method->docstringComment
+                ) . "\n";
+
+                if (!empty($method->requestParams)) {
+                    echo "\n";
+                    echo "        Args:\n";
+                    foreach ($method->requestParams as $requestParam) {
+                        echo "            {$requestParam->name}: {$requestParam->description}\n";
+                    }
+                }
+
+                echo "\n";
+                echo "        Returns:\n";
+                echo "            The API result dict.\n";
+                echo "        \"\"\"\n";
+                echo "        parameters: Dict[str, str] = {\n";
+                foreach ($method->requestParams as $requestParam) {
+                    if ($requestParam->isOptional) {
+                        continue;
+                    }
+                    echo "              '{$requestParam->name}': {$requestParam->pythonStringifiedValue()},\n";
+                }
+                echo "        }\n";
+                foreach ($method->requestParams as $requestParam) {
+                    if (!$requestParam->isOptional) {
+                        continue;
+                    }
+                    echo "        if {$requestParam->name} is not None:\n";
+                    echo "              parameters['{$requestParam->name}'] = {$requestParam->pythonStringifiedValue()}\n";
+                }
+                echo "        return self._client.query('/api/{$controller->apiName}/{$apiMethodName}/',\n";
+                echo "                               payload=parameters,\n";
+                echo "                               files_=files_,\n";
+                echo "                               timeout_=timeout_,\n";
+                echo "                               check_=check_)\n";
+                echo "\n";
+            }
+        }
+        echo "\n";
+        echo "\n";
+        echo "class Client:\n";
+        echo "    \"\"\".\"\"\",\n";
+        echo "    def __init__(self,\n";
+        echo "                 username: str,\n";
+        echo "                 *,\n";
+        echo "                 password: Optional[str] = None,\n";
+        echo "                 auth_token: Optional[str] = None,\n";
+        echo "                 url: str = 'https://omegaup.com') -> None:\n";
+        echo "        self._url = url\n";
+        echo "        self.auth_token: Optional[str] = None\n";
+        echo "        self.username = username\n";
+        echo "        if auth_token is not None:\n";
+        echo "            self.auth_token = auth_token\n";
+        echo "        elif password is not None:\n";
+        echo "            self.auth_token = self.query('/api/user/login/',\n";
+        echo "                                         payload={\n";
+        echo "                                             'usernameOrEmail': username,\n";
+        echo "                                             'password': password,\n";
+        echo "                                         })['auth_token']\n";
+        foreach ($this->controllers as $controller) {
+            echo "        self._{$controller->apiName}: Optional[{$controller->classBasename}] = None\n";
+        }
+        echo "\n";
+        echo "    def query(self,\n";
+        echo "              endpoint: str,\n";
+        echo "              payload: Optional[Mapping[str, str]] = None,\n";
+        echo "              files_: Optional[Mapping[str, BinaryIO]] = None,\n";
+        echo "              timeout_: datetime.timedelta = _DEFAULT_TIMEOUT,\n";
+        echo "              check_: bool = True) -> ApiReturnType:\n";
+        echo "        \"\"\"Issues a raw query to the omegaUp API.\"\"\"\n";
+        echo "        logger = logging.getLogger('omegaup')\n";
+        echo "        if payload is None:\n";
+        echo "            payload = {}\n";
+        echo "        else:\n";
+        echo "            payload = dict(payload)\n";
+        echo "\n";
+        echo "        if logger.isEnabledFor(logging.DEBUG):\n";
+        echo "            logger.debug('Calling endpoint: %s', endpoint)\n";
+        echo "            logger.debug('Payload: %s', _filterKeys(payload, {'password'}))\n";
+        echo "\n";
+        echo "        if self.auth_token is not None:\n";
+        echo "            payload['ouat'] = self.auth_token\n";
+        echo "\n";
+        echo "        r = requests.post(urllib.parse.urljoin(self._url, endpoint),\n";
+        echo "                          data=payload,\n";
+        echo "                          files=files_,\n";
+        echo "                          timeout=timeout_.total_seconds())\n";
+        echo "\n";
+        echo "        try:\n";
+        echo "            response: ApiReturnType = r.json()\n";
+        echo "        except:  # noqa: bare-except Re-raised below\n";
+        echo "            logger.exception(r.text)\n";
+        echo "            raise\n";
+        echo "\n";
+        echo "        if logger.isEnabledFor(logging.DEBUG):\n";
+        echo "            logger.info('Response: %s', _filterKeys(response, {'auth_token'}))\n";
+        echo "\n";
+        echo "        if check_ and r.status_code != 200:\n";
+        echo "            raise Exception(response)\n";
+        echo "\n";
+        echo "        return response\n";
+        foreach ($this->controllers as $controller) {
+            echo "\n";
+            echo "    @property\n";
+            echo "    def {$controller->apiName}(self) -> {$controller->classBasename}:\n";
+            echo "        \"\"\"Returns the {$controller->classBasename} API.\"\"\"\n";
+            echo "        if self._{$controller->apiName} is None:\n";
+            echo "            self._{$controller->apiName} = {$controller->classBasename}(self)\n";
+            echo "        return self._{$controller->apiName}\n";
         }
     }
 }
@@ -846,6 +1139,7 @@ function listDir(string $path): Generator {
 // It's a bit brittle to be fiddling with internal objects, but there is no
 // other way to get a valid instance.
 $rootDirectory = dirname(__DIR__, 3);
+/** @psalm-suppress DeprecatedClass cannot yet upgrade to Composer 2 */
 define('PSALM_VERSION', \PackageVersions\Versions::getVersion('vimeo/psalm'));
 $projectAnalyzer = new \Psalm\Internal\Analyzer\ProjectAnalyzer(
     \Psalm\Config::loadFromXMLFile(
@@ -878,6 +1172,8 @@ if ($options['file'] == 'api_types.ts') {
     $apiGenerator->generateApi();
 } elseif ($options['file'] == 'README.md') {
     $apiGenerator->generateDocumentation();
+} elseif ($options['file'] == 'api.py') {
+    $apiGenerator->generatePythonApi();
 } else {
     throw new \Exception("Invalid option for --file: {$options['file']}");
 }

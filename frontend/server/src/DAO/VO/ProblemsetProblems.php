@@ -45,14 +45,14 @@ class ProblemsetProblems extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['commit'])) {
-            $this->commit = strval(
+            $this->commit = is_scalar(
                 $data['commit']
-            );
+            ) ? strval($data['commit']) : '';
         }
         if (isset($data['version'])) {
-            $this->version = strval(
+            $this->version = is_scalar(
                 $data['version']
-            );
+            ) ? strval($data['version']) : '';
         }
         if (isset($data['points'])) {
             $this->points = floatval(

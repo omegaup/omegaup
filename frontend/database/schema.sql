@@ -37,7 +37,7 @@ CREATE TABLE `Assignments` (
   `description` tinytext NOT NULL,
   `alias` varchar(32) NOT NULL,
   `publish_time_delay` int DEFAULT NULL,
-  `assignment_type` enum('homework','test') NOT NULL,
+  `assignment_type` enum('homework','lesson','test') NOT NULL DEFAULT 'homework' COMMENT 'Almacena el tipo de contenido que se va a dar de alta',
   `start_time` timestamp NOT NULL DEFAULT '2000-01-01 06:00:00',
   `finish_time` timestamp NULL DEFAULT NULL,
   `max_points` double NOT NULL DEFAULT '0' COMMENT 'La cantidad total de puntos que se pueden obtener.',
@@ -56,10 +56,14 @@ CREATE TABLE `Assignments` (
 CREATE TABLE `Auth_Tokens` (
   `user_id` int DEFAULT NULL,
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
+  `acting_identity_id` int DEFAULT NULL COMMENT 'Identidad del usuario que indica que no está actuando como identidad principal',
   `token` varchar(128) NOT NULL,
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`token`),
   KEY `identity_id` (`identity_id`),
+  KEY `acting_identity_id` (`identity_id`),
+  KEY `fk_ati_acting_identity_id` (`acting_identity_id`),
+  CONSTRAINT `fk_ati_acting_identity_id` FOREIGN KEY (`acting_identity_id`) REFERENCES `Identities` (`identity_id`),
   CONSTRAINT `fk_ati_identity_id` FOREIGN KEY (`identity_id`) REFERENCES `Identities` (`identity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tokens de autorización para los logins.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -174,12 +178,33 @@ CREATE TABLE `Countries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `Course_Clone_Log` (
+  `course_clone_log_id` int NOT NULL AUTO_INCREMENT COMMENT 'Identificador del intento de clonar curso',
+  `ip` varchar(40) NOT NULL COMMENT 'Dirección IP desde la cual se intentó clonar el curso.',
+  `course_id` int NOT NULL COMMENT 'ID del curso original',
+  `new_course_id` int DEFAULT NULL COMMENT 'ID del curso nuevo, null si no se pudo colonar el curso',
+  `token_payload` varchar(220) NOT NULL COMMENT 'Claims del token usado para intentar clonar, independientemente de si fue exitoso o no.',
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en la que el usuario intenta clonar el curso',
+  `user_id` int NOT NULL COMMENT 'ID del usuario que intentó clonar.',
+  `result` enum('unknown','success','token_expired','token_corrupted','token_invalid') NOT NULL DEFAULT 'success' COMMENT 'Resultado obtenido del intento de clonación de curso',
+  PRIMARY KEY (`course_clone_log_id`),
+  KEY `user_id` (`user_id`),
+  KEY `course_id` (`course_id`),
+  KEY `new_course_id` (`new_course_id`),
+  CONSTRAINT `fk_ccl_course_id` FOREIGN KEY (`course_id`) REFERENCES `Courses` (`course_id`),
+  CONSTRAINT `fk_ccl_new_course_id` FOREIGN KEY (`new_course_id`) REFERENCES `Courses` (`course_id`),
+  CONSTRAINT `fk_ccl_user_id` FOREIGN KEY (`user_id`) REFERENCES `Users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Bitácora de registro para cursos clonados';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Course_Identity_Request` (
   `identity_id` int NOT NULL COMMENT 'Identidad del usuario',
   `course_id` int NOT NULL COMMENT 'Curso al cual se necesita un request para ingresar',
   `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Hora en la que se realizó el request',
   `last_update` timestamp NULL DEFAULT NULL COMMENT 'Última fecha de actualización del request',
   `accepted` tinyint(1) DEFAULT NULL COMMENT 'Indica si la respuesta del request fue aceptada',
+  `extra_note` mediumtext COMMENT 'Indica una descripción con el motivo de aceptar o rechazar un usuario al curso',
   PRIMARY KEY (`identity_id`,`course_id`),
   KEY `course_id` (`course_id`),
   KEY `identity_id` (`identity_id`),
@@ -565,7 +590,6 @@ CREATE TABLE `Problems_Languages` (
 CREATE TABLE `Problems_Tags` (
   `problem_id` int NOT NULL,
   `tag_id` int NOT NULL,
-  `public` tinyint(1) NOT NULL DEFAULT '0',
   `source` enum('owner','voted','quality') NOT NULL DEFAULT 'owner' COMMENT 'El origen del tag: elegido por el autor, elegido por los usuarios o elegido por un revisor.',
   PRIMARY KEY (`problem_id`,`tag_id`),
   KEY `problem_id` (`problem_id`),
@@ -800,7 +824,8 @@ CREATE TABLE `Runs` (
   `run_id` int NOT NULL AUTO_INCREMENT,
   `submission_id` int NOT NULL COMMENT 'El envío',
   `version` char(40) NOT NULL COMMENT 'El hash SHA1 del árbol de la rama private.',
-  `status` enum('new','waiting','compiling','running','ready') NOT NULL DEFAULT 'new',
+  `commit` char(40) NOT NULL COMMENT 'El hash SHA1 del commit en la rama master del problema con el que se realizó el envío.',
+  `status` enum('new','waiting','compiling','running','ready','uploading') NOT NULL DEFAULT 'new',
   `verdict` enum('AC','PA','PE','WA','TLE','OLE','MLE','RTE','RFE','CE','JE','VE') NOT NULL,
   `runtime` int NOT NULL DEFAULT '0',
   `penalty` int NOT NULL DEFAULT '0',
@@ -812,6 +837,7 @@ CREATE TABLE `Runs` (
   PRIMARY KEY (`run_id`),
   UNIQUE KEY `runs_versions` (`submission_id`,`version`),
   KEY `submission_id` (`submission_id`),
+  KEY `status_submission_id` (`status`,`submission_id`),
   CONSTRAINT `fk_r_submission_id` FOREIGN KEY (`submission_id`) REFERENCES `Submissions` (`submission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Estado de todas las ejecuciones.';
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -924,7 +950,8 @@ CREATE TABLE `Submissions` (
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `Tags` (
   `tag_id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) NOT NULL,
+  `name` varchar(75) NOT NULL,
+  `public` tinyint(1) NOT NULL DEFAULT '0' COMMENT 'Indica si el tag es público o no. Los usuarios solo pueden agregar tags privados',
   PRIMARY KEY (`tag_id`),
   UNIQUE KEY `tag_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Tags privados para los problemas.';

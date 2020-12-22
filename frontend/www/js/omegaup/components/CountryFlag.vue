@@ -1,5 +1,7 @@
 <template>
-  <img height="11" v-bind:src="flagUrl" v-bind:title="country" width="16" />
+  <span class="pr-1">
+    <img height="11" :src="flagUrl" :title="country" width="16" />
+  </span>
 </template>
 
 <script lang="ts">

@@ -10,6 +10,13 @@ namespace OmegaUp;
 class Validators {
     /**
      * Check if email is valid
+     */
+    public static function email(string $email): bool {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    /**
+     * Check if email is valid
      *
      * @param mixed $parameter
      * @param string $parameterName Name of parameter that will appear en error message
@@ -52,6 +59,13 @@ class Validators {
                 $parameterName
             );
         }
+    }
+
+    /**
+     * Check whether parameter value is non-empty string
+     */
+    public static function stringNonEmpty(string $parameter): bool {
+        return !empty($parameter);
     }
 
     /**
@@ -115,55 +129,71 @@ class Validators {
     }
 
     /**
-     * @param mixed $parameter
-     * @param string $parameterName
-     * @param bool $required
-     * @psalm-assert string $parameter
+     * Returns whether the alias is valid.
+     * The form of namespaced alias is: "namespace:alias"
+     *
+     * @param string $alias
+     * @return boolean
+     *
+     * @throws \OmegaUp\Exceptions\InvalidParameterException
      */
-    public static function validateValidAlias(
-        $parameter,
-        string $parameterName,
-        bool $required = true
-    ): void {
-        if (!self::isPresent($parameter, $parameterName, $required)) {
-            return;
-        }
-
-        if (
-            !is_string($parameter) ||
-            empty($parameter) ||
-            strlen($parameter) > 32
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
-        if (self::isRestrictedAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'aliasInUse'
-            );
-        }
-        if (!self::isValidAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
+    public static function namespacedAlias(string $alias): bool {
+        return (
+            preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $alias) === 1
+            && !self::isRestrictedAlias($alias)
+            && strlen($alias) <= 32
+        );
     }
 
     /**
-     * Returns whether the alias is valid and is not a restricted alias.
+     * Returns whether the alias is valid.
      *
      * @param string $alias
      * @return boolean
      */
-    public static function isValidAlias(string $alias): bool {
-        return preg_match(
-            '/^[a-zA-Z0-9_-]+$/',
-            $alias
-        ) === 1 && !self::isRestrictedAlias(
-            $alias
+    public static function alias(string $alias): bool {
+        return (
+            preg_match('/^[a-zA-Z0-9_-]+$/', $alias) === 1
+            && !self::isRestrictedAlias($alias)
+        );
+    }
+
+    /**
+     * Returns whether the username or email is valid.
+     *
+     * @param string $usernameOrEmail
+     * @return boolean
+     */
+    public static function usernameOrEmail(string $usernameOrEmail): bool {
+        return (
+            self::email($usernameOrEmail)
+            || self::normalUsername($usernameOrEmail)
+            || self::identityUsername($usernameOrEmail)
+        );
+    }
+
+    /**
+     * Returns whether the username is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function normalUsername(string $username): bool {
+        return preg_match('/^[a-zA-Z0-9_.-]+$/', $username) !== 0;
+    }
+
+    /**
+     * Returns whether the username of an identity is valid.
+     *
+     * @param string $username
+     * @return boolean
+     */
+    public static function identityUsername(string $username): bool {
+        return (
+            preg_match(
+                '/^[a-zA-Z0-9_.-]+:[a-zA-Z0-9_.-]+$/',
+                $username
+            ) !== 0
         );
     }
 
@@ -174,46 +204,8 @@ class Validators {
      * @return boolean whether the alias is restricted.
      */
     public static function isRestrictedAlias(string $alias): bool {
-        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup'];
+        $restrictedAliases = ['new', 'admin', 'problem', 'list', 'mine', 'omegaup', 'collection'];
         return in_array(strtolower($alias), $restrictedAliases);
-    }
-
-    /**
-     * Enforces namespaced alias (of the form "namespace:alias").
-     *
-     * @param mixed $parameter
-     * @param string $parameterName
-     * @psalm-assert string $parameter
-     * @throws \OmegaUp\Exceptions\InvalidParameterException
-     */
-    public static function validateValidNamespacedAlias(
-        $parameter,
-        string $parameterName
-    ): void {
-        if (!self::isPresent($parameter, $parameterName, /*required=*/true)) {
-            return;
-        }
-        if (
-            !is_string($parameter) ||
-            strlen($parameter) < 2 ||
-            strlen($parameter) > 32
-        ) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
-        if (self::isRestrictedAlias($parameter)) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
-                'aliasInUse'
-            );
-        }
-        if (!preg_match('/^(?:[a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]+$/', $parameter)) {
-            throw new \OmegaUp\Exceptions\InvalidParameterException(
-                'parameterInvalidAlias',
-                $parameterName
-            );
-        }
     }
 
     /**
@@ -475,7 +467,11 @@ class Validators {
                 'parameterNotInExpectedSet',
                 $parameterName,
                 [
-                    'bad_elements' => strval($parameter),
+                    'bad_elements' => (
+                        is_scalar($parameter) || is_object($parameter) ?
+                        strval($parameter) :
+                        ''
+                    ),
                     'expected_set' => implode(', ', $enum),
                 ]
             );

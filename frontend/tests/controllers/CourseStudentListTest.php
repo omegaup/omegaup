@@ -29,9 +29,10 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         ]));
 
         foreach ($students as $s) {
-            $this->assertArrayContainsWithPredicate($response['students'], function ($value) use ($s) {
-                return $value['username'] == $s->username;
-            });
+            $this->assertArrayContainsWithPredicate(
+                $response['students'],
+                fn ($value) => $value['username'] == $s->username
+            );
         }
     }
 
@@ -76,103 +77,191 @@ class CourseStudentListTest extends \OmegaUp\Test\ControllerTestCase {
         }
     }
 
-    /**
-     *  Tests progress in apiDetails is correctly calculated for multiple
-     *  assignments and multiple students
-     */
-    public function testCourseStudentListWithProgressMultipleAssignments() {
-        $homeworkCount = 5;
-        $testCount = 5;
-        $problemsPerAssignment = 3;
-        $studentCount = 5;
-        $problemAssignmentsMap = [];
-
-        // Create course with assignments
-        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithNAssignmentsPerType(
-            ['homework' => 5, 'test' => 5]
-        );
-
-        // Add problems to assignments
-        $adminLogin = self::login($courseData['admin']);
-        for ($i = 0; $i < $homeworkCount + $testCount; $i++) {
-            $assignmentAlias = $courseData['assignment_aliases'][$i];
-            $problemAssignmentsMap[$assignmentAlias] = [];
-
-            for ($j = 0; $j < $problemsPerAssignment; $j++) {
-                $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
-                \OmegaUp\Controllers\Course::apiAddProblem(new \OmegaUp\Request([
-                    'auth_token' => $adminLogin->auth_token,
-                    'course_alias' => $courseData['course_alias'],
-                    'assignment_alias' => $assignmentAlias,
-                    'problem_alias' => $problemData['request']['problem_alias'],
-                ]));
-                $problemAssignmentsMap[$assignmentAlias][] = $problemData;
-            }
+    public function testGetStudentsProgressForCourse() {
+        $problemsData = [];
+        for ($i = 0; $i < 4; $i++) {
+            $problemsData[] = \OmegaUp\Test\Factories\Problem::createProblem();
         }
 
-        // Create & add students to course
-        $students = [];
-        for ($i = 0; $i < $studentCount; $i++) {
-            $students[] = \OmegaUp\Test\Factories\Course::addStudentToCourse(
-                $courseData
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignment = $courseData['assignment_alias'];
+
+        $login = self::login($courseData['admin']);
+
+        // assignment is going to have the first 3 problems
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignment,
+            [$problemsData[0], $problemsData[1], $problemsData[2]]
+        );
+
+        $users = [];
+        $participants = [];
+        for ($i = 0; $i < 3; $i++) {
+            [
+                'user' => $users[],
+                'identity' => $participants[]
+            ] = \OmegaUp\Test\Factories\User::createUser();
+
+            \OmegaUp\Test\Factories\Course::addStudentToCourse(
+                $courseData,
+                $participants[$i]
             );
         }
 
-        // Submit runs - Simulate each student submitting runs to some problems and some others not.
-        // Also, sometimes only PAs are sent, other times ACs.
-        $expectedScores = \OmegaUp\Test\Factories\Course::submitRunsToAssignmentsInCourse(
+        // Sort participants for tests asserts
+        usort(
+            $participants,
+            fn ($a, $b) => strcasecmp(
+                !empty($a->name) ? $a->name : $a->username,
+                !empty($b->name) ? $b->name : $b->username
+            )
+        );
+
+        // First student will solve problem0 and problem1, and fail on problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
             $courseData,
-            $students,
-            $courseData['assignment_aliases'],
-            $problemAssignmentsMap
+            $participants[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $participants[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[2],
+            $courseData,
+            $participants[0]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+
+        // Second student will solve problem1, fail on problem0 and won't try problem2
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[1],
+            $courseData,
+            $participants[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[0],
+            $courseData,
+            $participants[1]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0, 'WA');
+
+        // Third student will solve problem2 and won't try problem0 andproblem1
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemsData[2],
+            $courseData,
+            $participants[2]
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $results = \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            $courseData['course']->course_id,
+            $courseData['course']->group_id,
+        )['allProgress'];
+
+        $this->assertEquals($participants[0]->name, $results[0]['name']);
+        $this->assertArrayHasKey($assignment, $results[0]['progress']);
+        $this->assertEquals(
+            100,
+            $results[0]['progress'][$assignment][$problemsData[0]['problem']->alias]
+        );
+        $this->assertEquals(
+            100,
+            $results[0]['progress'][$assignment][$problemsData[1]['problem']->alias]
+        );
+        $this->assertEquals(
+            0,
+            $results[0]['progress'][$assignment][$problemsData[2]['problem']->alias]
         );
 
-        // Adding a new student with no runs. Should show in progress
-        $studentWithNoRuns = \OmegaUp\Test\Factories\Course::addStudentToCourse(
-            $courseData
+        $this->assertEquals($participants[1]->name, $results[1]['name']);
+        $this->assertArrayHasKey($assignment, $results[1]['progress']);
+        $this->assertEquals(
+            0,
+            $results[1]['progress'][$assignment][$problemsData[0]['problem']->alias]
+        );
+        $this->assertEquals(
+            100,
+            $results[1]['progress'][$assignment][$problemsData[1]['problem']->alias]
+        );
+        $this->assertEquals(
+            0,
+            $results[1]['progress'][$assignment][$problemsData[2]['problem']->alias]
         );
 
-        // Call API
-        $adminLogin = self::login($courseData['admin']);
-        $response = \OmegaUp\Controllers\Course::apiListStudents(new \OmegaUp\Request([
-            'auth_token' => $adminLogin->auth_token,
-            'course_alias' => $courseData['course_alias']
-        ]));
+        $this->assertEquals($participants[2]->name, $results[2]['name']);
+        $this->assertArrayHasKey($assignment, $results[2]['progress']);
+        $this->assertEquals(
+            0,
+            $results[2]['progress'][$assignment][$problemsData[0]['problem']->alias]
+        );
+        $this->assertEquals(
+            0,
+            $results[2]['progress'][$assignment][$problemsData[1]['problem']->alias]
+        );
+        $this->assertEquals(
+            100,
+            $results[2]['progress'][$assignment][$problemsData[2]['problem']->alias]
+        );
+    }
 
-        // Verify response maps to expected scores
-        foreach ($expectedScores as $username => $scores) {
-            $student = $this->findByPredicate($response['students'], function ($value) use ($username) {
-                return $value['username'] == $username;
-            });
-            if (is_null($student)) {
-                $this->fail(
-                    "Failed asserting that the response has student {$username}"
-                );
-            }
+    public function testGetStudentsProgressForCourseWithZeroes() {
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+        $problemData['points'] = 0;
 
-            foreach ($scores as $assignmentAlias => $assignmentScore) {
-                $this->assertArrayHasKey(
-                    $assignmentAlias,
-                    $student['progress'],
-                    "Alias $assignmentAlias not found in response"
-                );
-                $this->assertEquals(
-                    $assignmentScore,
-                    $student['progress'][$assignmentAlias],
-                    "Score for $username $assignmentAlias did not match expected."
-                );
-            }
-        }
+        $courseData = \OmegaUp\Test\Factories\Course::createCourseWithOneAssignment();
+        $courseAlias = $courseData['course_alias'];
+        $assignment = $courseData['assignment_alias'];
 
-        // Verify the student with no runs is on the list but with 0 reported assignments
-        $student = $this->findByPredicate($response['students'], function ($value) use ($studentWithNoRuns) {
-            return $value['username'] == $studentWithNoRuns->username;
-        });
-        if (is_null($student)) {
-            $this->fail(
-                "Failed asserting that the response has student {$studentWithNoRuns->username}"
-            );
-        }
-        $this->assertEquals(0, count($student['progress']));
+        $login = self::login($courseData['admin']);
+
+        // assignment is going to have the first 3 problems
+        \OmegaUp\Test\Factories\Course::addProblemsToAssignment(
+            $login,
+            $courseAlias,
+            $assignment,
+            [$problemData]
+        );
+
+        [
+            'user' => $user,
+            'identity' => $participant
+        ] = \OmegaUp\Test\Factories\User::createUser();
+
+        \OmegaUp\Test\Factories\Course::addStudentToCourse(
+            $courseData,
+            $participant
+        );
+
+        $runData = \OmegaUp\Test\Factories\Run::createCourseAssignmentRun(
+            $problemData,
+            $courseData,
+            $participant
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData);
+
+        $results = \OmegaUp\DAO\Courses::getStudentsInCourseWithProgressPerAssignment(
+            $courseData['course']->course_id,
+            $courseData['course']->group_id,
+        )['allProgress'];
+
+        $this->assertCount(1, $results);
+        $this->assertEquals($participant->name, $results[0]['name']);
+        $this->assertArrayHasKey($assignment, $results[0]['progress']);
+        $this->assertEquals(
+            0,
+            $results[0]['progress'][$assignment][$problemData['problem']->alias]
+        );
     }
 }

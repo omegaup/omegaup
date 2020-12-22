@@ -5,10 +5,12 @@ namespace OmegaUp;
 /**
  *  Scoreboard
  *
- * @author alanboy
- * @author pablo.aguilar
- * @author lhchavez
- * @author joemmanuel
+ * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
+ * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
+ * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
+ * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  */
 class Scoreboard {
     // Column to return total score per user
@@ -35,7 +37,7 @@ class Scoreboard {
     /**
      * Generate Scoreboard snapshot
      *
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     * @return Scoreboard
      */
     public function generate(
         bool $withRunDetails = false,
@@ -60,7 +62,7 @@ class Scoreboard {
                     strval($this->params->problemset_id)
                 );
             }
-            /** @var null|array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, place?: int, problems: list<array{alias: string, penalty: float, percent: float, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: array{status: string}, name: string|null, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: array{memory: float, time: float, wall_time: float}}>}>}}, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string} */
+            /** @var null|Scoreboard */
             $result = $cache->get();
             if (!is_null($result)) {
                 \OmegaUp\Scoreboard::setIsLastRunFromCacheForTesting(true);
@@ -144,7 +146,7 @@ class Scoreboard {
     /**
      * Returns Scoreboard events
      *
-     * @return list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>
+     * @return list<ScoreboardEvent>
      */
     public function events(): array {
         $result = null;
@@ -163,10 +165,10 @@ class Scoreboard {
 
         // If cache is turned on and we're not looking for admin-only runs
         if ($canUseContestantCache) {
-            /** @var list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>|null */
+            /** @var list<ScoreboardEvent>|null */
             $result = $contestantEventsCache->get();
         } elseif ($canUseAdminCache) {
-            /** @var list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>|null */
+            /** @var list<ScoreboardEvent>|null */
             $result = $adminEventsCache->get();
         }
 
@@ -486,7 +488,8 @@ class Scoreboard {
      * @param bool $sortByName
      * @param bool $withRunDetails
      * @param null|string $authToken
-     * @return array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
+     *
+     * @return Scoreboard
      */
     private static function getScoreboardFromRuns(
         array $contestRuns,
@@ -507,7 +510,7 @@ class Scoreboard {
         $testOnly = [];
         /** @val array<int, bool> */
         $noRuns = [];
-        /** @val array<int, array{problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, username: string, name: string|null, country: null|string, is_invited: bool, total: array{points: float, penalty: float}}> */
+        /** @val array<int, array{problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, username: string, name: string|null, country: string, is_invited: bool, total: array{points: float, penalty: float}}> */
         $identitiesInfo = [];
 
         $problems = [];
@@ -539,7 +542,7 @@ class Scoreboard {
                 'name' => $contestant['name'] ?
                     $contestant['name'] :
                     $contestant['username'],
-                'country' => $contestant['country_id'],
+                'country' => $contestant['country_id'] ?? 'xx',
                 'classname' => $contestant['classname'],
                 'is_invited' => boolval($contestant['is_invited']),
                 self::TOTAL_COLUMN => [
@@ -609,7 +612,7 @@ class Scoreboard {
             $problem['runs']++;
         }
 
-        /** @var list<array{country: null|string, is_invited: bool, name: null|string, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}> */
+        /** @var list<ScoreboardRankingEntry> */
         $ranking = [];
         foreach ($rawContestIdentities as $contestant) {
             $identityId = $contestant['identity_id'];
@@ -641,12 +644,9 @@ class Scoreboard {
              * @param array{order: int, alias: string} $a
              * @param array{order: int, alias: string} $b
              */
-            function (array $a, array $b): int {
-                return $a['order'] - $b['order'];
-            }
+            fn (array $a, array $b) => $a['order'] - $b['order']
         );
 
-        /** @var list<array{country: null|string, is_invited: bool, name: null|string, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}> $ranking */
         return [
             'problems' => $problems,
             'ranking' => $ranking,
@@ -658,7 +658,7 @@ class Scoreboard {
     }
 
     /**
-     * @param array{country: null|string, is_invited: bool, name: string|null, problems: list<array{alias: string, penalty: float, percent: float, points: float, runs: int}>, total: array{penalty: float, points: float}, username: string}[] $scoreboard
+     * @param list<ScoreboardRankingEntry> $scoreboard
      * @param bool $sortByName
      */
     private static function sortScoreboard(
@@ -670,8 +670,8 @@ class Scoreboard {
             usort(
                 $scoreboard,
                 /**
-                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $a
-                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $b
+                 * @param ScoreboardRankingEntry $a
+                 * @param ScoreboardRankingEntry $b
                  */
                 function (array $a, array $b): int {
                     if ($a[self::TOTAL_COLUMN]['points'] != $b[self::TOTAL_COLUMN]['points']) {
@@ -688,12 +688,13 @@ class Scoreboard {
             usort(
                 $scoreboard,
                 /**
-                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $a
-                 * @param array{username: string, name: string|null, country: null|string, is_invited: bool, place?: int, problems: list<array{alias: string, points: float, penalty: float, percent: float, runs: int}>, total: array{points: float, penalty: float}} $b
+                 * @param ScoreboardRankingEntry $a
+                 * @param ScoreboardRankingEntry $b
                  */
-                function (array $a, array $b): int {
-                    return strcasecmp($a['username'], $b['username']);
-                }
+                fn (array $a, array $b) => strcasecmp(
+                    $a['username'],
+                    $b['username']
+                )
             );
         }
 
@@ -737,7 +738,7 @@ class Scoreboard {
      * @param list<array{score: float, penalty: int, contest_score: float|null, problem_id: int, identity_id: int, type: string|null, time: \OmegaUp\Timestamp, submit_delay: int, guid: string}> $contestRuns
      * @param list<array{identity_id: int, username: string, classname: string, name: string|null, country_id: null|string, is_invited: bool}> $rawContestIdentities
      * @param array<int, array{order: int, alias: string}> $problemMapping
-     * @return list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}>
+     * @return list<ScoreboardEvent>
      */
     private static function calculateEvents(
         \OmegaUp\ScoreboardParams $params,
@@ -752,7 +753,7 @@ class Scoreboard {
             $contestIdentities[$identity['identity_id']] = $identity;
         }
 
-        /** @var list<array{country: null|string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: string|null, username: string, problem: array{alias: string, points: float, penalty: float}}> */
+        /** @var list<ScoreboardEvent> */
         $result = [];
         /** @var array<int, array<int, array{points: int, penalty: int}>> */
         $identityProblemsScore = [];
@@ -822,7 +823,7 @@ class Scoreboard {
                     'points' => round(floatval($contestScore), 2),
                     'penalty' => 0.0,
                 ],
-                'country' => $identity['country_id'],
+                'country' => $identity['country_id'] ?? 'xx',
                 'classname' => $identity['classname'],
                 'is_invited' => boolval($identity['is_invited']),
                 self::TOTAL_COLUMN => [

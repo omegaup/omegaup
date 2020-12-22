@@ -40,20 +40,11 @@ test_config.php
 yarn-error.log
 
 #ignore crated-by-test stuff
-frontend/server/api/tests/problems/
-frontend/server/api/tests/submissions/
-frontend/tests/controllers/gitserver.config.json
-frontend/tests/controllers/gitserver.log
-frontend/tests/controllers/gitserver.pid
-frontend/tests/controllers/grade/
-frontend/tests/controllers/img/
-frontend/tests/controllers/mysql_types.log*
-frontend/tests/controllers/omegaup.log
-frontend/tests/controllers/templates/
-frontend/tests/omegaup.db
+frontend/tests/runfiles/
 frontend/tests/ui/results/
-omegaup_test.log
+.nyc_output/
 coverage.xml
+coverage/
 
 # Ignore runtime and test stuff
 test-env
@@ -76,6 +67,7 @@ frontend/www/img/
 frontend/www/phpminiadmin/
 frontend/www/pmamini.php
 frontend/www/templates/
+frontend/www/probleminput/
 frontend/www/tests/index.html
 
 # Ignore sublime sftp config
@@ -102,6 +94,7 @@ frontend/www/media/dist/
 # Ignore C++ / Pascal docs
 frontend/www/docs/cpp
 frontend/www/docs/pas
+frontend/www/docs/java
 
 # Ignore VS Code json
 .vscode/*
@@ -110,3 +103,6 @@ frontend/www/docs/pas
 # Ignore omegaup.db
 omegaup.db
 .my.cnf
+
+# Ignore backend stuff
+stuff/docker/go/*/

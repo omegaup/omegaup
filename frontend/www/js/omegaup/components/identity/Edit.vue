@@ -8,11 +8,7 @@
       </h1>
     </div>
     <div class="panel-body">
-      <form
-        class="form-horizontal"
-        role="form"
-        v-on:submit.prevent="onEditMember"
-      >
+      <form class="form-horizontal" role="form" @submit.prevent="onEditMember">
         <div class="row">
           <div class="form-group">
             <label class="col-md-4 col-sm-4 control-label" for="username">{{
@@ -22,11 +18,11 @@
               <div class="input-group">
                 <span class="input-group-addon">{{ groupName }}:</span>
                 <input
+                  v-model="identityName"
                   class="form-control"
                   name="username"
                   size="30"
                   type="text"
-                  v-model="identityName"
                 />
               </div>
             </div>
@@ -37,11 +33,11 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="identity.name"
                 class="form-control"
                 name="name"
                 size="30"
                 type="text"
-                v-model="identity.name"
               />
             </div>
           </div>
@@ -51,13 +47,13 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <select
+                v-model="selectedCountry"
                 class="form-control"
                 name="countryId"
-                v-model="selectedCountry"
               >
                 <option
-                  v-bind:value="country.country_id"
                   v-for="country in countries"
+                  :value="country.country_id"
                 >
                   {{ country.name }}
                 </option>
@@ -70,13 +66,13 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <select
+                v-model="selectedState"
                 class="form-control"
                 name="stateId"
-                v-model="selectedState"
               >
                 <option
-                  v-bind:value="code.split('-')[1]"
                   v-for="[code, state] in Object.entries(countryStates)"
+                  :value="code.split('-')[1]"
                 >
                   {{ state.name }}
                 </option>
@@ -89,18 +85,14 @@
             }}</label>
             <div class="col-md-7 col-sm-7">
               <input
+                v-model="identity.school"
                 class="form-control"
                 name="school"
                 size="20"
                 type="text"
-                v-model="identity.school"
               />
             </div>
-            <input
-              name="schoolId"
-              type="hidden"
-              v-bind:value="identity.school_id"
-            />
+            <input name="schoolId" type="hidden" :value="identity.school_id" />
           </div>
         </div>
         <div class="form-group pull-right">
@@ -110,7 +102,7 @@
           <button
             class="btn btn-secundary"
             type="reset"
-            v-on:click="$emit('emit-cancel')"
+            @click="$emit('emit-cancel')"
           >
             {{ T.wordsCancel }}
           </button>
@@ -122,22 +114,22 @@
 
 <script lang="ts">
 import { Vue, Component, Watch, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as iso3166 from '@/third_party/js/iso-3166-2.js/iso3166.min.js';
 
 @Component
 export default class IdentityEdit extends Vue {
-  @Prop() identity!: omegaup.Identity;
+  @Prop() identity!: types.Identity;
   @Prop() countries!: iso3166.Country[];
   @Prop({ default: 'MX' }) selectedCountry!: string;
-  @Prop() selectedState!: string;
+  @Prop() selectedState!: string | undefined;
   @Prop() username!: string;
 
   T = T;
 
   @Watch('selectedCountry')
-  onPropertyChanged(newContry: string, oldCountry: string) {
+  onPropertyChanged(newContry: string) {
     if (this.identity.country_id == newContry) {
       this.selectedState = this.identity.state_id;
     } else {

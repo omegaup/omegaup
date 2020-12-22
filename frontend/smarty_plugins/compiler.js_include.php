@@ -7,7 +7,9 @@ function getJavaScriptDeps(string $entrypoint): array {
     $jsonPath = __DIR__ . "/../www/js/dist/{$entrypoint}.deps.json";
     $textContents = @file_get_contents($jsonPath);
     if ($textContents === false) {
-        die('Please run <tt style="background: #eee">yarn run dev-all</tt>.');
+        die(
+            'Please run <tt style="background: #eee">cd /opt/omegaup && yarn install && yarn run dev-all</tt>.'
+        );
     }
     /** @var array{css: list<string>, js: list<string>} */
     $jsonContents = json_decode($textContents, /*assoc=*/true);

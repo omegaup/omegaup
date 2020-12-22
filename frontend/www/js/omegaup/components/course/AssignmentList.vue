@@ -1,125 +1,110 @@
 <template>
-  <div class="omegaup-course-assignmentlist panel">
-    <div class="panel-heading">
-      <h3>{{ T.wordsAssignments }}</h3>
+  <div class="omegaup-course-assignmentlist card">
+    <div class="card-header">
+      <h3>{{ T.wordsCourseContent }}</h3>
     </div>
-    <div class="panel-body" v-if="assignments.length == 0">
-      <div class="empty-category">
-        {{ T.courseAssignmentEmpty }}
+    <div class="card-body">
+      <div v-if="content.length === 0" class="card-body">
+        <div class="empty-table-message">
+          {{ T.courseContentEmpty }}
+        </div>
+      </div>
+      <table v-else class="table table-striped">
+        <thead>
+          <tr>
+            <td></td>
+            <th>{{ T.wordsContentType }}</th>
+            <th>{{ T.wordsName }}</th>
+            <th class="text-center">{{ T.wordsActions }}</th>
+          </tr>
+        </thead>
+        <tbody v-sortable="{ onUpdate: sortContent }">
+          <tr v-for="assignment in content" :key="assignment.alias">
+            <td>
+              <button
+                v-tooltip="T.courseAssignmentReorder"
+                class="btn btn-link"
+              >
+                <font-awesome-icon icon="arrows-alt" />
+              </button>
+            </td>
+            <td class="align-middle">
+              <template v-if="assignment.assignment_type === 'homework'">
+                <font-awesome-icon icon="file-alt" />
+                <span class="ml-2">{{ T.wordsHomework }}</span>
+              </template>
+              <template v-else-if="assignment.assignment_type === 'lesson'">
+                <font-awesome-icon icon="chalkboard-teacher" />
+                <span class="ml-2">{{ T.wordsLesson }}</span>
+              </template>
+              <template v-else>
+                <font-awesome-icon icon="list-alt" />
+                <span class="ml-2">{{ T.wordsExam }}</span>
+              </template>
+            </td>
+            <td class="align-middle">
+              <a :href="assignmentUrl(assignment)">{{ assignment.name }}</a>
+            </td>
+            <td class="text-center">
+              <button
+                v-tooltip="T.courseAssignmentEdit"
+                class="btn btn-link"
+                @click="$emit('emit-edit', assignment)"
+              >
+                <font-awesome-icon icon="edit" />
+              </button>
+              <button
+                v-tooltip="T.courseAddProblemsAdd"
+                class="btn btn-link"
+                @click="$emit('emit-add-problems', assignment)"
+              >
+                <font-awesome-icon icon="list-alt" />
+              </button>
+              <button
+                v-if="assignment.has_runs"
+                v-tooltip="T.assignmentRemoveAlreadyHasRuns"
+                class="btn btn-link"
+                data-toggle="tooltip"
+                data-placement="bottom"
+              >
+                <font-awesome-icon icon="trash" class="disabled" />
+              </button>
+              <button
+                v-else
+                v-tooltip="T.courseAssignmentDelete"
+                class="btn btn-link"
+                @click="$emit('emit-delete', assignment)"
+              >
+                <font-awesome-icon icon="trash" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <button
+          v-if="content.length > 1"
+          class="btn btn-primary"
+          :class="{ disabled: !contentOrderChanged }"
+          role="button"
+          @click="saveNewOrder"
+        >
+          {{ T.wordsSaveNewOrder }}
+        </button>
       </div>
     </div>
-    <div class="panel-body" v-else="">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th colspan="4" v-text="T.wordsHomeworks"></th>
-          </tr>
-        </thead>
-        <tbody v-sortable="{ onUpdate: sortHomeworks }">
-          <tr v-bind:key="assignment.alias" v-for="assignment in homeworks">
-            <td>
-              <a v-bind:title="T.courseAssignmentReorder"
-                ><span
-                  aria-hidden="true"
-                  class="glyphicon glyphicon-move handle"
-                ></span
-              ></a>
-            </td>
-            <td>
-              <a v-bind:href="assignmentUrl(assignment)">{{
-                assignment.name
-              }}</a>
-            </td>
-            <td class="button-column">
-              <a
-                v-bind:title="T.courseAssignmentEdit"
-                v-on:click="$emit('edit', assignment)"
-                ><span
-                  aria-hidden="true"
-                  class="glyphicon glyphicon-edit"
-                ></span
-              ></a>
-            </td>
-            <td class="button-column">
-              <a
-                v-bind:title="T.courseAddProblemsAdd"
-                v-on:click="$emit('add-problems', assignment)"
-                ><span
-                  aria-hidden="true"
-                  class="glyphicon glyphicon-th-list"
-                ></span
-              ></a>
-            </td>
-            <td class="button-column">
-              <a
-                v-bind:title="T.courseAssignmentDelete"
-                v-on:click="$emit('delete', assignment)"
-                ><span
-                  aria-hidden="true"
-                  class="glyphicon glyphicon-remove"
-                ></span
-              ></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <hr />
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th colspan="4" v-text="T.wordsExams"></th>
-          </tr>
-        </thead>
-        <tbody v-sortable="{ onUpdate: sortTests }">
-          <tr v-bind:key="assignment.alias" v-for="assignment in tests">
-            <td>
-              <a v-bind:title="T.courseAssignmentReorder"
-                ><span
-                  aria-hidden="true"
-                  class="glyphicon glyphicon-move handle"
-                ></span
-              ></a>
-            </td>
-            <td>
-              <a v-bind:href="assignmentUrl(assignment)">{{
-                assignment.name
-              }}</a>
-            </td>
-            <td class="button-column">
-              <a
-                v-bind:title="T.courseAssignmentEdit"
-                v-on:click="$emit('edit', assignment)"
-                ><span
-                  aria-hidden="true"
-                  class="glyphicon glyphicon-edit"
-                ></span
-              ></a>
-            </td>
-            <td class="button-column">
-              <a
-                v-bind:title="T.courseAssignmentDelete"
-                v-on:click="$emit('delete', assignment)"
-                ><span
-                  aria-hidden="true"
-                  class="glyphicon glyphicon-remove"
-                ></span
-              ></a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="panel-footer">
+    <div class="card-footer">
       <form class="new">
         <div class="row">
           <div class="form-group col-md-12">
-            <div class="pull-right">
+            <div class="text-right">
               <button
+                v-if="assignmentFormMode === AssignmentFormMode.Default"
                 class="btn btn-primary"
                 type="submit"
-                v-on:click.prevent="$emit('new')"
+                @click.prevent="$emit('emit-new')"
               >
-                {{ T.courseAssignmentNew }}
+                {{ T.courseAddContent }}
               </button>
             </div>
           </div>
@@ -130,49 +115,79 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
+import 'v-tooltip/dist/v-tooltip.css';
+import { VTooltip } from 'v-tooltip';
 
-@Component
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
+@Component({
+  components: {
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
+  },
+  directives: {
+    tooltip: VTooltip,
+  },
+})
 export default class CourseAssignmentList extends Vue {
-  @Prop() assignments!: omegaup.Assignment[];
+  @Prop() content!: types.CourseAssignment[];
   @Prop() courseAlias!: string;
+  @Prop() assignmentFormMode!: omegaup.AssignmentFormMode;
 
+  contentOrderChanged = false;
   T = T;
-
-  get homeworks(): omegaup.Assignment[] {
-    return this.assignments.filter((assignment: omegaup.Assignment) => {
-      return assignment.assignment_type == 'homework';
-    });
-  }
-
-  get tests(): omegaup.Assignment[] {
-    return this.assignments.filter((assignment: omegaup.Assignment) => {
-      return assignment.assignment_type == 'test';
-    });
-  }
+  AssignmentFormMode = omegaup.AssignmentFormMode;
+  currentContent: types.CourseAssignment[] = this.content;
 
   assignmentUrl(assignment: omegaup.Assignment): string {
     return `/course/${this.courseAlias}/assignment/${assignment.alias}/`;
   }
 
-  sortHomeworks(event: any): void {
-    this.homeworks.splice(
+  sortContent(event: any): void {
+    this.currentContent.splice(
       event.newIndex,
       0,
-      this.homeworks.splice(event.oldIndex, 1)[0],
+      this.currentContent.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort-homeworks', this.courseAlias, this.homeworks);
+    this.contentOrderChanged = true;
   }
 
-  sortTests(event: any): void {
-    this.tests.splice(
-      event.newIndex,
-      0,
-      this.tests.splice(event.oldIndex, 1)[0],
+  saveNewOrder(): void {
+    this.contentOrderChanged = false;
+    this.$emit(
+      'emit-sort-content',
+      this.courseAlias,
+      this.currentContent.map(
+        (assignment: types.CourseAssignment) => assignment.alias,
+      ),
     );
-    this.$emit('sort-tests', this.courseAlias, this.tests);
+  }
+
+  @Watch('content')
+  onContentChanged(newValue: types.CourseAssignment[]): void {
+    this.currentContent = newValue;
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.disabled {
+  color: lightgrey;
+}
+
+.table td {
+  vertical-align: middle;
+}
+</style>

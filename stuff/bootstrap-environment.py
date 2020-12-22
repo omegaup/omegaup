@@ -8,6 +8,7 @@ A tool to run an import script to populate the database with objects.
 '''
 
 import argparse
+import errno
 import grp
 import json
 import logging
@@ -107,8 +108,7 @@ def _does_resource_exist(s, request):
         api_endpoint += '/'
     if api_endpoint == '/problem/create/':
         if s.request('/problem/details/',
-                     {'problem_alias':
-                      request['params']['problem_alias']})['exists']:
+                     {'problem_alias': request['params']['problem_alias']}):
             logging.warning('Problem %s exists, skipping',
                             request['params']['problem_alias'])
             return True
@@ -134,7 +134,7 @@ def _does_resource_exist(s, request):
                             request['params']['alias'])
             return True
     if api_endpoint == '/user/create/':
-        if s.request('/user/profile',
+        if s.request('/user/profile/',
                      {'username': request['params']['username']}):
             logging.warning('User %s exists, skipping',
                             request['params']['username'])
@@ -186,12 +186,19 @@ def _run_script(path, args, now):
                 _process_one_request(s, request, now)
 
 
-def _purge_old_problems():
+def _purge_old_problems() -> None:
     logging.info('Purging old problems')
     # Removing directories requires the user to be in the 'www-data' group.
     can_delete = 'www-data' in (grp.getgrgid(grid).gr_name
                                 for grid in os.getgroups())
     problems_root = os.path.join(OMEGAUP_RUNTIME_ROOT, 'problems.git')
+    if not os.path.isdir(OMEGAUP_RUNTIME_ROOT):
+        raise RuntimeError('Please run this script inside the VM / container'
+                           ) from FileNotFoundError(errno.ENOENT,
+                                                    os.strerror(errno.ENOENT),
+                                                    OMEGAUP_RUNTIME_ROOT)
+    if not os.path.isdir(problems_root):
+        return
     for alias in os.listdir(problems_root):
         path = os.path.join(problems_root, alias)
         logging.debug('Removing %s', path)
@@ -223,7 +230,9 @@ def main():
     '''Main entrypoint.'''
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--root-url', type=str, default='http://localhost')
+    parser.add_argument('--root-url',
+                        type=str,
+                        default='http://localhost:8001/')
     parser.add_argument('--verbose', action='store_true')
     parser.add_argument(
         '--purge',

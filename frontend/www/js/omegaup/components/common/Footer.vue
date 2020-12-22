@@ -11,7 +11,10 @@
         <h4 class="section-title">{{ T.frontPageFooterSite }}</h4>
         <ul>
           <li>
-            <a href="/arena/">{{ T.navArena }}</a>
+            <a href="/arena/">{{ T.navContests }}</a>
+          </li>
+          <li>
+            <a href="/course/">{{ T.navCourses }} </a>
           </li>
           <li>
             <a href="/problem/">{{ T.navProblems }}</a>
@@ -20,13 +23,7 @@
             <a href="/rank/">{{ T.navRanking }}</a>
           </li>
           <li>
-            <a href="/schools/">{{ T.navSchools }}</a>
-          </li>
-          <li>
             <a href="https://blog.omegaup.com">{{ T.navBlog }}</a>
-          </li>
-          <li>
-            <a href="https://omegaup.com/preguntas/">{{ T.navQuestions }}</a>
           </li>
         </ul>
       </div>
@@ -57,11 +54,11 @@
           </li>
           <li>
             <a
+              v-if="!omegaUpLockDown && isLoggedIn"
               href="https://github.com/omegaup/omegaup/issues/new"
-              v-on:click="$event.target.href = reportAnIssueURL()"
               target="_blank"
               rel="nofollow"
-              v-if="!omegaUpLockDown && isLoggedIn"
+              @click="$event.target.href = reportAnIssueURL()"
               >{{ T.reportAnIssue }}</a
             >
           </li>
@@ -104,6 +101,21 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { Component, Vue, Prop } from 'vue-property-decorator';
+import T from '../../lang';
+import { reportAnIssueURL } from '../../errors';
+
+@Component
+export default class Footer extends Vue {
+  @Prop() isLoggedIn!: boolean;
+  @Prop() omegaUpLockDown!: boolean;
+
+  T = T;
+  reportAnIssueURL = reportAnIssueURL;
+}
+</script>
 
 <style lang="scss">
 @import '../../../../sass/main.scss';
@@ -218,18 +230,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Component, Vue, Prop } from 'vue-property-decorator';
-import T from '../../lang';
-import { reportAnIssueURL } from '../../errors';
-
-@Component
-export default class Footer extends Vue {
-  @Prop() isLoggedIn!: boolean;
-  @Prop() omegaUpLockDown!: boolean;
-
-  T = T;
-  reportAnIssueURL = reportAnIssueURL;
-}
-</script>

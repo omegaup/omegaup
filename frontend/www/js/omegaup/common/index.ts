@@ -15,9 +15,12 @@ OmegaUp.on('ready', () => {
     problems_solved: user.problems_solved,
   }));
 
-  const commonIndex = new Vue({
+  new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    components: {
+      'omegaup-homepage': Homepage,
+    },
+    render: function (createElement) {
       return createElement('omegaup-homepage', {
         props: {
           coderOfTheMonth: payload.coderOfTheMonthData
@@ -47,9 +50,6 @@ OmegaUp.on('ready', () => {
           schoolOfTheMonth: payload.schoolOfTheMonthData,
         },
       });
-    },
-    components: {
-      'omegaup-homepage': Homepage,
     },
   });
 });

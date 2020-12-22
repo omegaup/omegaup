@@ -38,7 +38,47 @@ class RunStatusTest extends \OmegaUp\Test\ControllerTestCase {
 
         $this->assertEquals($runData['response']['guid'], $response['guid']);
         $this->assertEquals('JE', $response['verdict']);
-        $this->assertEquals('new', $response['status']);
+        $this->assertEquals('uploading', $response['status']);
+    }
+
+    /**
+     * Basic test of viewing run details with grade run
+     */
+    public function testShowRunDetailsValidWithGradeRun() {
+        // Get a problem
+        $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
+
+        // Get a contest
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+
+        // Add the problem to the contest
+        \OmegaUp\Test\Factories\Contest::addProblemToContest(
+            $problemData,
+            $contestData
+        );
+
+        // Create our contestant
+        ['identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+
+        // Create a run
+        $runData = \OmegaUp\Test\Factories\Run::createRun(
+            $problemData,
+            $contestData,
+            $identity
+        );
+        \OmegaUp\Test\Factories\Run::gradeRun($runData, 0.05, 'PA');
+
+        $login = self::login($identity);
+        $response = \OmegaUp\Controllers\Run::apiStatus(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'run_alias' => $runData['response']['guid'],
+        ]));
+
+        $this->assertEquals($runData['response']['guid'], $response['guid']);
+        $this->assertEquals('PA', $response['verdict']);
+        $this->assertEquals('ready', $response['status']);
+        $this->assertEquals(5, $response['contest_score']);
+        $this->assertEquals(0.05, $response['score']);
     }
 
     /**

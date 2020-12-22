@@ -1,11 +1,19 @@
 {
-    "config": {
-      "platform": {
-        "php": "7.2.19"
-      }
+  "name": "omegaup/frontend",
+  "description": "The omegaUp frontend",
+  "license": "BSD-3-Clause",
+  "config": {
+    "platform": {
+      "php": "7.4.3"
     },
-    "require-dev": {
-        "vimeo/psalm": "^3.11.2",
-        "jetbrains/phpstorm-stubs": "^2019.3"
-    }
+    "process-timeout": 1200
+  },
+  "require-dev": {
+      "vimeo/psalm": "^3.15",
+      "jetbrains/phpstorm-stubs": "^2019.3",
+      "phpunit/phpunit": "^9"
+  },
+  "scripts": {
+    "test": "./stuff/mysql_types.sh"
+  }
 }

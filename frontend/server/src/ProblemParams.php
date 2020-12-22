@@ -39,6 +39,11 @@ class ProblemParams {
     // Custom validator
     const VALIDATOR_CUSTOM = 'custom';
 
+    // Diffs to show when problem is educational
+    const SHOW_DIFFS_NONE = 'none';
+    const SHOW_DIFFS_EXAMPLES = 'examples';
+    const SHOW_DIFFS_ALL = 'all';
+
     /**
      * @readonly
      * @var string
@@ -61,6 +66,12 @@ class ProblemParams {
      * @var null|list<string>
      */
     public $languages;
+
+    /**
+     * @readonly
+     * @var null|string
+     */
+    public $problemLevel;
 
     /**
      * @readonly
@@ -154,7 +165,7 @@ class ProblemParams {
 
     /**
      * @psalm-suppress RedundantConditionGivenDocblockType
-     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
+     * @param array{allow_user_add_tags?: bool, email_clarifications?: bool, extra_wall_time?: int, input_limit?: int, languages?: string, memory_limit?: int, order?: string, output_limit?: int, overall_wall_time_limit?: int, problem_alias: string, problem_level?: string, selected_tags?: string, show_diff?: string, source?: string, time_limit?: int, title?: string, update_published?: \OmegaUp\ProblemParams::UPDATE_PUBLISHED_NONE|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_NON_PROBLEMSET|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_OWNED_PROBLEMSETS|\OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS, validator?: \OmegaUp\ProblemParams::VALIDATOR_TOKEN|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_CASELESS|\OmegaUp\ProblemParams::VALIDATOR_TOKEN_NUMERIC|\OmegaUp\ProblemParams::VALIDATOR_LITERAL, validator_time_limit?: int, visibility?: \OmegaUp\ProblemParams::VISIBILITY_DELETED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED|\OmegaUp\ProblemParams::VISIBILITY_PRIVATE|\OmegaUp\ProblemParams::VISIBILITY_PUBLIC|\OmegaUp\ProblemParams::VISIBILITY_PROMOTED} $params
      */
     public function __construct($params, bool $isRequired = true) {
         $isUpdate = !$isRequired;
@@ -261,6 +272,7 @@ class ProblemParams {
             $params['languages']
         ) : null;
         $this->updatePublished = $params['update_published'] ?? \OmegaUp\ProblemParams::UPDATE_PUBLISHED_EDITABLE_PROBLEMSETS;
+        $this->problemLevel = $params['problem_level'] ?? null;
         $this->selectedTagsAsJSON = $params['selected_tags'] ?? null;
         $this->source = $params['source'] ?? null;
         $this->validator = $params['validator'] ?? null;
@@ -328,5 +340,38 @@ class ProblemParams {
             $object->$objectFieldName = $value;
         }
         return $importantChange;
+    }
+
+    /**
+    * Convert string visibility to numeric visibility
+    */
+    public static function stringVisibilityToNumeric(string $visibility): int {
+        switch ($visibility) {
+            case 'deleted':
+                return \OmegaUp\ProblemParams::VISIBILITY_DELETED;
+            case 'private_banned':
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+            case 'public_banned':
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+            case 'private_warning':
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
+            case 'private':
+                return \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+            case 'public_warning':
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+            case 'public':
+                return \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+            case 'promoted':
+                return \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
+            default:
+                // TODO(#4144): Remove this when the migration is complete.
+                if (is_numeric($visibility)) {
+                    return intval($visibility);
+                }
+                throw new \OmegaUp\Exceptions\InvalidParameterException(
+                    'invalidVisibility',
+                    'visibility'
+                );
+        }
     }
 }

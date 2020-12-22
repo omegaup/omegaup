@@ -1,6 +1,6 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
 class ScopedFacebook {
     /** @var \OmegaUp\ScopedSession */
@@ -22,10 +22,12 @@ class ScopedFacebook {
 
 /**
  * Session controller handles sessions.
+ * @psalm-type AssociatedIdentity=array{default: bool, username: string}
+ * @psalm-type CurrentSession=array{associated_identities: list<AssociatedIdentity>, auth_token: null|string, classname: string, email: null|string, identity: \OmegaUp\DAO\VO\Identities|null, is_admin: bool, loginIdentity: \OmegaUp\DAO\VO\Identities|null, user: \OmegaUp\DAO\VO\Users|null, valid: bool}
  */
 class Session extends \OmegaUp\Controllers\Controller {
     const AUTH_TOKEN_ENTROPY_SIZE = 15;
-    /** @var null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
+    /** @var null|CurrentSession */
     private static $_currentSession = null;
     /** @var null|\OmegaUp\SessionManager */
     private static $_sessionManager = null;
@@ -63,7 +65,7 @@ class Session extends \OmegaUp\Controllers\Controller {
      *
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{session: null|array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}, time: int}
+     * @return array{session: null|CurrentSession, time: int}
      */
     public static function apiCurrentSession(?\OmegaUp\Request $r = null): array {
         return [
@@ -77,10 +79,8 @@ class Session extends \OmegaUp\Controllers\Controller {
      */
     private static function getAuthToken(\OmegaUp\Request $r): ?string {
         $sessionManager = self::getSessionManagerInstance();
-        $authToken = null;
-        if (!is_null($r['auth_token'])) {
-            $authToken = strval($r['auth_token']);
-        } else {
+        $authToken = $r->ensureOptionalString('auth_token');
+        if (is_null($authToken)) {
             $authToken = $sessionManager->getCookie(
                 OMEGAUP_AUTH_TOKEN_COOKIE_NAME
             );
@@ -88,15 +88,12 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (!is_null($authToken) && self::isAuthTokenValid($authToken)) {
             return $authToken;
         }
-        if (
-            isset($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME])
-                && self::isAuthTokenValid(
-                    strval(
-                        $_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]
-                    )
-                )
-        ) {
-            return strval($_REQUEST[OMEGAUP_AUTH_TOKEN_COOKIE_NAME]);
+
+        $cookie = \OmegaUp\Request::getRequestVar(
+            OMEGAUP_AUTH_TOKEN_COOKIE_NAME
+        );
+        if (!empty($cookie) && self::isAuthTokenValid($cookie)) {
+            return $cookie;
         }
         return null;
     }
@@ -104,7 +101,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{valid: bool, email: ?string, user: ?\OmegaUp\DAO\VO\Users, identity: ?\OmegaUp\DAO\VO\Identities, auth_token: ?string, is_admin: bool}
+     * @return CurrentSession
      */
     public static function getCurrentSession(?\OmegaUp\Request $r = null): array {
         if (
@@ -117,11 +114,10 @@ class Session extends \OmegaUp\Controllers\Controller {
         if (is_null($r)) {
             $r = new \OmegaUp\Request();
         }
-        if (is_null($r['auth_token'])) {
+        $authToken = $r->ensureOptionalString('auth_token');
+        if (is_null($authToken)) {
             $authToken = self::getAuthToken($r);
             $r['auth_token'] = $authToken;
-        } else {
-            $authToken = strval($r['auth_token']);
         }
         if (
             defined('OMEGAUP_SESSION_CACHE_ENABLED') &&
@@ -131,10 +127,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             self::$_currentSession = \OmegaUp\Cache::getFromCacheOrSet(
                 \OmegaUp\Cache::SESSION_PREFIX,
                 $authToken,
-                /** @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool} */
-                function () use ($r) {
-                    return self::getCurrentSessionImpl($r);
-                },
+                fn () => self::getCurrentSessionImpl($r),
                 APC_USER_CACHE_SESSION_TIMEOUT
             );
             return self::$_currentSession;
@@ -146,36 +139,40 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param null|string $auth_token
      *
-     * @return array{valid: bool, email: string|null, user: \OmegaUp\DAO\VO\Users|null, identity: \OmegaUp\DAO\VO\Identities|null, auth_token: string|null, is_admin: bool}
+     * @return CurrentSession
      */
     private static function getCurrentSessionImpl(\OmegaUp\Request $r): array {
-        if (empty($r['auth_token'])) {
-            return [
-                'valid' => false,
-                'email' => null,
-                'user' => null,
-                'identity' => null,
-                'auth_token' => null,
-                'is_admin' => false,
-            ];
+        $authToken = $r->ensureOptionalString('auth_token');
+        $emptySession = [
+            'valid' => false,
+            'email' => null,
+            'user' => null,
+            'identity' => null,
+            'loginIdentity' => null,
+            'classname' => 'user-rank-unranked',
+            'auth_token' => null,
+            'is_admin' => false,
+            'associated_identities' => [],
+        ];
+        if (empty($authToken)) {
+            return $emptySession;
         }
-        $authToken = strval($r['auth_token']);
-
-        $currentIdentity = \OmegaUp\DAO\AuthTokens::getIdentityByToken(
-            $authToken
-        );
-        if (is_null($currentIdentity)) {
+        $identityExt = \OmegaUp\DAO\AuthTokens::getIdentityByToken($authToken);
+        if (is_null($identityExt)) {
             // Means user has auth token, but does not exist in DB
-            return [
-                'valid' => false,
-                'email' => null,
-                'user' => null,
-                'identity' => null,
-                'auth_token' => null,
-                'is_admin' => false,
-            ];
+            return $emptySession;
         }
+        [
+            'currentIdentity' => $currentIdentityExt,
+            'loginIdentity' => $loginIdentityExt,
+        ] = $identityExt;
+        $identityClassname = $currentIdentityExt['classname'];
+        unset($currentIdentityExt['classname']);
+        unset($loginIdentityExt['classname']);
+        $currentIdentity = new \OmegaUp\DAO\VO\Identities($currentIdentityExt);
+        $loginIdentity = new \OmegaUp\DAO\VO\Identities($loginIdentityExt);
 
+        $associatedIdentities = [];
         if (is_null($currentIdentity->user_id)) {
             $currentUser = null;
             $email = null;
@@ -189,6 +186,11 @@ class Session extends \OmegaUp\Controllers\Controller {
             $email = !is_null($currentUser->main_email_id) ?
                 \OmegaUp\DAO\Emails::getByPK($currentUser->main_email_id) :
                 null;
+            if ($currentUser->main_identity_id === $loginIdentity->identity_id) {
+                $associatedIdentities = \OmegaUp\DAO\Identities::getAssociatedIdentities(
+                    $currentIdentity
+                );
+            }
         }
 
         return [
@@ -196,10 +198,13 @@ class Session extends \OmegaUp\Controllers\Controller {
             'email' => !empty($email) ? $email->email : '',
             'user' => $currentUser,
             'identity' => $currentIdentity,
+            'loginIdentity' => $loginIdentity,
+            'classname' => $identityClassname,
             'auth_token' => $authToken,
             'is_admin' => \OmegaUp\Authorization::isSystemAdmin(
                 $currentIdentity
             ),
+            'associated_identities' => $associatedIdentities,
         ];
     }
 
@@ -251,11 +256,16 @@ class Session extends \OmegaUp\Controllers\Controller {
         setcookie(OMEGAUP_AUTH_TOKEN_COOKIE_NAME, 'deleted', 1, '/');
     }
 
-    private static function registerSession(\OmegaUp\DAO\VO\Identities $identity): string {
+    private static function registerSession(
+        \OmegaUp\DAO\VO\Identities $identity,
+        ?\OmegaUp\DAO\VO\Users $user
+    ): string {
         // Log the login.
         \OmegaUp\DAO\IdentityLoginLog::create(new \OmegaUp\DAO\VO\IdentityLoginLog([
             'identity_id' => intval($identity->identity_id),
-            'ip' => ip2long(strval($_SERVER['REMOTE_ADDR'])),
+            'ip' => ip2long(
+                \OmegaUp\Request::getServerVar('REMOTE_ADDR') ?? ''
+            ),
         ]));
 
         self::invalidateLocalCache();
@@ -343,7 +353,7 @@ class Session extends \OmegaUp\Controllers\Controller {
     /**
      * @omegaup-request-param string $storeToken
      *
-     * @return array<string, string>
+     * @return array{isAccountCreation: bool}
      */
     public static function apiGoogleLogin(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -382,21 +392,19 @@ class Session extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array<string, string>
+     * @return array{isAccountCreation: bool}
      */
     public static function LoginViaGoogle(
         string $email,
         ?string $name = null
     ): array {
-        return self::ThirdPartyLogin('Google', $email, $name);
+        return self::thirdPartyLogin('Google', $email, $name);
     }
 
     /**
      * Logs in via Facebook API.
-     *
-     * @return array<string, mixed>
      */
-    public static function LoginViaFacebook(): array {
+    public static function loginViaFacebook(): void {
         // Mostly taken from
         // https://developers.facebook.com/docs/php/howto/example_facebook_login
         $scopedFacebook = new ScopedFacebook();
@@ -404,20 +412,26 @@ class Session extends \OmegaUp\Controllers\Controller {
         try {
             $accessToken = $helper->getAccessToken();
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
+            $errorMessage = $e->getMessage();
+            self::$log->error("Graph returned an error: {$errorMessage}");
+            throw $e;
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
+            $errorMessage = $e->getMessage();
+            self::$log->error(
+                "Facebook SDK returned an error: {$errorMessage}"
+            );
+            throw $e;
         }
 
-        if (is_null($accessToken)) {
-            $response = ['status' => 'error'];
-            if (!is_null($helper->getError())) {
-                $response['error'] = strval(
-                    $helper->getError()
-                ) . ' ' . strval(
-                    $helper->getErrorDescription()
-                );
-            }
+        if (is_null($accessToken) && !is_null($helper->getError())) {
+            $errorDescription = $helper->getErrorDescription();
+            self::$log->error(
+                "Unable to login via Facebook: {$errorDescription}"
+            );
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'token'
+            );
         }
 
         try {
@@ -426,28 +440,99 @@ class Session extends \OmegaUp\Controllers\Controller {
                 $accessToken
             );
         } catch (\Facebook\Exceptions\FacebookResponseException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
+            self::$log->error("Unable to login via Facebook: {$e}");
+            throw $e;
         } catch (\Facebook\Exceptions\FacebookSDKException $e) {
-            return ['status' => 'error', 'error' => $e->getMessage()];
+            self::$log->error("Unable to login via Facebook: {$e}");
+            throw $e;
         }
 
         $fbUserProfile = $fbResponse->getGraphUser();
         self::$log->info('User is logged in via facebook !!');
         if (is_null($fbUserProfile->getEmail())) {
             self::$log->error('Facebook email empty');
-            return [
-                'status' => 'error',
-                'error' => \OmegaUp\Translations::getInstance()->get(
-                    'loginFacebookEmptyEmailError'
-                ),
-            ];
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'loginFacebookEmptyEmailError',
+                'error'
+            );
         }
 
-        return self::ThirdPartyLogin(
+        \OmegaUp\Controllers\Session::thirdPartyLogin(
             'Facebook',
             strval($fbUserProfile->getEmail()),
             $fbUserProfile->getName()
         );
+
+        self::redirect();
+    }
+
+    public static function loginViaLinkedIn(
+        string $code,
+        string $state,
+        ?string $redirect
+    ): void {
+        try {
+            $li = self::getLinkedInInstance($redirect);
+            $authToken = $li->getAuthToken($code, $state);
+            $profile = $li->getProfileInfo($authToken);
+            $redirect = $li->extractRedirect($state);
+        } catch (\OmegaUp\Exceptions\ApiException $e) {
+            self::$log->error("Unable to login via LinkedIn: $e");
+            throw $e;
+        }
+        \OmegaUp\Controllers\Session::thirdPartyLogin(
+            'LinkedIn',
+            $profile['emailAddress'],
+            "{$profile['firstName']} {$profile['lastName']}"
+        );
+
+        self::redirect($redirect);
+    }
+
+    private static function getLinkedInInstance(
+        ?string $redirect = null
+    ): \OmegaUp\LinkedIn {
+        return new \OmegaUp\LinkedIn(
+            OMEGAUP_LINKEDIN_CLIENTID,
+            OMEGAUP_LINKEDIN_SECRET,
+            OMEGAUP_URL . '/login?linkedin',
+            $redirect
+        );
+    }
+
+    public static function getLinkedInLoginUrl(): string {
+        return self::getLinkedInInstance()->getLoginUrl();
+    }
+
+    private static function getRedirectUrl(?string $url = null): string {
+        $defaultRedirectUrl = '/profile/';
+        if (is_null($url)) {
+            return $defaultRedirectUrl;
+        }
+        $redirectParsedUrl = parse_url($url);
+        // If a malformed URL is given, don't redirect.
+        if ($redirectParsedUrl === false) {
+            return $defaultRedirectUrl;
+        }
+        // Just the path portion of the URL was given.
+        if (
+            empty($redirectParsedUrl['scheme']) ||
+            empty($redirectParsedUrl['host'])
+        ) {
+            $path = $redirectParsedUrl['path'] ?? '';
+            return $path !== '/logout/' ? $url : $defaultRedirectUrl;
+        }
+        $redirectUrl = "{$redirectParsedUrl['scheme']}://{$redirectParsedUrl['host']}";
+        if (isset($redirectParsedUrl['port'])) {
+            $redirectUrl .= ":{$redirectParsedUrl['port']}";
+        }
+        return $redirectUrl === OMEGAUP_URL ? $url : $defaultRedirectUrl;
+    }
+
+    private static function redirect(?string $redirect = null): void {
+        $redirectUrl = self::getRedirectUrl($redirect);
+        header("Location: {$redirectUrl}");
+        throw new \OmegaUp\Exceptions\ExitException();
     }
 
     /**
@@ -501,6 +586,7 @@ class Session extends \OmegaUp\Controllers\Controller {
             "Identity {$identity->username} has logged in natively."
         );
 
+        $user = null;
         if (!is_null($identity->user_id)) {
             $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
             if (is_null($user)) {
@@ -510,71 +596,83 @@ class Session extends \OmegaUp\Controllers\Controller {
         }
 
         try {
-            return self::registerSession($identity);
+            return self::registerSession($identity, $user);
         } catch (\Exception $e) {
             self::$log->error($e);
             throw new \OmegaUp\Exceptions\InvalidCredentialsException();
         }
     }
 
-    public static function getLinkedInInstance(): \OmegaUp\LinkedIn {
-        return new \OmegaUp\LinkedIn(
-            OMEGAUP_LINKEDIN_CLIENTID,
-            OMEGAUP_LINKEDIN_SECRET,
-            OMEGAUP_URL . '/login?linkedin',
-            isset($_GET['redirect']) ? strval($_GET['redirect']) : null
-        );
-    }
-    public static function getLinkedInLoginUrl(): string {
-        return self::getLinkedInInstance()->getLoginUrl();
-    }
-
     /**
-     * @return array<string, mixed>
+     * Does login for an identity given username or email. Password no needed
+     * because user should have a successful native login
+     *
+     * @omegaup-request-param null|string $auth_token
      */
-    public static function LoginViaLinkedIn(): array {
-        if (empty($_GET['code']) || empty($_GET['state'])) {
-            return ['status' => 'error'];
+    public static function loginWithAssociatedIdentity(
+        \OmegaUp\Request $r,
+        string $usernameOrEmail,
+        \OmegaUp\DAO\VO\Identities $loggedIdentity
+    ): void {
+        // Only users that originally logged in from their main identities can
+        // select another identity.
+        if (!$r->isLoggedAsMainIdentity()) {
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'userNotAllowed'
+            );
         }
+
+        $currentSession = self::getCurrentSession($r);
+        if (is_null($currentSession['auth_token'])) {
+            self::$log->warn('Auth token not found.');
+            throw new \OmegaUp\Exceptions\UnauthorizedException(
+                'loginRequired'
+            );
+        }
+
+        $identity = \OmegaUp\DAO\Identities::resolveAssociatedIdentity(
+            $usernameOrEmail,
+            $loggedIdentity
+        );
+        if (is_null($identity) || is_null($identity->identity_id)) {
+            self::$log->warn("Identity {$usernameOrEmail} not found.");
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+
+        self::$log->info(
+            "User {$loggedIdentity->username} has logged with associated identity {$identity->username}."
+        );
 
         try {
-            $li = self::getLinkedInInstance();
-            $authToken = $li->getAuthToken(
-                strval($_GET['code']),
-                strval($_GET['state'])
+            \OmegaUp\DAO\AuthTokens::updateActingIdentityId(
+                $currentSession['auth_token'],
+                $identity->identity_id
             );
-            $profile = $li->getProfileInfo($authToken);
-            $redirect = $li->extractRedirect(strval($_GET['state']));
-            if (!is_null($redirect)) {
-                $_GET['redirect'] = $redirect;
-            }
+            self::invalidateCache();
 
-            return self::ThirdPartyLogin(
-                'LinkedIn',
-                $profile['emailAddress'],
-                $profile['firstName'] . ' ' . $profile['lastName']
-            );
+            self::getCurrentSession($r);
         } catch (\OmegaUp\Exceptions\ApiException $e) {
-            self::$log->error("Unable to login via LinkedIn: $e");
-            return $e->asResponseArray();
+            self::$log->error($e);
+            throw $e;
         }
     }
 
     /**
-     * @return array<string, string>
+     * @return array{isAccountCreation: bool}
      */
-    private static function ThirdPartyLogin(
+    private static function thirdPartyLogin(
         string $provider,
         string $email,
         ?string $name = null
-    ) {
+    ): array {
         // We trust this user's identity
         self::$log->info("User is logged in via $provider");
         $results = \OmegaUp\DAO\Identities::findByEmail($email);
-
+        $isAccountCreation = true;
         if (!is_null($results)) {
             self::$log->info("User has been here before with $provider");
             $identity = $results;
+            $isAccountCreation = false;
         } else {
             // The user has never been here before, let's register them
             self::$log->info("LoginVia$provider: Creating new user for $email");
@@ -593,17 +691,24 @@ class Session extends \OmegaUp\Controllers\Controller {
                 );
             } catch (\OmegaUp\Exceptions\ApiException $e) {
                 self::$log->error("Unable to login via $provider: $e");
-                /** @var array<string, string> */
-                return $e->asResponseArray();
+                throw $e;
             }
             $identity = \OmegaUp\DAO\Identities::findByUsername($username);
             if (is_null($identity)) {
                 throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
             }
         }
+        if (is_null($identity->username) || is_null($identity->user_id)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
+        $user = \OmegaUp\DAO\Users::getByPK($identity->user_id);
+        if (is_null($user)) {
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
+        }
 
-        self::registerSession($identity);
-        return ['status' => 'ok'];
+        self::registerSession($identity, $user);
+
+        return ['isAccountCreation' => $isAccountCreation];
     }
 
     public static function setSessionManagerForTesting(

@@ -20,7 +20,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 
-CI = os.environ.get('CONTINUOUS_INTEGRATION') == 'true'
 OMEGAUP_ROOT = os.path.normpath(os.path.join(__file__, '../../../..'))
 
 PATH_WHITELIST = ('/api/grader/status/', '/js/error_handler.js')
@@ -136,12 +135,12 @@ def create_run(driver, problem_alias, filename):
                                  'frontend/tests/resources/%s' % filename)
     with open(resource_path, 'r') as f:
         driver.browser.execute_script(
-            'document.querySelector("#submit .CodeMirror")'
+            'document.querySelector("form[data-run-submit] .CodeMirror")'
             '.CodeMirror.setValue(arguments[0]);',
             f.read())
     original_url = driver.browser.current_url
     driver.browser.find_element_by_css_selector(
-        '#submit input[type="submit"]').submit()
+        'form[data-run-submit] button[type="submit"]').submit()
     driver.wait.until(EC.url_changes(original_url))
 
     logging.debug('Run submitted.')
@@ -222,26 +221,29 @@ def assert_js_errors(driver,
                 unmatched_errors.append(entry)
         driver.log_collector.extend(unmatched_errors)
 
-        missed_paths = [
-            path for path, seen in zip(expected_paths, seen_paths) if not seen
-        ]
-        missed_messages = [
-            message for message, seen in zip(expected_messages, seen_messages)
-            if not seen
-        ]
-        if missed_paths or missed_messages:
-            raise Exception(
-                ('Some messages were not matched\n'
-                 '\tMatched errors:\n\t\t{matched_errors}\n'
-                 '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
-                 '\tMissed paths:\n\t\t{missed_paths}\n'
-                 '\tMissed messages:\n\t\t{missed_messages}').format(
-                     matched_errors='\n'.join(
-                         json.dumps(entry) for entry in matched_errors),
-                     unmatched_errors='\n'.join(
-                         json.dumps(entry) for entry in unmatched_errors),
-                     missed_paths='\n'.join(missed_paths),
-                     missed_messages='\n'.join(missed_messages)))
+    if driver.browser_name == 'firefox':
+        # Firefox does not support providing console message contents.
+        return
+    missed_paths = [
+        path for path, seen in zip(expected_paths, seen_paths) if not seen
+    ]
+    missed_messages = [
+        message for message, seen in zip(expected_messages, seen_messages)
+        if not seen
+    ]
+    if missed_paths or missed_messages:
+        raise Exception(
+            ('Some messages were not matched\n'
+             '\tMatched errors:\n\t\t{matched_errors}\n'
+             '\tUnmatched errors:\n\t\t{unmatched_errors}\n'
+             '\tMissed paths:\n\t\t{missed_paths}\n'
+             '\tMissed messages:\n\t\t{missed_messages}\n').format(
+                 matched_errors='\n'.join(
+                     json.dumps(entry) for entry in matched_errors),
+                 unmatched_errors='\n'.join(
+                     json.dumps(entry) for entry in unmatched_errors),
+                 missed_paths='\n'.join(missed_paths),
+                 missed_messages='\n'.join(missed_messages)))
 
 
 @contextlib.contextmanager
@@ -273,6 +275,73 @@ def assert_no_js_errors(
                      original_errors='\n'.join(
                          json.dumps(message) for message in original_errors),
                      unexpected_errors='\n'.join(unexpected_errors)))
+
+
+@annotate
+@no_javascript_errors()
+def create_problem(
+        driver,
+        problem_alias: str,
+        resource_path: str = 'frontend/tests/resources/triangulos.zip'
+) -> None:
+    '''Create a problem.'''
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-problems]'))).click()
+    with driver.page_transition():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR,
+                 'a[data-nav-problems-create]'))).click()
+
+    with assert_js_errors(
+            driver,
+            expected_messages=('/api/problem/details/',)
+    ):
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "problem_alias"]'))).send_keys(problem_alias)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "title"]'))).send_keys(problem_alias)
+    input_limit = driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH,
+             '//input[@name = "input_limit"]')))
+    input_limit.clear()
+    input_limit.send_keys('1024')
+    # Alias should be set automatically
+    driver.browser.find_element_by_name('source').send_keys('test')
+    # Make the problem public
+    driver.browser.find_element_by_xpath(
+        '//input[@type="radio" and @name="visibility" and @value="true"]'
+    ).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//input[@type = "search"]'))).send_keys('Recur')
+    driver.wait.until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, '.vbt-matched-text'))
+    ).click()
+    Select(
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (
+                    By.CSS_SELECTOR,
+                    'select[name="problem-level"]'
+                )
+            )
+        )
+    ).select_by_value('problemLevelBasicKarel')
+    contents_element = driver.browser.find_element_by_name(
+        'problem_contents')
+    contents_element.send_keys(os.path.join(OMEGAUP_ROOT, resource_path))
+    with driver.page_transition(wait_for_ajax=False):
+        contents_element.submit()
+    assert (('/problem/%s/edit/' % problem_alias) in
+            driver.browser.current_url), driver.browser.current_url
 
 
 def path_matches(message: str, path_list: Sequence[str]) -> bool:
@@ -310,9 +379,9 @@ def message_matches(message: str, message_list: Sequence[str]) -> bool:
 
         return False
 
-    # No quoted messages found, so let's try to do a suffix match.
+    # No quoted messages found, so let's try to do a substring match.
     for whitelisted_message in message_list:
-        if message.endswith(whitelisted_message):
+        if whitelisted_message in message:
             return True
 
     return False
@@ -325,7 +394,7 @@ def check_scoreboard_events(driver, alias, url, *, num_elements, scoreboard):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//tr/td/a[contains(@href, "%s")][text()="%s"]' %
+                 '//tr/td/a[contains(@href, "%s")][contains(text(), "%s")]' %
                  (alias, scoreboard)))).click()
     assert (url in driver.browser.current_url), driver.browser.current_url
 
@@ -356,21 +425,23 @@ def create_group(driver, group_title, description):
             EC.element_to_be_clickable(
                 (By.XPATH,
                  ('//a[@href = "/group/new/"]')))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//input[@name = "title"]'))).send_keys(group_title)
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.XPATH,
-             '//textarea[@name = "description"]'))).send_keys(description)
+    with assert_js_errors(
+            driver,
+            expected_messages=('/api/group/details/',)
+    ):
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//input[@name = "title"]'))).send_keys(group_title)
+        driver.wait.until(
+            EC.visibility_of_element_located(
+                (By.XPATH,
+                 '//textarea[@name = "description"]'))).send_keys(description)
 
     with driver.page_transition():
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//form[contains(concat(" ", normalize-space(@class), '
-                 '" "), " new-group-form ")]'))).submit()
+                (By.CSS_SELECTOR, 'form[data-group-new]'))).submit()
 
     group_alias = re.search(r'/group/([^/]*)/edit/',
                             driver.browser.current_url).group(1)

@@ -7,30 +7,58 @@
       }}</a>
     </li>
     <li class="grader grader-status">{{ graderStatusMessage }}</li>
-    <li class="grader grader-broadcaster-sockets" v-if="status === 'ok'">
+    <li v-if="status === 'ok'" class="grader grader-broadcaster-sockets">
       Broadcaster sockets:
       {{ graderInfo !== null ? graderInfo.broadcaster_sockets : '' }}
     </li>
-    <li class="grader grader-broadcaster-sockets" v-else-if="error !== null">
+    <li v-else-if="error !== null" class="grader grader-broadcaster-sockets">
       API api/grader/status call failed:
-      <pre style="width: 40em;">{{ error }}</pre>
+      <pre style="width: 40em">{{ error }}</pre>
     </li>
-    <li class="grader grader-embedded-runner" v-if="status === 'ok'">
+    <li v-if="status === 'ok'" class="grader grader-embedded-runner">
       Embedded runner:
       {{ graderInfo !== null ? graderInfo.embedded_runner : '' }}
     </li>
-    <li class="grader grader-queues" v-if="status === 'ok'">
+    <li v-if="status === 'ok'" class="grader grader-queues">
       Queues:
+      <!-- eslint-disable vue/no-v-html -->
       <pre
-        style="width: 50em;"
         v-if="graderInfo !== null"
-        v-html="UI.prettyPrintJSON(graderInfo.queue)"
+        style="width: 50em"
+        v-html="ui.prettyPrintJSON(graderInfo.queue)"
       ></pre>
+      <!-- eslint-enable -->
     </li>
   </ul>
 </template>
 
-<style>
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import * as ui from '../../ui';
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
+export default class GraderStatus extends Vue {
+  @Prop() status!: string;
+  @Prop() error!: string;
+  @Prop() graderInfo!: types.GraderStatus | null;
+
+  T = T;
+  ui = ui;
+
+  get graderStatusMessage(): string {
+    return this.status === 'ok' ? 'Grader OK' : 'Grader DOWN';
+  }
+}
+</script>
+
+<style lang="scss" scoped>
 .grader-submissions,
 a.grader-submissions-link {
   background-color: #fff;
@@ -61,24 +89,3 @@ ul {
   list-style: none;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { types } from '../../api_types';
-import T from '../../lang';
-import * as UI from '../../ui';
-
-@Component
-export default class GraderStatus extends Vue {
-  @Prop() status!: string;
-  @Prop() error!: string;
-  @Prop() graderInfo!: types.GraderStatus | null;
-
-  T = T;
-  UI = UI;
-
-  get graderStatusMessage(): string {
-    return this.status === 'ok' ? 'Grader OK' : 'Grader DOWN';
-  }
-}
-</script>

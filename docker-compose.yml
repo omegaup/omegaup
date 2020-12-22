@@ -6,7 +6,8 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20200503
+    image: omegaup/dev-php:20201122
+    user: "${UID_GID}"
     restart: always
     volumes:
       - type: bind
@@ -18,16 +19,19 @@ services:
       - gitserver
       - grader
     ports:
-      - target: 8000
+      - target: 8001
         published: 8001
         protocol: tcp
         mode: host
+    environment:
+      CI: "${CI:-false}"
 
   gitserver:
     build:
       dockerfile: ./Dockerfile.gitserver
       context: ./stuff/docker/
-    image: omegaup/dev-gitserver:20200503
+    image: omegaup/dev-gitserver:20200930
+    user: "${UID_GID}"
     restart: always
     depends_on:
       - mysql
@@ -42,7 +46,8 @@ services:
     build:
       dockerfile: ./Dockerfile.broadcaster
       context: ./stuff/docker/
-    image: omegaup/dev-broadcaster:20200407
+    image: omegaup/dev-broadcaster:20201118
+    user: "${UID_GID}"
     restart: always
     depends_on:
       - mysql
@@ -55,7 +60,8 @@ services:
     build:
       dockerfile: ./Dockerfile.grader
       context: ./stuff/docker/
-    image: omegaup/dev-grader:20200407
+    image: omegaup/dev-grader:20201118
+    user: "${UID_GID}"
     restart: always
     depends_on:
       - mysql
@@ -69,7 +75,8 @@ services:
     build:
       dockerfile: ./Dockerfile.runner
       context: ./stuff/docker/
-    image: omegaup/dev-runner:20200407
+    image: omegaup/dev-runner:20201118
+    user: "${UID_GID}"
     restart: always
     depends_on:
       - grader

@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+exec < /dev/tty
+
+# Redirect output to stderr.
+exec 1>&2
+
+OLD_HEAD="${1}"
+NEW_HEAD="${2}"
+CHANGING_BRANCHES="${3}"
+
+# Try to avoid having dirty git submodules when checking out branches.
+if ! git diff-tree -r --quiet "${OLD_HEAD}" "${NEW_HEAD}" | grep -q ^:160000; then
+	git submodule update --recursive
+fi
+
+# Whenever composer.lock is changed, `composer install` needs to be run.
+if ! git diff-tree --quiet "${OLD_HEAD}" "${NEW_HEAD}" -- composer.lock; then
+	if [[ -x /usr/bin/composer ]]; then
+		/usr/bin/composer install
+	else
+		echo
+		echo "*****************************************************************"
+		echo
+		echo "composer.lock changed."
+		echo
+		echo "Please run \`/usr/bin/composer install\` inside the VM / container."
+		echo
+		echo "*****************************************************************"
+		echo
+	fi
+fi
+
+# Whenever yarn.lock is changed, `yarn install` needs to be run.
+if ! git diff-tree --quiet "${OLD_HEAD}" "${NEW_HEAD}" -- yarn.lock; then
+	if which yarn >/dev/null ; then
+		yarn install
+		echo
+		echo "*****************************************************************"
+		echo
+		echo "yarn.lock changed."
+		echo
+		echo "Please restart the container OR the \`yarn run dev-all:watch\` command"
+		echo
+		echo "*****************************************************************"
+		echo
+	else
+		echo
+		echo "*****************************************************************"
+		echo
+		echo "yarn.lock changed."
+		echo
+		echo "Please restart the container, OR run \`yarn install\` and"
+		echo "restart \`yarn run dev-all:watch\`"
+		echo
+		echo "*****************************************************************"
+		echo
+	fi
+fi

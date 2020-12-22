@@ -11,14 +11,14 @@ import time
 from typing import List, Optional
 
 DOWNLOAD_FILES = [
-    ('https://s3.amazonaws.com/omegaup-omegajail/'
-     'omegajail-bionic-rootfs-x86_64.tar.xz'),
-    ('https://github.com/omegaup/omegajail/releases/download/v1.0.0/'
-     'omegajail-bionic-distrib-x86_64.tar.xz'),
+    ('https://github.com/omegaup/omegajail/releases/download/v3.0.0/'
+     'omegajail-focal-rootfs-x86_64.tar.xz'),
+    ('https://github.com/omegaup/omegajail/releases/download/v3.0.1/'
+     'omegajail-focal-distrib-x86_64.tar.xz'),
     'https://s3.amazonaws.com/omegaup-dist/omegaup-runner-config.tar.xz',
-    ('https://github.com/omegaup/quark/releases/download/v1.1.29/'
+    ('https://github.com/omegaup/quark/releases/download/v1.2.15/'
      'omegaup-runner.tar.xz'),
-    ('https://github.com/omegaup/logslurp/releases/download/v0.0.4/'
+    ('https://github.com/omegaup/logslurp/releases/download/v0.1.4/'
      'omegaup-logslurp.tar.xz'),
 ]
 
@@ -138,18 +138,25 @@ class RemoteRunner:
         '''Puts the provided file contents onto the remote machine.'''
         # pylint: disable=too-many-arguments
 
-        tmpfile = '/tmp/.%f.tmp' % (time.time())
-        self.sudo(['/bin/cp', '/dev/stdin', tmpfile],
-                  stdin=contents,
-                  capture=False,
-                  check=True)
-        if mode is not None:
-            self.sudo(['/bin/chmod', '0%o' % mode, tmpfile])
+        # If there is no need to change the owner, we can run as the current
+        # user.
         if owner is not None:
-            self.sudo(['/bin/chown', owner, tmpfile])
+            run = self.sudo
+        else:
+            run = self.run
+
+        tmpfile = '/tmp/.%f.tmp' % (time.time())
+        run(['/bin/cp', '/dev/stdin', tmpfile],
+            stdin=contents,
+            capture=False,
+            check=True)
+        if owner is not None:
+            run(['/bin/chown', owner, tmpfile])
+        if mode is not None:
+            run(['/bin/chmod', '0%o' % mode, tmpfile])
         if group is not None:
-            self.sudo(['/bin/chgrp', group, tmpfile])
-        return self.sudo(['/bin/mv', tmpfile, dest])
+            run(['/bin/chgrp', group, tmpfile])
+        return run(['/bin/mv', tmpfile, dest])
 
 
 def hash_for(filename: str) -> str:
@@ -184,16 +191,20 @@ def _create_directories(runner: RemoteRunner) -> None:
 
 
 def _download_files(runner: RemoteRunner) -> None:
+    refresh_omegajail_rootfs = False
+
     for url in DOWNLOAD_FILES:
         filename = os.path.basename(url)
+        url_filename = f'.{filename}.url'
         quoted_filename = shlex.quote(filename)
+        quoted_url_filename = shlex.quote(url_filename)
         if runner.run([
                 (f'[[ '
-                 f'-f {quoted_filename} && '
-                 f'"`sha1sum -b {quoted_filename}`" == "{hash_for(filename)}" '
+                 f'-f {quoted_url_filename} && '
+                 f'"`cat {quoted_url_filename}`" == "{shlex.quote(url)}" '
                  f']]'),
         ]).returncode == 0:
-            logging.info('Hashes matched, skipping')
+            logging.info('URLs matched, skipping')
             continue
         logging.info('Downloading %s...', url)
         runner.run([
@@ -202,9 +213,29 @@ def _download_files(runner: RemoteRunner) -> None:
         runner.run([
             '/usr/bin/curl', '--location', '--remote-time', '--output',
             filename, '--url', url
-        ])
+        ], check=True)
+        if 'rootfs' in filename:
+            refresh_omegajail_rootfs = True
+            continue
+        if 'omegajail' in filename and refresh_omegajail_rootfs:
+            # If we are going to refresh the rootfs anyways, might as well
+            # delay this until when the rootfs is refreshed.
+            continue
         logging.info('Extracting %s...', url)
         runner.sudo(['/bin/tar', '-xf', filename, '-C', '/'], check=True)
+        runner.put(url, url_filename)
+
+    if refresh_omegajail_rootfs:
+        logging.info('Refreshing omegajail rootfs...')
+        runner.sudo(['/bin/rm', '-rf', '/var/lib/omegajail'], check=True)
+        for url in DOWNLOAD_FILES:
+            filename = os.path.basename(url)
+            url_filename = f'.{filename}.url'
+            if 'omegajail' not in filename:
+                continue
+            logging.info('Extracting %s...', url)
+            runner.sudo(['/bin/tar', '-xf', filename, '-C', '/'], check=True)
+            runner.put(url, url_filename)
 
 
 def _create_ssl_keys(runner: RemoteRunner, certroot: str) -> None:
@@ -260,7 +291,9 @@ def _install_logslurp_service(runner: RemoteRunner) -> None:
             ']',
     ]).returncode != 0:
         runner.put(LOGSLURP_SERVICE,
-                   '/etc/systemd/system/omegaup-logslurp.service')
+                   '/etc/systemd/system/omegaup-logslurp.service',
+                   owner='root',
+                   group='root')
 
     if runner.run([
             '[', '-h',

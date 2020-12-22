@@ -1,7 +1,7 @@
 <template>
-  <div class="panel panel-primary problem-form">
-    <div class="panel-heading" v-if="!isUpdate">
-      <h3 class="panel-title">
+  <div class="card problem-form">
+    <div v-if="!isUpdate" class="card-header">
+      <h3 class="card-title">
         {{ T.problemNew }}
       </h3>
     </div>
@@ -9,62 +9,56 @@
       <p class="no-bottom-margin">
         {{ T.problemEditFormFirstTimeCreatingAProblem }}
         <strong>
-          <a v-bind:href="howToWriteProblemLink" target="_blank">
+          <a :href="howToWriteProblemLink" target="_blank">
             {{ T.problemEditFormHereIsHowToWriteProblems }}
           </a>
         </strong>
       </p>
     </div>
-    <div class="panel-body">
-      <form
-        method="POST"
-        class="form"
-        enctype="multipart/form-data"
-        v-on:submit="onSubmit"
-      >
+    <div class="card-body">
+      <form method="POST" class="form" enctype="multipart/form-data">
         <div class="row">
-          <div
-            class="form-group  col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('title') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsTitle }}</label>
             <input
-              name="title"
               v-model="title"
+              required
+              name="title"
               type="text"
               class="form-control"
-              v-on:blur="onGenerateAlias"
+              :class="{ 'is-invalid': errors.includes('title') }"
+              @blur="onGenerateAlias"
             />
           </div>
 
-          <div
-            class="form-group  col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('alias') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.wordsAlias }}</label>
             <input
-              name="alias"
-              v-model="alias"
               ref="alias"
+              v-model="alias"
+              required
+              name="problem_alias"
               type="text"
               class="form-control"
-              v-bind:disabled="isUpdate"
+              :class="{ 'is-invalid': errors.includes('problem_alias') }"
+              :disabled="isUpdate"
             />
           </div>
         </div>
 
         <omegaup-problem-settings
-          v-bind:timeLimit="timeLimit"
-          v-bind:extraWallTime="extraWallTime"
-          v-bind:memoryLimit="memoryLimit"
-          v-bind:outputLimit="outputLimit"
-          v-bind:inputLimit="inputLimit"
-          v-bind:initialValidator="validator"
-          v-bind:initialLanguage="languages"
-          v-bind:overallWallTimeLimit="overallWallTimeLimit"
-          v-bind:validatorTimeLimit="validatorTimeLimit"
-          v-bind:validLanguages="data.validLanguages"
-          v-bind:validatorTypes="data.validatorTypes"
+          :errors="errors"
+          :time-limit="timeLimit"
+          :extra-wall-time="extraWallTime"
+          :memory-limit="memoryLimit"
+          :output-limit="outputLimit"
+          :input-limit="inputLimit"
+          :initial-validator="validator"
+          :initial-language="languages"
+          :overall-wall-time-limit="overallWallTimeLimit"
+          :validator-time-limit="validatorTimeLimit"
+          :valid-languages="data.validLanguages"
+          :validator-types="data.validatorTypes"
         ></omegaup-problem-settings>
 
         <div class="row">
@@ -73,19 +67,19 @@
             <div class="form-control">
               <label class="radio-inline">
                 <input
+                  v-model="emailClarifications"
                   type="radio"
                   name="email_clarifications"
-                  v-bind:value="true"
-                  v-model="emailClarifications"
+                  :value="true"
                 />
                 {{ T.wordsYes }}
               </label>
               <label class="radio-inline">
                 <input
+                  v-model="emailClarifications"
                   type="radio"
                   name="email_clarifications"
-                  v-bind:value="false"
-                  v-model="emailClarifications"
+                  :value="false"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -97,21 +91,21 @@
             <div class="form-control">
               <label class="radio-inline">
                 <input
+                  v-model="isPublic"
                   type="radio"
                   name="visibility"
-                  v-bind:disabled="!isEditable"
-                  v-bind:value="true"
-                  v-model="isPublic"
+                  :disabled="!isEditable"
+                  :value="true"
                 />
                 {{ T.wordsYes }}
               </label>
               <label class="radio-inline">
                 <input
+                  v-model="isPublic"
                   type="radio"
                   name="visibility"
-                  v-bind:disabled="!isEditable"
-                  v-bind:value="false"
-                  v-model="isPublic"
+                  :disabled="!isEditable"
+                  :value="false"
                 />
                 {{ T.wordsNo }}
               </label>
@@ -120,70 +114,117 @@
         </div>
 
         <div class="row">
-          <div
-            class="form-group  col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('source') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.problemEditSource }}</label>
             <input
-              name="source"
               v-model="source"
+              required
+              name="source"
               type="text"
               class="form-control"
+              :class="{ 'is-invalid': errors.includes('source') }"
             />
           </div>
 
-          <div
-            class="form-group col-md-6"
-            v-bind:class="{ 'has-error': errors.includes('file') }"
-          >
+          <div class="form-group col-md-6">
             <label class="control-label">{{ T.problemEditFormFile }}</label>
-            <a v-bind:href="howToWriteProblemLink" target="_blank">
+            <a :href="howToWriteProblemLink" target="_blank">
               <span>{{ T.problemEditFormHowToWriteProblems }}</span>
             </a>
             <input
+              :required="!isUpdate"
               name="problem_contents"
               type="file"
               class="form-control"
-              v-on:change="onUploadFile"
+              :class="{
+                'is-invalid': errors.includes('problem_contents'),
+              }"
+              @change="onUploadFile"
             />
           </div>
         </div>
 
-        <omegaup-problem-tags
-          v-bind:initialTags="data.tags"
-          v-bind:initialSelectedTags="data.selectedTags || []"
-          v-bind:alias="data.alias"
-          v-if="!isUpdate"
-        ></omegaup-problem-tags>
-        <div class="row" v-else="">
-          <div
-            class="form-group  col-md-12"
-            v-bind:class="{ 'has-error': errors.includes('message') }"
-          >
+        <template v-if="!isUpdate">
+          <div class="row">
+            <div class="form-group col-md-12">
+              <label>{{ T.wordsShowCasesDiff }}</label>
+              <select
+                v-model="showDiff"
+                name="show_diff"
+                class="form-control"
+                :class="{ 'is-invalid': errors.includes('show_diff') }"
+              >
+                <option value="none">{{ T.problemVersionDiffModeNone }}</option>
+                <option value="examples">{{ T.wordsOnlyExamples }}</option>
+                <option value="all">{{ T.wordsAll }}</option>
+              </select>
+            </div>
+          </div>
+
+          <omegaup-problem-tags
+            :public-tags="data.publicTags"
+            :level-tags="data.levelTags"
+            :alias="data.alias"
+            :is-create="true"
+            :problem-level="problemLevel"
+            :selected-private-tags="selectedPrivateTags"
+            :selected-public-tags="selectedPublicTags"
+            :can-add-new-tags="true"
+            :errors="errors"
+            @emit-add-tag="addTag"
+            @emit-remove-tag="removeTag"
+            @select-problem-level="selectProblemLevel"
+          ></omegaup-problem-tags>
+          <input name="selected_tags" :value="selectedTagsList" type="hidden" />
+          <input name="problem_level" :value="problemLevel" type="hidden" />
+        </template>
+
+        <div v-else class="row">
+          <div class="form-group col-md-6">
+            <label>{{ T.wordsShowCasesDiff }}</label>
+            <select
+              v-model="showDiff"
+              name="show_diff"
+              class="form-control"
+              :class="{ 'is-invalid': errors.includes('show_diff') }"
+            >
+              <option value="none">{{ T.problemVersionDiffModeNone }}</option>
+              <option value="examples">{{ T.wordsOnlyExamples }}</option>
+              <option value="all">{{ T.wordsAll }}</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
             <label class="control-label">{{
               T.problemEditCommitMessage
             }}</label>
             <input
-              class="form-control"
-              name="message"
               v-model="message"
+              required
+              class="form-control"
+              :class="{ 'is-invalid': errors.includes('message') }"
+              name="message"
               type="text"
             />
           </div>
         </div>
 
         <input
+          v-if="isEditable"
           type="hidden"
           name="visibility"
-          v-bind:value="visibility"
-          v-if="isEditable"
+          :value="visibility"
         />
         <input name="request" value="submit" type="hidden" />
 
         <div class="row">
           <div class="form-group col-md-6 no-bottom-margin">
-            <button type="submit" class="btn btn-primary">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              :title="
+                !problemLevel && !isUpdate ? T.selectProblemLevelDesc : ''
+              "
+            >
               {{ buttonText }}
             </button>
           </div>
@@ -193,19 +234,11 @@
   </div>
 </template>
 
-<style>
-.problem-form .languages {
-  padding: 0;
-  width: 100%;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import problem_Settings from './Settings.vue';
 import problem_Tags from './Tags.vue';
 import T from '../../lang';
-import * as ui from '../../ui';
 import latinize from 'latinize';
 import { types } from '../../api_types';
 
@@ -217,6 +250,7 @@ import { types } from '../../api_types';
 })
 export default class ProblemForm extends Vue {
   @Prop() data!: types.ProblemFormPayload;
+  @Prop({ default: () => [] }) errors!: string[];
   @Prop({ default: false }) isUpdate!: boolean;
   @Prop({ default: 0 }) originalVisibility!: number;
 
@@ -237,11 +271,12 @@ export default class ProblemForm extends Vue {
   validator = this.data.validator;
   languages = this.data.languages;
   tags = this.data.tags;
+  problemLevel = this.data.problem_level || '';
+  showDiff = this.data.showDiff;
   selectedTags = this.data.selectedTags || [];
   message = '';
   hasFile = false;
   public = false;
-  errors: string[] = [];
 
   get howToWriteProblemLink(): string {
     return 'https://github.com/omegaup/omegaup/wiki/C%C3%B3mo-escribir-problemas-para-Omegaup';
@@ -294,48 +329,39 @@ export default class ProblemForm extends Vue {
     );
   }
 
-  onSubmit(e: Event): void {
-    this.errors = [];
-    if (this.isUpdate && this.message) {
-      return;
-    }
-    if (this.title && this.alias && this.source && this.hasFile) {
-      return;
-    }
-    ui.error(T.editFieldRequired);
-    if (!this.title) {
-      this.errors.push('title');
-    }
-    if (!this.alias) {
-      this.errors.push('alias');
-    }
-    if (!this.source) {
-      this.errors.push('source');
-    }
-    if (!this.isUpdate && !this.hasFile) {
-      this.errors.push('file');
-    }
-    if (this.isUpdate && !this.message) {
-      this.errors.push('message');
-    }
-    e.preventDefault();
+  get selectedPublicTags(): string[] {
+    return this.selectedTags
+      .filter((tag) => tag.public === true)
+      .map((tag) => tag.tagname);
+  }
+
+  get selectedPrivateTags(): string[] {
+    return this.selectedTags
+      .filter((tag) => tag.public === false)
+      .map((tag) => tag.tagname);
+  }
+
+  addTag(alias: string, tagname: string, isPublic: boolean): void {
+    this.selectedTags.push({
+      tagname: tagname,
+      public: isPublic,
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  removeTag(alias: string, tagname: string, isPublic: boolean): void {
+    this.selectedTags = this.selectedTags.filter(
+      (tag) => tag.tagname !== tagname,
+    );
+  }
+
+  selectProblemLevel(levelTag: string): void {
+    this.problemLevel = levelTag;
   }
 
   onUploadFile(ev: InputEvent): void {
     const uploadedFile = <HTMLInputElement>ev.target;
     this.hasFile = uploadedFile.files !== null;
-  }
-
-  onAddTag(tagname: string, isPublic: boolean): void {
-    this.selectedTags.push({ tagname: tagname, public: isPublic });
-    this.tags = this.tags.filter((val, index, arr) => val.name !== tagname);
-  }
-
-  onRemoveTag(tagname: string): void {
-    this.tags.push({ name: tagname });
-    this.selectedTags = this.selectedTags.filter(
-      (val, index, arr) => val.tagname !== tagname,
-    );
   }
 
   onGenerateAlias(): void {
@@ -366,3 +392,10 @@ export default class ProblemForm extends Vue {
   }
 }
 </script>
+
+<style>
+.problem-form .languages {
+  padding: 0;
+  width: 100%;
+}
+</style>

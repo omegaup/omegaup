@@ -3,11 +3,11 @@
     <!-- id-lint off -->
     <div id="ranking-chart"></div>
     <!-- id-lint on -->
-    <label
-      ><input
+    <label v-if="showInvitedUsersFilter">
+      <input
+        v-model="onlyShowExplicitlyInvited"
         class="toggle-contestants"
         type="checkbox"
-        v-model="onlyShowExplicitlyInvited"
       />
       {{ T.scoreboardShowOnlyInvitedIdentities }}</label
     >
@@ -18,65 +18,63 @@
           <th><!-- position --></th>
           <th>{{ T.wordsUser }}</th>
           <th v-for="(problem, index) in problems">
-            <a
-              v-bind:href="'#problems/' + problem.alias"
-              v-bind:title="problem.alias"
-              >{{ UI.columnName(index) }}</a
-            >
+            <a :href="'#problems/' + problem.alias" :title="problem.alias">{{
+              ui.columnName(index)
+            }}</a>
           </th>
-          <th v-bind:colspan="2 + problems.length">{{ T.wordsTotal }}</th>
+          <th :colspan="2 + problems.length">{{ T.wordsTotal }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr
-          v-bind:class="user.username"
-          v-for="(user, userIndex) in ranking"
-          v-if="showUser(user.is_invited)"
-        >
-          <td
-            class="legend"
-            v-bind:style="{ backgroundColor: legendColor(userIndex) }"
-          ></td>
-          <td class="position">{{ user.place || '—' }}</td>
-          <td class="user">
-            {{ UI.rankingUsername(user) }}
-            <img
-              alt=""
-              height="11"
-              v-bind:src="'/media/flags/' + user.country.toLowerCase() + '.png'"
-              v-bind:title="user.country"
-              v-if="user.country"
-              width="16"
-            />
-          </td>
-
-          <td
-            v-bind:class="problemClass(problem, problems[problemIndex].alias)"
-            v-for="(problem, problemIndex) in user.problems"
+        <template v-for="(user, userIndex) in ranking">
+          <tr
+            v-if="showUser(user.is_invited)"
+            :key="user.username"
+            :class="user.username"
           >
-            <template v-if="problem.runs &gt; 0">
+            <td
+              class="legend"
+              :style="{ backgroundColor: legendColor(userIndex) }"
+            ></td>
+            <td class="position">{{ user.place || '—' }}</td>
+            <td class="user">
+              {{ ui.rankingUsername(user) }}
+              <img
+                v-if="user.country"
+                alt=""
+                height="11"
+                :src="`/media/flags/${user.country.toLowerCase()}.png`"
+                :title="user.country"
+                width="16"
+              />
+            </td>
+
+            <td
+              v-for="(problem, problemIndex) in user.problems"
+              :class="problemClass(problem, problems[problemIndex].alias)"
+            >
+              <template v-if="problem.runs > 0">
+                <div class="points">
+                  {{ renderPoints(problem) }}
+                </div>
+                <div class="penalty">
+                  <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
+                    problem.runs
+                  }})
+                </div>
+              </template>
+              <template v-else> - </template>
+            </td>
+            <td>
               <div class="points">
-                {{ renderPoints(problem) }}
+                {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
               </div>
               <div class="penalty">
-                <span v-if="showPenalty">{{ problem.penalty }}</span> ({{
-                  problem.runs
-                }})
+                {{ user.total.penalty }} ({{ totalRuns(user) }})
               </div>
-            </template>
-            <template v-else="">
-              -
-            </template>
-          </td>
-          <td>
-            <div class="points">
-              {{ user.total.points.toFixed(digitsAfterDecimalPoint) }}
-            </div>
-            <div class="penalty">
-              {{ user.total.penalty }} ({{ totalRuns(user) }})
-            </div>
-          </td>
-        </tr>
+            </td>
+          </tr>
+        </template>
       </tbody>
     </table>
     <div class="footer">
@@ -84,6 +82,72 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+
+import { types } from '../../api_types';
+import { omegaup } from '../../omegaup';
+import T from '../../lang';
+import * as ui from '../../ui';
+
+@Component
+export default class ArenaScoreboard extends Vue {
+  @Prop() scoreboardColors!: string[];
+  @Prop() problems!: omegaup.Problem[];
+  @Prop() ranking!: types.ScoreboardRankingEntry[];
+  @Prop() lastUpdated!: Date;
+  @Prop({ default: true }) showInvitedUsersFilter!: boolean;
+  @Prop({ default: true }) showPenalty!: boolean;
+  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
+
+  T = T;
+  ui = ui;
+  onlyShowExplicitlyInvited = true;
+
+  get lastUpdatedString(): string {
+    return !this.lastUpdated ? '' : this.lastUpdated.toString();
+  }
+
+  legendColor(idx: number): string {
+    return this.scoreboardColors && idx < this.scoreboardColors.length
+      ? this.scoreboardColors[idx]
+      : '';
+  }
+
+  renderPoints(p: types.ScoreboardRankingProblem): string {
+    return (
+      (p.points > 0 ? '+' : '') + p.points.toFixed(this.digitsAfterDecimalPoint)
+    );
+  }
+
+  totalRuns(u: types.ScoreboardRankingEntry): number {
+    return u.problems.reduce(
+      (acc: number, val: types.ScoreboardRankingProblem) => acc + val.runs,
+      0,
+    );
+  }
+
+  problemClass(p: types.ScoreboardRankingProblem, alias: string): string {
+    if (p.percent === 100) {
+      return `${alias} accepted`;
+    } else if (p.pending) {
+      return `${alias} pending`;
+    } else if (p.percent === 0 && p.runs > 0) {
+      return `${alias} wrong`;
+    } else {
+      return alias;
+    }
+  }
+
+  showUser(userIsInvited: boolean): boolean {
+    // Invited users filter is only available in contests, in a course all users
+    // are visible in scoreboard.
+    if (!this.showInvitedUsersFilter) return true;
+    return userIsInvited || !this.onlyShowExplicitlyInvited;
+  }
+}
+</script>
 
 <style>
 .omegaup-scoreboard {
@@ -150,63 +214,3 @@
   border-left-width: 0;
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
-import T from '../../lang';
-import * as UI from '../../ui';
-
-@Component
-export default class ArenaScoreboard extends Vue {
-  @Prop() scoreboardColors!: string[];
-  @Prop() problems!: omegaup.Problem[];
-  @Prop() ranking!: omegaup.ScoreboardUser[];
-  @Prop() lastUpdated!: Date;
-  @Prop({ default: true }) showPenalty!: boolean;
-  @Prop({ default: 2 }) digitsAfterDecimalPoint!: number;
-
-  T = T;
-  UI = UI;
-  onlyShowExplicitlyInvited = true;
-
-  get lastUpdatedString(): string {
-    return !this.lastUpdated ? '' : this.lastUpdated.toString();
-  }
-
-  legendColor(idx: number): string {
-    return this.scoreboardColors && idx < this.scoreboardColors.length
-      ? this.scoreboardColors[idx]
-      : '';
-  }
-
-  renderPoints(p: omegaup.ScoreboardUserProblem): string {
-    return (
-      (p.points > 0 ? '+' : '') + p.points.toFixed(this.digitsAfterDecimalPoint)
-    );
-  }
-
-  totalRuns(u: omegaup.ScoreboardUser): number {
-    return u.problems.reduce(
-      (acc: number, val: omegaup.ScoreboardUserProblem) => acc + val.runs,
-      0,
-    );
-  }
-
-  problemClass(p: omegaup.ScoreboardUserProblem, alias: string): string {
-    if (p.percent === 100) {
-      return `${alias} accepted`;
-    } else if (p.pending) {
-      return `${alias} pending`;
-    } else if (p.percent === 0 && p.runs > 0) {
-      return `${alias} wrong`;
-    } else {
-      return alias;
-    }
-  }
-
-  showUser(userIsInvited: boolean): boolean {
-    return userIsInvited || !this.onlyShowExplicitlyInvited;
-  }
-}
-</script>

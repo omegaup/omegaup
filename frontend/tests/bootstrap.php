@@ -12,6 +12,8 @@ namespace {
     @include_once(OMEGAUP_ROOT . '/tests/test_config.php');
     require_once(OMEGAUP_ROOT . '/tests/test_config.default.php');
     require_once(OMEGAUP_ROOT . '/server/config.default.php');
+    // This is required before bootstrap.php is invoked.
+    @mkdir(OMEGAUP_TEST_ROOT, 0755, true);
     require_once(OMEGAUP_ROOT . '/server/bootstrap.php');
     // Load api caller
     require_once(OMEGAUP_ROOT . '/tests/ApiCallerMock.php');
@@ -32,12 +34,7 @@ namespace {
     require_once(OMEGAUP_ROOT . '/tests/Factories/Run.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/Schools.php');
     require_once(OMEGAUP_ROOT . '/tests/Factories/User.php');
-    \OmegaUp\Test\Utils::cleanupLogs();
     \OmegaUp\Test\Utils::cleanupFilesAndDB();
-    // Clean APC cache
-    \OmegaUp\Cache::clearCacheForTesting();
-    \OmegaUp\Test\Factories\QualityNomination::initQualityReviewers();
-    \OmegaUp\Test\Factories\QualityNomination::initTags();
 
     \OmegaUp\Grader::setInstanceForTesting(new \OmegaUp\Test\NoOpGrader());
 }

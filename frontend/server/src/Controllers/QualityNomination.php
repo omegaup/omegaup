@@ -1,7 +1,15 @@
 <?php
 
- namespace OmegaUp\Controllers;
+namespace OmegaUp\Controllers;
 
+/**
+ * QualityNominationController
+ *
+ * @psalm-type ProblemStatement=array{images: array<string, string>, sources: array<string, string>, language: string, markdown: string}
+ * @psalm-type PageItem=array{class: string, label: string, page: int, url?: string}
+ * @psalm-type NominationListItem=array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+ *
+ */
 class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Number of reviewers to automatically assign each nomination.
@@ -55,15 +63,159 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         'problemTopicTwoPointers',
     ];
 
-    const CATEGORY_TAGS = [
-        'problemCategoryOpenResponse',
-        'problemCategoryKarelEducation',
-        'problemCategoryIntroductionToProgramming',
-        'problemCategoryMathematicalProblems',
-        'problemCategoryElementaryDataStructures',
-        'problemCategoryAlgorithmAndNetworkOptimization',
-        'problemCategoryCompetitiveProgramming',
-        'problemCategorySpecializedTopics',
+    const ALLOWED_PUBLIC_TAGS = [
+        'problemTagArithmetic',
+        'problemTagConditionals',
+        'problemTagLoops',
+        'problemTagFunctions',
+        'problemTagArrays',
+        'problemTagMatrices',
+        'problemTagCharsAndStrings',
+        'problemTagFormattedInputAndOutput',
+        'problemTagSimulation',
+        'problemTagImplementation',
+        'problemTagAnalyticGeometry',
+        'problemTagSystemsOfEquations',
+        'problemTagDiophantineEquations',
+        'problemTagGCDAndLCM',
+        'problemTagModularArithmetic',
+        'problemTagModularMultiplicativeInverse',
+        'problemTagChineseRemainderTheorem',
+        'problemTagRecursion',
+        'problemTagPermutations',
+        'problemTagCombinations',
+        'problemTagDivisibilityRules',
+        'problemTagCountingProblems',
+        'problemTagCombinatorialDesigns',
+        'problemTagGameTheory',
+        'problemTagNumberTheory',
+        'problemTagNumericalSeries',
+        'problemTagPartialSums',
+        'problemTagPrimalityTest',
+        'problemTagPrimeGeneration',
+        'problemTagPrimeFactorization',
+        'problemTagFourierTransformation',
+        'problemTagBigNumbers',
+        'problemTagBooleanAlgebra',
+        'problemTagBitManipulation',
+        'problemTagProbabilityAndStatistics',
+        'problemTagExponentiationBySquaring',
+        'problemTagSorting',
+        'problemTagBinarySearch',
+        'problemTagExponentialSearch',
+        'problemTagStringMatching',
+        'problemTagStacks',
+        'problemTagQueues',
+        'problemTagLinkedLists',
+        'problemTagHeaps',
+        'problemTagTreeTransversal',
+        'problemTagBinarySearchTree',
+        'problemTagGraphRepresentation',
+        'problemTagGraphConnectivity',
+        'problemTagDirectedGraphs',
+        'problemTagTrees',
+        'problemTagBreadthFirstSearch',
+        'problemTagDepthFirstSearch',
+        'problemTagShortestPaths',
+        'problemTagMinimumSpanningTrees',
+        'problemTagTopologicalSorting',
+        'problemTagGraphsWithNegativeWeights',
+        'problemTagDisjointSets',
+        'problemTagHashing',
+        'problemTagInvertedIndices',
+        'problemTagInputAndOutput',
+        'problemTagTries',
+        'problemTagBruteForce',
+        'problemTagIncrementalSearch',
+        'problemTagBacktracking',
+        'problemTagLocalSearch',
+        'problemTagGreedyAlgorithms',
+        'problemTagDivideAndConquer',
+        'problemTagMemorization',
+        'problemTagDynamicProgramming',
+        'problemTagSubArraySearch',
+        'problemTagSubsequenceSearch',
+        'problemTagMeetInTheMiddle',
+        'problemTagBipartiteMatching',
+        'problemTagMaxFlow',
+        'problemTagWaveletTrees',
+        'problemTagSegmentTrees',
+        'problemTagSuffixTrees',
+        'problemTagFenwickTrees',
+        'problemTagLeastCommonAncestor',
+        'problemTagLazyPropagation',
+        'problemTagOfflineQueries',
+        'problemTagSlidingWindow',
+        'problemTagMonotoneStack',
+        'problemTagTwoPointersTechnique',
+        'problemTagSQRTDecomposition',
+        'problemTagPalindromeAlgorithms',
+        'problemTagNearestNeighbors',
+        'problemTagConvexHull',
+        'problemTagSweepLine',
+        'problemTagLexingAndParsing',
+        'problemTagGeneticAlgorithms',
+        'problemTagParticleSwarmOptimization',
+        'problemTagHeuristics',
+        'problemTagDataCompression',
+        'problemTagBigData',
+        'problemTagOMI',
+        'problemTagOMIAguascalientes',
+        'problemTagOMIBajaCalifornia',
+        'problemTagOMIBajaCaliforniaSur',
+        'problemTagOMICampeche',
+        'problemTagOMICoahuila',
+        'problemTagOMIColima',
+        'problemTagOMIChiapas',
+        'problemTagOMIChihuahua',
+        'problemTagOMIDistritoFederal',
+        'problemTagOMIDurango',
+        'problemTagOMIGuanajuato',
+        'problemTagOMIGuerrero',
+        'problemTagOMIHidalgo',
+        'problemTagOMIJalisco',
+        'problemTagOMIMexico',
+        'problemTagOMIMichoacan',
+        'problemTagOMIMorelos',
+        'problemTagOMINayarit',
+        'problemTagOMINuevoLeon',
+        'problemTagOMIOaxaca',
+        'problemTagOMIPuebla',
+        'problemTagOMIQueretaro',
+        'problemTagOMIQuintanaRoo',
+        'problemTagOMISanLuisPotosi',
+        'problemTagOMISinaloa',
+        'problemTagOMISonora',
+        'problemTagOMITabasco',
+        'problemTagOMITamaulipas',
+        'problemTagOMITlaxcala',
+        'problemTagOMIVeracruz',
+        'problemTagOMIYucatan',
+        'problemTagOMIZacatecas',
+        'problemTagOMIPS',
+        'problemTagIOI',
+        'problemTagICPC',
+        'problemTagCIIC',
+        'problemTagCodingCup',
+        'problemTagCodingRush',
+        'problemTagCOCI',
+        'problemTagBOI',
+        'problemTagAnalysisOfRecurrences',
+        'problemTagUnformattedInputAndOutput',
+        'problemTagFileSeeking',
+        'problemTagLinearSearch',
+        'problemTagSetsMultisets',
+        'problemTagMapsMultimaps',
+    ];
+
+    const LEVEL_TAGS = [
+        'problemLevelAdvancedCompetitiveProgramming',
+        'problemLevelAdvancedSpecializedTopics',
+        'problemLevelBasicIntroductionToProgramming',
+        'problemLevelBasicKarel',
+        'problemLevelIntermediateAnalysisAndDesignOfAlgorithms',
+        'problemLevelIntermediateDataStructuresAndAlgorithms',
+        'problemLevelIntermediateMathsInProgramming',
     ];
 
     /**
@@ -331,15 +483,38 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'contents'
                 );
             }
-
+            // TODO: rename 'tag' to 'level'.
             if (
                 isset($contents['tag']) &&
-                !in_array($contents['tag'], self::CATEGORY_TAGS)
+                !in_array($contents['tag'], self::LEVEL_TAGS)
             ) {
                 throw new \OmegaUp\Exceptions\InvalidParameterException(
                     'parameterInvalid',
                     'contents'
                 );
+            }
+
+            if (
+                isset($contents['tags'])
+            ) {
+                if (!is_array($contents['tags'])) {
+                    throw new \OmegaUp\Exceptions\InvalidParameterException(
+                        'parameterInvalid',
+                        'contents'
+                    );
+                }
+                /** @var mixed $tag */
+                foreach ($contents['tags'] as &$tag) {
+                    if (
+                        !is_string($tag) ||
+                        !in_array($tag, self::ALLOWED_PUBLIC_TAGS)
+                    ) {
+                        throw new \OmegaUp\Exceptions\InvalidParameterException(
+                            'parameterInvalid',
+                            'contents'
+                        );
+                    }
+                }
             }
 
             if (
@@ -349,7 +524,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 )
             ) {
                 throw new \OmegaUp\Exceptions\PreconditionFailedException(
-                    'reviewerHasAlreadySentNominationForProblem'
+                    'qualityNominationReviewerHasAlreadySentNominationForProblem'
                 );
             }
         }
@@ -447,30 +622,23 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * A user that has already solved a problem can dismiss suggestions. The
      * `contents` field is empty.
      *
-     * @omegaup-request-param mixed $contents
-     * @omegaup-request-param mixed $nomination
-     * @omegaup-request-param mixed $problem_alias
-     *
      * @throws \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException
      *
      * @return array{qualitynomination_id: int}
+     *
+     * @omegaup-request-param string $contents
+     * @omegaup-request-param 'demotion'|'dismissal'|'promotion'|'quality_tag'|'suggestion' $nomination
+     * @omegaup-request-param string $problem_alias
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Validate request
         $r->ensureMainUserIdentity();
 
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['problem_alias'],
-            'problem_alias'
-        );
-        \OmegaUp\Validators::validateInEnum(
-            $r['nomination'],
-            'nomination',
-            ['suggestion', 'promotion', 'demotion', 'dismissal', 'quality_tag']
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateStringNonEmpty($r['contents'], 'contents');
         /**
@@ -483,7 +651,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'contents'
             );
         }
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }
@@ -491,7 +659,10 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $nomination = \OmegaUp\Controllers\QualityNomination::createNomination(
             $problem,
             $r->identity,
-            strval($r['nomination']),
+            $r->ensureEnum(
+                'nomination',
+                ['suggestion', 'promotion', 'demotion', 'dismissal', 'quality_tag']
+            ),
             $contents
         );
 
@@ -503,21 +674,18 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     /**
      * Marks a problem of a nomination (only the demotion type supported for now) as (resolved, banned, warning).
      *
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $qualitynomination_id
-     * @omegaup-request-param mixed $rationale
-     * @omegaup-request-param mixed $status
-     * @omegaup-request-param bool|null $all
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param bool|null $all
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param int $qualitynomination_id
+     * @omegaup-request-param string $rationale
+     * @omegaup-request-param 'banned'|'open'|'resolved'|'warning' $status
      */
     public static function apiResolve(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
-        \OmegaUp\Validators::validateInEnum(
-            $r['status'],
+        $status = $r->ensureEnum(
             'status',
             ['open', 'resolved', 'banned', 'warning']
         );
@@ -538,7 +706,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         );
         if (is_null($qualitynomination)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'qualitynominationNotFound'
+                'qualityNominationNotFound'
             );
         }
         if ($qualitynomination->nomination !== 'demotion') {
@@ -546,17 +714,17 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'onlyDemotionsSupported'
             );
         }
-        if ($r['status'] === $qualitynomination->status) {
+        if ($status === $qualitynomination->status) {
             return ['status' => 'ok'];
         }
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         if (is_null($qualitynomination->problem_id)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'problemIdNotFound'
+                'problemNotFound'
             );
         }
         $problem = \OmegaUp\DAO\Problems::getByPK(
@@ -572,7 +740,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $problem->visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
         );
         $newProblemVisibility = $problem->visibility;
-        switch ($r['status']) {
+        switch ($status) {
             case 'banned':
                 if ($isProblemPublic) {
                     $newProblemVisibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
@@ -599,7 +767,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 break;
         }
 
-        $message = ($r['status'] === 'banned') ? 'banningProblemDueToReport' : 'banningDeclinedByReviewer';
+        $message = ($status === 'banned') ?
+            \OmegaUp\Translations::getInstance()->get(
+                'banningProblemDueToReport'
+            ) :
+            \OmegaUp\Translations::getInstance()->get(
+                'banningDeclinedByReviewer'
+            );
 
         if ($r->ensureOptionalBool('all') ?? false) {
             $nominations = \OmegaUp\DAO\QualityNominations::getAllDemotionsForProblem(
@@ -611,11 +785,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
 
         $problemParams = new \OmegaUp\ProblemParams([
             'visibility' => $newProblemVisibility,
-            'problem_alias' => $r['problem_alias'],
+            'problem_alias' => $problemAlias,
         ], /*$isRequired=*/ false);
 
-        \OmegaUp\DAO\DAO::transBegin();
         try {
+            \OmegaUp\DAO\DAO::transBegin();
             \OmegaUp\Controllers\Problem::updateProblem(
                 $r->identity,
                 $r->user,
@@ -625,27 +799,33 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 /*$redirect=*/ false
             );
             foreach ($nominations as $nomination) {
-                $nomination->status = strval($r['status']);
-                \OmegaUp\DAO\QualityNominations::update($nomination);
                 \OmegaUp\DAO\QualityNominationLog::create(
                     new \OmegaUp\DAO\VO\QualityNominationLog([
-                        'user_id' => $nomination->user_id,
+                        'user_id' => $r->user->user_id,
                         'qualitynomination_id' => $nomination->qualitynomination_id,
                         'from_status' => $nomination->status,
-                        'to_status' => $r['status'],
+                        'to_status' => $status,
                         'rationale' => $r['rationale']
                     ])
                 );
+                /**
+                * @var null|array{tags?: mixed, before_ac?: mixed, difficulty?: mixed, quality?: mixed, statements?: mixed, source?: mixed, reason?: mixed, original?: mixed} $contents
+                */
+                $contents = json_decode($nomination->contents ?? '{}', true);
+                $contents['rationale'] = $r['rationale'];
+                $nomination->contents = json_encode($contents);
+                $nomination->status = $status;
+                \OmegaUp\DAO\QualityNominations::update($nomination);
             }
-            \OmegaUp\DAO\DAO::transEnd();
-            if ($r['status'] == 'banned' || $r['status'] == 'warning') {
+            if ($status == 'banned' || $status == 'warning') {
                 self::sendNotificationEmail(
                     $problem,
                     $qualitynomination,
                     $r['rationale'] ?? '',
-                    strval($r['status'])
+                    $status
                 );
             }
+            \OmegaUp\DAO\DAO::transEnd();
         } catch (\Exception $e) {
             \OmegaUp\DAO\DAO::transRollback();
             self::$log->error('Failed to resolve demotion request', $e);
@@ -676,7 +856,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $adminUser = \OmegaUp\DAO\Problems::getAdminUser($problem);
 
         if (is_null($adminUser)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         [
             'email' => $email,
@@ -694,44 +874,38 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationBanned'
-                )
-                    ?: 'demotionProblemNotificationBanned',
+                ),
                 ['problem_name' => strval($problem->title)]
             );
             $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailBannedSubject'
-                )
-                    ?: 'demotionProblemEmailBannedSubject',
+                ),
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailBannedBody'
-                )
-                    ?: 'demotionProblemEmailBannedBody',
+                ),
                 $emailParams
             );
         } else {
             $notificationContents = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemNotificationWarning'
-                )
-                    ?: 'demotionProblemNotificationWarning',
+                ),
                 ['problem_name' => strval($problem->title)]
             );
             $subject = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailWarningSubject'
-                )
-                    ?: 'demotionProblemEmailWarningSubject',
+                ),
                 $emailParams
             );
             $body = \OmegaUp\ApiUtils::formatString(
                 \OmegaUp\Translations::getInstance()->get(
                     'demotionProblemEmailWarningBody'
-                )
-                    ?: 'demotionProblemEmailWarningBody',
+                ),
                 $emailParams
             );
         }
@@ -741,7 +915,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                 'user_id' => $user->user_id,
                 'contents' =>  json_encode(
                     [
-                        'type' => 'demotion',
+                        'type' => \OmegaUp\DAO\Notifications::DEMOTION,
                         'message' => $notificationContents,
                         'status' => $status
                     ]
@@ -761,7 +935,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * @param int     $nominator The user id of the person that made the nomination.  May be null.
      * @param int     $assignee  The user id of the person assigned to review nominations.  May be null.
      *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>} The response.
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>} The response.
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
@@ -823,16 +997,16 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
-     *
+     * @omegaup-request-param 'author_username'|'nominator_username'|'problem_alias'|null $column
      * @omegaup-request-param int $offset
+     * @omegaup-request-param null|string $query
      * @omegaup-request-param int $rowcount
      * @omegaup-request-param mixed $status
+     *
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiList(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
@@ -860,13 +1034,21 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             ['promotion', 'demotion']
         );
 
+        $query = $r->ensureOptionalString('query');
+        $column = $r->ensureOptionalEnum(
+            'column',
+            ['problem_alias','nominator_username','author_username']
+        );
+
         $response = \OmegaUp\DAO\QualityNominations::getNominations(
-            /* nominator */ null,
+            /* nominator */            null,
             /* assignee */ null,
             $offset,
             $rowCount,
             $types,
-            $status
+            $status,
+            $query,
+            $column
         );
 
         $pagerItems = \OmegaUp\Pager::paginate(
@@ -874,7 +1056,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
             $rowCount,
             $offset,
             /*$adjacent=*/5,
-            /*$params=*/[]
+            /*$params=*/ []
         );
 
         return [
@@ -890,15 +1072,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>} The response.
+     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}>} The response.
      *
      * @omegaup-request-param int $page
      * @omegaup-request-param int $page_size
      */
     public static function apiMyAssignedList(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         // Validate request
         $r->ensureMainUserIdentity();
@@ -908,15 +1088,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{nominations: list<array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nominator: array{name: null|string, username: string}, problem: array{alias: string, title: string}, qualitynomination_id: int, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}|null>, pager_items: list<array{class: string, label: string, page: int}>}
      *
      * @omegaup-request-param int $offset
      * @omegaup-request-param int $rowcount
+     *
+     * @return array{nominations: list<NominationListItem>, pager_items: list<PageItem>}
      */
     public static function apiMyList(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
 
@@ -964,16 +1143,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      *
      * @param \OmegaUp\Request $r
      *
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, array{language: string, markdown: string, images: array<string, string>}>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
      *
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @omegaup-request-param int $qualitynomination_id
      */
     public static function apiDetails(\OmegaUp\Request $r) {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
         // Validate request
         $r->ensureMainUserIdentity();
 
@@ -985,7 +1162,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, array{language: string, markdown: string, images: array<string, string>}>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
+     * @return array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: array<string, ProblemStatement>|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}
      */
     private static function getDetails(
         \OmegaUp\DAO\VO\Identities $identity,
@@ -1024,7 +1201,7 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
         $response['reviewer'] = $currentUserReviewer;
 
         if ($response['nomination'] === 'promotion') {
-            /** @var array<string, array{language: string, markdown: string, images: array<string, string>}> */
+            /** @var array<string, ProblemStatement> */
             $originalStatements = [];
             $response['original_contents'] = [
                 'statements' => $originalStatements,
@@ -1068,16 +1245,14 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}}, entrypoint: string}
+     * @return array{smartyProperties: array{payload: array{author: array{name: null|string, username: string}, contents?: array{before_ac?: bool, difficulty?: int, quality?: int, rationale?: string, reason?: string, statements?: array<string, string>, tags?: list<string>}, nomination: string, nomination_status: string, nominator: array{name: null|string, username: string}, original_contents?: array{source: null|string, statements: mixed|\stdClass, tags?: list<array{source: string, name: string}>}, problem: array{alias: string, title: string}, qualitynomination_id: int, reviewer: bool, status: string, time: \OmegaUp\Timestamp, votes: list<array{time: \OmegaUp\Timestamp|null, user: array{name: null|string, username: string}, vote: int}>}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $qualitynomination_id
      */
     public static function getDetailsForSmarty(
         \OmegaUp\Request $r
     ): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         $r->ensureInt('qualitynomination_id');
@@ -1090,6 +1265,9 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     $r->identity,
                     $qualityNominationId
                 ),
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleQualityNominationDetails'
+                ),
             ],
             'entrypoint' => 'qualitynomination_details',
         ];
@@ -1099,15 +1277,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
     public static function getListForSmarty(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         $r->ensureOptionalInt('page');
@@ -1128,8 +1304,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'length' => $length,
                     'myView' => false,
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleQualityNominationList'
+                ),
             ],
-            'template' => 'quality.nomination.list.tpl',
+            'entrypoint' => 'qualitynomination_list',
         ];
     }
 
@@ -1137,15 +1316,13 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
      * Gets the details for the quality nomination's list
      * with pagination for a certain user
      *
-     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}}, template: string}
+     * @return array{smartyProperties: array{payload: array{page: int, length: int, myView: bool}, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param int $length
      * @omegaup-request-param int $page
      */
     public static function getMyListForSmarty(\OmegaUp\Request $r): array {
-        if (OMEGAUP_LOCKDOWN) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException('lockdown');
-        }
+        \OmegaUp\Controllers\Controller::ensureNotInLockdown();
 
         $r->ensureMainUserIdentity();
         $r->ensureOptionalInt('page');
@@ -1165,8 +1342,11 @@ class QualityNomination extends \OmegaUp\Controllers\Controller {
                     'length' => $length,
                     'myView' => true,
                 ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleQualityNominationMyList'
+                ),
             ],
-            'template' => 'quality.nomination.list.tpl',
+            'entrypoint' => 'qualitynomination_list',
         ];
     }
 }

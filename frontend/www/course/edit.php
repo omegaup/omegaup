@@ -7,13 +7,7 @@ if (OMEGAUP_LOCKDOWN) {
 }
 
 \OmegaUp\UITools::render(
-    function (\OmegaUp\Request $r) {
-        $r->ensureMainUserIdentity();
-        return [
-            'smartyProperties' => [
-                'IS_UPDATE' => 1,
-            ],
-            'template' => 'course.edit.tpl',
-        ];
-    }
+    fn (\OmegaUp\Request $r) => \OmegaUp\Controllers\Course::getCourseEditDetailsForSmarty(
+        $r
+    )
 );

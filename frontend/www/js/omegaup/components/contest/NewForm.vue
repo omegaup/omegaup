@@ -1,36 +1,56 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-heading" v-if="!update">
+  <div class="card panel panel-primary">
+    <div v-if="!update" class="card-header bg-primary text-white panel-heading">
       <h3 class="panel-title">{{ T.contestNew }}</h3>
     </div>
-    <div class="panel-body">
-      <div class="btn-group bottom-margin" v-if="update">
-        <button class="btn btn-default" v-on:click="fillOmi()">
+    <div class="card-body panel-body">
+      <div class="btn-group bottom-margin mb-3">
+        <button class="btn btn-default btn-secondary" @click="fillOmi">
           {{ T.contestNewFormOmiStyle }}
         </button>
-        <button class="btn btn-default" v-on:click="fillPreIoi()">
+        <button class="btn btn-default btn-secondary" @click="fillPreIoi">
           {{ T.contestNewForm }}
         </button>
-        <button class="btn btn-default" v-on:click="fillConacup()">
+        <button class="btn btn-default btn-secondary" @click="fillConacup">
           {{ T.contestNewFormConacupStyle }}
         </button>
+        <button class="btn btn-default btn-secondary" @click="fillIcpc">
+          {{ T.contestNewFormICPCStyle }}
+        </button>
       </div>
-      <form class="new_contest_form" v-on:submit.prevent="onSubmit">
+      <form class="contest-form" @submit.prevent="onSubmit">
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.wordsTitle }}</label>
-            <input class="form-control" size="30" type="text" v-model="title" />
+            <input
+              v-model="title"
+              class="form-control"
+              :class="{
+                'is-invalid': invalidParameterName === 'title',
+              }"
+              name="title"
+              data-title
+              :placeholder="titlePlaceHolder"
+              size="30"
+              type="text"
+              required="required"
+            />
           </div>
           <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormShortTitle_alias_ }}</label>
+            <label>{{ T.contestNewFormShortTitleAlias }}</label>
             <input
-              class="form-control"
-              disabled="update"
-              type="text"
               v-model="alias"
+              class="form-control"
+              :class="{
+                'is-invalid': invalidParameterName === 'alias',
+              }"
+              name="alias"
+              :disabled="update"
+              type="text"
+              required="required"
             />
             <p class="help-block">
-              {{ T.contestNewFormShortTitle_alias_Desc }}
+              {{ T.contestNewFormShortTitleAliasDesc }}
             </p>
           </div>
         </div>
@@ -46,6 +66,7 @@
             <label>{{ T.contestNewFormEndDate }}</label>
             <omegaup-datetimepicker
               v-model="finishTime"
+              :is-invalid="invalidParameterName === 'finish_time'"
             ></omegaup-datetimepicker>
             <p class="help-block">{{ T.contestNewFormEndDateDesc }}</p>
           </div>
@@ -54,26 +75,34 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormDescription }}</label>
             <textarea
+              v-model="description"
               class="form-control"
+              :class="{
+                'is-invalid': invalidParameterName === 'description',
+              }"
+              name="description"
               cols="30"
               rows="10"
-              v-model="description"
+              required="required"
             ></textarea>
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormDifferentStarts }}</label>
             <div class="checkbox">
               <label
-                ><input type="checkbox" v-model="windowLengthEnabled" />
+                ><input v-model="windowLengthEnabled" type="checkbox" />
                 {{ T.wordsEnable }}</label
               >
             </div>
             <input
+              v-model="windowLength"
               class="form-control"
+              :class="{
+                'is-invalid': invalidParameterName === 'window_length',
+              }"
               size="3"
               type="text"
-              v-bind:disabled="!windowLengthEnabled"
-              v-model="windowLength"
+              :disabled="!windowLengthEnabled"
             />
             <p class="help-block">{{ T.contestNewFormDifferentStartsDesc }}</p>
           </div>
@@ -82,10 +111,15 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormScoreboardTimePercent }}</label>
             <input
+              v-model="scoreboard"
               class="form-control scoreboard-time-percent"
+              :class="{
+                'is-invalid': invalidParameterName === 'scoreboard',
+              }"
+              name="scoreboard"
               size="3"
               type="text"
-              v-model="scoreboard"
+              required="required"
             />
             <p class="help-block">
               {{ T.contestNewFormScoreboardTimePercentDesc }}
@@ -94,11 +128,14 @@
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormSubmissionsSeparation }}</label>
             <input
+              v-model="submissionsGap"
               class="form-control"
+              :class="{
+                'is-invalid': invalidParameterName === 'submissions_gap',
+              }"
               size="2"
               type="text"
-              v-model="submissionsGap"
-              value="1"
+              required="required"
             />
             <p class="help-block">
               {{ T.contestNewFormSubmissionsSeparationDesc }}
@@ -108,7 +145,7 @@
         <div class="row">
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormPenaltyType }}</label>
-            <select class="form-control" v-model="penaltyType">
+            <select v-model="penaltyType" class="form-control">
               <option value="none">
                 {{ T.contestNewFormNoPenalty }}
               </option>
@@ -127,18 +164,22 @@
           <div class="form-group col-md-6">
             <label>{{ T.wordsPenalty }}</label>
             <input
+              v-model="penalty"
               class="form-control"
+              :class="{
+                'is-invalid': invalidParameterName === 'penalty',
+              }"
               size="2"
               type="text"
-              v-model="penalty"
+              required="required"
             />
             <p class="help-block">{{ T.contestNewFormPenaltyDesc }}</p>
           </div>
         </div>
         <div class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label>{{ T.wordsFeedback }}</label>
-            <select class="form-control" v-model="feedback">
+            <select v-model="feedback" class="form-control">
               <option value="none">
                 {{ T.wordsNone }}
               </option>
@@ -153,47 +194,60 @@
               {{ T.contestNewFormImmediateFeedbackDesc }}
             </p>
           </div>
-          <div class="form-group col-md-6">
-            <label>{{ T.contestNewFormPointDecrementFactor }}</label>
-            <input
-              class="form-control"
-              size="4"
-              type="text"
-              v-model="pointsDecayFactor"
-            />
-            <p class="help-block">
-              {{ T.contestNewFormPointDecrementFactorDesc }}
-            </p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="form-group col-md-6">
+          <div class="form-group col-md-4">
             <label>{{ T.contestNewFormScoreboardAtEnd }}</label>
-            <select class="form-control" v-model="showScoreboardAfter">
-              <option v-bind:value="true">
+            <select v-model="showScoreboardAfter" class="form-control">
+              <option :value="true">
                 {{ T.wordsYes }}
               </option>
-              <option v-bind:value="false">
+              <option :value="false">
                 {{ T.wordsNo }}
               </option>
             </select>
             <p class="help-block">{{ T.contestNewFormScoreboardAtEndDesc }}</p>
           </div>
+          <div class="form-group col-md-4">
+            <label>{{ T.contestNewFormPartialScore }}</label>
+            <select v-model="partialScore" class="form-control">
+              <option :value="true">
+                {{ T.wordsYes }}
+              </option>
+              <option :value="false">
+                {{ T.wordsNo }}
+              </option>
+            </select>
+            <p class="help-block">{{ T.contestNewFormPartialScoreDesc }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label>{{ T.contestNewFormPointDecrementFactor }}</label>
+            <input
+              v-model="pointsDecayFactor"
+              class="form-control"
+              :class="{
+                'is-invalid': invalidParameterName === 'points_decay_factor',
+              }"
+              size="4"
+              type="text"
+              required="required"
+            />
+            <p class="help-block">
+              {{ T.contestNewFormPointDecrementFactorDesc }}
+            </p>
+          </div>
           <div class="form-group col-md-6">
             <label>{{ T.wordsLanguages }}</label
             ><br />
-            <select
-              class="form-control selectpicker"
-              multiple="multiple"
+            <multiselect
               v-model="languages"
+              :options="Object.keys(allLanguages)"
+              :multiple="true"
+              :placeholder="T.contestNewFormLanguages"
+              :close-on-select="false"
+              :allow-empty="false"
             >
-              <option
-                v-bind:value="lang"
-                v-for="(language, lang) in availableLanguages"
-              >
-                {{ language }}
-              </option>
-            </select>
+            </multiselect>
             <p class="help-block">{{ T.contestNewFormLanguages }}</p>
           </div>
         </div>
@@ -202,7 +256,7 @@
             <label>{{ T.contestNewFormBasicInformationRequired }}</label>
             <div class="checkbox">
               <label
-                ><input type="checkbox" v-model="needsBasicInformation" />{{
+                ><input v-model="needsBasicInformation" type="checkbox" />{{
                   T.wordsEnable
                 }}</label
               >
@@ -213,7 +267,7 @@
           </div>
           <div class="form-group col-md-6">
             <label>{{ T.contestNewFormUserInformationRequired }}</label>
-            <select class="form-control" v-model="requestsUserInformation">
+            <select v-model="requestsUserInformation" class="form-control">
               <option value="no">
                 {{ T.wordsNo }}
               </option>
@@ -230,11 +284,12 @@
           </div>
         </div>
         <div class="form-group">
-          <button class="btn btn-primary" type="submit" v-if="update">
-            {{ T.contestNewFormUpdateContest }}
-          </button>
-          <button class="btn btn-primary" type="submit" v-else="">
-            {{ T.contestNewFormScheduleContest }}
+          <button class="btn btn-primary" type="submit">
+            {{
+              update
+                ? T.contestNewFormUpdateContest
+                : T.contestNewFormScheduleContest
+            }}
           </button>
         </div>
       </form>
@@ -243,47 +298,72 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import DateTimePicker from '../DateTimePicker.vue';
+import Multiselect from 'vue-multiselect';
 
 @Component({
   components: {
     'omegaup-datetimepicker': DateTimePicker,
+    Multiselect,
   },
 })
 export default class NewForm extends Vue {
-  @Prop() data!: omegaup.Contest;
   @Prop() update!: boolean;
+  @Prop() allLanguages!: string[];
+  @Prop({ default: '' }) initialAlias!: string;
+  @Prop({ default: '' }) initialDescription!: string;
+  @Prop({ default: 'none' }) initialFeedback!: string;
+  @Prop() initialLanguages!: string[];
+  @Prop() initialFinishTime!: Date;
+  @Prop({ default: false }) initialNeedsBasicInformation!: boolean;
+  @Prop({ default: 0 }) initialPenalty!: number;
+  @Prop({ default: 'none' }) initialPenaltyType!: string;
+  @Prop({ default: 0.0 }) initialPointsDecayFactor!: number;
+  @Prop({ default: 'no' }) initialRequestsUserInformation!: string;
+  @Prop({ default: 100 }) initialScoreboard!: number;
+  @Prop({ default: true }) initialShowScoreboardAfter!: boolean;
+  @Prop({ default: true }) initialPartialScore!: boolean;
+  @Prop() initialStartTime!: Date;
+  @Prop() initialSubmissionsGap!: number;
+  @Prop({ default: '' }) initialTitle!: string;
+  @Prop({ default: null }) initialWindowLength!: null | number;
+  @Prop({ default: null }) invalidParameterName!: null | string;
 
   T = T;
-  alias = this.data.alias;
-  availableLanguages = this.data.available_languages;
-  contest = this.data;
-  contestantMustRegister = this.data.contestant_must_register;
-  description = this.data.description;
-  feedback = this.data.feedback;
-  finishTime = this.data.finish_time;
-  scoreboard = this.data.scoreboard;
-  languages = this.data.languages;
-  needsBasicInformation = this.data.needs_basic_information;
-  penalty = this.data.penalty;
-  penaltyType = this.data.penalty_type;
-  penaltyCalcPolicy = this.data.penalty_calc_policy;
-  pointsDecayFactor = this.data.points_decay_factor;
-  requestsUserInformation = this.data.requests_user_information;
-  startTime = this.data.start_time;
-  showPenalty = this.data.show_penalty;
-  showScoreboardAfter = this.data.show_scoreboard_after;
-  submissionsGap = this.data.submissions_gap;
-  title = this.data.title;
+  alias = this.initialAlias;
+  description = this.initialDescription;
+  feedback = this.initialFeedback;
+  finishTime = this.initialFinishTime;
+  languages = this.initialLanguages;
+  needsBasicInformation = this.initialNeedsBasicInformation;
+  penalty = this.initialPenalty;
+  penaltyType = this.initialPenaltyType;
+  pointsDecayFactor = this.initialPointsDecayFactor;
+  requestsUserInformation = this.initialRequestsUserInformation;
+  scoreboard = this.initialScoreboard;
+  showScoreboardAfter = this.initialShowScoreboardAfter;
+  partialScore = this.initialPartialScore;
+  startTime = this.initialStartTime;
+  submissionsGap = this.initialSubmissionsGap
+    ? this.initialSubmissionsGap / 60
+    : 1;
+  title = this.initialTitle;
+  windowLength = this.initialWindowLength;
+  windowLengthEnabled = this.initialWindowLength !== null;
   titlePlaceHolder = '';
-  windowLength = this.data.window_length || 0;
-  windowLengthEnabled =
-    this.data.window_length != 0 && this.data.window_length != null;
+
+  @Watch('windowLengthEnabled')
+  onPropertyChange(newValue: boolean): void {
+    if (!newValue) {
+      this.windowLength = null;
+    }
+  }
 
   fillOmi(): void {
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderOmiStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;
@@ -297,6 +377,7 @@ export default class NewForm extends Vue {
   }
 
   fillPreIoi(): void {
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderIoiStyle;
     this.windowLengthEnabled = true;
     this.windowLength = 180;
@@ -310,6 +391,7 @@ export default class NewForm extends Vue {
   }
 
   fillConacup(): void {
+    this.languages = Object.keys(this.allLanguages);
     this.titlePlaceHolder = T.contestNewFormTitlePlaceholderConacupStyle;
     this.windowLengthEnabled = false;
     this.windowLength = 0;
@@ -322,12 +404,61 @@ export default class NewForm extends Vue {
     this.showScoreboardAfter = true;
   }
 
-  onSubmit() {
-    this.$emit('emit-update-contest', this);
+  fillIcpc(): void {
+    const languagesKeys = Object.keys(this.allLanguages);
+    this.languages = languagesKeys.filter(
+      (lang) =>
+        lang.includes('c11') ||
+        lang.includes('cpp') ||
+        lang.includes('py') ||
+        lang.includes('java'),
+    );
+    this.titlePlaceHolder = T.contestNewFormTitlePlaceholderICPCStyle;
+    this.windowLengthEnabled = false;
+    this.windowLength = null;
+    this.scoreboard = 80;
+    this.pointsDecayFactor = 0;
+    this.submissionsGap = 1;
+    this.feedback = 'none';
+    this.penalty = 20;
+    this.penaltyType = 'contest_start';
+    this.showScoreboardAfter = true;
+    this.partialScore = false;
   }
 
-  mounted() {
-    $('.selectpicker', this.$el).selectpicker();
+  onSubmit() {
+    if (this.update) {
+      this.$emit('emit-update-contest', this);
+      return;
+    }
+    const contest: omegaup.Contest = {
+      alias: this.alias,
+      title: this.title,
+      description: this.description,
+      start_time: this.startTime,
+      finish_time: this.finishTime,
+      window_length: !this.windowLengthEnabled ? null : this.windowLength,
+      points_decay_factor: this.pointsDecayFactor,
+      submissions_gap: (this.submissionsGap || 1) * 60,
+      languages: this.languages,
+      feedback: this.feedback,
+      penalty: this.penalty,
+      scoreboard: this.scoreboard,
+      penalty_type: this.penaltyType,
+      show_scoreboard_after: this.showScoreboardAfter,
+      partial_score: this.partialScore,
+      needs_basic_information: this.needsBasicInformation,
+      requests_user_information: this.requestsUserInformation,
+    };
+    this.$emit('create-contest', contest);
   }
 }
 </script>
+
+<style lang="scss">
+@import '../../../../../../node_modules/vue-multiselect/dist/vue-multiselect.min.css';
+
+.multiselect__tag {
+  background: #678dd7;
+}
+</style>

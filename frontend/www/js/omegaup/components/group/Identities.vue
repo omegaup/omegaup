@@ -3,15 +3,15 @@
     <div class="panel-body">
       <div class="upload-csv">
         <div class="panel-heading">
-          <div v-html="T.groupsCsvHelp"></div>
+          <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
           {{ T.groupsUploadCsvFile }}
-          <input name="identities" type="file" v-on:change="readCsv" />
+          <input name="identities" type="file" @change="readCsv" />
         </div>
       </div>
       <br />
       <div
+        v-show="identities.length > 0"
         class="panel panel-default no-bottom-margin"
-        v-show="identities.length &gt; 0"
       >
         <div class="panel-heading">
           <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
@@ -29,7 +29,11 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="identity in identities">
+            <tr
+              v-for="identity in identities"
+              :key="identity.username"
+              :class="{ 'alert-danger': userErrorRow === identity.username }"
+            >
               <td class="username">
                 <strong>{{ identity.username }}</strong>
               </td>
@@ -46,7 +50,7 @@
           <button
             class="btn btn-primary"
             name="create-identities"
-            v-on:click.prevent="$emit('bulk-identities', identities)"
+            @click.prevent="$emit('bulk-identities', identities)"
           >
             {{ T.groupCreateIdentities }}
           </button>
@@ -54,7 +58,7 @@
         <div class="panel-footer">
           <button
             class="btn"
-            v-on:click.prevent="$emit('download-identities', identities)"
+            @click.prevent="$emit('download-identities', identities)"
           >
             <span
               class="glyphicon glyphicon-download-alt"
@@ -69,17 +73,23 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class Identities extends Vue {
   @Prop() groupAlias!: string;
+  @Prop() userErrorRow!: string | null;
 
   T = T;
-  identities: omegaup.Identity[] = [];
+  identities: types.Identity[] = [];
 
   readCsv(ev: InputEvent): void {
     const fileUpload = <HTMLInputElement>ev.target;
@@ -90,7 +100,7 @@ export default class Identities extends Vue {
     const regex = /.*\.(?:csv|txt)$/;
 
     if (!regex.test(fileUpload.value.toLowerCase())) {
-      UI.error(T.groupsInvalidCsv);
+      ui.error(T.groupsInvalidCsv);
       return;
     }
     this.$emit('read-csv', this, fileUpload);

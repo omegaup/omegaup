@@ -3,12 +3,12 @@ require_once('../../server/bootstrap_smarty.php');
 
 try {
     $r = new \OmegaUp\Request([
-            'contest_alias' => $_REQUEST['alias'],
-            'auth_token' => array_key_exists(
-                'ouat',
-                $_REQUEST
-            ) ? $_REQUEST['ouat'] : null,
-        ]);
+        'contest_alias' => $_REQUEST['alias'],
+        'auth_token' => array_key_exists(
+            'ouat',
+            $_REQUEST
+        ) ? $_REQUEST['ouat'] : null,
+    ]);
 
     // Open the contest for the current user
     $contest = \OmegaUp\Controllers\Contest::apiOpen($r);

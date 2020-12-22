@@ -1,14 +1,14 @@
 import contest_ScoreboardMerge from '../components/contest/ScoreboardMerge.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import * as api from '../api';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   var scoreboardMerge = new Vue({
     el: '#scoreboard-merge',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-contest-scoreboardmerge', {
         props: {
           availableContests: this.contests,
@@ -17,11 +17,11 @@ OmegaUp.on('ready', function() {
           aliases: this.aliases,
         },
         on: {
-          'get-scoreboard': function(contestAliases) {
+          'get-scoreboard': function (contestAliases) {
             api.Contest.scoreboardMerge({
               contest_aliases: contestAliases.map(encodeURIComponent).join(','),
             })
-              .then(function(ranks) {
+              .then(function (ranks) {
                 const ranking = ranks.ranking;
                 let scoreboard = [],
                   aliases = [],
@@ -36,7 +36,8 @@ OmegaUp.on('ready', function() {
                   }
                   // Fill scoreboard object
                   for (const index in ranking) {
-                    if (!ranking.hasOwnProperty(index)) continue;
+                    if (!Object.prototype.hasOwnProperty.call(ranking, index))
+                      continue;
                     const place = parseInt(index) + 1;
                     const entry = ranking[index];
                     scoreboard.push({
@@ -54,17 +55,17 @@ OmegaUp.on('ready', function() {
                 scoreboardMerge.showPenalty = showPenalty;
                 scoreboardMerge.scoreboard = scoreboard;
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
     },
-    mounted: function() {
+    mounted: function () {
       api.Contest.list()
-        .then(function(contests) {
+        .then(function (contests) {
           scoreboardMerge.contests = contests.results;
         })
-        .catch(UI.apiError);
+        .catch(ui.apiError);
     },
     data: {
       contests: [],

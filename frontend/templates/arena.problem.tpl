@@ -1,5 +1,6 @@
-{include file='head.tpl' jsfile={version_hash src='/ux/contest.js'} bodyid='only-problem' inArena=true inline}
+{include file='head.tpl' bodyid='only-problem' inArena=true inline}
 <script type="text/json" id="payload">{$payload|json_encode}</script>
+{js_include entrypoint="arena_contest"}
   {if !empty($payload['languages'])}
   <ul class="tabs">
     <li><a href="#problems" class="active">{#wordsProblem#}</a></li>
@@ -14,34 +15,9 @@
   {/if}
   <div id="problems" class="tab">
     <div id="problem" class="main">
-      <h1 class="title">
-        {$title|escape}
-        {if $quality_seal || $visibility == 3}<img src="/media/quality-badge-sm.png" title="{#wordsHighQualityProblem#}"></img>{/if}
-        {if $visibility == 1 || $visibility == -1}<span class="glyphicon glyphicon-warning-sign" title="{#wordsWarningProblem#}"></span>{/if}
-        {if $visibility == 0 || $visibility == -1}<span class="glyphicon glyphicon-eye-close" title="{#wordsPrivate#}"></span>{/if}
-        {if $visibility <= -2}<span class="glyphicon glyphicon-ban-circle" title="{#wordsBannedProblem#}"></span>{/if}
-        {if $problem_admin}
-          (<a href="/problem/{$problem_alias}/edit/">{#wordsEdit#}</a>)
-        {/if}
-      </h1>
-      <table class="data">
-        <tr>
-          <td>{#wordsPoints#}</td>
-          <td class="points">{$points|escape}</td>
-          <td>{#wordsMemoryLimit#}</td>
-          <td class="memory_limit">{$memory_limit|escape}</td>
-        </tr>
-        <tr>
-          <td>{#wordsTimeLimit#}</td>
-          <td class="time_limit">{$time_limit|escape}</td>
-          <td>{#wordsOverallWallTimeLimit#}</td>
-          <td class="overall_wall_time_limit">{$overall_wall_time_limit|escape}</td>
-        </tr>
-        <tr>
-          <td>{#problemEditFormInputLimit#}</td>
-          <td class="input_limit">{$input_limit|escape}</td>
-        </tr>
-      </table>
+      <div id="problem-settings-summary"></div>
+      <script type="text/json" id="settings-summary-payload">{$settings_summary_payload|json_encode}</script>
+      {js_include entrypoint="problem_settings_summary"}
       {if $karel_problem}
         <div class="karel-js-link">
           <a href="/karel.js/{if !empty($sample_input)}#mundo:{$sample_input|escape:url}{/if}" target="_blank">{#openInKarelJs#} <span class="glyphicon glyphicon-new-window"></span></a>
@@ -118,7 +94,7 @@
   </div>
 </div>
 <div id="overlay">
-  {include file='arena.runsubmit.tpl' inline}
+  <div id="run-submit"></div>
   <div id="run-details"></div>
 </div>
 <div id="footer"></div>

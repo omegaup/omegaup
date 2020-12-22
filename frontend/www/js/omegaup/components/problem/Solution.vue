@@ -1,88 +1,73 @@
 <template>
-  <div class="panel">
-    <div
-      v-show="showSolution"
-      class="solution"
-      v-html="solution"
-      ref="solutionRef"
-    ></div>
-    <div class="interstitial" v-if="!showSolution">
-      <p v-html="statusMessage"></p>
-      <p
-        v-html="
-          UI.formatString(T.solutionTokens, {
+  <div class="card">
+    <omegaup-markdown
+      v-if="showSolution"
+      :markdown="solution.markdown"
+      :image-mapping="solution.images"
+    ></omegaup-markdown>
+    <div v-else class="interstitial">
+      <omegaup-markdown :markdown="statusMessage"></omegaup-markdown>
+      <omegaup-markdown
+        v-show="allTokens !== null && availableTokens !== null"
+        :markdown="
+          ui.formatString(T.solutionTokens, {
             available: availableTokens,
             total: allTokens,
           })
         "
-        v-show="allTokens !== null &amp;&amp; availableTokens !== null"
-      ></p>
+      ></omegaup-markdown>
       <div class="text-center">
-        <a
-          class="btn btn-primary btn-md"
+        <button
           v-if="status === 'unlocked'"
-          v-on:click="$emit('get-solution')"
-          >{{ T.wordsSeeSolution }}</a
-        >
-        <a
           class="btn btn-primary btn-md"
-          v-else-if="status === 'locked' &amp;&amp; allTokens === null &amp;&amp; availableTokens === null"
-          v-on:click="$emit('get-tokens')"
-          >{{ T.solutionViewCurrentTokens }}</a
+          @click="$emit('get-solution')"
         >
-        <a
+          {{ T.wordsSeeSolution }}
+        </button>
+        <button
+          v-else-if="
+            status === 'locked' &&
+            allTokens === null &&
+            availableTokens === null
+          "
           class="btn btn-primary btn-md"
-          v-else-if="status === 'locked' &amp;&amp; availableTokens &gt; 0"
-          v-on:click="$emit('unlock-solution')"
-          >{{ T.wordsUnlockSolution }}</a
+          @click="$emit('get-tokens')"
         >
+          {{ T.solutionViewCurrentTokens }}
+        </button>
+        <button
+          v-else-if="status === 'locked' && availableTokens &gt; 0"
+          class="btn btn-primary btn-md"
+          @click="$emit('unlock-solution')"
+        >
+          {{ T.wordsUnlockSolution }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
-<style>
-.interstitial {
-  padding: 2em;
-}
-
-.solution {
-  padding: 2em 7em;
-}
-
-.solution-tokens {
-  font-size: 1.25em;
-}
-</style>
-
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
+import { types } from '../../api_types';
 
-@Component
+import omegaup_Markdown from '../Markdown.vue';
+
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class ProblemSolution extends Vue {
   @Prop() status!: string;
-  @Prop() solution!: string;
+  @Prop({ default: null }) solution!: types.ProblemStatement | null;
   @Prop() availableTokens!: number;
   @Prop() allTokens!: number;
 
   T = T;
-  UI = UI;
-
-  mounted(): void {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
-  }
-
-  @Watch('solution')
-  onSolutionUpdated() {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
-  }
-
-  @Watch('showSolution')
-  onShowSolutionUpdated() {
-    MathJax.Hub.Queue(['Typeset', MathJax.Hub, this.$refs.solutionRef]);
-  }
+  ui = ui;
 
   get showSolution(): boolean {
     return this.status === 'unlocked' && this.solution !== null;
@@ -104,3 +89,17 @@ export default class ProblemSolution extends Vue {
   }
 }
 </script>
+
+<style>
+.interstitial {
+  padding: 2em;
+}
+
+.solution {
+  padding: 2em 7em;
+}
+
+.solution-tokens {
+  font-size: 1.25em;
+}
+</style>

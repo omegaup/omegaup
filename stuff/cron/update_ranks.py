@@ -4,6 +4,7 @@
 
 import argparse
 import datetime
+import json
 import logging
 import os
 import sys
@@ -97,14 +98,14 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
             `i`.`country_id`,
             `i`.`state_id`,
             `isc`.`school_id`,
-            `up`.`identity_id`,
+            `i`.`identity_id`,
             `i`.`user_id`,
             COUNT(`p`.`problem_id`) AS `problems_solved_count`,
             SUM(ROUND(100 / LOG(2, `p`.`accepted` + 1) , 0)) AS `score`
         FROM
         (
-            SELECT DISTINCT
-                `s`.`identity_id`,
+            SELECT
+                `iu`.`user_id`,
                 `s`.`problem_id`
             FROM
                 `Submissions` AS `s`
@@ -112,20 +113,28 @@ def update_user_rank(cur: MySQLdb.cursors.BaseCursor) -> Sequence[float]:
                 `Runs` AS `r`
             ON
                 `r`.run_id = `s`.current_run_id
+            INNER JOIN
+                `Identities` AS `iu`
+            ON
+                `iu`.identity_id = `s`.identity_id
             WHERE
-                `r`.verdict = 'AC' AND `s`.type = 'normal'
+                `r`.verdict = 'AC' AND
+                `s`.type = 'normal' AND
+                `iu`.user_id IS NOT NULL
+            GROUP BY
+                `iu`.user_id, `s`.`problem_id`
         ) AS up
+        INNER JOIN
+            `Users` AS `u` ON `u`.`user_id` = `up`.`user_id`
         INNER JOIN
             `Problems` AS `p`
         ON `p`.`problem_id` = up.`problem_id` AND `p`.visibility > 0
         INNER JOIN
-            `Identities` AS `i` ON `i`.`identity_id` = up.`identity_id`
+            `Identities` AS `i` ON `i`.`identity_id` = u.`main_identity_id`
         LEFT JOIN
             `Identities_Schools` AS `isc`
         ON
             `isc`.`identity_school_id` = `i`.`current_identity_school_id`
-        INNER JOIN
-            `Users` AS `u` ON `u`.`user_id` = `i`.`user_id`
         WHERE
             `u`.`is_private` = 0
             AND NOT EXISTS (
@@ -520,16 +529,16 @@ def update_coder_of_the_month_candidates(
             1)
 
     # First make sure there are not already selected coder of the month
-        cur.execute('''
-                SELECT
-                    COUNT(*) AS `count`
-                FROM
-                    `Coder_Of_The_Month`
-                WHERE
-                    `time` = %s AND
-                    `selected_by` IS NOT NULL AND
-                    `category` = %s;
-                ''', (first_day_of_next_month, category))
+    cur.execute('''
+            SELECT
+                COUNT(*) AS `count`
+            FROM
+                `Coder_Of_The_Month`
+            WHERE
+                `time` = %s AND
+                `selected_by` IS NOT NULL AND
+                `category` = %s;
+            ''', (first_day_of_next_month, category))
     for row in cur:
         if row['count'] > 0:
             logging.info('Skipping because already exist selected coder')
@@ -590,7 +599,10 @@ def update_coder_of_the_month_candidates(
                 s.time >= %s AND s.time <= %s
             ) AS up
           INNER JOIN
-            Problems ps ON ps.problem_id = up.problem_id and ps.visibility >= 1
+            Problems ps ON
+            ps.problem_id = up.problem_id
+            AND ps.visibility >= 1
+            AND ps.quality_seal = 1
           INNER JOIN
             Identities i ON i.identity_id = up.identity_id
           LEFT JOIN
@@ -662,45 +674,77 @@ def update_coder_of_the_month_candidates(
                         row['score'],
                         row['ProblemsSolved']
                     ))
+        cur.execute(
+            '''
+            INSERT INTO
+                `Notifications` (
+                    `user_id`,
+                    `contents`
+                )
+            VALUES (
+                %s,
+                %s
+            );
+            ''',
+            (
+                row['user_id'],
+                json.dumps({
+                    'type': 'coder-of-the-month',
+                    'body': {
+                        'localizationString': 'coderOfTheMonthNotice',
+                        'localizationParams': {
+                            'username': row['username'],
+                        },
+                        'iconUrl': '/media/info.png',
+                    },
+                }),
+            ),
+        )
 
 
 def update_users_stats(
         cur: MySQLdb.cursors.BaseCursor,
         dbconn: MySQLdb.connections.Connection,
-        date: datetime.date) -> None:
+        date: datetime.date,
+        update_coder_of_the_month: bool) -> None:
     '''Updates all the information and ranks related to users'''
     logging.info('Updating users stats...')
     try:
         try:
             scores = update_user_rank(cur)
             update_user_rank_cutoffs(cur, scores)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update user ranking')
             raise
 
         try:
             update_author_rank(cur)
-            dbconn.commit()
         except:  # noqa: bare-except
             logging.exception('Failed to update authors ranking')
             raise
+        # We update both the general rank and the author's rank in the same
+        # transaction since both are stored in the same DB table.
+        dbconn.commit()
 
-        try:
-            update_coder_of_the_month_candidates(cur, date, 'all')
-            dbconn.commit()
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to update candidates to coder of the month')
-            raise
+        if update_coder_of_the_month:
+            try:
+                update_coder_of_the_month_candidates(cur, date, 'all')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month')
+                raise
 
-        try:
-            update_coder_of_the_month_candidates(cur, date, 'female')
-            dbconn.commit()
-        except:  # noqa: bare-except
-            logging.exception(
-                'Failed to update candidates to coder of the month female')
-            raise
+            try:
+                update_coder_of_the_month_candidates(cur, date, 'female')
+                dbconn.commit()
+            except:  # noqa: bare-except
+                logging.exception(
+                    'Failed to update candidates to coder of the month female')
+                raise
+        else:
+            logging.info('Skipping updating Coder of the Month')
+
         logging.info('Users stats updated')
     except:  # noqa: bare-except
         logging.exception('Failed to update all users stats')
@@ -750,6 +794,9 @@ def main() -> None:
                         type=_parse_date,
                         default=_default_date(),
                         help='The date the command should take as today')
+    parser.add_argument('--update-coder-of-the-month',
+                        action='store_true',
+                        help='Update the Coder of the Month')
     args = parser.parse_args()
     lib.logs.init(parser.prog, args)
 
@@ -758,7 +805,8 @@ def main() -> None:
     try:
         with dbconn.cursor(cursorclass=MySQLdb.cursors.DictCursor) as cur:
             update_problem_accepted_stats(cur)
-            update_users_stats(cur, dbconn, args.date)
+            update_users_stats(cur, dbconn, args.date,
+                               args.update_coder_of_the_month)
             update_schools_stats(cur, dbconn, args.date)
     finally:
         dbconn.close()

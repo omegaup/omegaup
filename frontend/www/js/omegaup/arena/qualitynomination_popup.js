@@ -1,33 +1,31 @@
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import qualitynomination_Popup from '../components/qualitynomination/Popup.vue';
 import Vue from 'vue';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let qualityPayload = JSON.parse(
     document.getElementById('quality-payload').innerText,
   );
-  let problemStatement = document.getElementsByClassName('statement')[0]
-    .innerText;
 
   let qualityNominationForm = new Vue({
     el: '#qualitynomination-popup',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('qualitynomination-popup', {
         props: {
           nominated: this.nominated,
-          nominatedBeforeAC: this.nominatedBeforeAC,
+          nominatedBeforeAc: this.nominatedBeforeAc,
           solved: this.solved,
           tried: this.tried,
           dismissed: this.dismissed,
-          dismissedBeforeAC: this.dismissedBeforeAC,
+          dismissedBeforeAc: this.dismissedBeforeAc,
           canNominateProblem: this.canNominateProblem,
           problemAlias: this.problemAlias,
         },
         on: {
-          submit: function(ev) {
+          submit: function (ev) {
             let contents = {};
             if (!ev.solved && ev.tried) {
               contents.before_ac = true;
@@ -45,9 +43,9 @@ OmegaUp.on('ready', function() {
               problem_alias: qualityPayload.problem_alias,
               nomination: 'suggestion',
               contents: JSON.stringify(contents),
-            }).catch(UI.apiError);
+            }).catch(ui.apiError);
           },
-          dismiss: function(ev) {
+          dismiss: function (ev) {
             let contents = {};
             if (!ev.solved && ev.tried) {
               contents.before_ac = true;
@@ -57,21 +55,21 @@ OmegaUp.on('ready', function() {
               nomination: 'dismissal',
               contents: JSON.stringify(contents),
             })
-              .then(function(data) {
-                UI.info(T.qualityNominationRateProblemDesc);
+              .then(function (data) {
+                ui.info(T.qualityNominationRateProblemDesc);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
     },
     data: {
       nominated: qualityPayload.nominated,
-      nominatedBeforeAC: qualityPayload.nominatedBeforeAC,
+      nominatedBeforeAc: qualityPayload.nominatedBeforeAc,
       solved: qualityPayload.solved,
       tried: qualityPayload.tried,
       dismissed: qualityPayload.dismissed,
-      dismissedBeforeAC: qualityPayload.dismissedBeforeAC,
+      dismissedBeforeAc: qualityPayload.dismissedBeforeAc,
       canNominateProblem: qualityPayload.can_nominate_problem,
       problemAlias: qualityPayload.problem_alias,
     },

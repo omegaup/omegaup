@@ -1,15 +1,15 @@
 import Vue from 'vue';
 import qualitynomination_Details from '../components/qualitynomination/Details.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import T from '../lang';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let payload = JSON.parse(document.getElementById('payload').innerText);
   let viewDetails = new Vue({
     el: '#main-container',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-qualitynomination-details', {
         props: {
           contents: payload.contents,
@@ -32,9 +32,9 @@ OmegaUp.on('ready', function() {
           initialRationale: payload.contents.rationale,
         },
         on: {
-          'mark-resolution': function(viewDetails, newStatus, all) {
+          'mark-resolution': function (viewDetails, newStatus, all) {
             if (!viewDetails.rationale) {
-              UI.error(T.editFieldRequired);
+              ui.error(T.editFieldRequired);
               return;
             }
             api.QualityNomination.resolve({
@@ -44,10 +44,10 @@ OmegaUp.on('ready', function() {
               rationale: viewDetails.rationale,
               all: all,
             })
-              .then(function(data) {
-                UI.success(T.qualityNominationResolutionSuccess);
+              .then(function (data) {
+                ui.success(T.qualityNominationResolutionSuccess);
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });

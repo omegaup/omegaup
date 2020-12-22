@@ -1,31 +1,25 @@
-import { types } from './api_types';
 import T from './lang';
 import { formatDate, formatDateTime } from './time';
 import { omegaup } from './omegaup';
 
-export function navigateTo(url: Location): void {
-  window.location = url;
+export function navigateTo(href: string): void {
+  window.location.href = href;
 }
 
 function escapeString(s: string): string {
   if (typeof s !== 'string') return '';
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 export { escapeString as escape };
 
-export function buildURLQuery(queryParameters: {
-  [key: string]: string;
-}): string {
+export function buildURLQuery(queryParameters: { [key: string]: any }): string {
   return Object.entries(queryParameters)
     .map(([key, value]) => {
       const encodedKey = encodeURIComponent(key);
       if (Array.isArray(value)) {
         return value
-          .map(entry => `${encodedKey}[]=${encodeURIComponent(entry)}`)
+          .map((entry) => `${encodedKey}[]=${encodeURIComponent(entry)}`)
           .join('&');
       }
       return `${encodedKey}=${encodeURIComponent(value)}`;
@@ -33,11 +27,17 @@ export function buildURLQuery(queryParameters: {
     .join('&');
 }
 
-export function isVirtual(contest: omegaup.Contest): boolean {
+export function isVirtual(contest: {
+  rerun_id?: number;
+  title: string;
+}): boolean {
   return !!contest.rerun_id && contest.rerun_id > 0;
 }
 
-export function contestTitle(contest: omegaup.Contest): string {
+export function contestTitle(contest: {
+  rerun_id?: number;
+  title: string;
+}): string {
   if (isVirtual(contest)) {
     return formatString(T.virtualContestSuffix, {
       title: contest.title,
@@ -52,7 +52,7 @@ export function formatString(
 ): string {
   const re = new RegExp('%\\(([^!)]+)(?:!([^)]+))?\\)', 'g');
   return template.replace(re, (match, key, modifier) => {
-    if (!values.hasOwnProperty(key)) {
+    if (!Object.prototype.hasOwnProperty.call(values, key)) {
       // If the array does not provide a replacement for the key, just return
       // the original substring.
       return match;
@@ -127,10 +127,10 @@ export function apiError(response: { error?: string; payload?: any }): void {
   );
 }
 
-export function ignoreError(response: {
-  error?: string;
-  payload?: any;
-}): void {}
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function ignoreError(response: { error?: string; payload?: any }): void {
+  return;
+}
 
 export function dismissNotifications(originalStatusCounter?: number): void {
   const statusElement = $('#status');
@@ -164,7 +164,7 @@ export function prettyPrintJSON(json: JSONType): string {
 }
 
 export function syntaxHighlight(json: JSONType): string {
-  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
+  const jsonRE = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
   return json
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -223,32 +223,6 @@ export function copyToClipboard(value: string): void {
   } finally {
     document.body.removeChild(tempInput);
   }
-}
-
-export function renderSampleToClipboardButton(): void {
-  document
-    .querySelectorAll('.sample_io > tbody > tr > td:first-of-type')
-    .forEach(function(item, index) {
-      const preElement = item.querySelector('pre');
-      if (!preElement) {
-        // This can only happen if a user messed up with the markdown of a
-        // problem.
-        return;
-      }
-      const inputValue = preElement.innerHTML;
-
-      const clipboardButton = document.createElement('button');
-      clipboardButton.title = T.copySampleCaseTooltip;
-      clipboardButton.className = 'glyphicon glyphicon-copy clipboard';
-
-      clipboardButton.addEventListener('click', (event: Event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        copyToClipboard(inputValue);
-      });
-
-      item.appendChild(clipboardButton);
-    });
 }
 
 declare global {

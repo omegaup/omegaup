@@ -1,13 +1,13 @@
 import Vue from 'vue';
 import problem_Feedback from '../components/problem/Feedback.vue';
-import { OmegaUp } from '../omegaup';
-import * as UI from '../ui';
+import { OmegaUp } from '../omegaup-legacy';
+import * as ui from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   const payload = JSON.parse(document.getElementById('payload').innerText);
   let problemFeedback = new Vue({
     el: '#problem-feedback',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-problem-feedback', {
         props: {
           qualityHistogram: this.qualityHistogram,

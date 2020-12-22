@@ -1,4 +1,4 @@
-omegaup.OmegaUp.on('ready', function() {
+omegaup.OmegaUp.on('ready', function () {
   var interviewAlias = /\/interview\/([^\/]+)\/result\/([^\/]+)?.*/.exec(
     window.location.pathname,
   )[1];
@@ -10,7 +10,7 @@ omegaup.OmegaUp.on('ready', function() {
     interview: interviewAlias,
     username: candidateUsername,
   })
-    .then(function(userStats) {
+    .then(function (userStats) {
       $('.page-header h1 span').html(
         omegaup.T.interviewResultsFor + ' ' + userStats.name_or_username,
       );
@@ -33,7 +33,7 @@ omegaup.OmegaUp.on('ready', function() {
     username: candidateUsername,
     contest_alias: interviewAlias,
   })
-    .then(function(runs) {
+    .then(function (runs) {
       console.log(runs);
     })
     .catch(omegaup.UI.ignoreError);

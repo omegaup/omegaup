@@ -69,13 +69,13 @@ class Identity {
             $unassociatedIdentity['username']
         );
         if (is_null($unassociatedIdentity)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
         $associatedIdentity = \OmegaUp\DAO\Identities::FindByUsername(
             $associatedIdentity['username']
         );
         if (is_null($associatedIdentity)) {
-            throw new \OmegaUp\Exceptions\NotFoundException('userNotFound');
+            throw new \OmegaUp\Exceptions\NotFoundException('userNotExist');
         }
 
         $unassociatedIdentity->password = $password;

@@ -38,8 +38,9 @@ class SessionManager {
         string $path
     ): void {
         // Expire all old cookies
-        if (isset($_SERVER['HTTP_COOKIE'])) {
-            $cookies = explode(';', strval($_SERVER['HTTP_COOKIE']));
+        $httpCookie = \OmegaUp\Request::getServerVar('HTTP_COOKIE');
+        if (!empty($httpCookie)) {
+            $cookies = explode(';', $httpCookie);
             foreach ($cookies as $cookie) {
                 $parts = explode('=', $cookie);
                 $oldName = trim($parts[0]);
@@ -50,6 +51,7 @@ class SessionManager {
 
         // Set the new one
         $domain = OMEGAUP_COOKIE_DOMAIN;
+        $secure = !empty(\OmegaUp\Request::getServerVar('HTTPS'));
         $_COOKIE[$name] = $value;
         if (PHP_VERSION_ID < 70300) {
             setcookie(
@@ -58,7 +60,7 @@ class SessionManager {
                 $expire,
                 "{$path}; SameSite=Lax",  // This hack only works for PHP < 7.3.
                 $domain,
-                /*secure=*/!empty($_SERVER['HTTPS']),
+                /*secure=*/$secure,
                 /*httponly=*/true
             );
         } elseif (PHP_VERSION_ID < 70400) {
@@ -72,7 +74,7 @@ class SessionManager {
                 $expire,
                 $path,
                 $domain,
-                /*secure=*/!empty($_SERVER['HTTPS']),
+                /*secure=*/$secure,
                 /*httponly=*/true,
                 /*samesite=*/'Lax'
             );
@@ -84,7 +86,7 @@ class SessionManager {
                     'expires' => $expire,
                     'path' => $path,
                     'domain' => $domain,
-                    'secure' => !empty($_SERVER['HTTPS']),
+                    'secure' => $secure,
                     'httponly' => true,
                     'samesite' => 'Lax',
                 ]

@@ -130,7 +130,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties'];
+        )['smartyProperties']['payload'];
 
         // Explicitly join contest
         \OmegaUp\Controllers\Contest::apiOpen(new \OmegaUp\Request([
@@ -238,7 +238,7 @@ class ContestUsersTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $userLogin->auth_token,
                 'contest_alias' => $contestData['request']['alias'],
             ])
-        )['smartyProperties'];
+        )['smartyProperties']['payload'];
 
         $this->assertTrue($contestDetails['needsBasicInformation']);
     }

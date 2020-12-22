@@ -41,15 +41,14 @@ if (!defined('IS_TEST') || IS_TEST !== true) {
     require_once(__DIR__ . '/config.default.php');
 }
 
-define(
-    'OMEGAUP_LOCKDOWN',
-    isset(
-        $_SERVER['HTTP_HOST']
-    ) && strpos(
-        strval($_SERVER['HTTP_HOST']),
-        OMEGAUP_LOCKDOWN_DOMAIN
-    ) === 0
-);
+if (!defined('OMEGAUP_LOCKDOWN')) {
+    define(
+        'OMEGAUP_LOCKDOWN',
+        isset($_SERVER['HTTP_HOST']) &&
+        is_string($_SERVER['HTTP_HOST']) &&
+        strpos($_SERVER['HTTP_HOST'], OMEGAUP_LOCKDOWN_DOMAIN) === 0
+    );
+}
 
 $contentSecurityPolicy = [
     'script-src' => [
@@ -68,6 +67,7 @@ $contentSecurityPolicy = [
         '\'self\'',
         'https://www.facebook.com',
         'https://web.facebook.com',
+        'https://www.youtube.com',
         'https://platform.twitter.com',
         'https://www.google.com',
         'https://apis.google.com',
@@ -84,9 +84,7 @@ if (!is_null(NEW_RELIC_SCRIPT_HASH)) {
     array_push($contentSecurityPolicy['script-src'], NEW_RELIC_SCRIPT_HASH);
 }
 header('Content-Security-Policy: ' . implode('; ', array_map(
-    function ($k) use ($contentSecurityPolicy) {
-        return "{$k} " . implode(' ', $contentSecurityPolicy[$k]);
-    },
+    fn ($k) => "{$k} " . implode(' ', $contentSecurityPolicy[$k]),
     array_keys($contentSecurityPolicy)
 )));
 header('X-Frame-Options: DENY');

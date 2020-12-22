@@ -1,164 +1,142 @@
 <template>
-  <div class="omegaup-course-problemlist panel">
-    <div class="panel-heading">
-      <form class="problemlist">
-        <div class="row">
-          <div class="form-group col-md-8">
-            <label
-              >{{ T.wordsAssignments }}
-              <select
-                class="form-control"
-                name="assignments"
-                v-model="assignment"
-              >
-                <option v-bind:value="a" v-for="a in assignments">
-                  {{ a.name }}
-                </option>
-              </select></label
-            >
-          </div>
-          <div class="form-group col-md-4 pull-right" v-show="assignment.alias">
-            <label
-              >&nbsp;
-              <button
-                class="form-control btn btn-primary"
-                v-on:click.prevent="onShowForm"
-              >
-                {{ T.courseEditAddProblems }}
-              </button></label
-            >
-          </div>
-        </div>
-      </form>
+  <div class="card" data-course-problemlist>
+    <div class="card-header">
+      <h5>
+        {{ T.courseAddProblemsAdd }}
+      </h5>
+      <span>{{ T.courseAddProblemsEditAssignmentDesc }}</span>
     </div>
-    <div class="table-body" v-if="assignmentProblems.length == 0">
-      <div class="empty-category">
+    <div class="card-body">
+      <div v-if="problems.length == 0" class="empty-table-message">
         {{ T.courseAssignmentProblemsEmpty }}
       </div>
-    </div>
-    <table class="table table-striped" v-else="">
-      <thead>
-        <tr>
-          <th>{{ T.contestAddproblemProblemOrder }}</th>
-          <th>{{ T.contestAddproblemProblemName }}</th>
-          <th>{{ T.contestAddproblemProblemRemove }}</th>
-        </tr>
-      </thead>
-      <tbody v-sortable="{ onUpdate: sort }">
-        <tr v-bind:key="problem.letter" v-for="problem in assignmentProblems">
-          <td>
-            <a v-bind:title="T.courseAssignmentProblemReorder"
-              ><span
-                aria-hidden="true"
-                class="glyphicon glyphicon-move handle"
-              ></span
-            ></a>
-          </td>
-          <td>{{ problem.title }}</td>
-          <td class="button-column">
-            <a
-              v-bind:title="T.courseAssignmentProblemRemove"
-              v-on:click="$emit('remove', assignment, problem)"
-              ><span
-                aria-hidden="true"
-                class="glyphicon glyphicon-remove"
-              ></span
-            ></a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <div class="panel-footer" v-show="showForm">
-      <form>
-        <div class="row">
-          <div class="col-md-4" v-show="showTopicsAndLevel">
-            <div class="form-group">
-              <label
-                >{{ T.wordsTopics }}
-                <select class="form-control" multiple v-model="topics">
-                  <!-- TODO: How do we do this in general? -->
-                  <option value="binary-search">
-                    {{ T.problemTopicBinarySearch }}
-                  </option>
-                  <option value="graph-theory">
-                    {{ T.problemTopicGraphTheory }}
-                  </option>
-                  <option value="sorting">
-                    {{ T.problemTopicSorting }}
-                  </option>
-                </select></label
-              >
-            </div>
-            <div class="form-group">
-              <label
-                >{{ T.wordsLevels }}
-                <select class="form-control" v-model="level">
-                  <option value="intro">
-                    {{ T.problemLevelIntro }}
-                  </option>
-                  <option value="easy">
-                    {{ T.problemLevelEasy }}
-                  </option>
-                  <option value="medium">
-                    {{ T.problemLevelMedium }}
-                  </option>
-                  <option value="hard">
-                    {{ T.problemLevelHard }}
-                  </option>
-                </select></label
-              >
-            </div>
-          </div>
-          <div class="col-md-8">
-            <div class="row" v-show="showTopicsAndLevel">
-              <div class="form-group col-md-12">
-                <label
-                  >{{ T.wordsProblems }}
-                  <select
-                    class="form-control"
-                    size="15"
-                    v-model="taggedProblemAlias"
-                  >
-                    <option
-                      v-bind:value="problem.alias"
-                      v-for="problem in taggedProblems"
-                    >
-                      {{ problem.title }}
-                    </option>
-                  </select></label
+      <div v-else>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>{{ T.contestAddproblemProblemOrder }}</th>
+              <th>{{ T.contestAddproblemProblemName }}</th>
+              <th>{{ T.contestAddproblemProblemPoints }}</th>
+              <th>{{ T.contestAddproblemProblemRemove }}</th>
+            </tr>
+          </thead>
+          <tbody v-sortable="{ onUpdate: sort }">
+            <tr v-for="problem in problems" :key="problem.letter">
+              <td>
+                <button
+                  class="btn btn-link"
+                  type="button"
+                  :title="T.courseAssignmentProblemReorder"
                 >
-              </div>
-            </div>
+                  <font-awesome-icon icon="arrows-alt" />
+                </button>
+              </td>
+              <td class="align-middle">{{ problem.alias }}</td>
+              <td class="align-middle">{{ problem.points }}</td>
+              <td class="button-column">
+                <button
+                  class="btn btn-link"
+                  :title="T.courseAssignmentProblemRemove"
+                  @click.prevent="onRemoveProblem(assignment, problem)"
+                >
+                  <font-awesome-icon icon="trash" />
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <button
+            class="btn btn-primary"
+            :disabled="!problemsOrderChanged"
+            role="button"
+            @click="saveNewOrder"
+          >
+            {{ T.wordsSaveNewOrder }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <form @submit.prevent="">
+        <div class="row">
+          <div class="col-md-12">
             <div class="row">
-              <div class="form-group col-md-12">
+              <div class="form-group col-md-5">
                 <label
                   >{{ T.wordsProblem }}
                   <omegaup-autocomplete
-                    class="form-control"
-                    v-bind:init="el => typeahead.problemTypeahead(el)"
                     v-model="problemAlias"
+                    class="form-control"
+                    :init="(el) => typeahead.problemTypeahead(el)"
                   ></omegaup-autocomplete
                 ></label>
                 <p class="help-block">
                   {{ T.courseAddProblemsAssignmentsDesc }}
                 </p>
               </div>
+              <div class="form-group col-md-2">
+                <label
+                  >{{ T.wordsPoints }}
+                  <input v-model="points" type="number" class="form-control" />
+                </label>
+              </div>
+              <div class="form-group col-md-5">
+                <label for="use-latest-version"
+                  >{{ T.contestAddproblemChooseVersion }}
+                  <div class="form-control form-group">
+                    <div class="form-check form-check-inline">
+                      <label class="form-check-label">
+                        <input
+                          v-model="useLatestVersion"
+                          class="form-check-input"
+                          type="radio"
+                          :value="true"
+                        />{{ T.contestAddproblemLatestVersion }}
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <label class="form-check-label">
+                        <input
+                          v-model="useLatestVersion"
+                          class="form-check-input"
+                          type="radio"
+                          :value="false"
+                        />{{ T.contestAddproblemOtherVersion }}
+                      </label>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <omegaup-problem-versions
+                v-if="!useLatestVersion"
+                v-model="selectedRevision"
+                :log="versionLog"
+                :published-revision="publishedRevision"
+                :show-footer="false"
+                @runs-diff="onRunsDiff"
+              ></omegaup-problem-versions>
             </div>
-            <div class="form-group pull-right">
+            <div class="form-group text-right">
               <button
-                class="btn btn-primary"
+                data-add-problem
+                class="btn btn-primary mr-2"
                 type="submit"
-                v-bind:disabled="problemAlias.length == 0"
-                v-on:click.prevent="
-                  $emit('add-problem', assignment, problemAlias)
+                :disabled="problemAlias.length == 0"
+                @click.prevent="
+                  onSaveProblem(assignment, {
+                    alias: problemAlias,
+                    points: points,
+                    commit: selectedRevision.commit,
+                  })
                 "
               >
-                {{ T.courseAddProblemsAdd }}
+                {{ addProblemButtonLabel }}
               </button>
               <button
                 class="btn btn-secondary"
                 type="reset"
-                v-on:click.prevent="showForm = false"
+                @click.prevent="reset"
               >
                 {{ T.wordsCancel }}
               </button>
@@ -167,74 +145,169 @@
         </div>
       </form>
     </div>
-    <!-- panel-body -->
+    <!-- card-body -->
   </div>
-  <!-- panel -->
+  <!-- card -->
 </template>
-
-<style>
-.omegaup-course-problemlist .form-group > label {
-  width: 100%;
-}
-</style>
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as typeahead from '../../typeahead';
 import Autocomplete from '../Autocomplete.vue';
+import problem_Versions from '../problem/Versions.vue';
+
+import {
+  FontAwesomeIcon,
+  FontAwesomeLayers,
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { library } from '@fortawesome/fontawesome-svg-core';
+library.add(fas);
+
+const emptyCommit: types.ProblemVersion = {
+  author: {},
+  commit: '',
+  committer: {},
+  message: '',
+  parents: [],
+  tree: {},
+  version: '',
+};
 
 @Component({
   components: {
     'omegaup-autocomplete': Autocomplete,
+    'omegaup-problem-versions': problem_Versions,
+    'font-awesome-icon': FontAwesomeIcon,
+    'font-awesome-layers': FontAwesomeLayers,
+    'font-awesome-layers-text': FontAwesomeLayersText,
   },
 })
 export default class CourseProblemList extends Vue {
-  @Prop() assignments!: omegaup.Assignment[];
-  @Prop() assignmentProblems!: omegaup.AssignmentProblem[];
+  @Prop() assignments!: types.CourseAssignment[];
+  @Prop() assignmentProblems!: types.ProblemsetProblem[];
   @Prop() taggedProblems!: omegaup.Problem[];
-  @Prop() selectedAssignment!: omegaup.Assignment;
+  @Prop() selectedAssignment!: types.CourseAssignment;
 
   typeahead = typeahead;
   T = T;
-  assignment: Partial<omegaup.Assignment> = {};
-  showForm = false;
-  level = 'intro';
+  assignment: Partial<types.CourseAssignment> = this.selectedAssignment;
+  problems: types.AddedProblem[] = this.assignmentProblems;
+  difficulty = 'intro';
   topics: string[] = [];
   taggedProblemAlias = '';
   problemAlias = '';
-  showTopicsAndLevel = false;
+  points = 100;
+  showTopicsAndDifficulty = false;
+  problemsOrderChanged = false;
+  useLatestVersion = true;
+  versionLog: types.ProblemVersion[] = [];
+  publishedRevision = emptyCommit;
+  selectedRevision = emptyCommit;
 
   get tags(): string[] {
     let t = this.topics.slice();
-    t.push(this.level);
+    t.push(this.difficulty);
     return t;
   }
 
-  onShowForm(): void {
-    this.showForm = true;
-    this.problemAlias = '';
-    this.level = 'intro';
-    this.topics = [];
+  get addProblemButtonDisabled(): boolean {
+    if (this.useLatestVersion) {
+      return this.problemAlias === '';
+    } else {
+      return this.selectedRevision.commit === '';
+    }
+  }
+
+  get addProblemButtonLabel(): string {
+    for (const problem of this.problems) {
+      if (this.problemAlias === problem.alias) {
+        return T.wordsUpdateProblem;
+      }
+    }
+    return T.wordsAddProblem;
   }
 
   sort(event: any) {
-    this.assignmentProblems.splice(
+    this.problems.splice(
       event.newIndex,
       0,
-      this.assignmentProblems.splice(event.oldIndex, 1)[0],
+      this.problems.splice(event.oldIndex, 1)[0],
     );
-    this.$emit('sort', this.assignment, this.assignmentProblems);
+    this.problemsOrderChanged = true;
+  }
+
+  saveNewOrder() {
+    this.$emit(
+      'emit-sort',
+      this.assignment.alias,
+      this.assignmentProblems.map((problem) => problem.alias),
+    );
+    this.problemsOrderChanged = false;
+  }
+
+  onSaveProblem(
+    assignment: types.CourseAssignment,
+    problem: types.AddedProblem,
+  ): void {
+    this.$emit('save-problem', assignment, problem);
+  }
+
+  onRemoveProblem(
+    assignment: types.CourseAssignment,
+    problem: types.AddedProblem,
+  ): void {
+    this.$emit('emit-remove-problem', assignment, problem);
+  }
+
+  onRunsDiff(
+    versions: types.ProblemVersion[],
+    selectedCommit: types.ProblemVersion,
+  ): void {
+    let found = false;
+    for (const problem of this.problems) {
+      if (this.problemAlias === problem.alias) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      return;
+    }
+    this.$emit('runs-diff', this, versions, selectedCommit);
+  }
+
+  @Watch('problemAlias')
+  onAliasChange(newProblemAlias: string) {
+    if (!newProblemAlias) {
+      this.versionLog = [];
+      this.selectedRevision = this.publishedRevision = emptyCommit;
+      return;
+    }
+    this.$emit('change-alias', this, newProblemAlias);
+  }
+
+  @Watch('assignmentProblems')
+  onAssignmentProblemChange(newValue: types.AddedProblem[]): void {
+    this.problems = newValue;
+  }
+
+  @Watch('problems')
+  onProblemsChange(): void {
+    this.reset();
   }
 
   @Watch('assignment')
-  onAssignmentChange(newVal: omegaup.Assignment): void {
-    this.$emit('assignment', newVal);
+  onAssignmentChange(newVal: types.CourseAssignment): void {
+    this.$emit('emit-select-assignment', newVal);
   }
 
   @Watch('selectedAssignment')
-  onSelectedAssignmentChange(newVal: omegaup.Assignment): void {
+  onSelectedAssignmentChange(newVal: types.CourseAssignment): void {
     this.assignment = newVal;
   }
 
@@ -245,7 +318,19 @@ export default class CourseProblemList extends Vue {
 
   @Watch('tags')
   onTagsChange() {
-    this.$emit('tags', this.tags);
+    this.$emit('emit-tags', this.tags);
+  }
+
+  reset(): void {
+    this.problemAlias = '';
+    this.points = 100;
+    this.useLatestVersion = true;
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.form-group > label {
+  width: 100%;
+}
+</style>

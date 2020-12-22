@@ -1,9 +1,9 @@
 <template>
   <div class="root d-flex flex-row h-100">
     <textarea
-      class="col px-0"
-      v-bind:disabled="readOnly"
       v-model="contents"
+      class="col px-0"
+      :disabled="readOnly"
     ></textarea>
   </div>
 </template>
@@ -13,9 +13,18 @@ import * as Util from './util';
 
 export default {
   props: {
-    store: Object,
-    storeMapping: Object,
-    extension: String,
+    store: {
+      type: Object,
+      required: true,
+    },
+    storeMapping: {
+      type: Object,
+      required: true,
+    },
+    extension: {
+      type: String,
+      required: true,
+    },
     module: {
       type: String,
       default: null,
@@ -26,7 +35,7 @@ export default {
     },
   },
   computed: {
-    filename: function() {
+    filename: function () {
       if (typeof this.storeMapping.module !== 'undefined') {
         return (
           Util.vuexGet(this.store, this.storeMapping.module) +
@@ -45,7 +54,7 @@ export default {
         Util.vuexSet(this.store, this.storeMapping.contents, value);
       },
     },
-    title: function() {
+    title: function () {
       return this.filename;
     },
   },

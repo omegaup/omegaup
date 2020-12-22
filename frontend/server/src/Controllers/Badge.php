@@ -4,9 +4,10 @@ namespace OmegaUp\Controllers;
 
 /**
  * BadgesController
- *
- * @psalm-type Badge=array{assignation_time?: \OmegaUp\Timestamp|null, badge_alias: string, unlocked?: boolean, first_assignation?: \OmegaUp\Timestamp|null, total_users?: int, owners_count?: int}
+
+ * @psalm-type Badge=array{assignation_time: \OmegaUp\Timestamp|null, badge_alias: string, first_assignation: \OmegaUp\Timestamp|null, owners_count: int, total_users: int}
  * @psalm-type BadgeDetailsPayload=array{badge: Badge}
+ * @psalm-type BadgeListPayload=array{badges: list<string>, ownedBadges: list<Badge>}
  */
 class Badge extends \OmegaUp\Controllers\Controller {
     /** @psalm-suppress MixedOperand OMEGAUP_ROOT is really a string. */
@@ -16,15 +17,15 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * @return list<string>
      */
     public static function getAllBadges(): array {
+        /** @psalm-suppress MixedArgument OMEGAUP_BADGES_ROOT is really a string. */
         $aliases = array_diff(
-            scandir(
-                strval(static::OMEGAUP_BADGES_ROOT)
-            ),
+            scandir(static::OMEGAUP_BADGES_ROOT),
             ['..', '.', 'default_icon.svg']
         );
         $results = [];
         foreach ($aliases as $alias) {
-            if (!is_dir(strval(static::OMEGAUP_BADGES_ROOT) . "/${alias}")) {
+            /** @psalm-suppress MixedOperand OMEGAUP_BADGES_ROOT is really a string. */
+            if (!is_dir(static::OMEGAUP_BADGES_ROOT . "/${alias}")) {
                 continue;
             }
             $results[] = $alias;
@@ -80,18 +81,18 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns a the assignation timestamp of a badge
      * for current user.
      *
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return array{assignation_time: \OmegaUp\Timestamp|null}
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function apiMyBadgeAssignationTime(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['badge_alias'],
-            'badge_alias'
+        $badgeAlias = $r->ensureString(
+            'badge_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateBadgeExists(
-            $r['badge_alias'],
+            $badgeAlias,
             self::getAllBadges()
         );
         return [
@@ -99,7 +100,7 @@ class Badge extends \OmegaUp\Controllers\Controller {
                 null :
                 \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
                     $r->user,
-                    $r['badge_alias']
+                    $badgeAlias
                 ),
         ];
     }
@@ -108,20 +109,20 @@ class Badge extends \OmegaUp\Controllers\Controller {
      * Returns the number of owners and the first
      * assignation timestamp for a certain badge
      *
-     * @omegaup-request-param mixed $badge_alias
-     *
      * @return Badge
+     *
+     * @omegaup-request-param null|string $badge_alias
      */
     public static function apiBadgeDetails(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateValidAlias(
-            $r['badge_alias'],
-            'badge_alias'
+        $badgeAlias = $r->ensureString(
+            'badge_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateBadgeExists(
-            $r['badge_alias'],
+            $badgeAlias,
             self::getAllBadges()
         );
-        return self::getBadgeDetails($r['badge_alias']);
+        return self::getBadgeDetails($badgeAlias);
     }
 
     /**
@@ -139,46 +140,64 @@ class Badge extends \OmegaUp\Controllers\Controller {
             $badgeAlias
         );
         return [
+            'assignation_time' => null,
             'badge_alias' => $badgeAlias,
             'first_assignation' => $firstAssignation,
             'total_users' => $totalUsers,
             'owners_count' => $ownersCount,
         ];
     }
+    /**
+     * @return array{smartyProperties: array{payload: BadgeListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
+     */
+    public static function getBadgeListForSmarty(\OmegaUp\Request $r) {
+        $r->ensureIdentity();
+        $badges = self::apiList($r);
+        $ownedBadges = self::apiMyList($r);
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'badges' => $badges,
+                    'ownedBadges' => $ownedBadges['badges']
+                ],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleBadges')
+            ],
+            'entrypoint' => 'badge_list',
+        ];
+    }
 
     /**
-     * @omegaup-request-param mixed $badge_alias
+     * @return array{smartyProperties: array{payload: BadgeDetailsPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
-     * @return array{smartyProperties: array{badgeDetailsPayload: BadgeDetailsPayload}, template: string}
+     * @omegaup-request-param string $badge_alias
      */
     public static function getDetailsForSmarty(\OmegaUp\Request $r) {
         $r->ensureIdentity();
-        \OmegaUp\Validators::validateValidAlias(
-            $r['badge_alias'],
-            'badge_alias'
+        $badgeAlias = $r->ensureString(
+            'badge_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
 
         \OmegaUp\Validators::validateBadgeExists(
-            $r['badge_alias'],
+            $badgeAlias,
             \OmegaUp\Controllers\Badge::getAllBadges()
         );
+
+        $details = self::getBadgeDetails($badgeAlias);
+        if (!is_null($r->user)) {
+            $details['assignation_time'] = \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
+                $r->user,
+                $badgeAlias
+            );
+        }
         return [
             'smartyProperties' => [
-                'badgeDetailsPayload' => [
-                    'badge' => (
-                        self::getBadgeDetails($r['badge_alias']) +
-                        [
-                            'assignation_time' => is_null($r->user) ?
-                                null :
-                                \OmegaUp\DAO\UsersBadges::getUserBadgeAssignationTime(
-                                    $r->user,
-                                    $r['badge_alias']
-                                ),
-                        ]
-                    ),
+                'payload' => [
+                    'badge' => $details,
                 ],
+                'title' => new \OmegaUp\TranslationString('omegaupTitleBadges')
             ],
-            'template' => 'badge.details.tpl',
+            'entrypoint' => 'badge_details',
         ];
     }
 }

@@ -7,31 +7,30 @@
  */
 class Authorization extends \OmegaUp\Controllers\Controller {
     /**
-     * @omegaup-request-param mixed $problem_alias
-     * @omegaup-request-param mixed $token
-     * @omegaup-request-param mixed $username
-     *
      * @return array{has_solved: bool, is_admin: bool, can_view: bool, can_edit: bool}
+     *
+     * @omegaup-request-param string $problem_alias
+     * @omegaup-request-param string $token
+     * @omegaup-request-param mixed $username
      */
     public static function apiProblem(\OmegaUp\Request $r): array {
-        \OmegaUp\Validators::validateValidAlias(
-            $r['problem_alias'],
-            'problem_alias'
+        $problemAlias = $r->ensureString(
+            'problem_alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
         \OmegaUp\Validators::validateValidUsername(
             $r['username'],
             'username'
-        );
-        \OmegaUp\Validators::validateStringNonEmpty(
-            $r['token'],
-            'token'
         );
 
         // This is not supposed to be called by end-users, but by the
         // gitserver. Regular sessions cannot be used since they
         // expire, so use a pre-shared secret to authenticate that
         // grants admin-level privileges just for this call.
-        if ($r['token'] !== OMEGAUP_GITSERVER_SECRET_TOKEN) {
+        if (
+            $r->ensureString('token') !== OMEGAUP_GITSERVER_SECRET_TOKEN ||
+            empty(OMEGAUP_GITSERVER_SECRET_TOKEN)
+        ) {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
@@ -39,7 +38,7 @@ class Authorization extends \OmegaUp\Controllers\Controller {
             $r['username']
         );
 
-        $problem = \OmegaUp\DAO\Problems::getByAlias($r['problem_alias']);
+        $problem = \OmegaUp\DAO\Problems::getByAlias($problemAlias);
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException('problemNotFound');
         }

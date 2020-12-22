@@ -16,7 +16,7 @@ import operator
 import os
 import sys
 import warnings
-from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple
+from typing import Dict, Mapping, NamedTuple, Optional, Sequence, Tuple, Set
 from typing import DefaultDict
 
 import MySQLdb.constants.ER
@@ -274,11 +274,10 @@ def replace_voted_tags(dbconn: MySQLdb.connections.Connection,
                         (problem_id,))
             cur.execute("""INSERT IGNORE INTO
                                `Problems_Tags`(`problem_id`, `tag_id`,
-                                               `public`, `source`)
+                                               `source`)
                            SELECT
                                %%s AS `problem_id`,
                                `t`.`tag_id` AS `tag_id`,
-                               1 AS `public`,
                                'voted' AS `source`
                            FROM
                                `Tags` AS `t`
@@ -286,13 +285,12 @@ def replace_voted_tags(dbconn: MySQLdb.connections.Connection,
                                `t`.`name` IN (%s);""" %
                         ', '.join('%s' for _ in problem_tags),
                         (problem_id,) + tuple(problem_tags))
-            for msg in cur.messages:
-                if isinstance(msg, tuple) and msg[0] == cur.Warning:
-                    if msg[1][1] == MySQLdb.constants.ER.DUP_ENTRY:
-                        # It is somewhat expected to get duplicate entries.
-                        continue
+            for level, code, message in dbconn.show_warnings():
+                if code == MySQLdb.constants.ER.DUP_ENTRY:
+                    # It is somewhat expected to get duplicate entries.
+                    continue
                 logging.warning('Warning while updated tags in problem %d: %r',
-                                problem_id, msg)
+                                problem_id, (level, code, message))
             dbconn.commit()
     except:  # noqa: bare-except
         logging.exception('Failed to replace voted tags')
@@ -400,7 +398,8 @@ def aggregate_reviewers_feedback_for_problem(
 
         total_votes = 0
         seal_positive_votes = 0
-        categories_votes: DefaultDict[str, int] = collections.defaultdict(int)
+        level_tag_votes: DefaultDict[str, int] = collections.defaultdict(int)
+        topic_tag_votes: Set[str] = set()
         for row in cur:
             try:
                 contents = json.loads(row[0])
@@ -411,7 +410,10 @@ def aggregate_reviewers_feedback_for_problem(
             if contents['quality_seal']:
                 seal_positive_votes += 1
             if 'tag' in contents and not contents['tag'] is None:
-                categories_votes[contents['tag']] += 1
+                level_tag_votes[contents['tag']] += 1
+            if 'tags' in contents:
+                # Take the union of voted topic tags
+                topic_tag_votes.update(contents['tags'])
 
         # Update the quality_seal for problem
         cur.execute(
@@ -424,27 +426,30 @@ def aggregate_reviewers_feedback_for_problem(
                 p.`problem_id` = %s;""",
             (seal_positive_votes > (total_votes / 2), problem_id))
 
-        # Delete old category for problem and add the new one
-        most_voted_category = max(categories_votes, key=categories_votes.get)
+        # Delete old level and topic tags for problem and add the new ones
+        most_voted_level = max(level_tag_votes, key=level_tag_votes.get)
+        final_tags = list({(problem_id, tag) for tag in topic_tag_votes} |
+                          {(problem_id, most_voted_level)})
+
         cur.execute("""DELETE FROM
                                `Problems_Tags`
                            WHERE
                                `problem_id` = %s AND `source` = 'quality';""",
                     (problem_id,))
 
-        cur.execute("""INSERT INTO
+        # Add new tags for problem
+        cur.executemany("""INSERT IGNORE INTO
                                `Problems_Tags`(`problem_id`, `tag_id`,
-                                               `public`, `source`)
+                                               `source`)
                            SELECT
                                %s AS `problem_id`,
                                `t`.`tag_id` AS `tag_id`,
-                               1 AS `public`,
                                'quality' AS `source`
                            FROM
                                `Tags` AS `t`
                            WHERE
                                `t`.`name` = %s;""",
-                    (problem_id, most_voted_category))
+                        (final_tags))
 
 
 def aggregate_reviewers_feedback(
@@ -452,7 +457,7 @@ def aggregate_reviewers_feedback(
     '''Aggregates the quality_tag nominations sent by reviewers
 
     Updates the quality_seal field on Problems table and updates the
-    problem category tag.
+    problem level tag.
     '''
     with dbconn.cursor() as cur:
         cur.execute("""SELECT DISTINCT qn.`problem_id`

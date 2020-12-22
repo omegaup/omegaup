@@ -152,7 +152,7 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         {
             $login = self::login($contestData['director']);
             $groupData = \OmegaUp\Test\Factories\Groups::createGroup(
-                /*$owner=*/null,
+                /*$owner=*/                null,
                 /*$name=*/null,
                 /*$description=*/null,
                 /*$alias=*/null,
@@ -492,9 +492,10 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         // Assert that two contests are not recommended
         for ($i = 0; $i < 2; $i++) {
             $contest = $recommendedContest[$i];
-            $contest = $this->findByPredicate($response['results'], function ($value) use ($contest) {
-                return $value['alias'] == $contest['contest']->alias;
-            });
+            $contest = $this->findByPredicate(
+                $response['results'],
+                fn ($value) => $value['alias'] == $contest['contest']->alias
+            );
 
             $this->assertEquals(0, $contest['recommended']);
         }
@@ -527,9 +528,10 @@ class ContestListTest extends \OmegaUp\Test\ControllerTestCase {
         // Assert that two contests are already recommended
         for ($i = 0; $i < 2; $i++) {
             $contest = $recommendedContest[$i];
-            $contest = $this->findByPredicate($response['results'], function ($value) use ($contest) {
-                return $value['alias'] == $contest['contest']->alias;
-            });
+            $contest = $this->findByPredicate(
+                $response['results'],
+                fn ($value) => $value['alias'] == $contest['contest']->alias,
+            );
 
             $this->assertEquals(1, $contest['recommended']);
         }

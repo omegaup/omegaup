@@ -56,7 +56,6 @@ class ContestRunsTest extends \OmegaUp\Test\ControllerTestCase {
             $identity->username,
             $response['runs'][0]['username']
         );
-        $this->assertEquals('J1', $response['runs'][0]['judged_by']);
 
         // Contest admin should be able to view run, even if not problem admin.
         $directorIdentity = \OmegaUp\Controllers\Identity::resolveIdentity(

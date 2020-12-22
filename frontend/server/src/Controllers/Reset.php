@@ -8,11 +8,11 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * password. The first step consist of sending an email to the user with
      * instructions to reset he's password, if and only if the email is valid.
      *
-     * @omegaup-request-param mixed $email
-     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
      * @return array{message?: string, token?: string}
+     *
+     * @omegaup-request-param string $email
      */
     public static function apiCreate(\OmegaUp\Request $r): array {
         self::validateCreateRequest($r);
@@ -40,14 +40,12 @@ class Reset extends \OmegaUp\Controllers\Controller {
             return ['token' => $token];
         }
 
-        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset')
-            ?: 'wordsReset';
+        $subject = \OmegaUp\Translations::getInstance()->get('wordsReset');
         $link = OMEGAUP_URL . '/login/password/reset/?';
         $link .= 'email=' . rawurlencode($email) . '&reset_token=' . $token;
         $message = \OmegaUp\Translations::getInstance()->get(
             'wordsResetMessage'
-        )
-            ?: 'wordsResetMessage';
+        );
         $body = str_replace('[link]', $link, $message);
 
         try {
@@ -64,7 +62,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         return [
             'message' => \OmegaUp\Translations::getInstance()->get(
                 'passwordResetRequestSuccess'
-            ) ?? 'passwordResetRequestSuccess'
+            )
         ];
     }
 
@@ -72,12 +70,12 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * Creates a reset operation, support team members can generate a valid
      * token and then they can send it to end user
      *
-     * @omegaup-request-param mixed $email
-     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      * @throws \OmegaUp\Exceptions\ForbiddenAccessException
      *
      * @return array{link: string, token: string}
+     *
+     * @omegaup-request-param string $email
      */
     public static function apiGenerateToken(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -139,14 +137,14 @@ class Reset extends \OmegaUp\Controllers\Controller {
      * in order to reset the password. This operation is done if and only if
      * the correct parameters are suplied.
      *
-     * @omegaup-request-param mixed $email
-     * @omegaup-request-param mixed $password
-     * @omegaup-request-param mixed $password_confirmation
-     * @omegaup-request-param mixed $reset_token
-     *
      * @throws \OmegaUp\Exceptions\InvalidParameterException
      *
      * @return array{message: string}
+     *
+     * @omegaup-request-param string $email
+     * @omegaup-request-param string $password
+     * @omegaup-request-param string $password_confirmation
+     * @omegaup-request-param string $reset_token
      */
     public static function apiUpdate(\OmegaUp\Request $r): array {
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -156,7 +154,7 @@ class Reset extends \OmegaUp\Controllers\Controller {
         $user = \OmegaUp\DAO\Users::findByEmail($r['email']);
         if (is_null($user)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
-                'userNotFound'
+                'userNotExist'
             );
         }
         \OmegaUp\Validators::validateStringNonEmpty(
@@ -226,12 +224,12 @@ class Reset extends \OmegaUp\Controllers\Controller {
                 'message' :
                     \OmegaUp\Translations::getInstance()->get(
                         'passwordResetResetSuccess'
-                    ) ?? 'passwordResetResetSuccess'
+                    )
         ];
     }
 
     /**
-     * @omegaup-request-param mixed $email
+     * @omegaup-request-param string $email
      */
     private static function validateCreateRequest(\OmegaUp\Request $r): void {
         \OmegaUp\Validators::validateStringNonEmpty($r['email'], 'email');

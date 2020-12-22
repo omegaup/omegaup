@@ -5,26 +5,31 @@ import T from './lang';
 let momentInitialized: boolean = false;
 let remoteDeltaTime: number = 0;
 
-export function formatDelta(delta: number): string {
+export function formatFutureDateRelative(futureDate: Date): string {
   if (!momentInitialized) {
     moment.locale(T.locale);
     momentInitialized = true;
   }
 
-  let months = delta / (30 * 24 * 60 * 60 * 1000);
+  // moment is a weird library. The top-level import can be a function or an
+  // object, and it depends on whether it was processed by webpack (in regular
+  // compilation) or just babel (in tests).
+  return ((moment as any)?.default ?? moment)(futureDate).endOf().fromNow();
+}
+
+export function formatDelta(delta: number): string {
+  const months = delta / (30 * 24 * 60 * 60 * 1000);
   if (months >= 1.0) {
-    return moment(delta + Date.now())
-      .endOf()
-      .fromNow();
+    return formatFutureDateRelative(new Date(delta + Date.now()));
   }
 
-  let days = Math.floor(delta / (24 * 60 * 60 * 1000));
+  const days = Math.floor(delta / (24 * 60 * 60 * 1000));
   delta -= days * (24 * 60 * 60 * 1000);
-  let hours = Math.floor(delta / (60 * 60 * 1000));
+  const hours = Math.floor(delta / (60 * 60 * 1000));
   delta -= hours * (60 * 60 * 1000);
-  let minutes = Math.floor(delta / (60 * 1000));
+  const minutes = Math.floor(delta / (60 * 1000));
   delta -= minutes * (60 * 1000);
-  let seconds = Math.floor(delta / 1000);
+  const seconds = Math.floor(delta / 1000);
 
   let clock = '';
 
@@ -44,7 +49,6 @@ export function toDDHHMM(durationSeconds: number): string {
   const minutes = Math.floor(
     (durationSeconds - days * 86400 - hours * 3600) / 60,
   );
-  const seconds = durationSeconds - days * 86400 - hours * 3600 - minutes * 60;
 
   let time = '';
   if (days > 0) time += `${days}d `;
@@ -229,7 +233,10 @@ export function remoteTimeAdapter<T>(value: T): T {
     }
   } else if (typeof value === 'object') {
     for (const p in value) {
-      if (!(<any>value).hasOwnProperty(p) || typeof value[p] !== 'object') {
+      if (
+        !Object.prototype.hasOwnProperty.call(<any>value, p) ||
+        typeof value[p] !== 'object'
+      ) {
         continue;
       }
       value[p] = remoteTimeAdapter(value[p]);

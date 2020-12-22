@@ -15,7 +15,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas",
                 "problem_alias": "sumas",
                 "validator": "token-numeric",
@@ -28,7 +28,9 @@
                 "input_limit": 10240,
                 "source": "omegaUp classics",
                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                "email_clarifications": 1
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"
@@ -37,7 +39,7 @@
             {
               "api": "\\OmegaUp\\Controllers\\Problem::apiCreate",
               "params": {
-                "visibility": 2,
+                "visibility": "public",
                 "title": "Sumas_2",
                 "problem_alias": "sumas_2",
                 "validator": "token-numeric",
@@ -50,10 +52,42 @@
                 "input_limit": 10240,
                 "source": "omegaUp classics",
                 "languages": "c11-gcc,c11-clang,cpp11-gcc,cpp11-clang,cpp17-gcc,cpp17-clang,java,py2,py3,rb,cs,pas,hs,lua",
-                "email_clarifications": 1
+                "email_clarifications": 1,
+                "problem_level":"problemLevelBasicIntroductionToProgramming",
+                "selected_tags": "[{\"tagname\":\"problemTagBinarySearchTree\",\"public\":true}]"
               },
               "files": {
                 "problem_contents": "frontend/tests/resources/testproblem.zip"
+              }
+            },
+            {
+              "api": "\\OmegaUp\\Controllers\\QualityNomination::apiCreate",
+              "params": {
+                "problem_alias": "sumas",
+                "nomination": "quality_tag",
+                "contents": {
+                  "tag": "problemLevelBasicKarel",
+                  "quality_seal": true,
+                  "tags":[
+                    "problemTagRecursion",
+                    "problemTagCharsAndStrings"
+                  ]
+                }
+              }
+            },
+            {
+              "api": "\\OmegaUp\\Controllers\\QualityNomination::apiCreate",
+              "params": {
+                "problem_alias": "sumas_2",
+                "nomination": "quality_tag",
+                "contents": {
+                  "tag": "problemLevelBasicKarel",
+                  "quality_seal": true,
+                  "tags": [
+                    "problemTagRecursion",
+                    "problemTagCharsAndStrings"
+                  ]
+                }
               }
             },
             {
@@ -115,6 +149,7 @@
     {
       "type": "scripts",
       "scripts": [
+        "aggregate_feedback.py",
         "update_ranks.py"
       ]
     },

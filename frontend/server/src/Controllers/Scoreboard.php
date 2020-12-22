@@ -10,11 +10,11 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
     /**
      * Returns a list of contests
      *
-     * @omegaup-request-param mixed $alias
-     * @omegaup-request-param mixed $course_alias
-     * @omegaup-request-param mixed $token
-     *
      * @return array{status: string}
+     *
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param null|string $course_alias
+     * @omegaup-request-param mixed $token
      */
     public static function apiRefresh(\OmegaUp\Request $r) {
         // This is not supposed to be called by end-users, but by the
@@ -25,16 +25,16 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
             throw new \OmegaUp\Exceptions\ForbiddenAccessException();
         }
 
-        \OmegaUp\Validators::validateValidAlias(
-            $r['alias'],
-            'alias'
-        );
         if (!is_null($r['course_alias'])) {
-            \OmegaUp\Validators::validateValidAlias(
-                $r['course_alias'],
-                'course_alias'
+            $courseAlias = $r->ensureString(
+                'course_alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
             );
-            $course = \OmegaUp\DAO\Courses::getByAlias($r['course_alias']);
+            $assignmentAlias = $r->ensureString(
+                'alias',
+                fn (string $alias) => \OmegaUp\Validators::alias($alias)
+            );
+            $course = \OmegaUp\DAO\Courses::getByAlias($courseAlias);
             if (
                 is_null($course) ||
                 is_null($course->group_id) ||
@@ -45,7 +45,7 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
                 );
             }
             $assignment = \OmegaUp\DAO\Assignments::getByAliasAndCourse(
-                $r['alias'],
+                $assignmentAlias,
                 intval($course->course_id)
             );
             if (is_null($assignment)) {
@@ -60,22 +60,24 @@ class Scoreboard extends \OmegaUp\Controllers\Controller {
                     true
                 )
             );
-        } else {
-            $contest = \OmegaUp\DAO\Contests::getByAlias($r['alias']);
-            if (is_null($contest)) {
-                throw new \OmegaUp\Exceptions\NotFoundException(
-                    'contestNotFound'
-                );
-            }
-            \OmegaUp\Scoreboard::refreshScoreboardCache(
-                \OmegaUp\ScoreboardParams::fromContest(
-                    $contest
-                )
+
+            return ['status' => 'ok'];
+        }
+        $contestAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $contest = \OmegaUp\DAO\Contests::getByAlias($contestAlias);
+        if (is_null($contest)) {
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'contestNotFound'
             );
         }
-
-        return [
-            'status' => 'ok'
-        ];
+        \OmegaUp\Scoreboard::refreshScoreboardCache(
+            \OmegaUp\ScoreboardParams::fromContest(
+                $contest
+            )
+        );
+        return ['status' => 'ok'];
     }
 }

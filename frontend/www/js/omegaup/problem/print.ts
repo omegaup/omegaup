@@ -1,25 +1,28 @@
-import * as markdown from '../markdown';
-import { OmegaUp } from '../omegaup';
+import Vue from 'vue';
 
-declare global {
-  namespace MathJax {
-    namespace Hub {
-      function Queue(params: any[]): void;
-    }
-  }
-}
+import { types } from '../api_types';
+
+import omegaup_Markdown from '../components/Markdown.vue';
 
 (() => {
-  const payload = JSON.parse(
-    (<HTMLElement>document.getElementById('payload')).innerText,
+  const problemDetails = <types.ProblemDetails>(
+    JSON.parse((<HTMLElement>document.getElementById('payload')).innerText)
   );
-  const markdownConverter = markdown.markdownConverter({ preview: true });
 
-  const statement = <HTMLElement>document.querySelector('div.statement');
-  statement.innerHTML = markdownConverter.makeHtmlWithImages(
-    payload.statement.markdown,
-    payload.statement.images,
-    payload.settings,
-  );
-  MathJax.Hub.Queue(['Typeset', MathJax.Hub, statement]);
+  new Vue({
+    el: <HTMLElement>document.querySelector('div.statement'),
+    components: {
+      'omegaup-markdown': omegaup_Markdown,
+    },
+    render: function (createElement) {
+      return createElement('omegaup-markdown', {
+        props: {
+          markdown: problemDetails.statement.markdown,
+          imageMapping: problemDetails.statement.images,
+          sourceMapping: problemDetails.statement.sources,
+          problemSettings: problemDetails.settings,
+        },
+      });
+    },
+  });
 })();

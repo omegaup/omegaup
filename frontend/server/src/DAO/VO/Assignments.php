@@ -62,19 +62,19 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['name'])) {
-            $this->name = strval(
+            $this->name = is_scalar(
                 $data['name']
-            );
+            ) ? strval($data['name']) : '';
         }
         if (isset($data['description'])) {
-            $this->description = strval(
+            $this->description = is_scalar(
                 $data['description']
-            );
+            ) ? strval($data['description']) : '';
         }
         if (isset($data['alias'])) {
-            $this->alias = strval(
+            $this->alias = is_scalar(
                 $data['alias']
-            );
+            ) ? strval($data['alias']) : '';
         }
         if (isset($data['publish_time_delay'])) {
             $this->publish_time_delay = intval(
@@ -82,9 +82,9 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
             );
         }
         if (isset($data['assignment_type'])) {
-            $this->assignment_type = strval(
+            $this->assignment_type = is_scalar(
                 $data['assignment_type']
-            );
+            ) ? strval($data['assignment_type']) : '';
         }
         if (isset($data['start_time'])) {
             /**
@@ -183,11 +183,11 @@ class Assignments extends \OmegaUp\DAO\VO\VO {
     public $publish_time_delay = null;
 
     /**
-     * [Campo no documentado]
+     * Almacena el tipo de contenido que se va a dar de alta
      *
-     * @var string|null
+     * @var string
      */
-    public $assignment_type = null;
+    public $assignment_type = 'homework';
 
     /**
      * [Campo no documentado]

@@ -1,30 +1,37 @@
 import group_Identities from '../components/group/Identities.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
-import * as UI from '../ui';
+import * as ui from '../ui';
 import T from '../lang';
 import Vue from 'vue';
 import * as CSV from '../../../third_party/js/csv.js/csv.js';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let groupAlias = /\/group\/([^\/]+)\/?/.exec(window.location.pathname)[1];
   let groupIdentities = new Vue({
     el: '#create-identities',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-group-identites', {
-        props: { identities: this.identities, groupAlias: this.groupAlias },
+        props: {
+          identities: this.identities,
+          groupAlias: this.groupAlias,
+          userErrorRow: this.userErrorRow,
+        },
         on: {
-          'bulk-identities': function(identities) {
+          'bulk-identities': function (identities) {
             api.Identity.bulkCreate({
               identities: JSON.stringify(identities),
               group_alias: groupAlias,
             })
-              .then(function(data) {
-                UI.success(T.groupsIdentitiesSuccessfullyCreated);
+              .then(function (data) {
+                ui.success(T.groupsIdentitiesSuccessfullyCreated);
               })
-              .catch(UI.apiError);
+              .catch(function (data) {
+                ui.error(data.error);
+                groupIdentities.userErrorRow = data.parameter;
+              });
           },
-          'download-identities': function(identities) {
+          'download-identities': function (identities) {
             const csv = CSV.serialize({
               fields: [
                 { id: 'username' },
@@ -38,20 +45,20 @@ OmegaUp.on('ready', function() {
               records: identities,
             });
             const hiddenElement = document.createElement('a');
-            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURI(
+            hiddenElement.href = `data:text/csv;charset=utf-8,${window.encodeURIComponent(
               csv,
             )}`;
             hiddenElement.target = '_blank';
             hiddenElement.download = 'identities.csv';
             hiddenElement.click();
           },
-          'read-csv': function(identitiesComponent, fileUpload) {
+          'read-csv': function (identitiesComponent, fileUpload) {
             identitiesComponent.identities = [];
             CSV.fetch({
               file: fileUpload.files[0],
-            }).done(function(dataset) {
+            }).done(function (dataset) {
               if (dataset.fields.length != 6) {
-                UI.error(T.groupsInvalidCsv);
+                ui.error(T.groupsInvalidCsv);
                 return;
               }
               for (let cells of dataset.records) {
@@ -65,12 +72,13 @@ OmegaUp.on('ready', function() {
                   school_name: cells[5],
                 });
               }
+              groupIdentities.userErrorRow = null;
             });
           },
         },
       });
     },
-    data: { identities: [], groupAlias: groupAlias },
+    data: { identities: [], groupAlias: groupAlias, userErrorRow: null },
     components: {
       'omegaup-group-identites': group_Identities,
     },
@@ -84,8 +92,8 @@ OmegaUp.on('ready', function() {
       let arr = new Uint8Array(2 * len);
       window.crypto.getRandomValues(arr);
       return Array.from(
-        arr.filter(value => value <= 255 - (255 % validChars.length)),
-        value => validChars[value % validChars.length],
+        arr.filter((value) => value <= 255 - (255 % validChars.length)),
+        (value) => validChars[value % validChars.length],
       )
         .join('')
         .substr(0, len);

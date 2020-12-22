@@ -87,7 +87,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
             'author' => $identity
         ]));
         $problemAuthorData[1] = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0,
+            'visibility' => 'private',
             'author' => $identity
         ]));
 
@@ -133,7 +133,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateProblemsCount() {
         // Create private problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private'
         ]));
         $user = $problemData['authorUser'];
 
@@ -146,7 +146,7 @@ class UserProblemsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateProblemsCountWithPublicProblem() {
         // Create public problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 2
+            'visibility' => 'public'
         ]));
         $user = $problemData['authorUser'];
 

@@ -2,23 +2,6 @@ body {
   padding-top: 51px; /* Espacio para el navbar */
 }
 
-.forcebreaks {
-  text-overflow: ellipsis !important;
-  word-wrap: break-word;
-  overflow: hidden;
-  display: table-cell;
-}
-
-/*
- * Evita el desborde de la tabla top 5 coders trabajando en conjunto con la
- * clase ".forcebreaks" de common.css de tal manera que se establece overflow:
- * hidden con un ancho máximo de 166px de contenido para mostrar.
- */
-.forcebreaks-top-5 {
-  word-wrap: initial !important;
-  max-width: 155px;
-}
-
 /* Clase para quitar el padding de algn contenedor o div tag */
 .no-padding {
   padding: 0;

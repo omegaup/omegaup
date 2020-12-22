@@ -23,14 +23,25 @@ class ProblemArtifacts {
         $this->revision = $revision;
     }
 
-    public function get(string $path, bool $quiet = false): string {
+    public function get(string $path): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowURL($this->alias, $this->revision, $path)
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        /** @var string */
-        return $browser->exec();
+        $response = $browser->exec();
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
+            $this->log->error(
+                "Failed to get contents for {$this->alias}:{$this->revision}/{$path}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
+            );
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+        return $response;
     }
 
     public function exists(string $path): bool {
@@ -46,7 +57,7 @@ class ProblemArtifacts {
         );
     }
 
-    public function getByRevision(bool $quiet = false): string {
+    public function getByRevision(): string {
         $browser = new GitServerBrowser(
             $this->alias,
             GitServerBrowser::buildShowRevisionURL(
@@ -55,15 +66,26 @@ class ProblemArtifacts {
             )
         );
         $browser->headers[] = 'Accept: application/octet-stream';
-        /** @var string */
-        return $browser->exec();
+        $response = $browser->exec();
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
+            $this->log->error(
+                "Failed to get contents for {$this->alias}:{$this->revision}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
+            );
+            throw new \OmegaUp\Exceptions\NotFoundException(
+                'resourceNotFound'
+            );
+        }
+        return $response;
     }
 
     /**
      * Returns a list of tree entries.
      *
      * @param string $path The path to display.
-     * @return list<array{mode: int, type: string, id: string, name: string}> The list of
+     * @return list<array{mode: int, type: string, id: string, name: string, size: int}> The list of
      * direct entries in $path.
      */
     public function lsTree(string $path): array {
@@ -77,13 +99,16 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
-        if (!is_string($response)) {
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Failed to get entries of {$path} for problem {$this->alias} at revision {$this->revision}"
+                "Failed to get tree entries for {$this->alias}:{$this->revision}/{$path}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
             return [];
         }
-        /** @var null|array{id: string, entries?: null|list<array{mode: int, type: string, id: string, name: string}>} */
+        /** @var null|array{id: string, entries?: null|list<array{mode: int, type: string, id: string, name: string, size: int}>} */
         $response = json_decode($response, /*assoc=*/true);
         if (!is_array($response) || !array_key_exists('entries', $response)) {
             $this->log->error(
@@ -91,7 +116,7 @@ class ProblemArtifacts {
             );
             return [];
         }
-        /** @var null|list<array{mode: int, type: string, id: string, name: string}> */
+        /** @var null|list<array{mode: int, type: string, id: string, name: string, size: int}> */
         $entries = $response['entries'];
         if (!is_iterable($entries)) {
             $this->log->error(
@@ -106,11 +131,11 @@ class ProblemArtifacts {
      * Returns the list of files that are transitively reachable from $path.
      *
      * @param string $path The path to display.
-     * @return list<array{path: string, mode: int, id: string, type: string}> The list of files
+     * @return list<array{id: string, mode: int, path: string, size: int, type: string}> The list of files
      * that are transitively reachable from $path.
      */
     public function lsTreeRecursive(string $path = '.'): array {
-        /** @var list<array{path: string, mode: int, id: string, type: string}> */
+        /** @var list<array{id: string, mode: int, path: string, size: int, type: string}> */
         $entries = [];
         /** @var list<string> */
         $queue = [$path];
@@ -151,9 +176,12 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
-        if (!is_string($response)) {
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Invalid commit for problem {$this->alias} at revision {$this->revision}"
+                "Invalid commit for problem {$this->alias} at revision {$this->revision}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
             return null;
         }
@@ -178,9 +206,12 @@ class ProblemArtifacts {
         );
         $browser->headers[] = 'Accept: application/json';
         $response = $browser->exec();
-        if (!is_string($response)) {
+        /** @var int */
+        $httpStatusCode = curl_getinfo($browser->curl, CURLINFO_HTTP_CODE);
+        if (!is_string($response) || $httpStatusCode != 200) {
             $this->log->error(
-                "Failed to get log for problem {$this->alias} at revision {$this->revision}"
+                "Failed to get log for problem {$this->alias} at revision {$this->revision}. " .
+                "HTTP {$httpStatusCode}: \"{$response}\""
             );
             return [];
         }

@@ -5,20 +5,20 @@
         {{ title }} <span class="badge">{{ items.length }}</span>
       </h2>
     </div>
-    <div class="panel-body text-center" v-if="sortOptions.length > 0">
+    <div v-if="sortOptions.length > 0" class="panel-body text-center">
       <div class="form-check form-check-inline">
         <label v-for="sortOption in sortOptions" class="radio-inline">
           <input
+            v-model="currentSortOption"
             name="sort-selector"
             type="radio"
-            v-bind:value="sortOption.value"
-            v-model="currentSortOption"
+            :value="sortOption.value"
           />
           {{ sortOption.title }}
         </label>
       </div>
     </div>
-    <table class="table table-striped" v-if="items.length &gt; 0">
+    <table v-if="items.length > 0" class="table table-striped">
       <slot name="table-header"></slot>
       <tbody>
         <tr v-for="(group, index) in paginatedItems">
@@ -26,35 +26,35 @@
             {{ currentPageNumber * rowsPerPage + (index + 1) }}
           </td>
           <td v-for="item in group">
-            <slot name="item-data" v-bind:item="item">
-              <a v-bind:href="item.getUrl()">
+            <slot name="item-data" :item="item">
+              <a :href="item.getUrl()">
                 {{ item.toString() }}
               </a>
             </slot>
           </td>
-          <td class="numericColumn" v-if="!group[0].getBadge().isEmpty()">
+          <td v-if="!group[0].getBadge().isEmpty()" class="numericColumn">
             <strong>{{ group[0].getBadge().get() }}</strong>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="panel-footer text-center" v-if="items.length &gt; 0">
+    <div v-if="items.length > 0" class="panel-footer text-center">
       <div class="btn-group" role="group">
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="
-            this.totalPagesCount === 1 || this.currentPageNumber === 0
-          "
-          v-on:click="previousPage"
+          :disabled="totalPagesCount === 1 || currentPageNumber === 0"
+          @click="previousPage"
         >
           {{ T.wordsPrevious }}
         </button>
         <button
           class="btn btn-primary"
           type="button"
-          v-bind:disabled="this.totalPagesCount === 1 || this.currentPageNumber &gt;= this.totalPagesCount - 1"
-          v-on:click="nextPage"
+          :disabled="
+            totalPagesCount === 1 || currentPageNumber >= totalPagesCount - 1
+          "
+          @click="nextPage"
         >
           {{ T.wordsNext }}
         </button>
@@ -66,7 +66,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../lang';
-import { LinkableResource } from '../types.ts';
+import { LinkableResource } from '../linkable_resource';
 
 interface SortOption {
   value: string;

@@ -144,13 +144,7 @@ def test_user_ranking_contest(driver):
                     (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
         with driver.page_transition():
-            driver.wait.until(
-                EC.element_to_be_clickable(
-                    (By.XPATH,
-                     '//div[contains(concat(" ", normalize-space(@class), " "'
-                     '), " contest-list")]//a[contains(concat(" ", '
-                     'normalize-space(@class), " "), " tab-current ")]'
-                     ))).click()
+            select_contests_list(driver, 'data-list-current')
             driver.wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, '.contest-list a[href="/arena/%s/"]' %
@@ -175,6 +169,20 @@ def test_user_ranking_contest(driver):
         users_full_set = {user1, user2, user3, driver.user_username,
                           uninvited_identity.username}
         compare_contestants_list(driver, users_full_set)
+
+
+@util.no_javascript_errors()
+@util.annotate
+def select_contests_list(driver, selected_list):
+    '''This function allows us select one item of the contest list types
+    because now it needs to click on dropdown button first
+    '''
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[data-contests]'))).click()
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR, 'a[%s]' % selected_list))).click()
 
 
 @util.no_javascript_errors()
@@ -252,6 +260,45 @@ def check_ranking(driver, problem, user, *, scores):
     assert ranking_problem.text in scores, ranking_problem
 
 
+@util.no_javascript_errors()
+@util.annotate
+def test_user_clarifications_contest(driver):
+    '''Tests creating a contest and adding a clarification.'''
+
+    run_id = driver.generate_id()
+    contest_alias = 'utrank_contest_%s' % run_id
+    problem = 'sumas'
+    user1 = 'ut_rank_user_1_%s' % run_id
+    password = 'P@55w0rd'
+
+    driver.register_user(user1, password)
+
+    create_contest_admin(driver, contest_alias, problem, [user1],
+                         driver.user_username)
+
+    with driver.login(user1, password):
+        enter_contest(driver, contest_alias)
+        create_clarification_user(driver, problem, 'question 1')
+
+    with driver.login_admin():
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'a[data-nav-contests]'))).click()
+        with driver.page_transition():
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
+
+        with driver.page_transition():
+            select_contests_list(driver, 'data-list-current')
+            driver.wait.until(
+                EC.element_to_be_clickable(
+                    (By.CSS_SELECTOR, '.contest-list a[href="/arena/%s/"]' %
+                     contest_alias))).click()
+
+        answer_clarification_admin(driver, 'no')
+
+
 # pylint: disable=too-many-arguments
 @util.annotate
 def create_contest_admin(driver, contest_alias, problem, users, user,
@@ -284,7 +331,7 @@ def create_contest_admin(driver, contest_alias, problem, users, user,
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.ID, 'start-contest-submit'))).click()
+                    (By.CSS_SELECTOR, 'button[data-start-contest]'))).click()
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH, '//a[@href = "#ranking"]'))).click()
@@ -307,6 +354,62 @@ def update_scoreboard_for_contest(driver, contest_alias):
         urllib.parse.quote(contest_alias, safe=''))
     driver.browser.get(scoreboard_refresh_url)
     assert '"status":"ok"' in driver.browser.page_source
+
+
+@util.annotate
+def create_clarification_user(driver, problem, question):
+    '''Makes the user post a question in an specific contest and problem'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "#clarifications"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#clarifications')))
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "#clarifications/new"]'))).click()
+
+    Select(driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH,
+             '//select[@name = "problem"]')))).select_by_value(problem)
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//textarea[@name = "message"]'))).send_keys(question)
+
+    driver.browser.find_element_by_id('clarification').submit()
+
+    clarifications = driver.browser.find_elements_by_class_name('inserted')
+
+    assert len(clarifications) == 1, len(clarifications)
+
+
+@util.annotate
+def answer_clarification_admin(driver, answer):
+    '''Makes the admin course answer users' clarifications'''
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[@href = "#clarifications"]'))).click()
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.CSS_SELECTOR, '#clarifications')))
+
+    Select(driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             '.inserted .create-response-canned')))).select_by_value(answer)
+
+    driver.browser.find_element_by_css_selector(
+        '.inserted .create-response-form').submit()
+
+    resolved = driver.wait.until(
+        EC.visibility_of_element_located((By.CSS_SELECTOR, '.inserted')))
+
+    assert 'resolved' in resolved.get_attribute('class').split(), resolved
 
 
 @util.annotate
@@ -333,7 +436,7 @@ def create_run_user(driver, contest_alias, problem, filename, **kwargs):
 
 
 @util.annotate
-def create_contest(driver, contest_alias, scoreboard_time_percent=100):
+def create_contest(driver, alias, scoreboard_time_percent=100):
     '''Creates a new contest.'''
 
     driver.wait.until(
@@ -346,17 +449,17 @@ def create_contest(driver, contest_alias, scoreboard_time_percent=100):
 
     driver.wait.until(
         EC.visibility_of_element_located(
-            (By.ID, ('title')))).send_keys(contest_alias)
-    driver.browser.find_element_by_id('alias').send_keys(
-        contest_alias)
-    driver.browser.find_element_by_id('description').send_keys(
+            (By.CSS_SELECTOR, 'input[data-title]'))).send_keys(alias)
+    driver.browser.find_element_by_name('alias').send_keys(alias)
+    driver.browser.find_element_by_name('description').send_keys(
         'contest description')
-    scoreboard_element = driver.browser.find_element_by_id('scoreboard')
+    scoreboard_element = driver.browser.find_element_by_name('scoreboard')
     scoreboard_element.clear()
     scoreboard_element.send_keys(scoreboard_time_percent)
 
     with driver.page_transition():
-        driver.browser.find_element_by_tag_name('form').submit()
+        driver.browser.find_element_by_css_selector(
+            'form.contest-form').submit()
 
 
 @util.annotate
@@ -439,26 +542,9 @@ def enter_contest(driver, contest_alias):
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR, 'a[data-nav-contests-arena]'))).click()
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, '//ul[contains(@class, "arena-tabs")]'
-                       '/li[contains(@class, "active")]')))
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "'
-             '), " contest-list")]//a[contains(concat(" ", '
-             'normalize-space(@class), " "), " tab-past ")]'))).click()
-    driver.wait.until(
-        EC.visibility_of_element_located(
-            (By.CSS_SELECTOR, '.contest-list .list-past')))
+    select_contests_list(driver, 'data-list-past')
+    select_contests_list(driver, 'data-list-current')
 
-    driver.wait.until(
-        EC.element_to_be_clickable(
-            (By.XPATH,
-             '//div[contains(concat(" ", normalize-space(@class), " "'
-             '), " contest-list")]//a[contains(concat(" ", '
-             'normalize-space(@class), " "), " tab-current ")]'))).click()
     driver.wait.until(
         EC.visibility_of_element_located(
             (By.CSS_SELECTOR, '.contest-list .list-current')))
@@ -478,7 +564,7 @@ def enter_contest(driver, contest_alias):
     with driver.page_transition():
         driver.wait.until(
             EC.element_to_be_clickable(
-                (By.ID, 'start-contest-submit'))).click()
+                (By.CSS_SELECTOR, 'button[data-start-contest]'))).click()
 
 
 @util.annotate

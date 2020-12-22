@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="panel-body controls">
+  <div class="card w-100 mb-4">
+    <div class="card-body controls">
       <label
         >{{ T.problemVersionDiffMode }}
         <select v-model="diffMode">
@@ -14,10 +14,10 @@
       >
       <label
         >{{ T.problemVersionShowOnlyChanges }}
-        <input type="checkbox" v-model="showOnlyChanges"
+        <input v-model="showOnlyChanges" type="checkbox"
       /></label>
     </div>
-    <div class="panel-body no-padding">
+    <div class="card-body no-padding">
       <div class="container-fluid">
         <div class="row">
           <div class="col-md-6 scrollable">
@@ -35,34 +35,34 @@
               <tbody>
                 <tr
                   v-for="revision in log"
-                  v-on:click="selectedRevision = revision"
+                  @click="selectedRevision = revision"
                 >
                   <td>
                     <span
-                      v-bind:title="T.problemVersionPublishedRevision"
                       v-if="publishedRevision == revision"
+                      :title="T.problemVersionPublishedRevision"
                       >✔️</span
                     >
                   </td>
                   <td>
                     <input
+                      v-model="selectedRevision"
                       name="version"
                       type="radio"
-                      v-bind:value="revision"
-                      v-model="selectedRevision"
+                      :value="revision"
                     />
                   </td>
 
                   <td>
                     {{ time.formatDateTime(new Date(revision.committer.time))
                     }}<br />
-                    <acronym v-bind:title="revision.commit"
+                    <acronym :title="revision.commit"
                       ><tt>{{ revision.commit.substr(0, 8) }}</tt></acronym
                     >
                   </td>
                   <td>{{ revision.author.name }}</td>
                   <td>
-                    <acronym v-bind:title="revision.version"
+                    <acronym :title="revision.version"
                       ><tt>{{ revision.version.substr(0, 8) }}</tt></acronym
                     >
                   </td>
@@ -72,18 +72,18 @@
             </table>
           </div>
           <div class="col-md-6 scrollable">
-            <ul class="list-group no-margin" v-if="diffMode == 'files'">
+            <ul v-if="diffMode == 'files'" class="list-group no-margin">
               <li
-                class="list-group-item"
-                v-bind:class="diffEntry[1]"
                 v-for="diffEntry in diffFiles"
+                class="list-group-item"
+                :class="diffEntry[1]"
               >
                 {{ diffEntry[0] }}
               </li>
             </ul>
             <table
-              class="table table-condensed"
               v-if="diffMode == 'submissions'"
+              class="table table-condensed"
             >
               <thead>
                 <tr>
@@ -106,12 +106,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-bind:class="diffEntry[1]"
-                  v-for="diffEntry in diffSubmissions"
-                >
+                <tr v-for="diffEntry in diffSubmissions" :class="diffEntry[1]">
                   <td class="text-center">
-                    <acronym v-bind:title="diffEntry[0].guid"
+                    <acronym :title="diffEntry[0].guid"
                       ><tt>{{ diffEntry[0].guid.substr(0, 8) }}</tt></acronym
                     >
                   </td>
@@ -131,10 +128,10 @@
         </div>
       </div>
     </div>
-    <div class="panel-footer" v-if="showFooter">
+    <div v-if="showFooter" class="card-footer">
       <form
-        v-on:submit.prevent="
-          $emit('select-version', selectedRevision, updatePublished)
+        @submit.prevent="
+          $emit('emit-select-version', selectedRevision, updatePublished)
         "
       >
         <button class="btn btn-primary" type="submit">
@@ -156,38 +153,12 @@
   </div>
 </template>
 
-<style>
-.scrollable {
-  max-height: 600px;
-  overflow-y: auto;
-}
-.controls {
-  border-bottom: 1px solid #ddd;
-  background-color: #f5f5f5;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import * as time from '../../time';
-
-interface RunsDiff {
-  guid: string;
-  new_score: number;
-  new_status: string;
-  new_verdict: string;
-  old_score: number;
-  old_status: string;
-  old_verdict: string;
-  problemset_id: number;
-  username: string;
-}
-
-interface CommitRunsDiff {
-  [commit: string]: RunsDiff[];
-}
 
 @Component
 export default class ProblemVersions extends Vue {
@@ -200,7 +171,7 @@ export default class ProblemVersions extends Vue {
   time = time;
   diffMode = 'files';
   selectedRevision: omegaup.Commit = this.value;
-  runsDiff: CommitRunsDiff = {};
+  runsDiff: types.CommitRunsDiff = {};
   showOnlyChanges = false;
   updatePublished = 'owned-problemsets';
 
@@ -216,7 +187,7 @@ export default class ProblemVersions extends Vue {
 
     const diff = [];
     for (const path of Object.keys(tree)) {
-      if (!parentTree.hasOwnProperty(path)) {
+      if (!Object.prototype.hasOwnProperty.call(parentTree, path)) {
         diff.push([path, 'list-group-item-success']);
         continue;
       }
@@ -229,7 +200,7 @@ export default class ProblemVersions extends Vue {
       }
     }
     for (const path of Object.keys(parentTree)) {
-      if (tree.hasOwnProperty(path)) {
+      if (Object.prototype.hasOwnProperty.call(tree, path)) {
         continue;
       }
       diff.push([path, 'list-group-item-danger']);
@@ -239,20 +210,24 @@ export default class ProblemVersions extends Vue {
     return diff;
   }
 
-  get diffSubmissions(): [RunsDiff, string][] {
+  get diffSubmissions(): [types.RunsDiff, string][] {
     if (!this.selectedRevision) {
       return [];
     }
     const version = this.selectedRevision.version;
-    if (!this.runsDiff.hasOwnProperty(version)) {
+    if (!Object.prototype.hasOwnProperty.call(this.runsDiff, version)) {
       return [];
     }
-    const result: [RunsDiff, string][] = [];
+    const result: [types.RunsDiff, string][] = [];
     for (const row of this.runsDiff[version]) {
       let className = '';
-      if (row.new_score > row.old_score) {
+      if (row.new_score && row.old_score && row.new_score > row.old_score) {
         className = 'success';
-      } else if (row.new_score < row.old_score) {
+      } else if (
+        row.new_score &&
+        row.old_score &&
+        row.new_score < row.old_score
+      ) {
         className = 'danger';
       } else if (row.old_verdict != row.new_verdict) {
         className = 'warning';
@@ -265,17 +240,35 @@ export default class ProblemVersions extends Vue {
   }
 
   @Watch('value')
-  onValueChange(newValue: omegaup.Commit, oldValue: omegaup.Commit) {
+  onValueChange(newValue: omegaup.Commit) {
     this.selectedRevision = newValue;
   }
 
   @Watch('selectedRevision')
-  onSelectedRevisionChange(newValue: omegaup.Commit, oldValue: omegaup.Commit) {
+  onSelectedRevisionChange(newValue: omegaup.Commit) {
     this.$emit('input', this.selectedRevision);
-    if (!newValue || this.runsDiff.hasOwnProperty(newValue.version)) {
+    if (
+      !newValue ||
+      Object.prototype.hasOwnProperty.call(this.runsDiff, newValue.version)
+    ) {
       return;
     }
-    this.$emit('runs-diff', this, this.selectedRevision);
+    if (!this.showFooter) {
+      this.$emit('runs-diff', this, this.selectedRevision);
+    } else {
+      this.$emit('emit-runs-diff', this, this.selectedRevision);
+    }
   }
 }
 </script>
+
+<style>
+.scrollable {
+  max-height: 600px;
+  overflow-y: auto;
+}
+.controls {
+  border-bottom: 1px solid #ddd;
+  background-color: #f5f5f5;
+}
+</style>

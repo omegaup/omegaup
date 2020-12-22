@@ -1,12 +1,12 @@
 <template>
   <div class="panel panel-primary">
     <div class="panel-body">
-      <form class="form" v-on:submit.prevent="onSubmit">
+      <form class="form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.wordsGroup }}</label>
           <omegaup-autocomplete
-            v-bind:init="el => typeahead.groupTypeahead(el)"
             v-model="groupName"
+            :init="(el) => typeahead.groupTypeahead(el)"
           ></omegaup-autocomplete>
         </div>
         <button class="btn btn-primary" type="submit">
@@ -24,10 +24,10 @@
       <tbody>
         <tr v-for="group in groups">
           <td>
-            <a v-bind:href="`/group/${group.alias}/edit/`">{{ group.name }}</a>
+            <a :href="`/group/${group.alias}/edit/`">{{ group.name }}</a>
           </td>
           <td>
-            <button class="close" type="button" v-on:click="onRemove(group)">
+            <button class="close" type="button" @click="onRemove(group)">
               ×
             </button>
           </td>

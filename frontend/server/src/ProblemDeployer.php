@@ -35,6 +35,31 @@ class ProblemDeployer {
     /** @var bool */
     private $updatePublished = true;
 
+    /** The mapping of gitserver errors to translation strings. */
+    const ERROR_MAPPING = [
+        'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
+        'config-bad-layout' => 'problemDeployerConfigBadLayout',
+        'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',
+        'config-repository-not-absolute-url' => 'problemDeployerConfigRepositoryNotAbsoluteUrl',
+        'config-subdirectory-missing-target' => 'problemDeployerConfigSubdirectoryMissingTarget',
+        'interactive-bad-layout' => 'problemDeployerInteractiveBadLayout',
+        'internal-error' => 'problemDeployerInternalError',
+        'internal-git-error' => 'problemDeployerInternalGitError',
+        'invalid-zip-filename' => 'problemDeployerInvalidZipFilename',
+        'json-parse-error' => 'problemDeployerJsonParseError',
+        'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
+        'no-statements' => 'problemDeployerNoStatements',
+        'no-es-statement' => 'problemDeployerEsNoStatement',
+        'not-a-review' => 'problemDeployerNotAReview',
+        'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
+        'problem-bad-layout' => 'problemDeployerProblemBadLayout',
+        'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
+        'review-bad-layout' => 'problemDeployerReviewBadLayout',
+        'slow-rejected' => 'problemDeployerSlowRejected',
+        'tests-bad-layout' => 'problemDeployerTestsBadLayout',
+        'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
+    ];
+
     public function __construct(
         string $alias,
         bool $acceptsSubmissions = true,
@@ -46,13 +71,12 @@ class ProblemDeployer {
         if (
             isset($_FILES['problem_contents'])
             && isset($_FILES['problem_contents']['tmp_name'])
-            && is_string($_FILES['problem_contents']['tmp_name'])
             && \OmegaUp\FileHandler::getFileUploader()->isUploadedFile(
-                strval($_FILES['problem_contents']['tmp_name'])
+                $_FILES['problem_contents']['tmp_name']
             )
         ) {
             /** @psalm-suppress MixedArrayAccess */
-            $this->zipPath = strval($_FILES['problem_contents']['tmp_name']);
+            $this->zipPath = $_FILES['problem_contents']['tmp_name'];
         } else {
             $this->zipPath = __DIR__ . '/empty.zip';
         }
@@ -155,7 +179,6 @@ class ProblemDeployer {
                 }
             }
         }
-        $this->generateLibinteractiveTemplates($this->publishedCommit);
     }
 
     /**
@@ -286,6 +309,7 @@ class ProblemDeployer {
     }
 
     /**
+     * @param list<string> $args
      * @return array{output: null|string, retval: int}
      */
     private function executeRaw(array $args, string $cwd) {
@@ -428,9 +452,11 @@ class ProblemDeployer {
         }
 
         if ($result['statusCode'] == 409) {
-            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+            $exception = new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
                 'problemAliasExists'
             );
+            $exception->addCustomMessageToArray('parameter', 'problem_alias');
+            throw $exception;
         }
         if ($result['retval'] != 0) {
             $errorMessage = 'problemDeployerInternalError';
@@ -441,31 +467,9 @@ class ProblemDeployer {
                 if (is_null($output)) {
                     $context = $result['output'];
                 } else {
-                    $errorMapping = [
-                        'change-missing-settings-json' => 'problemDeployerChangeMissingSettingsJson',
-                        'config-bad-layout' => 'problemDeployerConfigBadLayout',
-                        'config-invalid-publishing-mode' => 'problemDeployerConfigInvalidPublishingMode',
-                        'config-repository-not-absolute-url' => 'problemDeployerConfigRepositoryNotAbsoluteUrl',
-                        'config-subdirectory-missing-target' => 'problemDeployerConfigSubdirectoryMissingTarget',
-                        'interactive-bad-layout' => 'problemDeployerInteractiveBadLayout',
-                        'internal-error' => 'problemDeployerInternalError',
-                        'internal-git-error' => 'problemDeployerInternalGitError',
-                        'invalid-zip-filename' => 'problemDeployerInvalidZipFilename',
-                        'json-parse-error' => 'problemDeployerJsonParseError',
-                        'mismatched-input-file' => 'problemDeployerMismatchedInputFile',
-                        'no-statements' => 'problemDeployerNoStatements',
-                        'not-a-review' => 'problemDeployerNotAReview',
-                        'omegaup-update-problem-old-version' => 'problemDeployerOmegaupUpdateProblemOldVersion',
-                        'problem-bad-layout' => 'problemDeployerProblemBadLayout',
-                        'published-must-point-to-commit-in-master' => 'problemDeployerPublishedMustPointToCommitInMaster',
-                        'review-bad-layout' => 'problemDeployerReviewBadLayout',
-                        'slow-rejected' => 'problemDeployerSlowRejected',
-                        'tests-bad-layout' => 'problemDeployerTestsBadLayout',
-                        'too-many-objects-in-packfile' => 'problemDeployerTooManyObjectsInPackfile',
-                    ];
                     $tokens = explode(': ', $output['error'], 2);
-                    if (array_key_exists($tokens[0], $errorMapping)) {
-                        $errorMessage = $errorMapping[$tokens[0]];
+                    if (array_key_exists($tokens[0], self::ERROR_MAPPING)) {
+                        $errorMessage = self::ERROR_MAPPING[$tokens[0]];
                         if (count($tokens) == 2) {
                             $context = $tokens[1];
                         }
@@ -474,6 +478,7 @@ class ProblemDeployer {
                     }
                 }
             }
+            /** @psalm-suppress TranslationStringNotALiteralString This is handled in TranslationStringChecker */
             $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
                 $errorMessage,
                 $context
@@ -533,6 +538,51 @@ class ProblemDeployer {
             }
         } finally {
             curl_close($curl);
+        }
+    }
+
+    public function renameRepository(
+        string $targetAlias
+    ): void {
+        $curl = curl_init();
+        try {
+            curl_setopt_array(
+                $curl,
+                [
+                    CURLOPT_URL => OMEGAUP_GITSERVER_URL . "/{$this->alias}/rename-repository/{$targetAlias}",
+                    CURLOPT_HTTPHEADER => [
+                        // Unsetting Expect:, since it kind of breaks the gitserver.
+                        'Expect: ',
+                        \OmegaUp\SecurityTools::getGitserverAuthorizationHeader(
+                            $this->alias,
+                            'omegaup:system'
+                        ),
+                    ],
+                    CURLOPT_RETURNTRANSFER => 1,
+                ]
+            );
+            $output = curl_exec($curl);
+            /** @var int */
+            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $retval = ($output !== false && $statusCode == 200) ? 0 : 1;
+        } finally {
+            curl_close($curl);
+        }
+
+        if ($statusCode == 409) {
+            throw new \OmegaUp\Exceptions\DuplicatedEntryInDatabaseException(
+                'problemAliasExists'
+            );
+        }
+        if ($retval != 0) {
+            $error = new \OmegaUp\Exceptions\ProblemDeploymentFailedException(
+                'problemDeployerInternalError',
+                /*$context=*/null
+            );
+            $this->log->error(
+                "rename problem failed: HTTP/{$statusCode}: {$error}"
+            );
+            throw $error;
         }
     }
 }

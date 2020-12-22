@@ -17,7 +17,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     /**
      * @param list<string> $tags
      */
-    final private static function addTagFilter(
+    private static function addTagFilter(
         string $identityType,
         ?int $identityId,
         array $tags,
@@ -34,13 +34,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN (
                 SELECT
                     pt.problem_id,
-                    BIT_AND(pt.public) as public
+                    BIT_AND(t.public) as public
                 FROM
                     Problems_Tags pt
                 INNER JOIN
                     Problems pp
                 ON
                     pp.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    pt.tag_id = t.tag_id
                 WHERE pt.tag_id IN (
                     SELECT t.tag_id
                     FROM Tags t
@@ -79,7 +83,8 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
      * @param null|array{0: int, 1: int} $difficultyRange
      * @param list<string> $programmingLanguages
      * @param list<string> $tags
-     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int}>, count: int}
+     * @param list<string> $authors
+     * @return array{problems: list<array{alias: string, difficulty: float|null, quality_seal: bool, difficulty_histogram: list<int>, points: float, quality: float|null, quality_histogram: list<int>, ratio: float, score: float, tags: list<array{name: string, source: string}>, title: string, visibility: int, problem_id: int}>, count: int}
      */
     final public static function byIdentityType(
         string $identityType,
@@ -95,7 +100,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         int $minVisibility,
         bool $requireAllTags,
         array $programmingLanguages,
-        ?array $difficultyRange
+        ?array $difficultyRange,
+        bool $onlyQualitySeal,
+        ?string $level,
+        string $difficulty,
+        array $authors
     ) {
         // Just in case.
         if ($order !== 'asc' && $order !== 'desc') {
@@ -113,6 +122,21 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             ';
         }
 
+        $clauses = [];
+
+        $levelJoin = '';
+        if (!is_null($level)) {
+            $levelJoin = '
+            INNER JOIN
+                Problems_Tags pt ON p.problem_id = pt.problem_id
+            INNER JOIN
+                Tags t ON t.tag_id = pt.tag_id
+            ';
+            $clauses[] = [
+                't.name = ?', [$level]
+            ];
+        }
+
         // Use BINARY mode to force case sensitive comparisons when ordering by title.
         $collation = ($orderBy === 'title') ? 'COLLATE utf8mb4_bin' : '';
         $select = '';
@@ -122,30 +146,104 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         // Clauses is an array of 2-tuples that contains a chunk of SQL and the
         // arguments that are needed for that chunk.
         /** @var list<array{0: string, 1: list<string>}> */
-        $clauses = [];
         foreach ($programmingLanguages as $programmingLanguage) {
             $clauses[] = [
                 'FIND_IN_SET(?, p.languages) > 0',
                 [$programmingLanguage],
             ];
         }
-        if (!is_null($difficultyRange) && count($difficultyRange) === 2) {
-            $conditions = 'p.difficulty >= ? AND p.difficulty <= ?';
-            if ($difficultyRange[0] === 0) {
-                $conditions = '(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty <= ?))';
+
+        // Convert the difficulty in text form to a range
+        if (is_null($difficultyRange)) {
+            $difficultyRange = [];
+            switch ($difficulty) {
+                case 'easy':
+                    $difficultyRange[] = 0;
+                    $difficultyRange[] = 1;
+                    break;
+                case 'medium':
+                    $difficultyRange[] = 2;
+                    $difficultyRange[] = 2;
+                    break;
+                case 'hard':
+                    $difficultyRange[] = 3;
+                    $difficultyRange[] = 4;
+                    break;
+            }
+        }
+
+        if (count($difficultyRange) === 2) {
+            $difficultyBounds = [];
+            switch ($difficultyRange[0]) {
+                case '0':
+                    $difficultyBounds[] = 0;
+                    break;
+                case '1':
+                    $difficultyBounds[] = 0.5;
+                    break;
+                case '2':
+                    $difficultyBounds[] = 1.5;
+                    break;
+                case '3':
+                    $difficultyBounds[] = 2.5;
+                    break;
+                case '4':
+                    $difficultyBounds[] = 3.5;
+                    break;
+            }
+            switch ($difficultyRange[1]) {
+                case '0':
+                    $difficultyBounds[] = 0.5;
+                    break;
+                case '1':
+                    $difficultyBounds[] = 1.5;
+                    break;
+                case '2':
+                    $difficultyBounds[] = 2.5;
+                    break;
+                case '3':
+                    $difficultyBounds[] = 3.5;
+                    break;
+                case '4':
+                    $difficultyBounds[] = 4;
+                    break;
+            }
+
+            if ($difficultyBounds[1] === 4) {
+                $upperBoundComparison = '<=';
+            } else {
+                $upperBoundComparison = '<';
+            }
+            if ($difficultyBounds[0] === 0) {
+                // If the lower limit is equal to 0, take into account problems
+                // without difficulty.
+                $conditions = "(p.difficulty IS NULL OR (p.difficulty >= ? AND p.difficulty {$upperBoundComparison} ?))";
+            } else {
+                $conditions = "p.difficulty >= ? AND p.difficulty {$upperBoundComparison} ?";
             }
 
             $clauses[] = [
                 $conditions,
-                $difficultyRange,
+                $difficultyBounds,
             ];
         }
 
         if (!is_null($query)) {
-            $clauses[] = [
-                "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
-                [$query, $query],
-            ];
+            if (is_numeric($query)) {
+                $clauses[] = [
+                    "(
+                      p.title LIKE CONCAT('%', ?, '%') OR
+                      p.alias LIKE CONCAT('%', ?, '%') OR
+                      p.problem_id = ?
+                    )",
+                    [$query, $query, intval($query)],
+                ];
+            } else {
+                $clauses[] = [
+                    "(p.title LIKE CONCAT('%', ?, '%') OR p.alias LIKE CONCAT('%', ?, '%'))",
+                    [$query, $query],
+                ];
+            }
         }
 
         if ($identityType === IDENTITY_ADMIN) {
@@ -175,7 +273,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         Submissions.identity_id = Identities.identity_id
                     GROUP BY
                         Problems.problem_id
-                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin;
+                    ) ps ON ps.problem_id = p.problem_id ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility > ?',
@@ -224,7 +322,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     INNER JOIN
                         Group_Roles gr ON gr.group_id = gi.group_id
                     WHERE gi.identity_id = ? AND gr.role_id = ?
-                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin;
+                ) gr ON p.acl_id = gr.acl_id ' . $languageJoin . $levelJoin;
             $args[] = $identityId;
             $args[] = $userId;
             $args[] = \OmegaUp\Authorization::ADMIN_ROLE;
@@ -255,7 +353,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                         p.* ';
             $sql = '
                     FROM
-                        Problems p ' . $languageJoin;
+                        Problems p ' . $languageJoin . $levelJoin;
 
             $clauses[] = [
                 'p.visibility >= ?',
@@ -278,15 +376,47 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             );
         }
 
+        if (!empty($authors)) {
+            $placeholders = join(',', array_fill(0, count($authors), '?'));
+            $sql .= "
+                INNER JOIN (
+                    SELECT
+                        pp.problem_id
+                    FROM
+                        Problems pp
+                    INNER JOIN
+                        ACLs acl
+                    ON
+                        pp.acl_id = acl.acl_id
+                    INNER JOIN
+                        User_Rank ur
+                    ON
+                        ur.user_id = acl.owner_id
+                    WHERE ur.user_id IN (
+                        SELECT
+                            user_id
+                        FROM
+                            User_Rank
+                        WHERE username IN ($placeholders)
+                    )
+                ) pa ON pa.problem_id = p.problem_id";
+
+            $args = array_merge($args, $authors);
+        }
+
+        if ($onlyQualitySeal) {
+            $clauses[] = [
+                'p.quality_seal = ?', [1]
+            ];
+        }
+
         // Finally flatten all WHERE clauses, and add a 'WHERE' if applicable.
         if (!empty($clauses)) {
             $sql .= "\nWHERE\n" . implode(
                 ' AND ',
                 array_map(
                     /** @param array{0: string, 1: list<string>} $clause */
-                    function (array $clause): string {
-                        return $clause[0];
-                    },
+                    fn (array $clause) => $clause[0],
                     $clauses
                 )
             );
@@ -328,7 +458,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
 
         // Only these fields (plus score, points and ratio) will be returned.
         $filters = [
-            'title','quality', 'difficulty', 'alias', 'visibility',
+            'title', 'quality', 'difficulty', 'alias', 'visibility', 'problem_id',
             'quality_histogram', 'difficulty_histogram', 'quality_seal',
         ];
         $problems = [];
@@ -342,7 +472,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                     \OmegaUp\DAO\VO\Problems::FIELD_NAMES
                 )
             );
-            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool} */
+            /** @var array{title: string, quality: null|float, difficulty: null|float, alias: string, visibility: int,quality_histogram: list<int>, difficulty_histogram: list<int>, quality_seal: bool, problem_id: int} */
             $problem = $problemObject->asFilteredArray($filters);
 
             // score, points and ratio are not actually fields of a Problems object.
@@ -395,7 +525,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         WHERE
             pt.problem_id = ?';
         if ($public) {
-            $sql .= ' AND pt.public = 1';
+            $sql .= ' AND t.public = 1';
         }
         if (!$showUserTags) {
             $sql .= ' AND pt.source <> \'voted\'';
@@ -542,10 +672,17 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             INNER JOIN
                 Problems p ON p.acl_id = a.acl_id
             WHERE
-                p.visibility = ? AND
+                (
+                    p.visibility >= ? OR
+                    p.visibility = ?
+                ) AND
                 i.identity_id = ?;';
 
-        $params = [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $identityId];
+        $params = [
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING,
+            \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED,
+            $identityId,
+        ];
 
         /** @var list<array{accepted: int, acl_id: int, alias: string, allow_user_add_tags: bool, commit: string, creation_date: \OmegaUp\Timestamp, current_version: string, deprecated: bool, difficulty: float|null, difficulty_histogram: null|string, email_clarifications: bool, input_limit: int, languages: string, order: string, problem_id: int, quality: float|null, quality_histogram: null|string, quality_seal: bool, show_diff: string, source: null|string, submissions: int, title: string, visibility: int, visits: int}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
@@ -558,33 +695,33 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     /**
-     * @return list<array{alias: string, title: string, username: string}>
+     * @return list<array{alias: string, solved: bool, title: string, username: string}>
      */
-    final public static function getSolvedProblemsByUsersOfCourse(
-        string $courseAlias
-    ): array {
-        $sql = "
-            SELECT
+    public static function getProblemsByUsersInACourse(string $courseAlias) {
+        $sql  = '
+           SELECT
                 rp.alias,
                 rp.title,
+                IFNULL(rp.solved, FALSE) AS solved,
                 i.username
             FROM
-                Courses c
+                Identities i
             INNER JOIN
                 Groups_Identities gi
             ON
-                c.group_id = gi.group_id
-            INNER JOIN
-                Identities i
-            ON
                 gi.identity_id = i.identity_id
+            INNER JOIN
+                Courses c
+            ON
+                c.group_id = gi.group_id
             INNER JOIN
                 (
                 SELECT
                     p.problem_id,
                     p.alias,
                     p.title,
-                    s.identity_id
+                    s.identity_id,
+                    MAX(r.score) = 1 AS solved
                 FROM
                     Submissions s
                 INNER JOIN
@@ -596,8 +733,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 ON
                     p.problem_id = s.problem_id
                 WHERE
-                    r.verdict = 'AC'
-                    AND p.visibility = ?
+                    p.visibility = ?
                 GROUP BY
                     p.problem_id, s.identity_id
                 ) rp
@@ -608,79 +744,21 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
                 AND gi.accept_teacher = true
             ORDER BY
                 i.username ASC,
-                rp.problem_id DESC;";
-
-        /** @var list<array{alias: string, title: string, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
-        );
-    }
-
-    /**
-     * @return list<array{alias: string, title: string, username: string}>
-     */
-    final public static function getUnsolvedProblemsByUsersOfCourse(
-        string $courseAlias
-    ): array {
-        $sql = '
-            SELECT
-                rp.alias,
-                rp.title,
-                i.username
-            FROM
-                Identities i
-            INNER JOIN
-                Groups_Identities gi
-            ON
-                gi.identity_id = i.identity_id
-            INNER JOIN
-                Courses c
-            ON
-                c.group_id = gi.group_id
-            INNER JOIN
-                (
-                SELECT
-                    pp.problem_id,
-                    pp.alias,
-                    pp.title,
-                    s.identity_id,
-                    MAX(r.score) AS max_score
-                FROM
-                    Submissions s
-                INNER JOIN
-                    Runs r
-                ON
-                    r.run_id = s.current_run_id
-                INNER JOIN
-                    Problems pp
-                ON
-                    pp.problem_id = s.problem_id
-                WHERE
-                    pp.visibility = ?
-                GROUP BY
-                    pp.problem_id, s.identity_id
-                HAVING
-                    max_score < 1
-                ) rp
-            ON
-                rp.identity_id = i.identity_id
-            INNER JOIN
-                Problems p
-            ON
-                rp.problem_id = p.problem_id
-            WHERE
-                c.alias = ?
-                AND gi.accept_teacher = true
-            ORDER BY
-                i.username ASC,
                 rp.problem_id DESC;';
 
-        /** @var list<array{alias: string, title: string, username: string}> */
-        return \OmegaUp\MySQLConnection::getInstance()->GetAll(
-            $sql,
-            [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
-        );
+        $problemsUsers = [];
+        /** @var array{alias: string, solved: int, title: string, username: string} $problemsUser */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [\OmegaUp\ProblemParams::VISIBILITY_PUBLIC, $courseAlias]
+            ) as $problemsUser
+        ) {
+            $problemsUser['solved'] = boolval($problemsUser['solved']);
+            $problemsUsers[] = $problemsUser;
+        }
+
+        return $problemsUsers;
     }
 
     final public static function hasTriedToSolveProblem(
@@ -791,6 +869,7 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
         $params = [$problem->problem_id];
 
         $result = [];
+        /** @var array{email: string} $row */
         foreach (
             \OmegaUp\MySQLConnection::getInstance()->GetAll(
                 $sql,
@@ -1076,7 +1155,11 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
     }
 
     final public static function isVisible(\OmegaUp\DAO\VO\Problems $problem): bool {
-        return intval($problem->visibility) >= 1;
+        return (intval(
+            $problem->visibility
+        ) >= \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING  || intval(
+            $problem->visibility
+        ) == \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED);
     }
 
     public static function deleteProblem(int $problemId): int {
@@ -1165,5 +1248,77 @@ class Problems extends \OmegaUp\DAO\Base\Problems {
             $problems[] = new \OmegaUp\DAO\VO\Problems($row);
         }
         return $problems;
+    }
+
+    /**
+     * @return list<array{name: string, problems_per_tag: int}>
+     */
+    final public static function getQualityProblemsPerTagCount(): array {
+        $sql = "SELECT
+                    t.name, COUNT(p.problem_id) AS problems_per_tag
+                FROM
+                    Problems p
+                INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
+                WHERE
+                    t.name LIKE CONCAT('problemLevel','%')
+                    AND p.quality_seal = 1
+                GROUP BY
+                    t.name;";
+
+        /** @var list<array{name: string, problems_per_tag: int}> */
+        return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
+    }
+
+    final public static function getRandomLanguageProblemAlias(): string {
+        $sql = "SELECT
+                    alias
+                FROM
+                    Problems p
+                    INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
+                WHERE
+                    quality_seal = 1
+                    AND (t.name LIKE CONCAT('problemLevel','%') AND t.name NOT LIKE 'problemLevelBasicKarel')
+                ORDER BY
+                    RAND() LIMIT 1;";
+
+        /** @var string */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
+    }
+
+    final public static function getRandomKarelProblemAlias(): string {
+        $sql = "SELECT
+                    alias
+                FROM
+                    Problems p
+                    INNER JOIN
+                    Problems_Tags pt
+                ON
+                    p.problem_id = pt.problem_id
+                INNER JOIN
+                    Tags t
+                ON
+                    t.tag_id = pt.tag_id
+                WHERE
+                    quality_seal = 1
+                    AND t.name = 'problemLevelBasicKarel'
+                ORDER BY
+                    RAND() LIMIT 1;";
+
+        /** @var string */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne($sql);
     }
 }

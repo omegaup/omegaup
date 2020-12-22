@@ -33,7 +33,7 @@ def test_create_group_with_identities_and_restrictions(driver):
                 navbar.find_element_by_css_selector(
                     'li.nav-problems .dropdown-menu')))
         # Problems menu
-        for present_href in ['/problem/', '/submissions/',
+        for present_href in ['/problem/collection/', '/submissions/',
                              '/problem/new/']:
             assert problems_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % present_href), (
@@ -57,7 +57,7 @@ def test_create_group_with_identities_and_restrictions(driver):
             EC.visibility_of(
                 navbar.find_element_by_css_selector(
                     'li.nav-problems .dropdown-menu')))
-        for present_href in ['/problem/', '/submissions/']:
+        for present_href in ['/problem/collection/', '/submissions/']:
             assert problems_dropdown.find_elements_by_css_selector(
                 'a[href="%s"]' % present_href), (
                     '%s item is not present!' % present_href)
@@ -82,10 +82,13 @@ def test_create_group_with_identities_and_restrictions(driver):
                     '%s item is visible!' % absent_href)
 
         # Courses list
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.CSS_SELECTOR, 'a[data-nav-courses]'))).click()
         with driver.page_transition():
             driver.wait.until(
                 EC.element_to_be_clickable(
-                    (By.XPATH, '//a[@href = "/schools/"]'))).click()
+                    (By.CSS_SELECTOR, 'a[data-nav-courses-all]'))).click()
         assert not driver.browser.find_elements_by_css_selector(
             'a[href="/course/new/"]')
 

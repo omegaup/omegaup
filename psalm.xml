@@ -2,6 +2,8 @@
 <psalm
     totallyTyped="true"
     autoloader="frontend/server/bootstrap.php"
+    cacheDirectory="/tmp/psalm"
+    hoistConstants="true"
     resolveFromConfigFile="true"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
@@ -17,10 +19,16 @@
             <directory name="frontend/www/phpminiadmin" />
             <directory name="frontend/www/preguntas" />
             <directory name="frontend/www/third_party" />
+
+            <!-- These need a bit more work to be compliant -->
+            <directory name="frontend/tests/controllers" />
+            <directory name="frontend/tests/badges" />
         </ignoreFiles>
     </projectFiles>
 
     <stubs>
+       <file name="frontend/server/stubs.php" />
+
        <!-- For PASSWORD_ARGON2ID -->
        <file name="vendor/jetbrains/phpstorm-stubs/standard/password.php" />
 
@@ -33,5 +41,19 @@
 
     <plugins>
         <plugin filename="frontend/server/src/Psalm/RequestParamChecker.php" />
+        <plugin filename="frontend/server/src/Psalm/TranslationStringChecker.php" />
     </plugins>
+
+    <issueHandlers>
+        <InvalidDocblock>
+            <errorLevel type="suppress">
+                <file name="frontend/server/libs/third_party/paseto/src/Parsing/PasetoMessage.php" />
+            </errorLevel>
+        </InvalidDocblock>
+    </issueHandlers>
+
+    <globals>
+        <var name="_FILES" type="array&lt;string, array{tmp_name?: string}&gt;" />
+        <var name="_COOKIE" type="array&lt;string, string&gt;" />
+    </globals>
 </psalm>

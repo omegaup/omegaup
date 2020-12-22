@@ -24,7 +24,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
     ): array {
         $sql = '
             SELECT
-                t.name, pt.public
+                t.name, t.public
             FROM
                 Problems_Tags pt
             INNER JOIN
@@ -33,7 +33,7 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
                 pt.problem_id = ?';
         $params = [$problem->problem_id];
         if ($publicOnly) {
-            $sql .= ' AND pt.public = 1';
+            $sql .= ' AND t.public = 1';
         }
         if (!$includeVoted) {
             $sql .= ' AND pt.source != "voted"';
@@ -42,6 +42,42 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
 
         /** @var list<array{name: string, public: bool}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll($sql, $params);
+    }
+
+    /**
+     * Returns the list of tags of a problem. That list will contain
+     * either public or private tags.
+     *
+     * @return list<string>
+     */
+    public static function getTagsForProblem(
+        \OmegaUp\DAO\VO\Problems $problem,
+        bool $public
+    ): array {
+        $sql = "
+            SELECT
+                `t`.`name`
+            FROM
+                `Problems_Tags` AS `pt`
+            INNER JOIN
+                `Tags` `t` on `t`.`tag_id` = `pt`.`tag_id`
+            WHERE
+                `pt`.`problem_id` = ? AND
+                `t`.`name` NOT LIKE 'problemRestricted%' AND
+                `t`.`name` NOT LIKE 'problemLevel%' AND
+                `t`.`public` = ?;";
+
+        $results = [];
+        /** @var array{name: string} $row */
+        foreach (
+            \OmegaUp\MySQLConnection::getInstance()->GetAll(
+                $sql,
+                [ $problem->problem_id, $public ]
+            ) as $row
+        ) {
+            $results[] = $row['name'];
+        }
+        return $results;
     }
 
     public static function clearRestrictedTags(\OmegaUp\DAO\VO\Problems $problem): void {
@@ -72,5 +108,74 @@ class ProblemsTags extends \OmegaUp\DAO\Base\ProblemsTags {
                         name IN ($placeholders)
                 ) AND problem_id = ?;";
         \OmegaUp\MySQLConnection::getInstance()->Execute($sql, $params);
+    }
+
+    public static function getProblemLevel(
+        \OmegaUp\DAO\VO\Problems $problem
+    ): ?string {
+        $sql = "
+            SELECT
+                `t`.`name`
+            FROM
+                `Problems_Tags` AS `pt`
+            INNER JOIN
+                `Tags` AS `t`
+            ON
+                `t`.`tag_id` = `pt`.`tag_id`
+            WHERE
+                `t`.`name` LIKE 'problemLevel%' AND
+                `pt`.`problem_id` = ?;";
+
+        /** @var string|null */
+        return \OmegaUp\MySQLConnection::getInstance()->GetOne(
+            $sql,
+            [ $problem->problem_id ],
+        );
+    }
+
+    public static function updateProblemLevel(
+        \OmegaUp\DAO\VO\Problems $problem,
+        ?\OmegaUp\DAO\VO\Tags $tag
+    ): void {
+        try {
+            \OmegaUp\DAO\DAO::transBegin();
+            // Delete old tag
+            $sql = "
+                DELETE
+                    `pt`
+                FROM
+                    `Problems_Tags` AS `pt`
+                INNER JOIN
+                    `Tags` AS `t`
+                ON
+                    `t`.`tag_id` = `pt`.`tag_id`
+                WHERE
+                    `pt`.`problem_id` = ? AND
+                    `t`.`name` LIKE 'problemLevel%';";
+            \OmegaUp\MySQLConnection::getInstance()->Execute(
+                $sql,
+                [ $problem->problem_id ],
+            );
+
+            if ($tag) {
+                $sql = '
+                    INSERT INTO
+                        `Problems_Tags` (
+                            `tag_id`,
+                            `problem_id`
+                        )
+                    VALUES
+                        (?,?);';
+
+                \OmegaUp\MySQLConnection::getInstance()->Execute(
+                    $sql,
+                    [ $tag->tag_id, $problem->problem_id ],
+                );
+            }
+            \OmegaUp\DAO\DAO::transEnd();
+        } catch (\Exception $e) {
+            \OmegaUp\DAO\DAO::transRollback();
+            throw $e;
+        }
     }
 }

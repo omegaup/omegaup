@@ -16,8 +16,8 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
 
         // Get a problem
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 2,
-            'author' => $authorIdentity
+            'visibility' => 'public',
+            'author' => $authorIdentity,
         ]));
 
         // Add the problem to the contest
@@ -149,7 +149,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testProblemDetailsNotInContest() {
         // Get 1 problem public
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 2
+            'visibility' => 'public',
         ]));
 
         // Get a user for our scenario
@@ -182,7 +182,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateProblemDetailsOutsideOfContest() {
         // Get 1 problem public
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private',
         ]));
 
         // Get a user for our scenario
@@ -206,7 +206,7 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     public function testPrivateProblemDetailsAnonymousOutsideOfContest() {
         // Get 1 problem public
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => 0
+            'visibility' => 'private',
         ]));
 
         try {
@@ -387,20 +387,18 @@ class ProblemDetailsTest extends \OmegaUp\Test\ControllerTestCase {
     }
 
     /**
-     * Solutions that don't exist don't cause an exception.
+     * Solutions that doesn't exist should be null.
      */
     public function testShowSolutionInexistent() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
             'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
         ]));
         $login = self::login($problemData['author']);
-        {
-            $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
-                'auth_token' => $login->auth_token,
-                'problem_alias' => $problemData['request']['problem_alias'],
-            ]));
-            $this->assertEmpty($response['solution']['markdown']);
-        }
+        $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $problemData['request']['problem_alias'],
+        ]));
+        $this->assertNull($response['solution']);
     }
 
     /**

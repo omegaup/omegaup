@@ -80,6 +80,12 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
                 \OmegaUp\DAO\Identities::findByUsername($identity->username)
             )
         );
+
+        $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals(1, $results['allowed']);
+        $this->assertEquals(1, $results['seen']);
     }
 
     public function testGetSolutionForbiddenAccessException() {
@@ -99,5 +105,63 @@ class ProblemsForfeitedTest extends \OmegaUp\Test\ControllerTestCase {
                 'allowedSolutionsLimitReached'
             );
         }
+
+        $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals(0, $results['allowed']);
+        $this->assertEquals(0, $results['seen']);
+    }
+
+    public function testGetNonexistentSolution() {
+        ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
+        $login = self::login($identity);
+        $problems = [];
+        for (
+            $i = 0; $i < \OmegaUp\Controllers\ProblemForfeited::SOLVED_PROBLEMS_PER_ALLOWED_SOLUTION; $i++
+        ) {
+            $problems[] = \OmegaUp\Test\Factories\Problem::createProblem();
+            $run = \OmegaUp\Test\Factories\Run::createRunToProblem(
+                $problems[$i],
+                $identity,
+                $login
+            );
+            \OmegaUp\Test\Factories\Run::gradeRun($run);
+        }
+
+        $extraProblem = \OmegaUp\Test\Factories\Problem::createProblem(
+            new \OmegaUp\Test\Factories\ProblemParams([
+                'zipName' => OMEGAUP_TEST_RESOURCES_ROOT . 'imagetest.zip',
+            ])
+        );
+
+        try {
+            \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
+                'auth_token' => $login->auth_token,
+                'problem_alias' => $extraProblem['problem']->alias,
+            ]));
+            $this->fail('Should have thrown ForbiddenAccessException');
+        } catch (\OmegaUp\Exceptions\ForbiddenAccessException $e) {
+            $this->assertEquals($e->getMessage(), 'problemSolutionNotVisible');
+        }
+
+        $response = \OmegaUp\Controllers\Problem::apiSolution(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'problem_alias' => $extraProblem['problem']->alias,
+            'forfeit_problem' => true,
+        ]));
+        $this->assertNull($response['solution']);
+        $this->assertFalse(
+            \OmegaUp\DAO\ProblemsForfeited::isProblemForfeited(
+                $extraProblem['problem'],
+                \OmegaUp\DAO\Identities::findByUsername($identity->username)
+            )
+        );
+
+        $results = \OmegaUp\Controllers\ProblemForfeited::apiGetCounts(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+        ]));
+        $this->assertEquals(1, $results['allowed']);
+        $this->assertEquals(0, $results['seen']);
     }
 }

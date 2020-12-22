@@ -1,38 +1,29 @@
 <template>
-  <div class="panel panel-primary">
-    <div class="panel-heading">
-      <h3 class="panel-title">{{ T.courseList }}</h3>
-    </div>
+  <div>
+    <template v-for="(typeCourses, accessMode) in courses">
+      <div
+        v-if="typeCourses.activeTab !== ''"
+        :key="accessMode"
+        class="card mb-4"
+        :class="accessMode"
+      >
+        <div class="card-header">
+          <h3 class="card-title">{{ getDescription(accessMode) }}</h3>
+        </div>
 
-    <div class="page-header" v-if="isMainUserIdentity">
-      <div class="pull-right">
-        <a class="btn btn-primary" href="/course/new/">{{ T.courseNew }}</a>
+        <omegaup-course-filtered-list
+          :courses="typeCourses"
+          :active-tab="typeCourses.activeTab"
+        ></omegaup-course-filtered-list>
       </div>
-      <h1>&nbsp;</h1>
-    </div>
-    <template
-      v-for="typeCourses in courses"
-      v-if="typeCourses.activeTab !== ''"
-    >
-      <div class="page-header">
-        <h1>
-          <span>{{ typeCourses.description }}</span>
-        </h1>
-      </div>
-
-      <omegaup-course-filtered-list
-        v-bind:courses="typeCourses"
-        v-bind:activeTab="typeCourses.activeTab"
-      ></omegaup-course-filtered-list>
     </template>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
-import * as UI from '../../ui';
 import course_FilteredList from './FilteredList.vue';
 
 @Component({
@@ -41,10 +32,14 @@ import course_FilteredList from './FilteredList.vue';
   },
 })
 export default class CourseList extends Vue {
-  @Prop() courses!: omegaup.Course[];
-  @Prop() isMainUserIdentity!: boolean;
+  @Prop() courses!: types.StudentCourses;
 
   T = T;
-  UI = UI;
+
+  getDescription(admissionMode: string): string {
+    if (admissionMode === 'public') return T.courseListPublicCourses;
+    if (admissionMode === 'student') return T.courseListIStudy;
+    return '';
+  }
 }
 </script>

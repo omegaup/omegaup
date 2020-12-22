@@ -14,20 +14,20 @@
           <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="/"
-          ><img alt="omegaUp" src="/media/omegaup_curves.png"/>
+          ><img alt="omegaUp" src="/media/omegaup_curves.png" />
           <img
+            v-show="omegaUpLockDown"
             alt="lockdown"
             title="lockdown"
-            v-bind:src="lockDownImage"
-            v-show="omegaUpLockDown"
+            :src="lockDownImage"
         /></a>
       </div>
       <div aria-expanded="false" class="navbar-collapse collapse">
-        <ul class="nav navbar-nav" v-if="!omegaUpLockDown && !inContest">
+        <ul v-if="!omegaUpLockDown && !inContest" class="nav navbar-nav">
           <li
-            class="dropdown nav-contests"
-            v-bind:class="{ active: navbarSection === 'contests' }"
             v-if="isLoggedIn"
+            class="dropdown nav-contests"
+            :class="{ active: navbarSection === 'contests' }"
           >
             <a
               class="dropdown-toggle"
@@ -57,18 +57,39 @@
               </template>
             </ul>
           </li>
-          <li v-bind:class="{ active: navbarSection === 'contests' }" v-else="">
+          <li v-else :class="{ active: navbarSection === 'contests' }">
             <a href="/arena/" data-nav-contests-arena>{{ T.wordsContests }}</a>
           </li>
           <li
-            class="nav-courses"
-            v-bind:class="{ active: navbarSection === 'courses' }"
+            v-if="isLoggedIn"
+            class="dropdown nav-courses"
+            :class="{ active: navbarSection === 'courses' }"
           >
-            <a href="/schools/">{{ T.navCourses }}</a>
+            <a class="dropdown-toogle" data-toggle="dropdown" data-nav-courses
+              ><span>{{ T.navCourses }}</span
+              ><span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="/course/" data-nav-courses-all>
+                  {{ T.navAllCourses }}
+                </a>
+              </li>
+              <template v-if="isMainUserIdentity">
+                <li>
+                  <a href="/course/new/" data-nav-courses-create>
+                    {{ T.buttonCreateCourse }}
+                  </a>
+                </li>
+              </template>
+            </ul>
+          </li>
+          <li v-else :class="{ active: navbarSection === 'courses' }">
+            <a href="/course/">{{ T.navCourses }}</a>
           </li>
           <li
             class="dropdown nav-problems"
-            v-bind:class="{ active: navbarSection === 'problems' }"
+            :class="{ active: navbarSection === 'problems' }"
           >
             <a
               class="dropdown-toggle"
@@ -80,8 +101,8 @@
             </a>
             <ul class="dropdown-menu">
               <li>
-                <a href="/problem/" data-nav-problems-all>{{
-                  T.navAllProblems
+                <a href="/problem/collection/" data-nav-problems-collection>{{
+                  T.problemcollectionViewProblems
                 }}</a>
               </li>
               <li v-if="isLoggedIn && isMainUserIdentity">
@@ -99,7 +120,7 @@
           </li>
           <li
             class="dropdown nav-rank"
-            v-bind:class="{ active: navbarSection === 'rank' }"
+            :class="{ active: navbarSection === 'rank' }"
           >
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <span>{{ T.navRanking }}</span>
@@ -108,6 +129,9 @@
             <ul class="dropdown-menu">
               <li>
                 <a href="/rank/">{{ T.navUserRanking }}</a>
+              </li>
+              <li>
+                <a href="/rank/authors/">{{ T.navAuthorRanking }}</a>
               </li>
               <li>
                 <a href="/rank/schools/">{{ T.navSchoolRanking }}</a>
@@ -140,53 +164,94 @@
               <li>
                 <a href="http://blog.omegaup.com/">{{ T.navBlog }}</a>
               </li>
-              <li>
-                <a href="https://omegaup.com/preguntas/">{{
-                  T.navQuestions
-                }}</a>
-              </li>
             </ul>
           </li>
         </ul>
-        <ul class="nav navbar-nav" v-else=""></ul>
+        <ul v-else class="nav navbar-nav"></ul>
         <!-- in lockdown or contest mode there is no left navbar -->
-        <ul class="nav navbar-nav navbar-right" v-if="!isLoggedIn">
+        <ul v-if="!isLoggedIn" class="nav navbar-nav navbar-right">
           <li>
-            <a v-bind:href="formattedLoginURL">{{ T.navLogIn }}</a>
+            <a :href="formattedLoginURL">{{ T.navLogIn }}</a>
           </li>
         </ul>
-        <ul class="nav navbar-nav navbar-right" v-else="">
+        <ul v-else class="nav navbar-nav navbar-right">
           <omegaup-notifications-clarifications
-            v-bind:initialClarifications="initialClarifications"
             v-if="inContest"
+            :initial-clarifications="initialClarifications"
           ></omegaup-notifications-clarifications>
           <li
             class="dropdown nav-user"
-            v-bind:class="{ active: navbarSection === 'users' }"
+            :class="{ active: navbarSection === 'users' }"
+            data-nav-right
           >
             <a
               class="dropdown-toggle user-dropdown"
               data-toggle="dropdown"
               data-nav-user
               href="#"
-              ><img v-bind:src="gravatarURL51"/>
-              <span class="username" v-bind:title="currentUsername">{{
+              ><img :src="gravatarURL51" />
+              <span class="username" :title="currentUsername">{{
                 currentUsername
               }}</span>
               <omegaup-common-grader-badge
                 v-show="isAdmin"
-                v-bind:queueLength="graderQueueLength"
-                v-bind:error="errorMessage !== null"
+                :queue-length="graderQueueLength"
+                :error="errorMessage !== null"
               ></omegaup-common-grader-badge>
               <span class="caret"></span
             ></a>
             <ul class="dropdown-menu">
-              <template v-show="!omegaUpLockDown && !inContest">
+              <template v-if="!omegaUpLockDown && !inContest">
+                <div class="text-center">
+                  <img
+                    :src="gravatarURL128"
+                    height="70"
+                    class="img-circle"
+                    :title="currentUsername"
+                  />
+                  <h4 v-if="currentName !== ''">
+                    <strong>{{ currentName }}</strong>
+                  </h4>
+                  <h4 v-else>
+                    <strong>{{ currentUsername }}</strong>
+                  </h4>
+                  <h5>
+                    <strong>{{ currentEmail }}</strong>
+                  </h5>
+                </div>
                 <li>
-                  <a href="/profile/" data-nav-profile
+                  <a href="/profile/" data-nav-profile class="text-center"
                     ><span class="glyphicon glyphicon-user"></span>
                     {{ T.navViewProfile }}</a
                   >
+                </li>
+                <li role="separator" class="divider"></li>
+                <template v-if="identitiesNotLoggedIn.length > 0">
+                  <li
+                    v-for="identity in identitiesNotLoggedIn"
+                    :key="identity.username"
+                  >
+                    <button
+                      class="btn btn-link dropdown-item"
+                      @click="$emit('change-account', identity.username)"
+                    >
+                      <img
+                        :src="gravatarURL51"
+                        height="45"
+                        class="img-circle"
+                        :title="identity.username"
+                      />{{ identity.username }}
+                    </button>
+                  </li>
+                  <li role="separator" class="divider"></li>
+                </template>
+                <li>
+                  <a href="/badge/list/">{{ T.navViewBadges }}</a>
+                </li>
+                <li>
+                  <a href="/course/mine/" data-nav-courses-mine
+                    >{{ T.navMyCourses }}
+                  </a>
                 </li>
                 <li>
                   <a href="/problem/mine/">{{ T.navMyProblems }}</a>
@@ -203,6 +268,7 @@
                   <a href="/nomination/mine/">{{ T.navMyQualityNomination }}</a>
                 </li>
               </template>
+              <li role="separator" class="divider"></li>
               <li>
                 <a href="/logout/"
                   ><span class="glyphicon glyphicon-log-out"></span>
@@ -211,9 +277,9 @@
               </li>
               <omegaup-common-grader-status
                 v-show="isAdmin"
-                v-bind:status="errorMessage !== null ? 'down' : 'ok'"
-                v-bind:error="errorMessage"
-                v-bind:graderInfo="graderInfo"
+                :status="errorMessage !== null ? 'down' : 'ok'"
+                :error="errorMessage"
+                :grader-info="graderInfo"
               ></omegaup-common-grader-status>
             </ul>
           </li>
@@ -223,7 +289,58 @@
   </div>
 </template>
 
-<style lang="scss">
+<script lang="ts">
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { types } from '../../api_types';
+import T from '../../lang';
+import notifications_Clarifications from '../notification/Clarifications.vue';
+import common_GraderStatus from '../common/GraderStatus.vue';
+import common_GraderBadge from '../common/GraderBadge.vue';
+
+@Component({
+  components: {
+    'omegaup-notifications-clarifications': notifications_Clarifications,
+    'omegaup-common-grader-status': common_GraderStatus,
+    'omegaup-common-grader-badge': common_GraderBadge,
+  },
+})
+export default class Navbar extends Vue {
+  @Prop() omegaUpLockDown!: boolean;
+  @Prop() inContest!: boolean;
+  @Prop() isLoggedIn!: boolean;
+  @Prop() isReviewer!: boolean;
+  @Prop() gravatarURL51!: string;
+  @Prop() gravatarURL128!: string;
+  @Prop() associatedIdentities!: types.AssociatedIdentity[];
+  @Prop() currentEmail!: string;
+  @Prop() currentName!: string;
+  @Prop() currentUsername!: string;
+  @Prop() isAdmin!: boolean;
+  @Prop() isMainUserIdentity!: boolean;
+  @Prop() lockDownImage!: string;
+  @Prop() navbarSection!: string;
+  @Prop() graderInfo!: types.GraderStatus | null;
+  @Prop() graderQueueLength!: number;
+  @Prop() errorMessage!: string | null;
+  @Prop() initialClarifications!: types.Clarification[];
+
+  notifications: types.Notification[] = [];
+  clarifications: types.Clarification[] = this.initialClarifications;
+  T = T;
+
+  get formattedLoginURL(): string {
+    return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
+  }
+
+  get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
+    return this.associatedIdentities.filter(
+      (identity) => identity.username !== this.currentUsername,
+    );
+  }
+}
+</script>
+
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 #root .navbar-default {
@@ -405,45 +522,3 @@
   }
 }
 </style>
-
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
-import { types } from '../../api_types';
-import T from '../../lang';
-import notifications_Clarifications from '../notification/Clarifications.vue';
-import common_GraderStatus from '../common/GraderStatus.vue';
-import common_GraderBadge from '../common/GraderBadge.vue';
-
-@Component({
-  components: {
-    'omegaup-notifications-clarifications': notifications_Clarifications,
-    'omegaup-common-grader-status': common_GraderStatus,
-    'omegaup-common-grader-badge': common_GraderBadge,
-  },
-})
-export default class Navbar extends Vue {
-  @Prop() omegaUpLockDown!: boolean;
-  @Prop() inContest!: boolean;
-  @Prop() isLoggedIn!: boolean;
-  @Prop() isReviewer!: boolean;
-  @Prop() gravatarURL51!: string;
-  @Prop() currentUsername!: string;
-  @Prop() isAdmin!: boolean;
-  @Prop() isMainUserIdentity!: boolean;
-  @Prop() lockDownImage!: string;
-  @Prop() navbarSection!: string;
-  @Prop() graderInfo!: types.GraderStatus | null;
-  @Prop() graderQueueLength!: number;
-  @Prop() errorMessage!: string | null;
-  @Prop() initialClarifications!: omegaup.Clarification[];
-
-  notifications: types.Notification[] = [];
-  clarifications: omegaup.Clarification[] = this.initialClarifications;
-  T = T;
-
-  get formattedLoginURL(): string {
-    return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
-  }
-}
-</script>

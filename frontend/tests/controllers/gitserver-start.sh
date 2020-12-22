@@ -2,18 +2,19 @@
 
 set -e
 
-if [[ $# -ne 2 ]]; then
-	echo "Usage: $0 <port> <problems.git path>"
+if [[ $# -ne 3 ]]; then
+	echo "Usage: $0 <port> <runfiles directory> <problems.git path>"
 	exit 1
 fi
 
 DIR="$(realpath "$(dirname "$0")")"
 PORT="$1"
-ROOT_PATH="$2"
+RUNFILES="$2"
+ROOT_PATH="$3"
 
-"${DIR}/gitserver-stop.sh"
+"${DIR}/gitserver-stop.sh" "${RUNFILES}"
 
-cat > "${DIR}/gitserver.config.json" <<EOF
+cat > "${RUNFILES}/gitserver.config.json" <<EOF
 {
 	"Logging": {
 		"File": ""
@@ -32,5 +33,5 @@ EOF
 
 /usr/bin/nohup /usr/bin/omegaup-gitserver \
 	-insecure-skip-authorization \
-	-config="${DIR}/gitserver.config.json" >> "${DIR}/gitserver.log" 2>&1 &
-echo $! > "${DIR}/gitserver.pid"
+	-config="${RUNFILES}/gitserver.config.json" >> "${RUNFILES}/gitserver.log" 2>&1 &
+echo $! > "${RUNFILES}/gitserver.pid"

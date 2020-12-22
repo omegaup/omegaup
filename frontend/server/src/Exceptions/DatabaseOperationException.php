@@ -16,9 +16,7 @@ class DatabaseOperationException extends \OmegaUp\Exceptions\ApiException {
     }
 
     public function getErrorMessage(): string {
-        return \OmegaUp\Translations::getInstance()->get(
-            'generalError'
-        ) ?: 'generalError';
+        return \OmegaUp\Translations::getInstance()->get('generalError');
     }
 
     public function isDuplicate(): bool {

@@ -1,16 +1,16 @@
 <template>
   <div class="panel panel-default">
     <div class="panel-heading">
-      {{ UI.formatString(T.contestReport, { contest_alias: contestAlias }) }}
+      {{ ui.formatString(T.contestReport, { contest_alias: contestAlias }) }}
     </div>
     <div class="panel-body">
       <div v-for="contestantData in contestReport">
         <h1>{{ T.username }}: {{ contestantData.username }}</h1>
         <h3>
           {{ T.wordsTotal }}:<span
-            v-if="contestantData.hasOwnProperty('total') &amp;&amp; contestantData.total.hasOwnProperty('points')"
+            v-if="Object.prototype.hasOwnProperty.call(contestantData, 'total') &amp;&amp; Object.prototype.hasOwnProperty.call(contestantData.total, 'points')"
             >{{ contestantData.total.points }}</span
-          ><span v-else="">0</span>
+          ><span v-else>0</span>
         </h3>
         <div v-for="item in contestantData.problems">
           <h3>{{ T.wordsProblem }}: {{ item.alias }}</h3>
@@ -55,9 +55,9 @@
                   <th>{{ T.wordsGroup }}</th>
                   <th>{{ T.rankScore }}</th>
                 </tr>
-                <tr v-for="group in item.run_details.details.groups">
-                  <td>{{ group.group }}</td>
-                  <td>{{ group.score }}</td>
+                <tr v-for="groupDetails in item.run_details.details.groups">
+                  <td>{{ groupDetails.group }}</td>
+                  <td>{{ groupDetails.score }}</td>
                 </tr>
               </table>
 
@@ -77,7 +77,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
-import * as UI from '../../ui';
+import * as ui from '../../ui';
 
 interface ContestReport {
   country?: string;
@@ -99,6 +99,6 @@ export default class Report extends Vue {
   @Prop() contestAlias!: string;
 
   T = T;
-  UI = UI;
+  ui = ui;
 }
 </script>

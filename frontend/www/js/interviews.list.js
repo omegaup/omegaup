@@ -1,12 +1,12 @@
-omegaup.OmegaUp.on('ready', function() {
-  $('form#new_interview_form').on('submit', function(ev) {
+omegaup.OmegaUp.on('ready', function () {
+  $('form#new_interview_form').on('submit', function (ev) {
     ev.preventDefault();
     omegaup.API.Interview.create({
       alias: $('#alias').val(),
       title: $('#title').val(),
       duration: $('#duration').val(),
     })
-      .then(function(response) {
+      .then(function (response) {
         omegaup.UI.success(omegaup.T.interviewCreatedSuccess);
         fillInterviewsTable();
       })
@@ -15,7 +15,7 @@ omegaup.OmegaUp.on('ready', function() {
 
   function fillInterviewsTable() {
     omegaup.API.Interview.list()
-      .then(function(interviews) {
+      .then(function (interviews) {
         var html = '';
         for (var i = interviews.results.length - 1; i >= 0; i--) {
           html +=
@@ -34,9 +34,7 @@ omegaup.OmegaUp.on('ready', function() {
         }
 
         $('#contest_list').removeClass('wait_for_ajax');
-        $('#contest_list > table > tbody')
-          .empty()
-          .html(html);
+        $('#contest_list > table > tbody').empty().html(html);
       })
       .catch(omegaup.UI.apiError);
   }

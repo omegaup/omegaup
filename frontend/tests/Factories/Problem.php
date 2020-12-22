@@ -16,7 +16,7 @@ class ProblemParams {
     public $title;
 
     /**
-     * @var int
+     * @var 'deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'
      */
     public $visibility;
 
@@ -51,15 +51,48 @@ class ProblemParams {
     public $allowUserAddTags;
 
     /**
-     * @param array{allow_user_add_tags?: bool, zipName?: string, title?: string, visibility?: int, author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string} $params
+     * @readonly
+     * @var bool
+     */
+    public $qualitySeal;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $problemLevel;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $selectedTags;
+
+    /**
+     * @readonly
+     * @var string
+     */
+    public $validator;
+
+    /**
+     * @param array{allow_user_add_tags?: bool, quality_seal?: bool, zipName?: string, title?: string, visibility?: ('deleted'|'private_banned'|'public_banned'|'private_warning'|'private'|'public_warning'|'public'|'promoted'), author?: \OmegaUp\DAO\VO\Identities, authorUser?: \OmegaUp\DAO\VO\Users, languages?: string, show_diff?: string, problem_level?: string, selected_tags?: string, validator?: string} $params
      */
     public function __construct($params = []) {
         $this->zipName = $params['zipName'] ?? (OMEGAUP_TEST_RESOURCES_ROOT . 'testproblem.zip');
         $this->title = $params['title'] ?? \OmegaUp\Test\Utils::createRandomString();
         $this->languages = $params['languages'] ?? 'c11-gcc,c11-clang,cpp17-gcc,cpp17-clang,py2,py3';
-        $this->visibility = $params['visibility'] ?? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC;
+        $this->visibility = $params['visibility'] ?? 'public';
         $this->showDiff = $params['show_diff'] ?? 'none';
         $this->allowUserAddTags = $params['allow_user_add_tags'] ?? false;
+        $this->problemLevel = $params['problem_level'] ?? 'problemLevelBasicIntroductionToProgramming';
+        $this->qualitySeal = $params['quality_seal'] ?? false;
+        $this->selectedTags = $params['selected_tags'] ?? $params['selected_tags'] ?? json_encode([
+            [
+                'tagname' => 'problemLevelBasicIntroductionToProgramming',
+                'public' => true,
+            ],
+        ]);
+        $this->validator = $params['validator'] ?? 'token';
         if (!empty($params['author']) && !empty($params['authorUser'])) {
             $this->author = $params['author'];
             $this->authorUser = $params['authorUser'];
@@ -118,7 +151,7 @@ class Problem {
                 32
             ),
             'author_username' => $params->author->username,
-            'validator' => 'token',
+            'validator' => $params->validator,
             'time_limit' => 5000,
             'overall_wall_time_limit' => 60000,
             'validator_time_limit' => 30000,
@@ -132,6 +165,9 @@ class Problem {
             'languages' => $params->languages,
             'show_diff' => $params->showDiff,
             'allow_user_add_tags' => $params->allowUserAddTags,
+            'quality_seal' => $params->qualitySeal,
+            'problem_level' => $params->problemLevel,
+            'selected_tags' => $params->selectedTags,
         ]);
 
         // Set file upload context
@@ -154,7 +190,7 @@ class Problem {
         \OmegaUp\Test\ScopedLoginToken $login = null
     ): array {
         return self::createProblem(new \OmegaUp\Test\Factories\ProblemParams([
-            'visibility' => \OmegaUp\ProblemParams::VISIBILITY_PUBLIC,
+            'visibility' => 'public',
             'author' => $author,
         ]), $login);
     }
@@ -169,9 +205,12 @@ class Problem {
         if (is_null($params)) {
             $params = new \OmegaUp\Test\Factories\ProblemParams();
         }
-        $params->visibility = $params->visibility >= \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
-            ? \OmegaUp\ProblemParams::VISIBILITY_PUBLIC
-            : \OmegaUp\ProblemParams::VISIBILITY_PRIVATE;
+
+        $visibility = $params->visibility;
+
+        if ($params->visibility != 'private' && $params->visibility != 'public') {
+            $params->visibility = 'public';
+        }
 
         // Get a user
         $problemData = self::getRequest($params);
@@ -192,23 +231,42 @@ class Problem {
         // Call the API
         \OmegaUp\Controllers\Problem::apiCreate($r);
         $problem = \OmegaUp\DAO\Problems::getByAlias(
-            strval(
-                $r['problem_alias']
-            )
+            $r->ensureString('problem_alias')
         );
         if (is_null($problem)) {
             throw new \OmegaUp\Exceptions\NotFoundException(
                 'problemNotFound'
             );
         }
-        $visibility = intval($params->visibility);
 
         if (
-            $visibility === \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED
-            || $visibility === \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED
-            || $visibility === \OmegaUp\ProblemParams::VISIBILITY_PROMOTED
+            $visibility === 'public_banned'
+            || $visibility === 'private_banned'
+            || $visibility === 'public_warning'
+            || $visibility === 'private_warning'
+            || $visibility === 'promoted'
         ) {
-            $problem->visibility = intval($visibility);
+            switch (strval($visibility)) {
+                case 'private_banned':
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_BANNED;
+                    break;
+                case 'public_banned':
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_BANNED;
+                    break;
+                case 'private_warning':
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PRIVATE_WARNING;
+                    break;
+                case 'public_warning':
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PUBLIC_WARNING;
+                    break;
+                case 'promoted':
+                    $problem->visibility = \OmegaUp\ProblemParams::VISIBILITY_PROMOTED;
+                    break;
+            }
+            \OmegaUp\DAO\Problems::update($problem);
+        }
+        if ($params->qualitySeal) {
+            $problem->quality_seal = true;
             \OmegaUp\DAO\Problems::update($problem);
         }
 

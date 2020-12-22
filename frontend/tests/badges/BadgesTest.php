@@ -29,6 +29,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         foreach ($apicall['requests'] as $req) {
             $params = [
                 'auth_token' => $login->auth_token,
+                'languages' => 'c11-gcc',
             ];
             foreach ($req['params'] as $k => $v) {
                 $params[$k] = $v;
@@ -122,7 +123,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
      */
     public function testBadge(string $badgeAlias) {
         $this->assertTrue(
-            \OmegaUp\Validators::isValidAlias($badgeAlias),
+            \OmegaUp\Validators::alias($badgeAlias),
             'The alias for this badge is invalid.'
         );
 
@@ -166,7 +167,7 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 break;
 
             case 'phpunit':
-                $testPath = static::BADGES_TESTS_ROOT . "/{$badgeAlias}Test.php";
+                $testPath = static::BADGES_TESTS_ROOT . "/Badge_{$badgeAlias}Test.php";
                 $this->assertTrue(
                     file_exists($testPath),
                     "The file '{$testPath}' doesn't exist."
@@ -246,7 +247,10 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
         \OmegaUp\Test\Factories\Problem::createProblemWithAuthor($identityTwo);
         \OmegaUp\Test\Factories\Contest::createContest(
             new \OmegaUp\Test\Factories\ContestParams(
-                ['contestDirector' => $identityTwo]
+                [
+                    'contestDirector' => $identityTwo,
+                    'languages' => 'c11-gcc',
+                ]
             )
         );
         $expectedUserOneResults = ['problemSetter'];
@@ -336,6 +340,14 @@ class BadgesTest extends \OmegaUp\Test\BadgesTestCase {
                 $this->greaterThanOrEqual($previousTime),
                 $this->lessThanOrEqual(\OmegaUp\Time::get())
             )
+        );
+
+        $smartyResult = \OmegaUp\Controllers\Badge::getDetailsForSmarty(new \OmegaUp\Request([
+            'auth_token' => $login->auth_token,
+            'badge_alias' => 'problemSetter'
+        ]));
+        $this->assertNotNull(
+            $smartyResult['smartyProperties']['payload']['badge']['assignation_time']
         );
 
         $contestManagerResult = \OmegaUp\Controllers\Badge::apiMyBadgeAssignationTime(new \OmegaUp\Request([

@@ -13,7 +13,7 @@ namespace OmegaUp\DAO;
  */
 class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequest {
     /**
-     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, problemset_id: int, request_time: \OmegaUp\Timestamp}>
+     * @return list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, name: null|string, problemset_id: int, request_time: \OmegaUp\Timestamp, username: string}>
      */
     public static function getFirstAdminForProblemsetRequest(
         int $problemsetId
@@ -21,6 +21,8 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
         $sql = '
             SELECT
                 r.*,
+                i.username,
+                i.name,
                 (SELECT
                     h.admin_id
                 FROM
@@ -34,10 +36,12 @@ class ProblemsetIdentityRequest extends \OmegaUp\DAO\Base\ProblemsetIdentityRequ
                     1) AS admin_id
             FROM
                 `Problemset_Identity_Request` r
+            INNER JOIN
+                `Identities` i ON i.identity_id = r.identity_id
             WHERE
                 r.problemset_id = ?;';
 
-        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, problemset_id: int, request_time: \OmegaUp\Timestamp}> */
+        /** @var list<array{accepted: bool|null, admin_id: int|null, extra_note: null|string, identity_id: int, last_update: \OmegaUp\Timestamp|null, name: null|string, problemset_id: int, request_time: \OmegaUp\Timestamp, username: string}> */
         return \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemsetId]

@@ -77,9 +77,10 @@ class Grader {
             OMEGAUP_GRADER_URL . '/run/grade/',
             self::REQUEST_MODE_JSON,
             [
-                'run_ids' => array_map(function (\OmegaUp\DAO\VO\Runs $r) {
-                    return intval($r->run_id);
-                }, $runs),
+                'run_ids' => array_map(
+                    fn (\OmegaUp\DAO\VO\Runs $r) => intval($r->run_id),
+                    $runs
+                ),
                 'rejudge' => true,
                 'debug' => false, // TODO(lhchavez): Reenable with ACLs.
             ]
@@ -181,13 +182,20 @@ class Grader {
         );
     }
 
+    /**
+     * @param list<string> $fileHeaders
+     */
     public function getGraderResourcePassthru(
         \OmegaUp\DAO\VO\Runs $run,
         string $filename,
-        bool $missingOk = false
+        bool $missingOk = false,
+        array $fileHeaders = []
     ): ?bool {
         if (self::$OMEGAUP_GRADER_FAKE) {
             return null;
+        }
+        foreach ($fileHeaders as $header) {
+            header($header);
         }
         /** @var null|bool */
         return $this->curlRequest(
@@ -233,6 +241,7 @@ class Grader {
             $curl = curl_init();
             if ($curl === false) {
                 throw new \OmegaUp\Exceptions\InternalServerErrorException(
+                    'generalError',
                     new \RuntimeException('curl_init failed')
                 );
             }
@@ -243,8 +252,9 @@ class Grader {
                     CURLOPT_URL => $url,
                     CURLOPT_RETURNTRANSFER => ($mode != self::REQUEST_MODE_PASSTHRU),
                     CURLOPT_FOLLOWLOCATION => 1,
-                    CURLOPT_SSLCERT => OMEGAUP_SSLCERT_URL,
-                    CURLOPT_CAINFO => OMEGAUP_CACERT_URL,
+                    CURLOPT_SSLKEY => '/etc/omegaup/frontend/key.pem',
+                    CURLOPT_SSLCERT => '/etc/omegaup/frontend/certificate.pem',
+                    CURLOPT_CAINFO => '/etc/omegaup/frontend/certificate.pem',
                 ]
             );
             if (!is_null($postData)) {

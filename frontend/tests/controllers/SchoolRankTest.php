@@ -6,7 +6,7 @@
  */
 
 class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
-    public function testApiMonthlySolvedProblemsCount() {
+    public function testGetMonthlySolvedProblemsCount() {
         $schoolData = \OmegaUp\Test\Factories\Schools::createSchool();
 
         $users = [];
@@ -98,9 +98,9 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Utils::runUpdateRanks();
 
-        $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
-            'school_id' => $schoolData['school']->school_id,
-        ]))['distinct_problems_solved'];
+        $response = \OmegaUp\Controllers\School::getMonthlySolvedProblemsCount(
+            $schoolData['school']->school_id
+        );
         $this->assertCount(1, $response); // one month, the first one
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
@@ -169,9 +169,9 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Utils::runUpdateRanks();
 
-        $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
-            'school_id' => $schoolData['school']->school_id,
-        ]))['distinct_problems_solved'];
+        $response = \OmegaUp\Controllers\School::getMonthlySolvedProblemsCount(
+            $schoolData['school']->school_id
+        );
         $this->assertCount(2, $response); // two months (first and second)
         $this->assertEquals($response[0]['month'], $firstMonthNumber);
         $this->assertEquals(
@@ -199,18 +199,18 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
 
         \OmegaUp\Test\Utils::runUpdateRanks();
 
-        $response = \OmegaUp\Controllers\School::apiMonthlySolvedProblemsCount(new \OmegaUp\Request([
-            'school_id' => $schoolData['school']->school_id,
-        ]))['distinct_problems_solved'];
+        $response = \OmegaUp\Controllers\School::getMonthlySolvedProblemsCount(
+            $schoolData['school']->school_id
+        );
         $this->assertCount(2, $response); // just two months (first and second)
     }
 
     /**
-     * Tests School::apiUsers() in order to retrieve all
+     * Tests School::getUsers() in order to retrieve all
      * users from school with their number of solved problems,
      * created problems and organized contests
      */
-    public function testSchoolApiUsers() {
+    public function testSchoolGetUsers() {
         /** Creates 3 users:
          * user1 solves 0 problems, organizes 0 contests and creates 2 problems
          * user2 solves 2 problems, organizes 0 contest and creates 1 problems
@@ -224,7 +224,11 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         }
 
         // User3 automatically organizes a contest
-        $contestData = \OmegaUp\Test\Factories\Contest::createContest();
+        $contestData = \OmegaUp\Test\Factories\Contest::createContest(
+            new \OmegaUp\Test\Factories\ContestParams(
+                ['languages' => 'c11-gcc']
+            )
+        );
         $identities[] = $contestData['director'];
 
         \OmegaUp\Test\Factories\Schools::addUserToSchool(
@@ -276,35 +280,35 @@ class SchoolRankTest extends \OmegaUp\Test\ControllerTestCase {
         );
         \OmegaUp\Test\Factories\Run::gradeRun($runData);
 
-        $result = \OmegaUp\Controllers\School::apiUsers(new \OmegaUp\Request([
-            'school_id' => $schoolData['school']->school_id
-        ]));
+        $results = \OmegaUp\Controllers\School::getUsers(
+            $schoolData['school']->school_id
+        );
 
-        $this->assertCount(3, $result['users']);
+        $this->assertCount(3, $results);
 
         $this->assertEquals(
             $identities[0]->username,
-            $result['users'][0]['username']
+            $results[0]['username']
         );
-        $this->assertEquals(0, $result['users'][0]['solved_problems']);
-        $this->assertEquals(0, $result['users'][0]['organized_contests']);
-        $this->assertEquals(2, $result['users'][0]['created_problems']);
+        $this->assertEquals(0, $results[0]['solved_problems']);
+        $this->assertEquals(0, $results[0]['organized_contests']);
+        $this->assertEquals(2, $results[0]['created_problems']);
 
         $this->assertEquals(
             $identities[1]->username,
-            $result['users'][1]['username']
+            $results[1]['username']
         );
-        $this->assertEquals(2, $result['users'][1]['solved_problems']);
-        $this->assertEquals(0, $result['users'][1]['organized_contests']);
-        $this->assertEquals(1, $result['users'][1]['created_problems']);
+        $this->assertEquals(2, $results[1]['solved_problems']);
+        $this->assertEquals(0, $results[1]['organized_contests']);
+        $this->assertEquals(1, $results[1]['created_problems']);
 
         $this->assertEquals(
             $identities[2]->username,
-            $result['users'][2]['username']
+            $results[2]['username']
         );
-        $this->assertEquals(1, $result['users'][2]['solved_problems']);
-        $this->assertEquals(1, $result['users'][2]['organized_contests']);
-        $this->assertEquals(0, $result['users'][2]['created_problems']);
+        $this->assertEquals(1, $results[2]['solved_problems']);
+        $this->assertEquals(1, $results[2]['organized_contests']);
+        $this->assertEquals(0, $results[2]['created_problems']);
     }
 
     /**

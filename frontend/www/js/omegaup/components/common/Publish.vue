@@ -1,13 +1,13 @@
 <template>
   <div class="panel panel-primary">
     <div class="panel-body">
-      <form class="publish-form" v-on:submit.prevent="onSubmit">
+      <form class="publish-form" @submit.prevent="onSubmit">
         <div class="form-group">
           <label>{{ T.contestNewFormAdmissionMode }}</label>
           <select
+            v-model="admissionMode"
             class="form-control"
             name="admission-mode"
-            v-model="admissionMode"
           >
             <option value="private">
               {{ T.wordsPrivate }}
@@ -15,13 +15,13 @@
             <option value="registration">
               {{ T.wordsRegistration }}
             </option>
-            <option value="public" v-if="shouldShowPublicOption">
+            <option v-if="shouldShowPublicOption" value="public">
               {{ T.wordsPublic }}
             </option>
           </select>
-          <p class="help-block">
-            <span v-html="admissionModeDescription"></span>
-          </p>
+          <omegaup-markdown
+            :markdown="admissionModeDescription"
+          ></omegaup-markdown>
         </div>
         <button class="btn btn-primary change-admission-mode" type="submit">
           {{ T.wordsSaveChanges }}
@@ -35,8 +35,13 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
+import omegaup_Markdown from '../Markdown.vue';
 
-@Component
+@Component({
+  components: {
+    'omegaup-markdown': omegaup_Markdown,
+  },
+})
 export default class Publish extends Vue {
   @Prop() initialAdmissionMode!: omegaup.AdmissionMode;
   @Prop() admissionModeDescription!: string;

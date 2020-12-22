@@ -1,26 +1,27 @@
 import Vue from 'vue';
 import user_BasicEdit from '../components/user/BasicEdit.vue';
-import { OmegaUp } from '../omegaup';
+import { OmegaUp } from '../omegaup-legacy';
 import * as api from '../api';
+import * as ui from '../ui';
 
-OmegaUp.on('ready', function() {
+OmegaUp.on('ready', function () {
   let basicEdit = new Vue({
     el: '#user-basic-edit',
-    render: function(createElement) {
+    render: function (createElement) {
       return createElement('omegaup-user-basic-edit', {
         props: {
           username: this.username,
         },
         on: {
-          update: function(username, password) {
+          update: function (username, password) {
             api.User.updateBasicInfo({
               username,
               password,
             })
-              .then(function(response) {
+              .then(function (response) {
                 window.location = '/profile/';
               })
-              .catch(UI.apiError);
+              .catch(ui.apiError);
           },
         },
       });
@@ -34,8 +35,8 @@ OmegaUp.on('ready', function() {
   });
 
   api.User.profile({})
-    .then(function(data) {
+    .then(function (data) {
       basicEdit.username = data.username;
     })
-    .catch(UI.apiError);
+    .catch(ui.apiError);
 });

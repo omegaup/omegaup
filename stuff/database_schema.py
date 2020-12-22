@@ -10,6 +10,7 @@ import os.path
 import re
 import subprocess
 import sys
+from typing import Optional
 
 import database_utils
 from hook_tools import git_tools
@@ -17,16 +18,22 @@ from hook_tools import git_tools
 OMEGAUP_ROOT = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
-def _expected_database_schema(*, config_file=None, username=None,
-                              password=None, verbose=False):
+def _expected_database_schema(*,
+                              config_file: Optional[str] = None,
+                              username: Optional[str] = None,
+                              password: Optional[str] = None,
+                              hostname: Optional[str] = None,
+                              verbose: bool = False) -> bytes:
     '''Runs mysqldump and removes the AUTO_INCREMENT annotation.'''
     args = [os.path.join(OMEGAUP_ROOT, 'stuff/db-migrate.py')]
     if config_file:
         args.extend(['--mysql-config-file', config_file])
-    if username:
+    if username is not None:
         args.extend(['--username', username])
-    if password:
+    if password is not None:
         args.extend(['--password', password])
+    if hostname is not None:
+        args.extend(['--hostname', hostname])
     args.append('schema')
     stderr = subprocess.DEVNULL
     if verbose:
@@ -54,15 +61,12 @@ def main():
             git_tools.Argument(
                 '--database', default='omegaup', help='MySQL database'),
             git_tools.Argument(
+                '--hostname', default=None, type=str,
+                help='Hostname of the MySQL server'),
+            git_tools.Argument(
                 '--username', default='root', help='MySQL root username'),
             git_tools.Argument(
                 '--password', default='omegaup', help='MySQL password')])
-
-    # If running in an automated environment, we can close stdin.
-    # This will disable all prompts.
-    if (args.continuous_integration
-            or os.environ.get('CONTINUOUS_INTEGRATION') == 'true'):
-        sys.stdin.close()
 
     validate_only = args.tool == 'validate'
 
@@ -75,6 +79,7 @@ def main():
     expected = _expected_database_schema(config_file=args.mysql_config_file,
                                          username=args.username,
                                          password=args.password,
+                                         hostname=args.hostname,
                                          verbose=args.verbose)
     actual = git_tools.file_contents(
         args, root, 'frontend/database/schema.sql')

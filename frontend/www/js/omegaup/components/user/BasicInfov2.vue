@@ -1,206 +1,104 @@
 <template>
   <div class="card-body">
-    <div>
-      <ul class="uiList fbSettingsList _4kg _6-h _4ks">
-        <li class="fbSettingsListItem clearfix uiListItem"></li>
-        <li class="fbSettingsListItem clearfix uiListItem">
-          <div class="pvm phs clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profileUsername }}</strong>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              https://omegaup.com/profile/<strong
-                ><omegaup-user-username
-                  v-bind:classname="profile.classname"
-                  v-bind:username="profile.username"
-                ></omegaup-user-username></strong
-              >/
-            </div>
+    <div class="fields-border">
+      <div class="form-group row padding-field">
+        <div class="col-sm-3">
+          <strong>{{ T.profileUsername }}</strong>
+        </div>
+        <div class="col-sm-9 field-data">
+          https://omegaup.com/profile/<strong
+            ><omegaup-user-username
+              :classname="profile.classname"
+              :username="profile.username"
+            ></omegaup-user-username></strong
+          >/
+        </div>
+      </div>
+      <div class="form-group row padding-field">
+        <div class="col-sm-3">
+          <strong>{{ T.profile }}</strong>
+        </div>
+        <div class="col-sm-9 field-data">
+          {{ profile.name }}
+        </div>
+      </div>
+
+      <div v-if="profile.email">
+        <div class="form-group row padding-field">
+          <div class="col-sm-3">
+            <strong>{{ T.profileEmail }}</strong>
           </div>
-        </li>
-        <li class="fbSettingsListItem clearfix uiListItem">
-          <div class="pvm phs fbSettingsListLink clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profile }}</strong>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              {{ profile.name }}
-            </div>
+          <div class="col-sm-9 field-data">
+            Primary: <strong data-email> {{ profile.email }}</strong
+            >&nbsp;
           </div>
-        </li>
-        <li class="fbSettingsListItem clearfix uiListItem" v-if="profile.email">
-          <div class="pvm phs fbSettingsListLink clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profileEmail }}</strong>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              Primary: <strong>{{ profile.email }}</strong
-              >&nbsp;
-            </div>
+        </div>
+
+        <div class="form-group row padding-field">
+          <div class="col-sm-3">
+            <strong>{{ T.profileCountry }}</strong>
           </div>
-        </li>
-        <li class="fbSettingsListItem clearfix uiListItem">
-          <div class="pvm phs fbSettingsListLink clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profileCountry }}</strong>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              <strong>{{ profile.country }}</strong>
-            </div>
+          <div class="col-sm-9 field-data">
+            <strong>{{ profile.country }}</strong>
           </div>
-        </li>
-        <li class="fbSettingsListItem clearfix uiListItem">
-          <div class="pvm phs fbSettingsListLink clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profileState }}</strong>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              <strong>{{ profile.state }}</strong>
-            </div>
+        </div>
+
+        <div class="form-group row padding-field">
+          <div class="col-sm-3">
+            <strong>{{ T.profileState }}</strong>
           </div>
-        </li>
-        <li class="fbSettingsListItem clearfix uiListItem">
-          <div class="pvm phs fbSettingsListLink clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profileSchool }}</strong>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              <a v-bind:href="`/schools/profile/${profile.school_id}/`"
-                ><strong>{{ profile.school }}</strong></a
-              >
-            </div>
+          <div class="col-sm-9 field-data">
+            <strong>{{ profile.state }}</strong>
           </div>
-        </li>
-        <li class="fbSettingsListItem clearfix uiListItem">
-          <div class="pvm phs fbSettingsListLink clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profileGraduationDate }}</strong>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              <strong>{{ profile.graduation_date }}</strong>
-            </div>
+        </div>
+
+        <div class="form-group row padding-field">
+          <div class="col-sm-3">
+            <strong>{{ T.profileSchool }}</strong>
           </div>
-        </li>
-        <li class="fbSettingsListItem clearfix uiListItem">
-          <div class="pvm phs fbSettingsListLink clearfix">
-            <div class="pls fbSettingsListItemLabel">
-              <strong>{{ T.profileRank }}</strong
-              ><a href="https://blog.omegaup.com/categorias/" target="_blank"
-                ><em class="glyphicon glyphicon-question-sign"></em
-              ></a>
-            </div>
-            <div class="fbSettingsListItemContent fcg">
-              <strong
-                ><omegaup-user-username
-                  v-bind:classname="profile.classname"
-                  v-bind:username="rank"
-                ></omegaup-user-username
-              ></strong>
-            </div>
+          <div class="col-sm-9 field-data">
+            <a :href="`/schools/profile/${profile.school_id}/`"
+              ><strong>{{ profile.school }}</strong></a
+            >
           </div>
-        </li>
-      </ul>
+        </div>
+
+        <div class="form-group row padding-field">
+          <div class="col-sm-3">
+            <strong>{{ T.profileGraduationDate }}</strong>
+          </div>
+          <div class="col-sm-9 field-data">
+            <strong>{{ profile.graduation_date }}</strong>
+          </div>
+        </div>
+
+        <div class="form-group row padding-field">
+          <div class="col-sm-3">
+            <strong>{{ T.profileRank }}</strong
+            ><a href="https://blog.omegaup.com/categorias/" target="_blank"
+              ><em class="glyphicon glyphicon-question-sign"></em
+            ></a>
+          </div>
+          <div class="col-sm-9 field-data">
+            <strong
+              ><omegaup-user-username
+                :classname="profile.classname"
+                :username="rank"
+              ></omegaup-user-username
+            ></strong>
+          </div>
+        </div>
+      </div>
     </div>
-    <a
-      v-if="!profile.is_private"
-      v-bind:href="`/submissions/${profile.username}/`"
-    >
+    <a v-if="!profile.is_private" :href="`/submissions/${profile.username}/`">
       {{ T.wordsSeeLatestSubmissions }}
     </a>
   </div>
 </template>
 
-<style>
-.fbSettingsList .fbSettingsListItemLabel {
-  color: #333;
-  float: left;
-  width: 165px;
-}
-
-.fbSettingsList .fbSettingsListItemSaved,
-.fbSettingsList .fbSettingsListItemEdit {
-  color: #3b5998;
-  float: right;
-  padding-left: 25px;
-  padding-right: 5px;
-  text-align: right;
-}
-
-._4ks > li {
-  border-color: #e9e9e9;
-  border-style: solid;
-  border-width: 0 0 1px 0;
-}
-
-.uiListItem {
-  display: block;
-}
-
-.fcg {
-  color: gray;
-}
-
-.clearfix {
-  zoom: 1;
-}
-
-.uiIconText {
-  display: inline-block;
-  padding-left: 21px;
-  position: relative;
-}
-
-.fbSettingsList .fbSettingsListItemEdit {
-  color: #3b5998;
-  float: right;
-  padding-left: 25px;
-  padding-right: 5px;
-  text-align: right;
-}
-
-#facebook .hidden_elem {
-  display: none !important;
-}
-
-.fbSettingsList .fbSettingsListItemSaved {
-  color: #777;
-}
-
-.clearfix::after {
-  clear: both;
-  content: '.';
-  display: block;
-  font-size: 0;
-  height: 0;
-  line-height: 0;
-  visibility: hidden;
-}
-._4kg._6-h > li:first-child {
-  padding-top: 0;
-}
-
-.uiListItem:first-child {
-  border-width: 0;
-}
-.fbSettingsList a.fbSettingsListLink {
-  background: transparent;
-  display: block;
-  text-decoration: none;
-}
-
-.pvm {
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-.phs {
-  padding-left: 5px;
-  padding-right: 5px;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
-import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 import user_Username from './Username.vue';
 
@@ -210,8 +108,26 @@ import user_Username from './Username.vue';
   },
 })
 export default class UserBasicInfo extends Vue {
-  @Prop() profile!: omegaup.Profile;
+  @Prop() profile!: types.UserProfile;
   @Prop() rank!: string;
   T = T;
 }
 </script>
+
+<style>
+.fields-border > .form-group,
+.fields-border div > .form-group {
+  border-color: #e9e9e9 !important;
+  border-style: solid !important;
+  border-width: 0 0 0.05rem 0 !important;
+}
+
+.field-data {
+  color: gray;
+}
+
+.padding-field {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+</style>

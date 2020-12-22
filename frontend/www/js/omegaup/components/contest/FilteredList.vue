@@ -1,96 +1,94 @@
 <template>
-  <div class="panel panel-primary">
-    <div v-if="contests.length === 0">
-      <div class="empty-category">{{ T.contestListEmpty }}</div>
-    </div>
-    <div class="panel" v-else="">
-      <h5 v-if="recommended">{{ T.arenaPageRecommendedContestsText }}</h5>
-      <div class="panel-body">
-        <table class="contest-list table">
-          <thead>
+  <div v-if="contests.length === 0">
+    <div class="empty-category">{{ T.contestListEmpty }}</div>
+  </div>
+  <div v-else>
+    <h5 v-if="recommended">{{ T.arenaPageRecommendedContestsText }}</h5>
+    <div class="card-body">
+      <table class="contest-list table">
+        <thead>
+          <tr>
+            <th>{{ T.wordsContest }}</th>
+            <th v-if="showTimes">{{ T.wordsStartTime }}</th>
+            <th v-if="showTimes">{{ T.wordsEndTime }}</th>
+            <th v-if="showTimes">{{ T.wordsDuration }}</th>
+            <th v-if="showPractice" colspan="2"></th>
+            <th v-if="showVirtual"></th>
+            <th v-if="showPublicUpdated">
+              {{ T.wordsPublicUpdated }}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="contest-list">
+          <template v-for="contest in page">
             <tr>
-              <th class="col-md-6">{{ T.wordsContest }}</th>
-              <th class="col-md-2" v-if="showTimes">{{ T.wordsStartTime }}</th>
-              <th class="col-md-2" v-if="showTimes">{{ T.wordsEndTime }}</th>
-              <th class="col-md-2" v-if="showTimes">{{ T.wordsDuration }}</th>
-              <th class="col-md-2" colspan="2" v-if="showPractice"></th>
-              <th class="col-md-2" v-if="showVirtual"></th>
-              <th class="col-md-2" v-if="showPublicUpdated">
-                {{ T.wordsPublicUpdated }}
-              </th>
-            </tr>
-          </thead>
-          <tbody v-for="contest in page" class="contest-list row">
-            <tr>
-              <td class="col-md-6">
-                <a v-bind:href="`/arena/${contest.alias}/`">
+              <td class="">
+                <a :href="`/arena/${contest.alias}/`">
                   <span>{{ ui.contestTitle(contest) }}</span>
                   <span
+                    v-if="contest.recommended"
                     class="glyphicon glyphicon-ok"
                     aria-hidden="true"
-                    v-if="contest.recommended"
                   ></span>
                 </a>
               </td>
-              <td class="no-wrap col-md-2" v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.start_time.iso())">{{
+              <td v-if="showTimes">
+                <a :href="getTimeLink(contest.start_time.iso())">{{
                   contest.start_time.long()
                 }}</a>
               </td>
-              <td class="no-wrap col-md-2" v-if="showTimes">
-                <a v-bind:href="getTimeLink(contest.finish_time.iso())">{{
+              <td v-if="showTimes">
+                <a :href="getTimeLink(contest.finish_time.iso())">{{
                   contest.finish_time.long()
                 }}</a>
               </td>
-              <td class="no-wrap col-md-2" v-if="showTimes">
+              <td v-if="showTimes">
                 {{ time.toDDHHMM(contest.duration) }}
               </td>
-              <td class="col-md-2" v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/practice/`">
+              <td v-if="showPractice">
+                <a :href="`/arena/${contest.alias}/practice/`">
                   <span>{{ T.wordsPractice }}</span>
                 </a>
               </td>
-              <td class="col-md-2" v-if="showPractice">
-                <a v-bind:href="`/arena/${contest.alias}/#ranking`">
+              <td v-if="showPractice">
+                <a :href="`/arena/${contest.alias}/#ranking`">
                   <span>{{ T.wordsContestsResults }}</span>
                 </a>
               </td>
-              <td class="col-md-2" v-if="!ui.isVirtual(contest) && showVirtual">
-                <a v-bind:href="`/arena/${contest.alias}/virtual/`">
+              <td v-if="!ui.isVirtual(contest) && showVirtual">
+                <a :href="`/arena/${contest.alias}/virtual/`">
                   <span>{{ T.virtualContest }}</span>
                 </a>
               </td>
-              <td class="no-wrap col-md-2" v-if="showPublicUpdated">
+              <td v-if="showPublicUpdated">
                 {{ contest.last_updated.long() }}
               </td>
             </tr>
             <tr>
-              <td colspan="5" class="forcebreaks forcebreaks-arena">
+              <td colspan="5">
                 {{ contest.description }}
               </td>
             </tr>
-          </tbody>
-          <tfoot>
-            <tr v-if="hasNext || hasPrevious" align="center">
-              <td class="no-wrap" v-bind:colspan="pagerColumns">
-                <a v-if="hasPrevious" v-on:click="previous" href="#">{{
-                  T.wordsPrevPage
-                }}</a>
-                <span class="page-num">{{ pageNumber }}</span>
-                <a v-if="hasNext" v-on:click="next" href="#">{{
-                  T.wordsNextPage
-                }}</a>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
+          </template>
+        </tbody>
+        <tfoot>
+          <tr v-if="hasNext || hasPrevious" align="center">
+            <td class="no-wrap" :colspan="pagerColumns">
+              <a v-if="hasPrevious" href="#" @click="previous">{{
+                T.wordsPrevPage
+              }}</a>
+              <span class="page-num">{{ pageNumber }}</span>
+              <a v-if="hasNext" href="#" @click="next">{{ T.wordsNextPage }}</a>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
+import { Vue, Component, Prop } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
 import T from '../../lang';
 import * as ui from '../../ui';

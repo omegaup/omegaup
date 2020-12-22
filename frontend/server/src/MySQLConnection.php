@@ -71,12 +71,12 @@ class MySQLConnection {
     }
 
     private function connect(): void {
-        $this->_connection = mysqli_init();
+        $this->_connection = \mysqli_init();
         $this->_connection->options(MYSQLI_READ_DEFAULT_GROUP, false);
         $this->_connection->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
         if (
-            !$this->_connection->real_connect(
+            !@$this->_connection->real_connect(
                 'p:' . OMEGAUP_DB_HOST,
                 OMEGAUP_DB_USER,
                 OMEGAUP_DB_PASS,
@@ -84,9 +84,9 @@ class MySQLConnection {
             )
         ) {
             throw new \OmegaUp\Exceptions\DatabaseOperationException(
-                'Failed to connect to MySQL (' . mysqli_connect_errno() . '): '
-                . mysqli_connect_error(),
-                mysqli_connect_errno()
+                'Failed to connect to MySQL (' . \mysqli_connect_errno() . '): '
+                . \mysqli_connect_error(),
+                \mysqli_connect_errno()
             );
         }
         $this->_connection->autocommit(false);
@@ -165,9 +165,9 @@ class MySQLConnection {
                 $chunks[] = $params[$i] ? '1' : '0';
             } else {
                 $chunks[] = "'" . $this->_connection->real_escape_string(
-                    strval(
-                        $params[$i]
-                    )
+                    is_scalar($params[$i]) || is_object($params[$i]) ?
+                    strval($params[$i]) :
+                    ''
                 ) . "'";
             }
             $chunks[] = $inputChunks[$i + 1];
@@ -256,11 +256,15 @@ class MySQLConnection {
                 return floatval($value);
 
             case FieldType::TYPE_TIMESTAMP:
-                return new \OmegaUp\Timestamp(strtotime(strval($value)));
+                return new \OmegaUp\Timestamp(strtotime(
+                    is_scalar($value) || is_object($value) ? strval($value) : ''
+                ));
 
             case FieldType::TYPE_STRING:
             default:
-                return strval($value);
+                return (
+                    is_scalar($value) || is_object($value) ? strval($value) : ''
+                );
         }
     }
 
@@ -338,13 +342,18 @@ class MySQLConnection {
         array $params,
         int $resultmode
     ): ?\mysqli_result {
-        $result = $this->_connection->query(
-            $this->BindQueryParams(
-                $sql,
-                $params
-            ),
-            $resultmode
-        );
+        $query = $this->BindQueryParams($sql, $params);
+        $result = $this->_connection->query($query, $resultmode);
+        if (
+            $result === false &&
+            $this->_needsFlushing === false &&
+            $this->_connection->errno == 2006
+        ) {
+            // If there have not been any non-committed updates to the
+            // database, let's try to reconnect and do this one more time.
+            $this->connect();
+            $result = $this->_connection->query($query, $resultmode);
+        }
         if ($result === false) {
             $errorMessage = "Failed to query MySQL ({$this->_connection->errno}): {$this->_connection->error}";
             \Logger::getLogger('mysql')->debug($errorMessage);
