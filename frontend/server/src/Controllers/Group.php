@@ -8,6 +8,9 @@
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
  * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupDescription: null|string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
+ * @psalm-type ContestListItem=array{admission_mode: string, alias: string, contest_id: int, description: string, finish_time: \OmegaUp\Timestamp, last_updated: \OmegaUp\Timestamp, original_finish_time: \OmegaUp\Timestamp, problemset_id: int, recommended: bool, rerun_id: int, start_time: \OmegaUp\Timestamp, title: string, window_length: int|null}
+ * @psalm-type ScoreboardContest=array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}
+ * @psalm-type GroupScoreboardContestsPayload=array{availableContests: list<ContestListItem>, contests: list<ScoreboardContest>}
  *
  * @author joemmanuel
  */
@@ -505,6 +508,56 @@ class Group extends \OmegaUp\Controllers\Controller {
                     $r->identity->identity_id
                 ),
             ],
+        ];
+    }
+
+    /**
+     * @omegaup-request-param string $group
+     * @omegaup-request-param string $scoreboard
+     *
+     * @return array{smartyProperties: array{payload: GroupScoreboardContestsPayload, title: \OmegaUp\TranslationString}, template: string}
+     */
+    public static function getGroupScoreboardContestsForSmarty(
+        \OmegaUp\Request $r
+    ): array {
+        // Authenticate user
+        $r->ensureIdentity();
+
+        $groupAlias = $r->ensureString(
+            'group',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+        $scoreboard = $r->ensureString(
+            'scoreboard',
+            fn (string $scoreboard) => \OmegaUp\Validators::alias($scoreboard)
+        );
+        [
+            'contests' => $contests,
+        ] = \OmegaUp\Controllers\GroupScoreboard::getScoreboardDetails(
+            $groupAlias,
+            $r->identity,
+            $scoreboard
+        );
+
+        return [
+            'smartyProperties' => [
+                'payload' => [
+                    'availableContests' => \OmegaUp\Controllers\Contest::getContestList(
+                        $r->identity,
+                        /*$query=*/ null,
+                        /*$page=*/ 1,
+                        /*$pageSize=*/ 20,
+                        \OmegaUp\DAO\Enum\ActiveStatus::ALL,
+                        \OmegaUp\DAO\Enum\RecommendedStatus::ALL
+                    ),
+                    'contests' => $contests,
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleGroupsScoreboardEdit'
+                ),
+            ],
+            // Change following line with: 'entrypoint' => 'group_scoreboard_contests',
+            'template' => 'group.scoreboard.edit.tpl',
         ];
     }
 }
