@@ -8,6 +8,8 @@
  * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
  * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupDescription: null|string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
+ * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
+ * @psalm-type GroupListPayload=array{groups: list<Group>}
  *
  * @author joemmanuel
  */
@@ -492,19 +494,25 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{payload: array{groups: array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}[]}}
+     * @return array{smartyProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupListForSmarty(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
         return [
-            'payload' => [
-                'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
-                    $r->user->user_id,
-                    $r->identity->identity_id
+            'smartyProperties' => [
+                'payload' => [
+                    'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
+                        $r->user->user_id,
+                        $r->identity->identity_id
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleGroups'
                 ),
             ],
+            'entrypoint' => 'group_list',
         ];
     }
 }
