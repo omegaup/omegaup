@@ -1936,6 +1936,8 @@ export namespace types {
   export interface GroupScoreboardContestsPayload {
     availableContests: types.ContestListItem[];
     contests: types.ScoreboardContest[];
+    groupAlias: string;
+    scoreboardAlias: string;
   }
 
   export interface Histogram {

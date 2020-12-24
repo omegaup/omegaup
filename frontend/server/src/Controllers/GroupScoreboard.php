@@ -104,12 +104,14 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             $contestAlias
         );
 
-        \OmegaUp\DAO\GroupsScoreboardsProblemsets::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
-            'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
-            'problemset_id' => $contestScoreboard['contest']->problemset_id,
-            'only_ac' => $r->ensureBool('only_ac'),
-            'weight' => $r->ensureFloat('weight'),
-        ]));
+        \OmegaUp\DAO\GroupsScoreboardsProblemsets::replace(
+            new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
+                'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
+                'problemset_id' => $contestScoreboard['contest']->problemset_id,
+                'only_ac' => $r->ensureBool('only_ac'),
+                'weight' => $r->ensureFloat('weight'),
+            ])
+        );
 
         self::$log->info(
             "Contest {$contestAlias} added to scoreboard {$scoreboardAlias}"
