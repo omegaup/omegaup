@@ -2,17 +2,8 @@ import * as api from '../api';
 import { Arena, GetOptionsFromLocation } from './arena';
 import { OmegaUp } from '../omegaup';
 
-function getInputValue(
-  element: HTMLElement | null,
-  itemSelector: string | null,
-): string | undefined {
-  if (itemSelector !== null) {
-    if (element !== null) {
-      element = element.querySelector(itemSelector);
-    } else {
-      element = document.querySelector(itemSelector);
-    }
-  }
+function getInputValue(itemSelector: string): string | undefined {
+  const element = document.querySelector(itemSelector);
   if (element) {
     return (<HTMLInputElement>element).value;
   }
@@ -56,11 +47,8 @@ OmegaUp.on('ready', () => {
       .forEach((input) => input.setAttribute('disabled', 'disabled'));
     api.Clarification.create({
       contest_alias: arenaInstance.options.contestAlias,
-      problem_alias: getInputValue(
-        null,
-        '#clarification select[name="problem"]',
-      ),
-      message: getInputValue(null, '#clarification textarea[name="message"]'),
+      problem_alias: getInputValue('#clarification select[name="problem"]'),
+      message: getInputValue('#clarification textarea[name="message"]'),
     })
       .then(() => {
         arenaInstance.hideOverlay();
