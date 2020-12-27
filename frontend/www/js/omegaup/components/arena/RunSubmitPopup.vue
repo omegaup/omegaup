@@ -100,7 +100,7 @@ export default class ArenaRunSubmitPopup extends Vue {
   now: number = Date.now();
 
   get canSubmit(): boolean {
-    return this.nextSubmissionTimestamp.getTime() < this.now;
+    return this.nextSubmissionTimestamp.getTime() <= this.now;
   }
 
   get filename(): string {

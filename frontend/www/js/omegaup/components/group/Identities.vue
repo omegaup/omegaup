@@ -1,22 +1,21 @@
 <template>
-  <div class="panel panel-default">
-    <div class="panel-body">
-      <div class="upload-csv">
-        <div class="panel-heading">
-          <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
-          {{ T.groupsUploadCsvFile }}
-          <input name="identities" type="file" @change="readCsv" />
-        </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="mb-4">
+        <omegaup-markdown :markdown="T.groupsCsvHelp"></omegaup-markdown>
+        {{ T.groupsUploadCsvFile }}
+        <input
+          name="identities"
+          type="file"
+          accept=".csv,.txt"
+          @change="readCsv"
+        />
       </div>
-      <br />
-      <div
-        v-show="identities.length > 0"
-        class="panel panel-default no-bottom-margin"
-      >
-        <div class="panel-heading">
-          <h3 class="panel-title">{{ T.wordsIdentities }}</h3>
+      <template v-if="identities.length > 0">
+        <div class="card-header">
+          <h3 class="card-title">{{ T.wordsIdentities }}</h3>
         </div>
-        <table class="identities-table table">
+        <table class="table" data-identities-table>
           <thead>
             <tr>
               <th>{{ T.profileUsername }}</th>
@@ -46,28 +45,25 @@
             </tr>
           </tbody>
         </table>
-        <div class="panel-heading">
-          <button
-            class="btn btn-primary"
-            name="create-identities"
-            @click.prevent="$emit('bulk-identities', identities)"
-          >
-            {{ T.groupCreateIdentities }}
-          </button>
-        </div>
-        <div class="panel-footer">
+        <div class="card-footer">
+          <div class="w-100">
+            <button
+              class="btn btn-primary"
+              name="create-identities"
+              @click.prevent="$emit('bulk-identities', identities)"
+            >
+              {{ T.groupCreateIdentities }}
+            </button>
+          </div>
           <button
             class="btn"
             @click.prevent="$emit('download-identities', identities)"
           >
-            <span
-              class="glyphicon glyphicon-download-alt"
-              aria-hidden="true"
-            ></span>
+            <font-awesome-icon :icon="['fas', 'download']" />
           </button>
           {{ T.groupsIdentityWarning }}
         </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>
@@ -76,11 +72,16 @@
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
-import * as ui from '../../ui';
 import omegaup_Markdown from '../Markdown.vue';
+
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
+library.add(faDownload);
 
 @Component({
   components: {
+    FontAwesomeIcon,
     'omegaup-markdown': omegaup_Markdown,
   },
 })
@@ -91,19 +92,25 @@ export default class Identities extends Vue {
   T = T;
   identities: types.Identity[] = [];
 
-  readCsv(ev: InputEvent): void {
-    const fileUpload = <HTMLInputElement>ev.target;
-    this.identities = [];
-    if (fileUpload.value == '') {
+  readFile(e: HTMLInputElement): File | null {
+    return (e.files && e.files[0]) || null;
+  }
+
+  readCsv(ev: Event): void {
+    const file = this.readFile(ev.target as HTMLInputElement);
+    if (!file || file.name === '') {
       return;
     }
+
     const regex = /.*\.(?:csv|txt)$/;
 
-    if (!regex.test(fileUpload.value.toLowerCase())) {
-      ui.error(T.groupsInvalidCsv);
+    if (!regex.test(file.name.toLowerCase())) {
+      this.$emit('invalid-file');
       return;
     }
-    this.$emit('read-csv', this, fileUpload);
+
+    this.identities = [];
+    this.$emit('read-csv', { identities: this.identities, file: file });
   }
 }
 </script>
