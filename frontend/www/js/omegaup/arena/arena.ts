@@ -1,11 +1,11 @@
 import Vue from 'vue';
-import Vuex from 'vuex';
 import * as Highcharts from 'highcharts/highstock';
 
 import * as api from '../api';
 import T from '../lang';
 import { omegaup, OmegaUp } from '../omegaup';
 import { types, messages } from '../api_types';
+import { myRunsStore, runsStore } from './runsStore';
 import * as time from '../time';
 import * as ui from '../ui';
 import JSZip from 'jszip';
@@ -28,8 +28,6 @@ import ArenaAdmin from './admin_arena';
 
 export { ArenaAdmin };
 
-Vue.use(Vuex);
-
 export interface ArenaOptions {
   assignmentAlias: string | null;
   contestAlias: string | null;
@@ -39,9 +37,7 @@ export interface ArenaOptions {
   disableSockets: boolean;
   isInterview: boolean;
   isLockdownMode: boolean;
-  isOnlyProblem: boolean;
   isPractice: boolean;
-  onlyProblemAlias: string | null;
   originalContestAlias: string | null;
   originalProblemsetId?: number;
   payload: types.CommonPayload;
@@ -73,64 +69,6 @@ export interface Problem {
   title: string;
   visibility: number;
 }
-
-export interface RunsState {
-  // The list of runs.
-  runs: types.Run[];
-
-  // The mapping of run GUIDs to indices on the runs array.
-  index: Record<string, number>;
-}
-
-export const runsStore = new Vuex.Store<RunsState>({
-  state: {
-    runs: [],
-    index: {},
-  },
-  mutations: {
-    addRun(state, run: types.Run) {
-      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
-        Vue.set(
-          state.runs,
-          state.index[run.guid],
-          Object.assign({}, state.runs[state.index[run.guid]], run),
-        );
-        return;
-      }
-      Vue.set(state.index, run.guid, state.runs.length);
-      state.runs.push(run);
-    },
-    clear(state) {
-      state.runs.splice(0);
-      state.index = {};
-    },
-  },
-});
-
-const myRunsStore = new Vuex.Store<RunsState>({
-  state: {
-    runs: [],
-    index: {},
-  },
-  mutations: {
-    addRun(state, run: types.Run) {
-      if (Object.prototype.hasOwnProperty.call(state.index, run.guid)) {
-        Vue.set(
-          state.runs,
-          state.index[run.guid],
-          Object.assign({}, state.runs[state.index[run.guid]], run),
-        );
-        return;
-      }
-      Vue.set(state.index, run.guid, state.runs.length);
-      state.runs.push(run);
-    },
-    clear(state) {
-      state.runs.splice(0);
-      state.index = {};
-    },
-  },
-});
 
 // Number of digits after the decimal point to show.
 const digitsAfterDecimalPoint: number = 2;
@@ -372,21 +310,18 @@ export class Arena {
       data: () => ({
         isContestFinished: false,
         isProblemsetOpened: true,
-        problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
+        problemAlias: null,
       }),
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
             contestAlias: options.contestAlias,
-            isContestFinished:
-              this.isContestFinished &&
-              !options.isPractice &&
-              !options.isOnlyProblem,
+            isContestFinished: this.isContestFinished && !options.isPractice,
             isProblemsetOpened: this.isProblemsetOpened,
             problemAlias: this.problemAlias,
             runs: myRunsStore.state.runs,
             showDetails: true,
-            showPoints: !options.isPractice && !options.isOnlyProblem,
+            showPoints: !options.isPractice,
           },
           on: {
             details: (run: types.Run) => {
@@ -423,6 +358,7 @@ export class Arena {
               isLoggedIn: options.payload.isLoggedIn,
               isReviewer: options.payload.isReviewer,
               gravatarURL51: options.payload.gravatarURL51,
+              gravatarURL128: options.payload.gravatarURL128,
               currentUsername: options.payload.currentUsername,
               isAdmin: options.payload.isAdmin,
               isMainUserIdentity: options.payload.isMainUserIdentity,
@@ -1034,11 +970,7 @@ export class Arena {
       this.updateRunFallback(run.guid);
       return;
     }
-    if (
-      !this.options.isPractice &&
-      !this.options.isOnlyProblem &&
-      this.options.contestAlias != 'admin'
-    ) {
+    if (!this.options.isPractice && this.options.contestAlias != 'admin') {
       this.refreshRanking();
     }
   }
@@ -1574,7 +1506,7 @@ export class Arena {
     ) {
       $('#clarifications-count').html(`(${clarifications.length})`);
     } else if (clarifications.length >= this.clarificationsRowcount) {
-      $('#clarifications-count').html(`(${clarifications.length}+)`);
+      $('#clarifications-count').html(`(${this.clarificationsRowcount}+)`);
     }
 
     const previouslyAnswered = this.answeredClarifications;
@@ -1747,7 +1679,7 @@ export class Arena {
           this.myRunsList.problemAlias = problem.alias;
         };
 
-        if (this.options.isPractice || this.options.isOnlyProblem) {
+        if (this.options.isPractice) {
           api.Problem.runs({ problem_alias: problem.alias })
             .then(time.remoteTimeAdapter)
             .then((data) => {
@@ -1865,11 +1797,11 @@ export class Arena {
         return createElement('qualitynomination-popup', {
           props: {
             nominated: this.qualityPayload.nominated,
-            nominatedBeforeAC: this.qualityPayload.nominatedBeforeAC,
+            nominatedBeforeAc: this.qualityPayload.nominatedBeforeAc,
             solved: this.qualityPayload.solved,
             tried: this.qualityPayload.tried,
             dismissed: this.qualityPayload.dismissed,
-            dismissedBeforeAC: this.qualityPayload.dismissedBeforeAC,
+            dismissedBeforeAc: this.qualityPayload.dismissedBeforeAc,
             canNominateProblem: this.qualityPayload.canNominateProblem,
             problemAlias: this.qualityPayload.problemAlias,
           },
@@ -2070,9 +2002,6 @@ export class Arena {
   }
 
   computeProblemsetArg(): { contest_alias?: string; problemset_id?: number } {
-    if (this.options.isOnlyProblem) {
-      return {};
-    }
     if (this.options.contestAlias) {
       return { contest_alias: this.options.contestAlias };
     }
@@ -2101,11 +2030,9 @@ export class Arena {
         }
 
         const currentProblem = this.problems[this.currentProblem.alias];
-        if (!this.options.isOnlyProblem) {
-          currentProblem.lastSubmission = new Date();
-          currentProblem.nextSubmissionTimestamp =
-            response.nextSubmissionTimestamp;
-        }
+        currentProblem.lastSubmission = new Date();
+        currentProblem.nextSubmissionTimestamp =
+          response.nextSubmissionTimestamp;
         const run = {
           guid: response.guid,
           submit_delay: response.submit_delay,
@@ -2308,7 +2235,6 @@ export function GetDefaultOptions(): ArenaOptions {
     isLockdownMode: false,
     isInterview: false,
     isPractice: false,
-    isOnlyProblem: false,
     disableClarifications: false,
     disableSockets: false,
     assignmentAlias: null,
@@ -2317,18 +2243,21 @@ export function GetDefaultOptions(): ArenaOptions {
     courseName: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
-    onlyProblemAlias: null,
     originalContestAlias: null,
     partialScore: true,
     problemsetId: null,
     problemsetAdmin: false,
     payload: {
+      associatedIdentities: [],
       omegaUpLockDown: false,
       bootstrap4: false,
       inContest: false,
       isLoggedIn: false,
       isReviewer: false,
       gravatarURL51: '',
+      gravatarURL128: '',
+      currentEmail: '',
+      currentName: undefined,
       currentUsername: '',
       userClassname: 'user-rank-unranked',
       userCountry: 'xx',
@@ -2362,13 +2291,7 @@ export function GetOptionsFromLocation(
     options.isPractice = true;
   }
 
-  if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
-    options.isOnlyProblem = true;
-    const match = /\/arena\/problem\/([^/]+)\/?/.exec(arenaLocation.pathname);
-    if (match) {
-      options.onlyProblemAlias = match[1];
-    }
-  } else {
+  if (arenaLocation.pathname.indexOf('/arena/problem/') === -1) {
     const match = /\/arena\/([^/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];

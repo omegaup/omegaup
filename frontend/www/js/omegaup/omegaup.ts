@@ -1,5 +1,6 @@
 import * as ui from './ui';
 import * as api from './api';
+import { types } from './api_types';
 import * as errors from './errors';
 import * as time from './time';
 
@@ -21,7 +22,7 @@ export class Experiments {
   // The list of all enabled experiments for a particular request should have
   // been injected into the DOM by Smarty.
   static loadGlobal(): Experiments {
-    const experimentsNode = document.getElementById(
+    const experimentsNode = document?.getElementById(
       'omegaup-enabled-experiments',
     );
     let experimentsList: Array<string> = [];
@@ -279,19 +280,6 @@ export namespace omegaup {
     name: string;
   }
 
-  export interface Identity extends User {
-    name: string;
-    username: string;
-    school: string;
-    school_name?: string;
-    gender?: string;
-    password?: string;
-    school_id: number;
-    country_id: string;
-    state_id: string;
-    classname: string;
-  }
-
   export interface IdentityContest {
     username: string;
     end_time?: Date;
@@ -369,8 +357,9 @@ export namespace omegaup {
 
   export interface QueryParameters {
     some_tags: boolean;
-    min_difficulty: number;
-    max_difficulty: number;
+    min_difficulty?: number;
+    max_difficulty?: number;
+    difficulty_range: string;
     order_by: string;
     sort_order: string;
     only_karel?: boolean;
@@ -554,7 +543,7 @@ export namespace omegaup {
     ready: boolean = false;
     experiments: Experiments | null = null;
     email?: string;
-    identity?: omegaup.Identity;
+    identity?: types.Identity;
 
     _documentReady: boolean = false;
     _initialized: boolean = false;

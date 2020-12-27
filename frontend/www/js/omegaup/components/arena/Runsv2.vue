@@ -27,7 +27,7 @@
 
             <label
               >{{ T.wordsVerdict }}:
-              <select v-model="filterVerdict">
+              <select v-model="filterVerdict" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="AC">AC</option>
                 <option value="PA">PA</option>
@@ -46,7 +46,7 @@
 
             <label
               >{{ T.wordsStatus }}:
-              <select v-model="filterStatus">
+              <select v-model="filterStatus" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="new">new</option>
                 <option value="waiting">waiting</option>
@@ -58,7 +58,7 @@
 
             <label
               >{{ T.wordsLanguage }}:
-              <select v-model="filterLanguage">
+              <select v-model="filterLanguage" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
                 <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
@@ -178,7 +178,7 @@
           <tr v-for="run in filteredRuns" :key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
-              <acronym :title="run.guid">
+              <acronym :title="run.guid" data-run-guid>
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
@@ -378,9 +378,9 @@ export default class Runsv2 extends Vue {
       !this.filterContest &&
       !this.filterVerdict
     ) {
-      return this.runs;
+      return this.sortedRuns;
     }
-    return this.runs.filter((run) => {
+    return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
         if (this.filterVerdict == 'NO-AC') {
           if (run.verdict == 'AC') {
@@ -407,6 +407,12 @@ export default class Runsv2 extends Vue {
       }
       return true;
     });
+  }
+
+  get sortedRuns(): types.Run[] {
+    return this.runs
+      .slice()
+      .sort((a, b) => b.time.getTime() - a.time.getTime());
   }
 
   get newSubmissionUrl(): string {

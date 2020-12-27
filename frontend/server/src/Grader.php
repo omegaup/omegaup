@@ -252,8 +252,9 @@ class Grader {
                     CURLOPT_URL => $url,
                     CURLOPT_RETURNTRANSFER => ($mode != self::REQUEST_MODE_PASSTHRU),
                     CURLOPT_FOLLOWLOCATION => 1,
-                    CURLOPT_SSLCERT => OMEGAUP_SSLCERT_URL,
-                    CURLOPT_CAINFO => OMEGAUP_CACERT_URL,
+                    CURLOPT_SSLKEY => '/etc/omegaup/frontend/key.pem',
+                    CURLOPT_SSLCERT => '/etc/omegaup/frontend/certificate.pem',
+                    CURLOPT_CAINFO => '/etc/omegaup/frontend/certificate.pem',
                 ]
             );
             if (!is_null($postData)) {

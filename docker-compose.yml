@@ -6,7 +6,7 @@ services:
     build:
       dockerfile: ./Dockerfile.dev-php
       context: ./stuff/docker/
-    image: omegaup/dev-php:20200930
+    image: omegaup/dev-php:20201122
     user: "${UID_GID}"
     restart: always
     volumes:
@@ -46,7 +46,7 @@ services:
     build:
       dockerfile: ./Dockerfile.broadcaster
       context: ./stuff/docker/
-    image: omegaup/dev-broadcaster:20201018
+    image: omegaup/dev-broadcaster:20201118
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -60,7 +60,7 @@ services:
     build:
       dockerfile: ./Dockerfile.grader
       context: ./stuff/docker/
-    image: omegaup/dev-grader:20201018
+    image: omegaup/dev-grader:20201118
     user: "${UID_GID}"
     restart: always
     depends_on:
@@ -75,7 +75,7 @@ services:
     build:
       dockerfile: ./Dockerfile.runner
       context: ./stuff/docker/
-    image: omegaup/dev-runner:20201018
+    image: omegaup/dev-runner:20201118
     user: "${UID_GID}"
     restart: always
     depends_on:

@@ -963,6 +963,9 @@ export const Group = {
     messages.GroupRemoveUserRequest,
     messages.GroupRemoveUserResponse
   >('/api/group/removeUser/'),
+  update: apiCall<messages.GroupUpdateRequest, messages.GroupUpdateResponse>(
+    '/api/group/update/',
+  ),
 };
 
 export const GroupScoreboard = {
@@ -1010,6 +1013,10 @@ export const Identity = {
     messages.IdentityCreateRequest,
     messages.IdentityCreateResponse
   >('/api/identity/create/'),
+  selectIdentity: apiCall<
+    messages.IdentitySelectIdentityRequest,
+    messages.IdentitySelectIdentityResponse
+  >('/api/identity/selectIdentity/'),
   update: apiCall<
     messages.IdentityUpdateRequest,
     messages.IdentityUpdateResponse
@@ -1162,10 +1169,14 @@ export const Problem = {
     messages.ProblemMyListRequest,
     messages.ProblemMyListResponse
   >('/api/problem/myList/'),
-  randomProblem: apiCall<
-    messages.ProblemRandomProblemRequest,
-    messages.ProblemRandomProblemResponse
-  >('/api/problem/randomProblem/'),
+  randomKarelProblem: apiCall<
+    messages.ProblemRandomKarelProblemRequest,
+    messages.ProblemRandomKarelProblemResponse
+  >('/api/problem/randomKarelProblem/'),
+  randomLanguageProblem: apiCall<
+    messages.ProblemRandomLanguageProblemRequest,
+    messages.ProblemRandomLanguageProblemResponse
+  >('/api/problem/randomLanguageProblem/'),
   rejudge: apiCall<
     messages.ProblemRejudgeRequest,
     messages.ProblemRejudgeResponse

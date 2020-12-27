@@ -3,8 +3,8 @@
     <div class="card-body">
       <h3>{{ T.wordsDifficulty }}</h3>
       <div
-        v-for="(difficultyName, difficulty) in difficulties"
-        :key="difficulty"
+        v-for="difficulty in difficulties"
+        :key="difficulty.id"
         class="form-check"
       >
         <label class="form-check-label">
@@ -13,8 +13,9 @@
             class="form-check-input"
             type="radio"
             name="difficulty"
-            :value="difficulty"
-          />{{ difficultyName }}
+            :value="difficulty.id"
+            @click="$emit('change-difficulty', difficulty.id)"
+          />{{ difficulty.name }}
         </label>
       </div>
     </div>
@@ -22,28 +23,34 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Model, Emit, Watch } from 'vue-property-decorator';
+import { Vue, Component, Emit, Watch, Prop } from 'vue-property-decorator';
 import T from '../../lang';
 
 @Component
 export default class FilterDifficulty extends Vue {
-  @Model('change', { type: String }) readonly selectedDifficulty:
-    | null
-    | string = null;
+  @Prop() selectedDifficulty!: string;
 
   T = T;
-  difficulties: { [key: string]: string } = {
-    qualityFormDifficultyEasy: T.qualityFormDifficultyEasy,
-    qualityFormDifficultyMedium: T.qualityFormDifficultyMedium,
-    qualityFormDifficultyHard: T.qualityFormDifficultyHard,
-  };
-
   currentDifficulty = this.selectedDifficulty;
 
-  @Watch('selectedDifficulty')
-  onSelectedDifficultyChanged(val: string | null) {
-    this.currentDifficulty = val;
-  }
+  difficulties: { [key: string]: { name: string; id: string } } = {
+    anyDifficulty: {
+      name: T.qualityFormDifficultyAny,
+      id: 'all',
+    },
+    difficultyEasy: {
+      name: T.qualityFormDifficultyEasy,
+      id: 'easy',
+    },
+    difficultyMedium: {
+      name: T.qualityFormDifficultyMedium,
+      id: 'medium',
+    },
+    difficultyHard: {
+      name: T.qualityFormDifficultyHard,
+      id: 'hard',
+    },
+  };
 
   @Emit('change')
   @Watch('currentDifficulty')

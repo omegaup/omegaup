@@ -13,17 +13,13 @@ describe('FilterDifficulty.vue', () => {
       },
     });
 
+    expect(wrapper.text()).toContain(T.qualityFormDifficultyAny);
     expect(wrapper.text()).toContain(T.qualityFormDifficultyEasy);
     expect(wrapper.text()).toContain(T.qualityFormDifficultyMedium);
     expect(wrapper.text()).toContain(T.qualityFormDifficultyHard);
-    expect(
-      wrapper.find('input[value="qualityFormDifficultyEasy').exists(),
-    ).toBe(true);
-    expect(
-      wrapper.find('input[value="qualityFormDifficultyMedium').exists(),
-    ).toBe(true);
-    expect(
-      wrapper.find('input[value="qualityFormDifficultyHard').exists(),
-    ).toBe(true);
+    expect(wrapper.find('input[value="all"]').exists()).toBe(true);
+    expect(wrapper.find('input[value="easy"]').exists()).toBe(true);
+    expect(wrapper.find('input[value="medium"]').exists()).toBe(true);
+    expect(wrapper.find('input[value="hard"]').exists()).toBe(true);
   });
 });

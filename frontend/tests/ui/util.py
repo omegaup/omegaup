@@ -441,9 +441,7 @@ def create_group(driver, group_title, description):
     with driver.page_transition():
         driver.wait.until(
             EC.visibility_of_element_located(
-                (By.XPATH,
-                 '//form[contains(concat(" ", normalize-space(@class), '
-                 '" "), " new-group-form ")]'))).submit()
+                (By.CSS_SELECTOR, 'form[data-group-new]'))).submit()
 
     group_alias = re.search(r'/group/([^/]*)/edit/',
                             driver.browser.current_url).group(1)
@@ -476,12 +474,10 @@ def add_identities_group(driver, group_alias):
         OMEGAUP_ROOT, 'frontend/tests/resources/identities.csv'))
 
     username_elements = driver.browser.find_elements_by_xpath(
-        '//table[contains(concat(" ", normalize-space(@class), " "), " '
-        'identities-table ")]/tbody/tr/td[contains(concat(" ", '
+        '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " username ")]/strong')
     password_elements = driver.browser.find_elements_by_xpath(
-        '//table[contains(concat(" ", normalize-space(@class), " "), " '
-        'identities-table ")]/tbody/tr/td[contains(concat(" ", '
+        '//table[@data-identities-table]/tbody/tr/td[contains(concat(" ", '
         'normalize-space(@class), " "), " password ")]')
     usernames = [username.text for username in username_elements]
     passwords = [password.text for password in password_elements]
@@ -494,5 +490,22 @@ def add_identities_group(driver, group_alias):
              '//button[starts-with(@name, "create-identities")]')))
     with dismiss_status(driver, message_class='success'):
         create_identities_button.click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.XPATH, '//a[contains(@href, "#members")]'))).click()
+
+    driver.wait.until(
+        EC.visibility_of_element_located(
+            (By.XPATH, '//table[@data-table-identities]')))
+
+    identity_elements = driver.browser.find_elements_by_xpath(
+        '//table[@data-table-identities]/tbody/tr/td/span/a'
+    )
+    uploaded_identities = [identity.text for identity in identity_elements]
+    for i, identity in enumerate(identities):
+        assert identity.username == uploaded_identities[i], (
+            'username %s does not match with %s' % (
+                identity.username, uploaded_identities[i]))
 
     return identities

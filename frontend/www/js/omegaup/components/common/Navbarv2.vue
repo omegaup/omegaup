@@ -125,9 +125,9 @@
               <div class="dropdown-menu">
                 <a
                   class="dropdown-item"
-                  href="/problem/"
-                  data-nav-problems-all
-                  >{{ T.navAllProblems }}</a
+                  href="/problem/collection/"
+                  data-nav-problems-collection
+                  >{{ T.problemcollectionViewProblems }}</a
                 >
                 <a
                   v-if="isLoggedIn && isMainUserIdentity"
@@ -249,9 +249,22 @@
               </a>
               <div class="dropdown-menu dropdown-menu-right">
                 <template v-if="!omegaUpLockDown && !inContest">
+                  <div class="text-center mb-1">
+                    <img
+                      :src="gravatarURL128"
+                      height="70"
+                      class="rounded-circle mb-1"
+                      :title="currentUsername"
+                    />
+                    <h5 v-if="currentName !== ''" class="mx-2">
+                      {{ currentName }}
+                    </h5>
+                    <h5 v-else class="mx-2">{{ currentUsername }}</h5>
+                    <h6 class="mx-2">{{ currentEmail }}</h6>
+                  </div>
                   <a
                     v-show="!omegaUpLockDown && !inContest"
-                    class="dropdown-item"
+                    class="dropdown-item text-center"
                     data-nav-profile
                     href="/profile/"
                   >
@@ -268,6 +281,26 @@
                       ></div>
                     </div>
                   </a>
+                  <div class="dropdown-divider"></div>
+                  <div v-if="identitiesNotLoggedIn.length > 0" class="mb-1">
+                    <div
+                      v-for="identity in identitiesNotLoggedIn"
+                      :key="identity.username"
+                    >
+                      <button
+                        class="btn btn-link dropdown-item"
+                        @click="$emit('change-account', identity.username)"
+                      >
+                        <img
+                          :src="gravatarURL51"
+                          height="45"
+                          class="rounded-circle mr-3"
+                          :title="identity.username"
+                        />{{ identity.username }}
+                      </button>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                  </div>
                   <a class="dropdown-item" href="/badge/list/">{{
                     T.navViewBadges
                   }}</a>
@@ -296,6 +329,7 @@
                     T.navMyQualityNomination
                   }}</a>
                 </template>
+                <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="/logout/">
                   <font-awesome-icon :icon="['fas', 'sign-out-alt']" />
                   {{ T.navLogOut }}
@@ -344,6 +378,10 @@ export default class Navbar extends Vue {
   @Prop() isLoggedIn!: boolean;
   @Prop() isReviewer!: boolean;
   @Prop() gravatarURL51!: string;
+  @Prop() gravatarURL128!: string;
+  @Prop() associatedIdentities!: types.AssociatedIdentity[];
+  @Prop() currentEmail!: string;
+  @Prop() currentName!: string;
   @Prop() currentUsername!: string;
   @Prop() isAdmin!: boolean;
   @Prop() isMainUserIdentity!: boolean;
@@ -361,6 +399,12 @@ export default class Navbar extends Vue {
 
   get formattedLoginURL(): string {
     return `/login/?redirect=${encodeURIComponent(window.location.pathname)}`;
+  }
+
+  get identitiesNotLoggedIn(): types.AssociatedIdentity[] {
+    return this.associatedIdentities.filter(
+      (identity) => identity.username !== this.currentUsername,
+    );
   }
 
   readNotifications(notifications: types.Notification[], url?: string): void {

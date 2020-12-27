@@ -5,7 +5,9 @@
         <h1 class="card-title">{{ T.collectionTitle }}</h1>
       </div>
       <div class="col-md-5 text-right align-self-end">
-        <a href="/problem/" data-nav-problems-all>{{ T.navAllProblems }}</a>
+        <a class="btn btn-primary" href="/problem/" data-nav-problems-all>{{
+          T.navAllProblems
+        }}</a>
       </div>
     </div>
     <div class="card panel panel-default">
@@ -64,13 +66,13 @@
                 <font-awesome-icon :icon="['fas', 'user']"></font-awesome-icon>
               </template>
               <template #button>
-                <a class="btn btn-primary" href="/problem/author/">{{
+                <a class="btn btn-primary" href="/problem/collection/author/">{{
                   T.problemcollectionViewProblems
                 }}</a>
               </template>
             </omegaup-problem-collection>
             <omegaup-problem-collection
-              :title="T.problemCollectionRandomProblem"
+              :title="T.problemCollectionRandomLanguageProblem"
             >
               <template #icon>
                 <font-awesome-icon
@@ -78,7 +80,21 @@
                 ></font-awesome-icon>
               </template>
               <template #button>
-                <a class="btn btn-primary" href="/problem/random/">{{
+                <a class="btn btn-primary" href="/problem/random/language/">{{
+                  T.problemcollectionViewProblems
+                }}</a>
+              </template>
+            </omegaup-problem-collection>
+            <omegaup-problem-collection
+              :title="T.problemCollectionRandomKarelProblem"
+            >
+              <template #icon>
+                <font-awesome-icon
+                  :icon="['fas', 'random']"
+                ></font-awesome-icon>
+              </template>
+              <template #button>
+                <a class="btn btn-primary" href="/problem/random/karel/">{{
                   T.problemcollectionViewProblems
                 }}</a>
               </template>

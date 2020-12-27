@@ -1180,7 +1180,7 @@ class QualityNominationTest extends \OmegaUp\Test\ControllerTestCase {
      * should be able to send a dismissal or suggestion for it adding the before_ac
      * flag on nomination contents.
      */
-    public function testBeforeACNomination() {
+    public function testBeforeAcNomination() {
         $problemData = \OmegaUp\Test\Factories\Problem::createProblem();
         ['user' => $user, 'identity' => $identity] = \OmegaUp\Test\Factories\User::createUser();
 

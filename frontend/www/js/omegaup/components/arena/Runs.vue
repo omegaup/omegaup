@@ -1,7 +1,10 @@
 <template>
   <div class="mt-2">
     <div class="table-responsive">
-      <table class="runs table table-striped">
+      <table
+        class="runs table table-striped"
+        :class="{ global: showAllRuns, local: !showAllRuns }"
+      >
         <caption>
           {{
             T.wordsSubmissions
@@ -17,7 +20,7 @@
 
             <label
               >{{ T.wordsVerdict }}:
-              <select v-model="filterVerdict">
+              <select v-model="filterVerdict" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="AC">AC</option>
                 <option value="PA">PA</option>
@@ -36,7 +39,7 @@
 
             <label
               >{{ T.wordsStatus }}:
-              <select v-model="filterStatus">
+              <select v-model="filterStatus" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="new">new</option>
                 <option value="waiting">waiting</option>
@@ -48,7 +51,7 @@
 
             <label
               >{{ T.wordsLanguage }}:
-              <select v-model="filterLanguage">
+              <select v-model="filterLanguage" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
                 <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
@@ -66,7 +69,7 @@
                 <option value="lua">Lua (5.3)</option>
                 <option value="kp">Karel (Pascal)</option>
                 <option value="kj">Karel (Java)</option>
-                <option value="cat">{#wordsJustOutput#}</option>
+                <option value="cat">{{ T.wordsJustOutput }}</option>
               </select>
             </label>
 
@@ -168,7 +171,7 @@
           <tr v-for="run in filteredRuns" :key="run.guid">
             <td>{{ time.formatTimestamp(run.time) }}</td>
             <td>
-              <acronym :title="run.guid">
+              <acronym :title="run.guid" data-run-guid>
                 <tt>{{ run.guid.substring(0, 8) }}</tt>
               </acronym>
             </td>
@@ -332,6 +335,7 @@ declare global {
   },
 })
 export default class Runs extends Vue {
+  @Prop({ default: false }) showAllRuns!: boolean;
   @Prop({ default: false }) isContestFinished!: boolean;
   @Prop({ default: true }) isProblemsetOpened!: boolean;
   @Prop({ default: false }) showContest!: boolean;
@@ -371,9 +375,9 @@ export default class Runs extends Vue {
       !this.filterContest &&
       !this.filterVerdict
     ) {
-      return this.runs;
+      return this.sortedRuns;
     }
-    return this.runs.filter((run) => {
+    return this.sortedRuns.filter((run) => {
       if (this.filterVerdict) {
         if (this.filterVerdict == 'NO-AC') {
           if (run.verdict == 'AC') {
@@ -400,6 +404,12 @@ export default class Runs extends Vue {
       }
       return true;
     });
+  }
+
+  get sortedRuns(): types.Run[] {
+    return this.runs
+      .slice()
+      .sort((a, b) => b.time.getTime() - a.time.getTime());
   }
 
   get newSubmissionUrl(): string {

@@ -7,7 +7,7 @@ namespace OmegaUp\Controllers;
  *
  * @psalm-type Progress=array{score: float, max_score: float}
  * @psalm-type AssignmentProgress=array<string, Progress>
- * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAC: bool, language?: string, nominated: bool, nominatedBeforeAC: bool, problemAlias: string, solved: bool, tried: bool}
+ * @psalm-type ProblemQualityPayload=array{canNominateProblem: bool, dismissed: bool, dismissedBeforeAc: bool, language?: string, nominated: bool, nominatedBeforeAc: bool, problemAlias: string, solved: bool, tried: bool}
  * @psalm-type ProblemsetProblem=array{accepts_submissions: bool, accepted: int, alias: string, commit: string, difficulty: float, input_limit: int, languages: string, letter: string, order: int, points: float, quality_payload?: ProblemQualityPayload, quality_seal: bool, submissions: int, title: string, version: string, visibility: int, visits: int}
  * @psalm-type IdentityRequest=array{accepted: bool|null, admin?: array{name: null|string, username: string}, classname: string, country: null|string, country_id: null|string, last_update: \OmegaUp\Timestamp|null, name: null|string, request_time: \OmegaUp\Timestamp, username: string}
  * @psalm-type CourseAdmin=array{role: string, username: string}
@@ -16,7 +16,8 @@ namespace OmegaUp\Controllers;
  * @psalm-type CourseDetails=array{admission_mode?: string, alias: string, assignments?: list<CourseAssignment>, description: string, finish_time: \OmegaUp\Timestamp|null, is_admin: bool, is_curator: bool, name: string, needs_basic_information: bool, requests_user_information: string, school_id: int|null, school_name: null|string, show_scoreboard: bool, start_time: \OmegaUp\Timestamp, student_count?: int, unlimited_duration: bool}
  * @psalm-type RunMetadata=array{verdict: string, time: float, sys_time: int, wall_time: float, memory: int}
  * @psalm-type Run=array{guid: string, language: string, status: string, verdict: string, runtime: int, penalty: int, memory: int, score: float, contest_score: float|null, time: \OmegaUp\Timestamp, submit_delay: int, type: null|string, username: string, classname: string, alias: string, country: string, contest_alias: null|string}
- * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<array{contest_score: float, max_score: float, meta: RunMetadata, name: null|string, out_diff: string, score: float, verdict: string}>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
+ * @psalm-type CaseResult=array{contest_score: float, max_score: float, meta: RunMetadata, name: string, out_diff?: string, score: float, verdict: string}
+ * @psalm-type ScoreboardRankingProblem=array{alias: string, penalty: float, percent: float, pending?: int, place?: int, points: float, run_details?: array{cases?: list<CaseResult>, details: array{groups: list<array{cases: list<array{meta: RunMetadata}>}>}}, runs: int}
  * @psalm-type ScoreboardRankingEntry=array{classname: string, country: string, is_invited: bool, name: null|string, place?: int, problems: list<ScoreboardRankingProblem>, total: array{penalty: float, points: float}, username: string}
  * @psalm-type Scoreboard=array{finish_time: \OmegaUp\Timestamp|null, problems: list<array{alias: string, order: int}>, ranking: list<ScoreboardRankingEntry>, start_time: \OmegaUp\Timestamp, time: \OmegaUp\Timestamp, title: string}
  * @psalm-type ScoreboardEvent=array{classname: string, country: string, delta: float, is_invited: bool, total: array{points: float, penalty: float}, name: null|string, username: string, problem: array{alias: string, points: float, penalty: float}}
@@ -2468,6 +2469,32 @@ class Course extends \OmegaUp\Controllers\Controller {
             intval($resolvedUser->user_id)
         );
 
+        if (
+            $resolvedUser->user_id !== $r->identity->user_id
+            && !is_null($resolvedUser->user_id)
+        ) {
+            \OmegaUp\DAO\Notifications::create(
+                new \OmegaUp\DAO\VO\Notifications([
+                    'user_id' => $resolvedUser->user_id,
+                    'contents' =>  json_encode(
+                        [
+                            'type' => \OmegaUp\DAO\Notifications::COURSE_ADMINISTRATOR_ADDED,
+                            'body' => [
+                                'localizationString' => new \OmegaUp\TranslationString(
+                                    'notificationCourseAddAdmin'
+                                ),
+                                'localizationParams' => [
+                                    'courseName' => $course->name,
+                                ],
+                                'url' => "/course/{$course->alias}/",
+                                'iconUrl' => '/media/info.png',
+                            ],
+                        ]
+                    ),
+                ])
+            );
+        }
+
         return [
             'status' => 'ok',
         ];
@@ -3586,10 +3613,11 @@ class Course extends \OmegaUp\Controllers\Controller {
         $courseDetails = self::getBasicCourseDetails($course);
         $commonDetails = [];
         if (
+            is_null($identity) &&
             $shouldShowIntro &&
             $course->admission_mode === self::ADMISSION_MODE_PRIVATE
         ) {
-            throw new \OmegaUp\Exceptions\ForbiddenAccessException();
+            \OmegaUp\UITools::redirectToLoginIfNotLoggedIn();
         }
         if ($course->admission_mode !== self::ADMISSION_MODE_PRIVATE) {
             $commonDetails = [
@@ -4193,8 +4221,8 @@ class Course extends \OmegaUp\Controllers\Controller {
                     'tried' => false,
                     'nominated' => false,
                     'dismissed' => false,
-                    'nominatedBeforeAC' => false,
-                    'dismissedBeforeAC' => false,
+                    'nominatedBeforeAc' => false,
+                    'dismissedBeforeAc' => false,
                 ];
             } else {
                 $nominationStatus = \OmegaUp\DAO\QualityNominations::getNominationStatusForProblem(

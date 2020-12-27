@@ -70,23 +70,26 @@ def test_create_problem(driver):
     with driver.login_user():
         prepare_run(driver, problem_alias)
         assert (problem_alias in driver.browser.find_element_by_xpath(
-            '//h1[@class="title"]').get_attribute('innerText'))
+            '//h3[@data-problem-title]').get_attribute('innerText'))
 
-        runs_before_submit = driver.browser.find_elements_by_css_selector(
-            'td[data-run-status]')
+        runs_before_submit = driver.browser.find_elements_by_xpath(
+            '//table[contains(concat(" ", normalize-space(@class), " "), " '
+            'local ")]/tbody/tr/td[@data-run-status]')
 
         filename = 'Main.java'
         util.create_run(driver, problem_alias, filename)
 
-        runs_after_submit = driver.browser.find_elements_by_css_selector(
-            'td[data-run-status]')
+        runs_after_submit = driver.browser.find_elements_by_xpath(
+            '//table[contains(concat(" ", normalize-space(@class), " "), " '
+            'local ")]/tbody/tr/td[@data-run-status]')
 
         assert len(runs_before_submit) + 1 == len(runs_after_submit)
 
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.XPATH,
-                 '//button[contains(@class, "details")]'))).click()
+                 '//button[contains(concat(" ", normalize-space(@class), " "),'
+                 ' " details ")]'))).click()
 
         driver.wait.until(
             EC.visibility_of_element_located(
@@ -106,7 +109,7 @@ def test_create_problem(driver):
                 if row is not None:
                     assert (row in textarea.text), row
 
-        driver.browser.find_element_by_id('overlay').click()
+        driver.browser.find_element_by_xpath('//div[@data-overlay]').click()
         driver.update_score(problem_alias)
 
     with driver.login_user():
@@ -114,9 +117,7 @@ def test_create_problem(driver):
         driver.wait.until(
             EC.visibility_of_element_located(
                 (By.XPATH,
-                 '//div[contains(concat(" ", normalize-space(@class), " "), '
-                 '" qualitynomination-popup ")]/form[contains(concat(" ", '
-                 'normalize-space(@class), " "), " popup ")]')))
+                 '//div[@data-overlay-popup]/form[@data-promotion-popup]')))
 
 
 @util.annotate
@@ -132,7 +133,12 @@ def prepare_run(driver, problem_alias):
         driver.wait.until(
             EC.element_to_be_clickable(
                 (By.CSS_SELECTOR,
-                 'a[data-nav-problems-all]'))).click()
+                 'a[data-nav-problems-collection]'))).click()
+
+    driver.wait.until(
+        EC.element_to_be_clickable(
+            (By.CSS_SELECTOR,
+             'a[data-nav-problems-all]'))).click()
 
     driver.wait.until(
         EC.element_to_be_clickable(

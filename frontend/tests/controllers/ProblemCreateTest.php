@@ -598,6 +598,7 @@ if __name__ == \'__main__\':
                 $problemData[] = \OmegaUp\Test\Factories\Problem::createProblem(
                     new \OmegaUp\Test\Factories\ProblemParams([
                         'problem_level' => $level,
+                        'quality_seal' => true,
                     ])
                 );
             }

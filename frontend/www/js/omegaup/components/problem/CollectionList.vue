@@ -1,21 +1,57 @@
 <template>
   <div>
-    <h1 class="card-title">{{ title }}</h1>
+    <div class="row">
+      <div class="col col-md-4 d-flex align-items-center">
+        <a href="/problem/collection/" data-nav-problems-collection>{{
+          T.problemCollectionBackCollections
+        }}</a>
+      </div>
+      <div class="col">
+        <h1>{{ title }}</h1>
+      </div>
+    </div>
     <div class="row">
       <div class="col col-md-4">
         <omegaup-problem-filter-tags
-          :tags.sync="tags"
-          :public-tags="publicTags"
+          :selected-tags="selectedTags"
+          :tags="availableTags"
+          :public-quality-tags="publicQualityTags"
+          @new-selected-tag="
+            (selectedTags) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
+          "
         ></omegaup-problem-filter-tags>
         <omegaup-problem-filter-difficulty
-          v-model="selectedDifficulty"
+          :selected-difficulty="difficulty"
+          @change-difficulty="
+            (difficulty) =>
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
+          "
         ></omegaup-problem-filter-difficulty>
       </div>
       <div class="col">
+        <div v-if="!problems || problems.length == 0" class="card-body">
+          <div class="empty-table-message">
+            {{ T.courseAssignmentProblemsEmpty }}
+          </div>
+        </div>
         <omegaup-problem-base-list
+          v-else
           :problems="problems"
           :logged-in="loggedIn"
-          :current-tags="currentTags"
+          :selected-tags="selectedTags"
           :pager-items="pagerItems"
           :wizard-tags="wizardTags"
           :language="language"
@@ -28,9 +64,16 @@
           :tags="tagsList"
           :sort-order="sortOrder"
           :column-name="columnName"
+          :path="`/problem/collection/${level}/`"
           @apply-filter="
             (columnName, sortOrder) =>
-              $emit('apply-filter', columnName, sortOrder)
+              $emit(
+                'apply-filter',
+                columnName,
+                sortOrder,
+                difficulty,
+                selectedTags,
+              )
           "
         >
         </omegaup-problem-base-list>
@@ -59,7 +102,7 @@ export default class CollectionList extends Vue {
   @Prop() data!: types.CollectionDetailsByLevelPayload;
   @Prop() problems!: omegaup.Problem;
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -72,21 +115,28 @@ export default class CollectionList extends Vue {
   @Prop({ default: () => [] }) tagsList!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() difficulty!: string;
 
   T = T;
   level = this.data.level;
-  tags: string[] = this.data.collection.map((element) => element.alias);
-  selectedDifficulty: null | string = null;
 
-  get publicTags(): string[] {
-    let tags: string[] = this.data.collection.map((x) => x.alias);
-    return this.data.publicTags.filter((x) => !tags.includes(x));
+  get publicQualityTags(): types.TagWithProblemCount[] {
+    const tagNames: Set<string> = new Set(
+      this.data.frequentTags.map((x) => x.name),
+    );
+    return this.data.publicTags.filter((tag) => !tagNames.has(tag.name));
+  }
+
+  get availableTags(): types.TagWithProblemCount[] {
+    const tags: types.TagWithProblemCount[] = this.data.frequentTags;
+    const selectedTagNames = new Set<string>(this.selectedTags);
+    return tags.concat(
+      this.publicQualityTags.filter((tag) => selectedTagNames.has(tag.name)),
+    );
   }
 
   get title(): string {
     switch (this.level) {
-      case 'author':
-        return T.omegaupTitleCollectionsByAuthor;
       case 'problemLevelBasicKarel':
         return T.problemLevelBasicKarel;
       case 'problemLevelBasicIntroductionToProgramming':

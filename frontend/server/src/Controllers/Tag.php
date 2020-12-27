@@ -4,6 +4,8 @@
 
 /**
  * TagController
+ *
+ * @psalm-type TagWithProblemCount=array { name: string, problemCount: int }
  */
 class Tag extends \OmegaUp\Controllers\Controller {
     public static function normalize(string $name): string {
@@ -69,15 +71,15 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return list<array{alias: string}>
+     * @return list<TagWithProblemCount>
      */
-    public static function getFrequentTagsByLevel(
+    public static function getPublicQualityTagsByLevel(
         string $problemLevel
     ): array {
         return \OmegaUp\Cache::getFromCacheOrSet(
             \OmegaUp\Cache::TAGS_LIST,
-            "level-{$problemLevel}",
-            fn () => \OmegaUp\DAO\Tags::getFrequentTagsByLevel(
+            "publicquality-level-{$problemLevel}",
+            fn () => \OmegaUp\DAO\Tags::getPublicQualityTagsByLevel(
                 $problemLevel
             ),
             APC_USER_CACHE_SESSION_TIMEOUT
@@ -87,20 +89,48 @@ class Tag extends \OmegaUp\Controllers\Controller {
     /**
      * Return most frequent public tags of a certain level
      *
-     * @return array{frequent_tags: list<array{alias: string}>}
+     * @return list<TagWithProblemCount>
+     */
+    public static function getFrequentQualityTagsByLevel(
+        string $problemLevel,
+        int $rows
+    ): array {
+        return \OmegaUp\Cache::getFromCacheOrSet(
+            \OmegaUp\Cache::TAGS_LIST,
+            "level-{$problemLevel}-{$rows}",
+            fn () => \OmegaUp\DAO\Tags::getFrequentQualityTagsByLevel(
+                $problemLevel,
+                $rows
+            ),
+            APC_USER_CACHE_SESSION_TIMEOUT
+        );
+    }
+
+    /**
+     * Return most frequent public tags of a certain level
+     *
+     * @return array{frequent_tags: list<TagWithProblemCount>}
      *
      * @omegaup-request-param string $problemLevel
+     * @omegaup-request-param int $rows
      */
     public static function apiFrequentTags(\OmegaUp\Request $r): array {
         $param = $r->ensureString(
             'problemLevel',
             fn (string $problemAlias) => \OmegaUp\Validators::alias(
-                $problemAlias
+                $problemAlias,
             )
         );
 
+        $rows = $r->ensureInt(
+            'rows'
+        );
+
         return [
-            'frequent_tags' => self::getFrequentTagsByLevel($param),
+            'frequent_tags' => self::getFrequentQualityTagsByLevel(
+                $param,
+                $rows
+            ),
         ];
     }
 }

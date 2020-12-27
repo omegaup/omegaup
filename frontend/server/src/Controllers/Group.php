@@ -5,9 +5,11 @@
 /**
  *  GroupController
  *
- * @psalm-type Identity=array{classname: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, school: null|string, school_id: int|null, state: null|string, state_id: null|string, username: string}
+ * @psalm-type Identity=array{classname?: string, country: null|string, country_id: null|string, gender: null|string, name: null|string, password?: string, school: null|string, school_id: int|null, school_name?: string, state: null|string, state_id: null|string, username: string}
  * @psalm-type GroupScoreboard=array{alias: string, create_time: string, description: null|string, name: string}
- * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
+ * @psalm-type GroupEditPayload=array{countries: list<\OmegaUp\DAO\VO\Countries>, groupAlias: string, groupDescription: null|string, groupName: null|string, identities: list<Identity>, isOrganizer: bool, scoreboards: list<GroupScoreboard>}
+ * @psalm-type Group=array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}
+ * @psalm-type GroupListPayload=array{groups: list<Group>}
  *
  * @author joemmanuel
  */
@@ -86,6 +88,39 @@ class Group extends \OmegaUp\Controllers\Controller {
             $r['description'],
             $r->user->user_id
         );
+
+        return ['status' => 'ok'];
+    }
+
+    /**
+     * Update an existing group
+     *
+     * @return array{status: string}
+     *
+     * @omegaup-request-param string $alias
+     * @omegaup-request-param string $description
+     * @omegaup-request-param string $name
+     */
+    public static function apiUpdate(\OmegaUp\Request $r) {
+        $r->ensureMainUserIdentity();
+
+        $groupAlias = $r->ensureString(
+            'alias',
+            fn (string $alias) => \OmegaUp\Validators::alias($alias)
+        );
+
+        $group = self::validateGroupAndOwner($groupAlias, $r->identity);
+        if (is_null($group)) {
+            throw new \OmegaUp\Exceptions\InvalidParameterException(
+                'parameterNotFound',
+                'group_alias'
+            );
+        }
+
+        $group->name = $r->ensureString('name');
+        $group->description = $r->ensureString('description');
+        \OmegaUp\DAO\Groups::update($group);
+        self::$log->info("Group {$group->alias} updated succesfully.");
 
         return ['status' => 'ok'];
     }
@@ -386,7 +421,7 @@ class Group extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{IS_ORGANIZER: bool, payload: GroupEditPayload, title: \OmegaUp\TranslationString}, template: string}
+     * @return array{smartyProperties: array{payload: GroupEditPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      *
      * @omegaup-request-param string $group
      */
@@ -431,10 +466,10 @@ class Group extends \OmegaUp\Controllers\Controller {
 
         return [
             'smartyProperties' => [
-                'IS_ORGANIZER' => $isOrganizer,
                 'payload' => [
                     'groupAlias' => $groupAlias,
                     'groupName' => $group->name,
+                    'groupDescription' => $group->description,
                     'countries' => \OmegaUp\DAO\Countries::getAll(
                         null,
                         100,
@@ -454,25 +489,30 @@ class Group extends \OmegaUp\Controllers\Controller {
                     'omegaupTitleGroupsEdit'
                 ),
             ],
-            // TODO: Replace the following line with 'entrypoint' => 'group_edit'
-            'template' => 'group.edit.tpl',
+            'entrypoint' => 'group_edit',
         ];
     }
 
     /**
-     * @return array{payload: array{groups: array{alias: string, create_time: \OmegaUp\Timestamp, description: null|string, name: string}[]}}
+     * @return array{smartyProperties: array{payload: GroupListPayload, title: \OmegaUp\TranslationString}, entrypoint: string}
      */
     public static function getGroupListForSmarty(\OmegaUp\Request $r): array {
         // Authenticate user
         $r->ensureMainUserIdentity();
 
         return [
-            'payload' => [
-                'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
-                    $r->user->user_id,
-                    $r->identity->identity_id
+            'smartyProperties' => [
+                'payload' => [
+                    'groups' => \OmegaUp\DAO\Groups::getAllGroupsAdminedByUser(
+                        $r->user->user_id,
+                        $r->identity->identity_id
+                    ),
+                ],
+                'title' => new \OmegaUp\TranslationString(
+                    'omegaupTitleGroups'
                 ),
             ],
+            'entrypoint' => 'group_list',
         ];
     }
 }

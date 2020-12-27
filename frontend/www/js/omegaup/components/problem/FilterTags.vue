@@ -5,17 +5,17 @@
       <div v-for="(tag, index) in tags" :key="index" class="form-check">
         <label class="form-check-label">
           <input
-            v-model="selectedTags"
-            :value="tag"
+            v-model="currentSelectedTags"
+            :value="tag.name"
             class="form-check-input"
             type="checkbox"
-          />{{ T[tag] }}
+          />{{ `${T[tag.name]}  (${tag.problemCount})` }}
         </label>
       </div>
       <div class="form-group">
         <vue-typeahead-bootstrap
-          :data="publicTags"
-          :serializer="publicTagsSerializer"
+          :data="publicQualityTagNames"
+          :serializer="publicQualityTagsSerializer"
           :placeholder="T.collecionOtherTags"
           @hit="addOtherTag"
         >
@@ -26,8 +26,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
 import T from '../../lang';
+import { types } from '../../api_types';
 import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
 @Component({
   components: {
@@ -35,24 +36,33 @@ import VueTypeaheadBootstrap from 'vue-typeahead-bootstrap';
   },
 })
 export default class FilterTags extends Vue {
-  @Prop() tags!: string[];
-  @Prop() publicTags!: string[];
+  @Prop() publicQualityTags!: types.TagWithProblemCount[];
+  @Prop({ default: () => [] }) tags!: types.TagWithProblemCount[];
+  @Prop({ default: () => [] }) selectedTags!: string[];
 
   T = T;
-  selectedTags: string[] = [];
+  currentSelectedTags = this.selectedTags;
+
+  get publicQualityTagNames(): string[] {
+    return this.publicQualityTags.map((x) => x.name);
+  }
 
   addOtherTag(tag: string): void {
-    if (!this.tags.includes(tag)) {
-      this.selectedTags.push(tag);
-      this.tags.push(tag);
+    if (!this.currentSelectedTags.includes(tag)) {
+      this.currentSelectedTags.push(tag);
     }
   }
 
-  publicTagsSerializer(tagname: string): string {
-    if (Object.prototype.hasOwnProperty.call(T, tagname)) {
-      return T[tagname];
+  publicQualityTagsSerializer(name: string): string {
+    if (Object.prototype.hasOwnProperty.call(T, name)) {
+      return T[name];
     }
-    return tagname;
+    return name;
+  }
+
+  @Watch('currentSelectedTags')
+  onNewTagSelected(): void {
+    this.$emit('new-selected-tag', this.currentSelectedTags);
   }
 }
 </script>

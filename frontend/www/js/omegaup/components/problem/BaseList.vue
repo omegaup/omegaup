@@ -164,7 +164,7 @@
                     ? 'custom-badge-quality'
                     : ''
                 } m-1 p-2`"
-                :href="hrefForProblemTag(currentTags, tag.name)"
+                :href="hrefForProblemTag(selectedTags, tag.name)"
                 >{{
                   Object.prototype.hasOwnProperty.call(T, tag.name)
                     ? T[tag.name]
@@ -254,7 +254,7 @@ library.add(faEyeSlash, faMedal, faExclamationTriangle, faBan);
 export default class BaseList extends Vue {
   @Prop() problems!: omegaup.Problem[];
   @Prop() loggedIn!: boolean;
-  @Prop() currentTags!: string[];
+  @Prop() selectedTags!: string[];
   @Prop() pagerItems!: types.PageItem[];
   @Prop() wizardTags!: omegaup.Tag[];
   @Prop() language!: string;
@@ -267,6 +267,7 @@ export default class BaseList extends Vue {
   @Prop() tags!: string[];
   @Prop() sortOrder!: string;
   @Prop() columnName!: string;
+  @Prop() path!: string;
 
   T = T;
   ui = ui;
@@ -287,11 +288,11 @@ export default class BaseList extends Vue {
     T.qualityFormDifficultyVeryHard,
   ];
 
-  hrefForProblemTag(currentTags: string[], problemTag: string): string {
-    if (!currentTags) return `/problem/?tag[]=${problemTag}`;
-    let tags = currentTags.slice();
+  hrefForProblemTag(selectedTags: string[], problemTag: string): string {
+    if (!selectedTags) return `${this.path}?tag[]=${problemTag}`;
+    let tags = selectedTags.slice();
     if (!tags.includes(problemTag)) tags.push(problemTag);
-    return `/problem/?tag[]=${tags.join('&tag[]=')}`;
+    return `${this.path}?tag[]=${tags.join('&tag[]=')}`;
   }
 }
 </script>

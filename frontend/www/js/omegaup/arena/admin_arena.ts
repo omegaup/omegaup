@@ -8,7 +8,8 @@ import arena_Runsv2 from '../components/arena/Runsv2.vue';
 import * as ui from '../ui';
 import * as time from '../time';
 
-import { Arena, runsStore } from './arena';
+import { Arena } from './arena';
+import { runsStore } from './runsStore';
 
 export default class ArenaAdmin {
   arena: Arena;
@@ -35,7 +36,7 @@ export default class ArenaAdmin {
             contestAlias: arena.options.contestAlias,
             runs: runsStore.state.runs,
             showContest: arena.options.contestAlias == 'admin',
-            showProblem: !arena.options.isOnlyProblem,
+            showProblem: true,
             showDetails: true,
             showDisqualify: true,
             showPager: true,
@@ -155,14 +156,7 @@ export default class ArenaAdmin {
       status: runsListComponent.filterStatus || undefined,
     };
 
-    if (this.arena.options.onlyProblemAlias) {
-      options.show_all = true;
-      options.problem_alias = this.arena.options.onlyProblemAlias;
-      api.Problem.runs(options)
-        .then(time.remoteTimeAdapter)
-        .then((response) => this.runsChanged(response))
-        .catch(ui.apiError);
-    } else if (this.arena.options.contestAlias === 'admin') {
+    if (this.arena.options.contestAlias === 'admin') {
       api.Run.list(options)
         .then(time.remoteTimeAdapter)
         .then((response) => this.runsChanged(response))
@@ -185,20 +179,7 @@ export default class ArenaAdmin {
   }
 
   refreshClarifications(): void {
-    if (this.arena.options.onlyProblemAlias) {
-      api.Problem.clarifications({
-        problem_alias: this.arena.options.onlyProblemAlias,
-        offset: this.arena.clarificationsOffset,
-        rowcount: this.arena.clarificationsRowcount,
-      })
-        .then(time.remoteTimeAdapter)
-        .then((response) =>
-          this.arena.clarificationsChange(response.clarifications),
-        )
-        .catch(ui.apiError);
-    } else {
-      this.arena.refreshClarifications();
-    }
+    this.arena.refreshClarifications();
   }
 
   runsChanged(data: { runs: types.Run[] }): void {

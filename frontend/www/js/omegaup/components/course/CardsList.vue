@@ -2,7 +2,9 @@
   <div>
     <div class="card-header mb-3">
       <h1>{{ T.courseCardAboutCourses }}</h1>
-      <p v-html="T.courseCardDescriptionCourses"></p>
+      <omegaup-markdown
+        :markdown="T.courseCardDescriptionCourses"
+      ></omegaup-markdown>
       <div class="text-right align-middle">
         <a href="https://blog.omegaup.com/cursos-en-omegaup/">{{
           T.wordsReadMore
@@ -65,6 +67,7 @@ import { Vue, Component, Prop } from 'vue-property-decorator';
 import { types } from '../../api_types';
 import T from '../../lang';
 import course_CourseCard from './CourseCard.vue';
+import omegaup_Markdown from '../Markdown.vue';
 
 import {
   FontAwesomeIcon,
@@ -77,10 +80,11 @@ library.add(fas);
 
 @Component({
   components: {
-    'omegaup-course-card': course_CourseCard,
     'font-awesome-icon': FontAwesomeIcon,
     'font-awesome-layers': FontAwesomeLayers,
     'font-awesome-layers-text': FontAwesomeLayersText,
+    'omegaup-course-card': course_CourseCard,
+    'omegaup-markdown': omegaup_Markdown,
   },
 })
 export default class CourseList extends Vue {
