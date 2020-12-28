@@ -758,6 +758,42 @@ export namespace types {
       );
     }
 
+    export function GroupScoreboardContestsPayload(
+      elementId: string = 'payload',
+    ): types.GroupScoreboardContestsPayload {
+      return ((x) => {
+        x.availableContests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.last_updated = ((x: number) => new Date(x * 1000))(
+              x.last_updated,
+            );
+            x.original_finish_time = ((x: number) => new Date(x * 1000))(
+              x.original_finish_time,
+            );
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.availableContests);
+        x.contests = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.finish_time = ((x: number) => new Date(x * 1000))(x.finish_time);
+            x.start_time = ((x: number) => new Date(x * 1000))(x.start_time);
+            return x;
+          });
+        })(x.contests);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function IndexPayload(
       elementId: string = 'payload',
     ): types.IndexPayload {
@@ -1927,6 +1963,13 @@ export namespace types {
     name: string;
   }
 
+  export interface GroupScoreboardContestsPayload {
+    availableContests: types.ContestListItem[];
+    contests: types.ScoreboardContest[];
+    groupAlias: string;
+    scoreboardAlias: string;
+  }
+
   export interface Histogram {
     difficulty: number;
     difficultyHistogram?: string;
@@ -2636,6 +2679,34 @@ export namespace types {
     start_time: Date;
     time: Date;
     title: string;
+  }
+
+  export interface ScoreboardContest {
+    acl_id: number;
+    admission_mode: string;
+    alias: string;
+    contest_id: number;
+    description: string;
+    feedback: string;
+    finish_time: Date;
+    languages: string;
+    last_updated: number;
+    only_ac?: boolean;
+    partial_score: boolean;
+    penalty: string;
+    penalty_calc_policy: string;
+    points_decay_factor: number;
+    problemset_id: number;
+    recommended: boolean;
+    rerun_id: number;
+    scoreboard: number;
+    show_scoreboard_after: boolean;
+    start_time: Date;
+    submissions_gap: number;
+    title: string;
+    urgent: boolean;
+    weight?: number;
+    window_length?: number;
   }
 
   export interface ScoreboardEvent {
