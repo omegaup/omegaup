@@ -7,7 +7,7 @@
       <h4>{{ T.userRoles }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="role in roles">
+          <tr v-for="role in roles" :key="role.name">
             <td>
               <input
                 v-model="role.value"
@@ -23,7 +23,7 @@
       <h4>{{ T.userGroups }}</h4>
       <table class="table">
         <tbody>
-          <tr v-for="group in groups">
+          <tr v-for="group in groups" :key="group.alias">
             <td>
               <input
                 v-model="group.value"
@@ -43,16 +43,17 @@
 <script lang="ts">
 import { Vue, Component, Prop, Emit } from 'vue-property-decorator';
 import { omegaup } from '../../omegaup';
+import { types } from '../../api_types';
 import T from '../../lang';
 
 @Component
 export default class AdminRoles extends Vue {
   @Prop() initialRoles!: omegaup.Role[];
-  @Prop() initialGroups!: omegaup.Group[];
+  @Prop() initialGroups!: types.Group[];
 
   T = T;
   roles: omegaup.Role[] = this.initialRoles;
-  groups: omegaup.Group[] = this.initialGroups;
+  groups: types.Group[] = this.initialGroups;
 
   @Emit()
   onChangeRole(
@@ -68,8 +69,8 @@ export default class AdminRoles extends Vue {
   @Emit()
   onChangeGroup(
     ev: Event,
-    group: omegaup.Group,
-  ): omegaup.Selectable<omegaup.Group> {
+    group: types.Group,
+  ): omegaup.Selectable<types.Group> {
     return {
       value: group,
       selected: (<HTMLInputElement>ev.target).checked,

@@ -739,6 +739,25 @@ export namespace types {
       );
     }
 
+    export function GroupListPayload(
+      elementId: string = 'payload',
+    ): types.GroupListPayload {
+      return ((x) => {
+        x.groups = ((x) => {
+          if (!Array.isArray(x)) {
+            return x;
+          }
+          return x.map((x) => {
+            x.create_time = ((x: number) => new Date(x * 1000))(x.create_time);
+            return x;
+          });
+        })(x.groups);
+        return x;
+      })(
+        JSON.parse((<HTMLElement>document.getElementById(elementId)).innerText),
+      );
+    }
+
     export function GroupScoreboardContestsPayload(
       elementId: string = 'payload',
     ): types.GroupScoreboardContestsPayload {
@@ -1916,6 +1935,13 @@ export namespace types {
     status: string;
   }
 
+  export interface Group {
+    alias: string;
+    create_time: Date;
+    description?: string;
+    name: string;
+  }
+
   export interface GroupEditPayload {
     countries: dao.Countries[];
     groupAlias: string;
@@ -1924,6 +1950,10 @@ export namespace types {
     identities: types.Identity[];
     isOrganizer: boolean;
     scoreboards: types.GroupScoreboard[];
+  }
+
+  export interface GroupListPayload {
+    groups: types.Group[];
   }
 
   export interface GroupScoreboard {

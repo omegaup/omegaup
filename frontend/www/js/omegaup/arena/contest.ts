@@ -2,6 +2,13 @@ import * as api from '../api';
 import { Arena, GetOptionsFromLocation } from './arena';
 import { OmegaUp } from '../omegaup';
 
+function getInputValue(itemSelector: string): string | undefined {
+  const element = document.querySelector(itemSelector);
+  if (element) {
+    return (<HTMLInputElement>element).value;
+  }
+}
+
 OmegaUp.on('ready', () => {
   const arenaInstance = new Arena(GetOptionsFromLocation(window.location));
 
@@ -34,12 +41,14 @@ OmegaUp.on('ready', () => {
     arenaInstance.refreshClarifications();
   });
 
-  $('#clarification').on('submit', () => {
-    $('#clarification input').attr('disabled', 'disabled');
+  document.querySelector('#clarification')?.addEventListener('submit', () => {
+    document
+      .querySelectorAll('#clarification input')
+      .forEach((input) => input.setAttribute('disabled', 'disabled'));
     api.Clarification.create({
       contest_alias: arenaInstance.options.contestAlias,
-      problem_alias: $('#clarification select[name="problem"]').val(),
-      message: $('#clarification textarea[name="message"]').val(),
+      problem_alias: getInputValue('#clarification select[name="problem"]'),
+      message: getInputValue('#clarification textarea[name="message"]'),
     })
       .then(() => {
         arenaInstance.hideOverlay();
@@ -49,7 +58,9 @@ OmegaUp.on('ready', () => {
         alert(e.error);
       })
       .finally(() => {
-        $('#clarification input').prop('disabled', false);
+        document
+          .querySelectorAll('#clarification input')
+          .forEach((input) => input.removeAttribute('disabled'));
       });
 
     return false;

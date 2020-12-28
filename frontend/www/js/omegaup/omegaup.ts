@@ -273,13 +273,6 @@ export namespace omegaup {
     name: string;
   }
 
-  export interface Group {
-    alias: string;
-    create_time: Date;
-    description: string;
-    name: string;
-  }
-
   export interface IdentityContest {
     username: string;
     end_time?: Date;
