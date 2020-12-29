@@ -37,7 +37,9 @@ export interface ArenaOptions {
   disableSockets: boolean;
   isInterview: boolean;
   isLockdownMode: boolean;
+  isOnlyProblem: boolean;
   isPractice: boolean;
+  onlyProblemAlias: string | null;
   originalContestAlias: string | null;
   originalProblemsetId?: number;
   payload: types.CommonPayload;
@@ -310,18 +312,21 @@ export class Arena {
       data: () => ({
         isContestFinished: false,
         isProblemsetOpened: true,
-        problemAlias: null,
+        problemAlias: options.isOnlyProblem ? options.onlyProblemAlias : null,
       }),
       render: function (createElement) {
         return createElement('omegaup-arena-runs', {
           props: {
             contestAlias: options.contestAlias,
-            isContestFinished: this.isContestFinished && !options.isPractice,
+            isContestFinished:
+              this.isContestFinished &&
+              !options.isPractice &&
+              !options.isOnlyProblem,
             isProblemsetOpened: this.isProblemsetOpened,
             problemAlias: this.problemAlias,
             runs: myRunsStore.state.runs,
             showDetails: true,
-            showPoints: !options.isPractice,
+            showPoints: !options.isPractice && !options.isOnlyProblem,
           },
           on: {
             details: (run: types.Run) => {
@@ -970,7 +975,11 @@ export class Arena {
       this.updateRunFallback(run.guid);
       return;
     }
-    if (!this.options.isPractice && this.options.contestAlias != 'admin') {
+    if (
+      !this.options.isPractice &&
+      !this.options.isOnlyProblem &&
+      this.options.contestAlias != 'admin'
+    ) {
       this.refreshRanking();
     }
   }
@@ -1679,7 +1688,7 @@ export class Arena {
           this.myRunsList.problemAlias = problem.alias;
         };
 
-        if (this.options.isPractice) {
+        if (this.options.isPractice || this.options.isOnlyProblem) {
           api.Problem.runs({ problem_alias: problem.alias })
             .then(time.remoteTimeAdapter)
             .then((data) => {
@@ -2002,6 +2011,9 @@ export class Arena {
   }
 
   computeProblemsetArg(): { contest_alias?: string; problemset_id?: number } {
+    if (this.options.isOnlyProblem) {
+      return {};
+    }
     if (this.options.contestAlias) {
       return { contest_alias: this.options.contestAlias };
     }
@@ -2030,9 +2042,11 @@ export class Arena {
         }
 
         const currentProblem = this.problems[this.currentProblem.alias];
-        currentProblem.lastSubmission = new Date();
-        currentProblem.nextSubmissionTimestamp =
-          response.nextSubmissionTimestamp;
+        if (!this.options.isOnlyProblem) {
+          currentProblem.lastSubmission = new Date();
+          currentProblem.nextSubmissionTimestamp =
+            response.nextSubmissionTimestamp;
+        }
         const run = {
           guid: response.guid,
           submit_delay: response.submit_delay,
@@ -2235,6 +2249,7 @@ export function GetDefaultOptions(): ArenaOptions {
     isLockdownMode: false,
     isInterview: false,
     isPractice: false,
+    isOnlyProblem: false,
     disableClarifications: false,
     disableSockets: false,
     assignmentAlias: null,
@@ -2243,6 +2258,7 @@ export function GetDefaultOptions(): ArenaOptions {
     courseName: null,
     scoreboardToken: null,
     shouldShowFirstAssociatedIdentityRunWarning: false,
+    onlyProblemAlias: null,
     originalContestAlias: null,
     partialScore: true,
     problemsetId: null,
@@ -2291,7 +2307,13 @@ export function GetOptionsFromLocation(
     options.isPractice = true;
   }
 
-  if (arenaLocation.pathname.indexOf('/arena/problem/') === -1) {
+  if (arenaLocation.pathname.indexOf('/arena/problem/') !== -1) {
+    options.isOnlyProblem = true;
+    const match = /\/arena\/problem\/([^/]+)\/?/.exec(arenaLocation.pathname);
+    if (match) {
+      options.onlyProblemAlias = match[1];
+    }
+  } else {
     const match = /\/arena\/([^/]+)\/?/.exec(arenaLocation.pathname);
     if (match) {
       options.contestAlias = match[1];
