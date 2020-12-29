@@ -1,7 +1,7 @@
 <template>
   <omegaup-overlay-popup @dismiss="onCloseModal(currentView)">
     <transition name="fade">
-      <form data-promotion-popup class="h-auto w-auto" @submit.prevent="">
+      <form class="popup h-auto w-auto" @submit.prevent="">
         <div class="container-fluid d-flex align-items-start flex-column">
           <template v-if="currentView === AvailableViews.Content">
             <slot
@@ -41,7 +41,7 @@
                       :key="problemTopic.value"
                       class="tag-select"
                     >
-                      <label class="tag-label"
+                      <label class="tag-select"
                         ><input
                           v-model="tags"
                           type="checkbox"
@@ -105,7 +105,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import omegaup_OverlayPopup from '../OverlayPopup.vue';
-import { AvailableViews } from './DemotionPopup.vue';
+import { AvailableViews } from './DemotionPopupv2.vue';
 import T from '../../lang';
 
 interface ProblemTag {
@@ -255,11 +255,5 @@ ul.tag-select {
   overflow: auto;
   border: 1px solid #ccc;
   background: #fff;
-  list-style-type: none;
-}
-.tag-label {
-  width: -webkit-fill-available;
-  margin-bottom: 0;
-  padding-bottom: 0.5rem;
 }
 </style>

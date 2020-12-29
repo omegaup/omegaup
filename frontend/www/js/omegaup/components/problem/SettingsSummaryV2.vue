@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3 data-problem-title class="text-center mb-4">
+    <h3 class="text-center mb-4">
       {{ title }}
       <template v-if="showVisibilityIndicators">
         <img

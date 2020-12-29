@@ -18,6 +18,7 @@ rewrite ^/arena/?$ /arena/index.php last;
 rewrite ^/arena/admin/?$ /arena/admin.php last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/?$ /arena/problem.php?problem_alias=$1 last;
 rewrite ^/arena/problem/([a-zA-Z0-9_+-]+)/print/?$ /arena/problemprint.php?problem_alias=$1 last;
+rewrite ^/arena/problemv2/([a-zA-Z0-9_+-]+)/?$ /arena/problemv2.php?problem_alias=$1 last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/virtual/?$ /arena/virtual.php?contest_alias=$1  last;
 rewrite ^/arena/([a-zA-Z0-9_+-]+)/print/?$ /arena/contestprint.php?alias=$1 last;
 rewrite ^/arena/[a-zA-Z0-9_+-]+/admin/?$ /arena/contestadmin.php last;
