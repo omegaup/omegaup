@@ -14,11 +14,22 @@ import JSZip from 'jszip';
 import T from '../lang';
 
 OmegaUp.on('ready', () => {
-  const payload = types.payloadParsers.ProblemDetailsPayload();
+  const payload = types.payloadParsers.ProblemDetailsv2Payload();
   const commonPayload = types.payloadParsers.CommonPayload();
   const locationHash = window.location.hash.substr(1).split('/');
   const runs =
     payload.user.admin && payload.allRuns ? payload.allRuns : payload.runs;
+  if (runs) {
+    for (const run of runs) {
+      trackRun(run);
+    }
+  }
+  if (payload.user.admin) {
+    setInterval(() => {
+      refreshRuns();
+      refreshClarifications();
+    }, 5 * 60 * 1000);
+  }
   const problemDetailsView = new Vue({
     el: '#main-container',
     components: {
@@ -33,7 +44,6 @@ OmegaUp.on('ready', () => {
       availableTokens: 0,
       allTokens: 0,
       activeTab: window.location.hash ? locationHash[0] : 'problems',
-      nominationStatus: payload.nominationStatus,
       hasBeenNominated:
         payload.nominationStatus?.nominated ||
         (payload.nominationStatus?.nominatedBeforeAc &&
@@ -49,7 +59,7 @@ OmegaUp.on('ready', () => {
           runs: myRunsStore.state.runs,
           solvers: payload.solvers,
           user: payload.user,
-          nominationStatus: this.nominationStatus,
+          nominationStatus: payload.nominationStatus,
           histogram: payload.histogram,
           initialClarifications: this.initialClarifications,
           solutionStatus: this.solutionStatus,
@@ -225,7 +235,6 @@ OmegaUp.on('ready', () => {
             })
               .then(() => {
                 this.hasBeenNominated = true;
-                ui.reportEvent('quality-nomination', 'submit');
                 ui.dismissNotifications();
               })
               .catch(ui.apiError);
@@ -247,7 +256,6 @@ OmegaUp.on('ready', () => {
               contents: JSON.stringify(contents),
             })
               .then(() => {
-                ui.reportEvent('quality-nomination', 'dismiss');
                 ui.info(T.qualityNominationRateProblemDesc);
               })
               .catch(ui.apiError);
@@ -380,22 +388,6 @@ OmegaUp.on('ready', () => {
       return;
     }
     myRunsStore.commit('addRun', run);
-
-    if (!problemDetailsView.nominationStatus) {
-      return;
-    }
-    if (run.verdict !== 'AC' && run.verdict !== 'CE' && run.verdict !== 'JE') {
-      problemDetailsView.nominationStatus.tried = true;
-    }
-    if (run.verdict === 'AC') {
-      Vue.set(
-        problemDetailsView,
-        'nominationStatus',
-        Object.assign({}, problemDetailsView.nominationStatus, {
-          solved: true,
-        }),
-      );
-    }
   }
 
   function refreshRuns(): void {
@@ -433,17 +425,6 @@ OmegaUp.on('ready', () => {
       .catch(ui.apiError);
   }
 
-  if (runs) {
-    for (const run of runs) {
-      trackRun(run);
-    }
-  }
-  if (payload.user.admin) {
-    setInterval(() => {
-      refreshRuns();
-      refreshClarifications();
-    }, 5 * 60 * 1000);
-  }
   if (locationHash.includes('new-run')) {
     problemDetailsView.initialPopupDisplayed = PopupDisplayed.RunSubmit;
   } else if (locationHash[1] && locationHash[1].includes('show-run:')) {

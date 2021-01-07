@@ -2236,10 +2236,10 @@ the given scoreboard_alias
 
 ### Parameters
 
-| Name               | Type           | Description |
-| ------------------ | -------------- | ----------- |
-| `group_alias`      | `null\|string` |             |
-| `scoreboard_alias` | `null\|string` |             |
+| Name               | Type     | Description |
+| ------------------ | -------- | ----------- |
+| `group_alias`      | `string` |             |
+| `scoreboard_alias` | `string` |             |
 
 ### Returns
 

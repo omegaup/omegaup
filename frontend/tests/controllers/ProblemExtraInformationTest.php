@@ -25,9 +25,9 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
             $r
         )['smartyProperties'];
 
-        $this->assertFalse($result['payload']['user']['loggedIn']);
-        $this->assertFalse($result['payload']['problem']['karel_problem']);
-        $this->assertFalse($result['payload']['user']['admin']);
+        $this->assertFalse($result['payload']['user']['logged_in']);
+        $this->assertFalse($result['karel_problem']);
+        $this->assertFalse($result['problem_admin']);
 
         // Normal user is able to see the problem.
         [
@@ -40,9 +40,9 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
             $r
         )['smartyProperties'];
 
-        $this->assertTrue($result['payload']['user']['loggedIn']);
-        $this->assertFalse($result['payload']['problem']['karel_problem']);
-        $this->assertFalse($result['payload']['user']['admin']);
+        $this->assertTrue($result['payload']['user']['logged_in']);
+        $this->assertFalse($result['karel_problem']);
+        $this->assertFalse($result['problem_admin']);
     }
 
     public function testQualityPayload() {
@@ -60,7 +60,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['payload']['nominationStatus'];
+        $payload = $result['quality_payload'];
         $this->assertFalse($payload['nominated']);
         $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
@@ -81,7 +81,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['payload']['nominationStatus'];
+        $payload = $result['quality_payload'];
         $this->assertFalse($payload['nominated']);
         $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
@@ -104,7 +104,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['payload']['nominationStatus'];
+        $payload = $result['quality_payload'];
         $this->assertFalse($payload['nominated']);
         $this->assertFalse($payload['nominatedBeforeAc']);
         $this->assertFalse($payload['dismissed']);
@@ -134,7 +134,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['payload']['nominationStatus'];
+        $payload = $result['quality_payload'];
         $this->assertFalse($payload['nominated']);
         $this->assertTrue($payload['dismissed']);
         $this->assertTrue($payload['tried']);
@@ -157,7 +157,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
                 'auth_token' => $login->auth_token,
             ])
         )['smartyProperties'];
-        $payload = $result['payload']['nominationStatus'];
+        $payload = $result['quality_payload'];
         $this->assertTrue($payload['nominated']);
         $this->assertTrue($payload['dismissed']);
         $this->assertTrue($payload['tried']);
@@ -184,7 +184,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $this->assertEquals(
             \OmegaUp\Controllers\Problem::SOLUTION_UNLOCKED,
-            $result['payload']['solutionStatus']
+            $result['payload']['solution_status']
         );
 
         // Normal user should see the problem as locked
@@ -201,7 +201,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $this->assertEquals(
             \OmegaUp\Controllers\Problem::SOLUTION_LOCKED,
-            $result['payload']['solutionStatus']
+            $result['payload']['solution_status']
         );
 
         // Problem with no solutions should return NOT_FOUND
@@ -218,7 +218,7 @@ class ProblemExtraInformationTest extends \OmegaUp\Test\ControllerTestCase {
         )['smartyProperties'];
         $this->assertEquals(
             \OmegaUp\Controllers\Problem::SOLUTION_NOT_FOUND,
-            $result['payload']['solutionStatus']
+            $result['payload']['solution_status']
         );
     }
 }

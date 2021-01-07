@@ -104,12 +104,14 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             $contestAlias
         );
 
-        \OmegaUp\DAO\GroupsScoreboardsProblemsets::create(new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
-            'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
-            'problemset_id' => $contestScoreboard['contest']->problemset_id,
-            'only_ac' => $r->ensureBool('only_ac'),
-            'weight' => $r->ensureFloat('weight'),
-        ]));
+        \OmegaUp\DAO\GroupsScoreboardsProblemsets::replace(
+            new \OmegaUp\DAO\VO\GroupsScoreboardsProblemsets([
+                'group_scoreboard_id' => $contestScoreboard['scoreboard']->group_scoreboard_id,
+                'problemset_id' => $contestScoreboard['contest']->problemset_id,
+                'only_ac' => $r->ensureBool('only_ac'),
+                'weight' => $r->ensureFloat('weight'),
+            ])
+        );
 
         self::$log->info(
             "Contest {$contestAlias} added to scoreboard {$scoreboardAlias}"
@@ -180,8 +182,8 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
      *
      * @return array{ranking: list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>, scoreboard: array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}, contests: list<array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}>}
      *
-     * @omegaup-request-param null|string $group_alias
-     * @omegaup-request-param null|string $scoreboard_alias
+     * @omegaup-request-param string $group_alias
+     * @omegaup-request-param string $scoreboard_alias
      */
     public static function apiDetails(\OmegaUp\Request $r): array {
         $r->ensureIdentity();
@@ -193,9 +195,25 @@ class GroupScoreboard extends \OmegaUp\Controllers\Controller {
             'scoreboard_alias',
             fn (string $alias) => \OmegaUp\Validators::alias($alias)
         );
-        $scoreboard = self::validateGroupScoreboard(
+
+        return self::getScoreboardDetails(
             $groupAlias,
             $r->identity,
+            $scoreboardAlias
+        );
+    }
+
+    /**
+     * @return array{ranking: list<array{name: null|string, username: string, contests: array<string, array{points: float, penalty: float}>, total: array{points: float, penalty: float}}>, scoreboard: array{group_scoreboard_id: int, group_id: int, create_time: int, alias: string, name: string, description: string}, contests: list<array{contest_id: int, problemset_id: int, acl_id: int, title: string, description: string, start_time: \OmegaUp\Timestamp, finish_time: \OmegaUp\Timestamp, last_updated: int, window_length: null|int, rerun_id: int, admission_mode: string, alias: string, scoreboard: int, points_decay_factor: float, partial_score: bool, submissions_gap: int, feedback: string, penalty: string, penalty_calc_policy: string, show_scoreboard_after: bool, urgent: bool, languages: string, recommended: bool, only_ac?: bool, weight?: float}>}
+     */
+    public static function getScoreboardDetails(
+        string $groupAlias,
+        \OmegaUp\DAO\VO\Identities $identity,
+        string $scoreboardAlias
+    ): array {
+        $scoreboard = self::validateGroupScoreboard(
+            $groupAlias,
+            $identity,
             $scoreboardAlias
         );
 
