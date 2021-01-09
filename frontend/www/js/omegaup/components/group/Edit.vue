@@ -149,16 +149,13 @@
           :group-alias="groupAlias"
           :user-error-row="userErrorRow"
           @bulk-identities="
-            (identitiesComponent, identities) =>
-              $emit('bulk-identities', identitiesComponent, identities)
+            (identities) => $emit('bulk-identities', identities)
           "
           @download-identities="
             (identities) => $emit('download-identities', identities)
           "
-          @read-csv="
-            (identitiesComponent, fileUpload) =>
-              $emit('read-csv', identitiesComponent, fileUpload)
-          "
+          @read-csv="(source) => $emit('read-csv', source)"
+          @invalid-file="$emit('invalid-file')"
         ></omegaup-group-create-identities>
       </div>
     </div>
@@ -167,9 +164,9 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator';
-import group_Identities from './Identitiesv2.vue';
+import group_Identities from './Identities.vue';
 import group_Form from './Form.vue';
-import group_Members from './Membersv2.vue';
+import group_Members from './Members.vue';
 import group_Scoreboards from './Scoreboards.vue';
 import T from '../../lang';
 import { dao, types } from '../../api_types';
@@ -200,12 +197,12 @@ export default class GroupEdit extends Vue {
   @Prop() identities!: types.Identity[];
   @Prop() identitiesCsv!: types.Identity[];
   @Prop() scoreboards!: types.GroupScoreboard[];
+  @Prop() userErrorRow!: null | string;
 
   T = T;
   ui = ui;
   AvailableTabs = AvailableTabs;
   selectedTab: AvailableTabs = this.tab;
-  userErrorRow: string | null = null;
   currentIdentities = this.identities;
   currentIdentitiesCsv = this.identitiesCsv;
   currentScoreboards = this.scoreboards;

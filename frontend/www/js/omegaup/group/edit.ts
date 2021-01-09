@@ -1,7 +1,6 @@
 import group_Edit, { AvailableTabs } from '../components/group/Edit.vue';
 import group_Members from '../components/group/Members.vue';
 import group_Scoreboards from '../components/group/Scoreboards.vue';
-import group_Identities from '../components/group/Identities.vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 import * as api from '../api';
@@ -21,13 +20,14 @@ OmegaUp.on('ready', () => {
       tab: window.location.hash
         ? window.location.hash.substr(1)
         : AvailableTabs.Members,
-      identities: payload.identities.filter((identity) =>
-        identity.username.includes(':'),
-      ),
-      identitiesCsv: payload.identities.filter(
+      identities: payload.identities.filter(
         (identity) => !identity.username.includes(':'),
       ),
+      identitiesCsv: payload.identities.filter((identity) =>
+        identity.username.includes(':'),
+      ),
       scoreboards: payload.scoreboards,
+      userErrorRow: null,
     }),
     methods: {
       refreshGroupScoreboards: (): void => {
@@ -40,11 +40,11 @@ OmegaUp.on('ready', () => {
       refreshMemberList: (): void => {
         api.Group.members({ group_alias: payload.groupAlias })
           .then((data) => {
-            groupEdit.identities = data.identities.filter((identity) =>
-              identity.username.includes(':'),
-            );
-            groupEdit.identitiesCsv = data.identities.filter(
+            groupEdit.identities = data.identities.filter(
               (identity) => !identity.username.includes(':'),
+            );
+            groupEdit.identitiesCsv = data.identities.filter((identity) =>
+              identity.username.includes(':'),
             );
           })
           .catch(ui.apiError);
@@ -55,14 +55,27 @@ OmegaUp.on('ready', () => {
         props: {
           groupAlias: payload.groupAlias,
           groupName: payload.groupName,
+          groupDescription: payload.groupDescription,
           countries: payload.countries,
           isOrganizer: payload.isOrganizer,
           tab: this.tab,
           identities: this.identities,
           identitiesCsv: this.identitiesCsv,
           scoreboards: this.scoreboards,
+          userErrorRow: this.userErrorRow,
         },
         on: {
+          'update-group': (name: string, description: string) => {
+            api.Group.update({
+              alias: payload.groupAlias,
+              name: name,
+              description: description,
+            })
+              .then(() => {
+                ui.success(T.groupEditGroupUpdated);
+              })
+              .catch(ui.apiError);
+          },
           'create-scoreboard': (
             source: group_Scoreboards,
             scoreboardName: string,
@@ -170,22 +183,20 @@ OmegaUp.on('ready', () => {
             source.showChangePasswordForm = false;
             source.$el.scrollIntoView();
           },
-          'bulk-identities': (
-            source: group_Identities,
-            identities: types.Identity[],
-          ) => {
+          'bulk-identities': (identities: types.Identity[]) => {
             api.Identity.bulkCreate({
               identities: JSON.stringify(identities),
               group_alias: payload.groupAlias,
             })
               .then(() => {
                 this.refreshMemberList();
+                window.location.hash = `#${AvailableTabs.Members}`;
                 this.tab = AvailableTabs.Members;
                 ui.success(T.groupsIdentitiesSuccessfullyCreated);
               })
               .catch((data) => {
                 ui.error(data.error);
-                source.userErrorRow = data.parameter;
+                this.userErrorRow = data.parameter;
               });
           },
           'download-identities': (identities: types.Identity[]) => {
@@ -224,17 +235,14 @@ OmegaUp.on('ready', () => {
             hiddenElement.download = 'identities.csv';
             hiddenElement.click();
           },
-          'read-csv': (
-            source: group_Identities,
-            fileUpload: HTMLInputElement,
-          ) => {
-            source.identities = [];
-            if (!fileUpload.files) {
-              return;
-            }
-            CSV.fetch({
-              file: fileUpload.files[0],
-            })
+          'read-csv': ({
+            identities,
+            file,
+          }: {
+            identities: types.Identity[];
+            file: File;
+          }) => {
+            CSV.fetch({ file })
               .done((dataset: CSV.Dataset) => {
                 if (!dataset.fields || dataset.fields.length != 6) {
                   ui.error(T.groupsInvalidCsv);
@@ -248,7 +256,7 @@ OmegaUp.on('ready', () => {
                   gender,
                   school_name,
                 ] of cleanRecords(dataset.records)) {
-                  source.identities.push({
+                  identities.push({
                     username: `${payload.groupAlias}:${username}`,
                     name,
                     password: generatePassword(),
@@ -258,11 +266,15 @@ OmegaUp.on('ready', () => {
                     school_name,
                   });
                 }
-                source.userErrorRow = null;
+                ui.dismissNotifications();
+                this.userErrorRow = null;
               })
               .fail((data) => {
                 ui.error(data.error);
               });
+          },
+          'invalid-file': () => {
+            ui.error(T.groupsInvalidCsv);
           },
         },
       });
