@@ -108,7 +108,7 @@ module.exports = {
     user_edit_email_form: './frontend/www/js/omegaup/user/emailedit.js',
     user_manage_identities:
       './frontend/www/js/omegaup/user/manage_identities.js',
-    user_profile: './frontend/www/js/omegaup/user/profile.js',
+    user_profile: './frontend/www/js/omegaup/user/profile.ts',
     user_privacy_policy: './frontend/www/js/omegaup/user/privacy_policy.js',
     users_rank: './frontend/www/js/omegaup/user/rank.ts',
   },

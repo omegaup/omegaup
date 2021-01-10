@@ -3,7 +3,7 @@ import Vue from 'vue';
 import { OmegaUp } from '../omegaup';
 import { types } from '../api_types';
 
-import user_Profile from '../components/user/Profilev2.vue';
+import user_Profile from '../components/user/Profile.vue';
 
 OmegaUp.on('ready', () => {
   const payload = types.payloadParsers.UserProfileDetailsPayload();

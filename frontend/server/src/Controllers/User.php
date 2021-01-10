@@ -3660,7 +3660,7 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: UserProfileInfo}, template: string}
+     * @return array{smartyProperties: array{STATUS_ERROR: string}|array{profile: UserProfileInfo}, entrypoint: string}
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param string $contest_alias
@@ -3708,7 +3708,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'omegaupTitleProfile'
                     ),
                 ],
-                'template' => 'user.profile.tpl',
+                'entrypoint' => 'user_profile',
             ];
         } catch (\OmegaUp\Exceptions\ApiException $e) {
             \OmegaUp\ApiCaller::logException($e);
@@ -3719,7 +3719,7 @@ class User extends \OmegaUp\Controllers\Controller {
                         'omegaupTitleProfile'
                     )
                 ],
-                'template' => 'user.profile.tpl',
+                'entrypoint' => 'user_profile',
             ];
         }
     }
@@ -3766,11 +3766,11 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $auth_token
+     * @omegaup-request-param null|string $auth_token                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
      * @omegaup-request-param mixed $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: UserProfileInfo}, template: string}
-     */
+     */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
     public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
 
