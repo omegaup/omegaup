@@ -3766,11 +3766,11 @@ class User extends \OmegaUp\Controllers\Controller {
     }
 
     /**
-     * @omegaup-request-param null|string $auth_token                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+     * @omegaup-request-param null|string $auth_token
      * @omegaup-request-param mixed $username
      *
      * @return array{smartyProperties: array{STATUS_ERROR?: string, payload?: array{email: null|string}, profile?: UserProfileInfo}, template: string}
-     */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+     */
     public static function getEmailEditDetailsForSmarty(\OmegaUp\Request $r) {
         $currentSession = \OmegaUp\Controllers\Session::getCurrentSession();
 
