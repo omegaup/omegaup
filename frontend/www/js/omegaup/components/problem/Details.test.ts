@@ -123,7 +123,26 @@ describe('Details.vue', () => {
     qualityHistogram: '[0,1,2,3,4]',
   };
 
-  it('Should handle no nomination payload', () => {
+  const runs = <types.Run[]>[
+    {
+      alias: 'Hello',
+      classname: 'user-rank-unranked',
+      country: 'xx',
+      guid: 'abcdefg',
+      language: 'py3',
+      memory: 0,
+      penalty: 0,
+      runtime: 0,
+      score: 1,
+      status: 'ready',
+      submit_delay: 0,
+      time: new Date(),
+      username: 'omegaUp',
+      verdict: 'AC',
+    },
+  ];
+
+  it('Should handle details for a problem', () => {
     const wrapper = mount(problem_Details, {
       propsData: {
         initialTab: 'problems',
@@ -144,5 +163,73 @@ describe('Details.vue', () => {
 
     expect(wrapper.text()).toContain(sampleProblem.points);
     expect(wrapper.text()).toContain(time.formatDate(date));
+  });
+
+  it('Should handle run details for a problem', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem: sampleProblem,
+        user: user,
+        nominationStatus: nominationStatus,
+        initialClarifications: [],
+        activeTab: 'problems',
+        runs: runs,
+        allRuns: runs,
+        clarifications: <types.Clarification[]>[],
+        solutionStatus: 'not_found',
+        histogram: histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+      },
+    });
+
+    await wrapper.find('a[href="#runs"]').trigger('click');
+    await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
+    await wrapper
+      .find(
+        '.tab-content .show table tbody tr td div.dropdown ul li[data-actions-details] button',
+      )
+      .trigger('click');
+    expect(
+      wrapper.find('.tab-content .show div[data-overlay]').html(),
+    ).toBeTruthy();
+  });
+
+  it('Should handle run actions for a run in a given problem', async () => {
+    const wrapper = mount(problem_Details, {
+      propsData: {
+        initialTab: 'problems',
+        problem: sampleProblem,
+        user: user,
+        nominationStatus: nominationStatus,
+        initialClarifications: [],
+        activeTab: 'problems',
+        runs: runs,
+        allRuns: runs,
+        clarifications: <types.Clarification[]>[],
+        solutionStatus: 'not_found',
+        histogram: histogram,
+        showNewRunWindow: false,
+        publicTags: [],
+      },
+    });
+
+    await wrapper.find('a[href="#runs"]').trigger('click');
+    await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
+    await wrapper
+      .find(
+        '.tab-content .show table tbody tr td div.dropdown ul li[data-actions-rejudge] button',
+      )
+      .trigger('click');
+    expect(wrapper.emitted('rejudge')).toBeDefined();
+
+    await wrapper.find('td div.dropdown>button.btn-secondary').trigger('click');
+    await wrapper
+      .find(
+        '.tab-content .show table tbody tr td div.dropdown ul li[data-actions-disqualify] button',
+      )
+      .trigger('click');
+    expect(wrapper.emitted('disqualify')).toBeDefined();
   });
 });

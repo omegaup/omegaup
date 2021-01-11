@@ -254,7 +254,7 @@
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li v-if="showDetails">
+                  <li v-if="showDetails" data-actions-details>
                     <button
                       class="btn btn-link dropdown-item"
                       @click="$emit('details', run)"
@@ -262,7 +262,7 @@
                       {{ T.wordsDetails }}
                     </button>
                   </li>
-                  <li v-if="showRejudge">
+                  <li v-if="showRejudge" data-actions-rejudge>
                     <button
                       class="btn btn-link dropdown-item"
                       @click="$emit('rejudge', run)"
@@ -271,7 +271,7 @@
                     </button>
                   </li>
                   <li role="separator" class="divider"></li>
-                  <li v-if="showDisqualify">
+                  <li v-if="showDisqualify" data-actions-disqualify>
                     <button
                       class="btn btn-link dropdown-item"
                       @click="$emit('disqualify', run)"
