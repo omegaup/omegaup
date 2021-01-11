@@ -123,7 +123,7 @@ describe('Details.vue', () => {
     qualityHistogram: '[0,1,2,3,4]',
   };
 
-  const runs = [
+  const runs = <types.Run[]>[
     {
       alias: 'Hello',
       classname: 'user-rank-unranked',
@@ -174,8 +174,8 @@ describe('Details.vue', () => {
         nominationStatus: nominationStatus,
         initialClarifications: [],
         activeTab: 'problems',
-        runs: <types.Run[]>runs,
-        allRuns: <types.Run[]>runs,
+        runs: runs,
+        allRuns: runs,
         clarifications: <types.Clarification[]>[],
         solutionStatus: 'not_found',
         histogram: histogram,
@@ -205,8 +205,8 @@ describe('Details.vue', () => {
         nominationStatus: nominationStatus,
         initialClarifications: [],
         activeTab: 'problems',
-        runs: <types.Run[]>runs,
-        allRuns: <types.Run[]>runs,
+        runs: runs,
+        allRuns: runs,
         clarifications: <types.Clarification[]>[],
         solutionStatus: 'not_found',
         histogram: histogram,
