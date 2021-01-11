@@ -35,8 +35,12 @@ describe('ScoreboardContests.vue', () => {
       },
     });
 
-    expect(wrapper.find('tbody').text()).toContain('Hello omegaUp');
-    expect(wrapper.find('tbody').text()).toContain(T.wordsYes);
-    expect(wrapper.find('tbody').text()).toContain(2);
+    expect(wrapper.find('tbody tr td[data-contest-alias]').text()).toBe(
+      'Hello omegaUp',
+    );
+    expect(wrapper.find('tbody tr td[data-contest-only-ac').text()).toBe(
+      T.wordsYes,
+    );
+    expect(wrapper.find('tbody tr td[data-contest-weight]').text()).toBe('2');
   });
 });

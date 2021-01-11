@@ -69,14 +69,16 @@
       </thead>
       <tbody>
         <tr v-for="contest in contests" :key="contest.alias">
-          <td>
+          <td data-contest-alias>
             <a :href="`/arena/${contest.alias}/`">{{
               ui.contestTitle(contest)
             }}</a>
           </td>
-          <td>{{ contest.only_ac ? T.wordsYes : T.wordsNo }}</td>
-          <td>{{ contest.weight }}</td>
-          <td>
+          <td data-contest-only-ac>
+            {{ contest.only_ac ? T.wordsYes : T.wordsNo }}
+          </td>
+          <td data-contest-weight>{{ contest.weight }}</td>
+          <td data-contest-actions>
             <button
               class="btn btn-link"
               @click="$emit('remove-contest', contest.alias)"
