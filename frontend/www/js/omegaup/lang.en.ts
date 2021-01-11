@@ -421,6 +421,7 @@ const translations: { [key: string]: string; } = {
   groupEditScoreboardsContests: "Contests",
   groupEditScoreboardsContestsAdded: "Contest successfully added!",
   groupEditScoreboardsContestsRemoved: "Contest successfully removed!",
+  groupEditScoreboardsEdit: "Edit scoreboard %(scoreboard)",
   groupEditTitleWithName: "Edit group %(name)",
   groupNewFormCreateGroup: "Create group",
   groupNewFormDescription: "Group description",

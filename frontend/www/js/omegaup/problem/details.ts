@@ -357,6 +357,25 @@ OmegaUp.on('ready', () => {
           'change-show-run-location': (guid: string) => {
             window.location.hash = `#problems/show-run:${guid}/`;
           },
+          rejudge: (run: types.Run) => {
+            api.Run.rejudge({ run_alias: run.guid, debug: false })
+              .then(() => {
+                run.status = 'rejudging';
+                updateRunFallback(run.guid);
+              })
+              .catch(ui.ignoreError);
+          },
+          disqualify: (run: types.Run) => {
+            if (!window.confirm(T.runDisqualifyConfirm)) {
+              return;
+            }
+            api.Run.disqualify({ run_alias: run.guid })
+              .then(() => {
+                run.type = 'disqualified';
+                updateRunFallback(run.guid);
+              })
+              .catch(ui.ignoreError);
+          },
         },
       });
     },
