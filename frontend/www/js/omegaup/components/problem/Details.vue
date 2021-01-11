@@ -199,13 +199,26 @@
           :show-pager="true"
           :show-disqualify="true"
           :problemset-problems="[]"
-          @details="(run) => onShowRunDetails(run.guid)"
+          @details="(run) => onRunDetails(run.guid)"
           @rejudge="(run) => $emit('rejudge', run)"
           @disqualify="(run) => $emit('disqualify', run)"
           @filter-changed="
             (filter, value) => $emit('apply-filter', filter, value)
           "
         ></omegaup-arena-runs>
+        <omegaup-overlay
+          v-if="user.loggedIn"
+          :show-overlay="popupDisplayed !== PopupDisplayed.None"
+          @hide-overlay="onPopupDismissed"
+        >
+          <template #popup>
+            <omegaup-arena-rundetails-popup
+              v-show="popupDisplayed === PopupDisplayed.RunDetails"
+              :data="currentRunDetailsData"
+              @dismiss="onPopupDismissed"
+            ></omegaup-arena-rundetails-popup>
+          </template>
+        </omegaup-overlay>
       </div>
       <div
         class="tab-pane fade p-4"
@@ -434,11 +447,6 @@ export default class ProblemDetails extends Vue {
     this.popupDisplayed = PopupDisplayed.Promotion;
   }
 
-  onShowRunDetails(guid: string): void {
-    this.popupDisplayed = PopupDisplayed.RunDetails;
-    this.$emit('details', guid);
-  }
-
   onNewPromotionAsReviewer(): void {
     this.popupDisplayed = PopupDisplayed.Reviewer;
   }
@@ -511,7 +519,7 @@ export default class ProblemDetails extends Vue {
       }),
     );
 
-    this.$emit('change-show-run-location', this.guid);
+    this.$emit('change-show-run-location', guid);
   }
 
   @Emit('update:activeTab')
