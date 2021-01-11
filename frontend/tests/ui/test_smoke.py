@@ -119,6 +119,62 @@ def test_create_problem(driver):
                 (By.XPATH,
                  '//div[@data-overlay-popup]/form[@data-promotion-popup]')))
 
+    with driver.login_admin():
+        prepare_run(driver, problem_alias)
+        driver.wait.until(EC.element_to_be_clickable(
+            (By.XPATH, ('//a[contains(@href, "#runs")]')))).click()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//table[contains(concat(" ", normalize-space(@class), " "), '
+                 '" global ")]/tbody/tr/td/div[contains(concat(" ", '
+                 'normalize-space(@class), " "), " dropdown ")]/'
+                 'button'))).click()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//table[contains(concat(" ", normalize-space(@class), " "), '
+                 '" global ")]/tbody/tr/td/div[contains(concat(" ", '
+                 'normalize-space(@class), " "), " show ")]/ul/li['
+                 '@data-actions-details]/button'))).click()
+
+        assert (('show-run:') in
+                driver.browser.current_url), driver.browser.current_url
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//div[contains(concat(" ", normalize-space(@class), " "), '
+                 '" tab-content ")]/div[contains(concat(" ", '
+                 'normalize-space(@class), " "), " show ")]/div[@data-overlay]'
+                 '/div[@data-overlay-popup]/div/button'))).click()
+
+        assert driver.browser.current_url.endswith('#runs')
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//table[contains(concat(" ", normalize-space(@class), " "), '
+                 '" global ")]/tbody/tr/td/div[contains(concat(" ", '
+                 'normalize-space(@class), " "), " dropdown ")]/'
+                 'button'))).click()
+
+        driver.wait.until(
+            EC.element_to_be_clickable(
+                (By.XPATH,
+                 '//table[contains(concat(" ", normalize-space(@class), " "), '
+                 '" global ")]/tbody/tr/td/div[contains(concat(" ", '
+                 'normalize-space(@class), " "), " show ")]/ul/li['
+                 '@data-actions-rejudge]/button'))).click()
+
+        global_run = driver.browser.find_element_by_xpath(
+            '//table[contains(concat(" ", normalize-space(@class), " "), " '
+            'global ")]/tbody/tr/td[@data-run-status]/span')
+
+        assert global_run.text == 'rejudging'
+
 
 @util.annotate
 @util.no_javascript_errors()
