@@ -418,7 +418,6 @@ const translations: { [key: string]: string; } = {
   groupEditScoreboardsAdd: "Criar painel de avalia\u00e7\u00e3o",
   groupEditScoreboardsAddContest: "Adicionar concurso",
   groupEditScoreboardsAdded: "Painel adicionado com sucesso!",
-  groupEditScoreboardsContests: "Concursos",
   groupEditScoreboardsContestsAdded: "Concurso adicionado com sucesso!",
   groupEditScoreboardsContestsRemoved: "Concurso removido com sucesso!",
   groupEditScoreboardsEdit: "Editar painel de avalia\u00e7\u00e3o %(scoreboard)",
