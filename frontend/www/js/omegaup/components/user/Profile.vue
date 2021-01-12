@@ -21,11 +21,12 @@
               ></omegaup-user-username>
             </div>
             <div class="mb-3">
-              <h4 class="m-0">
-                {{
-                  profile.rankinfo.rank > 0 ? `#${profile.rankinfo.rank}` : ''
-                }}
+              <h4 v-if="profile.rankinfo.rank > 0" class="m-0">
+                {{ `#${profile.rankinfo.rank}` }}
               </h4>
+              <small v-else>
+                {{ rank }}
+              </small>
               <p>
                 <small>
                   {{ T.wordsRanking }}

@@ -74,18 +74,15 @@
 
         <div class="form-group row padding-field">
           <div class="col-sm-3">
-            <strong>{{ T.profileRank }}</strong
+            <strong>{{ T.profileAuthorRank }}</strong
             ><a href="https://blog.omegaup.com/categorias/" target="_blank"
               ><em class="glyphicon glyphicon-question-sign"></em
             ></a>
           </div>
           <div class="col-sm-9 field-data">
-            <strong
-              ><omegaup-user-username
-                :classname="profile.classname"
-                :username="rank"
-              ></omegaup-user-username
-            ></strong>
+            <strong>
+              {{ profile.rankinfo.author_ranking || T.authorRankUnranked }}
+            </strong>
           </div>
         </div>
       </div>
