@@ -75,7 +75,7 @@
                 data-button-manage-content
                 class="dropdown-item"
                 :href="`/course/${course.alias}/edit/#content`"
-                >{{ T.courseAddContent }}</a
+                >{{ T.wordsContentEdit }}</a
               >
             </div>
           </div>
