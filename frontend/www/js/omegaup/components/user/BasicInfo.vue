@@ -81,7 +81,7 @@
           </div>
           <div class="col-sm-9 field-data">
             <strong>
-              {{ profile.rankinfo.author_ranking || T.authorRankUnranked }}
+              {{ rank || T.authorRankUnranked }}
             </strong>
           </div>
         </div>

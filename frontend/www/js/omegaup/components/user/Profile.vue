@@ -25,11 +25,11 @@
                 {{ `#${profile.rankinfo.rank}` }}
               </h4>
               <small v-else>
-                {{ rank }}
+                <strong> {{ rank }} </strong>
               </small>
               <p>
                 <small>
-                  {{ T.wordsRanking }}
+                  {{ T.profileRank }}
                 </small>
               </p>
             </div>
