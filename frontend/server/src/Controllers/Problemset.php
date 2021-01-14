@@ -238,8 +238,6 @@ class Problemset extends \OmegaUp\Controllers\Controller {
      * @throws \OmegaUp\Exceptions\NotFoundException
      *
      * @return array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}, request: \OmegaUp\Request}
-     *         array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}, request: \OmegaUp\Request}
-     *         array{problemset: array{assignment: null|string, contest_alias: null|string, course: null|string, interview_alias: null|string, type: string}, request: \OmegaUp\Request|array{auth_token: string, contest_admin: bool, contest_alias: string, problemset_id: int, token: string}}
      *
      * @omegaup-request-param mixed $auth_token
      * @omegaup-request-param int $problemset_id

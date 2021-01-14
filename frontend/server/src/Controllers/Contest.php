@@ -1457,7 +1457,6 @@ class Contest extends \OmegaUp\Controllers\Controller {
             'contest' => $contest,
             'contest_admin' => $contestAdmin,
         ] = self::validateDetails($contestAlias, $r->identity, $token);
-        $token = $r->ensureOptionalString('token');
 
         return self::getContestDetails(
             $contestAlias,
