@@ -1,7 +1,7 @@
 {
   "es": {
     "name": "Puntuación 500",
-    "description": "El usuario ha conseguido una puntuación igual o mayor que 500."
+    "description": "Otorgado a personas que han conseguido una puntuación igual o mayor que 500."
   },
   "en": {
     "name": "500 score",
@@ -9,6 +9,6 @@
   },
   "pt": {
     "name": "Pontuação 500",
-    "description": "O usuário tem conseguido uma pontuação igual ou maior que 500."
+    "description": "Concedido a pessoas que obtiveram pontuação igual ou superior a 500."
   }
 }
