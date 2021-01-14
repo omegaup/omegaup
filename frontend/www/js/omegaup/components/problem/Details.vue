@@ -192,6 +192,7 @@
         :class="{ 'show active': selectedTab === 'runs' }"
       >
         <omegaup-arena-runs
+          :show-all-runs="true"
           :runs="allRuns"
           :show-details="true"
           :show-user="true"
@@ -252,9 +253,9 @@ import arena_Solvers from '../arena/Solvers.vue';
 import problem_Feedback from './Feedback.vue';
 import problem_SettingsSummary from './SettingsSummaryV2.vue';
 import problem_Solution from './Solution.vue';
-import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopupv2.vue';
+import qualitynomination_DemotionPopup from '../qualitynomination/DemotionPopup.vue';
 import qualitynomination_PromotionPopup from '../qualitynomination/PromotionPopup.vue';
-import qualitynomination_ReviewerPopupv2 from '../qualitynomination/ReviewerPopupv2.vue';
+import qualitynomination_ReviewerPopup from '../qualitynomination/ReviewerPopup.vue';
 import user_Username from '../user/Username.vue';
 import omegaup_Markdown from '../Markdown.vue';
 import omegaup_Overlay from '../Overlay.vue';
@@ -330,7 +331,7 @@ const numericSort = <T extends { [key: string]: any }>(key: string) => {
     'omegaup-problem-feedback': problem_Feedback,
     'omegaup-problem-settings-summary': problem_SettingsSummary,
     'omegaup-problem-solution': problem_Solution,
-    'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopupv2,
+    'omegaup-quality-nomination-reviewer-popup': qualitynomination_ReviewerPopup,
     'omegaup-quality-nomination-demotion-popup': qualitynomination_DemotionPopup,
     'omegaup-quality-nomination-promotion-popup': qualitynomination_PromotionPopup,
   },
@@ -418,12 +419,20 @@ export default class ProblemDetails extends Vue {
     );
   }
 
-  get parsedQualityHistogram(): number[] {
-    return JSON.parse(this.histogram?.qualityHistogram ?? '');
+  get parsedQualityHistogram(): null | number[] {
+    const qualityHistogram = this.histogram?.qualityHistogram;
+    if (!qualityHistogram) {
+      return null;
+    }
+    return JSON.parse(qualityHistogram);
   }
 
-  get parsedDifficultyHistogram(): number[] {
-    return JSON.parse(this.histogram?.difficultyHistogram ?? '');
+  get parsedDifficultyHistogram(): null | number[] {
+    const difficultyHistogram = this.histogram?.difficultyHistogram;
+    if (!difficultyHistogram) {
+      return null;
+    }
+    return JSON.parse(difficultyHistogram);
   }
 
   onNewSubmission(): void {
@@ -538,9 +547,14 @@ export default class ProblemDetails extends Vue {
 
   @Watch('initialPopupDisplayed')
   onPopupDisplayedChanged(newValue: PopupDisplayed): void {
+    this.popupDisplayed = newValue;
     if (newValue === PopupDisplayed.None) return;
     if (newValue === PopupDisplayed.RunSubmit) {
       this.onNewSubmission();
+      return;
+    }
+    if (newValue === PopupDisplayed.Promotion) {
+      ui.reportEvent('quality-nomination', 'shown');
       return;
     }
     if (newValue === PopupDisplayed.RunDetails && this.guid) {

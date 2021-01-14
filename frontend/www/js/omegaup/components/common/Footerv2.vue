@@ -147,7 +147,7 @@ export default class Footer extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @import '../../../../sass/main.scss';
 
 .common-footer {
@@ -175,6 +175,24 @@ export default class Footer extends Vue {
       // On small sizes, this will work as an inline grid (not 100% width)
       @media only screen and (max-width: 767px) {
         display: inline-grid;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0 auto;
+        text-align: center;
+        li {
+          margin-top: 8px;
+          padding: 0;
+          a {
+            text-decoration: none;
+            color: white;
+            &:hover {
+              color: gray;
+            }
+          }
+        }
       }
     }
   }
