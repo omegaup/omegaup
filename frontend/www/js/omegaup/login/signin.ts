@@ -26,7 +26,7 @@ OmegaUp.on('ready', () => {
   function redirect(isAccountCreation: boolean): void {
     const params = new URL(document.location.toString()).searchParams;
     const pathname = params.get('redirect');
-    if (pathname) {
+    if (pathname && pathname.indexOf('/') === 0) {
       window.location.href = pathname;
       return;
     }
