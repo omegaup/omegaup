@@ -166,7 +166,7 @@
           @emit-deny-request="(username) => $emit('deny-request', username)"
         ></omegaup-common-requests>
         <omegaup-contest-groups
-          :initial-groups="groups"
+          :data.sync="groups"
           @emit-add-group="(groupAlias) => $emit('add-group', groupAlias)"
           @emit-remove-group="(groupAlias) => $emit('remove-group', groupAlias)"
         ></omegaup-contest-groups>
