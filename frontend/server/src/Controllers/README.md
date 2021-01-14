@@ -438,10 +438,10 @@ Returns a report with all user activity for a contest.
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `token`         | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `token`         | `null\|string` |             |
 
 ### Returns
 
@@ -549,10 +549,10 @@ remaining time from the contest, or register the opened time.
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `token`         | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `token`         | `null\|string` |             |
 
 ### Returns
 
@@ -741,43 +741,16 @@ in the contest, \OmegaUp\Controllers\Contest::apiOpen() must be used.
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `token`         | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `token`         | `null\|string` |             |
 
 ### Returns
 
-| Name                        | Type                        |
-| --------------------------- | --------------------------- |
-| `admin`                     | `boolean`                   |
-| `admission_mode`            | `string`                    |
-| `alias`                     | `string`                    |
-| `description`               | `string`                    |
-| `director`                  | `string`                    |
-| `feedback`                  | `string`                    |
-| `finish_time`               | `Date`                      |
-| `languages`                 | `string[]`                  |
-| `needs_basic_information`   | `boolean`                   |
-| `opened`                    | `boolean`                   |
-| `original_contest_alias`    | `string`                    |
-| `original_problemset_id`    | `number`                    |
-| `partial_score`             | `boolean`                   |
-| `penalty`                   | `number`                    |
-| `penalty_calc_policy`       | `string`                    |
-| `penalty_type`              | `string`                    |
-| `points_decay_factor`       | `number`                    |
-| `problems`                  | `types.ProblemsetProblem[]` |
-| `problemset_id`             | `number`                    |
-| `requests_user_information` | `string`                    |
-| `scoreboard`                | `number`                    |
-| `show_penalty`              | `boolean`                   |
-| `show_scoreboard_after`     | `boolean`                   |
-| `start_time`                | `Date`                      |
-| `submission_deadline`       | `Date`                      |
-| `submissions_gap`           | `number`                    |
-| `title`                     | `string`                    |
-| `window_length`             | `number`                    |
+```typescript
+types.ContestDetails;
+```
 
 ## `/api/contest/list/`
 
@@ -852,13 +825,13 @@ Joins a contest - explicitly adds a identity to a contest.
 
 ### Parameters
 
-| Name                     | Type         | Description |
-| ------------------------ | ------------ | ----------- |
-| `contest_alias`          | `string`     |             |
-| `privacy_git_object_id`  | `string`     |             |
-| `statement_type`         | `string`     |             |
-| `share_user_information` | `bool\|null` |             |
-| `token`                  | `mixed`      |             |
+| Name                     | Type           | Description |
+| ------------------------ | -------------- | ----------- |
+| `contest_alias`          | `string`       |             |
+| `privacy_git_object_id`  | `string`       |             |
+| `statement_type`         | `string`       |             |
+| `share_user_information` | `bool\|null`   |             |
+| `token`                  | `null\|string` |             |
 
 ### Returns
 
@@ -1043,15 +1016,12 @@ Returns a detailed report of the contest
 
 ### Description
 
-Given a contest_alias and user_id, returns the role of the user within
-the context of a contest.
-
 ### Parameters
 
-| Name            | Type    | Description |
-| --------------- | ------- | ----------- |
-| `contest_alias` | `mixed` |             |
-| `token`         | `mixed` |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `token`         | `null\|string` |             |
 
 ### Returns
 
@@ -1131,10 +1101,10 @@ Returns the Scoreboard events
 
 ### Parameters
 
-| Name            | Type     | Description |
-| --------------- | -------- | ----------- |
-| `contest_alias` | `string` |             |
-| `token`         | `mixed`  |             |
+| Name            | Type           | Description |
+| --------------- | -------------- | ----------- |
+| `contest_alias` | `string`       |             |
+| `token`         | `null\|string` |             |
 
 ### Returns
 
