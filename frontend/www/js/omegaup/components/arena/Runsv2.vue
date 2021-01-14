@@ -27,7 +27,7 @@
 
             <label
               >{{ T.wordsVerdict }}:
-              <select v-model="filterVerdict">
+              <select v-model="filterVerdict" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="AC">AC</option>
                 <option value="PA">PA</option>
@@ -46,7 +46,7 @@
 
             <label
               >{{ T.wordsStatus }}:
-              <select v-model="filterStatus">
+              <select v-model="filterStatus" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="new">new</option>
                 <option value="waiting">waiting</option>
@@ -58,7 +58,7 @@
 
             <label
               >{{ T.wordsLanguage }}:
-              <select v-model="filterLanguage">
+              <select v-model="filterLanguage" class="form-control">
                 <option value="">{{ T.wordsAll }}</option>
                 <option value="cpp17-gcc">C++17 (g++ 9.3)</option>
                 <option value="cpp17-clang">C++17 (clang++ 10.0)</option>
